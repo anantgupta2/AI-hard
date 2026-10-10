@@ -185,6 +185,15 @@ Metrics:
   - An item is eligible only if it exists as Lean declarations that the comparator target depends on. Five N3 items (046, 079, 357, 368, 367) are excluded on this ground; they remain candidates, but cannot be tested in Lean.
   - Each shortlisted item gets a downstream list (`data/pilot/<fid>/downstream.json`, brief `docs/downstream_agent_prompt.md`): speedup targets, open problems and negative controls, each scored for whether it can be stated in Lean now.
   - Corollaries of the item's theorem are recorded separately and do not count as reuse of the device.
+- **Informal eureka list** (decided 2026-10-10): N3 items that cannot enter the Lean shortlist (no Lean declarations behind the comparator, or no Lean at all) go in a separate list, `data/eureka_informal.json`.
+  - It holds the five `excluded_no_lean` items and the N3 items of the influential-problems pass that lack Lean.
+  - These items are graded with the same N-tests at text level. Their discoverability and speedup protocols are written informally (LLM-judge and pen-and-paper), and they never count as confirmed eureka steps.
+  - An item moves to the Lean shortlist if it is later formalized.
+
+**Influential-problems pass** (added 2026-10-10): the release's highest-profile results get the full family + novelty analysis whether or not they are formalized, so that the most important claims are not missed by the Lean-only filter.
+- Lean-formalized: 103 (L = RL = BPL), 107 (ω ≤ 9/4), 003 (quasi-Riemann hypothesis, zero-free for Re s > 7/8), 293 (hyperinvariant-subspace counterexample) and 158 (the plane is not 5-colorable). Their comparators are compiled locally; eligible N3 items join the Lean shortlist.
+- Not formalized: 004 (Hilbert's tenth problem over ℚ), 002 (BSD formula in Selmer coranks 0 and 1) and 074 (Kakeya in R^3 maximal and R^4 dimension). These are analyzed fully, and their N3 items go on the informal list only.
+- 102 (Unique Games) already has its analyses; its comparators are compiled in this pass.
 
 **Calibration items.**
 - **Positive control:** Cook's ER extension variables for PHP, formalized as a small Lean or DIMACS example. These must pass tests 2–4.
