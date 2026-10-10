@@ -25,6 +25,23 @@ v2 changes (family 287 analysis, 2026-10-09):
     ranks definitions by dominated share / statement use rather than raw closure share, and
     also emits lemma candidates (`candidate_lemmas`).
 
+v3 changes (family 103 bug, 2026-10-10):
+  * generalized field notation `x.foo` now follows Lean: if `x` is a local whose binder type
+    has a head constant `C` (signature binders, section `variable`s, or `have`/`fun`/`∀`/`∃`
+    binders in the body), `x.foo` resolves to `C.foo` exactly. An external `C` (ℕ, ℝ, Finset,
+    Mathlib predicates ...) gives no edge. v2 linked `x.foo` to any unique in-tree decl with
+    short name `foo`, e.g. `T.factorial` (`T : ℕ`, i.e. `Nat.factorial`) -> `Hie.factorial`
+    in 103, which gave Hie.residual/substochastic/factorial 912 spurious dependents. Locals of
+    unknown type (no binder type, a type variable, `h : H.Good`) keep the v2 heuristic;
+  * locals shadow globals: a bound name is not looked up as a global constant (a body binder
+    only from its binding position on);
+  * a capitalized head that is not a bound local (e.g. `Nat.`, `Pi.`, `Fin.`, `Relation.`) is
+    a namespace: the token resolves only to a decl whose full name ends with the whole dotted
+    token, never by its last component (v2: `Pi.add_apply` -> `Hie.add_apply`);
+  * `open B` also resolves `B` through namespaces opened earlier (`open SiteX` then
+    `open Line` opens `SiteX.Line`), as Lean 4 does, and `open _root_.A.B` is handled.
+  Regression checks: scripts/test_extract_lean.py.
+
 Usage: python scripts/extract_lean.py 173 [179 132 ...] [--repo ...] [--out data/items]
 """
 
@@ -61,6 +78,21 @@ GENERIC_FIELDS = {
     "nonneg", "ne'", "bot", "top", "of", "single", "sum", "prod", "support", "mem", "subset", "isClosed", "isOpen",
     "map_mul", "map_one", "map_add", "map_zero", "isSelfAdjoint", "isIdempotentElem", "toStarAlgHom", "bijective",
 }
+NAME = r"[^\W\d][\w'!?₀-₉ₐ-ₜ]*"
+NOTATION_TYPES = {"ℕ": "Nat", "ℤ": "Int", "ℚ": "Rat", "ℝ": "Real", "ℂ": "Complex", "ℝ≥0": "NNReal", "ℝ≥0∞": "ENNReal"}
+# a type with one of these at bracket depth 0 is not `C args`: its head constant is not read off the text
+TYPE_INFIX = set("≤<≥>=≠∈∉⊆⊂⊇⊃∣∧∨↔→×∘•+*/^⁻∀∃λ|")
+BINDER_RE = re.compile(r"[\(\{⦃\[]\s*(%s(?:\s+%s)*)\s*(:(?!=)|[\)\}⦄\]])" % (NAME, NAME))
+BODY_TYPED_RE = re.compile(r"(?:\bfun|λ|∀|∃!?|\bhave|\blet|\bset)\s*\(?\s*(%s(?:\s+%s)*)\s*:(?!=)" % (NAME, NAME))
+# untyped binders of plain names: `let A := ..`, `fun x y =>`, `intro x y`, `∀ x y, ..`
+BODY_UNTYPED_RE = re.compile(
+    r"(?:\bfun|λ|∀|∃!?|\bintros?|\brintro|\blet|\bhave|\bset)[ \t]+((?:%s[ \t]*)+)(?=:=|=>|[,↦\n]|$)" % NAME
+)
+BODY_BOUND_RE = re.compile(
+    r"(?:\bfun|λ|∀|∃!?|\bintros?|\brintro|\bobtain|\brcases|\bwith|\bchoose|\bgeneralize|\bhave|\blet|\bset|^\s*\|)"
+    r"([^\n:=↦,]*)", flags=re.M
+)
+ANON_BOUND_RE = re.compile(r"(?<=[⟨,])\s*(%s)\s*(?=[,⟩])" % NAME)
 
 
 def strip_comments(src):
@@ -88,6 +120,113 @@ def split_signature(text):
     return n
 
 
+def binder_part_end(sig):
+    """Index of the first `:` at bracket depth 0 (start of the declared type), else len(sig)."""
+    depth = 0
+    for i, c in enumerate(sig):
+        if c in "([{⟨⦃":
+            depth += 1
+        elif c in ")]}⟩⦄":
+            depth = max(0, depth - 1)
+        elif c == ":" and depth == 0 and not sig.startswith(":=", i):
+            return i
+    return len(sig)
+
+
+def type_extent(text, i):
+    """End of a binder type starting at text[i]: an unmatched close bracket, or `,` `:=` `=>` `↦`
+    or a newline at depth 0."""
+    depth, j, n = 0, i, len(text)
+    while j < n:
+        c = text[j]
+        if c in "([{⟨⦃":
+            depth += 1
+        elif c in ")]}⟩⦄":
+            if depth == 0:
+                return j
+            depth -= 1
+        elif depth == 0 and (c in ",\n" or text.startswith((":=", "=>", "↦"), j)):
+            return j
+        j += 1
+    return n
+
+
+def type_head(ty):
+    """Head constant of a binder type written `C args` (ℕ, ℝ, ... mapped to Nat, Real, ...);
+    None for arrows, relations, binders and anything else whose head is not read off the text."""
+    ty = " ".join(ty.split()).lstrip("@")
+    if ty in NOTATION_TYPES:
+        return NOTATION_TYPES[ty]
+    depth = 0
+    for c in ty:
+        if c in "([{⟨⦃":
+            depth += 1
+        elif c in ")]}⟩⦄":
+            depth -= 1
+        elif depth == 0 and c in TYPE_INFIX:
+            return None
+    m = IDENT_RE.match(ty)
+    return NOTATION_TYPES.get(m.group(0), m.group(0)) if m else None
+
+
+def binder_info(binder_part, var_text, body):
+    """Locals of one declaration: (strong, weak, types, bind_pos).
+    strong = names bound by a binder group at depth 0 of the signature's binder part or of the
+    section `variable`s, or by a `fun`/`∀`/`∃`/`have`/`let`/`set`/`intro` binder in the body;
+    weak = strong plus names bound by intro/obtain/rcases/with/`|`/⟨..⟩ patterns;
+    types = {name: head constant of its binder type, or None if unknown or conflicting}.
+    Signature binders win over section variables, which win over body binders.
+    bind_pos = {name: (scope start, binder spans)} for names bound only in the body: the scope
+    starts at the end of the line of the first binding, so earlier occurrences and the binder's
+    own right-hand side (`let P := P δ x`) are not shadowed (`have : A = 5` ... `let A := ..`)."""
+    levels = []
+    for text in (binder_part, var_text):
+        lv, depth, pos = defaultdict(set), 0, 0
+        for m in BINDER_RE.finditer(text):
+            for c in text[pos : m.start()]:
+                depth += c in "([{⟨⦃"
+                depth -= c in ")]}⟩⦄"
+            pos = m.start()
+            if depth != 0:
+                continue  # nested group: a type ascription inside a binder type, not a binder
+            opener, typed = text[m.start()], m.group(2) == ":"
+            if opener == "[" and not typed:
+                continue  # anonymous instance binder `[C α]` binds nothing
+            head = type_head(text[m.end() : type_extent(text, m.end())]) if typed else None
+            for n in m.group(1).split():
+                lv[n].add(head)
+        levels.append(lv)
+    lv, first, spans = defaultdict(set), {}, defaultdict(list)
+    for head, m in [(None, m) for m in BODY_UNTYPED_RE.finditer(body)] + \
+            [(type_head(body[m.end() : type_extent(body, m.end())]), m) for m in BODY_TYPED_RE.finditer(body)]:
+        # scope starts after the line holding the binder's `:=` (which may follow a line break:
+        # split_signature cuts `.. = let P\n:= P δ x` at the let's own `:=`)
+        rest = body[m.end(1) :]
+        j = m.end(1) + len(rest) - len(rest.lstrip())
+        eol = body.find("\n", j + 2 if body.startswith(":=", j) else m.end(1))
+        for n in m.group(1).split():
+            lv[n].add(head)
+            if n not in first or m.start(1) < first[n][0]:
+                first[n] = (m.start(1), len(body) if eol < 0 else eol)
+            spans[n].append((m.start(1), m.end(1)))
+    levels.append(lv)
+    types = {}
+    for lv in levels:
+        for n, heads in lv.items():
+            if n not in types:
+                types[n] = next(iter(heads)) if len(heads) == 1 else None
+    strong = set(types)
+    weak = set(strong)
+    for m in BODY_BOUND_RE.finditer(body):
+        weak.update(t for t in IDENT_RE.findall(m.group(1)) if "." not in t)
+    weak.update(ANON_BOUND_RE.findall(body))
+    bind_pos = {}
+    for n, (_, scope) in first.items():
+        if n not in levels[0] and n not in levels[1]:
+            bind_pos[n] = (scope, spans[n])
+    return strong, weak, types, bind_pos
+
+
 def parse_file(path, rel):
     raw = path.read_text(encoding="utf-8", errors="replace")
     docs = {}  # line index -> preceding docstring
@@ -96,7 +235,7 @@ def parse_file(path, rel):
         docs[end_line + 1] = " ".join(m.group(1).split())
     lines = strip_comments(raw).split("\n")
     imports = [l.split()[1] for l in lines if l.startswith("import ")]
-    # scope stack: list of dicts {kind, parts, opens}
+    # scope stack: list of dicts {kind, parts, opens, vars}
     stack, decls, cur = [], [], None
 
     def cur_ns():
@@ -108,16 +247,20 @@ def parse_file(path, rel):
             out.extend(fr["opens"])
         return out
 
+    def cur_vars():
+        return file_vars + [v for fr in stack for v in fr["vars"]]
+
     file_opens = []  # opens at file top level
+    file_vars = []  # `variable` command texts at file top level
     for i, line in enumerate(lines):
         s = line.strip()
         top = not line.startswith(("  ", "\t"))
         if top and s.startswith("namespace "):
-            stack.append({"kind": "namespace", "parts": s.split()[1].split("."), "opens": []})
+            stack.append({"kind": "namespace", "parts": s.split()[1].split("."), "opens": [], "vars": []})
             cur = None
             continue
         if top and (s.startswith("section") or s.startswith("noncomputable section")):
-            stack.append({"kind": "section", "parts": [], "opens": []})
+            stack.append({"kind": "section", "parts": [], "opens": [], "vars": []})
             cur = None
             continue
         if top and (s == "end" or s.startswith("end ")):
@@ -145,6 +288,14 @@ def parse_file(path, rel):
                 target.append((tuple(ns_here), t))
             cur = None
             continue
+        if top and s.startswith("variable"):
+            # binder text of the command, including indented continuation lines
+            j = i + 1
+            while j < len(lines) and lines[j].startswith((" ", "\t")) and lines[j].strip():
+                j += 1
+            (stack[-1]["vars"] if stack else file_vars).append(" ".join(l.strip() for l in lines[i:j])[len("variable"):])
+            cur = None
+            continue
         m = DECL_RE.match(line) if top else None
         if m:
             kind, name = m.group(1), m.group(2)
@@ -165,6 +316,7 @@ def parse_file(path, rel):
                 "line": i + 1,
                 "namespace": ".".join(ns),
                 "opens": [list(o) for o in file_opens + cur_opens()],
+                "vars": " ".join(cur_vars()),
                 "doc": docs.get(i, docs.get(i - 1, "")),
                 "text": [line],
                 "local": "local " in line.split(kind)[0],
@@ -271,9 +423,16 @@ def build(fid, repo, catalog, follow_imports=True, keep_body=False):
         for a in d["aliases"]:
             alias_of.setdefault(a, d["name"])
     names = set(by_name) | set(alias_of)
-    short_index = defaultdict(set)
+    short_index = defaultdict(set)  # last component -> decls
+    suffix_index = defaultdict(set)  # dotted suffix of >= 2 components -> decls
+    known_ns = set()  # every proper prefix of an in-tree name
     for n in names:
-        short_index[n.split(".")[-1]].add(alias_of.get(n, n))
+        parts = n.split(".")
+        short_index[parts[-1]].add(alias_of.get(n, n))
+        for i in range(1, len(parts) - 1):
+            suffix_index[".".join(parts[i:])].add(alias_of.get(n, n))
+        for i in range(1, len(parts)):
+            known_ns.add(".".join(parts[:i]))
 
     def lookup(full, d):
         r = full if full in by_name else alias_of.get(full)
@@ -284,37 +443,38 @@ def build(fid, repo, catalog, follow_imports=True, keep_body=False):
     def visible(cands, d):
         return {c for c in cands if by_name[c]["_pos"] < d["_pos"]}
 
-    def resolve(tok, d):
-        tok = tok.lstrip("@")
-        if tok.startswith("_root_."):
-            return lookup(tok[7:], d), "root"
+    canon_cache = {}
+
+    def canonical_opens(opens):
+        """`open B` (issued in namespace A.C) opens A.C.B, A.B, B, and P.B for every namespace P
+        opened before it; keep the in-tree ones, in order."""
+        key = tuple((tuple(c), o) for c, o in opens)
+        if key not in canon_cache:
+            out = []
+            for ctx, o in key:
+                if o.startswith("_root_."):
+                    cands = [o[len("_root_.") :]]
+                else:
+                    cands = [".".join(ctx[:k] + (o,)) for k in range(len(ctx), -1, -1)] + [p + "." + o for p in out]
+                out += [c for c in dict.fromkeys(cands) if c in known_ns and c not in out]
+            canon_cache[key] = out
+        return canon_cache[key]
+
+    def resolve_global(tok, d):
+        """Lean name resolution of a constant: enclosing namespaces of the decl, opens, root."""
         ns = d["name"].split(".")[:-1]  # namespaces of the decl's own full name
         for k in range(len(ns), -1, -1):
             r = lookup(".".join(ns[:k] + [tok]), d)
             if r:
                 return r, "ns"
-        for ctx, o in d["opens"]:
-            ctx = list(ctx)
-            for k in range(len(ctx), -1, -1):
-                r = lookup(".".join(ctx[:k] + [o, tok]), d)
-                if r:
-                    return r, "open"
-        parts = tok.split(".")
-        # projection on a declared constant: `foo.exists`, `foo.le.trans` -> edge to `foo`
-        # (the longest dotted prefix that resolves as a declaration in scope)
-        for k in range(len(parts) - 1, 0, -1):
-            head = ".".join(parts[:k])
-            for j in range(len(ns), -1, -1):
-                r = lookup(".".join(ns[:j] + [head]), d)
-                if r:
-                    return r, "proj"
-            for ctx, o in d["opens"]:
-                ctx = list(ctx)
-                for j in range(len(ctx), -1, -1):
-                    r = lookup(".".join(ctx[:j] + [o, head]), d)
-                    if r:
-                        return r, "proj"
-        # generalized field notation: x.foo / x.foo.bar where x is a local
+        for o in d["canon_opens"]:
+            r = lookup(o + "." + tok, d)
+            if r:
+                return r, "open"
+        return None, None
+
+    def field_heuristic(parts, d):
+        # field notation on a term of unknown type: a unique, non-generic short name
         for k in range(1, len(parts)):
             suffix = parts[k]
             if suffix in GENERIC_FIELDS:
@@ -324,8 +484,80 @@ def build(fid, repo, catalog, follow_imports=True, keep_body=False):
                 return next(iter(c)), "field"
         return None, None
 
+    def field_on_local(parts, d):
+        """`x.foo` with x a bound local: Lean looks up `C.foo` for the head constant C of x's type."""
+        ty = d["ltypes"].get(parts[0])
+        if ty is None or not is_namespace_head(ty.split(".")[0], d):
+            return field_heuristic(parts, d)  # unknown, a type variable, or `H.Correct` with H local
+        X, _ = resolve_global(ty, d)
+        if not X:  # an in-tree type behind an `open` the parser missed: unique full-name suffix
+            c = {x for x in visible(suffix_index.get(ty, set()) if "." in ty else short_index.get(ty, set()), d)
+                 if by_name[x]["kind"] in DEF_KINDS and x.endswith("." + ty)}
+            X = next(iter(c)) if len(c) == 1 else None
+        if X:  # in-tree type; fall back for parent structures / definitions that unfold
+            r = lookup(X + "." + parts[1], d)
+            return (r, "typed") if r else field_heuristic(parts, d)
+        for c in [ty] + [o + "." + ty for o in d["canon_opens"]]:
+            r = lookup(c + "." + parts[1], d)  # in-tree extension of an external type
+            if r:
+                return r, "typed"
+        return None, "external"
+
+    def is_namespace_head(head, d):
+        return (head[0].isupper() and head not in d["weak"]
+                and not re.fullmatch(r"[^\W\d][\d'!?₀-₉ₐ-ₜ]*", head))  # `T`, `A'`, `M₁` are locals
+
+    def shadowed(head, tok, d):
+        if head not in d["strong"]:
+            return False
+        if head not in d["bind_pos"]:
+            return True  # signature binder or section variable
+        scope, spans = d["bind_pos"][head]
+        found = False
+        for m in re.finditer(r"(?<![\w.'])%s(?![\w'!?₀-₉ₐ-ₜ]|\.[^\W\d])" % re.escape(tok), d["btext"]):
+            if m.start() < scope and not any(a <= m.start() < b for a, b in spans):
+                return False  # a use before the body binder is in scope: the global
+            found = True
+        return found  # not found: the token only occurs in the signature's binder part
+
+    def resolve(tok, d):
+        tok = tok.lstrip("@")
+        if tok.startswith("_root_."):
+            return lookup(tok[7:], d), "root"
+        parts = tok.split(".")
+        if shadowed(parts[0], tok, d):  # a bound local shadows every global of the same name
+            return field_on_local(parts, d) if len(parts) > 1 else (None, None)
+        r, how = resolve_global(tok, d)
+        if r:
+            return r, how
+        # projection on a declared constant: `foo.exists`, `foo.le.trans` -> edge to `foo`
+        # (the longest dotted prefix that resolves as a declaration in scope)
+        for k in range(len(parts) - 1, 0, -1):
+            r, _ = resolve_global(".".join(parts[:k]), d)
+            if r:
+                return r, "proj"
+        if len(parts) == 1:
+            return None, None
+        if is_namespace_head(parts[0], d):
+            # a qualified name (`Nat.factorial`, `Pi.add_apply`) that is not in scope: external,
+            # unless one decl's full name ends with the whole token (or a dotted prefix of it,
+            # then projection) - never matched by its last component alone
+            for k in range(len(parts), 1, -1):
+                c = visible(suffix_index.get(".".join(parts[:k]), set()), d)
+                if len(c) == 1:
+                    return next(iter(c)), "suffix"
+            return None, "qualified"
+        return field_heuristic(parts, d)
+
+    for d in decls:
+        sig = d["signature"]
+        cut = binder_part_end(sig)
+        d["btext"] = sig[cut:] + "\n" + d["body"]
+        d["strong"], d["weak"], d["ltypes"], d["bind_pos"] = binder_info(sig[:cut], d["vars"], d["btext"])
+        d["canon_opens"] = canonical_opens(d["opens"])
+
     mathlib_refs = Counter()
-    n_field = 0
+    n_field = n_typed = n_suffix = n_external = 0
     pending = {}  # decl name -> unresolved field-notation tokens (suffix, count, in_sig)
     for d in decls:
         sig_toks = Counter(IDENT_RE.findall(d["signature"]))
@@ -345,7 +577,7 @@ def build(fid, repo, catalog, follow_imports=True, keep_body=False):
                     unresolved.append((suffix, cnt, ("." + suffix) in d["signature"]))
             else:
                 tgt, how = resolve(t, d)
-                if tgt is None and "." in t:
+                if tgt is None and how is None and "." in t:
                     suffix = t.split(".")[-1]
                     if suffix not in GENERIC_FIELDS and len(visible(short_index.get(suffix, ()), d)) > 1:
                         unresolved.append((suffix, cnt, t in sig_toks))
@@ -355,7 +587,10 @@ def build(fid, repo, catalog, follow_imports=True, keep_body=False):
                 if t in sig_toks or (t.startswith("\u0000.") and ("." + t[2:]) in d["signature"]):
                     uses_sig.add(tgt)
                 n_field += how in ("field", "dot")
+                n_typed += how == "typed"
+                n_suffix += how == "suffix"
             elif not tgt and not t.startswith("\u0000") and "." in t:
+                n_external += how in ("external", "qualified")
                 head = t.lstrip("@").split(".")[0]
                 if len(head) >= 3 and head[0].isascii() and head[0].isupper():
                     mathlib_refs[head] += cnt
@@ -497,8 +732,8 @@ def build(fid, repo, catalog, follow_imports=True, keep_body=False):
         if not keep_body:
             d.pop("body")
             d.pop("occ")
-        d.pop("opens")
-        d.pop("_pos")
+        for k in ("opens", "vars", "canon_opens", "strong", "weak", "ltypes", "bind_pos", "btext", "_pos"):
+            d.pop(k)
 
     # ---- imports ----------------------------------------------------------------------
     ext = defaultdict(set)
@@ -539,6 +774,9 @@ def build(fid, repo, catalog, follow_imports=True, keep_body=False):
         "n_proof_dag_theorems": len(reach_thms),
         "n_proof_dag_with_siblings": len(reach_sib),
         "n_field_notation_links": n_field,
+        "n_typed_field_links": n_typed,
+        "n_qualified_suffix_links": n_suffix,
+        "n_external_field_or_qualified_refs": n_external,
         "n_context_disambiguated_links": n_ctx,
         "target_signature_closure": sorted(sig_closure),
         "import_groups": {k: sorted(v) for k, v in sorted(ext.items())},
