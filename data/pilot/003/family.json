@@ -1,0 +1,2233 @@
+{
+ "family": "003",
+ "title": "The quasi-Riemann hypothesis",
+ "manuscripts": [
+  {
+   "key": "Q",
+   "title": "The Quasi-Riemann Hypothesis: A Zero-Free Half-Plane Re s>7/8",
+   "date": "2026-09-30",
+   "dir": "data/raw/openai-math/preprints/The-Quasi-Riemann-Hypothesis-September-30-2026",
+   "main_tex": "build/paper.tex (16,677 lines, single file, 28 bibitems, 151 theorem-like environments)",
+   "lean": "yes: comparators QuasiRiemannHypothesis, DirichletSevenEighths, HeckeSevenEighths"
+  },
+  {
+   "key": "A",
+   "title": "The Quasi-Riemann Hypothesis (alternate 11/12 proof)",
+   "date": "2026-10-05",
+   "dir": "data/raw/openai-math/preprints/The-Quasi-Riemann-Hypothesis-October-5-2026",
+   "main_tex": "build/paper2.tex (3,988 lines, 24 environments)",
+   "lean": "no separate formalization (lean/docs/003.md lists only Q and S). Its key Prop thm:ms coincides with Q eq:raw-moment, which has a Lean counterpart (Hecke/InverseAmplificationRaw.lean) on the 7/8 path (text-level inference)."
+  },
+  {
+   "key": "S",
+   "title": "Uniform exclusion of Landau-Siegel zeros",
+   "date": "2026-10-01",
+   "dir": "data/raw/openai-math/preprints/Uniform-exclusion-of-Landau-Siegel-zeros-October-1-2026",
+   "main_tex": "build/paper.tex (773 lines, 13 bibitems)",
+   "lean": "yes: comparator SiegelZeros (two theorem names)"
+  }
+ ],
+ "file_line_convention": "Q: = 7/8 manuscript build/paper.tex; A: = alternate 11/12 manuscript build/paper2.tex; S: = Siegel manuscript build/paper.tex; Lean paths relative to data/raw/openai-math/lean/",
+ "commit": "fd4aeeb",
+ "analyst_role": "family analyst (paper + Lean, text level). Lean was NOT compiled or run (lake/lean deliberately not invoked; the orchestrator compiles comparators). Q read in full for introduction, Sections 2-3, preliminaries, probe, Poisson/Euler, detector, sieve, 11/12 conclusion, compensated probe, inverse/plain moment statements and conclusion; the long inductive proofs (Q:9783-14983) skimmed only. A: introduction, outline, Sections 3-4 statements read in full; proofs skimmed. S: read in full and every step re-derived. scripts/extract_lean.py run with --out to the scratchpad (not data/items) to respect the write restriction.",
+ "base_library_L": "Mathlib d13f23b (has riemannZeta, DirichletCharacter.LFunction, WeakFEPair/Hurwitz kernels; no cubic theta, no Hecke L-functions over Q(sqrt-3), no large sieves) + bibliographies of Q (28), A (~70) and S (13). L contains one model-produced item: OpenAICubicFirstMoment (family 023), cited by Q as 'not used here'; A cites Q (OpenAI26).",
+ "lean": {
+  "exists": true,
+  "dirs": [
+   "OAI/NumberTheory/DirichletL (2,926 files)",
+   "OAI/NumberTheory/SiegelZeros (306 files)"
+  ],
+  "size": "3,232 files, ~350k lines, 31,058 declarations (24,200 theorems, 5,573 defs, 344 abbrevs, 93 structures); no other OAI dir imported.",
+  "external_imports": "Mathlib; PrimeNumberTheoremAnd (pinned c39a751, Oct 1 2026) modules SiegelZeros.HadamardSupport (104 imports) and Wiener (2); RellichKondrachov (1 import, CubicSieve/RadialWindows or ReopenedFibers). The PrimeNumberTheoremAnd/SiegelZeros/*.lean files (6,754 lines: Hadamard factorization support, NOTICE credits Kebekus/Cipollina) are ADDED by lean/patches/PrimeNumberTheoremAnd-lean4341.patch, i.e. OpenAI-supplied code inside a third-party package.",
+  "comparators": {
+   "QuasiRiemannHypothesis": "import Mathlib; theorem OAI.riemannZeta_ne_zero_of_seven_eighths_lt_re {s : C} (hs : (7/8:R) < s.re) : riemannZeta s != 0. Permitted axioms propext, Quot.sound, Classical.choice; enable_nanoda false; solution module OAI.NumberTheory.DirichletL.Nonvanishing.",
+   "DirichletSevenEighths": "forall q [NeZero q] (chi : DirichletCharacter C q) s, 7/8 < s.re -> not (chi = 1 and s = 1) -> DirichletCharacter.LFunction chi s != 0 (Mathlib's LFunction; covers imprimitive characters and q=1).",
+   "HeckeSevenEighths": "Challenge file itself defines ~30 declarations (ThetaProduct.product/rescale, EisensteinTheta.parityPair, HeckeTheta.finitePair/pair/completed/latticeL, HeckeFamily.K=CyclotomicField 3 Q, Character structure, coefficients, continuedLattice, LFunction := continuedLattice/6) and states LFunction chi s != 0 for 7/8 < Re s, not (chi.residue = 1 and s = 1). All challenge definitions occur verbatim (whitespace-normalized) in the library.",
+   "SiegelZeros": "exists c>0, forall q>=3, primitive, nonprincipal, real-valued chi, 0<beta<1, chi.LFunction beta = 0 -> c <= (1-beta) log q (two equivalent formulations)."
+  },
+  "target_dag": {
+   "zeta": "18,626 declarations reachable (14,455 theorems, 4,166 defs). Shares: Moments 16.5%, Eisenstein (cubic theta built from hyperbolic 3-space spectral theory) 15.4%, Detector 11.9%, Descent 6.4%, CubicSieve 6.1%, Hecke 6.0%, Inversion 5.0%, GaussSum 4.7%, QuadraticSieve 4.3%, Reflection 3.5%, PrimeRows 3.3%, Energy 3.2%.",
+   "siegel": "2,616 declarations reachable; LocalAlgebra 20.3%, Structure 15.6%, DirichletL/Hecke helpers 8.4%, Intersection 7.0%, EntireFunctions 6.7%, Hilbert 5.2%, Differentials 5.1%, Selection 5.1%, Determinants 5.0%. The Siegel DAG contains NO declaration of the 7/8 chain (no HeckeZeroSupremum, ProbeFinalAssembly or *seven_eighths*): an independent formal proof.",
+   "note": "extract_lean.py dominated shares are tiny (max 0.15 for detector_certified_bands) because the text-level DAG is huge and diluted; directory shares are used as the load-bearing proxy."
+  },
+  "route_differences": [
+   "Lean 7/8 proof appears to go directly from 'beta > 7/8' (DetectorCertifiedBands, FinalAssemblyCertifiedBands.lean:28-34; HighData has kappa<=1 and only beta>=51/100 hypotheses) without the paper's Part I bootstrap (Q:6812-6822 uses Theorem 11/12 to get Delta<=1/24, kappa<=5/6). Text-level, moderate confidence.",
+   "Lean Siegel proof replaces S's nearest-point/Lagrange interpolation lemma (S03) by a local isolated Bezout bound via local lengths and regular sequences (SiegelZeros/Intersection, Hilbert, LocalAlgebra; namespace WeightedTorusJets suggests a jet/derivation formulation as in S Remark S:434-443).",
+   "Cited inputs of the papers (Patterson/Kubota cubic theta and cusp expansions via DR, Goldmakher-Louvel quadratic large sieve, BGL sextic sieve, prime ideal theorem in ray classes, Hecke functional equation, Hadamard product) are all re-proved in Lean, since Mathlib lacks them."
+  ]
+ },
+ "trust_surface": {
+  "grep_DirichletL_SiegelZeros": {
+   "sorry": 0,
+   "axiom": 0,
+   "admit": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "@[extern": 0,
+   "unsafe": 0,
+   "opaque": 0,
+   "set_option": 0,
+   "macro/elab": 0,
+   "Lean.ofReduceBool/trustCompiler": 0,
+   "decide": "770 occurrences: (by decide) side conditions on small naturals/units, 20 'decide +revert', 4 'decide +kernel'; no search. Not computer-assisted."
+  },
+  "grep_patched_PNT_SiegelZeros": "0 sorry/axiom/native_decide in PrimeNumberTheoremAnd/SiegelZeros (patch-added) files.",
+  "comparator_axioms": "propext, Quot.sound, Classical.choice only; a sorry anywhere in the transitive closure (including third-party packages) would surface as sorryAx and fail the comparator. enable_nanoda=false: no second-kernel replay.",
+  "statement_fidelity": {
+   "zeta": "EXACT classical quasi-RH with explicit 7/8: Mathlib's riemannZeta (comparator imports only Mathlib; no OAI declaration named riemannZeta exists). No extra hypotheses. Mathlib's junk value at s=1 is irrelevant (it is nonzero anyway and the theorem holds at s=1 since riemannZeta 1 = (gamma - log 4pi)/2 != 0, Mathlib lemma riemannZeta_one_ne_zero). Classical claim: zeta(s) != 0 for Re s > 7/8 -- matches.",
+   "dirichlet": "Matches the uniform Dirichlet formulation [FG]; covers all moduli and all (also imprimitive) characters; excluded point only the principal pole. Stronger than the paper's headline for primitive characters (imprimitive L differs by Euler factors nonzero for Re s>0).",
+   "hecke": "Faithfulness rests on challenge-file definitions (theta-product WeakFEPair Lambda times pi^s/Gamma(s), divided by 6). Library lemmas LFunction_eq_ideal_tsum (Re s>1) and LFunction_differentiableAt / entire_nonprincipal (Hecke/IdealBridge.lean) show it is the analytic continuation of sum_I chi(I) N(I)^{-s}; these lemmas are NOT part of the comparator, so a reviewer must check them. Character = MulChar on O/m trivial on units: since Q(sqrt-3) has class number 1 and no real places, this covers all finite-order Hecke characters (analyst reasoning).",
+   "siegel": "Matches the logarithmic Landau-Siegel conjecture (ineffective-looking exists-c form; the paper's argument is effective in principle). Note: it is a trivial corollary of the Dirichlet 7/8 comparator ((1-beta)log q >= (1/8)log 3), but is proved independently."
+  },
+  "status": "Text-level only; compile + comparator result pending from orchestrator. If it passes, the zeta/Dirichlet claims are machine-checked modulo Lean kernel, Mathlib definitions and the comparator tool."
+ },
+ "main_statement": {
+  "Q": {
+   "file_line": "Q:paper.tex:106-111",
+   "latex": "\\begin{theorem}\\label{thm:main} Every finite-order Hecke $L$-function over $F=\\mathbb Q(\\sqrt{-3})$ has no zero in $\\Re s>7/8$. The same holds for every Dirichlet $L$-function, including $\\zeta(s)$. A pole at $s=1$ for a principal character is allowed. \\end{theorem}",
+   "paraphrase": "A fixed zero-free half-plane Re s>7/8, uniform in character, conductor and height, for all Dirichlet L-functions (incl. zeta) and all finite-order Hecke L-functions of Q(sqrt-3). Resolves the quasi-Riemann hypothesis; excludes Siegel zeros; not RH."
+  },
+  "A": {
+   "file_line": "A:paper2.tex:73-77",
+   "latex": "Every finite-order Hecke $L$-function over $K$ has no zeros in the half-plane $\\Rea s>11/12$. Thus every Dirichlet $L$-function, including $\\zeta(s)$, has no zeros for $\\Rea s>11/12$.",
+   "paraphrase": "Weaker exponent 11/12 by a different, shorter, non-bootstrap proof."
+  },
+  "S": {
+   "file_line": "S:paper.tex:66-75",
+   "latex": "There is an absolute constant $c>0$ such that every real zero $\\beta\\in(0,1)$ of every primitive nonprincipal real Dirichlet $L$-function of conductor $q\\ge3$ satisfies $(1-\\beta)\\log q\\ge c$.",
+   "paraphrase": "No Landau-Siegel zeros (logarithmic form), by an algebraic interpolation-determinant argument."
+  },
+  "formalized_vs_claimed": "Formalized: zeta 7/8, Dirichlet 7/8 (all q, chi), Hecke 7/8 over Q(sqrt-3), Siegel gap (independently). Not formalized: A's separate 11/12 proof, all corollaries (least nonresidue, deterministic square roots, PNT in APs with x^{11/12}log x, Miller test, idoneal numbers, effective class numbers). The Lean 7/8 route apparently skips the paper's 11/12 stage."
+ },
+ "labels": {
+  "A": {
+   "label": "A5",
+   "secondary": {
+    "hard_direction_form": null,
+    "explicit_rate": true,
+    "explicit_rate_detail": "Exponent 7/8 (and 11/12 in A) explicit; Siegel constant c not explicit."
+   },
+   "evidence": {
+    "quote": "Every finite-order Hecke $L$-function over $F=\\mathbb Q(\\sqrt{-3})$ has no zero in $\\Re s>7/8$.",
+    "file_line": "Q:paper.tex:107-108"
+   },
+   "confidence": "high",
+   "note": "Nonvanishing = impossibility of a zero (no exists rho). S is likewise A5 (no real zero in (1-c/log q,1))."
+  },
+  "B": {
+   "label": "B1",
+   "flags": {
+    "full_only_with_prior_results": false,
+    "adds_corollaries_for_other_conjectures": true,
+    "adds_corollaries_detail": "Vinogradov least-nonresidue conjecture, deterministic poly-time square roots (Q:325-361); Landau-Siegel zeros (A abstract, S), uniform PNT in APs x^{11/12}log x, deterministic Miller test, effective h(D)>>sqrt|D|/loglog|D|, completeness of Euler's 65 idoneal numbers (A:97-125). Downstream release families use it: 029 (Artin primitive roots; reuses the device over cyclotomic fields), 142 (deterministic polynomial factorization), 182 (polynomial differences at primes)."
+   },
+   "evidence": {
+    "quote": "Theorem~\\ref{thm:main} resolves the quasi-Riemann hypothesis affirmatively",
+    "file_line": "Q:paper.tex:113-114"
+   },
+   "confidence": "high"
+  },
+  "C": {
+   "primary": "C3",
+   "secondary": [
+    "C4",
+    "C2",
+    "C5"
+   ],
+   "evidence": {
+    "quote": "Then these assumptions contradict $\\beta_*>\\sigma_0$.",
+    "file_line": "Q:paper.tex:432"
+   },
+   "note": "Q: contradiction against a hypothetical family supremum beta_*>sigma_0 (C3), realized by a very long estimation chain (C4). A: direct estimate + Littlewood contradiction at a zero (C3/C4). S: contradiction along a sequence of hypothetical Siegel zeros (C3) via determinant bounds (C4). C2: Heath-Brown-type recursive Poisson descent on row ranges (Q:9783-11600, A:1514-1610). C5: cited Patterson/DR cusp expansions, GL quadratic large sieve, TZ ray-class prime counting, Hecke functional equation, BIMS for corollaries (all invoked in the papers; re-proved in Lean).",
+   "flags": {
+    "computer_assisted": false,
+    "computer_assisted_note": "Lean formalization is verification; 770 decide calls are side conditions; no search or enumeration.",
+    "ih_strengthened": true,
+    "ih_strengthened_detail": "The mean-square induction is run on a strengthened canonical family with an extra averaged squarefree label f carrying chi_n(f)^4 and scale F (A:641-648, A:1261-1279; Q canonical marked estimate Q:9296ff with prime-slot marks).",
+    "ih_template": "yes: 'add a parameter' (auxiliary label f, scale F) and 'carry an extra tracked quantity' (prime-slot marks Q_u); Heath-Brown admissible-exponent template [HB95 Lemma 8]."
+   },
+   "confidence": "high"
+  },
+  "D": {
+   "label": "D3 (provisional)",
+   "rests_on": "C1 (sextic-twist Mobius <-> cubic-theta duality: A03/A04/A07/Q16/Q18)",
+   "confidence": 0.4,
+   "note": "Pending novelty pass. All other machinery N0-N2."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Number theory",
+    "msc2020": [
+     "11M26 (nonreal zeros of zeta and L-functions)",
+     "11M20 (real zeros; Siegel)",
+     "11R42 (Hecke L-functions)",
+     "11L05 (Gauss sums)",
+     "11F27 (theta series)",
+     "11N35 (sieves)"
+    ]
+   },
+   "lean_dir_field": "NumberTheory (OAI/NumberTheory/DirichletL, OAI/NumberTheory/SiegelZeros)",
+   "method_fields": [
+    {
+     "field": "Automorphic forms / metaplectic forms (Kubota-Patterson cubic theta on hyperbolic 3-space)",
+     "tag": "essential"
+    },
+    {
+     "field": "Analytic number theory: large sieve (quadratic, sextic, additive), Poisson summation, zero detection, Mellin analysis",
+     "tag": "essential"
+    },
+    {
+     "field": "Algebraic number theory / class field theory: Gauss and Jacobi sums, cubic and sextic reciprocity, Kummer theory, ray class groups",
+     "tag": "essential"
+    },
+    {
+     "field": "Complex analysis (Hadamard products, Borel-Caratheodory, Mellin continuation)",
+     "tag": "essential"
+    },
+    {
+     "field": "Spectral theory of hyperbolic 3-manifolds (resolvent, scattering, Eisenstein residues)",
+     "tag": "essential in Lean only (Eisenstein/ dir); cited in the papers"
+    },
+    {
+     "field": "Transcendence / Diophantine approximation: interpolation determinants, multiplicity estimates",
+     "tag": "essential (S)"
+    },
+    {
+     "field": "Commutative algebra / intersection theory (local Bezout, Hilbert functions)",
+     "tag": "essential in Lean (S) only"
+    },
+    {
+     "field": "Computational complexity (deterministic square roots, Miller test)",
+     "tag": "corollary-only"
+    },
+    {
+     "field": "Additive combinatorics/Goldbach (BCSS, FG, BR18 contexts); zero-density (Guth-Maynard); Vinogradov-Korobov",
+     "tag": "background-cited"
+    }
+   ],
+   "cross_field_count": 5,
+   "note": "Problem field = number theory; method fields add automorphic forms, transcendence, spectral theory (Lean), commutative algebra (Lean)."
+  }
+ },
+ "items": [
+  {
+   "id": "Q01",
+   "kind": "definition (prose)",
+   "name": "finite-order Hecke character over F=Q(sqrt-3) and L_F(s,eta)",
+   "file_line": "Q:paper.tex:52-70",
+   "statement": "Ray class character mod f extended by zero; L_F(s,eta)=sum eta(a)Na^{-s}=Euler product, continued meromorphically. Dirichlet L(s,chi), zeta = character mod 1.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'agrees with the usual finite-order idelic definition' [MilneCFT]"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Goal vocabulary."
+   },
+   "analytic_check": "Occurs in the goal (it IS the goal's object).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook (Hecke 1920)."
+   },
+   "provisional_F": null,
+   "lean": "Comparator HeckeSevenEighths.lean defines HeckeFamily.Character/LFunction via a theta-product WeakFEPair; library proves LFunction_eq_ideal_tsum (Hecke/IdealBridge.lean:118) for Re s>1."
+  },
+  {
+   "id": "Q02",
+   "kind": "definition (prose)",
+   "name": "quasi-Riemann hypothesis / uniform exclusion",
+   "file_line": "Q:paper.tex:79-92",
+   "statement": "Find sigma_0<1, independent of character, conductor and height, with no zeros in Re s>sigma_0 ([BCSS] for zeta; [FG] uniform Dirichlet form).",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'is called the quasi-Riemann hypothesis \\cite[Section 1]{BCSS}'"
+   },
+   "uses_items": [
+    "Q01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The posed problem."
+   },
+   "analytic_check": "It is the goal.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "The posed problem."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q03",
+   "kind": "definition (display)",
+   "name": "beta_*: family supremum of real parts of zeros of primitive Hecke L-functions over F (sentinel 1/2)",
+   "file_line": "Q:paper.tex:380-389",
+   "statement": "beta_* = sup({1/2} U {Re rho: 1/2<=Re rho<=1, L_F(rho,eta)=0 for some primitive finite-order eta}).",
+   "cited_or_new": {
+    "status": "new notation for standard notion",
+    "cue": "none (defined inline)"
+   },
+   "uses_items": [
+    "Q01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Every estimate in both parts is measured against C(beta_*)."
+   },
+   "analytic_check": "Analytic: the supremum of zero real parts is the classical Theta of the goal family (goal = 'beta_* <= 7/8').",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Abbreviation of the classical Theta=sup Re rho, taken over a family."
+   },
+   "provisional_F": null,
+   "lean": "HeckeZeroSupremum.beta (Hecke/ZeroSupremum.lean:16), sSup of zeroSetWithSentinel; ranges over ALL Characters (not only primitive)."
+  },
+  {
+   "id": "Q04",
+   "kind": "proposition",
+   "name": "Continuation from a common signal (Prop 2.1)",
+   "file_line": "Q:paper.tex:400-466",
+   "statement": "If beta_*>sigma_0 and for every primitive eta a probe J_eta(Z) satisfies |J|<<Z^{C(sigma_0)+omega} and |J - f_eta|<<Z^{C(beta_*)-sigma}, with f_eta the Mellin integral of Z^{C(s)}e^{(s-5/6)^2}H_eta/L^S_F, omega,sigma uniform in eta, then contradiction.",
+   "cited_or_new": {
+    "status": "new (formulation); classical mechanism",
+    "cue": "'We prove this principle for a variable boundary'"
+   },
+   "uses_items": [
+    "Q03"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The logical spine of both parts."
+   },
+   "analytic_check": "Not a subterm of the goal; it is the Landau/Littlewood Mellin-continuation principle (L contains Davenport, IK).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Landau-type: a power saving for a Mellin-signal gives holomorphic continuation of 1/L; the uniform-in-eta margin against the family supremum is a routine packaging."
+   },
+   "provisional_F": null,
+   "lean": "Supremum.lean (continuationMargin...), Continuation*.lean"
+  },
+  {
+   "id": "Q05",
+   "kind": "theorem",
+   "name": "The 11/12 half-plane (Part I)",
+   "file_line": "Q:paper.tex:532-537",
+   "statement": "Every finite-order Hecke L over F and every Dirichlet L is zero-free in Re s>11/12.",
+   "cited_or_new": {
+    "status": "new (claimed)",
+    "cue": "Part I conclusion"
+   },
+   "uses_items": [
+    "Q04",
+    "Q16",
+    "Q17",
+    "Q19",
+    "Q21",
+    "Q23",
+    "Q26"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Input for Part II (Delta<=1/24)."
+   },
+   "analytic_check": "Goal-type statement.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "It is a (weaker) form of the goal; not a device."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q06",
+   "kind": "lemma",
+   "name": "Fixed numerators give ray characters",
+   "file_line": "Q:paper.tex:646-700",
+   "statement": "For fixed a, n -> (a/n)_6 is a finite-order ray character (Kummer theory, Frobenius on a^{1/6}).",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "Kummer theory, Artin reciprocity"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Turns fixed-numerator sextic symbols into Hecke twists."
+   },
+   "analytic_check": "Not in goal; in L (class field theory).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical Kummer theory."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q07",
+   "kind": "lemma",
+   "name": "Prime Gauss identities gamma_2(p)^3=-alpha(p); gamma_1 gamma_2 = conj(H(4)) gamma_3 gamma_2^3",
+   "file_line": "Q:paper.tex:766-839",
+   "statement": "For primary prime p: normalized cubic Gauss sum cubed is -p/|p|; Hasse-Davenport-type relation between sextic, cubic and quadratic Gauss sums.",
+   "cited_or_new": {
+    "status": "standard (re-proved)",
+    "cue": "'We first evaluate the prime Gauss sums' (proof via Jacobi sums)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The minus sign is what turns sextic Gauss sums times mu into cubic Gauss sums (A07)."
+   },
+   "analytic_check": "Not in goal; in L (Hasse 1950, HB00 eq (2), Ireland-Rosen).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical cubic Gauss-sum evaluation and Davenport-Hasse product formula."
+   },
+   "provisional_F": null,
+   "lean": "GaussSum/*, Eisenstein/PrimeGaussFactors.lean"
+  },
+  {
+   "id": "Q08",
+   "kind": "lemma",
+   "name": "Quadratic four-term formula; sextic reciprocity and fixed Gauss phase",
+   "file_line": "Q:paper.tex:841-1093",
+   "statement": "Evaluation of quadratic Gauss sums Gamma(c) and a fixed finite ray phase R(a,b), G(a) absorbing sextic reciprocity.",
+   "cited_or_new": {
+    "status": "standard (re-proved)",
+    "cue": "'Sextic reciprocity'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Bookkeeping of reciprocity phases."
+   },
+   "analytic_check": "In L (reciprocity laws).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical reciprocity / Gauss sums."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q09",
+   "kind": "lemmas",
+   "name": "Smooth calculus, Gaussian annular decomposition, kernel seminorms",
+   "file_line": "Q:paper.tex:1095-1414",
+   "statement": "Calculus for smooth norm profiles and Mellin/Fourier kernel bounds.",
+   "cited_or_new": {
+    "status": "routine",
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Plumbing."
+   },
+   "analytic_check": "Plumbing.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine analysis."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q10",
+   "kind": "lemmas",
+   "name": "Hecke strip growth, logarithmic control, deleted Euler factors",
+   "file_line": "Q:paper.tex:1425-1646",
+   "statement": "Convexity-type growth, Borel-Caratheodory log-derivative control on zero-free disks, bounds for finitely many deleted Euler factors.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "none"
+   },
+   "uses_items": [
+    "Q01"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Needed by the zero detector."
+   },
+   "analytic_check": "In L (Titchmarsh/IK).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook complex analysis."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q11",
+   "kind": "proposition",
+   "name": "Completed cubic reflection (theta transformation retaining character zeros)",
+   "file_line": "Q:paper.tex:1676-2462",
+   "statement": "Kubota-Patterson cubic theta: completed sums over indices cn^3 twisted by sextic symbols transform into dual sums of cusp coefficients twisted by a quadratic character, with all zero-on-nonunit restrictions retained.",
+   "cited_or_new": {
+    "status": "variant of cited",
+    "cue": "'We use the unconditional explicit cusp expansions recorded by Dunn and Radziwill [DR, Section 5 and Appendix A]'; 'derives the reflection used here while retaining the characters' zero-on-nonunit restrictions'"
+   },
+   "uses_items": [
+    "Q07",
+    "Q08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Every low estimate uses it."
+   },
+   "analytic_check": "Theta function and its cusp expansions are in L (Patterson 1977, DR 2024); the specific twisted completed form is not a subterm of the goal.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Close variant of DR's level-aspect Voronoi formula (DR Sec. 5; Patterson-Yoshimoto)."
+   },
+   "provisional_F": null,
+   "lean": "Eisenstein/ (2876 decls in zeta DAG: hyperbolic 3-space, resolvent, scattering, cusp residues - the theta function is constructed from scratch), Reflection/"
+  },
+  {
+   "id": "Q12",
+   "kind": "definition (prose)",
+   "name": "Completion: indices cn^3 with c squarefree, full cube factor retained; target and ray phase acting on the whole product",
+   "file_line": "Q:paper.tex:207-216; 3400-3412",
+   "statement": "Completed index A=cn^3 (c sf, n arbitrary, possibly sharing primes); 'completion means retaining the full cubic factor n^3'.",
+   "cited_or_new": {
+    "status": "variant",
+    "cue": "cube completion 'follows Dunn and Radziwill [DR, Lemma 5.4 and Prop 5.3]' (stated in A:375-377)"
+   },
+   "uses_items": [
+    "Q11"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Makes theta automorphy applicable."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "DR cube completion."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q13",
+   "kind": "lemmas/definition",
+   "name": "Unmarked reflected block; unmarked completed-row moment",
+   "file_line": "Q:paper.tex:2888-3311",
+   "statement": "Mean square over rows of reflected completed theta sums, bounded by the quadratic large sieve.",
+   "cited_or_new": {
+    "status": "variant",
+    "cue": "'Goldmakher-Louvel quadratic large sieve'"
+   },
+   "uses_items": [
+    "Q11",
+    "Q12"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Low side of Part I."
+   },
+   "analytic_check": "Not in goal; GL in L.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "DR + GL combination."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q14",
+   "kind": "lemma",
+   "name": "Planar additive large sieve; balanced additive norm",
+   "file_line": "Q:paper.tex:3497-3670",
+   "statement": "Large sieve for well-spaced points in C/O.",
+   "cited_or_new": {
+    "status": "standard (re-proved)",
+    "cue": "'The planar additive large sieve is classical; compare Huxley ... BaierBansal'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Low side."
+   },
+   "analytic_check": "In L.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Huxley; Baier-Bansal."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q15",
+   "kind": "proposition",
+   "name": "Balanced low estimate",
+   "file_line": "Q:paper.tex:3672-3721",
+   "statement": "At X=Y=Z^{1/2}: I_eta << Z^{1/4+eps}, via Cauchy-Schwarz of Q13 and Q14.",
+   "cited_or_new": {
+    "status": "new (routine combination)",
+    "cue": "none"
+   },
+   "uses_items": [
+    "Q13",
+    "Q14",
+    "Q16"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Low side of Part I."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Cauchy-Schwarz of two known-type norms."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q16",
+   "kind": "definition (display) / key construction",
+   "name": "The base probe I_eta(X,Y,Z)",
+   "file_line": "Q:paper.tex:3313-3460 (eq:general-probe 3437-3448)",
+   "statement": "Average over s (sextic Gauss sums g_{chi_s}(s,-m)) and m in O of smoothed Mellin integrals of corrected completed cubic-theta rows T_{m,s,eta}(t), twisted by target eta and fixed ray phases. Has two exact representations: reflected (low) and Poisson-in-m (high), and the principal Poisson row contains 1/L_F(s,eta).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'We now place the completed sums of the preceding section inside one average'"
+   },
+   "uses_items": [
+    "Q07",
+    "Q11",
+    "Q12"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The object compared in the continuation criterion; everything in Part I estimates it."
+   },
+   "analytic_check": "Not a subterm of the goal or of L: neither the goal (nonvanishing of L) nor L mentions sextic-Gauss-weighted averages of cubic theta coefficients.",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Constructed auxiliary probe; same core duality as A03/A04 (candidate C1)."
+   },
+   "provisional_F": "F3/F5"
+  },
+  {
+   "id": "Q17",
+   "kind": "section",
+   "name": "Exact Poisson series: rows H=ua^6, u sixth-power-free",
+   "file_line": "Q:paper.tex:3734-3846",
+   "statement": "Poisson in m (modulus s b_* A); frequencies factor as u a^6; strict positivity M(1/6)>0 of a radial Mellin transform.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "none"
+   },
+   "uses_items": [
+    "Q16"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "High side."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard Poisson summation over Z[omega]."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q18",
+   "kind": "lemma",
+   "name": "The complete local identity (scalar Euler identity)",
+   "file_line": "Q:paper.tex:3847-4199 (Lemma at 4010)",
+   "statement": "For each sixth-power-free row u and good prime p, the local factor of the high series is an explicit rational function; for u=1 the global product is a nonzero scalar times 1/L_F(s,eta) times a holomorphic Euler product.",
+   "cited_or_new": {
+    "status": "new (computation)",
+    "cue": "'Our objective is to prove that the high series is a scalar Euler product for the target'"
+   },
+   "uses_items": [
+    "Q07",
+    "Q17"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Identifies the reciprocal of the target in the principal row."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Explicit local computation enabled by the C1 duality; local-factor bookkeeping is standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q19",
+   "kind": "lemmas",
+   "name": "Buffered zero-free bins; pointwise dyadic estimates",
+   "file_line": "Q:paper.tex:4219-4499",
+   "statement": "Each non-principal row gets a buffered zero-free rectangle for its finite family of Hecke twists, with bins (i,a), a<=beta_*.",
+   "cited_or_new": {
+    "status": "new (variant)",
+    "cue": "none"
+   },
+   "uses_items": [
+    "Q03",
+    "Q10"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Organizes rows by the location of zeros."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Bookkeeping for zero detection."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q20",
+   "kind": "proposition",
+   "name": "Two saturated witnesses (zero detector)",
+   "file_line": "Q:paper.tex:4510-4686",
+   "statement": "A row with a zero in a bin a>51/100 yields an inverse (Mobius) polynomial M_r and a plain polynomial S_m with the same row character and twist height, each individually large: |M_r|^2>>U^{delta r-eps}, |S_m|^2>>U^{delta m-eps}.",
+   "cited_or_new": {
+    "status": "variant of classical",
+    "cue": "'The truncated-inverse and Gamma-integral construction is a form of the classical zero detector; compare [MP, Appendix C] and [GM, Section 13.1]'"
+   },
+   "uses_items": [
+    "Q19"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Converts zeros into large Dirichlet polynomials that the moments can count."
+   },
+   "analytic_check": "Zero detection is in L (MP, GM).",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Montgomery-Halasz zero detector; 'simultaneous saturated' pair is a refinement."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q21",
+   "kind": "lemma",
+   "name": "Sextic large sieve (primary convention)",
+   "file_line": "Q:paper.tex:4707-5171",
+   "statement": "Sum_k |sum_n c_n chi_n(k)|^2 << (KD)^eps (K+D+(KD)^{2/3}) sum|c_n|^2.",
+   "cited_or_new": {
+    "status": "standard (re-proved)",
+    "cue": "'using the norm-recursion method of Blomer, Goldmakher, and Louvel [BGL, Section 3]'; Gao-Zhao [GZSextic, Lemma 2.9]"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Row counts in Part I."
+   },
+   "analytic_check": "In L (BGL, GZSextic).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Specialization of BGL Theorem 1.3."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q22",
+   "kind": "proposition",
+   "name": "Sextic-sieve row envelope",
+   "file_line": "Q:paper.tex:5181-5458",
+   "statement": "Count of physical rows with a large inverse witness, after fixing the powerful part.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "none"
+   },
+   "uses_items": [
+    "Q20",
+    "Q21"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "High side, Part I."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard large-sieve counting."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q23",
+   "kind": "lemmas",
+   "name": "High-expansion analytics: contour moves, external tails, principal signal extraction, outer row norms",
+   "file_line": "Q:paper.tex:5460-6491",
+   "statement": "Contour shifts per bin, extraction of principal residues giving a nonzero scalar times f_eta, small/large row norms.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "none"
+   },
+   "uses_items": [
+    "Q17",
+    "Q18",
+    "Q20",
+    "Q22"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "High side."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Contour bookkeeping."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q24",
+   "kind": "proposition",
+   "name": "Balanced high estimate (saving 1/4800)",
+   "file_line": "Q:paper.tex:6582-6698",
+   "statement": "|J_I - f_I| << Z^{C_I(beta_*)-1/4800}; margin table at 6496-6505 (min 1/1200).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "none"
+   },
+   "uses_items": [
+    "Q23"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Second hypothesis of Q04 in Part I."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Numerical assembly."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q25",
+   "kind": "design principle (remark)",
+   "name": "Measuring row contributions against the hypothetical rightmost zero C(beta_*) (family bootstrap)",
+   "file_line": "Q:paper.tex:509-516; 4213-4216",
+   "statement": "'The high estimate is measured relative to C(beta_*), not to C(sigma_0).' Rows of the Poisson side are Hecke twists of the target whose zeros are themselves bounded by beta_*; this replaces the GRH used by DR.",
+   "cited_or_new": {
+    "status": "new (design)",
+    "cue": "'This distinction matters when a row contribution reaches the low scale but still has a power saving relative to the hypothetical rightmost zero.'"
+   },
+   "uses_items": [
+    "Q03",
+    "Q04",
+    "Q20"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Without it the rows could not be controlled unconditionally."
+   },
+   "analytic_check": "Not a subterm of goal; analogous bootstrap arguments exist (Ingham-type Theta arguments).",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Self-referential family bootstrap; GRH replaced by the hypothetical supremum. Close to standard 'rightmost zero' arguments."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q26",
+   "kind": "proposition",
+   "name": "Quadratic transfer to Dirichlet L-functions",
+   "file_line": "Q:paper.tex:6700-6808",
+   "statement": "L_F(s,chi o N) = L(s,chi) L(s,chi chi_{-3}) up to Euler factors nonzero in Re s>0; pole handled by L(1,chi_{-3})>0.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'quadratic factorization'"
+   },
+   "uses_items": [
+    "Q05"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Gives zeta and Dirichlet from Hecke."
+   },
+   "analytic_check": "In L.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Base change factorization (textbook)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q27",
+   "kind": "definition (display) / key construction",
+   "name": "The compensated probe (Part II): marked-minus-rescaled prime slots with asymmetric scales",
+   "file_line": "Q:paper.tex:6810-6915 (eq:compensated-probe-definition 6888-6898; geometry 6856-6864)",
+   "statement": "I_mod(Z)=sum over slot-prime tuples of prod W_i * sum_J (-1)^{|J|} q_{p_J}^{-3/2} conj(eta(p_{J^c})) I_{eta;p_{J^c}}(X/q_{p_J},Y/q_{p_J},Z q_{p_{J^c}}); X=Z^{17/48}, Y=Z^{23/48}, slots of total length 1/6; C_II(s)=s-11/16.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The subtraction is designed to cancel the scalar prime contribution on the high side, leaving the sextic-character prime factor used by the moment estimates.'"
+   },
+   "uses_items": [
+    "Q16",
+    "Q05"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Drives the improvement 11/12 -> 7/8."
+   },
+   "analytic_check": "Not in goal or L.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Local compensation of an Euler contribution, akin to mollifier/Euler-factor deletion devices; design-specific."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q28",
+   "kind": "lemmas",
+   "name": "Fixed-ray prime normalizer; prime-power Fourier sums; full finite correlations",
+   "file_line": "Q:paper.tex:6918-7247",
+   "statement": "Prime counting in a fixed ray class [TZ]; local Fourier correlations retaining shared prime powers.",
+   "cited_or_new": {
+    "status": "standard + routine",
+    "cue": "'prime counting in a fixed ray class [TZ, Thm 1.1]'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Part II arithmetic."
+   },
+   "analytic_check": "In L.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q29",
+   "kind": "lemmas",
+   "name": "Marked completion; whole-index marked reflection; quadratic-cubic norm bound; reflected energy",
+   "file_line": "Q:paper.tex:7249-8059",
+   "statement": "Reflection and energy bounds for completed rows carrying prime marks.",
+   "cited_or_new": {
+    "status": "new (variant of Q11/Q13)",
+    "cue": "none"
+   },
+   "uses_items": [
+    "Q11",
+    "Q13"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Terminal bound for the inverse-moment recursion."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Marked version of Q11-Q13."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q30",
+   "kind": "propositions",
+   "name": "Compensated low estimate; additive Gram bound; dynamic local errors",
+   "file_line": "Q:paper.tex:8061-9207",
+   "statement": "Low side and local error terms for the compensated probe.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "none"
+   },
+   "uses_items": [
+    "Q27",
+    "Q29"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Part II low side."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Estimation chain."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q31",
+   "kind": "lemma",
+   "name": "Marked inverse moment + canonical marked estimate (recursive two-Poisson descent)",
+   "file_line": "Q:paper.tex:9218-12341 (Lemma marked 9250; canonical 9296; induction 9783-11600)",
+   "statement": "sum_{0<q_u<<Z^m} |M_u(Z^r;W) Q_u|^2 << Z^{m+eps} under r+2z<=m-c1, 2r+8z<=3m-c2, M_u a Mobius polynomial twisted by sextic symbols chi_n(u), Q_u prime-slot polynomials. Proved via a canonical family with an extra averaged squarefree label f (fourth-power symbol), closed by two masked Poisson transforms shortening the row range, terminal bound by reflected energy.",
+   "cited_or_new": {
+    "status": "new (variant of HB95/GL method)",
+    "cue": "'For the recursive Poisson large-sieve framework, compare [HBQuadratic, Section 2], [HB, Section 4], [GL, Sections 4-7]; the present marked recursion is proved below.'"
+   },
+   "uses_items": [
+    "Q29",
+    "Q32"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Core of Part II and (via eq:raw-moment) of the alternate proof."
+   },
+   "analytic_check": "Not in goal; method in L.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Heath-Brown admissible-exponent recursion; the induction hypothesis is strengthened by adding a parameter (templated -> capped at N2). The Mobius-to-cubic-Gauss conversion inside it is C1."
+   },
+   "provisional_F": null,
+   "lean": "Descent/, Inversion/, Moments/ (InverseMoment.canonical_marked_energy_exists dominated share 0.077)"
+  },
+  {
+   "id": "Q32",
+   "kind": "lemma",
+   "name": "Masked primitive Poisson",
+   "file_line": "Q:paper.tex:9722-9781",
+   "statement": "Finite Poisson summation with a coprimality mask.",
+   "cited_or_new": {
+    "status": "routine",
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Plumbing for Q31."
+   },
+   "analytic_check": "In L.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q33",
+   "kind": "display + lemma",
+   "name": "Raw moment eq (raw-moment) and Sixth-power amplification",
+   "file_line": "Q:paper.tex:12343-12475 (eq:raw-moment 12370-12376; Lemma 12362)",
+   "statement": "sum_{q_u<=H} |D^{-1/2} sum_n mu(n)nu(n)chi_n(u)^{+-1} W(q_n/D)|^2 << H (HD)^eps for H>=D^{1+c} (identical to A04); amplification to sixth-power-free rows: sum_u|M_u|^2 << (H/P)(UD)^eps, P=(H/U)^{1/6}.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'A final amplification gives an unmarked estimate on sixth-power-free rows'"
+   },
+   "uses_items": [
+    "Q31"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Row count input of Part II; eq:raw-moment is the whole engine of the alternate proof."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N2 (amplification step); the raw moment itself is part of C1",
+    "justification": "Amplification by replicated rows is a standard device (DFI/Iwaniec-Sarnak)."
+   },
+   "provisional_F": null,
+   "lean": "Hecke/InverseAmplificationRaw.lean (HeckeInverseAmplification.RawMoment)"
+  },
+  {
+   "id": "Q34",
+   "kind": "lemmas",
+   "name": "Fourth moment with short prime factors; centered coefficient; masked rectangle cancellation",
+   "file_line": "Q:paper.tex:12477-14983 (Lemma plain 12531; 13953; 14545)",
+   "statement": "Mean square of products of two plain polynomials and short prime polynomials, excluding rows whose inducing character lies in the fixed finite group Theta; centered differences cancel main terms.",
+   "cited_or_new": {
+    "status": "new (variant)",
+    "cue": "'Ordinary Hecke reflection reduces the length ranges at each stage'"
+   },
+   "uses_items": [
+    "Q11",
+    "Q31"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Plain witness count in Part II."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Same recursion template applied to plain (non-Mobius) sums; centering trick standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q35",
+   "kind": "lemmas/proposition",
+   "name": "Prime amplitudes, bin prime bound, row counts from witnesses",
+   "file_line": "Q:paper.tex:14985-15493",
+   "statement": "Combines inverse and plain moment bounds with selected prime slots to count rows above the floor.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "none"
+   },
+   "uses_items": [
+    "Q20",
+    "Q31",
+    "Q33",
+    "Q34"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Part II high side."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Estimation chain."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "Q36",
+   "kind": "lemmas/proposition",
+   "name": "Principal normalizer, compensated high exponent, endpoint certificate, order of choices",
+   "file_line": "Q:paper.tex:15495-16420",
+   "statement": "Final exponent bookkeeping verifying Q04 at 7/8 with C_II.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "none"
+   },
+   "uses_items": [
+    "Q35",
+    "Q30"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Closes the proof."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Numerics."
+   },
+   "provisional_F": null,
+   "lean": "ParametersHighData.lean (HighData budgets), Detector/FinalAssembly*.lean"
+  },
+  {
+   "id": "Q37",
+   "kind": "corollary",
+   "name": "Least quadratic nonresidue n(p)<=C(log p)^A; deterministic poly-time square roots",
+   "file_line": "Q:paper.tex:325-361",
+   "statement": "Via BIMS weak-GRH theorem with eps=7/16 and Tonelli-Shanks.",
+   "cited_or_new": {
+    "status": "corollary of cited",
+    "cue": "'This supplies the weak-GRH hypothesis of Bhargava, Ivanyos, Mittal, and Saxena'"
+   },
+   "uses_items": [
+    "Q05"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Corollary only."
+   },
+   "analytic_check": "n/a",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Corollary via cited theorem."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "A01",
+   "kind": "theorem",
+   "name": "Main theorem (11/12)",
+   "file_line": "A:paper2.tex:73-77",
+   "statement": "Every finite-order Hecke L over K=Q(sqrt-3) has no zeros in Re s>11/12; hence every Dirichlet L incl. zeta.",
+   "cited_or_new": {
+    "status": "new (claimed)",
+    "cue": "'isolated Theorem 1.1 and its proof here' (A:81)"
+   },
+   "uses_items": [
+    "A04",
+    "A05",
+    "A06"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Headline."
+   },
+   "analytic_check": "Goal.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Goal statement."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "A02",
+   "kind": "corollary",
+   "name": "PNT in APs: |pi(x;q,a)-Li(x)/phi(q)| << x^{11/12} log x uniformly in q<=x, absolute effective constant",
+   "file_line": "A:paper2.tex:84-95",
+   "statement": "Explicit-formula consequence.",
+   "cited_or_new": {
+    "status": "corollary",
+    "cue": "'By a standard explicit-formula argument (see [Dav00, Ch. 19-20])'"
+   },
+   "uses_items": [
+    "A01"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Corollary."
+   },
+   "analytic_check": "n/a",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard explicit formula."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "A03",
+   "kind": "definition (display) / key construction",
+   "name": "Sextic-twisted Mobius family A_u(D)=sum_n mu(n)nu(n)chi_n(u)W(N n/D)",
+   "file_line": "A:paper2.tex:216-269; 669-674",
+   "statement": "Embed the target Mobius sum A_1(D) into a family indexed by u in O through the sextic residue symbol chi_n(u)=(u/n)_6.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'we embed it into a family of such sums, parametrized by u, by introducing a sextic twist'"
+   },
+   "uses_items": [
+    "A07"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Everything in A is about this family."
+   },
+   "analytic_check": "Not a subterm of the goal (nonvanishing of L) nor of L; Mobius sums in L only untwisted or quadratically twisted (Gao-Zhao).",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Core of candidate C1 (with A04, A07, Q16)."
+   },
+   "provisional_F": "F5"
+  },
+  {
+   "id": "A04",
+   "kind": "proposition",
+   "name": "Mean-square estimate (Prop thm:ms)",
+   "file_line": "A:paper2.tex:679-692",
+   "statement": "sum_{0<N(u)<=D^{1+theta}} |A_u(D)|^2 << D^{2+theta+eps}, i.e. square-root cancellation on average over a row range longer than the column range.",
+   "cited_or_new": {
+    "status": "new (claimed)",
+    "cue": "'The key estimate is the following'"
+   },
+   "uses_items": [
+    "A03",
+    "A10",
+    "A11",
+    "A12",
+    "A13",
+    "A14"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Sole analytic input."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Same statement as Q33 eq:raw-moment; carries the C1 duality."
+   },
+   "provisional_F": "F5"
+  },
+  {
+   "id": "A05",
+   "kind": "proof step",
+   "name": "Sixth-power rows replicate the target: A_{p^6}(D)=A_1(D)+O(D/Y)",
+   "file_line": "A:paper2.tex:284-299; 694-720",
+   "statement": "chi_n(p^6)=1_{p not | n}; with Y=H^{1/6}, |A_1|^2 << D^{2+theta+eps}/Y + D^2/Y^2, giving A_1(D)<<D^{11/12+eps}.",
+   "cited_or_new": {
+    "status": "new (application of standard amplification)",
+    "cue": "'because A_{p^6}(D) approx A_1(D) for many primes p'"
+   },
+   "uses_items": [
+    "A03",
+    "A04"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Converts the family bound into the individual bound; source of the exponent 11/12."
+   },
+   "analytic_check": "Not in goal; amplification idea in L only generically.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Amplifier/replication device (Iwaniec-Sarnak, DFI); trivial once A03-A04 are in place."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "A06",
+   "kind": "proof step",
+   "name": "Littlewood-type Mellin deduction of nonvanishing from Mobius power saving",
+   "file_line": "A:paper2.tex:722-760",
+   "statement": "M_W(s)=W^(s)/L^S_K(s,nu) is holomorphic on Re s>11/12, contradiction at a zero.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'smoothed Hecke version of the classical relation ... due to Littlewood [Lit12]'"
+   },
+   "uses_items": [
+    "A05"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Final step."
+   },
+   "analytic_check": "In L.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Littlewood 1912."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "A07",
+   "kind": "lemma",
+   "name": "Arithmetic identities: gamma_2(n)^3=mu(n)alpha(n); gamma_1 gamma_2 = mu alpha G; gamma_1 gamma_{-1}=chi_n(-1)",
+   "file_line": "A:paper2.tex:823-862",
+   "statement": "For squarefree primary n: the cube of the normalized cubic Gauss sum is mu(n)alpha(n); hence mu(n)gamma_{-1}(n)=chi_n(-1)G(n)^{-1}conj(alpha(n))gamma_2(n): Poisson's sextic Gauss sums absorb mu into cubic Gauss sums (= cubic theta coefficients).",
+   "cited_or_new": {
+    "status": "standard (consequences of Gauss-Jacobi, reciprocity)",
+    "cue": "'Following the work of Hasse [Has50, pp. 443-445] and Heath-Brown [HB00, (2)]' (A:320); 'collects standard consequences' (A:820)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The hinge of C1: without it the dual is not automorphic."
+   },
+   "analytic_check": "Identity itself is in L (Hasse, HB00).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical identity; its USE is the C1 device."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "A08",
+   "kind": "lemma",
+   "name": "Poisson summation over O with Gauss sums",
+   "file_line": "A:paper2.tex:875-936",
+   "statement": "Finite Fourier transform of sextic characters gives sextic Gauss sums.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Plumbing."
+   },
+   "analytic_check": "In L.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "A09",
+   "kind": "definition",
+   "name": "Dual mean square E(H,X,F) with auxiliary label f and fourth-power symbol",
+   "file_line": "A:paper2.tex:938-960; 641-648",
+   "statement": "E(H,X,F)=(1/XF) sum_{N f~F}^* sum_{N k<<H} |sum_n^* a_xi(n) chi_n(k) chi_n(f)^4 U(N n/X)|^2, a_xi(n)=conj(alpha(n))gamma_2(n)xi(n).",
+   "cited_or_new": {
+    "status": "new (templated strengthening)",
+    "cue": "'To carry out this argument with the auxiliary twists included, we use the family'"
+   },
+   "uses_items": [
+    "A07"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Induction family."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Strengthened induction hypothesis: add a parameter (template) -> capped at N2."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "A10",
+   "kind": "proposition",
+   "name": "Poisson reduction to the dual mean square",
+   "file_line": "A:paper2.tex:1000-1252",
+   "statement": "Original mean square << D H + (H/D) sum |B_h(D)|^2 schematically; common factors and exclusions removed.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "none"
+   },
+   "uses_items": [
+    "A03",
+    "A07",
+    "A08",
+    "A09"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Step 3."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Expansion + Poisson + coprimality inversion."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "A11",
+   "kind": "proposition",
+   "name": "Canonical estimate E(H,X,F)<<D^eps XF by finite iteration",
+   "file_line": "A:paper2.tex:1261-1279; 1514-1610",
+   "statement": "Proved by combining cube reduction and the transfer estimate; contraction H'/X'=H/X with H' < H(H/X)^2; O_theta(1) steps.",
+   "cited_or_new": {
+    "status": "variant of cited method",
+    "cue": "'following the admissible-exponent method of Heath-Brown [HB95, Lemma 8 and Sec. 8], [HB00, Lemma 9]; see also [GL, Thm 4.1] and [BGL, Sec 3.2]' (A:657-658)"
+   },
+   "uses_items": [
+    "A12",
+    "A13",
+    "A14"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Closes the recursion."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Heath-Brown admissible-exponent iteration (template)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "A12",
+   "kind": "proposition",
+   "name": "Completed mean-square estimate (Prop R) via theta reflection + quadratic large sieve",
+   "file_line": "A:paper2.tex:1317-1339; 1632-2215",
+   "statement": "sum_{N k<<H} |T(X;k,f)|^2 << D^eps (H + H^2 N(f)/X). The completed cubic-theta sum transforms to a dual sum twisted by the quadratic character chi_h^3, then Goldmakher-Louvel's quadratic large sieve applies, avoiding the (ML)^{2/3} term of BGL.",
+   "cited_or_new": {
+    "status": "variant of cited",
+    "cue": "'a variant (established in Appendix) of the theta transformation of Dunn and Radziwill [DR, Sec 5]'; 'Crucially, this avoids the additional term (ML)^{2/3}' (A:412)"
+   },
+   "uses_items": [
+    "A15",
+    "A16"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Where the square-root cancellation comes from."
+   },
+   "analytic_check": "Not in goal; DR and GL in L.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "DR theta transformation + GL quadratic LS; the observation chi^{-1}chi^{-2}=chi^3 (quadratic) is a short computation (also used by family 029)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "A13",
+   "kind": "lemma",
+   "name": "Cube reduction by Mobius inversion of the cube completion",
+   "file_line": "A:paper2.tex:1341-1467; 426-470",
+   "statement": "P_h(X)=sum_d mu(d)w_h(d)/N(d) T_h(X/N(d)^3); short d by Cauchy-Schwarz, long d reduces to E at smaller scale.",
+   "cited_or_new": {
+    "status": "variant",
+    "cue": "'explicit removal of the cube factors by Mobius inversion in Dunn and Radziwill [DR, Prop 5.3 and (8.2)]'"
+   },
+   "uses_items": [
+    "A12"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Step 5."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "DR."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "A14",
+   "kind": "proposition",
+   "name": "Transfer estimate (two Poisson summations with enlarged row range)",
+   "file_line": "A:paper2.tex:1487-1512; 2217-2685",
+   "statement": "Remaining mean square bounded by new E at (H',X')=(H/N(b)^3, X/N(b)^3); second Poisson returns Mobius coefficients to cubic Gauss coefficients.",
+   "cited_or_new": {
+    "status": "variant",
+    "cue": "'For related uses of an enlarged summation range, see Goldmakher-Louvel [GL, Lemma 4.4] following Heath-Brown [HB95, Lemma 9]'"
+   },
+   "uses_items": [
+    "A07",
+    "A08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Recursion step."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "HB95/GL enlarged-range trick; the Mobius<->cubic-Gauss round trip is C1."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "A15",
+   "kind": "lemmas",
+   "name": "Theta realization; reflection proposition; uniformity in the twist; theta bounds",
+   "file_line": "A:paper2.tex:1639-1882; 2874-3479",
+   "statement": "c_theta(nb^3)=3^{5/2}|b| conj(chi_n(lambda)^2) gamma_2(n) (Patterson Thm 8.1 via DR (5.7)); twisted theta = combination of translates; reflection with fixed ray class twists.",
+   "cited_or_new": {
+    "status": "cited + variant",
+    "cue": "'Patterson's formula [Pat77, Thm 8.1], recorded in [DR, (5.7)]'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Automorphic input."
+   },
+   "analytic_check": "In L (Patterson, DR).",
+   "provisional_N": {
+    "grade": "N0/N2",
+    "justification": "Patterson coefficients cited (N0); fixed-ray-class twist variant of DR reflection (N2)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "A16",
+   "kind": "lemma",
+   "name": "Quadratic large sieve over K",
+   "file_line": "A:paper2.tex:1886-1921",
+   "statement": "Goldmakher-Louvel number-field version of Heath-Brown's quadratic large sieve.",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'[GL, Thm 1.1 and Cor 1.2]'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Key analytic input."
+   },
+   "analytic_check": "In L.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Cited theorem (Lean: QuadraticSieve/ re-proves it)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "A17",
+   "kind": "lemmas",
+   "name": "Separating variables in smooth weights",
+   "file_line": "A:paper2.tex:3481-3640",
+   "statement": "Mellin separation of smooth weights.",
+   "cited_or_new": {
+    "status": "routine",
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Plumbing."
+   },
+   "analytic_check": "Plumbing.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "S01",
+   "kind": "theorem",
+   "name": "Uniform exclusion of Landau-Siegel zeros: (1-beta)log q >= c",
+   "file_line": "S:paper.tex:66-75",
+   "statement": "Absolute c>0 for every real zero in (0,1) of every primitive nonprincipal real Dirichlet L of conductor q>=3.",
+   "cited_or_new": {
+    "status": "new (claimed)",
+    "cue": "'We prove its logarithmic formulation.'"
+   },
+   "uses_items": [
+    "S02",
+    "S03",
+    "S07",
+    "S11",
+    "S12"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Headline of S."
+   },
+   "analytic_check": "Goal.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Goal statement."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "S02",
+   "kind": "lemma",
+   "name": "Prime bias forced by a real zero",
+   "file_line": "S:paper.tex:181-244",
+   "statement": "sum_{p<=X, chi(p)=1} log p/p << ell + delta(log X)^2/ell; hence primes with chi(p)=-1 carry mass >= log X - C ell - ... .",
+   "cited_or_new": {
+    "status": "standard (re-proved)",
+    "cue": "'compare [FI, Section 5]'; 'standard logarithmic-derivative identity; see [Davenport, Sec 12, 14]'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Analytic half of the contradiction."
+   },
+   "analytic_check": "In L (Davenport; FI 2018).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical consequence of a Siegel zero (Hadamard product, -zeta'/zeta - L'/L >= 0)."
+   },
+   "provisional_F": null,
+   "lean": "SiegelZeros/Characters/ConditionalPrimeBias.lean (W63.exists_prime_bias_of_hadamard); Hadamard support added to PrimeNumberTheoremAnd by an OAI patch"
+  },
+  {
+   "id": "S03",
+   "kind": "lemma",
+   "name": "Interpolation on a projected integer box",
+   "file_line": "S:paper.tex:252-408",
+   "statement": "If A:C^4->C^3 is surjective with kernel spanned by a vector with Q-independent coordinates, then polynomials of separate degrees t_j with prod(t_j-3(N-1)+1)>(4N-3)^4 interpolate on A(E_N). Proof: dimension count, nearest-point argument for an integer polytope, Lagrange interpolation on a supporting face.",
+   "cited_or_new": {
+    "status": "new proof of a multiplicity-type estimate",
+    "cue": "'General multiplicity estimates ... [Philippon]; rectangular derivative conditions and interpolation duality appear in [Fischler]. The estimate proved here makes the coefficient and coordinate uniformity explicit.'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Guarantees M independent rows (nonzero determinant)."
+   },
+   "analytic_check": "Not in goal; zero/multiplicity estimates in L.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Uniform rectangular multiplicity estimate; close to Philippon/Fischler; new elementary proof."
+   },
+   "provisional_F": null,
+   "lean": "Lean takes a different route: SiegelZeros/Intersection, Hilbert, LocalAlgebra (LocalIsolatedBezoutStatement, Intersection/IsolatedBezoutFromRegularSelection.lean:25)"
+  },
+  {
+   "id": "S04",
+   "kind": "corollary/remark",
+   "name": "Rectangle corollary; torus-derivation interpretation",
+   "file_line": "S:paper.tex:410-443",
+   "statement": "Rows with alpha_j<=T_j (T_1=32H^{2/3}U, T_2=T_3=32H^{-1/3}U) span; equals a rectangular multiplicity estimate for derivations D_j on (C^x)^4.",
+   "cited_or_new": {
+    "status": "standard viewpoint",
+    "cue": "'This interpolation viewpoint is standard in the subject; compare [Fischler]'"
+   },
+   "uses_items": [
+    "S03"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Parameter choice."
+   },
+   "analytic_check": "In L.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Corollary."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "S05",
+   "kind": "construction",
+   "name": "Biquadratic auxiliary field K=Q(sqrt d, sqrt 2), points theta_n=n1+n2a+n3b+n4ab, map A=(theta, sigma theta, sigma tau theta)",
+   "file_line": "S:paper.tex:445-486",
+   "statement": "Adjoin sqrt2 so that, for inert p (chi(p)=-1), Frobenius is sigma or sigma tau (both among the three used conjugates), and A has rank 3 with Q-independent kernel.",
+   "cited_or_new": {
+    "status": "new (design)",
+    "cue": "'Associate to chi a quadratic field Q(sqrt d) and adjoin sqrt2'"
+   },
+   "uses_items": [
+    "S03"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Sets up the determinant."
+   },
+   "analytic_check": "Not in goal or L.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Auxiliary-field design in a Dobrowolski/Cantor-Straus-type argument."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "S06",
+   "kind": "construction",
+   "name": "Weighted greedy row selection by w(alpha)=alpha_1+H alpha_2+H alpha_3 and determinant Delta",
+   "file_line": "S:paper.tex:488-515; Lemma exponents 517-550",
+   "statement": "Retain a row iff it increases the K-span of lower-weight rows; then S_2/S_1 <= (C_0/c_0)/H: almost all degree sits in the Frobenius-relevant coordinate.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'To favor the first exponent, we order the rows by alpha_1+H alpha_2+H alpha_3' (S:107-110)"
+   },
+   "uses_items": [
+    "S03",
+    "S05"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Makes the Frobenius replacement strictly weight-decreasing and makes S_1 dominate."
+   },
+   "analytic_check": "Not in goal or L.",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Weighted interpolation determinant: no exact precedent found; mechanism close to Cantor-Straus (see C6)."
+   },
+   "provisional_F": "F3",
+   "lean": "SiegelZeros/Determinants, Selection; Characters/BiquadraticArithmeticFull.lean:233 weighted_interpolation_determinant_dvd"
+  },
+  {
+   "id": "S07",
+   "kind": "equation",
+   "name": "Frobenius relation theta^p == g_p(theta) mod pR for chi(p)=-1",
+   "file_line": "S:paper.tex:577-596",
+   "statement": "a^p == -a, b^p == (2/p) b mod p, so theta^p == sigma(theta) or sigma tau(theta).",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'This is the Frobenius relation in the ring R.'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Source of divisibility."
+   },
+   "analytic_check": "In L (Euler's criterion).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "S08",
+   "kind": "lemma",
+   "name": "Divisibility Delta in p^{E_p}R, E_p=sum floor(alpha_1/p), via unitriangular row replacement",
+   "file_line": "S:paper.tex:598-650",
+   "statement": "Replace theta^{alpha_1} by theta^r(theta^p-g_p(theta))^k; the change is a combination of strictly lower-weight rows (weight drops by m(p-H)), so the determinant is unchanged while each replaced row is divisible by p^k.",
+   "cited_or_new": {
+    "status": "new (variant)",
+    "cue": "none (no cue); cf. Laurent [Laurent, Sec 6] for the determinant method"
+   },
+   "uses_items": [
+    "S06",
+    "S07"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Arithmetic lower bound."
+   },
+   "analytic_check": "Not in goal; analogous Frobenius-congruence divisibility in Dobrowolski 1979 / Cantor-Straus 1982 (not in L: not cited).",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Close variant of Dobrowolski/Cantor-Straus Frobenius divisibility for Lehmer's problem."
+   },
+   "provisional_F": null,
+   "lean": "SiegelZeros/Determinants/ThetaDivisibility.lean:62-248 (theta_frobenius_dvd, floor_sum_dvd_replacement_det)"
+  },
+  {
+   "id": "S09",
+   "kind": "bounds",
+   "name": "Archimedean (Hadamard) bound and prime lower bound; master inequality 1 <= 3/4(1+S2/S1)+...",
+   "file_line": "S:paper.tex:552-705",
+   "statement": "(1/4)log|N Delta| <= (M/2)log M + (S1+S2)(log N + ell/2 + log 8) vs >= S1(log U - C ell - ...) - CMU with log N = (3/4)log U; limit gives 1 <= 13/16+1/16=7/8.",
+   "cited_or_new": {
+    "status": "standard (determinant method)",
+    "cue": "'interpolation-determinant method described by Laurent'"
+   },
+   "uses_items": [
+    "S02",
+    "S06",
+    "S08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Closes S."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard comparison of bounds."
+   },
+   "provisional_F": null
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Patterson's cubic theta coefficients c_theta(nb^3)=3^{5/2}|b| conj(chi_n(lambda)^2)gamma_2(n) and cusp expansions",
+   "bib_key": "Patterson77; DR",
+   "locator": "Pat77 Thm 8.1; DR Sec 5, (5.6)-(5.8), App. A",
+   "field": "Automorphic forms",
+   "used_at": "A:360-366, 1686-1882; Q:122-127, 1676ff",
+   "status": "cited in papers (theta transformation re-derived with zeros kept); re-proved in Lean (Eisenstein/)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Quadratic large sieve over number fields",
+   "bib_key": "GL (Goldmakher-Louvel 2013), HB95",
+   "locator": "GL Thm 1.1, Cor 1.2",
+   "field": "Analytic number theory",
+   "used_at": "A:412, 1886; Q:2956-3311",
+   "status": "cited, invoked; re-proved in Lean (QuadraticSieve/)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Higher-order (sextic) large sieve",
+   "bib_key": "BGL; GZSextic; HB (cubic)",
+   "locator": "BGL Thm 1.3, Sec 3",
+   "field": "Analytic number theory",
+   "used_at": "Q:4707-5171",
+   "status": "re-proved for the sextic primary case (Q); not used in A",
+   "essential_for_headline": "Q only"
+  },
+  {
+   "name": "Heath-Brown recursive (admissible exponent) method",
+   "bib_key": "HB95; HB00; GL",
+   "locator": "HB95 Lemma 8-9, Sec 8; GL Lemma 4.4",
+   "field": "Analytic number theory",
+   "used_at": "A:1514-1610; Q:9783-11600",
+   "status": "method adapted (re-done)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Zero detector (truncated inverse + Gamma integral)",
+   "bib_key": "MP; GM",
+   "locator": "MP App. C; GM Sec 13.1",
+   "field": "Analytic number theory",
+   "used_at": "Q:4510-4686",
+   "status": "re-done with saturated witnesses",
+   "essential_for_headline": "Q only"
+  },
+  {
+   "name": "Prime ideal theorem in a fixed ray class",
+   "bib_key": "TZ (Thorner-Zaman); Lan03",
+   "locator": "TZ Thm 1.1; IK Thm 5.33",
+   "field": "Analytic number theory",
+   "used_at": "Q:7004-7040; A:713-716",
+   "status": "cited, invoked",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Hecke functional equation / meromorphic continuation",
+   "bib_key": "GZ; Hec20; IK",
+   "locator": "GZ (1.1); IK 5.10",
+   "field": "Analytic number theory",
+   "used_at": "Q:12477ff; A:740-748",
+   "status": "cited, invoked",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Gauss-Jacobi, Hasse-Davenport, cubic Jacobi sum = -p",
+   "bib_key": "Has50; HB00 (2)",
+   "locator": "Has50 pp.443-445",
+   "field": "Algebraic number theory",
+   "used_at": "Q:766-839; A:320-324, 823-862",
+   "status": "re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Littlewood's Mobius / zero-free equivalence",
+   "bib_key": "Lit12; MM09",
+   "locator": "-",
+   "field": "Analytic number theory",
+   "used_at": "A:233-237, 722-760",
+   "status": "re-done (smoothed Hecke form)",
+   "essential_for_headline": "A only"
+  },
+  {
+   "name": "Quadratic base change factorization L_K(s,chi o N)=L(s,chi)L(s,chi chi_{-3})",
+   "bib_key": "Dav00",
+   "locator": "-",
+   "field": "Algebraic number theory",
+   "used_at": "Q:6700-6808; A:752-760",
+   "status": "standard, invoked",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Bhargava-Ivanyos-Mittal-Saxena weak-GRH consequences; Tonelli-Shanks; Rodosskii; EKN20 idoneal; Littlewood class number",
+   "bib_key": "BIMS; Galbraith; Rod56; MV07; EKN20; Lit28",
+   "locator": "BIMS Conj 6.3, Thm 6.7",
+   "field": "Computational NT / analytic NT",
+   "used_at": "Q:325-361; A:97-125",
+   "status": "cited, corollary-only",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Hadamard product and log-derivative identity for L(s,chi); Mertens; Chebyshev",
+   "bib_key": "Davenport",
+   "locator": "Sec 12, 14",
+   "field": "Analytic number theory",
+   "used_at": "S:181-244, 653-660",
+   "status": "standard, re-proved",
+   "essential_for_headline": "S"
+  },
+  {
+   "name": "Interpolation determinant method; multiplicity estimates",
+   "bib_key": "Laurent; Philippon; Fischler",
+   "locator": "Laurent Sec 6; Fischler Thm 1.1, Lemma 1.3",
+   "field": "Transcendence theory",
+   "used_at": "S:136-150, 410-515",
+   "status": "method followed; lemma re-proved",
+   "essential_for_headline": "S"
+  },
+  {
+   "name": "Guth-Maynard large values; classical zero-free regions; Vinogradov-Korobov; Page; Deuring-Heilbronn; Siegel",
+   "bib_key": "GM; TZ; Vin58; Kor58; Page; Linnik; HeathBrown92; Siegel",
+   "locator": "-",
+   "field": "Analytic number theory",
+   "used_at": "intros",
+   "status": "background-cited",
+   "essential_for_headline": false
+  }
+ ],
+ "proof_architecture": {
+  "Q": [
+   {
+    "step": 1,
+    "claim": "Reduce to primitive Hecke characters over F; define beta_*; suppose beta_*>sigma_0. Continuation criterion (Q04): a uniform-in-eta power saving for a probe compared with a Mellin signal containing 1/L^S_F continues 1/L past beta_*, contradiction.",
+    "items": [
+     "Q03",
+     "Q04"
+    ]
+   },
+   {
+    "step": 2,
+    "claim": "Arithmetic: sextic symbols with zeros kept, prime Gauss identities (gamma_2^3=-alpha), reciprocity phases, smooth calculus, Hecke growth on zero-free disks.",
+    "items": [
+     "Q06",
+     "Q07",
+     "Q08",
+     "Q09",
+     "Q10"
+    ]
+   },
+   {
+    "step": 3,
+    "claim": "Completed cubic reflection: completed theta sums over cn^3 twisted by sextic symbols reflect to quadratic-twisted dual sums; quadratic large sieve bounds the reflected row energy.",
+    "items": [
+     "Q11",
+     "Q12",
+     "Q13"
+    ]
+   },
+   {
+    "step": 4,
+    "claim": "Base probe I_eta(X,Y,Z) (Q16). Low side: separates into additive polynomial x completed theta row; planar additive large sieve + Q13 give I << Z^{1/4+eps} at X=Y=Z^{1/2}.",
+    "items": [
+     "Q14",
+     "Q15",
+     "Q16"
+    ]
+   },
+   {
+    "step": 5,
+    "claim": "High side: Poisson in m; rows u a^6; scalar Euler identity: principal row u=1 = nonzero scalar x f_eta (contains 1/L_F); non-principal rows are Hecke twists of the target.",
+    "items": [
+     "Q17",
+     "Q18"
+    ]
+   },
+   {
+    "step": 6,
+    "claim": "Zero detector: a row with a zero above the floor yields saturated inverse and plain witnesses (Q20); sextic large sieve counts rows (Q21-Q22); everything measured against C(beta_*) (Q25).",
+    "items": [
+     "Q19",
+     "Q20",
+     "Q21",
+     "Q22",
+     "Q25"
+    ]
+   },
+   {
+    "step": 7,
+    "claim": "Contour analysis, principal extraction, outer rows: margins 1021/25000, 1/40, 1/1200, 43/300, >1; common saving 1/4800 -> Theorem 11/12 with C_I(s)=s-2/3; transfer to Dirichlet.",
+    "items": [
+     "Q23",
+     "Q24",
+     "Q05",
+     "Q26"
+    ]
+   },
+   {
+    "step": 8,
+    "claim": "Part II: assume 7/8<beta_*<=11/12. Compensated probe with prime slots (marked minus rescaled), asymmetric scales X=Z^{17/48}, Y=Z^{23/48}, C_II(s)=s-11/16.",
+    "items": [
+     "Q27",
+     "Q28"
+    ]
+   },
+   {
+    "step": 9,
+    "claim": "Compensated low estimate via marked reflection, reflected energy and additive Gram bound; local compensation errors.",
+    "items": [
+     "Q29",
+     "Q30"
+    ]
+   },
+   {
+    "step": 10,
+    "claim": "Two moment inductions: marked inverse moment (Mobius polynomials x prime slots; two Poisson transforms per step, terminal reflected energy) giving eq raw-moment and sixth-power amplification; plain fourth moment with prime factors (excluding inducing characters in Theta; centered cancellation).",
+    "items": [
+     "Q31",
+     "Q32",
+     "Q33",
+     "Q34"
+    ]
+   },
+   {
+    "step": 11,
+    "claim": "Refined row counts from both witnesses; principal normalizer; endpoint inequality; order of choices -> criterion verified at 7/8.",
+    "items": [
+     "Q35",
+     "Q36"
+    ]
+   }
+  ],
+  "A": [
+   {
+    "step": 1,
+    "claim": "Littlewood reduction: A_1(D)<<D^{11/12+eps} for every finite-order nu implies zero-freeness (A06).",
+    "items": [
+     "A06"
+    ]
+   },
+   {
+    "step": 2,
+    "claim": "Embed A_1 in the sextic family A_u(D) (A03); A_{p^6}=A_1+O(D/Y), so the mean square (A04) with H=D^{1+theta}, Y=H^{1/6} gives 11/12 (A05).",
+    "items": [
+     "A03",
+     "A04",
+     "A05"
+    ]
+   },
+   {
+    "step": 3,
+    "claim": "Poisson in u: sextic Gauss sums gamma_{-1} combine with mu into cubic Gauss sums (A07): dual family B_h of cubic-Gauss coefficients; target sum_h |B_h(D)|^2 << D^2.",
+    "items": [
+     "A07",
+     "A08",
+     "A09",
+     "A10"
+    ]
+   },
+   {
+    "step": 4,
+    "claim": "Realize cubic Gauss coefficients as theta coefficients; complete with cube factors; theta reflection gives quadratic twists chi_h^3; quadratic large sieve gives sum |T_h|^2 << H + H^2/X.",
+    "items": [
+     "A12",
+     "A15",
+     "A16"
+    ]
+   },
+   {
+    "step": 5,
+    "claim": "Remove cubes by Mobius inversion; short divisors directly; long divisors via the transfer estimate (two Poisson summations: Gauss -> Mobius -> Gauss) at contracted scales; iterate O(1) times.",
+    "items": [
+     "A11",
+     "A13",
+     "A14",
+     "A17"
+    ]
+   }
+  ],
+  "S": [
+   {
+    "step": 1,
+    "claim": "A real zero with delta=(1-beta)log q small forces primes with chi(p)=-1 to carry almost all of sum log p/p up to X=q^{O(1)}.",
+    "items": [
+     "S02"
+    ]
+   },
+   {
+    "step": 2,
+    "claim": "Biquadratic field K=Q(sqrt d, sqrt2); points theta_n on a box of side N; three conjugates; interpolation lemma gives a nonzero M x M determinant Delta from monomial rows at degree scale U=N^{4/3}.",
+    "items": [
+     "S03",
+     "S04",
+     "S05"
+    ]
+   },
+   {
+    "step": 3,
+    "claim": "Weighted greedy row order alpha_1+H(alpha_2+alpha_3): S_2/S_1 = O(1/H).",
+    "items": [
+     "S06"
+    ]
+   },
+   {
+    "step": 4,
+    "claim": "For inert p>H, theta^p == sigma(theta) or sigma tau(theta) mod p; unitriangular replacement gives p^{E_p} | Delta, E_p ~ S_1/p.",
+    "items": [
+     "S07",
+     "S08"
+    ]
+   },
+   {
+    "step": 5,
+    "claim": "Compare (1/4)log|N Delta|: lower ~ S_1 log U (inert mass ~ log U by step 1), upper ~ (S_1+S_2)(3/4 log U + ell/2). With H large, N=q^gamma, gamma large, delta->0: 1 <= 7/8, contradiction.",
+    "items": [
+     "S09"
+    ]
+   }
+  ]
+ },
+ "proof_comparison": {
+  "Q_partI_vs_A_same_exponent_11_12": [
+   {
+    "aspect": "Object",
+    "Q": "Base probe I_eta(X,Y,Z): sextic Gauss sums x completed cubic-theta rows x target eta; principal Poisson row contains 1/L_F (Q16, Q18).",
+    "A": "Mobius sum A_1(D) embedded in the sextic-twisted family A_u(D) (A03)."
+   },
+   {
+    "aspect": "Logic",
+    "Q": "Indirect: hypothetical family supremum beta_*>11/12; non-principal rows (Hecke twists) controlled by zero detector + sextic large sieve, measured against C(beta_*) (bootstrap).",
+    "A": "Direct and unconditional: mean-square bound (A04) -> individual power saving via sixth-power rows (A05) -> Littlewood (A06). No beta_*, no detector, no sextic large sieve."
+   },
+   {
+    "aspect": "Shared core",
+    "Q": "gamma_2^3=-alpha; theta reflection with quadratic twist; quadratic large sieve; cube completion.",
+    "A": "Same identities (A07), same reflection (A12/A15), same quadratic sieve (A16), same cube completion/removal (A13), plus HB recursion (A11, A14)."
+   },
+   {
+    "aspect": "Exponent source",
+    "Q": "C_I(s)=s-2/3, balanced scales X=Y=Z^{1/2}, low side Z^{1/4}; weakest margin 1/1200 (principal z remainder).",
+    "A": "|A_1|^2 << DH/Y + D^2/Y^2 with H=D^{1+theta}, Y=H^{1/6}: exponent 1/2(1+5/6)=11/12."
+   },
+   {
+    "aspect": "Relation",
+    "Q": "Q's Part II derives exactly A's key estimate as eq:raw-moment (Q:12370-12376) from its marked inverse moment, but uses it only for sixth-power-FREE rows.",
+    "A": "A observes that the sixth-power rows themselves replicate the target, which turns that lemma into a complete, much shorter 11/12 proof. A calls 11/12 'a natural intermediate step' toward Q (A:81)."
+   },
+   {
+    "aspect": "Size / formalization",
+    "Q": "Part I ~6,000 lines; Lean formalizes a direct 7/8 route that seems to skip Part I.",
+    "A": "~3,900 lines; not formalized separately, but its engine (raw moment) has a Lean counterpart on the 7/8 path."
+   }
+  ],
+  "Q_partII_7_8": "Adds prime compensation (Q27), asymmetric scales, a plain fourth moment (Q34) and refined row counts using both witnesses; C_II(s)=s-11/16.",
+  "S_vs_Q_A": "S is unrelated in method (algebraic: interpolation determinant + Frobenius divisibility + Siegel-zero prime bias) and proves a consequence of both Q and A; its Lean proof is independent of the 7/8 chain. It provides an independent cross-check of the Siegel corollary only."
+ },
+ "eureka_candidates_ranked": [
+  {
+   "rank": 1,
+   "id": "C1",
+   "item": "A03+A04+A07 (= Q16/Q17/Q18, Q33 eq:raw-moment)",
+   "name": "Sextic-twist duality: embed the Mobius (1/L) sum into a family twisted by sextic residue symbols over Z[omega], so Poisson in the twist turns mu(n) x sextic Gauss sum into a cubic Gauss sum = Kubota-Patterson theta coefficient; automorphy + quadratic large sieve give square-root cancellation on average",
+   "provisional_N": "N3",
+   "provisional_F": "F5",
+   "for": [
+    "Neither the goal nor L contains sextic-twisted Mobius families or theta coefficients attached to 1/L; the device makes the reciprocal of an L-function visible to an automorphic form (non-analytic).",
+    "It is the entire analytic engine of both A and Q (Lean: Moments+Eisenstein+GaussSum+Descent+Inversion+Reflection+QuadraticSieve ~ 56% of the zeta DAG).",
+    "Reused as a device by release family 029 (Hecke zero-free half-plane over cyclotomic fields containing mu_12)."
+   ],
+   "against": [
+    "Every ingredient is classical: the identity gamma_2(n)^3=mu(n)alpha(n) (Hasse, HB00 eq (2), cited at A:320), Patterson theta coefficients, DR's Voronoi formula and cube completion, GL quadratic sieve, HB recursion.",
+    "DR (Annals 2024) connect Gauss sums at primes with L-function/Mobius information under GRH; the same bridge used in the opposite direction may already be implicit there (full text not read).",
+    "Gao-Zhao (arXiv 2212.09241) treat mean squares of quadratic twists of Mobius by Poisson + Gauss sums (quadratic analogue)."
+   ],
+   "quick_lit_check": "WebSearch: DR abstract (dispersion estimate = cubic large sieve with main term, GRH-conditional); Gao-Zhao 2212.09241 (quadratic Mobius twists). No source found using sextic twists of Mobius sums to reach theta coefficients or zero-free regions (searches: 'mean square Mobius sums twisted by sextic residue symbols ... theta', 'Dunn Radziwill ... Mobius large sieve GRH')."
+  },
+  {
+   "rank": 2,
+   "id": "C6",
+   "item": "S05+S06+S08",
+   "name": "Weighted Frobenius interpolation determinant for Siegel zeros (biquadratic auxiliary field, row weight alpha_1+H(alpha_2+alpha_3), unitriangular Frobenius replacement giving p^{E_p} | Delta)",
+   "provisional_N": "N2 (N3 before quick check)",
+   "provisional_F": "F3",
+   "for": [
+    "No source found connecting interpolation determinants / Frobenius congruences with Siegel zeros; the argument is short and decisive (1 <= 7/8).",
+    "Weighted greedy ordering to concentrate degree in the Frobenius-active coordinate is not in Laurent/Philippon/Fischler."
+   ],
+   "against": [
+    "Dobrowolski (1979) and Cantor-Straus (1982) for Lehmer's problem use exactly the Frobenius congruence alpha^p == conjugate mod p to make an interpolation (Vandermonde/resultant) determinant divisible by p^d, summed over primes and compared with an archimedean bound (WebSearch summaries).",
+    "Siegel-zero prime bias is classical (FI 2018 Sec 5)."
+   ],
+   "quick_lit_check": "WebSearch: Dobrowolski/Cantor-Straus/Louboutin/Voutier (arXiv 2308.16305, 0908.4024 summaries); Laurent interpolation determinants; no Siegel-zero application found."
+  },
+  {
+   "rank": 3,
+   "id": "C2",
+   "item": "Q03+Q04+Q20+Q25",
+   "name": "Family bootstrap: measure every row against the hypothetical rightmost zero beta_* of the whole Hecke family, with saturated two-witness zero detector (replaces DR's GRH)",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Lets Q control Hecke-twist rows unconditionally."
+   ],
+   "against": [
+    "Classical Montgomery/Halasz zero detection (MP App. C, GM Sec 13); 'rightmost zero' supremum arguments are standard; A shows it is unnecessary for 11/12."
+   ],
+   "quick_lit_check": "Paper's own cues; no separate search beyond MP/GM (background knowledge, not verified)."
+  },
+  {
+   "rank": 4,
+   "id": "C3",
+   "item": "Q27",
+   "name": "Compensated probe: marked-minus-rescaled prime slots with asymmetric scales (11/12 -> 7/8)",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Specific design not found elsewhere; drives the improvement to 7/8."
+   ],
+   "against": [
+    "Local compensation of Euler contributions is mollifier-like (Selberg) and design-specific; improvement of an exponent within a fixed method."
+   ],
+   "quick_lit_check": "none beyond the paper (design-specific)."
+  },
+  {
+   "rank": 5,
+   "id": "C4",
+   "item": "A05/Q33",
+   "name": "Sixth-power row replication / amplification: chi_n(p^6)=1_{p not | n} so the target recurs ~Y/log Y times in the family",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Short and decisive in A."
+   ],
+   "against": [
+    "Standard amplification (Iwaniec-Sarnak, Duke-Friedlander-Iwaniec); trivial once C1 is in place."
+   ],
+   "quick_lit_check": "background knowledge; no targeted search."
+  }
+ ],
+ "correctness_audit": {
+  "verdict": "No definite gap found. S was re-derived step by step and appears correct (sanity check: with the generic Chebotarev distribution the bounds balance exactly at 3/4, so the method does not prove too much). Q and A are far too long to verify by hand; the outlines are internally consistent. Formal verification is the decisive trust anchor and is pending (orchestrator compile).",
+  "checked": [
+   "Continuation criterion Q04 (Q:400-466): proof correct (Fourier inversion on Re s=2, identity theorem, uniform epsilon_*).",
+   "A05 arithmetic: |A_1|^2 << D^{2+theta}/Y + D^2/Y^2 with Y=D^{(1+theta)/6} gives D^{11/6+5theta/6}; exponent 11/12. Correct.",
+   "A04 consistency: rows u=p^6 force |A_1|^2 Y <= DH, i.e. it is equivalent in strength to the 11/12 bound; rows u=a^3 (quadratic twists) are consistent with the known quadratic large sieve.",
+   "A07/Q07: gamma_2(p)^3=-alpha(p) from J(H^2,H^2)=-p (primary normalization) and Davenport-Hasse; the minus sign produces mu(n). Correct.",
+   "S: prime-bias lemma, Hadamard upper bound, Frobenius divisibility (weights drop by m(p-H)), Lemma exponents (c_0=(4*97^2)^{-1}, C_0=192), master inequality 13/16+1/16=7/8<1. Correct on reading.",
+   "Lean comparators: zeta and Dirichlet statements are exactly the classical claims with Mathlib definitions; no sorry/axiom/native_decide in 3,232 files nor in the patched PNT+ files."
+  ],
+  "concerns": [
+   "Extraordinary claims (a fixed zero-free half-plane for zeta; Landau-Siegel; Vinogradov's nonresidue conjecture) with no external review; the Manifold market and press only report claims (WebSearch snippets).",
+   "A04/Q33 claims square-root cancellation over rows H=D^{1+theta}, beyond the BGL sextic large sieve; equivalently a sub-(HX)^{2/3} dual mean square for cubic-Gauss coefficients. DR show (under GRH) Heath-Brown's cubic large sieve is sharp up to X^{o(1)}; whether DR's extremal configuration conflicts with A's dual bound E(H,X)<<X must be checked against DR's full text (not accessible here).",
+   "Lean 7/8 route seems to bypass the paper's Part I (no 11/12 stage; kappa<=1); so the formal proof is not a line-by-line certificate of the paper as written.",
+   "Hecke comparator relies on challenge-file definitions; their identification with the Hecke L-function rests on library lemmas outside the comparator (IdealBridge.lean:118 etc.).",
+   "Third-party package patched with OpenAI-written files (PNT+ SiegelZeros Hadamard support, 6,754 lines): covered by the axiom check, but part of the trusted build.",
+   "enable_nanoda=false: no independent kernel replay.",
+   "A's corollaries (uniform effective x^{11/12}log x; idoneal list; effective class numbers) and Q's BIMS corollary are not formalized.",
+   "The paper is not self-contained for cited inputs (DR cusp expansions, GL), but Lean re-proves them, which strengthens rather than weakens trust if it compiles."
+  ]
+ },
+ "extraction_friction": [
+  "Q is one 16,677-line .tex file with 151 environments; most load-bearing objects (probe, completion, compensated probe, beta_* bootstrap) are displays or prose, not environments.",
+  "Three manuscripts with two unrelated architectures; A is a simplification extracted from Q's Part II lemma; S proves a corollary by a different method. Item IDs need prefixes (Q/A/S).",
+  "lean/docs/003.md lists only Q and S; A has no formalization.",
+  "Lean: 3,232 files, 31k declarations; namespaces are not family IDs and are opaque (SevenEighths.*, ActualEisensteinCubic, CubicEisenstein, ShortDraft*, SiegelZerosAwei.W07..W63, WeightedTorusJets.W22...).",
+  "Lean routes differ from the papers (7/8 without the 11/12 stage; Siegel via local Bezout instead of the nearest-point lemma); paper<->Lean joins are by topic, not names.",
+  "extract_lean.py dominated shares are diluted (<=0.15); directory shares used instead. Output written to the scratchpad, not data/items.",
+  "Cited inputs (Patterson, GL, BGL, TZ) are re-proved in Lean (Eisenstein/ re-builds the cubic theta function from spectral theory), so 'cited vs re-proved' differs between paper and Lean."
+ ],
+ "sources_quick_lit_check": [
+  "https://annals.math.princeton.edu/2024/200-3/p03 (Dunn-Radziwill abstract, via WebSearch summary)",
+  "https://arxiv.org/pdf/2212.09241 (Gao-Zhao, mean squares of quadratic twists of Mobius; search snippet)",
+  "https://arxiv.org/pdf/2308.16305 and https://arxiv.org/pdf/0908.4024 (Dobrowolski / Cantor-Straus determinant summaries; snippets)",
+  "https://arxiv.org/pdf/2404.16003 (Basak-Thorner-Zaharescu, Remarks on Landau-Siegel zeros; snippet)",
+  "https://arxiv.org/pdf/2608.12257 (Power sums and Siegel-type zero-free regions; LLM used only for proofreading per snippet)",
+  "https://manifold.markets/vi/which-of-openais-claimed-math-resul (claims status; snippet)",
+  "https://officechai.com/ai/quasi-riemann-hypothesis-explanation/ (press; snippet)"
+ ]
+}
