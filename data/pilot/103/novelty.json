@@ -1,0 +1,628 @@
+{
+ "family": 103,
+ "title": "Exact derandomization of logarithmic space: L = RL = BPL",
+ "analyst_role": "NOVELTY analyst (text level; no Lean build; WebFetch unavailable - DNS failures for arxiv.org and eccc.weizmann.ac.il; claims rest on WebSearch summaries)",
+ "date": "2026-10-10",
+ "inputs": [
+  "data/pilot/103/family.json",
+  "data/pilot/103/family.md",
+  "manuscript build/sections/*.tex",
+  "lean/OAI/Computability/Logspace/*.lean",
+  "data/items/103_lean.json (scripts/extract_lean.py)",
+  "no trace.json / f1_*.json exist for 103"
+ ],
+ "base_library_L": "Mathlib d13f23b + the paper's references.bib (40 entries)",
+ "precedent_checks": [
+  {
+   "work": "Chen-Cohen-Doron-Khaskelberg-Ta-Shma, 'Improved Error Reduction for Weighted PRGs', APPROX/RANDOM 2026 (LIPIcs 392:39), ECCC TR26-064",
+   "fetched": false,
+   "ai_disclosure": "none mentioned in search summaries (unverified; page not fetchable)",
+   "contains_candidates": "absent (weighted-PRG error reduction; no copy hierarchy or budget telescoping)",
+   "role_in_paper": "background (intro.tex:166-170)"
+  },
+  {
+   "work": "Cheng-Wu, 'SC Derandomization for Regular ROBPs and Models Beyond BPL', arXiv:2609.23603 v1 (Sept 20, 2026)",
+   "fetched": false,
+   "ai_disclosure": "none mentioned in search summary (unverified)",
+   "contains_candidates": "absent (SC simulations for regular ROBPs)",
+   "role_in_paper": "background (intro.tex:171-177); posted 3 days before the manuscript"
+  },
+  {
+   "work": "Pyne-Tell, 'Using Hardness vs Randomness to Design Low-Space Algorithms', ECCC TR26-045 (survey, Mar 30 2026)",
+   "fetched": false,
+   "ai_disclosure": "none mentioned in search summary (unverified)",
+   "contains_candidates": "absent (survey)",
+   "role_in_paper": "background"
+  },
+  {
+   "work": "Cohen-Doron-Sberlo-Ta-Shma STOC'23 (ECCC TR22-149)",
+   "fetched": false,
+   "ai_disclosure": "n/a (2022-23, human-authored)",
+   "contains_candidates": "close in purpose to C2 (precision-alternating recursion avoids log n per level); Richardson-based shift-and-truncate is a neighbour of C1's correction",
+   "role_in_paper": "cited as related (intro.tex:131-136)"
+  },
+  {
+   "work": "OpenAI 'Ten Advances in Mathematics and TCS' (Astra, Aug 1 2026) - from search snippets",
+   "fetched": false,
+   "ai_disclosure": "model-produced",
+   "contains_candidates": "no BPL result mentioned in snippets",
+   "role_in_paper": "not cited"
+  }
+ ],
+ "candidates": [
+  {
+   "id": "C1",
+   "name": "Correction-and-copy hierarchy (shallow exact reward target)",
+   "paper_items": [
+    "I06 correction identity (hierarchy.tex:4-16)",
+    "I07 soft-threshold correction (hierarchy.tex:39-80)",
+    "I09 pilot detectors (hierarchy.tex:178-400)",
+    "I11 copy step, prop:hier-copy-step (hierarchy.tex:490-603)",
+    "I12 reward identity / shallow target, prop:hier-reward-target (hierarchy.tex:623-731)"
+   ],
+   "trace": "no trace for family 103",
+   "statement": "Stagewise: choose g by sampled column detectors, E=k_* iterations of E<-fQ((C+EC)/f)g, D=C-E+EC so I-D=(I+E)(I-C) (mass moved to reward), split large residual entries over D0 copies; max entry /2^H, active vertices x<=2; W_{l+1}=r(W_l+E_lW_l); after L=O(log n) stages 0<=p0(x)-W_L(primary)<=|V0|2^{-(H-1)L}.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Classical left preconditioning (I+S)A / modified Gauss-Seidel (Gunawardena-Jain-Snyder 1991 and successors; search snippets on '(I+C)' preconditioned SOR)",
+      "relation": "the identity I-D=(I+E)(I-C) alone",
+      "verdict": "equivalent for I06 only; genuinely different for the hierarchy"
+     },
+     {
+      "ref": "Incomplete LU with threshold dropping (ILUT, Saad 1994) [from memory, not searched]",
+      "relation": "threshold-based partial elimination",
+      "verdict": "genuinely different (drops small entries; here large entries are eliminated and remaining large ones split over copies)"
+     },
+     {
+      "ref": "Cohen-Doron-Renard-Sberlo-Ta-Shma CCC'21; Cohen-Doron-Sberlo-Ta-Shma STOC'23 (Richardson iteration, 'improved shift and truncate', 'precision-alternating recursive scheme' - search snippets)",
+      "relation": "Richardson-type correction of approximate inverses of stochastic products in small space",
+      "verdict": "genuinely different (powering/products of width-w matrices; no copy hierarchy, no detectors)"
+     },
+     {
+      "ref": "Ahmadinejad-Kelner-Murtagh-Peebles-Sidford-Vadhan FOCS'20 (cycle-lifted graphs; Eulerian Laplacian inversion via powering - search snippet)",
+      "relation": "lifting a chain to a product with a cycle; inverse via powering",
+      "verdict": "genuinely different (lift for spectral approximation, not copies to dilute heavy entries)"
+     },
+     {
+      "ref": "Saks-Zhou 1999; Hoza 2021 (BPL in L^{3/2}/sqrt(loglog))",
+      "relation": "recursive powering with random rounding",
+      "verdict": "genuinely different"
+     }
+    ],
+    "searches": [
+     "'Richardson iteration preconditioner space-bounded derandomization ...'",
+     "'Cohen Doron Sberlo Ta-Shma approximating iterated multiplication'",
+     "'preconditioned splitting (I+E)(I-C) substochastic ... copies vertices reward'",
+     "'Hoza better pseudodistributions ... Richardson'"
+    ],
+    "verdict": "no near-equivalent found in searches; components individually precedented (identity, thresholding, lifts, sampling)"
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "The goal is L=RL=BPL; L contains matrix inverses, Neumann series and Richardson-type corrections, but not the copy sets V_l, routing fractions, detector-gated multipliers or rewards W_l. The identity I-D=(I+E)(I-C) is analytic (preconditioning), the hierarchy is not. Syntactic size of E is small (a soft threshold of a Neumann sum) - irrelevant per the PHP anchor."
+   },
+   "test3": {
+    "verdict": "pass",
+    "evidence": "Defines the exact target estimated by all of Secs. 5-12. Lean: residual/substochastic/factorial (ProbabilityHierarchy.lean:179-277) each have 912 dependents = 35% of the whole 5166-declaration proof DAG, more than the entire 27% mathematical core; i.e. essentially the whole core estimator sits downstream. Dominated share ~0 because the target is also reached through implementation branches (text-level extractor; under-links tactic-internal uses)."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "not measurable (no trace); from L the identity is 1 step, the copy step + detector + potential argument is >=3 new ideas",
+    "chain_depth": 3,
+    "protocol": "P-C1"
+   },
+   "final": {
+    "N": "N3",
+    "F": "F5 (embedding the chain into a growing copy space V_l x {0..D0-1}) with an F4 component (potential |A(C_l)| * maxentry decreasing as 2^{-(H-1)l})",
+    "confidence": 0.5,
+    "justification": "No neighbour found for the whole construction across numerical linear algebra, Markov chains and space-bounded derandomization; it is non-analytic and load-bearing in Lean. Downgrade risks: it is a combination of individually known moves, and by itself it does not break the log^2 barrier (depth-L recursion). Grade is conditional on the proof being correct (comparator build pending)."
+   }
+  },
+  {
+   "id": "C2",
+   "name": "Slack-telescoped multilevel estimator in one shared O(log n)-bit environment",
+   "paper_items": [
+    "I20 additive schedule (estimation.tex:428-722)",
+    "I17 validated walk variants (averaging.tex:108-249)",
+    "I19 homogeneous loss / domain costs (estimation.tex:178-427)",
+    "I29 conditioning on one start (conclusion.tex:114-276)"
+   ],
+   "trace": "no trace",
+   "statement": "At budget M, sum over m of conditional-walk averages (walk length l(M-m)) of T_{b,m}-T_{b,m-1}; means telescope, differences have norm 2^{-p+C0 d} so O(d)-length walks suppress noise to 2^{-p-K_n d}; descriptors O(d) bits, children at budget <= M-d; integrated (all-vertex, retention-weighted) L_s errors; the final factor N is paid by p=Theta(log n).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Multilevel Monte Carlo (Heinrich 2001; Giles, Oper. Res. 2008) [from memory]",
+      "relation": "telescoping sum over levels; differences of consecutive levels have small variance, so fewer samples are needed at fine levels",
+      "verdict": "close variant of the core principle (transfer); MLMC has no space/recursion-depth role"
+     },
+     {
+      "ref": "Cohen-Doron-Sberlo-Ta-Shma STOC'23",
+      "relation": "'precision-alternating recursive scheme' to 'bypass the bottleneck of paying log n-space per recursion level' (search snippet)",
+      "verdict": "close in purpose (per-level cost below log n), different mechanism"
+     },
+     {
+      "ref": "Saks-Zhou 1999; Nisan 1994 (RL in SC)",
+      "relation": "reuse of one short random string across recursion levels",
+      "verdict": "genuinely different"
+     },
+     {
+      "ref": "Expander-walk samplers (AKS87, Gillman 1998)",
+      "relation": "averaging by walks",
+      "verdict": "N0 ingredient"
+     }
+    ],
+    "searches": [
+     "'multilevel telescoping estimator expander walk ... Saks-Zhou'",
+     "'multilevel Monte Carlo telescoping derandomization space-bounded computation BPL'"
+    ],
+    "verdict": "no space-bounded use of MLMC-type telescoping found; principle precedented in numerical probability"
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "Budgets, slacks and differences T_{b,m}-T_{b,m-1} occur nowhere in the goal or in L's space-derandomization statements."
+   },
+   "test3": {
+    "verdict": "pass",
+    "evidence": "It is what makes per-level space O(slack) so that the allowance telescoping (I28) closes at O(log n). Lean: IterationSchedule.lean ('decomposition of estimator increments'), HierarchicalEstimator.lean (error induction; Net.error_estimate dominated share 0.12), EstimatorBounds.lean."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1 from MLMC once the hierarchy and budget recursion are fixed; unknown otherwise",
+    "chain_depth": 2,
+    "protocol": "P-C2"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.5,
+    "justification": "The telescoping-differences principle is MLMC (an existing concept from numerical probability, so its import is transfer), and CDST23 already varies precision across recursion levels for the same purpose. The concrete space-accounting coupling is new, but under the strict rule it is a close variant. Upgrade to N3 only if test 4 shows hard discoverability given MLMC and CDST23 in L."
+   }
+  },
+  {
+   "id": "C3",
+   "name": "Allowance potential Phi(w,t)=Aw+Dt with stack telescoping",
+   "paper_items": [
+    "I28 (implementation.tex:114-146, 1185-1338)"
+   ],
+   "trace": "no trace",
+   "statement": "Frame cost A(w_i-w_{i+1})+D(t_i-t_{i+1}) telescopes to Phi(top)=O(log n); Psi=t+a'w nonincreasing bounds clocks.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "amortized/potential stack-space accounting (folklore; Goldreich composition lemma)",
+      "relation": "charge each suspended frame to decrease of a budget",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "CDST23 precision alternation; Cook-Mertz 2024 tree evaluation (search snippet)",
+      "relation": "budgeted recursion below log n per level",
+      "verdict": "genuinely different mechanisms"
+     }
+    ],
+    "searches": [
+     "'Cook Mertz tree evaluation ... catalytic registers recursion space reuse'"
+    ],
+    "verdict": "close variant"
+   },
+   "test2": {
+    "verdict": "pass (borderline)",
+    "evidence": "Standard potential once frame cost is proportional to slack."
+   },
+   "test3": {
+    "verdict": "pass",
+    "evidence": "Gives the space bound; Lean RecursivePrograms.lean 'Measured stack encodings ... simultaneous space bounds'."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1 given C2",
+    "chain_depth": 2,
+    "protocol": "not prioritised"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Routine potential argument downstream of C2."
+   }
+  },
+  {
+   "id": "C4",
+   "name": "Sampled column detectors and gated corrections",
+   "paper_items": [
+    "I09 (hierarchy.tex:178-400)",
+    "I13 incoming gate T_y (atoms.tex:286-373)"
+   ],
+   "trace": "no trace",
+   "statement": "U_i(y)=E[rank_J of row-gated scores over retained rows | Y_f(y)=1]; overloaded columns are not corrected and are split by copies.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "heavy-hitter / degree estimation by uniform sampling (folklore)",
+      "relation": "detect columns with many large entries from a sample",
+      "verdict": "close variant"
+     }
+    ],
+    "searches": [],
+    "verdict": "close variant"
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "not in goal/L"
+   },
+   "test3": {
+    "verdict": "pass",
+    "evidence": "Lean U_light/U_heavy used at ProbabilityHierarchy.lean:799,854"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1 given C1's need for degree control",
+    "chain_depth": 2,
+    "protocol": "folded into P-C1"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Sampling-based overload detection is standard; part of the C1 cluster."
+   }
+  },
+  {
+   "id": "C5",
+   "name": "Block-clean coupling for adaptive short fingerprints",
+   "paper_items": [
+    "I22, I23 (fingerprints.tex:1-752)"
+   ],
+   "trace": "no trace",
+   "statement": "Salts per budget block with access rule; compare with an exact-equality clean calculation independent of the current salt; charge escapes and collisions.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Schwartz 1980; Carter-Wegman 1979 (cited)",
+      "relation": "fingerprints",
+      "verdict": "N0 ingredient"
+     },
+     {
+      "ref": "standard ghost/clean-run coupling for adaptive hashing",
+      "relation": "same proof pattern",
+      "verdict": "close variant"
+     }
+    ],
+    "searches": [],
+    "verdict": "close variant"
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "not in goal"
+   },
+   "test3": {
+    "verdict": "fail in Lean / pass in paper",
+    "evidence": "No fingerprint/hash/collision declarations in the Lean dir (grep); CatalyticComparison.lean compares IDs exactly. Apparently not needed by the formal route."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "n/a",
+    "chain_depth": 1,
+    "protocol": "none (not Lean-backed)"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Standard coupling; not on the Lean path, so ineligible for the Lean shortlist anyway."
+   }
+  },
+  {
+   "id": "C6",
+   "name": "Validated walk variants (walks specified before conditioned endpoints are known)",
+   "paper_items": [
+    "I17 (averaging.tex:174-249)"
+   ],
+   "trace": "no trace",
+   "statement": "Each affine walk word expands to O(d)-bit wrap-guessing variants, each a measure-preserving bijection; exactly one passes tests at visited identifiers.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Margulis/Gabber-Galil shear expanders; Shalom 1999 (cited)",
+      "relation": "the walk itself",
+      "verdict": "N0 ingredient"
+     }
+    ],
+    "searches": [
+     "'Gabber Galil expander shear maps ... relative property (T)'"
+    ],
+    "verdict": "variant of known walk with a new implementation trick"
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "not in L"
+   },
+   "test3": {
+    "verdict": "pass",
+    "evidence": "AffineSampling.lean:2091-2440 (variants, sampler_identity, sampler_est)"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1-2",
+    "chain_depth": 2,
+    "protocol": "not prioritised"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.55,
+    "justification": "Engineering variant of known expander-walk sampling."
+   }
+  },
+  {
+   "id": "C7",
+   "name": "Factorial truncation of the correction fixed point",
+   "paper_items": [
+    "I08 (hierarchy.tex:82-171)"
+   ],
+   "trace": "no trace",
+   "statement": "(E_*-E_k)/f <= e^{1/theta1}(L_Q/theta1)^k/k! uniformly in V.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "path-counting bounds for Neumann/Picard iterates on nilpotent (strictly ordered) supports (folklore)",
+      "relation": "binom(m,k)f^k <= (1/theta)^k/k!",
+      "verdict": "close variant"
+     }
+    ],
+    "searches": [],
+    "verdict": "close variant"
+   },
+   "test2": {
+    "verdict": "borderline",
+    "evidence": "analytic consequence of I07 + row mass bound"
+   },
+   "test3": {
+    "verdict": "pass",
+    "evidence": "Lean `factorial` 35% of DAG downstream"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 1,
+    "protocol": "not prioritised"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.55,
+    "justification": "Routine estimate once I07 is defined; load-bearing but not hard to find."
+   }
+  },
+  {
+   "id": "C8",
+   "name": "Default-plus-exceptions row compression with first-overflow charging",
+   "paper_items": [
+    "I21 (compression.tex)"
+   ],
+   "trace": "no trace",
+   "statement": "Compressed prefixes keep row-function errors within budget.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "threshold/heavy-hitter sketches (Misra-Gries style) [from memory]",
+      "relation": "keep only large entries above an adaptive floor",
+      "verdict": "close variant"
+     }
+    ],
+    "searches": [],
+    "verdict": "close variant"
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "not in goal"
+   },
+   "test3": {
+    "verdict": "pass",
+    "evidence": "CompressionBounds/Programs/Evaluation.lean"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 2,
+    "protocol": "not prioritised"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.55,
+    "justification": "Standard sparsification idea with bespoke analysis."
+   }
+  },
+  {
+   "id": "C9",
+   "name": "Catalytic restoring equality test",
+   "paper_items": [
+    "I24 (fingerprints.tex:754-811)"
+   ],
+   "trace": "no trace",
+   "statement": "Flip/xor-read/flip/xor-read on a shared B-bit vector computes 1[k(v)=k(w)] and restores the vector.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Buhrman-Cleve-Koucky-Loff-Speelman STOC'14 transparent programs (cited)",
+      "relation": "same cancellation",
+      "verdict": "equivalent"
+     }
+    ],
+    "searches": [],
+    "verdict": "equivalent"
+   },
+   "test2": {
+    "verdict": "fail (in L)",
+    "evidence": "cited"
+   },
+   "test3": {
+    "verdict": "pass",
+    "evidence": "CatalyticComparison.lean"
+   },
+   "test4": {
+    "status": "not needed",
+    "pivot_distance": "0",
+    "chain_depth": 0,
+    "protocol": "none"
+   },
+   "final": {
+    "N": "N0",
+    "F": null,
+    "confidence": 0.9,
+    "justification": "Transfer from catalytic computing, acknowledged by the paper."
+   }
+  },
+  {
+   "id": "C10",
+   "name": "Uniform affine spectral gap (property (T)) / Lean Fourier torus gap",
+   "paper_items": [
+    "I16 (averaging.tex:32-106)"
+   ],
+   "trace": "no trace",
+   "statement": "Lazy walk on SL_H(Z) x| Z^H generators has uniform gap on finite transitive sets.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Shalom 1999 (cited); Margulis 1973 / Gabber-Galil 1981 / Jimbo-Maruoka Fourier proof (Lean route)",
+      "relation": "same",
+      "verdict": "equivalent"
+     }
+    ],
+    "searches": [
+     "'Gabber Galil expander shear maps Z_n^2 Fourier proof ...'"
+    ],
+    "verdict": "equivalent"
+   },
+   "test2": {
+    "verdict": "fail (in L)",
+    "evidence": "cited theorem"
+   },
+   "test3": {
+    "verdict": "pass",
+    "evidence": "slice_gap/square_gap used via full_gap (AffineSampling.lean:2295, 2439)"
+   },
+   "test4": {
+    "status": "not needed",
+    "pivot_distance": "0",
+    "chain_depth": 0,
+    "protocol": "none"
+   },
+   "final": {
+    "N": "N0",
+    "F": null,
+    "confidence": 0.9,
+    "justification": "Cross-field transfer (group theory / expanders)."
+   }
+  }
+ ],
+ "excluded_from_candidates": [
+  {
+   "item": "I02 configuration reduction, I05 rank-channel estimates, I25 arithmetic, I26/I27 controller interfaces and contours, I29 one-start Markov step, I30/I31 assembly, padding, compiler",
+   "reason": "N0/N1 (standard or bookkeeping)"
+  },
+  {
+   "item": "I04 rank channels, I13/I14 atoms, I19 homogeneous loss",
+   "reason": "N1-N2: polynomial hashing with frame conditioning; atoms are importance-weighted sparse sampling (paper itself relates them to weighted PRGs); root metric is Hellinger-type"
+  }
+ ],
+ "family_D": {
+  "label": "D3 (provisional)",
+  "confidence": 0.4,
+  "rests_on": "C1 (correction-and-copy hierarchy) alone; its practical force depends on the cluster C1+C2+C3 (hierarchy + slack-telescoped estimator + allowance potential).",
+  "falls_to": "D2 if test 4 (P-C1) shows a pre-cutoff model proposes a copy/dilution hierarchy with an entry-vs-support potential at the calibrated rate, or if an expert identifies a known reduction of absorption probabilities to O(log n) stages of 'eliminate large entries, split the rest over copies' (e.g. in incomplete-factorization or Markov-chain state-reduction literature).",
+  "not_transfer": "Ingredients (preconditioning, property (T)/expanders, catalytic tricks, hashing, contours) are N0 transfers; the candidate is the hierarchy built from them, so the cross-field exclusion does not apply.",
+  "correctness_caveat": "All grades are conditional on correctness. The claim resolves a famous open problem and is unrefereed. Trust rests on the comparator build (pending, orchestrator): 43k Lean lines, text-level clean, comparator definitions faithful. The Lean route differs from the paper (s=4, Fourier torus gap, no fingerprints), so a successful build certifies the theorem and C1/C2/C3, but not C5 or the paper's Sec. 6 property-(T) route."
+ },
+ "provenance_flag": {
+  "applies": "no",
+  "builds_on_prior_model_result_strict": false,
+  "model_produced_precedent": false,
+  "explanation": "Cited 2025-26 works (ChenCohenDoronKhaskelbergTaShma26, ChengWu26, PyneTell26) are human-authored per their listings; search summaries mention no AI assistance, but abstract pages could not be fetched (DNS failure), so disclosure is unverified. Web searches for the problem with ChatGPT/GPT-5/OpenAI/AI-assisted found no model-produced precedent; the only OpenAI model-produced math release found (Aug 2026 'Ten Advances', Astra) contains no BPL result per snippets. The paper itself is model-produced (author 'OpenAI')."
+ },
+ "bridge_novelty": [
+  {
+   "import": "Kazhdan property (T) / expanders (Shalom; Lean: Gabber-Galil-type Fourier gap) -> space derandomization",
+   "status": "known route",
+   "evidence": "expander walks are standard in space-bounded derandomization (AKS87, INW94, Reingold05)"
+  },
+  {
+   "import": "Riesz-Thorin interpolation (L2 -> Ls mixing)",
+   "status": "known route",
+   "evidence": "standard in Markov-chain mixing"
+  },
+  {
+   "import": "Numerical linear algebra (preconditioning, Richardson, Neumann series) -> BPL",
+   "status": "known route",
+   "evidence": "AKMPSV20, CDRST21, CDST23"
+  },
+  {
+   "import": "Catalytic computing -> space algorithms",
+   "status": "known route",
+   "evidence": "Buhrman et al. 2014; Cook-Mertz tree evaluation; BPL in CL line (Cook-Li-Mertz-Pyne STOC'25, search snippets)"
+  },
+  {
+   "import": "Algebraic fingerprinting / universal hashing",
+   "status": "known route",
+   "evidence": "standard"
+  },
+  {
+   "import": "Contour traversal (Cook-McKenzie, LMT)",
+   "status": "known route",
+   "evidence": "standard logspace technique"
+  },
+  {
+   "import": "Multilevel-Monte-Carlo-style telescoping -> space-bounded recursion (C2; implicit, not cited)",
+   "status": "new bridge (no precedent found)",
+   "evidence": "searches 'multilevel Monte Carlo telescoping derandomization space-bounded' returned nothing combining them; snippet-level"
+  }
+ ],
+ "discoverability_protocols": {
+  "common": {
+   "models": "Training cutoff strictly before 2026-09-23 (manuscript date; the release is 2026-10-06). Canary probe: ask whether L=BPL/RL=L is known and for the title 'Exact Derandomization of Logarithmic Space'; exclude any model that recognises it. Exclude from the main pool OpenAI's internal model(s) that produced the openai/math release (and the 'Astra' lineage behind OpenAI's Aug-2026 'Ten Advances' release, per search snippets); run them only as an uncontrolled upper-reference arm. No browsing/tools. Judge model different from proposer.",
+   "context_L_minus": "Problem statement (Thm 1.1 + Thm 1.2) and the configuration reduction (Lemma 2.1), plus L minus this paper: Mathlib d13f23b digest (Matrix, Finset sums, MeasureTheory finite averages, ZMod, Bertrand) and the paper's references.bib (40 entries; abstracts + key theorems of Nisan92/94, SaksZhou99, Hoza21, CDRST21, CDST23, AKMPSV20, ChenCohenDoronKhaskelbergTaShma26, ChengWu26, Shalom99, BuhrmanEtAl14, CookMcKenzie87, LMT00).",
+   "k_values": [
+    1,
+    4,
+    16,
+    64,
+    256
+   ],
+   "K": 256,
+   "controls": "Positive: Cook-Reckhow ER extension variables for PHP. Negative: I02 configuration reduction and I24 catalytic equality (should be rediscovered at high rate)."
+  },
+  "P-C1": {
+   "hide": "Sections 3 onward (hierarchy, atoms, estimator, ... ) - i.e. I06-I12 and everything downstream; keep Sec. 2 (configuration reduction).",
+   "prompt": "Given p0=(I-S)^{-1}e for a strictly forward substochastic S on poly(n) vertices, propose a sequence of O(log n) transformations producing an exact or one-sided-approximate representation of p0(x0) in which transition entries become uniformly small, suitable for estimation by short random seeds. State the transformation and its invariant.",
+   "equivalence": "Judge accepts if the proposal contains all of: (a) a correction moving transition mass into a reward via a factorization (I+E)(I-C) or equivalent; (b) duplication of vertices/destinations to split large entries; (c) control that support grows by a bounded factor while max entry shrinks geometrically, giving O(log n) stages. Partial credit (a) only = Richardson (expected high rate, negative control).",
+   "lean_check": "Optional: state ProbabilityHierarchy.lean's per-stage contract (SB bounds, residual, copyZone) and test whether a proposal's definitions satisfy it."
+  },
+  "P-C2": {
+   "hide": "Sections 7-12 (additive schedule, compression, fingerprints, controller) given the hierarchy and atoms.",
+   "prompt": "Given row-bounded stochastic tables in a shared O(log n)-bit environment and conditional-averaging walks with uniform gap, design a recursive estimator whose per-level space is not Theta(log n), so total space is O(log n).",
+   "equivalence": "Accept if the proposal telescopes estimates across consecutive budgets/precisions and ties averaging length and frame size to the budget decrease (slack), with total space summing to O(log n). Record separately proposals that cite MLMC or CDST23 explicitly.",
+   "contamination_note": "MLMC and CDST23 are in L (the latter cited); the test measures whether the space coupling is found, not the principle."
+  }
+ },
+ "open_questions": [
+  "Comparator build result (orchestrator): does `exact_logarithmic_space_derandomization` compile with only propext/Quot.sound/Classical.choice?",
+  "Confirm at elaboration level that the Lean route avoids fingerprints entirely (text grep finds none) and uses exact catalytic digit comparisons; if so the paper's Sec. 9 is superfluous to the formal proof.",
+  "Expert review: is there a precedent for diluting heavy transition entries over vertex copies with a detector-gated correction (Markov-chain state reduction, incomplete factorization, graph lifts)?",
+  "Is MLMC-style telescoping used anywhere in space-bounded derandomization before 2026-09? (searches negative, snippet-level)",
+  "Does the hierarchy (C1) give anything downstream by itself, e.g. deterministic logspace approximation for other absorbing-chain problems (NL-hard? no - substochastic forward chains only), or is its power inseparable from C2/C3?",
+  "Abstract pages of 2026 cited works were not fetchable; AI-disclosure status unverified."
+ ],
+ "sources": [
+  "https://arxiv.org/pdf/2609.23603 (Cheng-Wu; search result only)",
+  "https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.APPROX/RANDOM.2026.39 ; https://eccc.weizmann.ac.il/report/2026/064/ (CCDKT26; search result only)",
+  "https://eccc.weizmann.ac.il/report/2026/045 (Pyne-Tell survey; search result only)",
+  "https://eccc.weizmann.ac.il/report/2022/149 (CDST23; search result only)",
+  "https://arxiv.org/abs/1912.04524 (AKMPSV20; search result only)",
+  "https://eccc.weizmann.ac.il/report/2021/048/ (Hoza21; search result only)",
+  "https://devel.isa-afp.org/browser_info/current/AFP/Expander_Graphs/Expander_Graphs_MGG.html (Gabber-Galil/Jimbo-Maruoka Fourier proof; search result only)",
+  "https://eccc.weizmann.ac.il/report/2024/106 (Cook-Li-Mertz-Pyne CBPL=CL; search result only)",
+  "https://interestingengineering.com/ai-robotics/openai-largest-math-release-lean-proofs ; https://scalevise.com/resources/openai-lean-certified-proofs-ten-math-advances/ (OpenAI releases; search result only)"
+ ]
+}

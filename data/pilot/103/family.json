@@ -1,0 +1,1288 @@
+{
+ "family": 103,
+ "title": "Exact derandomization of logarithmic space: L = RL = BPL",
+ "manuscripts": [
+  {
+   "id": "103",
+   "title": "Exact Derandomization of Logarithmic Space: L = RL = BPL",
+   "manuscript_dir": "preprints/Exact-Derandomization-of-Logarithmic-Space-L-equals-RL-equals-BPL-September-23-2026",
+   "source_root": "preprints/Exact-Derandomization-of-Logarithmic-Space-L-equals-RL-equals-BPL-September-23-2026/build",
+   "tex_files": [
+    "main.tex",
+    "preamble.tex",
+    "sections/introduction.tex",
+    "sections/model.tex",
+    "sections/environment.tex",
+    "sections/hierarchy.tex",
+    "sections/atoms.tex",
+    "sections/averaging.tex",
+    "sections/estimation.tex",
+    "sections/compression.tex",
+    "sections/fingerprints.tex",
+    "sections/arithmetic.tex",
+    "sections/implementation.tex",
+    "sections/conclusion.tex",
+    "sections/compiler.tex",
+    "figures/compiler-padding.tex",
+    "figures/controller-space.tex"
+   ],
+   "lines": 8533,
+   "date": "September 23, 2026",
+   "author": "OpenAI"
+  }
+ ],
+ "file_line_convention": "paths relative to <manuscript_dir>/build; Lean paths relative to lean/ (openai-math fd4aeeb)",
+ "commit": "fd4aeeb",
+ "analyst_role": "FAMILY analyst (paper + Lean, text level; Lean not built by this agent - orchestrator compiles the comparator)",
+ "base_library_L": "Mathlib d13f23b + the paper's 40-entry references.bib (Nisan92/94, NisanZuckerman96, SaksZhou99, Hoza21, CCvM06, Reingold05/08, RTV06, ChengHoza22, BCG20, CDRST21, CDST23, AKMPSV20, ChenCohenDoronKhaskelbergTaShma26, ChengWu26, PyneTell26, PyneRazZhan23, Shalom99, Kassabov05, BHV08, Riesz27, Thorin48, Schwartz80, CarterWegman79, CookMcKenzie87, LMT00, BuhrmanCleveKouckyLoffSpeelman14, Avizienis63, ...)",
+ "main_statement": {
+  "file_line": "sections/introduction.tex:28-51",
+  "latex": "\\begin{theorem}[Exact logarithmic-space derandomization] L=RL=BPL. \\end{theorem}  \\begin{theorem}[Acceptance-probability approximation] ... uniform deterministic algorithm which, on input (x,1^q) ... outputs an integer 0<=a<=2^{q+2} satisfying |a2^{-(q+2)}-p_M(x)|<=2^{-q}. It uses O(log(n+2)+q) work space and (n+2)^{O(1)}2^{O(q)} time.\\end{theorem}",
+  "paraphrase": "Every language decided by a polynomial-time, logarithmic-space randomized machine with two-sided bounded error is decidable deterministically in logarithmic space; more strongly, acceptance probabilities of such machines can be approximated to inverse-polynomial additive error in deterministic logspace and polynomial time, with no gap promise.",
+  "comparator": {
+   "file": "lean/ComparatorChallenges/LogspaceEquality.lean",
+   "json": "lean/ComparatorChallenges/LogspaceEquality.json",
+   "theorem": "OAI.ExactDerandomization.exact_logarithmic_space_derandomization : L = RL ∧ RL = BPL",
+   "solution_module": "OAI.Computability.Logspace.Equality",
+   "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+   ],
+   "model": "Machine q w h: finite control Fin(q+1), h read-only two-way input heads on Fin(n+2) with endmarkers (clamped moves), w binary work tapes indexed by Z (initially false), one fresh coin per step; output state halts. spaceThrough = sum over work tapes of #distinct head positions visited in steps 0..t; LogSpace: exists c>0, forall x, coins, t: spaceThrough <= c*clog2(n+2). L: Deterministic (transition ignores coin) & LogSpace & Decides. RL/BPL: LogSpace & HaltsBy c(n+2)^k on all coin tapes & acceptanceProbability (exact rational over Fin t -> Bool) >=1/2 / =0, resp. >=2/3 / <=1/3."
+  },
+  "match_check": "Exact for Theorem 1.1 (class equality). Text diff: the 20 definition_names in the comparator are textually identical to OAI/Computability/Logspace/Deterministic.lean:1-130. Model is the standard one (multi-head two-way input is equivalent to single-head logspace; space counts visited work cells as in the paper's convention 'visiting a blank work cell counts toward space'). No loophole found: the time bound is on every coin tape, the space bound on every coin tape and every t.",
+  "formalized_vs_claimed": "Formalized: L=RL=BPL (and internally a fixed-precision estimator `fixed_precision_estimator`, Equality.lean:70, with error 1/32). NOT in the comparator: Theorem 1.2 (variable-precision approximation with explicit time/space), PromiseBPL=PromiseL, certified accepting computations, the effective compiler (lean/docs/103.md says so).",
+  "note_for_comparator": "Compilation not run by this agent (per orchestrator). Status pending orchestrator's comparator build."
+ },
+ "trust_surface": {
+  "lean": "39 files, 43,045 lines in lean/OAI/Computability/Logspace; imports only Mathlib (+Mathlib.NumberTheory.Bertrand) and own files",
+  "grep_scope": "all 39 .lean files, word-boundary grep",
+  "counts": {
+   "sorry": 0,
+   "admit": 0,
+   "axiom": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque (keyword)": 0,
+   "ofReduceBool/skipKernelTC": 0,
+   "partial def": 0,
+   "decide (Bool/Prop decisions, incl. `by decide` on small numerals)": 65,
+   "set_option maxHeartbeats": 38,
+   "set_option synthInstance.maxSize": 3,
+   "set_option autoImplicit true": "most files"
+  },
+  "note": "Hits for 'opaque'/'admit'/'extern' are English words in docstrings/identifiers (ContourTraversal.lean:927, EstimatorInterfaces.lean:20, QueryCombinators.lean:47). No trust-relevant constructs at text level. Declarations use whimsical code names (Rock, Umbra, Folk, Helix, Bean, ...), which makes paper-Lean joins laborious but is not a trust issue."
+ },
+ "labels": {
+  "A": {
+   "label": "A4",
+   "secondary": {
+    "hard_direction_form": "A1 (forall BPL machine, exists deterministic logspace decider; witness constructed)",
+    "explicit_rate": true
+   },
+   "evidence": {
+    "quote": "\\Lclass=\\RL=\\BPL.  ... uses O(\\log(n+2)+q) work space and (n+2)^{O(1)}2^{O(q)} time",
+    "file_line": "sections/introduction.tex:28-51"
+   },
+   "confidence": "0.75",
+   "note": "Class equality read as characterization; only BPL subset L is nontrivial. Theorem 1.2 is A3-style quantitative with explicit rate."
+  },
+  "B": {
+   "label": "B1",
+   "flags": {
+    "full_only_with_prior": false,
+    "adds_corollaries_for_other_conjectures": true,
+    "corollaries": [
+     "PromiseBPL=PromiseL (cor:promise-bpl)",
+     "acceptance-probability approximation without gap",
+     "certified accepting runs",
+     "effective compiler"
+    ],
+    "posed_by": "Aleliunas-Karp-Lipton-Lovasz-Rackoff 1979 (as the paper states); standard open problem RL vs L / BPL vs L"
+   },
+   "evidence": {
+    "quote": "explicitly asked whether polynomial-time randomized logarithmic space could be simulated in deterministic logarithmic space [AleliunasKLLR1979]",
+    "file_line": "sections/introduction.tex:75-79"
+   },
+   "confidence": "0.85 (conditional on correctness)",
+   "note": "Fully resolves the BPL vs L question for poly-time BPL (the standard class). Not the non-poly-time BPSPACE(log n) variant (paper notes BCP83 setting is distinct)."
+  },
+  "C": {
+   "primary": "C1",
+   "primary_evidence": {
+    "quote": "We enumerate the original encodings with their original multiplicities ... Repeated enumeration finds the median",
+    "file_line": "sections/introduction.tex:255-273"
+   },
+   "secondaries": [
+    "C2 (well-founded induction over stages/budgets; coupled actual-clean induction)",
+    "C4 (moment/estimation chains)",
+    "C5 (paper: Shalom property (T), Riesz-Thorin, Bertrand invoked without re-proof)"
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "65 `decide` uses, all on small Bool/Prop decisions or numerals (e.g. AffineSampling.lean:738 `decide (|lift k.2| <= |lift k.1|)`)",
+    "file_line": "lean/OAI/Computability/Logspace/*.lean"
+   },
+   "ih_strengthened": true,
+   "ih_template": "uniform/quantitative version + strengthen to all substructures: the induction proves an integrated L_s error bound for EVERY task, at every vertex weighted by retention (not just the start), with a coupled actual-vs-clean discrepancy carried along",
+   "ih_evidence": {
+    "quote": "Smooth support functions charge paths that leave these sets to lower-call errors; collisions within the fixed sets supply the remaining error. This coupled induction proves the moment bound for the actual estimator.",
+    "file_line": "sections/introduction.tex:327-334; fingerprints.tex:614-752"
+   },
+   "ih_note": "Strengthening is real but matches the 'uniform/quantitative version' and 'carry an extra tracked quantity' templates.",
+   "confidence": "C1 0.7; secondaries 0.6"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "I11/I12 correction-and-copy hierarchy (shallow exact target) and I20 slack-telescoped shared-environment estimator",
+   "evidence": {
+    "quote": "The hierarchy reduces transition entries more rapidly than it increases the number of vertices incident to positive entries.",
+    "file_line": "sections/introduction.tex:275-287"
+   },
+   "confidence": "0.45",
+   "caveats": [
+    "Grades conditional on correctness of an unrefereed, extraordinary claim",
+    "quick literature checks only; full grading in novelty phase",
+    "the hierarchy alone does not beat the log^2 barrier: depth-L recursion at O(log n) per level is Savitch-like; the estimator (I20) + allowance telescoping (I28) are what make space O(log n)"
+   ],
+   "flag_builds_on_prior_model_produced_result": false,
+   "flag_note": "No cited work self-identifies as model-produced in search snippets (ChenCohenDoronKhaskelbergTaShma2026, ChengWu2026SC arXiv:2609.23603, PyneTell2026 ECCC TR26-045 are human-authored per their listings). Not verified from full texts (WebFetch unavailable)."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Theoretical computer science",
+    "msc2020": "68Q15 (complexity classes), 68Q87 (probability in computer science), 68Q10",
+    "lean_dir": "Computability",
+    "note": ""
+   },
+   "lean_dir_field": "Computability (OAI/Computability/Logspace)",
+   "method_fields": [
+    {
+     "field": "linear algebra / iterative methods (preconditioning identity, Neumann series)",
+     "tag": "essential"
+    },
+    {
+     "field": "probability / sampling (pairwise-independent polynomial hashing, Chebyshev, Markov, moment bounds)",
+     "tag": "essential"
+    },
+    {
+     "field": "group theory / representation theory (Kazhdan property (T), relative (T) of SL2(Z)xZ^2; Shalom)",
+     "tag": "essential (paper); replaced by elementary Fourier analysis on finite tori in Lean"
+    },
+    {
+     "field": "harmonic analysis (Riesz-Thorin interpolation)",
+     "tag": "essential (paper; L2->Ls); Lean uses fourth moments"
+    },
+    {
+     "field": "expander graphs / Markov chain mixing",
+     "tag": "essential"
+    },
+    {
+     "field": "algebraic fingerprinting / universal hashing (Schwartz, Carter-Wegman)",
+     "tag": "essential (paper); apparently not used in Lean"
+    },
+    {
+     "field": "catalytic computing (Buhrman et al.)",
+     "tag": "essential (space accounting)"
+    },
+    {
+     "field": "space-bounded traversal (Cook-McKenzie contours, LMT reversible simulation)",
+     "tag": "essential (implementation)"
+    },
+    {
+     "field": "computer arithmetic (redundant digits, Avizienis)",
+     "tag": "essential (implementation)"
+    },
+    {
+     "field": "elementary number theory (Bertrand's postulate for the prime field)",
+     "tag": "essential, trivial"
+    },
+    {
+     "field": "pseudorandomness for space (Nisan, Saks-Zhou, weighted PRGs, Richardson)",
+     "tag": "background-cited (no theorem invoked)"
+    }
+   ],
+   "cross_field_count": 8,
+   "share_invoked_from_other_fields": "~0.6 of invoked external theorems are outside TCS (Shalom x2, Riesz/Thorin, Bertrand, Schwartz root bound; vs Cook-McKenzie, LMT, Carter-Wegman, Buhrman et al. in TCS)"
+  }
+ },
+ "items": [
+  {
+   "id": "I01",
+   "kind": "definition (inline)",
+   "name": "strictly forward / substochastic matrix; paired edge operation",
+   "file_line": "sections/model.tex:9-16",
+   "statement": "A matrix on V is strictly forward if each nonzero entry goes to a strictly later time; substochastic if nonnegative with row sums <=1; a paired edge operation returns the endpoint plus an inverse port.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'A matrix indexed by a finite set V is \\emph{strictly forward} if'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "high (plumbing-level)",
+    "why": "framework for every later matrix"
+   },
+   "analytic_check": "N/A - background vocabulary (nilpotent/substochastic matrices; Mathlib has Matrix, stochastic notions)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard Markov-chain vocabulary; 'paired ports' are rotation maps (Reingold/RVW)"
+   },
+   "provisional_F": null,
+   "lean": "ProbabilityHierarchy.lean (Mat, Domain, SB structure, Step)"
+  },
+  {
+   "id": "I02",
+   "kind": "lemma",
+   "name": "Configuration reduction (lem:model-reduction)",
+   "file_line": "sections/model.tex:18-88",
+   "statement": "A poly-time logspace randomized machine yields, uniformly in logspace, a polynomial-size V0, strictly forward substochastic S with bounded port degrees and paired ports, reward e, start x0, with p0=(I-S)^{-1}e in [0,1] and p0(x0)=acceptance probability.",
+   "cited_or_new": {
+    "status": "standard (re-proved)",
+    "cue": "configuration-graph reduction, no citation needed"
+   },
+   "uses_items": [
+    "I01"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential, routine",
+    "why": "entry point"
+   },
+   "analytic_check": "near-analytic: configuration graph of the goal's machine",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "textbook configuration-graph construction; time-layering standard"
+   },
+   "provisional_F": null,
+   "lean": "ConfigurationGraph.lean, TransitionTables.lean, ConfigurationEvaluation.lean"
+  },
+  {
+   "id": "I03",
+   "kind": "definition (inline) + convention",
+   "name": "Size convention B, stage count L=O(B), radix-D0 copy identifiers, rate grid b_k=2^{-Hk}",
+   "file_line": "sections/model.tex:96-148",
+   "statement": "B a power of two ~ log(n+2); stage-l vertex = base word plus l radix-D0 copy digits (affine-injective IDs); rates on geometric grid; prime field size 2^{O(B)}.",
+   "cited_or_new": {
+    "status": "new (bookkeeping)",
+    "cue": "'Fix an integer parameter B'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "plumbing",
+    "why": "addressing convention"
+   },
+   "analytic_check": "not in goal; bookkeeping",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "encoding convention"
+   },
+   "provisional_F": null,
+   "lean": "ConfigurationGraph.lean (radix encodings), copyZone in ProbabilityHierarchy.lean:908"
+  },
+  {
+   "id": "I04",
+   "kind": "definition (inline)",
+   "name": "Rank channel and frame (\\emph{frame})",
+   "file_line": "sections/environment.tex:162-191",
+   "statement": "Channel A=(a0,F) uniform in F_P^{H x h0} conditioned on F (last h0-1 columns) linearly independent; identifier y retained at rate b_k iff all coords of A(1,y,..,y^{h0-1})^T lie in [0,L_k).",
+   "cited_or_new": {
+    "status": "new instance of k-wise-independent polynomial hashing",
+    "cue": "'We call such an ordered collection of columns a \\emph{frame}.'"
+   },
+   "uses_items": [
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "all retention tests/detectors/atoms use it; frame condition makes it invariant under the SL_H affine walk"
+   },
+   "analytic_check": "not a subterm of goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "polynomial hash of degree h0-1 = Carter-Wegman k-wise independence with box retention; frame conditioning is a small twist to make the affine group act"
+   },
+   "provisional_F": null,
+   "lean": "AffineSampling.lean (Channel, Frame, hit/retain), ProbabilityHierarchy.lean:424 retain/tally"
+  },
+  {
+   "id": "I05",
+   "kind": "lemma",
+   "name": "Rank-channel estimates (lem:env-ranks)",
+   "file_line": "sections/environment.tex:192-252",
+   "statement": "Marginal retention ~ rate; pairwise conditional bound; Chebyshev lower tail for counts; affine-substitution invariance of the joint law.",
+   "cited_or_new": {
+    "status": "standard (re-proved)",
+    "cue": "pairwise independence + Chebyshev"
+   },
+   "uses_items": [
+    "I04"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential, routine",
+    "why": ""
+   },
+   "analytic_check": "analytic consequences of I04",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "pairwise-independent sampling facts"
+   },
+   "provisional_F": null,
+   "lean": "AffineSampling.lean:1601 (padding invariance), 1666 (variance), ProbabilityHierarchy.lean tally_var/tally_cond"
+  },
+  {
+   "id": "I06",
+   "kind": "construction / identity",
+   "name": "Correction identity D=C-E+EC, I-D=(I+E)(I-C) (reward transfer)",
+   "file_line": "sections/hierarchy.tex:4-16",
+   "statement": "For a nonnegative correction E, D=C-E+EC satisfies I-D=(I+E)(I-C), so W=(I-C)p becomes (I+E)W=(I-D)p: transition mass moved into reward.",
+   "cited_or_new": {
+    "status": "new use of a classical preconditioning identity",
+    "cue": "'The algebra behind this transfer is simple.' (no citation)"
+   },
+   "uses_items": [
+    "I01"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "defines every stage"
+   },
+   "analytic_check": "not a subterm of the goal; the identity itself is a left-preconditioner factorization in L (numerical linear algebra)",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "left preconditioning (I+E)(I-C) is the classical (I+S)/modified-Gauss-Seidel preconditioner family and Richardson-type splitting (cf. CohenDoronRenardSberloTaShma2021, AhmadinejadEtAl2020); the novelty is in choosing E (I07-I11)"
+   },
+   "provisional_F": null,
+   "lean": "ProbabilityHierarchy.lean:66 combine, :179 residual, :240 transfer_diff"
+  },
+  {
+   "id": "I07",
+   "kind": "definition",
+   "name": "Fixed-multiplier correction recurrence E_i=fQ((C+E_{i-1}C)/f)g with cutoff Q",
+   "file_line": "sections/hierarchy.tex:39-80",
+   "statement": "Q nondecreasing Lipschitz with (t-theta2)_+ <= Q(t) <= (t-theta1)_+, eighth root Lipschitz; E_i iterates the monotone map from 0.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'Fix a column multiplier g'"
+   },
+   "uses_items": [
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "correction actually used"
+   },
+   "analytic_check": "not a subterm of goal or L",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "monotone fixed-point iteration of a soft-thresholded Neumann-type correction; the soft threshold leaving residual theta1 f is a design choice; nearest: truncated Richardson/preconditioning and 'shift and truncate' (CDST23)"
+   },
+   "provisional_F": null,
+   "lean": "ProbabilityHierarchy.lean:105-161 (Q=shoulder, correct, adjust)"
+  },
+  {
+   "id": "I08",
+   "kind": "lemma",
+   "name": "Fixed point and factorial truncation (lem:hier-fixed-point)",
+   "file_line": "sections/hierarchy.tex:82-171",
+   "statement": "Unique strictly-forward fixed point E_*; (E_*-E_k)/f <= e^{1/theta1}(L_Q/theta1)^k/k!, uniformly in V, so a fixed k_* iterations suffice.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'An ordered-support argument gives a factorial truncation bound' (intro)"
+   },
+   "uses_items": [
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "makes per-stage work constant; Lean `factorial` has 35% of whole proof DAG downstream (text-level)"
+   },
+   "analytic_check": "not in L",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "row-support counting of strictly increasing chains (binom(m,k) f^k <= (1/theta)^k/k!) is a standard path-counting estimate; new in this application"
+   },
+   "provisional_F": null,
+   "lean": "ProbabilityHierarchy.lean:277 factorial, :348 kOK, :350 can_cut"
+  },
+  {
+   "id": "I09",
+   "kind": "definition + lemma",
+   "name": "Pilot detectors U_i(y) (column overload test via rank_J of row-gated sampled scores) and multiplier g = gamma(max U_r)",
+   "file_line": "sections/hierarchy.tex:178-400 (eq:hier-detector, lem:hier-column-test)",
+   "statement": "U_i(y)=E[rank_J{phi(G_i(x,y)/f)R_i(x): X_f(x)=1} | Y_f(y)=1]; many large entries in column y => U_i(y)>=19/20; U_i(y)>1/4 => many medium entries; positive multiplier => at most R_*/f large entries.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'A pilot selects this multiplier'"
+   },
+   "uses_items": [
+    "I04",
+    "I05",
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "bounds active-vertex growth and incoming degree"
+   },
+   "analytic_check": "not in goal/L",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "sampling-based heavy-column detection (rank-J order statistic of a random sample) resembles heavy-hitter / degree estimation by sampling; specific gating new"
+   },
+   "provisional_F": null,
+   "lean": "ProbabilityHierarchy.lean:467-678 (panel_rank, mark, score, U, U_light, U_heavy, Pilot, update)"
+  },
+  {
+   "id": "I10",
+   "kind": "lemma",
+   "name": "Residual bounds and unsigned-term domination (lem:hier-residual)",
+   "file_line": "sections/hierarchy.tex:411-480",
+   "statement": "D>=0, strictly forward, substochastic, D<=K_* f, D<=eps_good f on fully corrected columns, and D>=c_dom(C+E+EC).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": ""
+   },
+   "uses_items": [
+    "I07",
+    "I08",
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "domination lets each unsigned term be estimated against D"
+   },
+   "analytic_check": "no",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "direct consequence of I07/I08 definitions"
+   },
+   "provisional_F": null,
+   "lean": "ProbabilityHierarchy.lean:182 substochastic, :357 good_col, :374 cover"
+  },
+  {
+   "id": "I11",
+   "kind": "construction + proposition",
+   "name": "Copy step C^+(x_i,y_j)=r_i(x)D(x,y)s_j(D(x,y)/f) on V x {0..D0-1}; one-stage density and active-count reduction (prop:hier-copy-step)",
+   "file_line": "sections/hierarchy.tex:490-603",
+   "statement": "Routing fractions spread large residual entries over D0 copies; C^+ <= f/2^H, |A(C^+)| <= 2|A(C)|, intertwining C^+P^r=P^rD.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'We distribute the remaining large entries among copies of their destinations.'"
+   },
+   "uses_items": [
+    "I09",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "the density/active trade-off that makes the hierarchy shallow"
+   },
+   "analytic_check": "not a subterm of goal or L",
+   "provisional_N": {
+    "grade": "N3",
+    "why": "no neighbour found for 'split heavy transition entries over vertex copies, gated by a sampled column detector so active vertices at most double while max entry drops by 2^H'; nearest: graph lifts / cycle-lifted graphs (AKMPSV20), vertex splitting in sparsification"
+   },
+   "provisional_F": "F5 (change of representation: embedding the chain into a larger copy space) with an F4 flavour (entry-bound vs active-count potential)",
+   "lean": "ProbabilityHierarchy.lean:908 copyZone and following; TransitionEvaluation.lean"
+  },
+  {
+   "id": "I12",
+   "kind": "proposition",
+   "name": "Reward identity and shallow target (prop:hier-reward-target)",
+   "file_line": "sections/hierarchy.tex:623-731",
+   "statement": "C_lP_l^c=P_l^c-B_l(I-S); W_l=B_l e in [0,1]; W_{l+1}(x_i)=r_i(x)(W_l+E_lW_l)(x); 0<=p0(x)-W_l(all-primary copy)<=|V0|2^{-(H-1)l}; L=O(B) stages suffice.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'Reward transport and the final deterministic target'"
+   },
+   "uses_items": [
+    "I06",
+    "I11"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (defines the exact target)",
+    "why": "everything downstream estimates W_L"
+   },
+   "analytic_check": "not in goal; W_l is an invented intermediate quantity",
+   "provisional_N": {
+    "grade": "N3",
+    "why": "the hierarchy as a whole (I06+I07+I09+I11+I12) reduces acceptance probability to an O(log n)-stage reward recursion with no gap promise; no neighbour found (quick search: Richardson/preconditioning, CDST23, AKMPSV20, Saks-Zhou)"
+   },
+   "provisional_F": "F5 / F1 (new vertex sets V_l and rewards W_l play the role of extension variables)",
+   "lean": "ProbabilityHierarchy.lean (later part), HierarchyEvaluation.lean:2852 nursery"
+  },
+  {
+   "id": "I13",
+   "kind": "definition",
+   "name": "Stochastic atoms: dense bins B_a, correction tables F with incoming gate T_y, detector score tables S_i; normalization by exact preparatory conditional mean",
+   "file_line": "sections/atoms.tex:30-390",
+   "statement": "Sample-dependent row-bounded tables whose conditional means on retention slices equal matrix entries (dense atom identity, correction atom identity).",
+   "cited_or_new": {
+    "status": "new; related to weighted pseudorandomness",
+    "cue": "'Weighted pseudorandomness provides a related way to represent expectations with few random bits; see [BCG20, CDRST21]'"
+   },
+   "uses_items": [
+    "I04",
+    "I07",
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "makes matrix entries locally samplable with bounded row/incoming degree"
+   },
+   "analytic_check": "no",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "importance-weighted sparse sampling of matrix entries with exact normalization; paper itself names weighted PRGs as related; row-gate by rank_K is new"
+   },
+   "provisional_F": null,
+   "lean": "ProbabilityAtoms.lean, EstimatorOperations.lean"
+  },
+  {
+   "id": "I14",
+   "kind": "lemmas",
+   "name": "Dense atom identity; correction atom identity; support margins; port contract; assembly comparisons; fine product bounds",
+   "file_line": "sections/atoms.tex:224-792",
+   "statement": "Exact conditional-mean identities and bounded supports/ports for the atoms; Lipschitz assembly comparisons with incoming gates.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": ""
+   },
+   "uses_items": [
+    "I13"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": ""
+   },
+   "analytic_check": "no",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "routine verifications of I13"
+   },
+   "provisional_F": null,
+   "lean": "ProbabilityAtoms.lean, EstimatorOperations.lean"
+  },
+  {
+   "id": "I15",
+   "kind": "definition (inline)",
+   "name": "Common default + exception list representation (\\emph{default}); rank Lipschitz bound",
+   "file_line": "sections/atoms.tex:414-441; eq:atom-rank-lipschitz atoms.tex:70-79",
+   "statement": "Arrays represented by finitely many exceptions and one common default; rk_k is 1-Lipschitz in sup norm.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'Call that common value the \\emph{default}.'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "enables compression"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "sparse-with-default representation; order statistics Lipschitz is folklore"
+   },
+   "provisional_F": null,
+   "lean": "SparseRows.lean (virtual baselines)"
+  },
+  {
+   "id": "I16",
+   "kind": "lemma",
+   "name": "Uniform affine spectral gap for SL_H(Z) x| Z^H on finite transitive sets (lem:env-affine)",
+   "file_line": "sections/averaging.tex:32-106",
+   "statement": "Lazy walk on elementary generators has spectral gap bounded below uniformly on every finite transitive G_H-set.",
+   "cited_or_new": {
+    "status": "cited (transfer)",
+    "cue": "'The only external group-theoretic inputs are property (T) ... We use Shalom's quantitative statements'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential (paper)",
+    "why": "drives all conditional averaging"
+   },
+   "analytic_check": "in L via Shalom1999",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "transfer of Kazhdan property (T)/relative (T) (Margulis/Shalom); Lean replaces it with an elementary Fourier torus gap (Gabber-Galil style) 'without assuming a property-(T) result' (AffineSampling.lean:723-727)"
+   },
+   "provisional_F": null,
+   "lean": "AffineSampling.lean:723-1430 (square_gap, frame_gap, slice_gap) - different route"
+  },
+  {
+   "id": "I17",
+   "kind": "lemma",
+   "name": "Conditional averaging (lem:env-gap) and validated walk variants (lem:env-variants)",
+   "file_line": "sections/averaging.tex:108-249",
+   "statement": "A rational Markov operator on each retention slice with ||K^d-Pi||_{L_s} <= C 2^{-cd} uniformly; each walk word expands into O(d)-bit variants, each a measure-preserving bijection on the full environment, exactly one passes the slice/wrap test at visited identifiers.",
+   "cited_or_new": {
+    "status": "new construction on cited inputs",
+    "cue": "'We derive the affine finite-action gap and the conditional sampler from these inputs below.'"
+   },
+   "uses_items": [
+    "I04",
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "lets conditional expectations be computed by walks without storing the conditioned endpoints"
+   },
+   "analytic_check": "no",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "expander-walk averaging is N0 (Gillman/AKS); the trick of guessing wraps so the walk is specified before the conditioned identifier is known is a new variant"
+   },
+   "provisional_F": null,
+   "lean": "AffineSampling.lean:2091-2440 (variants, sampler_identity, sampler_est, walk_mix)"
+  },
+  {
+   "id": "I18",
+   "kind": "definition",
+   "name": "Task tuples, statistical budgets M, raw sample terms (direct, product, projection, reward) with importance factors",
+   "file_line": "sections/estimation.tex:26-176",
+   "statement": "Each task (input matrix, stage, rates, roles, suffixes) has budget M; sample terms use earlier estimates; true sample means equal targets (lem:est-true-means).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": ""
+   },
+   "uses_items": [
+    "I13",
+    "I17"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": ""
+   },
+   "analytic_check": "no",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "bookkeeping over I13"
+   },
+   "provisional_F": null,
+   "lean": "EstimatorInterfaces.lean, EstimatorInstructions.lean"
+  },
+  {
+   "id": "I19",
+   "kind": "definition + lemmas",
+   "name": "Homogeneous loss L(H,H')=|H-H'|^s/(H+H')^{s-1} and root discrepancy metric; scale/domain comparison; cost of releasing a source",
+   "file_line": "sections/estimation.tex:178-427",
+   "statement": "Loss comparable to |H^{1/s}-H'^{1/s}|^s, contracts under mixtures; source-domain change u->f costs (f/u)^{...} paid by child precision.",
+   "cited_or_new": {
+    "status": "new metric choice",
+    "cue": ""
+   },
+   "uses_items": [
+    "I18"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "error metric of the whole induction"
+   },
+   "analytic_check": "no",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "an s-th-root (Hellinger-type for s=2) discrepancy; standard device"
+   },
+   "provisional_F": null,
+   "lean": "AffineSampling.lean:2470- (fourth-root mixtures; s=4 in Lean)"
+  },
+  {
+   "id": "I20",
+   "kind": "construction + lemmas",
+   "name": "Additive schedule: average budget differences T_{b,m}-T_{b,m-1} by conditional walks of length l(M-m), grouped by dyadic slack (lem:est-paths, lem:est-mean-prefix, lem:est-raw-difference, lem:est-prefix)",
+   "file_line": "sections/estimation.tex:428-722",
+   "statement": "Means telescope to the budget-m_j term; differences have norm 2^{-p+C0 d} so a walk of length O(d) suppresses noise to 2^{-p-K_n d}; immediate path descriptors take O(d) bits and children have budget <= M-d.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'We then average differences between consecutive child budgets. Their conditional means telescope'"
+   },
+   "uses_items": [
+    "I17",
+    "I18",
+    "I19"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "this is where per-level space O(slack) instead of O(log n) is bought"
+   },
+   "analytic_check": "no",
+   "provisional_N": {
+    "grade": "N3",
+    "why": "multilevel-Monte-Carlo-style telescoping (Giles 2008) married to slack-proportional expander walks in a single shared O(log n)-bit environment; nearest in-field: CDST23 precision-alternating recursion, Saks-Zhou randomness reuse; no equivalent found in quick search"
+   },
+   "provisional_F": "F3 (auxiliary construction: the budget/slack recursion) with F1 aspects",
+   "lean": "IterationSchedule.lean (decomposition of increments), HierarchicalEstimator.lean, EstimatorBounds.lean"
+  },
+  {
+   "id": "I21",
+   "kind": "construction + proposition",
+   "name": "Row compression: default-plus-exceptions update with floors rho_j=2^{-c1 d_j}, capacity n_j=2^{c2 d_j}; first-overflow / stationary-reference charging; conditional rarity of heavy counts; integrated compression bound",
+   "file_line": "sections/compression.tex:1-701",
+   "statement": "Compressing each prefix to a short exception list preserves row-function errors (prop:buf-error) and gives the exact-grouping error reserve (prop:est-clean).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'We replace each array by a finite list of exceptions to a common default.'"
+   },
+   "uses_items": [
+    "I15",
+    "I20"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "keeps list storage O(slack)"
+   },
+   "analytic_check": "no",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "threshold/heavy-hitter compression with overflow charging resembles sparse-recovery / Misra-Gries style analyses; specific coupling new"
+   },
+   "provisional_F": null,
+   "lean": "CompressionBounds.lean, CompressionPrograms.lean, CompressionEvaluation.lean, EstimatorBounds.lean:2266 compress"
+  },
+  {
+   "id": "I22",
+   "kind": "lemma",
+   "name": "Short fingerprints k(v)=tau(alpha P_v(r)+beta) (lem:fp-hash)",
+   "file_line": "sections/fingerprints.tex:38-102",
+   "statement": "O(log B) random bits give keys in {1..B} with pair collision O(1/B).",
+   "cited_or_new": {
+    "status": "cited (transfer)",
+    "cue": "'combines polynomial evaluation, as in classical algebraic fingerprinting [Schwartz1980], with affine universal hashing [CarterWegman1979]'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "paper: essential; Lean: apparently absent",
+    "why": "no hash/fingerprint declarations found in the Lean dir at text level"
+   },
+   "analytic_check": "in L",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Schwartz-Zippel + Carter-Wegman"
+   },
+   "provisional_F": null,
+   "lean": "not found (grep fingerprint/hash/collision: no hits)"
+  },
+  {
+   "id": "I23",
+   "kind": "construction + lemmas",
+   "name": "Budget-block salts with access rule; clean calculation; witness envelopes; escape charging; bucket aliasing; uniform block coupling; Theorem fp-estimators",
+   "file_line": "sections/fingerprints.tex:104-752",
+   "statement": "Comparing actual (hashed) calculation with a block-clean exact-equality calculation independent of the current salt yields the integrated moment bound (1/N)E sum X_f(v)/f |W_bar-W|^8 <= C^8 2^{-8p}.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'This coupled induction proves the moment bound for the actual estimator.'"
+   },
+   "uses_items": [
+    "I20",
+    "I21",
+    "I22"
+   ],
+   "load_bearing_guess": {
+    "guess": "paper: essential; Lean: route differs",
+    "why": "Lean's Net.error_estimate (HierarchicalEstimator.lean:2533) proves the error bound apparently without hashing"
+   },
+   "analytic_check": "no",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "ghost/clean-coupling for adaptively chosen hashed comparisons is a standard probabilistic device; block structure new"
+   },
+   "provisional_F": null,
+   "lean": "no direct counterpart found; error bound in HierarchicalEstimator.lean:2533 error_estimate"
+  },
+  {
+   "id": "I24",
+   "kind": "lemma",
+   "name": "Restoring (catalytic) equality test (lem:fp-catalytic)",
+   "file_line": "sections/fingerprints.tex:754-811",
+   "statement": "With a shared B-bit vector of arbitrary contents, four excursions (flip, xor-read, flip, xor-read) xor 1[k(v)=k(w)] into a result bit and restore the vector.",
+   "cited_or_new": {
+    "status": "cited (transfer)",
+    "cue": "'The cancellation of arbitrary initial contents also appears in transparent programs for catalytic computation [BuhrmanCleveKouckyLoffSpeelman2014]'"
+   },
+   "uses_items": [
+    "I22"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "removes a log B key index per recursive frame"
+   },
+   "analytic_check": "in L (catalytic computing)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "catalytic transparent-program trick; Lean has an analogous 'Deterministic catalytic ID comparisons' module"
+   },
+   "provisional_F": null,
+   "lean": "CatalyticComparison.lean"
+  },
+  {
+   "id": "I25",
+   "kind": "lemmas + theorem",
+   "name": "Exact digit streams from approximation residues; gate evaluation from regenerated addresses; elementary ops, multiplication by minimum-index bands, reciprocal, indexed ranks, bounded sums, buffered tests; Uniform numerical interface (thm:arith-interface)",
+   "file_line": "sections/arithmetic.tex:1-867",
+   "statement": "Every numerical recipe at slack d answers digit queries with suspended storage O(d)+c(t-j).",
+   "cited_or_new": {
+    "status": "standard techniques, re-proved",
+    "cue": "redundant (Avizienis) digits; cites Avizienis1963"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential (implementation)",
+    "why": ""
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "online/redundant-digit arithmetic in small space (Avizienis; Chiu-Davida-Litow style logspace arithmetic)"
+   },
+   "provisional_F": null,
+   "lean": "DyadicArithmetic.lean, QueryPrograms.lean, QueryCombinators.lean"
+  },
+  {
+   "id": "I26",
+   "kind": "definitions",
+   "name": "Cursor, table tuple, restoring test, quantity query, terminal motion, excursion, paired motion (\\emph{...}); regenerable record (def:ctrl-record); raw allowance certificate (def:ctrl-allowance); opaque vs explicit operations",
+   "file_line": "sections/implementation.tex:46-300",
+   "statement": "Interfaces in which only one vertex address (the cursor) is kept; callers keep regenerable records only.",
+   "cited_or_new": {
+    "status": "new (engineering)",
+    "cue": "'A \\emph{table tuple} consists of'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "plumbing but essential",
+    "why": ""
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "reversible/restoring procedure interfaces in the LMT2000 tradition"
+   },
+   "provisional_F": null,
+   "lean": "EstimatorInterfaces.lean, AllocationPrograms.lean, BoundedTours.lean"
+  },
+  {
+   "id": "I27",
+   "kind": "lemmas",
+   "name": "Inverse contour (lem:ctrl-tour), capped incoming ports, incoming score rank",
+   "file_line": "sections/implementation.tex:442-646",
+   "statement": "Contour of the tree of a deterministic terminal program enumerates predecessors (incoming ports) without a second address.",
+   "cited_or_new": {
+    "status": "cited (transfer)",
+    "cue": "'using the contour idea of Cook and McKenzie [CookMcKenzie1987] and the space-preserving traversal perspective of Lange, McKenzie and Tapp [LMT2000]'"
+   },
+   "uses_items": [
+    "I26"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (implementation)",
+    "why": ""
+   },
+   "analytic_check": "in L",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Cook-McKenzie Euler-tour / LMT reversible simulation"
+   },
+   "provisional_F": null,
+   "lean": "ContourTraversal.lean, ContourPrograms.lean"
+  },
+  {
+   "id": "I28",
+   "kind": "theorem + potential",
+   "name": "Allowance potential Phi(w,t)=Aw+Dt, Psi=t+a'w; allowance w=K1(1+M)-(K0+s0)d; Realization theorem (thm:ctrl-realization)",
+   "file_line": "sections/implementation.tex:114-146, 1185-1338",
+   "statement": "Each suspended frame costs A(w_i-w_{i+1})+D(t_i-t_{i+1}); telescoping along the active call chain gives total O(M_top+t)=O(B) space, with Psi nonincreasing bounding all clocks.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'These differences telescope along the active call chain'"
+   },
+   "uses_items": [
+    "I20",
+    "I25",
+    "I26",
+    "I27"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "the actual O(log n) space bound"
+   },
+   "analytic_check": "not a subterm of goal",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "potential-function stack accounting where each frame is charged to a decrease of a budget parameter; neighbours: CDST23 precision-alternating recursion, amortized space accounting in catalytic/tree-evaluation algorithms (Cook-Mertz); the device is standard once I20 makes frame cost proportional to slack"
+   },
+   "provisional_F": null,
+   "lean": "RecursivePrograms.lean:1075 realization, HierarchyEvaluation.lean, DiagonalEvaluation.lean"
+  },
+  {
+   "id": "I29",
+   "kind": "lemma",
+   "name": "Conditioning on one start (lem:final-majority)",
+   "file_line": "sections/conclusion.tex:114-276",
+   "statement": "From the integrated 8th-moment bound, E[|W_bar(z)-W(z)|^8 | X_f(z)=1] <= N f/pi_f C^8 2^{-8p}; with p a large multiple of B the cost N is paid; median over enumerated conditional environments.",
+   "cited_or_new": {
+    "status": "new (simple)",
+    "cue": "'The factor N is the price of passing from the integrated bound to one specified start.'"
+   },
+   "uses_items": [
+    "I23"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "turns averaged accuracy into a decision"
+   },
+   "analytic_check": "Markov inequality",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "Markov's inequality + enumeration + median"
+   },
+   "provisional_F": null,
+   "lean": "ProbabilityDecision.lean:314 probes; FiniteFieldPrograms.lean:519 convince"
+  },
+  {
+   "id": "I30",
+   "kind": "theorems",
+   "name": "Fixed inverse-polynomial accuracy (thm:fixed-precision); main theorem; PromiseBPL=PromiseL; variable precision by padding (thm:probability); certified accepting computations",
+   "file_line": "sections/conclusion.tex:18-463; introduction.tex:28-51",
+   "statement": "Deterministic logspace poly-time transducer outputs p_M(x) within (n+2)^{-d}; hence L=RL=BPL etc.",
+   "cited_or_new": {
+    "status": "new results; padding standard",
+    "cue": ""
+   },
+   "uses_items": [
+    "I12",
+    "I23",
+    "I28",
+    "I29"
+   ],
+   "load_bearing_guess": {
+    "guess": "headline",
+    "why": ""
+   },
+   "analytic_check": "goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "assembly"
+   },
+   "provisional_F": null,
+   "lean": "Equality.lean (fixed_precision_estimator, BPL_subset_L, exact_logarithmic_space_derandomization); Amplification.lean (RL subset BPL); Deterministic.lean (L subset RL)"
+  },
+  {
+   "id": "I31",
+   "kind": "theorem + lemma",
+   "name": "Effective compiler with explicit bounds (thm:effective-simulation); total resource-capped interpreter",
+   "file_line": "sections/compiler.tex:1-556",
+   "statement": "A terminating compiler maps (M,a,b) to a deterministic logspace decider and explicit numerical bounds by specializing one fixed deterministic library.",
+   "cited_or_new": {
+    "status": "standard universal-machine technique",
+    "cue": "'should be read in this context of universal simulation' (PyneRazZhan2023)"
+   },
+   "uses_items": [
+    "I30"
+   ],
+   "load_bearing_guess": {
+    "guess": "corollary-only",
+    "why": "not in Lean comparator"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "universal interpreter + s-m-n specialization"
+   },
+   "provisional_F": null,
+   "lean": "not formalized (lean/docs/103.md: compiler not in comparator)"
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Property (T) of SL_H(Z), H>=3, quantitative Kazhdan constant",
+   "bib_key": "Shalom1999",
+   "locator": "Thm 2.6 p.156",
+   "field": "group theory",
+   "used_at": "averaging.tex:32-106",
+   "status": "cited (paper); Lean avoids it",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Relative property (T) of (SL2(Z) x| Z^2, Z^2), constant 1/10",
+   "bib_key": "Shalom1999",
+   "locator": "Thm 2.1 p.152; Cor 2.3",
+   "field": "group theory",
+   "used_at": "averaging.tex:52-63",
+   "status": "cited (paper); Lean: elementary Fourier 'square torus gap'",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Riesz(-Thorin) interpolation, diagonal case",
+   "bib_key": "Riesz1927; Thorin1948",
+   "locator": "Thms II, II'",
+   "field": "harmonic analysis",
+   "used_at": "averaging.tex:161-171",
+   "status": "cited",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Bertrand's postulate",
+   "bib_key": "(Mathlib.NumberTheory.Bertrand)",
+   "locator": "conclusion.tex:105-111",
+   "field": "number theory",
+   "used_at": "prime field choice",
+   "status": "cited; Mathlib",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Polynomial root bound (Schwartz)",
+   "bib_key": "Schwartz1980",
+   "locator": "fingerprints.tex:76-80",
+   "field": "algebra",
+   "used_at": "lem:fp-hash",
+   "status": "re-proved",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Universal hashing",
+   "bib_key": "CarterWegman1979",
+   "locator": "fingerprints.tex:83-92",
+   "field": "TCS",
+   "used_at": "lem:fp-hash",
+   "status": "re-proved",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Catalytic transparent-program cancellation",
+   "bib_key": "BuhrmanCleveKouckyLoffSpeelman2014",
+   "locator": "Sec. 3",
+   "field": "TCS (catalytic computing)",
+   "used_at": "lem:fp-catalytic",
+   "status": "re-proved (4-line)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Euler-tour/contour traversal of trees in logspace; reversible space-preserving traversal",
+   "bib_key": "CookMcKenzie1987; LMT2000",
+   "locator": "implementation.tex:442-646",
+   "field": "TCS",
+   "used_at": "lem:ctrl-tour",
+   "status": "re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Chebyshev / Markov inequalities",
+   "bib_key": "-",
+   "locator": "environment.tex, hierarchy.tex",
+   "field": "probability",
+   "used_at": "many",
+   "status": "standard",
+   "essential_for_headline": true
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Configuration reduction: p(x)=((I-S)^{-1}e)(x0) for a strictly forward substochastic S with paired bounded-degree ports.",
+   "items": [
+    "I01",
+    "I02"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Correction-and-copy hierarchy: per stage, pilot detectors choose column multiplier g; k_* fixed iterations of the soft-threshold correction E (factorial truncation); residual D=C-E+EC; copies split remaining large entries; entries drop by 2^H while active vertices at most double; reward W_{l+1}=r(W_l+E_lW_l); after L=O(log n) stages W_L(primary copy) is within 1/16 (or 1/poly) of p.",
+   "items": [
+    "I06",
+    "I07",
+    "I08",
+    "I09",
+    "I10",
+    "I11",
+    "I12"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "Stochastic atoms: represent entries/corrections/detector scores by row-bounded sampled tables with exact conditional-mean identities in a shared O(log n)-bit environment of rank channels.",
+   "items": [
+    "I04",
+    "I05",
+    "I13",
+    "I14",
+    "I15"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "Conditional averaging: affine (SL_H(Z) x| Z^H) walks on retention slices with uniform spectral gap; validated variants let walks be described before endpoints are known.",
+   "items": [
+    "I16",
+    "I17"
+   ]
+  },
+  {
+   "step": 5,
+   "claim": "Additive estimation: average budget differences with walks of length proportional to slack; mean errors telescope, noise contracts; dyadic slack groups.",
+   "items": [
+    "I18",
+    "I19",
+    "I20"
+   ]
+  },
+  {
+   "step": 6,
+   "claim": "Compression of each prefix to O(slack)-size exception lists with integrated error control.",
+   "items": [
+    "I21"
+   ]
+  },
+  {
+   "step": 7,
+   "claim": "Short fingerprints within budget blocks + clean-calculation coupling => integrated 8th-moment bound for the actual estimator (Thm fp-estimators). Catalytic equality test.",
+   "items": [
+    "I22",
+    "I23",
+    "I24"
+   ]
+  },
+  {
+   "step": 8,
+   "claim": "Logspace implementation: digit-query arithmetic, single cursor, contour-based inverse ports, allowance potential Phi=Aw+Dt telescoping => O(log n) space, poly time.",
+   "items": [
+    "I25",
+    "I26",
+    "I27",
+    "I28"
+   ]
+  },
+  {
+   "step": 9,
+   "claim": "Condition on the start (cost N paid by p=Theta(B)), enumerate environments, take median; compare to 1/2. Padding for variable precision; compiler.",
+   "items": [
+    "I29",
+    "I30",
+    "I31"
+   ]
+  }
+ ],
+ "lean_structure": {
+  "files": 39,
+  "lines": 43045,
+  "declarations": 6077,
+  "kind_counts": {
+   "theorem": 3168,
+   "def": 1485,
+   "abbrev": 1107,
+   "structure": 262,
+   "inductive": 28,
+   "instance": 26,
+   "class": 1
+  },
+  "proof_dag_size": 5166,
+  "core_vs_implementation": "Mathematical core (ProbabilityHierarchy, ProbabilityAtoms, AffineSampling, EstimatorBounds, EstimatorOperations, CompressionBounds, HierarchicalEstimator, IterationSchedule, EstimatorParameters, ProbabilityDecision) = 1398/5166 DAG declarations (27%), ~9.0k/27.9k DAG lines (32%). The remaining ~68-73% is machine/program/arithmetic/traversal implementation plumbing.",
+  "key_items_dag": {
+   "residual/substochastic/factorial (ProbabilityHierarchy.lean:179-277)": "frac_dag_dependents 0.35 of the whole DAG (912 dependents), i.e. more than the entire 27% core: the estimator and much of the evaluation layer sit downstream; dominated_share ~0 because the target is also reachable through other branches",
+   "Umbra.Scope.Sane.bells0": "dominated_share 0.38",
+   "Grain.Rock.convince": "0.15",
+   "Stage.Matter.probes": "0.135",
+   "Net.error_estimate": "0.12",
+   "fixed_precision_estimator": "0.63"
+  },
+  "route_differences_from_paper": [
+   "Lean uses fourth moments/fourth-root metrics (s=4) instead of the paper's s=8 (AffineSampling.lean:15-18: 'We use fourth moments (instead of eighth)').",
+   "Lean proves the uniform mixing input by 'an elementary Fourier proof of a square torus gap ... without assuming a property-(T) result' (AffineSampling.lean:723-727), i.e. a Gabber-Galil/Margulis-type shear expander argument, not Shalom.",
+   "No fingerprint/hash/collision declarations found (grep); CatalyticComparison.lean implements 'Deterministic catalytic ID comparisons' digit-by-digit. The paper's adaptive-fingerprint coupling (Sec. 9) appears to have no Lean counterpart; the Lean error bound (Net.error_estimate) seems to use exact comparisons. Text-level inference, unverified."
+  ],
+  "extractor_caveat": "scripts/extract_lean.py misses links made inside tactic proofs via `have := lemma ...` in some files: slice_gap/frame_gap/square_gap and U_heavy show in_proof_dag=False but are used (AffineSampling.lean:2295, ProbabilityHierarchy.lean:799)."
+ },
+ "eureka_candidates_ranked": [
+  "I11+I12 hierarchy",
+  "I20 slack-telescoped estimator",
+  "I28 allowance potential",
+  "I09 detectors",
+  "I23 fingerprint coupling"
+ ],
+ "eureka_candidates": [
+  {
+   "rank": 1,
+   "item": "I06+I07+I09+I11+I12: correction-and-copy hierarchy (shallow exact target)",
+   "provisional_N": "N3",
+   "provisional_F": "F5 (copy-space embedding) / F1 (new vertex sets V_l with rewards W_l)",
+   "for": "Turns an arbitrary poly-length substochastic computation into O(log n) stages where each stage cuts max entry by 2^H at the price of at most doubling active vertices; the row-sum potential |A|*maxentry decays as 2^{-(H-1)l}. Nothing like W_l appears in the goal or in L. It gives the approximation without any gap promise. Lean residual/factorial carry ~35% of the whole proof DAG downstream.",
+   "against": "Each ingredient has a neighbour: preconditioning identity (classical (I+S) preconditioning, Richardson in CDRST21/AKMPSV20/CDST23), vertex copies (graph lifts), sampled heavy-column detection. Alone it does not beat log^2 n (depth-L recursion).",
+   "nearest_neighbour": "Cohen-Doron-Sberlo-Ta-Shma STOC'23 (Richardson-based 'shift and truncate' for iterated stochastic products); Ahmadinejad et al. FOCS'20 (lifted graphs + Richardson preconditioning); Saks-Zhou 'random rounding' recursion.",
+   "lit_check": "WebSearch: Richardson/preconditioning in small space (AKMPSV20, CDST23) and '(I+E)(I-C)' splitting: no matching construction found (snippet-level)."
+  },
+  {
+   "rank": 2,
+   "item": "I20 (+I17,I19): budget-difference telescoping averaged by slack-proportional expander walks in one shared O(log n)-bit environment",
+   "provisional_N": "N3",
+   "provisional_F": "F3",
+   "for": "This is the step that pays O(slack) instead of O(log n) per recursion level: children at budget m<=M-d, walk/descriptor length O(d), noise 2^{-p-K_n d}. Combined with integrated (all-vertex) error norms, then one factor N paid at the end. MLMC-type telescoping is not known in the derandomization-of-space literature as far as quick searches show.",
+   "against": "Multilevel Monte Carlo (Heinrich 2001, Giles 2008) is precisely 'telescope consecutive levels, spend less sampling on small differences'; expander-walk averaging is classical; CDST23 already varies precision across recursion levels to avoid log n per level.",
+   "nearest_neighbour": "Giles 2008 MLMC; CDST23 precision-alternating recursion; Saks-Zhou.",
+   "lit_check": "WebSearch 'multilevel telescoping estimator expander walk ... Saks-Zhou': no space-bounded MLMC found; CDST23 'precision-alternating recursive scheme ... bypass the bottleneck of paying log n-space per recursion level' (snippet) is the closest."
+  },
+  {
+   "rank": 3,
+   "item": "I28 allowance potential Phi=Aw+Dt with stack telescoping",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "Makes the O(log n) space bound exact and uniform; nonincreasing Psi bounds numeric clocks.",
+   "against": "Potential-based stack accounting is standard once frame costs are proportional to slack; essentially the bookkeeping of I20.",
+   "nearest_neighbour": "Goldreich composition / space amortization; CDST23; Cook-Mertz-style budgeted recursion.",
+   "lit_check": "Cook-Mertz tree-evaluation snippets: different mechanism (catalytic registers)."
+  },
+  {
+   "rank": 4,
+   "item": "I09 sampled column detectors U_i and gated corrections",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "Needed for bounded incoming degree and active-count control.",
+   "against": "Sampling-based heavy-column detection is a standard idea.",
+   "nearest_neighbour": "heavy-hitter/degree estimation by sampling",
+   "lit_check": "not searched separately"
+  },
+  {
+   "rank": 5,
+   "item": "I23 block-clean coupling for adaptive fingerprints",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "Handles adaptively chosen endpoints vs. hash salts.",
+   "against": "Standard 'clean/ghost run' coupling; apparently absent from the Lean route, so not Lean-backed.",
+   "nearest_neighbour": "standard adaptive hashing analyses",
+   "lit_check": "not searched separately"
+  }
+ ],
+ "correctness_audit": {
+  "verdict": "Extraordinary claim (resolves BPL vs L for poly-time BPL). Paper proof is dense but internally coherent at the level read (hierarchy section checked line by line: identities I-D=(I+E)(I-C), C_{l+1}P^c_{l+1}=P^c_{l+1}-B_{l+1}(I-S), row-sum bound |V0|2^l q^{-l} all check). Estimation/compression/fingerprint/implementation sections read at statement + proof-sketch level only. Trust rests on the Lean: 43k lines, text-level clean (no sorry/axiom/native_decide), comparator definitions faithful; compile result pending from orchestrator.",
+  "checked": [
+   "hierarchy algebra (eq:hier-reward-algebra) by hand",
+   "factorial truncation counting argument",
+   "copy-step density/active-count argument",
+   "conditioning-on-one-start Markov argument",
+   "comparator model vs standard definitions of L, RL, BPL",
+   "comparator definitions textually identical to solution's Deterministic.lean",
+   "trust-surface grep",
+   "RL subset BPL via two repetitions (Amplification.lean)"
+  ],
+  "concerns": [
+   "Unreviewed; no public expert reaction found in searches (2026-10-10).",
+   "Paper and Lean follow partly different routes (s=4 vs 8; Fourier torus gap vs property (T); fingerprints apparently absent in Lean). The paper's own Sections 4 (averaging via Shalom) and 9 (fingerprints) are therefore not directly certified by the Lean; the theorem is certified only if the comparator compiles.",
+   "If the build fails or uses extra axioms, all of the above reduces to an unrefereed 8.5k-line paper whose sections 7-11 have many 'sufficiently large constant' choices whose consistency (order of choices, subsection conclusion.tex:38-112) is hard to check by hand.",
+   "Model faithfulness: h input heads uncounted, work alphabet binary - standard and equivalent; L requires halting via Decides but no time bound (standard). No loophole found.",
+   "The time bound of Theorem 1.2 (exponential in q) and compiler are not formalized.",
+   "Code-named Lean identifiers impede auditing which Lean lemma corresponds to which paper lemma."
+  ],
+  "consistency_checks": [
+   "Equality.lean BPL_subset_L uses only fixed_precision_estimator (error 1/32) + convince; matches paper's median/threshold argument with weaker constant",
+   "lean/docs/103.md scope statement matches comparator"
+  ]
+ },
+ "extraction_friction": [
+  "17 TeX files, 8.5k lines; all \\input resolved (main.tex lists 13 sections).",
+  "Lean identifiers are deliberately whimsical (Rock, Umbra.Scope.Sane.bells0, Folk, Bean, Helix.Moon...), so name-based LaTeX-Lean joins fail; joins here use module docstrings and file topics.",
+  "Extractor under-links tactic-internal uses (gap lemmas, U_heavy shown outside DAG though used).",
+  "Lean route deviates from paper (s=4, Fourier gap, no fingerprints), so paper items do not map 1:1 to Lean items.",
+  "Arithmetic (Sec. 10) and controller (Sec. 11) proofs read at statement level only; given their implementation nature they hold no eureka candidates but correctness is unaudited by hand.",
+  "No reasoning trace for this family."
+ ]
+}
