@@ -2,7 +2,7 @@
  "fid": "287",
  "date": "2026-10-09",
  "analyst_role": "downstream",
- "method_note": "Text-level only: the Lean was read, not compiled (no local toolchain). Dependency chains were traced by hand with grep over lean/OAI; scripts/extract_lean.py was not rerun. Web search was available for part of the session (one rate-limit interruption); the search index appears stale for Sep-Oct 2026 (it does not index 287 itself), so post-release precedent checks are inconclusive.",
+ "method_note": "Text-level only: the Lean was read, not compiled (no local toolchain). Dependency chains were traced by hand with grep over lean/OAI; scripts/extract_lean.py was not rerun. The first pass (2026-10-09) hit a rate limit and a stale index. The searches were rerun on 2026-10-10 (about 25 WebSearch queries, no rate limit): the index now covers 6-8 Oct 2026 (OpenAI repo, news coverage, Kalai and Tao blog posts, a reactions roundup), but WebFetch failed with DNS errors on every non-GitHub host and the proxy refuses arxiv.org, so pages were read only through search summaries. No post-release use of the device and no error report were found; the post-release check is now weakly negative rather than blank (only four days of coverage). See precedent_check.update_2026_10_10_web.",
  "item": "Small cocycle with a prescribed word value (paper lem:small-cocycle, cocycle.tex:31-46; Lean OAI.FreeGroupFactorMain.smallCocycle)",
  "item_statement": "For n>=3 and eta>0 there are a word w in F_n and a finitely supported real h with ||h||_2 < eta such that the 1-cocycle D into l2(F_n) (left regular action) with D_{x_1}=h, D_{x_j}=0 (j>=2) satisfies ||D_w - delta_e||_2 < eta.",
  "item_type": "lemma (F3, auxiliary construction)",
@@ -473,7 +473,8 @@
    "rank": 1,
    "title": "Free absorption L(Gamma*Z) = L(Gamma*F_2) for Gamma containing F_2",
    "lean": "statable now",
-   "argument": "The only target found where the device does work the theorem cannot do: free products are functorial, so L(F_2)=L(F_3) yields Q*L(F_2)=Q*L(F_3) but not Q*L(Z)=Q*L(F_2). Every ingredient (free prefix family, a cocycle supported on the moved generator, a flow fixing a free factor, Nielsen correction, Baire generation) seems to transfer verbatim, and the Lean already has the fixed-generator variant (FiniteActive). Without the item a prover has no visible route; with it the proof is a re-parametrization. This is the cleanest jump test, but first check Dykema-Radulescu (2000) to make sure it is not already known."
+   "argument": "The only target found where the device does work the theorem cannot do: free products are functorial, so L(F_2)=L(F_3) yields Q*L(F_2)=Q*L(F_3) but not Q*L(Z)=Q*L(F_2). Every ingredient (free prefix family, a cocycle supported on the moved generator, a flow fixing a free factor, Nielsen correction, Baire generation) seems to transfer verbatim, and the Lean already has the fixed-generator variant (FiniteActive). Without the item a prover has no visible route; with it the proof is a re-parametrization. This is the cleanest jump test, but first check Dykema-Radulescu (2000) to make sure it is not already known.",
+   "note_2026_10_10": "Literature check (searches only; full texts of Dykema-Radulescu could not be fetched). (a) Not known before 287: for Gamma = F_2 the target reads L(F_3) = L(F_4), which is the free group factor problem itself (Dykema 1994 / Radulescu 1994 dichotomy), and no source found states L(Gamma*Z) = L(Gamma*F_2) for any Gamma whose factor is not an interpolated free group factor. (b) Dykema-Radulescu, Math. Ann. 316 (2000), arXiv math/9911011: for a II_1 factor N and A in the class F, N*A = N*L(F_r) with r = fdim(A). This preserves free dimension, so it does not give Q*L(Z) = Q*L(F_2). (c) RISK: Dykema-Radulescu, Proc. AMS 131 (2003), arXiv math/0105114, define Q(1)*...*Q(n)*L(F_r) for real r (negative allowed) by rescaling, with (Q*L(F_r))_t = Q_t*L(F_{t^-2 r}) for r>1 and small t, and give 'two statements equivalent to isomorphism of free group factors' (exact wording not retrieved). My own inference, unverified: with 287's theorem this rescaling formula gives Q*L(F_r) = Q*L(F_s) for every II_1 factor Q and r,s>1, and if the extended notation is consistent down to r=1 (L(F_1)=L(Z)), also Q*L(Z) = Q*L(F_2). In that case the target, for ICC Gamma, is a corollary of the theorem plus classical machinery, not reuse of the device, and the argument above ('functoriality does not give it') fails. Rank kept at 1 because this is not confirmed, but read math/0105114 before running the test; if confirmed, move it to theorem_corollaries (only non-factor L(Gamma) would remain a candidate) and promote smallCocycleTwo."
   },
   {
    "rank": 2,
@@ -502,8 +503,24 @@
  ],
  "precedent_check": {
   "earlier_equivalents": "None found for the statement (prescribed-value small cocycle). Design-level neighbours: Shlyakhtenko 2609.11074 (2026-09-10, model-assisted) shares the outer architecture and the 1/sqrt(m) amplification but has no cocycle and no prescribed value; family 296 (same release, 2026-09-23) uses the same amplification along free prefixes in correlation form. The principle appeared at least three times in model-produced work within two weeks, which weakens the case that it is hard to find, though not the novelty of the exact statement.",
-  "after_2026_10_06": "Nothing found. Searches on 2026-10-09 returned no post-release work using the device; the index did not even return 287 or 2609.11074 for generic queries, so this check is inconclusive.",
-  "downgrade": "No downgrade from an exact earlier equivalent. The C2 grade in novelty.json (provisional N3, conf 0.4) stands; the 296 sibling adds pressure toward N2 at the level of the design."
+  "after_2026_10_06": "Rerun 2026-10-10: the index now covers 6-8 Oct 2026 (repo, news, Kalai/Tao blog posts, a reactions roundup). Nothing uses the small-cocycle device or the theorem; no error report; no specialist assessment (Shlyakhtenko, Popa, Ioana, Dykema, MathOverflow) was found. Only one cautious reaction was found, attributed to Alekseev. The check is now weakly negative, no longer blank, but it covers only four days and was read through search summaries (page fetches failed).",
+  "downgrade": "No downgrade: no earlier equivalent of the prescribed-value statement was found (2026-10-09 and 2026-10-10 searches). The C2 grade in novelty.json (provisional N3, conf 0.4) stands; the 296 sibling still adds pressure toward N2 at the level of the design. Separately, downstream target 1 (free absorption) is at risk of being a theorem corollary via Dykema-Radulescu 2003 rescaling. That would not downgrade the item, but it would remove the best jump test.",
+  "update_2026_10_10_web": {
+   "status": "Searches rerun 2026-10-10: about 25 WebSearch queries, no rate limit. The index now returns post-release pages (6-8 Oct 2026). WebFetch failed (getaddrinfo ENOTFOUND) on every non-GitHub host tried (postcutoff.com, proofsandprompts.com, gilkalai.wordpress.com, cellcog.ai, arxiv.org, export.arxiv.org, ar5iv, ams.org); the agent proxy also refuses CONNECT to arxiv.org (403), so findings rest on search summaries plus one GitHub fetch.",
+   "post_release": [
+    "The claim is public and indexed: OpenAI repo lean/docs/287.md (fetched; it states the interpolated-factor isomorphism for all r,s>1 incl. infinity; it does not mention smallCocycle), postcutoff.com (6 Oct, AI-written summary: 'a claim until specialists confirm ...'), kingy.ai, cellcog.ai, officechai, datacamp, interestingengineering.",
+    "Expert reactions: Kalai blog post (7 Oct) covers the release, but its treatment of 287 could not be read. Tao blog (7 Oct) hosts the AHM statement on the release as a whole, not on 287. proofsandprompts.com '100+ reactions' (8 Oct) quotes a reaction attributed (uncertainly, per the search summary) to Vadim Alekseev: he expected non-isomorphism and wants to study the details. No statement from Shlyakhtenko, Popa, Ioana, Dykema or on MathOverflow was found.",
+    "No error or gap report specific to 287. Secondary sources flag the limiting-generation and trace-preservation steps as 'the core burden'. Some secondary sources wrongly say there is no Lean proof yet; the repo's lean/docs/287.md says otherwise.",
+    "No post-release paper using the small-cocycle device, and no paper using the theorem (e.g. fundamental group of L(F_2)), was found. The query 'small cocycle prescribed word value free group' returned only unrelated hits (arXiv 2610.02213 on soficity of one-relator groups repairs a free-group-valued cocycle; it is a different object)."
+   ],
+   "shlyakhtenko_2609_11074": "Direct fetch of arxiv.org/abs/2609.11074 failed (DNS / proxy 403). Search summaries of the abs page: D. Shlyakhtenko, 'On the II_1 Factors of Fuchsian Groups', math.OA, submitted 10 Sep 2026. Abstract: surface-group factors (genus g>=2) are free group factors on 2g-1 generators; key step is that the commutator ABA^-1B^-1 is freely complemented in L(F_2); together with earlier results this gives the de la Harpe-Voiculescu conjecture for finitely generated torsion-free non-elementary discrete subgroups of PSL_2(R); obtained using ChatGPT Pro 6.0. One summary instead says the paper cannot settle the conjecture in all cases and proves a weaker containment; that conflict was not resolved. Date and content agree with novelty.json; no cocycle with a prescribed value appears in what was seen.",
+   "earlier_equivalents": [
+    "No earlier equivalent of the statement (a small-norm cocycle on one generator with D_w close to delta_e) was found. Closest neighbours: Pytlik-Szwarc / Szwarc deformations of the left regular representation of F_k and their l2 1-cocycles (arXiv 2607.17670, Jul 2026), Haagerup's tree cocycle, and Connes-Shlyakhtenko / Shlyakhtenko derivation-cocycle theory linking beta_1^(2), delta* and free entropy dimension. None prescribes a value at a word.",
+    "Free absorption L(Gamma*Z) = L(Gamma*F_2): see top5[0].note_2026_10_10. It was not known before 287 (for Gamma=F_2 it is the problem itself). Dykema-Radulescu 2003 rescaling may make it a corollary of the theorem for factor L(Gamma); this is unverified."
+   ],
+   "u_n_plus": "First L2-Betti number of the dual of U_N^+ is 1 (Vergnioux's conjecture, proved by Kyed-Raum; Bichon-Kyed-Raum, Math. Ann. 2018), and the higher ones vanish. Brannan-Vergnioux (arXiv 1703.08134) prove that orthogonal free quantum group factors are strongly 1-bounded. No source says whether L^infty(U_N^+) is a free group factor, so the open-problem row stands.",
+   "net": "No downgrade. No earlier equivalent of the statement; no post-release reuse; no error report. The post-release check is now weakly negative rather than inconclusive, limited by four days of coverage and by unreadable full texts."
+  }
  },
  "sources": [
   "data/pilot/287/novelty.json, lean.md, lean.json",
@@ -516,7 +533,29 @@
   "https://arxiv.org/abs/2609.11074 (via novelty.json)",
   "https://arxiv.org/abs/1703.08134 (Brannan-Vergnioux)",
   "https://arxiv.org/abs/1204.2182 (Guionnet-Shlyakhtenko; arXiv id from memory, not re-verified)",
-  "https://arxiv.org/abs/2506.10902 (Nuclear C*-algebras: 99 problems; search hit, lists L(F_2) vs L(F_3) as open as of April 2026)"
+  "https://arxiv.org/abs/2506.10902 (Nuclear C*-algebras: 99 problems; search hit, lists L(F_2) vs L(F_3) as open as of April 2026)",
+  "https://github.com/openai/math/blob/adc7f1241b42e322a6451854ab7e4b4c146bf78a/lean/docs/287.md (fetched 2026-10-10)",
+  "https://postcutoff.com/e/2026-10-06-free-group-factors-isomorphism-openai/ (search summary only; fetch failed)",
+  "https://proofsandprompts.com/2026/10/08/100-reactions-to-100-solutions/ (search summary only; fetch failed)",
+  "https://gilkalai.wordpress.com/2026/10/07/updates-sharing-ai-progress-on-mathematics-amazing-and-my-lecture-plans/ (search hit; content not read)",
+  "https://terrytao.wordpress.com/2026/10/07/ahm-statement-on-openais-october-6-release-of-mathematical-documents/comment-page-1/ (search hit)",
+  "https://kingy.ai/blog/openai-math-722-manuscripts-results-proofs-compute-costs/ (search hit)",
+  "https://cellcog.ai/blog/openai-math-results/ (search hit; fetch failed)",
+  "https://arxiv.org/abs/2609.11074 (search summary of abs page, 2026-10-10; direct fetch failed)",
+  "https://arxiv.org/pdf/2608.14673 (human audit of OpenAI proofs; search hit)",
+  "https://arxiv.org/html/2610.02213 (soficity of one-relator groups; unrelated cocycle)",
+  "https://arxiv.org/pdf/2607.17670 (L2-cohomology and deformations of the left regular representation)",
+  "https://arxiv.org/pdf/math/9911011 (Dykema-Radulescu, Compressions of free products, Math. Ann. 2000)",
+  "https://arxiv.org/pdf/math/0105114 (Dykema-Radulescu, Rescalings of free products of II_1 factors, Proc. AMS 2003)",
+  "https://www.ams.org/journals/proc/2003-131-06/S0002-9939-02-06749-7/S0002-9939-02-06749-7.pdf (same; fetch failed)",
+  "https://arxiv.org/html/math/0105115 (Dykema, Free subproducts and free scaled products)",
+  "https://ar5iv.arxiv.org/html/funct-an/9211013 (Dykema, Free products of hyperfinite vN algebras and free dimension)",
+  "https://arxiv.org/pdf/funct-an/9211012 (Dykema, Interpolated free group factors)",
+  "https://arxiv.org/pdf/2502.08595 (Dykema-Zhao, free products and rescalings)",
+  "https://arxiv.org/pdf/math/0606271 (Houdayer, free absorption for free Araki-Woods)",
+  "https://arxiv.org/pdf/math/0401121 (Ozawa, Kurosh type theorem)",
+  "https://link.springer.com/article/10.1007/s00208-017-1531-5 (Bichon-Kyed-Raum, l2-Betti numbers of universal quantum groups)",
+  "https://arxiv.org/pdf/1612.07706 (Higher l2-Betti numbers of universal quantum groups)"
  ],
  "search_log": [
   "grep lean/OAI for smallCocycle / one_step / rankStep / rankTwo / allInterpolatedIsomorphic call sites (FreeGroupFactor, InterpolatedFactors)",
@@ -524,6 +563,33 @@
   "grep CONTENTS.md for free group factor / cocycle / free entropy / generator: families 287, 296, 298 relevant; 296 read",
   "WebSearch 'free unitary quantum group U_N^+ ... free group factor ... first L2-Betti number' -> Brannan-Vergnioux (O_N^+ only); U_N^+ open",
   "WebSearch 'free group factors isomorphism problem solved 2026 ...' -> no post-release hits; survey 2506.10902 says open as of April 2026; index stale",
-  "First batch of searches failed on a session rate limit; repeated after the resume"
+  "First batch of searches failed on a session rate limit; repeated after the resume",
+  "Web 2026-10-10: 'free group factor isomorphism problem solved' -> postcutoff.com (6 Oct, AI-written: 287 claim, 'a claim until specialists confirm'), openai/math lean/docs/287.md; older sources call it open",
+  "Web 2026-10-10: 'L(F_2) isomorphic L(F_3) 2026' -> nothing relevant (group-level F2 vs F3 hits only)",
+  "Web 2026-10-10: 'free group factors isomorphic OpenAI' -> openai/math repo, 287.md, officechai, kingy.ai, datacamp, cellcog, postcutoff; no expert confirmation",
+  "Web 2026-10-10: 'small cocycle prescribed word value free group' -> no match; arXiv 2610.02213 (soficity of one-relator groups, free-group-valued cocycle repair) is a different object",
+  "Web 2026-10-10: 'free group factor problem OpenAI proof reaction Tao OR Kalai OR Popa OR Shlyakhtenko OR Ioana' -> proofsandprompts.com '100+ reactions' (8 Oct; reaction attributed to V. Alekseev, cautious); no statement by the named experts",
+  "Web 2026-10-10: 'mathoverflow free group factors isomorphic OpenAI proof October 2026' -> no MathOverflow thread found",
+  "Web 2026-10-10: '\"free group factor\" OpenAI proof error OR gap OR flaw' -> no error report; arXiv 2608.14673 (human audit of earlier OpenAI proofs) does not cover 287",
+  "Web 2026-10-10: 'arXiv October 2026 interpolated free group factors isomorphic cocycle consequence' -> no post-release paper",
+  "Web 2026-10-10: 'Gil Kalai blog OpenAI 722 manuscripts free group factors' -> Kalai post 7 Oct 2026 found; its 287 content was not readable in snippets",
+  "Web 2026-10-10: 'Terence Tao OpenAI math release October 2026 free group factor' -> Tao blog 7 Oct (AHM statement on the release), tech-insider; nothing on 287's mathematics",
+  "Web 2026-10-10: '\"free group factors\" OpenAI Dykema OR Shlyakhtenko comment proof checked October 2026' -> only 2609.11074; no comment from them",
+  "Web 2026-10-10: '\"An isomorphism of the free group factors\" cocycle lemma' -> paper not indexed by title",
+  "Web 2026-10-10: 'operator algebras blog free group factor problem resolved AI October 2026' -> postcutoff, fourweekmba; no specialist blog",
+  "Web 2026-10-10: 'fundamental group of L(F_2) equals R_+ 2026 consequence ...' -> no post-release follow-up paper",
+  "Web 2026-10-10: 'Shlyakhtenko \"On the II_1 Factors of Fuchsian Groups\" arXiv 2609.11074' -> abs page indexed: math.OA, submitted 10 Sep 2026, ChatGPT Pro 6.0 credited, commutator freely complemented in L(F_2)",
+  "WebFetch 2026-10-10: arxiv.org/abs/2609.11074, export.arxiv.org, ar5iv math/0105114, ams.org PDF, postcutoff, proofsandprompts (twice), gilkalai.wordpress, cellcog -> all failed (getaddrinfo ENOTFOUND; curl via proxy: CONNECT 403 for arxiv.org). github.com 287.md -> fetched",
+  "Web 2026-10-10: 'Dykema Radulescu compressions of free products ... Q * L(F_t) dichotomy' -> Math. Ann. 316 (2000), math/9911011: N*A = N*L(F_r), r=fdim(A), for A in F and N a II_1 factor (via citation in math/0105115)",
+  "Web 2026-10-10: 'Dykema \"free products of hyperfinite von Neumann algebras and free dimension\" ... free absorption' -> Duke 69 (1993) Thm 4.6 (hyperfinite free products are L(F_t)); dichotomy (Dykema/Radulescu 1994); nothing on general Q",
+  "Web 2026-10-10: '\"free absorption\" von Neumann algebra free product L(F_t) Dykema' -> type III free absorption (Houdayer math/0606271, Dykema funct-an/9601003); not the tracial Gamma statement",
+  "Web 2026-10-10: 'Dykema \"Rescalings of free products of II_1 factors\" abstract N * L(F_t)' -> Proc. AMS 131 (2003), math/0105114: Q(1)*...*Q(n)*L(F_r) for negative r; rescaling formula; 'two statements equivalent to isomorphism of free group factors'",
+  "Web 2026-10-10: two follow-ups for the exact equivalent statements in math/0105114 -> wording not retrieved",
+  "Web 2026-10-10: 'Dykema Zhao 2502.08595 ...' -> two-parameter family F_{s,r}(A); no new absorption statement seen",
+  "Web 2026-10-10: '\"N * L(F_r)\" OR \"Q*L(F_t)\" isomorphic for all t ...' and 'is M * L(Z) isomorphic to M * L(F_2) for every II_1 factor M' -> no source states it; Ozawa's Kurosh theorem (math/0401121) is a related non-isomorphism result for M*...*M",
+  "Web 2026-10-10: '\"L(Γ*Z)\" free product with Z absorption ... L^2 Betti number' -> nothing direct",
+  "Web 2026-10-10: 'free unitary quantum group U_N^+ L^infty free group factor first L2-Betti number' -> beta_1^(2)(dual U_N^+)=1 (Kyed-Raum; Bichon-Kyed-Raum Math. Ann.); Brannan-Vergnioux 1703.08134 is O_N^+ strong 1-boundedness; free-group-factor question for U_N^+ still open",
+  "Web 2026-10-10: 'Shlyakhtenko 1-cocycles free groups l^2 Betti number free entropy dimension derivations' -> Shlyakhtenko APDE 2009, 2110.12324, Connes-Shlyakhtenko; no prescribed-value cocycle",
+  "Web 2026-10-10: '1-cocycle free group left regular representation small norm generator prescribed value ...' -> arXiv 2607.17670 (Pytlik-Szwarc deformations, l2 1-cocycles); no prescribed value at a word"
  ]
 }

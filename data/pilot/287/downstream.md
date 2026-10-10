@@ -2,7 +2,7 @@
 
 **Item:** the paper's lem:small-cocycle (cocycle.tex:31-46), formalized in Lean as `OAI.FreeGroupFactorMain.smallCocycle` (SmallCocycle.lean:213). It is a lemma of type F3. In words: for n ≥ 3 and η > 0 there are a word w in F_n and a finitely supported real vector h with ‖h‖₂ < η such that the cocycle D with D_{x₁} = h and D_{x_j} = 0 (j ≥ 2) satisfies ‖D_w − δ_e‖₂ < η.
 
-**Method:** I read the Lean as text; it was not compiled. I traced the dependency chains by hand with grep. Web search worked for part of the session, but its index looks stale for Sep–Oct 2026, so the post-release precedent check is inconclusive.
+**Method:** I read the Lean as text; it was not compiled. I traced the dependency chains by hand with grep. The first pass (9 Oct) hit a rate limit and a stale search index. The searches were rerun on 10 Oct 2026, about 25 queries with no rate limit. The index now covers 6–8 Oct. Page fetches failed on every non-GitHub host, and the proxy blocks arxiv.org, so results come from search summaries. No post-release use of the device and no error report were found. The post-release check is now weakly negative rather than blank.
 
 ## Part A: Is the item in the Lean?
 
@@ -93,6 +93,10 @@ There is a second path, `rankThreeInfinite` → `FiniteActive.one_step` → `sma
 ## Top 5 (Lean-usable first)
 
 1. **L(Γ∗ℤ) ≅ L(Γ∗F₂).** This is the only target where the device does work the theorem cannot. It is statable now. Check the literature first.
+   - *10 Oct literature check:* this was not known before 287. For Γ = F₂ it reads L(F₃) ≅ L(F₄), which is the problem itself.
+   - Dykema–Rădulescu 2000 (N∗A ≅ N∗L(F_r), r = fdim A) preserves free dimension, so it does not give it.
+   - **Risk (my inference, not verified):** Dykema–Rădulescu 2003 (math/0105114) define Q∗L(F_r) for real r by rescaling, with (Q∗L(F_r))_t ≅ Q_t∗L(F_{t⁻²r}). They also prove "two statements equivalent to isomorphism of free group factors"; their wording was not retrieved. Combined with 287's theorem, this may already give Q∗L(ℤ) ≅ Q∗L(F₂) for every II₁ factor Q. Then the target would be a corollary for ICC Γ, not reuse of the device.
+   - Rank kept because this is unconfirmed. Read math/0105114 before running the test; if confirmed, demote this target and promote `smallCocycleTwo`.
 2. **`smallCocycleTwo`.** This is the most measurable target, with an existing 1.8k-line proof. It is in-family, so it calibrates the harness rather than confirming a jump.
 3. **Akemann–Ostrand lower bound.** It separates reuse of the item from reuse of the N0 shell library.
 4. **Fuchsian groups with torsion.** An open problem with the same obstruction; a stretch target.
@@ -107,4 +111,16 @@ There is a second path, `rankThreeInfinite` → `FiniteActive.one_step` → `sma
 - **What this means for the grade:**
   - The principle appeared at least three times in model-produced work within two weeks. That weakens the case that it is hard to find.
   - It does not remove the novelty of the exact statement.
-- **After 6 Oct 2026:** nothing found, but the search index looks stale, so this check is inconclusive.
+- **After 6 Oct 2026 (rerun 10 Oct):**
+  - The claim is indexed: the repo's `lean/docs/287.md` (fetched), news coverage, Kalai's blog (7 Oct; its 287 content not readable), Tao's blog (7 Oct; the AHM statement on the release as a whole), and a "100+ reactions" roundup (8 Oct).
+  - The roundup has one cautious reaction, attributed uncertainly to V. Alekseev, who expected non-isomorphism.
+  - No assessment from Shlyakhtenko, Popa, Ioana, Dykema or MathOverflow was found.
+  - No error report. Commentators name the limiting-generation and trace-preservation steps as the core burden.
+  - No paper uses the device, or even the theorem.
+  - The check is now weakly negative, not inconclusive. It covers only four days, and pages could not be fetched.
+- **Shlyakhtenko 2609.11074:** a direct fetch failed. Search summaries of the abstract page confirm: math.OA, submitted 10 Sep 2026, ChatGPT Pro 6.0 credited, and the key step is that the commutator is freely complemented in L(F₂). That matches novelty.json. One summary reports a weaker containment result; that conflict was not resolved.
+- **Earlier equivalents (rerun):** none of the statement.
+  - The nearest are Pytlik–Szwarc deformations and their ℓ² 1-cocycles (arXiv 2607.17670), Haagerup's tree cocycle, and Connes–Shlyakhtenko derivation theory. None prescribes a value at a word.
+  - For free absorption, see the Top 5 note.
+- **U_N^+:** β₁⁽²⁾ of the dual of U_N^+ is 1 (Kyed–Raum; Bichon–Kyed–Raum, Math. Ann.). Brannan–Vergnioux cover O_N^+ only. Whether L^∞(U_N^+) is a free group factor is still open.
+- **Verdict:** no downgrade. The provisional N3 (conf 0.4) stands. The best jump test (target 1) may collapse to a corollary; see the note above.
