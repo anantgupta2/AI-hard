@@ -3,7 +3,7 @@
  "item": "Clause-count-free restriction lemma (Lemma 2.1, 'Restriction bound'): under a p-random restriction, a width-k CNF H satisfies |E G·H_{T,rho}| <= W(H,T,rho)·corr_b(G) for every G, with E W <= 1/(1-theta), theta = sum_{l>b} C(k,l)(2p/(1-p))^l, valid for any constant pk (b chosen large) and independent of the number of clauses",
  "item_type": "F3 (lemma; F5 flavour: change of representation of a restricted CNF into a signed mixture of narrow CNFs)",
  "analysis_date": "2026-10-09",
- "method_note": "Text-level only. The Lean was NOT compiled (no local toolchain, no local Mathlib checkout). Chain traced by reading proofs; grep over OAI/Computability for reuse. WebSearch was unavailable for the whole session (account session limit); no web query returned results. Literature items below are from the analyst's own knowledge and from data/pilot/112/{family,novelty}.* and must be checked.",
+ "method_note": "Text-level only. The Lean was NOT compiled (no local toolchain, no local Mathlib checkout). Chain traced by reading proofs; grep over OAI/Computability for reuse. The web precedent searches, rate-limited in the first pass, were rerun on 2026-10-10 (38 WebSearch queries, none rate-limited, plus GitHub repository search). WebFetch could reach github.com but failed with DNS errors (ENOTFOUND) for arxiv.org, export.arxiv.org, alphaxiv.org, eccc.weizmann.ac.il, lacker.io and mathweb.ucsd.edu, so several literature claims rest on search-result abstracts and snippets, not on full texts; see precedent_check.update_2026_10_10_web.",
  "lean_status": "as in paper",
  "lean_status_why": "cnf_restriction_bound (Restriction.lean:59) states Lemma 2.1 exactly: W depends only on H and the restriction, restrictionAvg p W <= 1/(1-theta) with the paper's theta, and |E G·H_restricted| <= W·corr b G for all real G. The proof follows the paper's route (violation-path expansion, marker mixture, reweighting, backward counting) in Restriction*/MarkerMixture/ReversePath* files, and the comparator target consumes it through wide_correlation_of_good_restrictions.",
  "lean_gaps": [
@@ -144,7 +144,7 @@
     "score": "statable now",
     "statable_with": "OAI DepthThreeLowerBound: Circuit3, Circuit3.Computes, gateCount, CNF, CNF.WidthAtMost, finiteAvg, sign, indicator, corr, Restriction, restrictionAvg; parity as fun x => decide (Odd (card {i | x i}))",
     "missing": "none for the statement; proof needs a parity/narrow-CNF correlation lemma (~150-300 lines) and a re-parametrised counting lemma (~100-200 lines)",
-    "formal_proof_to_compare": "none in Lean (no switching-lemma or PPZ formalization known)"
+    "formal_proof_to_compare": "Updated 2026-10-10: switching-lemma formalizations exist outside Mathlib and the release: arXiv 2609.24188 (Formalizing PARITY Circuit Lower Bounds in Lean; whether it includes a depth-3 parity bound is unknown), codula-code/SwitchingLemma (core Lean v4.33.1, no Mathlib) and Quantyra/formal-switching-lemma (Lean v4.13.0). They use different toolchains from the pinned v4.34.1; see switching_lemma_formalizations. No PPZ formalization known."
    }
   },
   {
@@ -192,11 +192,11 @@
     "score": "statable with < 300 lines of new definitions",
     "statable_with": "CNF/Clause from DepthThree",
     "missing": "general depth-d circuit inductive type and size (~150 lines)",
-    "formal_proof_to_compare": "none"
+    "formal_proof_to_compare": "Updated 2026-10-10: arXiv 2609.24188 (Formalizing PARITY Circuit Lower Bounds in Lean, Sept 2026) is the closest candidate; its coverage of the depth-d bound is unverified (full text not fetched). See switching_lemma_formalizations."
    }
   }
  ],
- "switching_lemma_formalizations": "No Lean formalization of Håstad's switching lemma (or Razborov's or Rossman's proofs) is known to the analyst in Mathlib or in public Lean 4 repositories. Mathlib d13f23b has no circuit-complexity library. This could not be verified: there is no local Mathlib checkout and web search was unavailable. A grep of the release's lean/OAI/Computability, InformationTheory and Combinatorics found no 'switching', 'Hastad' or 'random restriction' mentions; DepthThree deliberately avoids the switching lemma. Possible Isabelle or Coq developments were not checked. Rerun with web access: 'switching lemma Lean', 'Hastad switching lemma formalization Isabelle AFP Coq'.",
+ "switching_lemma_formalizations": "UPDATED 2026-10-10 (web): switching-lemma formalizations DO exist, all outside Mathlib and outside the release. (1) arXiv 2609.24188 'Formalizing PARITY Circuit Lower Bounds in Lean' (Sept 2026). The full text was not fetchable. Search snippets say it states Hastad's switching lemma (O'Donnell's presentation) as a ratio of bad restrictions to all restrictions using Mathlib countP, with constant 10 under an extra rounding hypothesis (40 without), and discusses Razborov's encoding (d lg w + 2d auxiliary bits). Whether it includes a depth-3 parity bound is unknown. https://arxiv.org/pdf/2609.24188 (2) github.com/codula-code/SwitchingLemma, created 2026-09-03: per its README, a standalone Lean 4 proof in core Lean (no Mathlib), toolchain v4.33.1, of Hastad 2014 SIAM Lemma 3.3 via reweighting Lemma 3.4. The bound is Pr[DT depth >= h] <= (10 w eps)^h for width-w DNFs, plus a conditional version. The README claims no sorry and only the standard axioms (unverified here). https://github.com/codula-code/SwitchingLemma (3) github.com/Quantyra/formal-switching-lemma (v0.10.0, Lean v4.13.0), cited in 2609.24188 as Fredriksen's work: a SimpleDNF switching lemma (switchingLemmaTermSimple_proved) with CNF duals and layer schedules. Its README disclaims a general PHP switching lemma. https://github.com/Quantyra/formal-switching-lemma No Isabelle AFP or Coq switching-lemma entry was found; bounded-arithmetic formalizations (APC1, Krajicek PV1+WPHP) exist but are not proof-assistant code. Mathlib d13f23b still has no circuit-complexity library (no local checkout to grep). Consequence for targets: the 'formal proof to compare: none in Lean' notes in the depth-3 parity and depth-hierarchy targets are now stale. Comparator candidates exist, on different toolchains (v4.13.0, v4.33.1) from the pinned v4.34.1 and possibly without Mathlib. The earlier local greps still hold: the release's lean/OAI never mentions switching or Hastad, and DepthThree deliberately avoids the switching lemma.",
  "open_problems": [
   {
    "title": "An explicit function with depth-3 complexity 2^{n^{1/2+epsilon}} (HJP95 Problem 2)",
@@ -413,9 +413,42 @@
   }
  ],
  "precedent_check": {
-  "post_release_uses": "Not checked: web search unavailable in this session. Rerun queries: 'restriction lemma clause count depth-three', 'signed combination width-b CNF random restriction', 'Beyond the square-root exponent depth-three' after 2026-10-06.",
+  "post_release_uses": "None found (web rerun 2026-10-10). Searches for the exact title, '2^{omega(sqrt n)} depth-3 2026', 'restriction lemma clause count depth-three', 'signed combination width-b CNF random restriction', OpenAI + depth-three, and the Computational Complexity blog, ECCC, Goedel's Lost Letter, Aaronson and Kalai returned no paper, preprint or blog post (after 2026-10-06) that cites, uses or discusses the restriction lemma or the 2^{omega(sqrt n)} depth-3 claim. Press coverage of the Oct 6 release (Scientific American, Gizmodo, yourstory, interestingengineering, aiweekly) surfaced, none mentioning depth-3 circuits. Index lag four days after release is a real limitation; recheck later.",
   "earlier_equivalent": "None found in the novelty pass. Neighbours: H89 switching (needs pk < 1/5), Razborov encoding (pays log w bits), SBI/Razborov small-p, Lovett-Wu-Zhang 2020 mild restrictions (term compression, not CNF-to-CNF correlation transfer), IMP12, GMR sparsification. No new precedent found here; the release contains no other use.",
-  "verdict": "No downgrade from this pass. The main risk remains an expert-known folklore expansion."
+  "verdict": "No downgrade. The 2026-10-10 web rerun found no earlier equivalent and no post-release use. The closest neighbours are Lovett-Wu-Zhang 2020 and SBI 2002/04. Both are mild-restriction lemmas: LWZ gives a clause-count-free first moment, and SBI was mislabelled 'small p' earlier. Neither is a correlation-preserving, clause-count-free reduction of width-k CNFs to signed mixtures of width-b CNFs at arbitrary constant pk. The 2^{omega(sqrt n)} depth-3 barrier was listed as open through 2026-08 (lacker.io) and April 2026 (Talebanfard). C1 stays N3 provisional. The residual risk is still expert folklore, plus full texts (SBI, Razborov's improvement) that could not be fetched.",
+  "update_2026_10_10_web": {
+   "status": "Web searches rerun 2026-10-10. WebSearch worked; WebFetch failed with DNS errors on arxiv.org, ECCC, lacker.io and mathweb.ucsd.edu, so arXiv abstracts and the SBI full text could not be opened directly. GitHub pages could be fetched.",
+   "post_release_uses": "None found. No post-2026-10-06 item cites 'Beyond the square-root exponent', the restriction lemma, or a 2^{omega(sqrt n)} depth-3 bound. No blog discussion (Computational Complexity, Goedel's Lost Letter, Shtetl-Optimized, Combinatorics and more) of this family was found.",
+   "barrier_open_2025_2026": [
+    "Confirmed open before the release. The lacker.io problem page (search snippet says 'verified 2026-08-10') lists the 2^{omega(sqrt n)} explicit depth-3 bound as open, with record 2^{1.282 sqrt n} (PPSZ05) and parity Theta(n^{1/4} 2^{sqrt n}): https://lacker.io/complexity/problems/depth3-circuits-past-sqrt-n.html",
+    "Talebanfard, 'Depth-Three Circuits: Recent Constructions and Lower Bounds, and the Road Ahead', Sapienza DIAG, 17 April 2026; abstract: state-of-the-art lower bounds 'have not changed since the 80s': https://www.diag.uniroma1.it/node/30665",
+    "GKPRT26 'Optimal Depth-Three Circuits for Inner Product' (arXiv 2601.04446, Jan 2026) and 'Optimal Monotone Depth-Three Circuit Lower Bounds for Majority' (arXiv 2601.04072, Jan 2026) are 2026 depth-3 papers; neither claims a 2^{omega(sqrt n)} bound (abstracts via search): https://arxiv.org/abs/2601.04446 , https://arxiv.org/abs/2601.04072",
+    "Open-problem statement 'wide open to prove a lower bound 2^{omega(sqrt n)} of a depth-3 circuit (or formula) computing some explicit function (e.g., a function in P, or even E^NP)': arXiv 1705.03588 (2017), https://arxiv.org/abs/1705.03588",
+    "HJP95 (Computational Complexity 5, 1995, 99-112) poses the explicit 2^{omega(sqrt n)} question, specifically for MAJ: https://link.springer.com/article/10.1007/BF01268140 ; Paturi-Saks-Zane STOC 1997 says known techniques seem incapable of 2^{h(n) sqrt n} with h unbounded: https://cseweb.ucsd.edu/~paturi/myPapers/pubs/PaturiSaksZane_1997_stoc.pdf",
+    "GPPST24 (CCC 2024, arXiv 2403.09134) 'Local Enumeration and Majority Lower Bounds': Sigma_3^3 Majority bound 1.251^n; optimal local-enumeration bounds would give the unrestricted 2^{omega(sqrt n)} bound: https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.CCC.2024.17",
+    "Goldreich-Wigderson (multilinear functions, depth-3) and Golovnev-Kulikov-Williams 'Circuit Depth Reductions' (ITCS 2021) frame depth-3 bounds as routes to general lower bounds via Valiant's reduction; neither breaks sqrt n: https://www.wisdom.weizmann.ac.il/~oded/p_kk.html , https://arxiv.org/abs/1811.04828"
+   ],
+   "earlier_equivalents_checked": [
+    "Hastad switching lemma: standard statement Pr[DT depth of F|rho >= d] <= (10 sigma w)^d for sigma <= 1/5 (Katz lecture notes), i.e. non-trivial only for pk below an absolute constant. Verified in shape; conclusion is decision-tree depth, not a clause-count-free correlation transfer at arbitrary constant pk. https://www.cs.umd.edu/~jkatz/complexity/f05/switching-lemma.pdf",
+    "Razborov encoding proof: injective map from bad restrictions to restrictions plus auxiliary bits; the Lean PARITY paper (arXiv 2609.24188) states the auxiliary bits number d lg w + 2d. Verified 'pays log w bits per step'; not equivalent. https://arxiv.org/pdf/1504.03398 , https://arxiv.org/pdf/2609.24188",
+    "Rossman 2017 entropy proof: Pr[DTdepth(F|R_p) >= t] <= O(p log(m+1))^t for m-clause DNF/CNF. Verified: clause count enters as log m and p must be small; not equivalent. https://www.math.utoronto.ca/rossman/logsize.pdf",
+    "CORRECTION, Segerlind-Buss-Impagliazzo (FOCS 2002 / SICOMP 2004): the existing note lists SBI under 'small p'. That is wrong if p is the probability a variable stays free. SBI's lemma is for SMALL RESTRICTIONS, which fix only a small fraction of the variables, i.e. most variables stay free. Its hypothesis is DNFs with very small conjunctions. Its conclusion is weaker: ORs of very small ANDs become ANDs of modestly small ORs, or small-depth decision trees for small enough k. A follow-up says the restriction fixes 'a polynomially small fraction' of the bits. This makes SBI, with Razborov's improvement, a closer neighbour than recorded: a mild-restriction width-type conclusion. It is still not equivalent: it is a pointwise switching statement that needs k tiny relative to the restriction, not a signed narrow-CNF expansion with E W <= 1/(1-theta) at every constant pk. Whether its failure bound is free of the term count was NOT verified, because the full text could not be fetched. https://sites.math.rutgers.edu/~saks/DMSEM/F02/0910.html , https://mathweb.ucsd.edu/~sbuss/ResearchWeb/resK/focs02.pdf , https://arxiv.org/pdf/2403.02275",
+    "Lovett-Wu-Zhang, 'Decision list compression by mild random restrictions' (arXiv 1909.10658, STOC 2020): restriction lemma fixing only a small fraction of variables; E[#useful terms] <= (4/(1-alpha))^w (arXiv) / (4/alpha)^w (ECCC notation). Verified: clause-count-free first-moment bound at mild restriction rates, the closest in spirit, but its conclusion is DNF term compression (resolves GMR sparsification conjecture), not a correlation-preserving reduction of a width-k CNF to width-b CNFs. Not equivalent. https://arxiv.org/abs/1909.10658 , https://eccc.weizmann.ac.il/report/2019/137",
+    "Impagliazzo-Matthews-Paturi SODA 2012 (arXiv 1107.3127): extended switching lemma for several k-CNFs/k-DNFs simultaneously, building a restriction partition; Hastad-regime parameters. Verified; not equivalent. https://cseweb.ucsd.edu/~paturi/myPapers/pubs/ImpagliazzoMatthewsPaturi_2012_soda.pdf",
+    "Paturi-Pudlak-Zane FOCS 1997 satisfiability coding lemma: Omega(n^{1/4} 2^{sqrt n}) tight depth-3 parity bound via isolated solutions; PPSZ05 2^{1.282 sqrt n}. Verified; different mechanism, capped at sqrt n. https://courses.cs.washington.edu/courses/cse599i/24sp/papers/PaturiPudlakZane_1997_focs.pdf",
+    "Hastad-Jukna-Pudlak 1995 top-down method: 2^{0.618 sqrt n} parity, 2^{0.849 sqrt n} majority. Verified; not equivalent. https://www.csc.kth.se/~johanh/topdowndepth3.pdf",
+    "Golovnev-Kulikov-Williams 'Circuit Depth Reductions' (ITCS 2021): every size-s circuit is an OR of 2^{s/3.9} 16-CNFs; a depth-reduction result, not a restriction lemma. https://arxiv.org/abs/1811.04828",
+    "Kurur et al.: no depth-3 Boolean random-restriction paper by Kurur was found; the reference could not be identified (search 'Kurur depth-3 Boolean circuits lower bound random restriction' returned nothing by that author).",
+    "Related but not equivalent: Hastad-Rossman-Servedio-Tan average-case depth hierarchy (arXiv 1504.03398) bounds correlation of restricted Sipser functions with bounded-width CNFs via random projections, in the switching regime. Chen-Fatehpuria-Patel-Servedio 'Learning Depth-3 Circuits with Polynomial Savings' (arXiv 2609.18166, Sept 2026, before the release) improves approximate degree of width-k CNFs with a random-restriction-style argument. 'The Switching Lemma shows what the Switching Lemma cannot prove' (arXiv 2606.12631, June 2026) gives a natural-proofs-style barrier for switching-lemma properties at fixed depth; not a clause-count-free lemma. Abstracts only.",
+    "Targeted searches for a signed or alternating expansion of a restricted CNF into narrow CNFs, or for a clause-count-free width/correlation reduction at constant restriction rate, returned nothing equivalent."
+   ],
+   "corrections_to_existing_claims": [
+    "SBI is a small-restriction regime (few variables fixed), not 'small p'; see above. Novelty.md's 'These work only for small p' for SBI/Razborov should be read as 'small fraction fixed, with tiny term size'.",
+    "H89 threshold: the textbook form needs sigma <= 1/5 and gives (10 sigma w)^d, so it is useful only for pk < 1/10 in that normalisation. 'Needs pk < 1/5' is roughly right as 'pk below an absolute constant'.",
+    "Release size: press reports say 722 manuscripts / 372 families (CLAUDE.md says 719); not relevant to the verdict."
+   ],
+   "formalizations_found": "Yes, see switching_lemma_formalizations: arXiv 2609.24188 (Lean, Sept 2026), codula-code/SwitchingLemma (Lean 4 core, Sept 2026), Quantyra/formal-switching-lemma (Lean 4, SimpleDNF version)."
+  }
  },
  "sources": [
   "data/raw/openai-math/lean/OAI/Computability/DepthThree/{Main.lean, LanguageLowerBound.lean, HardSlice.lean, WideCorrelation.lean, Restriction.lean, RestrictionCostCorrelation.lean, RestrictionExpectedCost.lean, RestrictionPathData.lean, RestrictionPaths.lean, RestrictionCorrelation.lean, FiniteProbability.lean, CircuitQuantitative.lean, Core.lean, Model.lean}",
@@ -423,7 +456,34 @@
   "data/raw/openai-math/preprints/Beyond-the-Square-Root-Exponent-for-Depth-Three-Boolean-Circuits-September-23-2026/build/latex/sections/{00_introduction,02_restriction}.tex",
   "data/pilot/112/family.md, family.json, novelty.md, novelty.json; data/eureka_shortlist.json",
   "https://arxiv.org/abs/2601.04446 (GKPRT26; via novelty pass)",
-  "https://mathweb.ucsd.edu/~sbuss/ResearchWeb/resK/focs02.pdf (SBI; via novelty pass)"
+  "https://mathweb.ucsd.edu/~sbuss/ResearchWeb/resK/focs02.pdf (SBI; via novelty pass)",
+  "https://lacker.io/complexity/problems/depth3-circuits-past-sqrt-n.html (via search snippet; fetch failed)",
+  "https://www.diag.uniroma1.it/node/30665 (Talebanfard, Sapienza, 17 Apr 2026)",
+  "https://arxiv.org/abs/2601.04072 (Optimal Monotone Depth-Three Circuit Lower Bounds for Majority, 2026)",
+  "https://arxiv.org/abs/1705.03588 (depth-3 2^{omega(sqrt n)} explicit bound 'wide open')",
+  "https://link.springer.com/article/10.1007/BF01268140 (HJP95)",
+  "https://www.csc.kth.se/~johanh/topdowndepth3.pdf (HJP95 PDF)",
+  "https://cseweb.ucsd.edu/~paturi/myPapers/pubs/PaturiSaksZane_1997_stoc.pdf",
+  "https://courses.cs.washington.edu/courses/cse599i/24sp/papers/PaturiPudlakZane_1997_focs.pdf (PPZ97)",
+  "https://courses.cs.washington.edu/courses/cse599i/24sp/papers/PaturiPudlakSaksZane_2005_jacm.pdf (PPSZ05)",
+  "https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.CCC.2024.17 (GPPST24)",
+  "https://www.wisdom.weizmann.ac.il/~oded/p_kk.html (Goldreich-Wigderson, depth-3 multilinear)",
+  "https://arxiv.org/abs/1811.04828 (Golovnev-Kulikov-Williams, Circuit Depth Reductions)",
+  "https://www.cs.umd.edu/~jkatz/complexity/f05/switching-lemma.pdf (switching lemma statement)",
+  "https://arxiv.org/pdf/1504.03398 (HRST average-case depth hierarchy; Razborov encoding exposition)",
+  "https://www.math.utoronto.ca/rossman/logsize.pdf (Rossman entropy switching lemma)",
+  "https://sites.math.rutgers.edu/~saks/DMSEM/F02/0910.html (SBI abstract)",
+  "https://arxiv.org/pdf/2403.02275 (SBI described as fixing a polynomially small fraction)",
+  "https://arxiv.org/abs/1909.10658 (Lovett-Wu-Zhang)",
+  "https://eccc.weizmann.ac.il/report/2019/137 (Lovett-Wu-Zhang ECCC)",
+  "https://cseweb.ucsd.edu/~paturi/myPapers/pubs/ImpagliazzoMatthewsPaturi_2012_soda.pdf (IMP12)",
+  "https://arxiv.org/pdf/2609.18166 (Chen-Fatehpuria-Patel-Servedio, Learning Depth-3 Circuits with Polynomial Savings, Sept 2026)",
+  "https://arxiv.org/pdf/2606.12631 (Switching-lemma natural-proofs barrier, June 2026)",
+  "https://arxiv.org/pdf/2609.24188 (Formalizing PARITY Circuit Lower Bounds in Lean, Sept 2026)",
+  "https://github.com/codula-code/SwitchingLemma (Lean 4 switching lemma, core Lean)",
+  "https://github.com/Quantyra/formal-switching-lemma (Lean 4 SimpleDNF switching lemma)",
+  "https://scientificamerican.com/article/openais-latest-math-breakthroughs-commit-research-misconduct-experts-say (release coverage; no depth-3 mention)",
+  "https://gizmodo.com/openai-dumps-377-new-math-results-on-github-publishes-hand-wringing-blog-post-2000822613 (release coverage)"
  ],
  "search_log": [
   "Read the Restriction*.lean chain and the comparator; traced Main -> LanguageLowerBound -> HardSlice -> WideCorrelation -> Restriction",
@@ -432,6 +492,45 @@
   "grep -i switching|random restriction|Hastad over lean/OAI/{Computability,InformationTheory,Combinatorics} -> none",
   "Searched for a local Mathlib checkout to grep for switching lemmas -> none present",
   "WebSearch 'Lean 4 formalization Håstad switching lemma' and 'switching lemma formalized Lean' -> FAILED (session limit)",
-  "WebSearch was unavailable for the whole session (account session limit); no web query returned results. Literature items below are from the analyst's own knowledge and from data/pilot/112/{family,novelty}.* and must be checked."
+  "WebSearch was unavailable for the whole session (account session limit); no web query returned results. Literature items below are from the analyst's own knowledge and from data/pilot/112/{family,novelty}.* and must be checked.",
+  "Web 2026-10-10: '\"Beyond the square-root exponent\" depth-three circuits' -> title not indexed; only lacker.io problem page, Talebanfard 2026 seminar, Bun-Thaler 2018, IAS chasm pages",
+  "Web 2026-10-10: 'depth-3 circuit lower bound 2^omega(sqrt n) 2026' -> no 2026 result; problem open per lacker.io (verified 2026-08-10), HJP open question, PPSZ05 record",
+  "Web 2026-10-10: 'restriction lemma clause count depth-three circuits' -> IPS97 threshold restriction lemma, HJP, PPZ coding lemma, arXiv 2606.12631, arXiv 2601.04072; nothing equivalent",
+  "Web 2026-10-10: 'signed combination width-b CNF random restriction correlation' -> HRST 1504.03398, arXiv 2609.18166, ECCC TR25-124 (Chalupa); nothing equivalent",
+  "Web 2026-10-10: 'OpenAI depth three circuits lower bound October 2026' -> nothing linking OpenAI to depth-3; classical papers only",
+  "Web 2026-10-10: 'Computational Complexity blog OpenAI math release depth-3 circuits' -> no blog post found; GKPRT26 (2601.04446), ECCC 2023/106",
+  "Web 2026-10-10: 'ECCC 2026 depth-three circuits lower bound explicit function beyond sqrt n' -> no 2026 ECCC report breaking sqrt n",
+  "Web 2026-10-10: 'Aaronson Shtetl-Optimized OpenAI math results October 2026' -> no Aaronson post on the release; press coverage (SciAm, yourstory, aiweekly, interestingengineering) without depth-3 mention",
+  "Web 2026-10-10: 'Goedel's Lost Letter depth-three circuits OpenAI 2026' -> no GLL post; arXiv 2609.18166, GKPRT26, Talebanfard seminar",
+  "Web 2026-10-10: 'Gil Kalai Combinatorics and more OpenAI 372 math results' -> no Kalai post on the release; release coverage only",
+  "Web 2026-10-10: WebFetch arxiv.org/abs/2609.18166 and eccc.weizmann.ac.il/report/2026/158 -> FAILED (DNS ENOTFOUND); curl via proxy -> 403; retried arxiv/export.arxiv/alphaxiv/lacker.io/mathweb.ucsd.edu -> all ENOTFOUND",
+  "Web 2026-10-10: 'Lovett Wu Zhang 2020 decision list compression sunflower switching lemma mild random restriction' -> LWZ arXiv 1909.10658 confirmed: restriction lemma fixing a small fraction of variables, term compression",
+  "Web 2026-10-10: 'Segerlind Buss Impagliazzo switching lemma small restrictions k-DNF resolution' -> SBI SICOMP 2004 confirmed; small restrictions (few variables fixed), OR of tiny ANDs -> AND of modestly small ORs",
+  "Web 2026-10-10: 'Impagliazzo Matthews Paturi 2012 satisfiability algorithm AC0 extended switching lemma' -> IMP12 confirmed: extended switching lemma for multiple k-CNFs/k-DNFs",
+  "Web 2026-10-10: 'Razborov encoding proof switching lemma Hastad bad restrictions' -> encoding with auxiliary bits confirmed; found arXiv 2609.24188 (Lean PARITY formalization)",
+  "Web 2026-10-10: '\"Formalizing PARITY Circuit Lower Bounds in Lean\"' -> arXiv 2609.24188 (references only in snippet); cites Fredriksen SimpleDNF Lean switching lemma",
+  "Web 2026-10-10: 'Lean 4 formalization Hastad switching lemma' -> arXiv 2609.24188; Quantyra/formal-switching-lemma via its bibliography",
+  "Web 2026-10-10: 'switching lemma formalized Lean' -> arXiv 2609.24188 states Hastad's lemma (O'Donnell form) with Mathlib countP; no other formalization",
+  "Web 2026-10-10: 'switching lemma formalization Isabelle AFP Coq parity AC0' -> no AFP or Coq entry; only bounded-arithmetic formalizations (APC1, Krajicek)",
+  "Web 2026-10-10: 'Quantyra formal-switching-lemma Lean 4 SimpleDNF Fredriksen' -> nothing beyond 2609.24188",
+  "Web 2026-10-10: 'arXiv 2609.24188 Lean parity AC0 switching lemma abstract' -> abstract not indexed; WebFetch arxiv FAILED (DNS)",
+  "Web 2026-10-10: GitHub search_repositories 'switching lemma lean' -> codula-code/SwitchingLemma (Lean 4, created 2026-09-03); 'formal-switching-lemma' -> Quantyra/formal-switching-lemma (created 2026-06-19); 'parity AC0 lean', 'hastad lean4', 'circuit lower bound lean random restriction' -> none. WebFetch of both GitHub READMEs succeeded (summaries in switching_lemma_formalizations)",
+  "Web 2026-10-10: 'Golovnev Kulikov Williams circuit depth reductions depth-3 2^{omega(sqrt n)} open problem Valiant' -> GKW ITCS 2021 confirmed (OR of 2^{s/3.9} 16-CNFs); exact open-problem wording not surfaced",
+  "Web 2026-10-10: 'Goldreich Wigderson depth-three circuits open problem 2^{sqrt n} barrier multilinear circuits' -> GW depth-3 multilinear paper; Hastad exp(sqrt n) still best per GW",
+  "Web 2026-10-10: 'Hastad Jukna Pudlak top-down lower bounds depth-three circuits 1995 2^{omega(sqrt n)} majority open' -> HJP95 confirmed (0.618/0.849 constants); PSZ97 says techniques cannot reach 2^{h(n) sqrt n}",
+  "Web 2026-10-10: 'Talebanfard 2026 seminar depth-three circuits lower bounds Sapienza' -> 17 Apr 2026 talk: lower bounds 'have not changed since the 80s'",
+  "Web 2026-10-10: '\"The Switching Lemma shows what the Switching Lemma cannot prove\" natural proofs barrier' -> arXiv 2606.12631 (June 2026), barrier for switching-lemma properties; not a precedent",
+  "Web 2026-10-10: 'Paturi Pudlak Zane satisfiability coding lemma depth-3 lower bound parity' -> PPZ97 Theta(n^{1/4} 2^{sqrt n}) and PPSZ05 2^{1.282 sqrt n} confirmed",
+  "Web 2026-10-10: 'Rossman entropy proof switching lemma 2017 log size m clauses' -> O(p log(m+1))^t confirmed",
+  "Web 2026-10-10: 'Kurur depth-3 Boolean circuits lower bound random restriction' -> no Kurur paper found; reference unidentified",
+  "Web 2026-10-10: 'random restriction CNF width reduction independent of number of clauses constant restriction probability lemma' -> only standard switching lemma and CIP width reduction; nothing equivalent",
+  "Web 2026-10-10: '\"Decision list compression by mild random restrictions\" restriction lemma small fraction of variables fixed' -> LWZ bound E[#useful terms] <= (4/(1-alpha))^w confirmed",
+  "Web 2026-10-10: 'correlation with k-CNF under random restriction bounded by correlation with narrow CNFs depth-3 lower bound technique' -> nothing equivalent (GC0 correlation bounds, ECCC 2011/131 sparsification, PPZ)",
+  "Web 2026-10-10: 'Segerlind Buss Impagliazzo \"switching lemma for small restrictions\" statement probability r-DNF s-CNF fraction of variables fixed' (and a second phrasing) -> only abstract-level statements; exact failure bound not retrieved; WebFetch of mathweb.ucsd.edu focs02.pdf FAILED (DNS)",
+  "Web 2026-10-10: '\"Learning Depth-3 Circuits with Polynomial Savings\" abstract' -> Chen-Fatehpuria-Patel-Servedio, arXiv 2609.18166, approximate degree of width-k CNFs; pre-release, not equivalent",
+  "Web 2026-10-10: 'ECCC TR26-158' -> not identified (search returned unrelated ECCC acronyms)",
+  "Web 2026-10-10: 'OpenAI math release complexity theory depth-3 circuit lower bound reaction experts' -> coverage of Aug 2026 Astra release and Oct release (Gizmodo, Henry Yuen blog); no depth-3 discussion",
+  "Web 2026-10-10: 'Gurumukhani Paturi Pudlak Saks Talebanfard CCC 2024 Local enumeration and majority lower bounds depth-3 open problem' -> GPPST24 confirmed (1.251^n Sigma_3^3 Majority)",
+  "Web 2026-10-10: '\"depth-3\" OR \"depth-three\" circuits \"2^{omega(sqrt n)}\" explicit function in P 2026 preprint' -> no 2026 preprint; arXiv 1705.03588 calls it 'wide open'"
  ]
 }
