@@ -218,3 +218,8 @@ Caveats: The comparator PASS (2026-10-10) certifies the class equality; it does 
 - https://arxiv.org/pdf/1708.04634
 - https://lacker.io/complexity/problems/bpl-derandomization-exponent.html
 - https://www.tcs.tifr.res.in/web/events/1689
+
+
+## Extractor v3 note (2026-10-10)
+
+Superseded by scripts/extract_lean.py v3 (2026-10-10): Hie.residual has 325 dependents = 11.7% of the 2770 reachable theorems (substochastic 59, factorial 54). The 254 figure above was a text-level estimate. Test 3 for C1 passes on the hierarchy's module-level cone (~44%) and knockout, not on a whole-DAG share; see data/pilot/103/novelty.json C1 test3.

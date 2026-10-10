@@ -108,3 +108,8 @@ The AFLG 2.3078 barrier is **not** a valid control, because C1 lies outside zero
 - No earlier equivalent was found.
 - The closest neighbour is Alman–Li 2026, "Strassen calculus".
 - No use of the device after the release was found. Coverage is press only, plus one forum post saying the ℂ comparator passes.
+
+
+## Extractor v3 note (2026-10-10)
+
+Extractor v3 (2026-10-10) cone sizes supersede the v2 figures quoted in this file: the 9/4 cone has 793 decls (v2: 836) and the sharedFirst_tag sub-cone 178 decls = 22.4% (v2: 216 = 25.8%). Line counts were not recomputed. v2 linked Mathlib names such as Fintype.card and Finset.sum_apply to in-tree decls; see data/pilot/107/novelty.json C1 test3.
