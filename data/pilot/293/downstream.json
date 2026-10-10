@@ -1,0 +1,612 @@
+{
+ "fid": "293",
+ "item": "E1: backward intertwiner across odometer fibers - two-ended opposite-drift log-weights (B16), drift lemma (B17) and the normalized fiber-moving backward shift V in {S}' (B18)",
+ "item_type": "F3 (auxiliary construction inside a witness; novelty N3 candidate, conf 0.45)",
+ "lean_status": "as in paper",
+ "lean_status_why": "The device itself (two-ended residue-corrected weights halfExponent/residueCorrection, the drift lemma halfExponent_drift, the closed-form recurrence solution rawBackward, the fiberwise sup normalization backwardBound/backwardCoeff and the contraction backwardOperator with forward_backward_commute) is formalized object-for-object as in BI Sec. 3-4 and is used decisively on the comparator chain (forward_backward_scalar_transitive, hV); only the drift bookkeeping (goodBase = Z_2 minus Z instead of Borel-Cantelli) and the way V is consumed in the descent (support order + ergodic late intersection instead of tail labels) differ. Checked at text level only.",
+ "lean_gaps": [
+  "NOT COMPILED BY THIS AGENT: comparator runs on family 293 are in progress in another process, so lake/lean/comparator were not run (concurrent builds collide). data/lean_checks.json has no 293 entry yet. All statements here are text-level. The 23 BackwardIntertwiners files import only Mathlib; family analyst's grep found no sorry/axiom/admit/native_decide in the release.",
+  "run_cmd auxLemmasExt edits (flagged by the family analyst): they sit in OAI/Analysis/BrownMeasure/Model.lean:91 and OAI/Analysis/IrrationalRotation/Model/Product.lean:116 (+2 in ComparatorChallenges/IrrationalRotation.lean). A text-level import-closure walk shows they are NOT in the closure of OAI.Analysis.BackwardIntertwiners.* (imports only Mathlib), nor of OAI.Analysis.Hyperinvariant.Main (277 modules) or OAI.Analysis.FiniteFactor.Main (271 modules); they ARE in IrrationalRotation.Main and BrownMeasure.Main. Consequence: irrelevant for every BI-based target below (S1, S2, S4, O1, O4, O5, O7, O8, N1-N3); relevant only if a II_1 target imports IrrationalRotation or BrownMeasure (S3 should import FiniteFactor.Main, which is clean).",
+  "FiniteFactor comparator does not state hyperfiniteness: MainTarget asserts a factor that is finite (isometries unitary), has no minimal projection and has separable predual, i.e. a II_1 factor, but never 'hyperfinite'. Irrelevant for the E1 targets (BI's operator lives in L^inf(X) (x) B(l^2), type I). Relevant for S3 and O3: a 'relative ISP in R' target needs a hyperfiniteness predicate (est. 100-200 lines: SOT-dense increasing union of finite-dimensional *-subalgebras), and an L(F_n) target needs non-hyperfiniteness / free group factors (major library).",
+  "Drift lemma route: Lean proves an eventually-EXACT drift +100/-100 for x in goodBase = Z_2 minus the image of Z (halfExponent_drift, via goodBase_eventually_nonexceptional), and turns it into an affine bound with an existential constant (halfSum_eventually_affine). The paper uses Borel-Cantelli and an a.e.-finite non-integrable C(x). Same content; the Lean version is simpler and makes the 'pointwise finite, non-integrable constant' implicit in an existential.",
+  "Estimates differ but are harmless: residue correction bounded by 400 sqrt(k) (paper: 4D k^{1/3}); decay e^{-45n} (paper: -(D-c)n = -90n).",
+  "How V is consumed: on the comparator chain V is used only through b_j(x) > 0 a.e. and the coordinate shift (backwardOperator_power_nonzero) plus ergodic_late_intersection for the inverse odometer and the fiber support order (fiber_cyclic_orthogonal_order). The paper's dense-tail-image property (backwardFiber_tail_closure, backwardFiber_denseRange) is proved but used only in direct_model / DirectModelProperties, off the comparator chain. For the 'with item' arm the minimal E1 set is therefore: residueCorrection..halfExponent, plusResidue/minusResidue, halfExponent_drift, rawBackward*, backwardBound, backwardCoeff*, backwardFiber, backwardFiber_intertwines, backwardFieldOperator, backwardOperator, backwardOperator_norm, forward_backward_commute, backwardOperator_power_nonzero.",
+  "definition_names = [] in BackwardIntertwiners.json: the challenge re-declares commutant, TransitiveCommutant, strongOperatorTopology and FullClaim in namespace OAI.Hyperinvariant233; a text comparison with BackwardIntertwiners/HilbertClassification.lean:12-39 shows identical bodies. Whether the comparator locks them when definition_names is empty is for the orchestrator's run to confirm.",
+  "Library-size caveat for baselines: the BI import chain is LINEAR (23 files, 5,802 lines) and includes ~2.2k lines of off-path structural side results (OrdinaryStructure, DiagonalSymbols, StrongClosure, PolarDiagonals, SpectralProjections, PolarFactors, AtomicAlgebras, ProductSymbols, ModelProperties = 2,214 lines) between ErgodicTransitivity and AlgebraCorollary. Use the direct-route count (~3.6k = Domar branch 1,493 + weights/intertwiner/transitivity 1,742 + transport/corollary 353; family analyst's DAG estimate ~2.5k) as the baseline, not 5.8k."
+ ],
+ "comparator_chain": [
+  "OAI.BackwardIntertwiners.direct_algebra_corollary (AlgebraCorollary.lean:78; comparator target, ComparatorChallenges/BackwardIntertwiners.json)",
+  "OAI.Hyperinvariant233.fullClaim_of_mainClaim / mainClaim_transport / nonempty_linearIsometryEquiv (OperatorTransport.lean, HilbertClassification.lean; generic)",
+  "OAI.BackwardIntertwiners.direct_mainClaim (AlgebraCorollary.lean:40)",
+  "OAI.BackwardIntertwiners.forward_transitiveCommutant (AlgebraCorollary.lean:33)",
+  "OAI.BackwardIntertwiners.forward_backward_scalar_transitive (ErgodicTransitivity.lean:203)  <- uses V once (hV)",
+  "OAI.BackwardIntertwiners.forward_backward_commute (GlobalOperators.lean:397)  <- V in {S}'",
+  "OAI.BackwardIntertwiners.backwardOperator (GlobalOperators.lean:374) / backwardFieldOperator (:371) / backwardOperator_norm (:390)",
+  "OAI.BackwardIntertwiners.backwardFiber_intertwines (GlobalOperators.lean:198) -> backwardCoeff_recurrence (BackwardWeights.lean:234) -> rawBackward_recurrence (:121)",
+  "OAI.BackwardIntertwiners.backwardOperator_power_nonzero (ErgodicTransitivity.lean:158) -> backwardCoeff_ae_pos (BackwardWeights.lean:240) -> backwardCoeff_pos (:231) -> backwardBound_ge_one (:210) -> rawBackward_bddAbove (:193)",
+  "OAI.BackwardIntertwiners.rawBackward_decay (BackwardWeights.lean:169)  <- the two-ended decay",
+  "OAI.BackwardIntertwiners.halfExponent_drift (BackwardWeights.lean:75) -> residue_step, goodBase_eventually_nonexceptional (HaarBase.lean)",
+  "OAI.BackwardIntertwiners.halfExponent / residueCorrection (ExplicitWeights.lean:14-17)  <- THE ITEM's weight design (B16)",
+  "side: ergodic_late_intersection (ErgodicTransitivity.lean:15) with inverseOdometer_ergodic (:155); invariant_pointwise_order (:185) -> fiber_cyclic_orthogonal_order (Domar branch, N0/N1)",
+  "side: forwardOperator_quasinilpotent (AlgebraCorollary.lean:30) -> forwardOperator_power_norm (GlobalOperators.lean:454) (weights, not V)"
+ ],
+ "comparator_chain_branches": {
+  "headline_step": "direct_algebra_corollary -> fullClaim_of_mainClaim (generic) <- direct_mainClaim <- forward_transitiveCommutant <- forward_backward_scalar_transitive (hV : OperatorInvariant L backwardOperator)",
+  "recursive_identity": "forward_backward_commute -> backwardFiber_intertwines -> backwardCoeff_recurrence -> rawBackward_recurrence (the commutation recurrence, solved in closed form)",
+  "covariance": "backwardOperator_power_nonzero: V^n moves coordinate j over theta^{-n}x to j-n over x; with ergodic_late_intersection(inverseOdometer) and invariant_pointwise_order this is the descent",
+  "generic_core": "ergodic_late_intersection, scalar_invariant_pointwise_orthogonal, fiber_cyclic_orthogonal_order (Domar branch), fieldOperator, fiberWeightedPermutation - N0/N1",
+  "dag_stats": "Text-level: BI 23 files / 5,802 lines in a linear import chain; Domar branch 1,493; weights+base+intertwiner+transitivity 1,742; side results 2,214 (off-path); transport/corollary 353. E1-specific: ~430 lines (residue part 76 + BackwardWeights 247 + GlobalOperators backward ~110) + ~70 lines of use. Family analyst: intertwiner branch ~0.94k of ~2.5k DAG lines."
+ },
+ "lean_source": [
+  {
+   "name": "residueCorrection / halfExponent (B16 weights: +-D residue correction)",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/ExplicitWeights.lean",
+   "line": 11,
+   "text": "def weightBlock (k : ℕ) : ℕ := Nat.log 8 k + 1\ndef residueScale (k : ℕ) : ℕ := 2 ^ weightBlock k\n\ndef residueCorrection (t : ℕ → ℕ) (k : ℕ) : ℝ :=\n  if k = 0 then 0 else 100 * ((residueScale k : ℝ) - 2 + t (weightBlock k))\ndef halfExponent (t : ℕ → ℕ) (k : ℕ) : ℝ :=\n  10 * ((k : ℝ) + 1) + residueCorrection t k",
+   "note": "B16. The +-100 residue correction is the whole 'opposite drift' design: plusResidue uses T_m(x), minusResidue uses 2^m-1-T_m(x)."
+  },
+  {
+   "name": "bilateralExponent / bilateralBeta / bilateralWeight",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/ExplicitWeights.lean",
+   "line": 162,
+   "text": "def bilateralExponent (t u : ℕ → ℕ) : ℤ → ℝ\n  | .ofNat n => halfExponent t n\n  | .negSucc n => halfExponent u n\n\ndef bilateralBeta (t u : ℕ → ℕ) (j : ℤ) : ℝ := Real.exp (-bilateralExponent t u j)\n\n\ndef bilateralWeight (t u : ℕ → ℕ) : ℤ → ℝ\n  | .ofNat n => Real.exp (-halfSum t n)\n  | .negSucc n => Real.exp (halfSum u (n+1))",
+   "note": "Two-ended log-weights: t on the positive end, u on the negative end."
+  },
+  {
+   "name": "plusResidue / minusResidue",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/BackwardWeights.lean",
+   "line": 14,
+   "text": "def plusResidue (x : Base) (m : ℕ) : ℕ := residue m x\ndef minusResidue (x : Base) (m : ℕ) : ℕ := 2^m-1-residue m x",
+   "note": "Opposite residues at the two ends: the source of the opposite drift."
+  },
+  {
+   "name": "goodBase",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/HaarBase.lean",
+   "line": 127,
+   "text": "def goodBase : Set Base := (Set.range (fun n : ℤ => (show Base from (n : PadicInt 2))))ᶜ",
+   "note": "Z_2 minus the integers: replaces the paper's Borel-Cantelli conull set X_*."
+  },
+  {
+   "name": "halfExponent_drift (B17 two-ended drift lemma)",
+   "kind": "lemma",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/BackwardWeights.lean",
+   "line": 75,
+   "text": "lemma halfExponent_drift {x : Base} (hx : x ∈ goodBase) :\n    ∀ᶠ k : ℕ in atTop,\n      halfExponent (plusResidue (odometer x)) k - halfExponent (plusResidue x) k = 100 ∧\n      halfExponent (minusResidue (odometer x)) k - halfExponent (minusResidue x) k = -100",
+   "note": "Eventually exact drift +100 / -100 on goodBase; paper Lemma 4.1 has an a.e.-finite C(x) instead."
+  },
+  {
+   "name": "rawBackward (B18 closed-form solution of the commutation recurrence)",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/BackwardWeights.lean",
+   "line": 112,
+   "text": "def rawBackward (x : Base) (j : ℤ) : ℝ :=\n  explicitWeight (odometer x) (j-1) / (explicitWeight x j * Real.exp 10)",
+   "note": "b~_j(x) = w_{j-1}(theta x)/(w_j(x) e^10)."
+  },
+  {
+   "name": "rawBackward_recurrence",
+   "kind": "lemma",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/BackwardWeights.lean",
+   "line": 121,
+   "text": "lemma rawBackward_recurrence (x : Base) (j : ℤ) :\n    rawBackward x (j+1)*explicitBeta x j = rawBackward x j*explicitBeta (odometer x) (j-1)",
+   "note": "The forced commutation recurrence."
+  },
+  {
+   "name": "rawBackward_decay",
+   "kind": "lemma",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/BackwardWeights.lean",
+   "line": 169,
+   "text": "lemma rawBackward_decay {x : Base} (hx : x ∈ goodBase) :\n    Tendsto (fun n : ℕ => rawBackward x (n+1)) atTop (𝓝 0) ∧\n    Tendsto (fun n : ℕ => rawBackward x (-(n:ℤ))) atTop (𝓝 0)",
+   "note": "Decay at both ends (the decisive estimate; e^{-45n} bound)."
+  },
+  {
+   "name": "backwardBound / backwardCoeff (fiberwise sup normalization L(x))",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/BackwardWeights.lean",
+   "line": 207,
+   "text": "def backwardBound (x : Base) : ℝ := ⨆ j : ℤ, rawBackward x j\nlemma measurable_backwardBound : Measurable backwardBound :=\n  Measurable.iSup measurable_rawBackward\nlemma backwardBound_ge_one {x : Base} (hx : x ∈ goodBase) : 1 ≤ backwardBound x := by\n  rw [← rawBackward_zero x]\n  exact le_ciSup (rawBackward_bddAbove hx) 0\nlemma rawBackward_le_bound {x : Base} (hx : x ∈ goodBase) (j : ℤ) :\n    rawBackward x j ≤ backwardBound x := le_ciSup (rawBackward_bddAbove hx) j\n\n\n\ndef backwardCoeff (x : Base) (j : ℤ) : ℝ := by\n  classical\n  exact if x ∈ goodBase then rawBackward x j / backwardBound x else 0",
+   "note": "Includes measurability and ge_one lemmas between the two defs (statements with proofs, verbatim)."
+  },
+  {
+   "name": "backwardCoeff_recurrence",
+   "kind": "lemma",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/BackwardWeights.lean",
+   "line": 234,
+   "text": "lemma backwardCoeff_recurrence (x : Base) (j : ℤ) :\n    backwardCoeff x (j+1)*explicitBeta x j = backwardCoeff x j*explicitBeta (odometer x) (j-1)",
+   "note": ""
+  },
+  {
+   "name": "backwardFiber",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/GlobalOperators.lean",
+   "line": 161,
+   "text": "def backwardFiber (x : Base) : Fiber →L[ℂ] Fiber :=\n  fiberWeightedPermutation (Equiv.addRight 1) (fun j => (backwardCoeff x j:ℂ)) 1 (by norm_num)\n    (fun j => by simpa only [Complex.norm_real, Real.norm_of_nonneg (backwardCoeff_bounds x j).1] using (backwardCoeff_bounds x j).2)",
+   "note": "V_x e_j = b_j(x) e_{j-1}."
+  },
+  {
+   "name": "backwardFiber_intertwines",
+   "kind": "lemma",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/GlobalOperators.lean",
+   "line": 198,
+   "text": "lemma backwardFiber_intertwines (x : Base) :\n    forwardFiber (odometer x) * backwardFiber x = backwardFiber x * forwardFiber x",
+   "note": "S_{theta x} V_x = V_x S_x."
+  },
+  {
+   "name": "backwardFiber_tail_closure",
+   "kind": "lemma",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/GlobalOperators.lean",
+   "line": 228,
+   "text": "lemma backwardFiber_tail_closure {x : Base} (hx : x ∈ goodBase) (h : ℤ) :\n    ((coordinateTail h).map (backwardFiber x).toLinearMap).topologicalClosure = coordinateTail (h-1)",
+   "note": "Dense tail images; proved but used only in direct_model (DirectModelProperties), NOT on the comparator chain."
+  },
+  {
+   "name": "backwardFieldOperator / backwardOperator (V)",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/GlobalOperators.lean",
+   "line": 371,
+   "text": "def backwardFieldOperator : GlobalHilbert →L[ℂ] GlobalHilbert :=\n  fieldOperator backwardFiber 1 (by norm_num) backwardFiber_norm_le backwardFiber_aestronglyMeasurable\n\ndef backwardOperator : GlobalHilbert →L[ℂ] GlobalHilbert :=\n  (Lp.compMeasurePreservingₗᵢ ℂ inverseOdometer inverseOdometer_preserving).toContinuousLinearMap.comp backwardFieldOperator",
+   "note": "V = (composition with inverse odometer) o (field of V_x)."
+  },
+  {
+   "name": "backwardOperator_norm",
+   "kind": "lemma",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/GlobalOperators.lean",
+   "line": 390,
+   "text": "lemma backwardOperator_norm : ‖backwardOperator‖ ≤ 1",
+   "note": "Contraction."
+  },
+  {
+   "name": "forward_backward_commute",
+   "kind": "lemma",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/GlobalOperators.lean",
+   "line": 397,
+   "text": "lemma forward_backward_commute : forwardOperator * backwardOperator = backwardOperator * forwardOperator",
+   "note": "SV = VS."
+  },
+  {
+   "name": "ergodic_late_intersection",
+   "kind": "lemma",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/ErgodicTransitivity.lean",
+   "line": 15,
+   "text": "lemma ergodic_late_intersection {X : Type*} [MeasurableSpace X] {μ : Measure X}\n    [IsFiniteMeasure μ] {θ : X → X} (hθ : Ergodic θ μ)\n    {A B : Set X} (_ : MeasurableSet A) (hB : MeasurableSet B)\n    (hA0 : μ A ≠ 0) (hB0 : μ B ≠ 0) (N : ℕ) :\n    ∃ n : ℕ, N ≤ n ∧ μ (A ∩ (θ^[n]) ⁻¹' B) ≠ 0",
+   "note": "Generic ergodic recurrence (N0) used for the descent."
+  },
+  {
+   "name": "backwardOperator_power_nonzero",
+   "kind": "lemma",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/ErgodicTransitivity.lean",
+   "line": 158,
+   "text": "lemma backwardOperator_power_nonzero (n : ℕ) (f : GlobalHilbert) (j : ℤ) :\n    ∀ᵐ x ∂baseMeasure, f (inverseOdometer^[n] x) j ≠ 0 →\n      ((backwardOperator^n) f) x (j-n) ≠ 0",
+   "note": "How V is actually used: V^n moves a nonzero coordinate j at theta^{-n}x to coordinate j-n at x (needs only b_j>0 a.e.)."
+  },
+  {
+   "name": "forward_backward_scalar_transitive",
+   "kind": "lemma",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/ErgodicTransitivity.lean",
+   "line": 203,
+   "text": "lemma forward_backward_scalar_transitive (L : Submodule ℂ GlobalHilbert)\n    (hclosed : IsClosed (L : Set GlobalHilbert))\n    (hS : OperatorInvariant L forwardOperator)\n    (hV : OperatorInvariant L backwardOperator)\n    (hM : ∀ g : Lp ℂ ∞ baseMeasure, OperatorInvariant L (scalarMultiplier g)) :\n    L = ⊥ ∨ L = ⊤",
+   "note": "The single decisive use of V (hV)."
+  },
+  {
+   "name": "forward_transitiveCommutant",
+   "kind": "lemma",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/AlgebraCorollary.lean",
+   "line": 33,
+   "text": "lemma forward_transitiveCommutant : Hyperinvariant233.TransitiveCommutant forwardOperator",
+   "note": ""
+  },
+  {
+   "name": "direct_algebra_corollary (comparator target)",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/BackwardIntertwiners/AlgebraCorollary.lean",
+   "line": 78,
+   "text": "theorem direct_algebra_corollary (H : Type*) [NormedAddCommGroup H] [InnerProductSpace ℂ H]\n    [CompleteSpace H] [TopologicalSpace.SeparableSpace H] (hInf : ¬FiniteDimensional ℂ H) :\n    Hyperinvariant233.FullClaim (H:=H)",
+   "note": "BackwardIntertwiners comparator theorem."
+  }
+ ],
+ "with_without_arms": "WITH-item arm library: Mathlib d13f23b + OAI/Analysis/BackwardIntertwiners/{ConvexEnvelope, ConvolutionBounds, CoefficientSupport, WeightSeparation, FiberTails, ExplicitWeights, HaarBase, FiberMaps, BackwardWeights, GlobalOperators, ErgodicTransitivity} (3,235 lines) - the E1 declarations are listed in lean_gaps[5]. WITHOUT-item arm: same files, but (i) delete BackwardWeights.lean (247 lines), (ii) delete from GlobalOperators.lean every declaration whose name contains 'backward' plus forward_backward_commute (~110 lines; keep inverseOdometer, inverseOdometer_preserving, odometerMeasurableEquiv, which are N0), (iii) delete from ErgodicTransitivity.lean backwardOperator_power_nonzero, forward_backward_scalar_transitive, generated_transitive, explicitDirectModel*, direct_model (~95 lines), (iv) in ExplicitWeights.lean set residueCorrection := 0 (i.e. halfExponent t k = 10*(k+1)) and delete the residue lemmas (76 lines) and plusResidue/minusResidue, so the prover keeps unicellular quadratic fibers, the odometer, Haar base, residues (residue, residue_step) and ergodic recurrence, but must rediscover the opposite-drift weights and the fiber-moving intertwiner. Do not include AlgebraCorollary/OperatorTransport (they contain the theorem). E1-specific budget removed: ~430 lines of definitions/lemmas + ~70 lines of use.",
+ "speedup_targets": [
+  {
+   "id": "S1",
+   "title": "HSP witness over the 3-adic odometer (design re-run on a non-isomorphic base) - calibration target",
+   "statement": "On H_3 = L^2(Z_3, Haar; l^2(Z)) with theta x = x+1 there is a decomposable operator (Tf)(x) = T_x f(x), T_x a bilateral weighted shift with positive measurable weights, that is nonzero, norm-quasinilpotent and has a transitive commutant. The decomposable form over Z_3 is part of the statement, so the conclusion cannot be obtained by transporting BI's operator by a unitary (the 2-adic and 3-adic odometers have different discrete spectra and are not isomorphic).",
+   "lean_statement": "open MeasureTheory Filter Topology in\ninstance : MeasurableSpace (PadicInt 3) := borel _\nabbrev mu3 : Measure (PadicInt 3) := Measure.addHaarMeasure ⊤\ntheorem padic3_direct_witness :\n  ∃ (β : PadicInt 3 → ℤ → ℝ) (T : Lp (lp (fun _ : ℤ => ℂ) 2) 2 mu3 →L[ℂ] Lp (lp (fun _ : ℤ => ℂ) 2) 2 mu3),\n    (∀ j, Measurable fun x => β x j) ∧ (∀ x j, 0 < β x j) ∧\n    (∀ f, ∀ᵐ x ∂mu3, ∀ j : ℤ, T f x j = (β x (j-1) : ℂ) * f x (j-1)) ∧\n    T ≠ 0 ∧ Tendsto (fun n : ℕ => ‖T ^ n‖ ^ (1 / (n : ℝ))) atTop (𝓝 0) ∧\n    OAI.Hyperinvariant233.TransitiveCommutant T",
+   "reference": "BI Theorem 1.1 (2-adic); this is the same design with residues mod 3^m.",
+   "status": "Not stated anywhere; true if the BI design ports (expected: replace 2^m by 3^m in residueScale / ResidueBounds; drift and decay are unchanged).",
+   "current_proof_size": "No proof exists. BI 2-adic: ~10 pp.; Lean direct route ~3.6k lines (BI chain minus 2.2k side results), DAG ~2.5k.",
+   "how_item_helps": "With the item, only HaarBase (195 lines) and the residue constants change; halfExponent_drift, rawBackward*, backwardCoeff*, backwardOperator, forward_backward_scalar_transitive port verbatim modulo base. Without it the prover must rediscover the opposite-drift weights and V. Calibration value: this is a close variant (N2-type), so a large speedup here is EXPECTED and does not by itself evidence a jump; it calibrates the with/without pipeline on this family.",
+   "expected_speedup": "high (calibration only)",
+   "confidence": "high that the design ports",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib: PadicInt, Measure.addHaarMeasure, MeasureTheory.Lp, lp, ContinuousLinearMap; OAI: Hyperinvariant233.TransitiveCommutant (re-declared in the challenge file, 8 lines). WITH-item arm library: Mathlib d13f23b + OAI/Analysis/BackwardIntertwiners/{ConvexEnvelope, ConvolutionBounds, CoefficientSupport, WeightSeparation, FiberTails, ExplicitWeights, HaarBase, FiberMaps, BackwardWeights, GlobalOperators, ErgodicTransitivity} (3,235 lines) - the E1 declarations are listed in lean_gaps[5]. WITHOUT-item arm: same files, but (i) delete BackwardWeights.lean (247 lines), (ii) delete from GlobalOperators.lean every declaration whose name contains 'backward' plus forward_backward_commute (~110 lines; keep inverseOdometer, inverseOdometer_preserving, odometerMeasurableEquiv, which are N0), (iii) delete from ErgodicTransitivity.lean backwardOperator_power_nonzero, forward_backward_scalar_transitive, generated_transitive, explicitDirectModel*, direct_model (~95 lines), (iv) in ExplicitWeights.lean set residueCorrection := 0 (i.e. halfExponent t k = 10*(k+1)) and delete the residue lemmas (76 lines) and plusResidue/minusResidue, so the prover keeps unicellular quadratic fibers, the odometer, Haar base, residues (residue, residue_step) and ergodic recurrence, but must rediscover the opposite-drift weights and the fiber-moving intertwiner. Do not include AlgebraCorollary/OperatorTransport (they contain the theorem). E1-specific budget removed: ~430 lines of definitions/lemmas + ~70 lines of use.",
+    "missing": [
+     "proof only: 3-adic HaarBase analogue (ergodicity of x+1 on Z_3, residue_step, nonexceptional points), est. 150-250 lines; residueScale 2->3 edits in ExplicitWeights (~20 lines)"
+    ],
+    "formal_proof_to_compare": "BI Lean: 23 files / 5,802 lines (direct route ~3.6k; E1 block ~0.5k). No 3-adic formalization exists."
+   }
+  },
+  {
+   "id": "S2",
+   "title": "HSP witness fibred over an irrational rotation (Rokhlin towers replace odometer residues)",
+   "statement": "For every irrational alpha, on L^2(AddCircle 1; l^2(Z)) with theta x = x + alpha there is a decomposable bilateral-weighted-shift operator T (as in S1) that is nonzero, norm-quasinilpotent and has transitive commutant. Stronger (needs the Rokhlin lemma): the same over every ergodic aperiodic invertible probability-preserving system.",
+   "lean_statement": "abbrev HR := Lp (lp (fun _ : ℤ => ℂ) 2) 2 (volume : Measure (AddCircle (1:ℝ)))\ntheorem rotation_direct_witness (α : AddCircle (1:ℝ)) (hα : addOrderOf α = 0) :\n  ∃ (β : AddCircle (1:ℝ) → ℤ → ℝ) (T : HR →L[ℂ] HR),\n    (∀ j, Measurable fun x => β x j) ∧ (∀ x j, 0 < β x j) ∧\n    (∀ f, ∀ᵐ x, ∀ j : ℤ, T f x j = (β x (j-1) : ℂ) * f x (j-1)) ∧\n    T ≠ 0 ∧ Tendsto (fun n : ℕ => ‖T ^ n‖ ^ (1 / (n : ℝ))) atTop (𝓝 0) ∧\n    OAI.Hyperinvariant233.TransitiveCommutant T\n-- optional strengthening (forces the E1 shape): ∃ (b : AddCircle (1:ℝ) → ℤ → ℝ) (V : HR →L[ℂ] HR), V * T = T * V ∧ ∀ f, ∀ᵐ x, ∀ j : ℤ, V f (x + α) (j-1) = (b x j : ℂ) * f x j",
+   "reference": "BI Thm 1.1; Mathlib AddCircle.ergodic_add_right (Dynamics/Ergodic/AddCircleAdd.lean:31); Rokhlin lemma (classical, not in Mathlib d13f23b by grep).",
+   "status": "Not stated anywhere (my construction sketch): residues T_m(x) = time since the last visit of the theta-orbit to an interval of length 1/q_m (q_m continued-fraction denominators) increase by 1 except on a set of measure 1/q_m, which is summable; return times are bounded (three-gap theorem), so ResidueBounds-type caps and block scales can be chosen. Unverified; medium confidence.",
+   "current_proof_size": "No proof exists. Baseline: BI direct route ~3.6k Lean lines.",
+   "how_item_helps": "This is the design producing a witness over a base without a nested residue group: the drift lemma must be re-derived from tower levels (non-trivial adaptation), but recurrence solution, normalization, V, commutation and the descent transfer verbatim. Measures whether the E1 design (not just the 2-adic bookkeeping) is reusable. The paper itself says 'any ergodic base with a nested residue structure would do' (novelty bridge note); this target tests the claim beyond odometers.",
+   "expected_speedup": "med",
+   "confidence": "medium",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib: AddCircle, volume (Haar), AddCircle.ergodic_add_right, MeasureTheory.Lp, lp; OAI: TransitiveCommutant. The extra V-clause is optional; drop it for the plain witness statement. WITH-item arm library: Mathlib d13f23b + OAI/Analysis/BackwardIntertwiners/{ConvexEnvelope, ConvolutionBounds, CoefficientSupport, WeightSeparation, FiberTails, ExplicitWeights, HaarBase, FiberMaps, BackwardWeights, GlobalOperators, ErgodicTransitivity} (3,235 lines) - the E1 declarations are listed in lean_gaps[5]. WITHOUT-item arm: same files, but (i) delete BackwardWeights.lean (247 lines), (ii) delete from GlobalOperators.lean every declaration whose name contains 'backward' plus forward_backward_commute (~110 lines; keep inverseOdometer, inverseOdometer_preserving, odometerMeasurableEquiv, which are N0), (iii) delete from ErgodicTransitivity.lean backwardOperator_power_nonzero, forward_backward_scalar_transitive, generated_transitive, explicitDirectModel*, direct_model (~95 lines), (iv) in ExplicitWeights.lean set residueCorrection := 0 (i.e. halfExponent t k = 10*(k+1)) and delete the residue lemmas (76 lines) and plusResidue/minusResidue, so the prover keeps unicellular quadratic fibers, the odometer, Haar base, residues (residue, residue_step) and ergodic recurrence, but must rediscover the opposite-drift weights and the fiber-moving intertwiner. Do not include AlgebraCorollary/OperatorTransport (they contain the theorem). E1-specific budget removed: ~430 lines of definitions/lemmas + ~70 lines of use.",
+    "missing": [
+     "proof only: tower-level residues for rotations via continued fractions (Mathlib GenContFract exists) and bounded return times, est. 300-600 lines; or the general Rokhlin lemma, est. 500-900 lines"
+    ],
+    "formal_proof_to_compare": "BI Lean as baseline (5,802 lines; direct ~3.6k). No rotation-based formalization exists."
+   }
+  },
+  {
+   "id": "S3",
+   "title": "Invariant-projection-free quasinilpotent operator in a II_1 factor (FiniteFactor.MainTarget) with BI in the library",
+   "statement": "There is a II_1 factor M (scalar center, finite, no minimal projections, separable predual) and a nonzero norm-quasinilpotent T in M such that every projection p in M with (1-p)Tp = 0 is 0 or 1 (OAI.FiniteFactor.MainTarget).",
+   "lean_statement": "OAI.FiniteFactor.MainTarget.{0}  -- verbatim in ComparatorChallenges/FiniteFactor.lean (defs HasScalarCenter, IsFiniteAlgebra, HasNoMinimalProjection, HasSeparablePredual)",
+   "reference": "IP appendix product model; Haagerup-Schultz open case (Brown measure a point mass); Dykema 2005 Prop 2.1.",
+   "status": "Proved in the release (IP, product model) - not open. Test asks whether BI's device shortens it.",
+   "current_proof_size": "OAI.Analysis.FiniteFactor.Main import closure: 271 modules / 22,601 lines (text-level).",
+   "how_item_helps": "Weakly at best. BI's operator lives in L^inf(Z_2) (x) B(l^2(Z)), a type I_infinity algebra; there is no trace, and Dykema's bridge goes II_1 -> HSP, not back. A port would need a trace-compatible fibration (e.g. inside L^inf(X) x| Z) whose commutant-in-M contains a fiber-moving element; the unicellular-fiber lattice argument does not survive (II_1 factors have no unicellular structure of this kind). Included as a skeptical target: a speedup here would be surprising and informative.",
+   "expected_speedup": "low",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Exact statement in ComparatorChallenges/FiniteFactor.lean (Mathlib VonNeumannAlgebra). WITH arm: challenge defs + BI library (as in S1). WITHOUT arm: challenge defs only (no FiniteFactor/IrrationalRotation/RotationWeights). Import FiniteFactor.Main, not IrrationalRotation (run_cmd edits).",
+    "missing": [
+     "none to state; hyperfiniteness is NOT in MainTarget (see lean_gaps[2])"
+    ],
+    "formal_proof_to_compare": "FiniteFactor closure 22,601 lines; Hyperinvariant.Main closure 22,976 lines."
+   }
+  },
+  {
+   "id": "S4",
+   "title": "Plumbing control: bounded backward-type intertwiners between two bilateral weighted shifts (Shields-type criterion)",
+   "statement": "Let S_beta, S_gamma be injective bilateral weighted shifts on l^2(Z) with positive bounded weights. There is a nonzero bounded X with S_gamma X = X S_beta and X e_j in C e_{j-1} for all j iff the sequence r defined by r_0 = 1, r_{j+1} = r_j * gamma_{j-1}/beta_j (j in Z) is bounded; then X = (r_j / sup r) e_j -> e_{j-1} up to scale.",
+   "lean_statement": "theorem backward_intertwiner_iff (β γ : ℤ → ℝ) (hβ : ∀ j, 0 < β j) (hγ : ∀ j, 0 < γ j)\n    (Sβ Sγ : lp (fun _ : ℤ => ℂ) 2 →L[ℂ] lp (fun _ : ℤ => ℂ) 2)\n    (hSβ : ∀ v j, Sβ v j = (β (j-1) : ℂ) * v (j-1)) (hSγ : ∀ v j, Sγ v j = (γ (j-1) : ℂ) * v (j-1)) :\n    (∃ X : lp (fun _ : ℤ => ℂ) 2 →L[ℂ] lp (fun _ : ℤ => ℂ) 2, X ≠ 0 ∧ Sγ * X = X * Sβ ∧\n        ∃ b : ℤ → ℂ, ∀ v j, X v j = b (j+1) * v (j+1)) ↔\n    BddAbove (Set.range (fun j : ℤ => ‖backwardRatio β γ j‖))  -- backwardRatio: r_0=1, r_{j+1}=r_j*γ(j-1)/β j (define, ~15 lines)",
+   "reference": "Shields, 'Weighted shift operators and analytic function theory' (Math Surveys 13, 1974) - intertwiners/similarity of weighted shifts (from memory; statement here is mine). BI Lemma 4.2 is the fibred instance with gamma = beta(theta x).",
+   "status": "true (elementary); not formalized anywhere.",
+   "current_proof_size": "about 1 page; Lean: none.",
+   "how_item_helps": "Uses only the generic half of E1 (rawBackward_recurrence pattern, sup normalization backwardBound/backwardCoeff, fiberWeightedPermutation norm bound) and NOT the opposite-drift design. Run it as a CONTROL: if the 'with item' arm gives a large speedup here, that speedup is plumbing, and the same share should be discounted from S1/S2/O1 speedups.",
+   "expected_speedup": "med (plumbing, not the eureka part)",
+   "confidence": "high (that it is plumbing)",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib lp, ContinuousLinearMap, BddAbove; ~15-line definition of backwardRatio. WITH arm: FiberMaps.lean (fiberWeightedPermutation, 159 lines) + BackwardWeights recurrence/normalization lemmas generalized to abstract weights (rawBackward_recurrence, backwardBound, backwardCoeff_bounds, backwardCoeff_recurrence). WITHOUT arm: Mathlib only.",
+    "missing": [
+     "backwardRatio definition (~15 lines)"
+    ],
+    "formal_proof_to_compare": "None. Within-family proxy: BackwardWeights.lean 112-241 + GlobalOperators backward block (~230 lines)."
+   }
+  }
+ ],
+ "open_problems": [
+  {
+   "id": "O1",
+   "title": "Hyperinvariant subspace problem on reflexive non-Hilbert spaces: L^p[0,1] (1<p<inf, p != 2)",
+   "statement": "Does every nonscalar bounded operator on L^p[0,1] (equivalently on L^p(Z_2; l^p(Z)), an isomorphic copy) have a nontrivial closed hyperinvariant subspace? Target: a nonzero norm-quasinilpotent operator on L^p(Z_2, Haar; l^p(Z)) whose commutant has no nontrivial closed common invariant subspace.",
+   "lean_statement": "def BanachTransitiveCommutant {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] (T : E →L[ℂ] E) : Prop :=\n  ∀ K : Submodule ℂ E, IsClosed (K : Set E) →\n    (∀ A : E →L[ℂ] E, A * T = T * A → ∀ x ∈ K, A x ∈ K) → K = ⊥ ∨ K = ⊤\ntheorem Lp_hsp_counterexample (p : ℝ≥0∞) [Fact (1 ≤ p)] (hp1 : 1 < p) (hp : p ≠ ∞) :\n  ∃ T : Lp (lp (fun _ : ℤ => ℂ) p) p OAI.BackwardIntertwiners.baseMeasure →L[ℂ]\n        Lp (lp (fun _ : ℤ => ℂ) p) p OAI.BackwardIntertwiners.baseMeasure,\n    T ≠ 0 ∧ Tendsto (fun n : ℕ => ‖T ^ n‖ ^ (1 / (n : ℝ))) atTop (𝓝 0) ∧ BanachTransitiveCommutant T",
+   "reference": "Search snippet (JOT 73:1 (2015), theta.ro): 'the invariant and hyperinvariant subspace problem are still open in reflexive Banach spaces, and in particular in Hilbert spaces'; Read/Enflo counterexamples are on non-reflexive spaces (l^1, c_0); Argyros-Haydon space gives a positive HSP. Domar 1981 (Math. Scand. 49) is the classical weighted-translation source BI follows (whether it covers l^p for p != 2 was not verified here).",
+   "url": "https://www.theta.ro/jot/archive/2015-073-001/2015-073-001-006.pdf",
+   "status": "open as of the search snippets (HSP on reflexive spaces other than Hilbert); BI settles only p = 2.",
+   "obstruction_match": "Exact: the obstruction is to find an element of {S}' that moves fiber tails; E1 is Banach-agnostic. V's norm bound only needs sup_j b_j(x) <= 1 and measure preservation (holds on L^p(X; l^p)); the commutation recurrence and opposite-drift decay are scalar statements. The Hilbert-specific parts are the fiber lattice criterion (inner products) and the transitivity step (orthogonal complement), both replaceable by annihilating functionals.",
+   "adaptation": "(1) Fiber criterion on weighted l^p(Z): redo SupportSeparation / quadratic_fiber_tails with dual sequences c in l^q (SupportSeparation already has the dual-pairing shape (sum b_j c_{j-r}) with ||c_j|| w_j <= 1). (2) Global: replace L.orthogonal by a nonzero functional vanishing on L (Hahn-Banach, Mathlib exists_dual_vector / separating dual) and represent it fiberwise as z in L^q(X; l^q) (needs vector-valued L^p duality, not in Mathlib). (3) E1 and the descent (ergodic_late_intersection) unchanged. Note L^p(X; l^p) ~ L^p[0,1] (non-atomic), not l^p; an l^p version would need an atomic base, where the descent fails (see N3).",
+   "payoff": "high (first HSP counterexample on a reflexive non-Hilbert space, if the fiber criterion holds on l^p)",
+   "confidence": "medium",
+   "difficulty": "medium-high (duality infrastructure + l^p Domar criterion); E1 itself ports trivially",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib: lp with Fact (1 ≤ p), MeasureTheory.Lp, ContinuousLinearMap, Submodule, IsClosed; OAI: baseMeasure from BackwardIntertwiners/HaarBase.lean (or restate the Haar base; 30 lines). WITH-item arm library: Mathlib d13f23b + OAI/Analysis/BackwardIntertwiners/{ConvexEnvelope, ConvolutionBounds, CoefficientSupport, WeightSeparation, FiberTails, ExplicitWeights, HaarBase, FiberMaps, BackwardWeights, GlobalOperators, ErgodicTransitivity} (3,235 lines) - the E1 declarations are listed in lean_gaps[5]. WITHOUT-item arm: same files, but (i) delete BackwardWeights.lean (247 lines), (ii) delete from GlobalOperators.lean every declaration whose name contains 'backward' plus forward_backward_commute (~110 lines; keep inverseOdometer, inverseOdometer_preserving, odometerMeasurableEquiv, which are N0), (iii) delete from ErgodicTransitivity.lean backwardOperator_power_nonzero, forward_backward_scalar_transitive, generated_transitive, explicitDirectModel*, direct_model (~95 lines), (iv) in ExplicitWeights.lean set residueCorrection := 0 (i.e. halfExponent t k = 10*(k+1)) and delete the residue lemmas (76 lines) and plusResidue/minusResidue, so the prover keeps unicellular quadratic fibers, the odometer, Haar base, residues (residue, residue_step) and ergodic recurrence, but must rediscover the opposite-drift weights and the fiber-moving intertwiner. Do not include AlgebraCorollary/OperatorTransport (they contain the theorem). E1-specific budget removed: ~430 lines of definitions/lemmas + ~70 lines of use. For this target also give the p-generic fiberWeightedPermutation (FiberMaps) in both arms.",
+    "missing": [
+     "proof only: vector-valued L^p-L^q duality or a fiberwise functional-representation lemma (est. 500-1000 lines; Mathlib d13f23b has Holder pairing (MeasureTheory/Function/Holder.lean) but no (L^p)* = L^q iso by grep)",
+     "proof only: l^p version of the Domar-type criterion (rework of ~1.5k Hilbert-specific lines)"
+    ],
+    "formal_proof_to_compare": "None for p != 2. p = 2 baseline: BI direct route ~3.6k lines."
+   }
+  },
+  {
+   "id": "O2",
+   "title": "HSP and ISP on l^p (1<p<inf) - atomic version",
+   "statement": "Does every nonscalar operator on l^p (1<p<inf, p != 2) have a nontrivial hyperinvariant subspace?",
+   "lean_statement": "theorem lp_hsp (p : ℝ≥0∞) [Fact (1 ≤ p)] (hp1 : 1 < p) (hp : p ≠ ∞) (hp2 : p ≠ 2) :\n  ∃ T : lp (fun _ : ℕ => ℂ) p →L[ℂ] lp (fun _ : ℕ => ℂ) p, (∀ c : ℂ, T ≠ c • 1) ∧ BanachTransitiveCommutant T",
+   "reference": "same snippet as O1 (open on reflexive spaces).",
+   "url": "https://www.theta.ro/jot/archive/2015-073-001/2015-073-001-006.pdf",
+   "status": "open",
+   "obstruction_match": "Partial only. The device needs a NON-ATOMIC probability base (Poincare recurrence drives the descent); l^p(l^p) over an atomic base is l^p, but on an atomic base the descent fails (N3). L^p[0,1] is not isomorphic to l^p for p != 2, so O1 does not transfer.",
+   "adaptation": "None evident; would need a different source of recurrence on an atomic base (e.g. a non-measure-theoretic descent).",
+   "payoff": "high",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib lp; BanachTransitiveCommutant (5 lines).",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O3",
+   "title": "Relative ISP/HSP in non-hyperfinite II_1 factors (Haagerup-Schultz point-mass case), e.g. L(F_2)",
+   "statement": "If T is in a II_1 factor M with Brown measure a Dirac mass (e.g. T quasinilpotent), does T have a nontrivial closed invariant (hyperinvariant) subspace affiliated with M? IP answers NO in the hyperfinite factor R (every irrational rotation); open for L(F_n) and other non-hyperfinite factors.",
+   "lean_statement": "-- needs a free-group-factor or non-hyperfiniteness predicate; with FiniteFactor's defs:\n-- ∃ M, HasScalarCenter M ∧ IsFiniteAlgebra M ∧ HasNoMinimalProjection M ∧ HasSeparablePredual M ∧ ¬ IsHyperfinite M ∧\n--   ∃ T ∈ M, T ≠ 0 ∧ quasinilpotent T ∧ ∀ p ∈ M, IsStarProjection p → (1-p)*T*p = 0 → p = 0 ∨ p = 1",
+   "reference": "Haagerup-Schultz 2009 (point-mass case open; snippet via arXiv 1509.03358 / math/0611256); IP (this family).",
+   "url": "https://arxiv.org/pdf/1509.03358",
+   "status": "open outside R (as far as snippets show)",
+   "obstruction_match": "Architectural: E1 is the decomposable shadow of the JMJ commutant element in a crossed product (novelty test1). In a II_1 factor the analogue would be a commuting element of M moving a 'fibre' index - IP needed a different, much heavier mechanism (couplings, E2) even in R.",
+   "adaptation": "Unclear; E1 does not live in a finite algebra. Possible route: crossed products L^inf(X) x| Gamma by non-amenable Gamma with an E1-type cocycle, but non-hyperfiniteness then comes from Gamma, and the descent needs an amenable Z-direction.",
+   "payoff": "high",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "FiniteFactor challenge defs (Mathlib VonNeumannAlgebra).",
+    "missing": [
+     "hyperfiniteness predicate (100-200 lines) and a proof that some factor is NOT hyperfinite (free group factors / property Gamma theory: thousands of lines)",
+     "Brown measure in general (OAI BrownMeasure is model-specific, 1,756 lines)"
+    ],
+    "formal_proof_to_compare": "IP: FiniteFactor closure 22,601 lines (hyperfinite-type case, hyperfiniteness not stated)."
+   }
+  },
+  {
+   "id": "O4",
+   "title": "HSP for bilateral weighted shifts of multiplicity one (Atzmon-Sodin completely indecomposable shifts; Kerchy-Pearcy withdrawn claim)",
+   "statement": "Does every bilateral weighted shift on l^2(Z) (in particular the Atzmon-Sodin completely indecomposable shifts with spectrum the circle) have a nontrivial hyperinvariant subspace?",
+   "lean_statement": "theorem bilateral_shift_has_hyperinvariant (β : ℤ → ℝ) (hβ : ∀ j, 0 < β j) (hb : BddAbove (Set.range β))\n    (S : lp (fun _ : ℤ => ℂ) 2 →L[ℂ] lp (fun _ : ℤ => ℂ) 2) (hS : ∀ v j, S v j = (β (j-1) : ℂ) * v (j-1)) :\n    ¬ OAI.Hyperinvariant233.TransitiveCommutant S",
+   "reference": "Atzmon-Sodin, JFA 169 (1999); Kerchy-Pearcy arXiv:2503.13005 (withdrawn; Bercovici counterexample to Thm 3); Jodar 1985/1986 (snippets).",
+   "url": "https://arxiv.org/abs/2503.13005v2",
+   "status": "open (Kerchy-Pearcy's affirmative claim withdrawn)",
+   "obstruction_match": "The obstruction E1 bypasses is exactly the one present here: on a single fiber a bounded backward element of {S}' cannot exist (N1). E1 needs an ergodic base of fibers.",
+   "adaptation": "None by E1 (it provably fails on one fiber); listed because BI explains why multiplicity one is different: a counterexample of multiplicity one would need a non-shift-type commutant element.",
+   "payoff": "high",
+   "confidence": "low (that E1 helps)",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib lp; OAI TransitiveCommutant; BI forwardFiber pattern.",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O5",
+   "title": "HSP for operator-weighted bilateral shifts of finite multiplicity n",
+   "statement": "Does every bilateral shift on l^2(Z; C^n) with invertible (or injective) matrix weights have a nontrivial hyperinvariant subspace? BI's S is an operator-weighted bilateral shift of INFINITE multiplicity (weights M_{beta_j} on L^2(Z_2)).",
+   "lean_statement": "theorem finite_mult_shift_hyperinvariant (n : ℕ) (W : ℤ → Matrix (Fin n) (Fin n) ℂ) (S : lp (fun _ : ℤ => EuclideanSpace ℂ (Fin n)) 2 →L[ℂ] lp (fun _ : ℤ => EuclideanSpace ℂ (Fin n)) 2)\n    (hS : ∀ v j, S v j = Matrix.toEuclideanLin (W (j-1)) (v (j-1))) (hW : ∀ j, IsUnit (W j)) :\n    ¬ OAI.Hyperinvariant233.TransitiveCommutant S",
+   "reference": "Hamid-Pearcy, Acta Sci. Math. 72 (2006) 'Hyperinvariant subspaces for some operator-weighted bilateral shifts' (record only); Pilidi, Izvestiya 1979 (snippet).",
+   "url": "https://contentas.bibl.u-szeged.hu/Record/acta16161",
+   "status": "open in general (partial results; record only)",
+   "obstruction_match": "Exact boundary of E1: finite multiplicity = finite base cycle, where V^n restricted to a fiber is a backward shift in {S_x}', forced to vanish (N3). So BI shows infinite multiplicity suffices and E1 cannot reach finite n.",
+   "adaptation": "None by E1; a finite-multiplicity counterexample needs a new commutant mechanism.",
+   "payoff": "med",
+   "confidence": "low (that E1 helps)",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib lp, EuclideanSpace, Matrix.toEuclideanLin; OAI TransitiveCommutant.",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O6",
+   "title": "Bishop operators T_alpha f(x) = x f({x+alpha}) for Liouville alpha",
+   "statement": "Does the Bishop operator T_alpha on L^2[0,1] have a nontrivial (hyper)invariant subspace for every irrational alpha?",
+   "lean_statement": "-- on L^2 of AddCircle 1: (T f)(x) = (coe x : ℝ in [0,1)) * f (x + α); statement ¬ TransitiveCommutant T, or ISP: ∃ closed K ≠ ⊥, ≠ ⊤, T-invariant",
+   "reference": "Davie 1974 (non-Liouville), MacDonald 1990, Flattot 2008, Chamizo-Gallardo-Monsalve-Ubis arXiv:1812.08059 (survey snippet: 'still a tantalizing open problem').",
+   "url": "https://arxiv.org/pdf/1812.08059",
+   "status": "open for some Liouville alpha",
+   "obstruction_match": "Weak: same base dynamics (weighted translation over an ergodic rotation, cf. S2) but rank-one fibers, so there are no fiber tails to move; E1's mechanism needs infinite-dimensional unicellular fibers.",
+   "adaptation": "Only via S2-type tower residues if one wanted a fibred Bishop-type model; does not address T_alpha itself.",
+   "payoff": "high",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib AddCircle, Lp, volume, ergodic_add_right.",
+    "missing": [
+     "Bishop operator definition as a bounded operator on L^2(AddCircle) (~60-100 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O7",
+   "title": "Kerchy's question: does an operator with a shift-type invariant subspace have a nontrivial hyperinvariant subspace?",
+   "statement": "If a Hilbert space operator has an invariant subspace on which its restriction is similar to the unilateral shift, must it have a nontrivial hyperinvariant subspace?",
+   "lean_statement": "-- ShiftType T := ∃ K closed T-invariant, ∃ similarity e : K ≃L[ℂ] lp (fun _ : ℕ => ℂ) 2, e ∘ T|K = U+ ∘ e; goal: ShiftType T → ¬ TransitiveCommutant T",
+   "reference": "arXiv:2607.03759 (2026; title 'On hyperinvariant subspaces of operators containing unilateral shifts'; question as reported in snippet).",
+   "url": "https://arxiv.org/pdf/2607.03759",
+   "status": "open (2026)",
+   "obstruction_match": "Weak. BI's S is quasinilpotent, so no restriction is similar to a shift; any E1-based counterexample would need non-quasinilpotent fibers with a shift-like piece, which conflicts with unicellular (Domar) fibers.",
+   "adaptation": "Try S + lambda? No: S + lambda has the same commutant but restrictions have spectrum {lambda}, not the disc. No convincing adaptation.",
+   "payoff": "med",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib lp, ContinuousLinearEquiv, Submodule; OAI TransitiveCommutant.",
+    "missing": [
+     "unilateral shift on lp ℕ and ShiftType predicate (~60-100 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O8",
+   "title": "Attainable hyperinvariant-subspace lattices (which complete lattices are HypLat(T)?)",
+   "statement": "Characterize the lattices of the form HypLat(T); in particular realize specific finite or measure-algebra lattices by quasinilpotent operators.",
+   "lean_statement": "def HypLat (T : H →L[ℂ] H) : Set (Submodule ℂ H) := {K | IsClosed (K : Set H) ∧ ∀ A, A * T = T * A → ∀ x ∈ K, A x ∈ K}\n-- target example: ∃ T quasinilpotent with HypLat T order-isomorphic to the measure algebra of a given invariant σ-algebra",
+   "reference": "Foias-Jung-Ko-Pearcy, 'On the hyperinvariant subspace problem III' (JFA 2005; snippet: hyperlattices of many operators coincide with those of quasidiagonal (BCP) operators).",
+   "url": "https://msp.org/pjm/1984/110-1/p18.xhtml",
+   "status": "open in general (no characterization found in searches)",
+   "obstruction_match": "Medium: running E1 over a NON-ergodic base puts the invariant sets' projections L^2(E; K) into the common lattice of alg(S, V, L^inf); but operators swapping isomorphic ergodic components also commute with S, so prescribing HypLat needs pairwise non-intertwinable components. Theorem-level shortcut S (+) 0 already gives 4-element Boolean HypLat (corollary, not reuse).",
+   "adaptation": "Use distinct weight constants c_i per ergodic component and prove no nonzero intertwiners between components (open sub-question).",
+   "payoff": "med",
+   "confidence": "low",
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib Submodule, OrderIso; OAI BI library.",
+    "missing": [
+     "HypLat definition and the target lattice (~50-150 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "Transitive algebra problem (Kadison 1955) answered negatively: {S}' is a proper, SOT-closed, unital, transitive algebra. Lean: already inside FullClaim (TransitiveCommutant + commutant ≠ ⊤ + SOT-closed); 0 extra lines.",
+  "Arveson / Douglas-Pearcy sharpness: alg(S, V, L^inf(X) (x) 1) is transitive, contains an abelian von Neumann algebra of infinite multiplicity, and is not SOT-dense (it sits in {S}'). Lean: generated_transitive + commutant ≠ ⊤; ~20 lines.",
+  "{S}' is non-reflexive (Lat{S}' = {0,H}, so AlgLat{S}' = B(H) ≠ {S}'). Lean: define AlgLat (~20 lines) + ~20 lines of proof from FullClaim.",
+  "HSP fails for quasinilpotent operators and for C_00 contractions (||S|| = e^{-10} < 1), the classes where it was most studied (Foias-Jung-Ko-Pearcy reduce the HSP to quasinilpotents). Lean: immediate.",
+  "HSP fails on non-separable Hilbert spaces too (S (x) 1 on H_0 (x) l^2(Gamma); commutant contains {S}' (x) B(l^2 Gamma)). My inference, not in the paper; Lean ~150-300 lines (Hilbert tensor products are thin in Mathlib).",
+  "Contradicts the affirmative HSP claims of Garayev arXiv:2607.16373 (2026) and Sa Ge Lee arXiv:2306.13940 (2023); IP also refutes Cho-Ko-Lee 2017 Cor 2.8 and answers Zhu-Fang-Shi's question in R.",
+  "Compression calibration, NOT reuse: Hyperinvariant.main_theorem proves the same FullClaim via the IP product model (import closure 22,976 lines) vs BI (5,802 lines, direct route ~3.6k). With BI in the library the IP comparator statement is a one-line corollary; record as the family's internal compression ratio (~4-9x), not as a speedup."
+ ],
+ "release_reuse": {
+  "uses_of_device_in_release": "None outside family 293. Searched CONTENTS.md for weighted shift / odometer / intertwin / commutant / invariant subspace / transitive algebra / reflexiv / Lomonosov / cocycle / skew product / direct integral / bilateral / quasinilpotent / hyperreflex / unicellular, all preprint .tex for odometer|backward intertwiner|bilateral weighted shift (hits only in the two 293 manuscripts) and all Lean for 'odometer' outside BackwardIntertwiners (hits only in OAI/Computability/{MinUncut,PerfectCompleteness}: Turing-machine counter 'odometers', unrelated).",
+  "intra_family": "IP (same family, same day) reaches the HSP by the II_1 route (Dykema Prop 2.1) and uses base dynamics (u f(v) in R_theta) but no backward intertwiner; its Lean (FiniteFactor/IrrationalRotation/RotationWeights/BrownMeasure/Hyperinvariant) shares no declarations with BI. BI's paper imports two elementary lemmas from IP; BI's Lean re-proves them (Hyperinvariant233 namespace inside BackwardIntertwiners/HilbertClassification.lean, OperatorTransport.lean) and imports only Mathlib.",
+  "families_that_consume_the_theorem": [],
+  "families_that_could_use_it": [
+   "288 (Kadison similarity conjecture + one universal hyperreflexivity constant for all von Neumann algebras): contrast only. Hyperreflexivity there concerns self-adjoint algebras; {S}' is a non-self-adjoint non-reflexive algebra, so no conflict and no device use.",
+   "144 (Banach's simple Lebesgue spectrum problem; smooth diffeo of T^3): a source of smooth ergodic bases; E1 only needs a measurable base, so no gain."
+  ],
+  "lean_notes_2026_10_10": "BI Lean imports only Mathlib; E1 block = ExplicitWeights residue part (76 lines) + BackwardWeights.lean (247) + GlobalOperators backward declarations (~110) + V-use in ErgodicTransitivity (~70). Not compiled by this agent (comparator runs in progress elsewhere)."
+ },
+ "negative_controls": [
+  {
+   "title": "N1. Single fiber (theta = id): no nonzero bounded backward intertwiner",
+   "statement": "For a fixed fiber x with BI's weights, any bounded b : Z -> C with b(j+1) beta_j(x) = b(j) beta_{j-1}(x) for all j is identically 0. (With theta = id the recurrence ratio is beta_{j-1}/beta_j = exp(a_j - a_{j-1}) >= e^{10} for j >= 1, so b grows geometrically unless it vanishes.)",
+   "lean_statement": "theorem no_single_fiber_backward (x : OAI.BackwardIntertwiners.Base) (b : ℤ → ℂ) (hb : BddAbove (Set.range fun j => ‖b j‖))\n    (hrec : ∀ j, b (j+1) * OAI.BackwardIntertwiners.explicitBeta x j = b j * OAI.BackwardIntertwiners.explicitBeta x (j-1)) :\n    b = 0",
+   "why_device_must_fail": "This is the Atzmon-Sodin / single-shift obstruction E1 is designed to bypass: opposite drift needs theta x != x. The drift lemma (halfExponent_drift) is useless here, so the with-item arm should NOT be faster than without; a speedup would mean the prover gains only from plumbing.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "BI ExplicitWeights/BackwardWeights (explicitBeta, halfExponent_mono, bilateralExponent_nonneg).",
+    "missing": [],
+    "formal_proof_to_compare": "none; expected proof 40-80 lines"
+   }
+  },
+  {
+   "title": "N2. Unilateral fibers: the fiber-moving intertwiner is forced to be zero",
+   "statement": "If S, S' are unilateral weighted shifts on l^2(N) with positive weights and V e_j = b_j e_{j-1} (j >= 1), V e_0 = 0, with S' V = V S, then V = 0 (the j = 0 equation gives b_1 beta_0 = 0, then induction).",
+   "lean_statement": "theorem no_unilateral_backward (β β' : ℕ → ℝ) (hβ : ∀ j, 0 < β j)\n    (S S' V : lp (fun _ : ℕ => ℂ) 2 →L[ℂ] lp (fun _ : ℕ => ℂ) 2)\n    (hS : ∀ v j, S v (j+1) = (β j : ℂ) * v j) (hS0 : ∀ v, S v 0 = 0)\n    (hS' : ∀ v j, S' v (j+1) = (β' j : ℂ) * v j) (hS'0 : ∀ v, S' v 0 = 0)\n    (b : ℕ → ℂ) (hV : ∀ v j, V v j = b (j+1) * v (j+1)) (hcomm : S' * V = V * S) : V = 0",
+   "why_device_must_fail": "Bilateral (two-ended) fibers are essential: commutants of unilateral shifts are 'analytic' (Shields), with no backward component. Proved-false analogue of E1.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib lp; no OAI needed.",
+    "missing": [],
+    "formal_proof_to_compare": "none; expected proof 30-60 lines"
+   }
+  },
+  {
+   "title": "N3. Finite base / finite multiplicity (and Lomonosov): device must fail",
+   "statement": "Over a finite cycle base Z/N (operator-weighted shift of multiplicity N) with fibers satisfying QuadraticWeights, there is no V with V_i e_j = b_i(j) e_{j-1} into fiber i+1, all b_i(j) > 0, 0 <= b <= 1, commuting with S: V^N restricted to a fiber is a backward shift by N in {S_x}', which grows like exp(2cNj) and must vanish. Consistent with Lomonosov: over a finite base S is compact (each fiber is compact, BI forwardFiber_compact), so S has a hyperinvariant subspace. Atomic infinite base (Z, translation): Poincare recurrence fails and the descent field s(n) = h - n is consistent; in BI's own Lean the integer orbit is exactly what goodBase removes.",
+   "lean_statement": "theorem no_finite_base_backward (N : ℕ) [NeZero N] (w : Fin N → ℤ → ℝ) (hw : ∀ i, OAI.BackwardIntertwiners.QuadraticWeights (w i))\n    (b : Fin N → ℤ → ℝ) (hb : ∀ i j, 0 ≤ b i j ∧ b i j ≤ 1)\n    (hrec : ∀ i j, b i (j+1) * (w i (j+1) / w i j) = b i j * (w (i+1) j / w (i+1) (j-1))) :\n    ∃ i j, b i j = 0",
+   "why_device_must_fail": "Proved-false analogue: Lomonosov's theorem (any T commuting with a nonzero compact has a hyperinvariant subspace) forbids the conclusion over finite bases, and the explicit cycle argument shows the device step itself (bounded positive V) is what breaks. Note: the recurrence form must be checked against forwardFiber_weight_coordinates when formalizing (beta_j = w_{j+1}/w_j in BI's convention).",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "BI WeightSeparation (QuadraticWeights), Fin N arithmetic. Lomonosov itself is NOT in Mathlib d13f23b (grep: no Lomonosov / Schauder fixed point), so the Lomonosov form 'compact nonzero T has a hyperinvariant subspace' needs a major new library (est. 1.5-3k lines: Schauder fixed point + Lomonosov).",
+    "missing": [
+     "for the Lomonosov variant only: Schauder fixed point theorem and Lomonosov's lemma"
+    ],
+    "formal_proof_to_compare": "none; expected proof of the cycle version 100-200 lines"
+   }
+  },
+  {
+   "title": "N4. Quasinilpotent DT-operator (II_1): hyperinvariant subspaces exist",
+   "statement": "Dykema-Haagerup (arXiv math/0301112, JFA 2004): the quasinilpotent DT-operator in L(F_2) has a one-parameter family of nontrivial hyperinvariant subspaces; Haagerup-Schultz: non-point-mass Brown measure gives hyperinvariant subspaces.",
+   "lean_statement": "-- needs DT-operators / free probability; not statable with current libraries",
+   "why_device_must_fail": "Any E1-style II_1 port (O3, S3) must not apply to DT-operators; a good sanity check for a prover's II_1 attempts. Also: E1 cannot give an ISP counterexample, because S leaves every L^2(X; K_{>=h}) invariant (OrdinaryStructure.globalTail_forward).",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "none (DT-operators, free group factors, Brown measure in general are absent).",
+    "missing": [
+     "free probability / DT-operators (thousands of lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "target": "O1: HSP counterexample on L^p(Z_2; l^p(Z)) ~ L^p[0,1], 1<p<inf",
+   "lean_usable": true,
+   "argument": "The best genuine device-reuse test: the statement is new (HSP is open on reflexive non-Hilbert spaces per the search snippet) and is statable today in Mathlib with BI's Haar base. E1 is Banach-agnostic (the contraction bound needs only sup b <= 1 and measure preservation; recurrence and two-ended decay are scalar), while the parts that do not port (Domar criterion on l^p, orthogonal complements) are N0/N1 infrastructure. So a with/without gap on O1 is attributable to E1 more cleanly than on S1. Risk: the l^p fiber criterion may need real new work, and vector-valued L^p duality is missing in Mathlib (500-1000 lines), so budget the infrastructure in BOTH arms."
+  },
+  {
+   "rank": 2,
+   "target": "S2: HSP witness fibred over an irrational rotation",
+   "lean_usable": true,
+   "argument": "Tests whether the design (not the 2-adic bookkeeping) is reusable: the drift must come from Rokhlin-tower levels instead of residues, after which rawBackward, normalization, V and the descent transfer verbatim. Mathlib has AddCircle.ergodic_add_right, so the statement is ready; the with-arm should shorten the proof to the tower lemma (~300-600 lines) while the without-arm must rediscover opposite drift. Medium confidence that the tower construction works (my sketch, unverified)."
+  },
+  {
+   "rank": 3,
+   "target": "S1: 3-adic odometer re-run (calibration)",
+   "lean_usable": true,
+   "argument": "Cheapest, most reliable measurement: the decomposable form over Z_3 is in the statement, so BI cannot be transported by a unitary (non-isomorphic odometers). Expect a large speedup; because it is a close variant, use it to calibrate the pipeline and the size of the 'variant effect' rather than as jump evidence."
+  },
+  {
+   "rank": 4,
+   "target": "S4: backward-intertwiner criterion for two bilateral shifts (plumbing control) + N1/N2 negative controls",
+   "lean_usable": true,
+   "argument": "Run together with S1/S2/O1 to decompose any measured speedup: S4 uses only E1's generic recurrence/normalization (no opposite drift); N1 (single fiber) and N2 (unilateral fibers) are proved-false analogues where the drift design must not help. If the with-arm wins big on S4/N1/N2 too, the 'speedup' is plumbing."
+  },
+  {
+   "rank": 5,
+   "target": "S3: FiniteFactor.MainTarget with BI in the library",
+   "lean_usable": true,
+   "argument": "Skeptical target: BI's operator is type I, so I expect no help; a positive result would be striking. Exact statement exists (ComparatorChallenges/FiniteFactor.lean) with a 22.6k-line baseline. Import FiniteFactor.Main (free of run_cmd edits); hyperfiniteness is not part of the statement."
+  }
+ ],
+ "precedent_check": {
+  "earlier_equivalent_found": false,
+  "verdict": "No earlier equivalent found. Searches (snippets only) for fibred/direct-integral weighted shifts with a fiber-moving commutant element, operator-weighted bilateral shifts and hyperinvariant subspaces (Hamid-Pearcy 2006, Pilidi 1979, Jodar 1985/86, Herrero 1974 - records/snippets only), and post-release HSP news returned no use of the device. Nearest neighbours as in novelty.json (Bastian 1976, Atzmon-Sodin 1999, Dykema Prop 2.1 architecture).",
+  "nearest_neighbours": [
+   "Hamid-Pearcy, Acta Sci. Math. 72 (2006), 'Hyperinvariant subspaces for some operator-weighted bilateral shifts' - record only; BI's S IS an operator-weighted bilateral shift (weights M_{beta_j} on L^2(Z_2)), so this paper should be read by a human: it may contain positive results whose hypotheses BI's S must violate.",
+   "arXiv:2605.23846 (May 2026) 'Adjacent cross-sections of the commutant of Hilbert space operators' - excerpts show a block-triangular / rank-2 commutant-manifold method for the HSP; no fibration or intertwiner seen in snippets.",
+   "Dykema-Haagerup 2004 (DT, positive), Haagerup-Schultz 2009 (II_1, open point-mass case)."
+  ],
+  "post_release_use": "None found (search 2026-10-10: no post-Oct-6 citation or reuse of the backward intertwiner; the only 2026 HSP items are Garayev arXiv:2607.16373 (affirmative claim, conflicting) and arXiv:2607.03759 (Kerchy-type question)).",
+  "caveats": "WebFetch was not used (arXiv blocked; prior agents saw DNS failures); all literature statements rest on search-result snippets and may be imprecise. MathSciNet/zbMATH not queried."
+ },
+ "sources": [
+  "data/pilot/293/novelty.json, family.json, family.md",
+  "data/eureka_shortlist.json; docs/downstream_agent_prompt.md; data/pilot/248/downstream.json (format)",
+  "data/raw/openai-math/preprints/Backward-intertwiners-and-a-transitive-commutant-September-27-2026/build/sections/{introduction,intertwiner,conclusion}.tex",
+  "data/raw/openai-math/lean/OAI/Analysis/BackwardIntertwiners/{ExplicitWeights,HaarBase,FiberMaps,BackwardWeights,GlobalOperators,ErgodicTransitivity,AlgebraCorollary,HilbertClassification,FiberTails,WeightSeparation,OrdinaryStructure}.lean",
+  "data/raw/openai-math/lean/ComparatorChallenges/{BackwardIntertwiners,HyperinvariantSubspaces,FiniteFactor,IrrationalRotation,ContinuousCircleWeight,ProductBrown}.{json,lean}; lean/docs/293.md",
+  "data/raw/openai-math/lean/.lake/packages/mathlib (d13f23b723; grep only)",
+  "https://www.theta.ro/jot/archive/2015-073-001/2015-073-001-006.pdf (snippet: ISP/HSP open on reflexive spaces)",
+  "https://arxiv.org/pdf/math/0202003 (Androulakis, minimal vectors on super-reflexive spaces; snippet)",
+  "https://arxiv.org/pdf/math/0301112 (Dykema-Haagerup, quasinilpotent DT-operator; snippet)",
+  "https://arxiv.org/pdf/1509.03358 (Haagerup-Schultz point-mass open case; snippet)",
+  "https://arxiv.org/pdf/1812.08059 (Bishop operators survey; snippet)",
+  "https://contentas.bibl.u-szeged.hu/Record/acta16161 (Hamid-Pearcy 2006; record)",
+  "https://arxiv.org/abs/2503.13005v2 (Kerchy-Pearcy, withdrawn; snippet)",
+  "https://arxiv.org/pdf/2607.03759 (2026, operators containing unilateral shifts; snippet)",
+  "https://arxiv.org/pdf/2607.16373 (Garayev 2026; snippet)",
+  "https://arxiv.org/pdf/2605.23846 (adjacent cross-sections of the commutant; excerpts)",
+  "https://arxiv.org/pdf/2609.27479 (2026; transitive algebra problem stated as unsolved; snippet)",
+  "https://en.wikipedia.org/wiki/Lomonosov%27s_invariant_subspace_theorem (no formalization found)"
+ ],
+ "search_log": [
+  "Local: read brief, CLAUDE.md, 293 novelty/family, BI intro/intertwiner/conclusion .tex, BI Lean (23 files; declaration spans computed by script), comparator JSON/.lean for all six 293 configs, lean/docs/293.md.",
+  "Local import-closure walk (text-level Python over 'import OAI...' lines): BI = Mathlib only; Hyperinvariant.Main 277 modules / 22,976 lines; FiniteFactor.Main 271 / 22,601; IrrationalRotation.Main 735 / 81,127 (contains Model/Product.lean run_cmd); BrownMeasure.Main 292 / 24,357 (contains Model.lean run_cmd).",
+  "Local release search: CONTENTS.md and preprint .tex for odometer / weighted shift / intertwiner / commutant / invariant subspace / transitive / reflexive / quasinilpotent / unicellular; Lean grep 'odometer' outside BI (Computability only). Found 288 (hyperreflexivity, contrast), 144 (ergodic base, irrelevant).",
+  "Local Mathlib grep (d13f23b723): no Lomonosov, no Schauder fixed point (only Schauder bases), no Rokhlin lemma, no (L^p)* = L^q, no Volterra; present: AddCircle.ergodic_add_right, WeakOperatorTopology, exists_dual_vector, PadicInt.",
+  "WebSearch 2026-10-10 (snippets only, no WebFetch): 'hyperinvariant subspace problem reflexive Banach space L^p open problem'; 'Lomonosov invariant subspace theorem Lean Mathlib formalization'; 'Dykema Haagerup quasinilpotent DT-operator hyperinvariant subspaces'; 'Bishop operator hyperinvariant subspace Liouville open Davie MacDonald Flattot'; '\"hyperinvariant subspace\" counterexample OpenAI 2026 backward intertwiner odometer' (nothing); 'operator weighted shift hyperinvariant subspaces bilateral infinite multiplicity commutant'; 'Haagerup Schultz invariant subspace relative free group factor ... point mass open problem'; 'which lattices are hyperinvariant subspace lattices HypLat attainable lattice operator'; 'transitive algebra problem reflexive operator algebras open problems survey'; 'Kerchy 2026 operators containing unilateral shifts ...'; 'hyperinvariant subspace problem negative answer October 2026 ...'; '\"Adjacent cross-sections of the commutant\" ...'. No rate-limit failures."
+ ],
+ "reused_from": "data/pilot/293/novelty.json (E1 statement, test1 neighbours, precedent checks), family.md (trust surface, comparator table); new here: Part A chain at declaration level, run_cmd/hyperfiniteness exposure by import closure, with/without arms, targets and controls",
+ "lean_checked_at_text_level_only": true
+}
