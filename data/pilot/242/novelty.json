@@ -1,0 +1,719 @@
+{
+ "family": 242,
+ "title": "Single-fold Diophantine representations",
+ "analyst_role": "novelty",
+ "date": "2026-10-09",
+ "inputs": [
+  "docs/PLAN.md",
+  "docs/novelty_agent_prompt.md",
+  "data/pilot/287/novelty.json + novelty.md (worked example, key schema)",
+  "data/pilot/242/family.json + family.md (paper + Lean analyst; no trace exists for 242)",
+  "preprint build/: main.tex, elliptic.tex, power.tex, references.bib (16 entries)",
+  "lean/OAI/NumberTheory/SingleFold/{HeightGrowth,EllipticGrowth,Power}.lean (spot checks)",
+  "Full text of Cantone-Cuzziol-Omodeo 2024 (Le Matematiche PDF, extracted locally, 36 pp.)",
+  "Full text of Cornelissen-Zahidi math/0412473 (PDF, extracted locally)",
+  "Full text of AIM problem list 'Problems related to Extensions of Hilbert's Tenth Problem' (PDF, extracted locally)",
+  "arXiv abstract/HTML pages: math/0204001 (Poonen 2002), 0901.4168 (Shlapentokh), 0707.1485 (Eisentraeger-Everest), 0904.3709 (Mazur-Rubin), 2412.01768 (Koymans-Pagano), 2303.02208 (CCO 2023)"
+ ],
+ "base_library_L": "Mathlib d13f23b (incl. NumberTheory.Dioph, Pell, Height.logHeight/Northcott, WeierstrassCurve group law and addSubMap height bound, Computability REPred/ToPartrec/PartrecToTM2) + references.bib of 242 (16 entries: silverman, mati1970, mati1974, mati2010, dpr1961, minsky1961, shepherdson1963, cco2024, jm1984, jm1991, chaitin1987, poonen2002, millershlapentokh2022, lucas1878, robinson1952). L contains NO 2025-2026 work. L+ (for Test 4 arm only) adds the AIM Pheidas Question 9, Shlapentokh 2009 and Eisentraeger-Everest 2009.",
+ "precedent_checks": [
+  {
+   "ref": "Robinson 1952, Trans. AMS 72 (robinson1952, in L)",
+   "access": "original not fetched; content verified through CCO 2024 Sec. 1, which restates Robinson's growth criteria (J(u,v) => v <= u^u and u>1; for every l some J(u,v) with u^l < v)",
+   "relevance": "Defines the target: any Diophantine relation of JR growth yields exponentiation. Davis's 1963 generic version (CCO Thm 4) does NOT preserve univocity (CCO: 'univocity is not ensured').",
+   "contains_candidates": {
+    "C1": "absent (target only)",
+    "C3": "absent (non-single-fold reduction only)"
+   },
+   "ai_assistance": "n/a (1952)"
+  },
+  {
+   "ref": "Matiyasevich 1974 Sec. 4 (mati1974, in L), as presented in CCO 2024 Thm 5",
+   "access": "original (mathnet) not fetched; CCO 2024 Thm 5 read in full",
+   "relevance": "Univocal exponential system L1-L7: v = 2^u, u = 20*sum(c_i+1)(2b_i+1)(n_i^2+1) (scale already a polynomial in the output), paired Pell equations with bases b_i u+1 and u, index congruences mod b_i u and u-1, cutoff f_i,h_i < v, quotient c_i = f_i div h_i.",
+   "contains_candidates": {
+    "C3": "close variant: 242's Prop power is this system with 2^u replaced by g(u) and u = (c+1)^l (n+1)(b+1) + u_0",
+    "C4": "the single-fold EXPONENTIAL representation of all r.e. sets (Main Theorem) is already here, so the machine compiler re-proves a known reduction"
+   },
+   "ai_assistance": "n/a (1974)"
+  },
+  {
+   "ref": "Cantone, Cuzziol, Omodeo, 'On Diophantine singlefold specifications', Le Matematiche 79(2) (2024) 585-620 (cco2024, in L)",
+   "access": "full PDF fetched (lematematiche article 2703) and text-extracted locally; received 2024-09-30",
+   "relevance": "Abstract: one may replace exponentiation 'by any exponential-growth relation'. Sec. 7 states two goals: (1) a variant of Thm 5 with M(u,v) & D=0 in place of 2^u=v, M subject to requirements 'probably stronger than exponential growth' (citing Matiyasevich 2010 p. 749, condition (++): u < gamma w^beta, v > delta alpha^w); (2) a concrete M with a finite-fold/univocal polynomial specification. Sec. 8 proposes eight candidate relations built from Davis-style quaternary quartics tied to Pell equations for Heegner numbers. No elliptic curves or heights anywhere.",
+   "contains_candidates": {
+    "C1": "absent (goal (2) posed; candidates are quartic/Pell-based)",
+    "C2": "absent",
+    "C3": "goal (1) posed; 242 answers it with a requirement WEAKER than the one CCO anticipate (quasi-polynomial delta(log u)^2 < log g(u) < u log u instead of exponential)",
+    "C4": "absent",
+    "C5": "Sec. 2 bounded Bezout / minimality devices: close variant"
+   },
+   "ai_assistance": "none disclosed (grep of full text for ChatGPT/GPT/LLM/language model/artificial: no hits); human authors with institutional funding"
+  },
+  {
+   "ref": "Cantone, Cuzziol, Omodeo, 'Six equations in search of a finite-fold-ness proof', arXiv:2303.02208 (v1 2023-03-03, v3 2024-09-30)",
+   "access": "arXiv abstract + ar5iv HTML",
+   "relevance": "Finite-fold conjecture reduced to finiteness of solutions of one of six quartics; uses Matiyasevich's (++) growth property. No elliptic curves; heights only in a Tyszka reference title.",
+   "contains_candidates": {
+    "C1": "absent",
+    "C3": "absent"
+   },
+   "ai_assistance": "none on abstract page"
+  },
+  {
+   "ref": "Matiyasevich 2010, 'Towards finite-fold Diophantine representations', Zap. POMI 377 / J. Math. Sci. 171 (mati2010, in L)",
+   "access": "mathnet fetch failed (ECONNREFUSED); content via search summary and CCO 2024 Sec. 7",
+   "relevance": "Survey of approaches; source of the (++) growth requirement CCO quote. Unverified whether it discusses weaker cutoffs.",
+   "contains_candidates": {
+    "C3": "unverified"
+   },
+   "ai_assistance": "n/a (2010)"
+  },
+  {
+   "ref": "Poonen 2002, 'Using elliptic curves of rank one towards the undecidability of H10 over rings of algebraic integers', ANTS V, LNCS 2369 (poonen2002, in L; arXiv math/0204001)",
+   "access": "arXiv abstract + arXiv HTML v1 (summarised by WebFetch; wording unverified)",
+   "relevance": "NEAREST MECHANISM NEIGHBOUR. Lemma 8: for t=x(P), t'=x(mP), den(t) | num((t/t' - m^2)^2), i.e. the SQUARE of the index is extracted from a rank-one curve p-adically (formal group). Lemma 5 uses h(x(mP)) = m^2 h^(P) + O(1) only for size control (denominators grow). Lemma 9 then defines a set S containing the m^2.",
+   "contains_candidates": {
+    "C1": "close in purpose (squares of indices from a rank-one curve), different mechanism (non-archimedean congruence, output is the number m^2 in O_K, not a point of index m^2; no single-foldness)",
+    "C2": "absent (no archimedean window); the quadraticity-with-bounded-error fact it uses is the same input"
+   },
+   "ai_assistance": "n/a (2002)"
+  },
+  {
+   "ref": "Shlapentokh 2009/2011, 'Using indices of points on an elliptic curve to construct a Diophantine model of Z ...', arXiv:0901.4168",
+   "access": "arXiv abstract + ar5iv HTML (first 100k chars, summarised)",
+   "relevance": "Defines multiplication of indices via squaring (k^2 = (k+w)k - kw), detected by DIVISIBILITY of denominators V_n; intro contrasts with Poonen's 'approximation' modelling. No heights used to pin an index.",
+   "contains_candidates": {
+    "C1": "genuinely different (divisibility route to index squaring, over large subrings of number fields)",
+    "C2": "absent"
+   },
+   "ai_assistance": "n/a"
+  },
+  {
+   "ref": "Cornelissen, Zahidi, 'Elliptic divisibility sequences and undecidable problems about rational points', J. reine angew. Math. 613 (2007), arXiv:math/0412473",
+   "access": "full PDF text extracted locally",
+   "relevance": "Interprets Z via indices of nP; multiplication defined in (Z,+,|) by Robinson-style divisibility (Sec. 4). Heights only in primitive-divisor heuristics.",
+   "contains_candidates": {
+    "C1": "genuinely different",
+    "C2": "absent"
+   },
+   "ai_assistance": "n/a"
+  },
+  {
+   "ref": "Eisentraeger, Everest, 'Descent on elliptic curves and Hilbert's Tenth Problem', arXiv:0707.1485 (Proc. AMS 2009)",
+   "access": "ar5iv HTML (summarised)",
+   "relevance": "Canonical heights give log B_n ~ const * n^2, used only to prove primitive divisors (Lemma 2.5). Index i modelled by approximation: y-coordinate within 1/(10i) of i, addition by rounding. Shows the 'bounded error below the integer gap => exact selection' principle on elliptic curves, but linear, not a squaring test.",
+   "contains_candidates": {
+    "C1": "related principle, genuinely different construction",
+    "C2": "related principle (bounded-error exact selection), different statement"
+   },
+   "ai_assistance": "n/a"
+  },
+  {
+   "ref": "AIM problem list 'Problems related to Extensions of Hilbert's Tenth Problem', moderated by B. Poonen and T. Scanlon, notes by J. Demeyer (aimath.org/WWN/hilberts10th/hilberts10th.pdf; undated, presumably from the AIM workshop of 21-25 March 2005)",
+   "access": "full PDF text extracted locally (7 pp.)",
+   "relevance": "Question 9 (Pheidas) asks whether the proof of H10 over Z can be redone with elliptic curves instead of Pell equations, and adds: 'Can this give a finite-fold Diophantine definition of all r.e. sets?' This POSES the exact bridge of 242 about 21 years earlier. It gives no mechanism. Not in 242's bibliography and not cited by 242.",
+   "contains_candidates": {
+    "C1": "bridge posed (problem-level precedent), mechanism absent",
+    "C2": "absent",
+    "C3": "absent"
+   },
+   "ai_assistance": "n/a (c. 2005)"
+  },
+  {
+   "ref": "Denef 1980 (Trans. AMS 257), Cornelissen-Pheidas-Zahidi 2005, Mazur-Rubin 2010 (arXiv:0904.3709), Koymans-Pagano 2024 (arXiv:2412.01768, v3 2025-11-24), Alpoge-Bhargava-Ho-Shnidman 2025 (arXiv:2501.18774)",
+   "access": "abstracts / search summaries only; Denef and CPZ via secondary sources",
+   "relevance": "Rank-one or rank-stable elliptic curves as the Pell replacement for H10 over rings of integers. All use the curve for divisibility/definability of a subring, never a size window, never single-foldness. Koymans-Pagano: rank stability in quadratic extensions via additive combinatorics and 2-descent with full 2-torsion.",
+   "contains_candidates": {
+    "C1": "same bridge direction (elliptic curve replaces Pell), different problem and mechanism",
+    "C6": "descent techniques: N0"
+   },
+   "ai_assistance": "none disclosed on abstract pages (Koymans-Pagano is a 2024-25 work; not cited by 242; no AI wording on its abstract page)"
+  },
+  {
+   "ref": "Tyszka (arXiv:1404.5975 and related)",
+   "access": "search snippets",
+   "relevance": "Conjectures computable height bounds for equations with finitely many solutions, which would contradict the single-fold conjecture. Context only: if 242 is correct, Tyszka's (unproved) conjecture is false.",
+   "contains_candidates": {},
+   "ai_assistance": "n/a"
+  }
+ ],
+ "candidates": [
+  {
+   "id": "C1",
+   "name": "Elliptic-height single-fold growth function (index bracket + square window on a rank-one curve)",
+   "paper_items": [
+    "I15 height constants kappa, m_*, a_E",
+    "I16 W(Q)=H(x([m_*]Q)), W_j",
+    "I17 representatives",
+    "I18 index bracket at input scale",
+    "I19 square window",
+    "I20 prop:growth (elliptic.tex:283-402)"
+   ],
+   "lean": [
+    "EllipticModel.growth_model",
+    "GrowthCompilation.growth (EllipticGrowth.lean:487)",
+    "HeightGrowth.square_window (HeightGrowth.lean:233)"
+   ],
+   "trace": "no trace for 242",
+   "statement": "On E: y^2=x^3-25x with E(Q)=ZP+T, put W(Q)=H(x([m_*]Q)), so log W_j = a_E j^2 + O(c_E). On input u, the unique representative Q with W(Q) <= u+W_1 < max W(Q+-P) has index k ~ sqrt(log u); the unique representative R with kappa^-1 <= W(2Q)W(R)W_1 / (W(Q)^2 max W(R+-P)) <= kappa has index k^2. g(u)=W(R) has a single-fold graph and delta(log u)^2 < log g(u) < u log u.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "AIM problem list, Pheidas Question 9 (c. 2005)",
+      "relation": "poses 'elliptic curves instead of Pell equations' for H10 over Z and asks whether this gives finite-fold definitions of all r.e. sets; no mechanism",
+      "verdict": "problem-level precedent for the bridge, not a construction"
+     },
+     {
+      "ref": "Poonen 2002 Lemmas 5 and 8 (in L)",
+      "relation": "extracts m^2 of an index from a rank-one curve by a p-adic congruence; uses h(x(mP)) = m^2 h^ + O(1) for size control",
+      "verdict": "closest neighbour; same aim (square an index on a rank-one curve), genuinely different mechanism; no single-foldness, no growth function"
+     },
+     {
+      "ref": "Shlapentokh arXiv:0901.4168",
+      "relation": "index squaring via divisibility of denominators",
+      "verdict": "genuinely different"
+     },
+     {
+      "ref": "Eisentraeger-Everest arXiv:0707.1485; Poonen 2003 (JAMS)",
+      "relation": "index modelled by real approximation with error < 1/(10i), heights give n^2 denominator growth",
+      "verdict": "related principle (bounded error => exact integer), genuinely different construction"
+     },
+     {
+      "ref": "Cornelissen-Zahidi 2007",
+      "relation": "multiplication of indices via Robinson's (Z,+,|)",
+      "verdict": "genuinely different"
+     },
+     {
+      "ref": "CCO 2024 Sec. 7-8 (in L); CCO 2023 arXiv:2303.02208",
+      "relation": "pose the need for a concrete univocal growth relation M; candidates are Pell/quartic-based",
+      "verdict": "target posed, object absent"
+     },
+     {
+      "ref": "Matiyasevich 1970; Robinson 1952 (in L)",
+      "relation": "JR relations from Fibonacci/Pell; not single-fold",
+      "verdict": "ingredient / target"
+     }
+    ],
+    "verdict": "no near-equivalent found; the bridge itself was posed (Pheidas Q9) and the index-squaring aim has a non-archimedean precedent (Poonen 2002)",
+    "searches": "WebSearch (standard and extended): single-fold conjecture 2026; elliptic curve canonical height Julia Robinson predicate; rank one n^2 height denominator Diophantine squaring index; H10 over Z elliptic curve instead of Pell; definability via height ordering; Cornelissen-Zahidi; Matiyasevich finite-fold elliptic. Full-text reads: CCO 2024, Cornelissen-Zahidi, AIM problem list; HTML reads: Poonen 2002, Shlapentokh 2009, Eisentraeger-Everest. zbMATH, Google Scholar and MathOverflow were not queried directly; mathnet.ru was unreachable."
+   },
+   "test2": {
+    "verdict": "pass (moderate)",
+    "evidence": "The goal (MainStatement: REPred S => exists P with Represents P S) mentions no curves, points or heights. L contains Silverman's quadraticity and uniform comparison and Poonen's Lemma 5/8 statements, but no statement of a height-comparison relation, an index bracket on a curve, or a single-fold growth function. Moderating factor: given quadraticity with bounded error (in L), the window is a short derivation, so the non-analytic content is the decision to build a growth function from rational points at all."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "dominated_share": {
+     "GrowthCompilation.growth": 0.493,
+     "GrowthCompilation.graph_sf": 0.197,
+     "EllipticModel.growth_model": 0.147,
+     "HeightGrowth.square_window": 0.005
+    },
+    "lean": "Power.power (Power.lean:299) is exactly power_of_growth applied to GrowthCompilation.growth; no alternative source of g exists in the library, so knocking out growth disconnects power, binary containment, the machine compiler and main.",
+    "note": "The PLAN's 20% dependents proxy selects only carriers (Representation, SF, RationalCode); judged by knockout plus dominated share, as in 287."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "estimated 2 from L (decide to use rank-one points as a growth device [1 step from Poonen 2002 in L, 0 steps from Pheidas Q9 which is NOT in L]; then the square window [1 step from quadraticity with bounded error]). No trace.",
+    "chain_depth": 2,
+    "chain_note": "Only useful together with C3: the growth obtained is quasi-polynomial, which is below the exponential requirement (++) the literature expected; C3 is what makes it sufficient.",
+    "protocol": "P-C1"
+   },
+   "final": {
+    "N": "N3 (provisional: tests 1-3 pass, test 4 pending)",
+    "F": "F3 (auxiliary construction), with an F5 component (Pell torus replaced by elliptic heights)",
+    "confidence": 0.45,
+    "justification": "No construction of a single-fold (or any) Julia-Robinson-type relation from archimedean height comparisons was found. It supplies the object missing since 1974 by a mechanism Pell cannot provide: a bounded multiplicative window tests only linear index relations when log-growth is linear, but tests k^2 = r when log-growth is quadratic. Downgrade pressure: the bridge was explicitly posed (Pheidas Q9, c. 2005), and Poonen 2002 (in L) already squares indices on rank-one curves p-adically. The eureka content is therefore narrow: the archimedean window plus representative selection that yields uniqueness. Confidence lower than the analyst's provisional N3."
+   }
+  },
+  {
+   "id": "C2",
+   "name": "Square-window lemma as a standalone device",
+   "paper_items": [
+    "I19 (elliptic.tex:318-359)"
+   ],
+   "lean": [
+    "HeightGrowth.square_window"
+   ],
+   "trace": "no trace",
+   "statement": "If log W_j = a j^2 + O(c) for j >= 1 and 6c < log kappa < 2a - 6c, then for k,r >= 1: kappa^-1 <= W_{2k}W_rW_1/(W_k^2 W_{r+1}) <= kappa iff r = k^2.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Parallelogram law / second differences of quadratic forms (Neron-Tate: h(P+Q)+h(P-Q)=2h(P)+2h(Q)) in Silverman (in L)",
+      "relation": "same algebra: a fixed linear combination of quadratic values isolates a target quadratic expression",
+      "verdict": "close variant (textbook manipulation)"
+     },
+     {
+      "ref": "Eisentraeger-Everest 2009 / Poonen 2003 rounding",
+      "relation": "bounded error below integer gap gives exact selection",
+      "verdict": "related principle"
+     },
+     {
+      "ref": "Poonen 2002 Lemma 8",
+      "relation": "m^2 from t/t' congruence",
+      "verdict": "different mechanism, same aim"
+     }
+    ],
+    "verdict": "close variant of standard quadratic-form manipulations",
+    "searches": "as C1"
+   },
+   "test2": {
+    "verdict": "fail (borderline)",
+    "evidence": "Up to unfolding it is quadraticity with bounded error (Silverman VIII 9.1/9.3, in L) plus the identity (2k)^2 - 2k^2 - ((r+1)^2 - r^2) + 1 = 2(k^2 - r). Lean states it for an arbitrary sequence, which confirms it does not depend on elliptic structure."
+   },
+   "test3": {
+    "verdict": "pass (knockout, inside C1)",
+    "dominated_share": 0.005,
+    "note": "Small lemma high in the DAG; essential only through growth_model."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 1,
+    "protocol": "P-C2 (expected near-negative control)"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Given a quadratic sequence with bounded error, finding a bounded-window test for r=k^2 is an elementary exercise. Its value lies in C1's decision to have such a sequence in a single-fold system."
+   }
+  },
+  {
+   "id": "C3",
+   "name": "Single-fold power from a quasi-polynomial growth function (self-referential Pell scale u = (c+1)^l (n+1)(b+1) + u_0 with cutoff g(u))",
+   "paper_items": [
+    "I21 Pell sequences",
+    "I22 u^u < (2u-1)^(u-1)",
+    "I23 prop:power (power.tex:92-277)",
+    "I24 self-referential scale"
+   ],
+   "lean": [
+    "Power.power_of_growth",
+    "Power.power (Power.lean:299)"
+   ],
+   "trace": "no trace",
+   "statement": "If g has a complete single-fold graph and delta(log u)^2 < log g(u) < u log u eventually, then Pow(b,n,c) <=> b>=2 & c=b^n is single-fold, via the paired Pell system with u = (c+1)^l (n+1)(b+1)+u_0, l > 3/(delta log 2), cutoff F,H < g(u), residues n+1 and quotient c = F div H.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Matiyasevich 1974 Sec. 4 = CCO 2024 Thm 5 (in L)",
+      "relation": "identical skeleton (L2 already makes u a polynomial in c,b,n; L5 paired Pell; L6 residues; L7 cutoff; L4 quotient), with v = 2^u",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Davis 1963 = CCO 2024 Thm 4 (in L)",
+      "relation": "any JR relation replaces exponentiation, but univocity is lost",
+      "verdict": "close variant (non-single-fold)"
+     },
+     {
+      "ref": "CCO 2024 Sec. 7 goal (1); Matiyasevich 2010 requirement (++)",
+      "relation": "poses the generalised Thm 5 and expects requirements 'probably stronger than exponential growth'",
+      "verdict": "posed; 242 answers it with a WEAKER requirement"
+     }
+    ],
+    "verdict": "close variant of a named precedent (the paper says it adapts mati1974 as presented in cco2024)",
+    "searches": "Full text of CCO 2024 Secs. 6-7; CCO 2023 abstract/HTML; Matiyasevich 2010 not reachable"
+   },
+   "test2": {
+    "verdict": "fail (borderline)",
+    "evidence": "The system is CCO Thm 5 (in L) with one literal replaced and the scale polynomial changed. The non-obvious content is the bound analysis showing that a quasi-polynomial cutoff suffices because u >= c+1 > b^n already encodes n."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "dominated_share": 0.542,
+    "note": "power is the only route to exponentiation in Lean; everything from binary containment upward depends on it."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 1,
+    "protocol": "P-C3"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "A close variant of Matiyasevich's univocal Thm 5. It matters because it lowers the target from the exponential growth the literature expected (CCO Sec. 7, (++)) to quasi-polynomial Julia-Robinson growth, which is what makes C1's elliptic growth enough. If an easy Pell-only quasi-polynomial single-fold function exists, then this lowering, not C1, is the real key step; see open questions."
+   }
+  },
+  {
+   "id": "C4",
+   "name": "Single-fold machine compiler: clock register, dyadic base window, exact-halt identity",
+   "paper_items": [
+    "I29",
+    "I30 run encoding",
+    "I31 clock and dyadic window",
+    "I32 prop:machine-compiler"
+   ],
+   "lean": [
+    "CounterCompilation.halts_sf (dominated 0.78)",
+    "TM2Macro.exists_counter"
+   ],
+   "trace": "no trace",
+   "statement": "A Minsky run is encoded in base B=2^w; a clock register forces B in (2(C+T),4(C+T)], which contains exactly one power of two, and summing state equations gives B*I_h = H (halt exactly at the last step), so each halting input has exactly one complete witness.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Matiyasevich 1974 Main Theorem (in L)",
+      "relation": "single-fold exponential representation of every r.e. set; with single-fold exponentiation this already yields Thm main by substitution",
+      "verdict": "equivalent in role (the compiler re-proves a known reduction)"
+     },
+     {
+      "ref": "Jones-Matiyasevich 1984/1991 (in L)",
+      "relation": "register-machine bit-masking encoding",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Chaitin 1987 Secs. 2.3, 2.6 (in L)",
+      "relation": "base determined by input and time",
+      "verdict": "close variant (named by the paper)"
+     }
+    ],
+    "verdict": "close variant; role covered by mati1974",
+    "searches": "precedents named by the paper; mati1974 role confirmed from main.tex:78-83 and CCO 2024"
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Single-fold exponential representations of r.e. sets are statements in L (mati1974); the device is a re-implementation."
+   },
+   "test3": {
+    "verdict": "pass in this proof (dominated 0.78), but replaceable by citing mati1974",
+    "note": "Load-bearing for this write-up, not for the mathematics."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 1,
+    "protocol": "P-C4"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "Named precedents (Chaitin; Jones-Matiyasevich), and the reduction it serves is mati1974's theorem. Borderline N1."
+   }
+  },
+  {
+   "id": "C5",
+   "name": "Complete-witness discipline: shifted-inverse rational codes, zeroed inactive cases, representatives, Semi",
+   "paper_items": [
+    "I05",
+    "I06",
+    "I10",
+    "I11",
+    "I12",
+    "I13",
+    "I17",
+    "I40"
+   ],
+   "lean": [
+    "RationalCode",
+    "SF",
+    "Semi (L01)",
+    "FunctionalCompiler (L02)"
+   ],
+   "trace": "no trace",
+   "statement": "Every auxiliary (slacks, selectors, reduced numerators/denominators, inactive-branch variables) is forced to a unique value.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "CCO 2024 Sec. 2; mati1974 Sec. 3 (in L)",
+      "relation": "bounded Bezout coefficients, gated cases",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "known hygiene",
+    "searches": "as C3"
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Abbreviations of closure operations stated in L."
+   },
+   "test3": {
+    "verdict": "carrier (high dependents share, e.g. RationalCode 0.214) but not a proof idea"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 0,
+    "chain_depth": 0,
+    "protocol": "negative control"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.8,
+    "justification": "Careful bookkeeping; necessary but routine."
+   }
+  },
+  {
+   "id": "C6",
+   "name": "Rank one and torsion of y^2 = x^3 - 25x (2-isogeny descent / Lean full 2-descent, Nagell-Lutz or duplication-height enumeration)",
+   "paper_items": [
+    "I08",
+    "I09",
+    "I37",
+    "I38",
+    "I39"
+   ],
+   "lean": [
+    "CurveRank.rank_one (0.122)",
+    "HeightDescent.finitely_generated",
+    "Duplication.bounded_points"
+   ],
+   "trace": "no trace",
+   "statement": "E(Q) = ZP + E[2] with P nontorsion (congruent-number curve for n=5).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Silverman X.4 (in L); congruent number tables",
+      "relation": "textbook descent; rank 1 for n=5 is classical",
+      "verdict": "equivalent"
+     }
+    ],
+    "verdict": "N0 transfer",
+    "searches": "domain knowledge"
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Instances of Silverman's theorems."
+   },
+   "test3": {
+    "verdict": "pass (knockout via C1)",
+    "dominated_share": 0.122
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 0,
+    "chain_depth": 0,
+    "protocol": "negative control"
+   },
+   "final": {
+    "N": "N0",
+    "F": null,
+    "confidence": 0.95,
+    "justification": "Cross-field transfer; the choice of curve is arbitrary among rank-one curves."
+   }
+  },
+  {
+   "id": "C7",
+   "name": "Neron-Tate quadraticity and uniform comparison log H(x(Q)) = 2h^(Q) + O(1)",
+   "paper_items": [
+    "I14"
+   ],
+   "lean": [
+    "QuadraticHeight.lean (Tate limit, L03)"
+   ],
+   "trace": "no trace",
+   "statement": "h^([j]Q) = j^2 h^(Q); |log H(x(Q)) - 2h^(Q)| <= c_E.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Silverman VIII 9.1, 9.3 (in L)",
+      "relation": "identical",
+      "verdict": "equivalent"
+     }
+    ],
+    "verdict": "N0",
+    "searches": "n/a"
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Statement in L."
+   },
+   "test3": {
+    "verdict": "pass (knockout via C1)"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 0,
+    "chain_depth": 0,
+    "protocol": "negative control"
+   },
+   "final": {
+    "N": "N0",
+    "F": null,
+    "confidence": 0.95,
+    "justification": "Transfer of a textbook theorem."
+   }
+  },
+  {
+   "id": "C8",
+   "name": "Single-fold binary containment via Lucas's theorem mod 2",
+   "paper_items": [
+    "I25",
+    "I26"
+   ],
+   "lean": [
+    "Binary.lean"
+   ],
+   "trace": "no trace",
+   "statement": "x is bitwise contained in y iff binom(y,x) is odd, read as a digit of (B+1)^y in base B = 2^(y+1).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Robinson 1952 Sec. 5; Jones-Matiyasevich 1991 Sec. 3 (in L)",
+      "relation": "same method",
+      "verdict": "equivalent"
+     }
+    ],
+    "verdict": "N0/N1",
+    "searches": "named by paper"
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "In L up to the uniqueness check."
+   },
+   "test3": {
+    "verdict": "pass (knockout)"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 0,
+    "chain_depth": 0,
+    "protocol": "negative control"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.85,
+    "justification": "Known construction re-checked for uniqueness."
+   }
+  }
+ ],
+ "excluded_from_candidates": [
+  {
+   "paper": "I21 Pell sequences, I33 no-carry, I34 unique power of two in (2L,4L], I07 sum of squares",
+   "reason": "classical or elementary (N0); folded into C3/C4"
+  },
+  {
+   "paper": "I35 thm:main, I36 cor:unique-h10",
+   "reason": "headline and immediate corollary, not items"
+  },
+  {
+   "paper": "L06 duplication-height enumeration, L08 macro machine, L09 packed digits",
+   "reason": "Lean-only plumbing or classical (N0-N1); L06 folded into C6"
+  }
+ ],
+ "family_D": {
+  "label": "D3 (provisional)",
+  "confidence": 0.4,
+  "rests_on": "C1 alone (the elliptic-height single-fold growth function). C2 is its N2 sub-lemma; C3 is the N2 enabling step that makes C1's quasi-polynomial growth sufficient.",
+  "falls_to": "D2 if (a) Test 4 arm B for C1 exceeds the calibrated threshold; (b) an expert (Pheidas, Poonen, Shlapentokh, Zahidi, Cornelissen, Matiyasevich) identifies an earlier archimedean height-window or height-based index-squaring construction, e.g. in responses to AIM Question 9; or (c) once C3's weakened target is known, a Pell-only single-fold quasi-polynomial growth function turns out to be easy. Then the decisive step would be C3, which is N2.",
+  "not_transfer": "Neron-Tate theory, Mordell-Weil, descent and the rank-one curve are N0 transfer (C6, C7). The candidate is the use of quadratic log-growth of heights, with a bounded-error multiplicative window, to square a hidden index inside a single-fold system. That use has no found precedent, so the transfer exclusion does not apply. The bridge direction itself (elliptic curves instead of Pell) is not new: it was posed by Pheidas.",
+  "correctness_caveat": "All grades are conditional on correctness. This is an extraordinary claim (open since 1974) and unrefereed. The family analyst found no gap and reports that Lean proves the comparator verbatim (no sorry/axiom/native_decide; one kernel decide enumeration), but Lean was not compiled in either pass. The Lean route through the arithmetic geometry is independent of the paper's (full 2-descent, in-house Mordell-Weil and canonical height).",
+  "compression_note": "No step-3b compression run. power_of_growth is abstract in g, so C1 is a clean plug-in: a natural knockout experiment is to ask a prover for ANY g satisfying the hypothesis of power_of_growth."
+ },
+ "provenance_flag": {
+  "applies": "no",
+  "builds_on_prior_model_result_strict": false,
+  "model_produced_precedent": false,
+  "explanation": "The bibliography has no 2025-2026 entries; the latest is cco2024 (Le Matematiche, received 2024-09-30). Its full text has no AI-assistance wording, and its authors are human with institutional funding. Web searches for the single-fold conjecture together with ChatGPT, GPT-5 or OpenAI found only (i) press on other OpenAI results (GPT-5.6 Sol Ultra and the Cycle Double Cover conjecture, the-decoder 2026-07-11; Scientific American), and (ii) third-party indexes of the 2026-10-06 OpenAI release that list this family. No model-produced earlier work on single-fold representations or on elliptic-height growth relations was found. The nearest precedents (Pheidas Q9 c. 2005; Poonen 2002; CCO 2023/2024) are human and pre-LLM or AI-free."
+ },
+ "bridge_novelty": [
+  {
+   "bridge": "Arithmetic geometry (rank-one elliptic curves, Neron-Tate heights) -> Diophantine definability over N (single-fold)",
+   "status": "known route (posed), first execution with this mechanism",
+   "evidence": "Elliptic curves as a Pell replacement are standard for H10 over rings of integers (Denef 1980; Poonen 2002; Cornelissen-Pheidas-Zahidi; Shlapentokh; Mazur-Rubin 2010; Koymans-Pagano 2024). AIM Question 9 (Pheidas) explicitly asked whether this could be done over Z and give finite-fold definitions. Poonen 2002 already extracts squares of indices (p-adically). New: archimedean height comparison as a single-fold growth device over N."
+  },
+  {
+   "bridge": "Pell equations -> single-fold exponentiation",
+   "status": "known route",
+   "evidence": "Matiyasevich 1974 Sec. 4; CCO 2024 Lemma 6.1, Thm 5 (the paper says it adapts them). The weakened growth requirement (C3) is a new observation inside a known route."
+  },
+  {
+   "bridge": "Register machines / bit masking -> single-fold representation",
+   "status": "known route",
+   "evidence": "Jones-Matiyasevich 1984/1991; Chaitin 1987; Matiyasevich 1974 single-fold exponential Main Theorem."
+  },
+  {
+   "bridge": "Combinatorial number theory (Lucas mod 2) -> digit tests",
+   "status": "known route",
+   "evidence": "Robinson 1952 Sec. 5; Jones-Matiyasevich."
+  },
+  {
+   "bridge": "Computability (Minsky/Shepherdson-Sturgis; Mathlib PartrecToTM2) -> counter machines",
+   "status": "known route",
+   "evidence": "Classical."
+  }
+ ],
+ "discoverability_protocols": {
+  "common": {
+   "models": "Training-data cutoff strictly before 2026-09-24 (the preprint date; public release 2026-10-06). No earlier public source of C1 was found, so this is the binding date. Canary probe: ask whether the single-fold conjecture has been proved and whether a Julia-Robinson relation has been built from elliptic-curve heights; exclude any model that knows either. Exclude the OpenAI model(s) that produced the release and later models of that lineage, which run only as an uncontrolled reference arm. No browsing, retrieval or tools. The judge must differ from the proposer.",
+   "context_L": "Digest of Mathlib d13f23b API (Dioph, Pell, Height/Northcott, WeierstrassCurve group law and height bounds, REPred) plus 242's 16 bibliography entries, each given as its abstract plus the invoked statements (Silverman VIII 9.1/9.3, Poonen 2002 Lemmas 5 and 8, CCO 2024 Thm 5 and Sec. 7).",
+   "arms": {
+    "L": "main",
+    "L+": "adds AIM Question 9 (Pheidas), Shlapentokh 2009 and Eisentraeger-Everest 2009 to measure the effect of the posed bridge",
+    "open": "problem statement only",
+    "directed": "states the Robinson/Matiyasevich strategy: build a single-fold growth relation, then single-fold power via paired Pell"
+   },
+   "sampling": "n = 256 per arm, temperature 1.0, fixed reasoning budget; report unbiased pass@k for k in {1,2,4,8,16,32,64,128,256}; K = 256.",
+   "judging": "Two independent LLM judges, given 242's precedent remarks (main.tex:92-104, elliptic.tex:166-171) and this file's neighbour lists. A human logician/arithmetic geometer checks all hits and 10% of misses. Lean equivalence where a target exists.",
+   "controls": "Positive: Cook-Reckhow ER variables for PHP. Negative: C6 (rank-one descent), C7 (Neron-Tate), C8 (Lucas digit test), C2 (expected high hit rate).",
+   "prompt_template": "Problem: Prove that every r.e. set S of N^n has a single-fold Diophantine representation. Library: [L digest]. Established results you may use: [non-hidden items, verbatim]. [directed: Strategy: it suffices to give a single-fold Diophantine function or relation of suitable super-polynomial growth.] Propose the single most useful new lemma, definition or construction, stated precisely, with a proof sketch."
+  },
+  "P-C1": {
+   "item": "C1 elliptic-height growth function",
+   "hide": "I14-I20 (heights, W, representatives, bracket, window, prop:growth) and everything downstream that names g (I23 is restated abstractly in arm A only).",
+   "arm_A_pivot": "Give C3 as an established result (power_of_growth: any complete single-fold g with delta(log u)^2 < log g(u) < u log u suffices). Ask for g. This measures C1 given the weakened target.",
+   "arm_B_decisive": "Hide C3 too; give only CCO Thm 5 and Sec. 7 (with the (++) requirement). Ask for a route to single-fold exponentiation.",
+   "equivalence": "Hit = a single-fold Diophantine function/relation with super-polynomial and at most u^u growth whose uniqueness is argued, built from (a) a Diophantine family whose log-size is quadratic (or higher) in a hidden index, e.g. heights on a rank-one curve or an elliptic divisibility sequence, AND (b) a bounded-error comparison pinning a nonlinear index relation. Partial credit (recorded, not counted): 'use elliptic curves instead of Pell' without (b), or Poonen-style p-adic squaring without a single-fold growth output. Lean targets: HeightGrowth.square_window + EllipticGrowth.growth.",
+   "k": "1..256 (powers of 2)",
+   "pivot_distance": "estimated 2 (no trace)",
+   "chain_depth": 2
+  },
+  "P-C2": {
+   "item": "C2 square window",
+   "hide": "I19 only; give the quadratic sequence W_j with bounded error and the bracket",
+   "equivalence": "any bounded multiplicative window over a fixed finite set of W-values (indices linear in k, r) that holds iff r = k^2",
+   "k": "1..64",
+   "pivot_distance": 1,
+   "chain_depth": 1
+  },
+  "P-C3": {
+   "item": "C3 power from quasi-polynomial growth",
+   "hide": "I22-I24",
+   "context": "abstract g with delta(log u)^2 < log g(u) < u log u; CCO Thm 5 and Lemma 6.1",
+   "equivalence": "a single-fold system for c = b^n that uses g(u) as the Pell cutoff with u a fixed polynomial in (c,b,n) large enough that log u controls n; any choice making intended Pell solutions < g(u) and indices < modulus counts. Lean target: Power.power_of_growth",
+   "k": "1..64",
+   "pivot_distance": 1,
+   "chain_depth": 1
+  },
+  "P-C4": {
+   "item": "C4 machine compiler",
+   "hide": "I29-I32",
+   "equivalence": "any single-fold reduction from single-fold exponentiation to all r.e. sets, including citing Matiyasevich 1974 Main Theorem plus composition",
+   "k": "1..16",
+   "pivot_distance": 1,
+   "chain_depth": 1
+  }
+ },
+ "open_questions": [
+  "Expert query (Pheidas, Poonen, Shlapentokh, Cornelissen, Zahidi, Matiyasevich): was a height-comparison (archimedean) index squaring, or any elliptic JR relation over Z, discussed after AIM Question 9? This is the main risk to C1's N3.",
+  "Is a Pell-only single-fold quasi-polynomial growth function easy once C3's weakened target is known? A sketch suggests the classical index-transfer congruences reintroduce the cutoff problem, but this is unproved. If it is easy, the decisive idea is C3 (N2) and family_D falls to D2.",
+  "Read Matiyasevich 2010 p. 749 and Matiyasevich 1974 Sec. 4 directly (mathnet.ru unreachable): did either note that a sub-exponential cutoff suffices in Thm 5?",
+  "Confirm the date and provenance of the AIM problem list (assumed March 2005 workshop; PDF undated).",
+  "Poonen 2003 (JAMS, 'H10 and Mazur's conjecture for large subrings of Q') and Denef 1980 were not read; check them for size-based index arguments.",
+  "zbMATH, Google Scholar and MathOverflow were not queried directly; repeat 'elliptic curve Julia Robinson relation', 'height comparison Diophantine squaring', 'single-fold elliptic'.",
+  "Compile Lean and run the comparator; confirm growth -> power_of_growth -> halts_sf -> main under the permitted axioms.",
+  "Spot-check the WebFetch-summarised statements of Poonen 2002 Lemma 8 and Shlapentokh 2009 eqs. 2.4-3.12 against the PDFs."
+ ],
+ "sources": [
+  "https://lematematiche.dmi.unict.it/index.php/lematematiche/article/view/2703 (CCO 2024; PDF download/2703/1218/7841)",
+  "https://arxiv.org/abs/2303.02208 (CCO 2023, Six equations)",
+  "https://aimath.org/WWN/hilberts10th/hilberts10th.pdf (AIM problem list, Pheidas Question 9)",
+  "https://aimath.org/pastworkshops/hilberts10th.html (AIM workshop 21-25 March 2005)",
+  "https://arxiv.org/abs/math/0204001 and https://arxiv.org/html/math/0204001v1 (Poonen 2002)",
+  "https://arxiv.org/abs/0901.4168 and https://ar5iv.labs.arxiv.org/html/0901.4168 (Shlapentokh)",
+  "https://arxiv.org/abs/math/0412473 (Cornelissen-Zahidi)",
+  "https://ar5iv.labs.arxiv.org/html/0707.1485 (Eisentraeger-Everest)",
+  "https://arxiv.org/abs/0904.3709 (Mazur-Rubin)",
+  "https://arxiv.org/abs/2412.01768 (Koymans-Pagano)",
+  "https://www.mathnet.ru/eng/znsl3816 (Matiyasevich 2010; fetch failed)",
+  "https://arxiv.org/pdf/1404.5975 (Tyszka)",
+  "https://the-decoder.com/openais-gpt-5-6-sol-ultra-reportedly-solves-a-50-year-old-math-problem-in-under-an-hour/ (provenance search: unrelated OpenAI result)",
+  "https://kingy.ai/blog/openai-math-722-manuscripts-results-proofs-compute-costs/ (index of the release; snippet only)"
+ ]
+}

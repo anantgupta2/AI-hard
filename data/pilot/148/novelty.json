@@ -1,0 +1,633 @@
+{
+ "family": 148,
+ "title": "The entropy-rate dimension formula for self-similar measures",
+ "analyst_role": "novelty",
+ "date": "2026-10-09",
+ "inputs": [
+  "docs/PLAN.md",
+  "docs/novelty_agent_prompt.md",
+  "data/pilot/148/family.json + family.md",
+  "data/pilot/287/novelty.json + novelty.md (template)",
+  "preprint build/ main.tex + 6 sections + references.bib",
+  "lean/OAI/MeasureTheory/SelfSimilar (spot greps)",
+  "Varju 2019 and Varju survey full texts; web checks listed in sources"
+ ],
+ "base_library_L": "Mathlib d13f23b + references.bib of 148 (23 entries, including VarjuAbsolute2019 and VarjuSurvey2026). Kittle-Kogler 2025/2026 and Wu 2025 are NOT in L.",
+ "precedent_checks": [
+  {
+   "ref": "Varju, Absolute continuity of Bernoulli convolutions for algebraic parameters, JAMS 32 (2019); arXiv:1602.00261v4 (bib key VarjuAbsolute2019; in L)",
+   "role_in_148": "Named predecessor of the pair-capacity approach (pairs.tex:8-11: Prop 21 'is a predecessor of this approach'); Props 20 and Lemma 22 are adapted (entropy.tex:247-248).",
+   "access": "Full text read locally (PDF saved by WebFetch, extracted with PyMuPDF). Quotes below are from the extracted text, not a summarizer.",
+   "year": 2016,
+   "ai_disclosure": "none (2016-2018 human paper)",
+   "contents": {
+    "Prop 20": "Gain from convolving with a Bernoulli (fair two-point) measure at distance t: H(mu*nu; r2|r1) >= H(mu; r2|r1) + (1/3)(1 - H(mu; t|2t)) for r2 <= t(1-H(mu;t|2t))/10 and r1 >= 144 t (1-H(mu;t|2t))^-2.",
+    "Prop 21": "For finitely supported mu and r>0 with H(mu; r/2|r) <= 1.5 H(mu; r|2r): mu = nu + eta_1 + ... + eta_N with eta_i Bernoulli measures on pairs at distance in [r/2, 2r] and sum ||eta_i|| >= (1/128) H(mu;r|2r)/(log(H(mu;r|2r)^-1)+1).",
+    "Prop 21 proof": "Take the decomposition with ||nu|| minimal (i.e. MAXIMAL total Bernoulli mass); the residual has no pairs at distance in [r/2,2r], so Lemma 23 gives exact doubling H(nu; r/2|r) = 2H(nu; r|2r); Lemma 26 (Fano-type) costs 3||eta|| log ||eta||^-1. The log loss in the conclusion comes from this Fano term.",
+    "Lemma 27 + proof of Thm 3": "Selects a 2K-separated set B of scales at which Prop 21's doubling hypothesis holds and entropy is >= beta/12; between consecutive such scales entropy decays geometrically (factor 1.5^-j), so the scale-wise entropy sum is <= 3 x (sum over B) + O(K). Then Prop 21 gives Bernoulli pieces at each scale in B, Prop 20 gives a gain alpha/3 per piece (non-saturation of mu), and superadditivity sums the gains over the separated scales.",
+    "footnote": "Varju remarks that 'A decomposition similar to the one in Proposition 21 appears in [17]' = Lindenstrauss-Varju, work in progress (2018)."
+   },
+   "candidate_items": {
+    "P14 pair capacity": "same object, up to band convention: Varju's max over decompositions of sum ||eta_i|| (Bernoulli = equal-weight two-point submeasure) is exactly the LP in Def 3.1; Varju uses distances in [r/2,2r) (two dyadic bands), 148 uses one dyadic band [2^-l, 2^{1-l}). 148's contribution is naming it and writing it as a fractional-matching LP.",
+    "P15 pair bound": "close variant in role, different statement: Prop 21 is single-scale, needs a doubling hypothesis, and loses a log factor (Fano). Analyst's sketch (unverified): Prop 21 + Lemma 27's geometric-decay argument already give, for k=1 and with no separation constant, H(nu) - H^0_rho(nu) <= C * sum_l c_l log(1/c_l) + O(1). That log loss is fatal when the number of bands is uncontrolled. 148's new content is precisely the log-free (linear) multi-scale version, bought by observing the k-fold sum Y and paying log|kF| (pairs.tex:158-160 says this 'is what makes [the bound] linear in the exceptional probabilities').",
+    "P13 two-point gain": "same mechanism (Lemma 22 identity + Prop 20 scale capture), recast in averaged-entropy calculus.",
+    "P28 separated bands": "close variant of the template: Lemma 27 also selects separated scales and sums per-scale gains; 148 differs by adaptive block lengths n_i chosen after B_{n_h} are known, and disjointness of retained windows in block index at each physical scale."
+   },
+   "verdict": "Removes P14 from N3 contention (N1). Leaves P15/P17 standing only through the log-free multiscale mechanism."
+  },
+  {
+   "ref": "Varju, Entropy rates in the dimension theory of self-similar measures, arXiv:2509.22042 (bib key VarjuSurvey2026; in L)",
+   "role_in_148": "Source of the problem statement (Conjecture 3); cited introduction.tex:90-91, 111-112.",
+   "access": "Full text (v2) read locally; arXiv abs page via WebFetch.",
+   "metadata": "v1 26 Sep 2025; v2 22 Mar 2026 ('minor revision based on referee's report', 'to appear in the Proceedings of Fractal Geometry and Stochastics 7'); math.DS (+math.CA, math.NT); 14 pp; sole author.",
+   "ai_disclosure": "none. The abstract page has no mention of ChatGPT/GPT/OpenAI/AI (only the site's 'TXYZ.AI' demo link). The acknowledgements thank Ariel Rapaport, Lauritz Streck and the referee.",
+   "contents": "Conjecture 3 is called a 'folklore conjecture' and 'wide open'. The survey covers Hochman (Thm 5, WESC), Rapaport (Thm 6), Hochman-Varju (Thm 7, Bernoulli convolutions), Wu 2025 (countably many exceptions), Rapaport-Varju three maps, Streck. It describes Rapaport's key idea as showing that super-exponentially close pairs of k-fold compositions are rare. It contains NO proof strategy for Conjecture 3, no pair decomposition, no pair capacity, no sumset/k-fold device and no band-counting argument.",
+   "candidate_items": {
+    "P14": "absent",
+    "P15/P17": "absent",
+    "P22": "absent (h_RW is defined, Def 2; collapsing coincident maps motivates the conjecture, Sec 1)",
+    "P28": "absent",
+    "P12": "absent",
+    "P27": "absent"
+   },
+   "verdict": "Problem source only; establishes that no resolution or strategy was public as of 22 Mar 2026. Note: the survey cites Wu, arXiv:2503.21923 (2025), which 148 does not cite."
+  },
+  {
+   "ref": "Barany-Verma, Hausdorff dimension of self-similar measures and sets with common fixed point structure, arXiv:2507.05835 (bib key BaranyVerma2026; in L)",
+   "role_in_148": "Cited for Thm 3.5 (entropy-rate formula under WESC, allowing exact collisions), introduction.tex:138-140; neighbour of P22.",
+   "access": "arXiv abs page via WebFetch (summarizer).",
+   "metadata": "v1 8 Jul 2025, v2 14 Jul 2026; no comments field shown.",
+   "ai_disclosure": "none on the abstract page (unverified beyond the abstract page).",
+   "candidate_items": {
+    "P22": "close variant of the conclusion (entropy-rate formula under weak exponential separation via Hochman); the types-fix-slopes conditioning is absent",
+    "P14/P15/P28": "absent"
+   },
+   "verdict": "Human, background. No bearing on the N3 candidates."
+  },
+  {
+   "ref": "Feng-Feng, Dimension of homogeneous IFS with algebraic translations, J. LMS 112 (2025); arXiv:2405.03124 (bib key FengFeng2025; in L)",
+   "role_in_148": "Special case subsumed (introduction.tex:157-159).",
+   "access": "arXiv abs page via WebFetch (summarizer).",
+   "metadata": "v1 6 May 2024 only.",
+   "ai_disclosure": "none on the abstract page.",
+   "candidate_items": {
+    "all": "absent (Diophantine approximation route via Rapaport-Varju Appendix A)"
+   },
+   "verdict": "Human, background."
+  },
+  {
+   "ref": "Wu, Projection theorems with countably many exceptions and applications to the exact overlaps conjecture, arXiv:2503.21923 (NOT cited by 148; cited by the survey)",
+   "role_in_148": "none",
+   "access": "arXiv abs page via WebFetch (summarizer).",
+   "metadata": "v1 27 Mar 2025; v2 8 Oct 2025.",
+   "ai_disclosure": "none on the abstract page.",
+   "candidate_items": {
+    "all": "absent (transversality / projection-theorem route; dimension 1 outside a countable parameter set)"
+   },
+   "verdict": "Human, 2025, a different route. Omitted from 148's bibliography, so not in L."
+  },
+  {
+   "ref": "Kittle-Kogler, Dimension of contracting on average self-similar measures, arXiv:2501.17795 (NOT cited by 148)",
+   "role_in_148": "none; nearest human neighbour of the 'avoid inverse theorems' architecture.",
+   "access": "arXiv HTML v1 via WebFetch (summarizer; first 100k of 133k chars).",
+   "ai_disclosure": "none seen.",
+   "contents": "Generalises Hochman's theorem (needs M_n >= e^{-cn} infinitely often, or a sub-exponential separation (1.2)) 'avoiding the use of inverse theorems for entropy' via the variance summation method (Kittle, PLMS 2025 / arXiv:2305.05757). It uses 'entropy between scales controls trace': tr(g;2ar) >> H(g; r|2r), a single-scale variance-from-entropy statement, plus additivity of variance sums across separated scales (Prop 5.4, Prop 4.9). It uses no sumset/k-fold device and requires separation.",
+   "candidate_items": {
+    "P14": "genuinely different object (variance/trace at a scale, not pair mass), same role",
+    "P15": "close in role, single-scale, separation-dependent: genuinely different statement",
+    "P28": "close variant of the template (sum over well-separated scales)"
+   },
+   "verdict": "Human precedent for the separation-dependent, inverse-theorem-free architecture. Does not contain the separation-free log-free bound."
+  },
+  {
+   "ref": "Kittle-Kogler, The Exact Overlaps Conjecture for Self-Similar Measures on the Real Line, arXiv:2610.10511v1 (submitted 7 Oct 2026 17:52 UTC; math.DS, math.PR; 24 pp). POSTERIOR to 148 (148 dated 24 Sep 2026; openai/math public 6 Oct 2026).",
+   "role_in_148": "none (posterior). It cites 148 as [20] = 'OpenAIMath ... https://github.com/openai/math'.",
+   "access": "arXiv abs + HTML via WebFetch (summarizer, 3 passes); GitHub README of ckkogler/kk26-supplementary-material. Short quotes are summarizer-relayed: UNVERIFIED against the PDF.",
+   "ai_disclosure": "YES. The machine contribution statement in the paper body (not on the abs page) says that GPT-6 Astra found the first proof of Theorem 1.1 on 27 Sep 2026 and presented it to C. Kogler. The model was first asked, 'Motivated by a suggestion of Elon Lindenstrauss', to propose simpler proofs of Hochman's and Varju's main results (about 2 h), then proved the exact overlaps result in about 2.5 h. Section 2 is attributed to GPT-6 Astra and rewritten by the authors. The model also produced a Lean formalisation (about 47k lines in about 9.5 h). The supplementary repo states 'All documents written by GPT-6 Astra' and includes a chat transcript dated 27 Sep to 5 Oct 2026.",
+   "contents": "Theorem 1.3 (entropy loss under addition): for independent finitely supported real X_1..X_m, sum H(X_i) - H(sum X_i) <= 30m sum E(X_i), where E is a 'variance energy' = integral over r of the normalized local variance V(r) dr/r. Proof: Poisson random cut processes, conditional cumulative entropy given the sum, a Margulis-Russo derivative, dispersion D(X)=E|X-X'| (Lemma 2.2: A(X|X+Y) <= 9(D(X)+D(Y))). The deduction of Thm 1.1 uses scale-separated sequences (s_{j+1} >= lambda^{-(n+1)} s_j) and a concatenation lemma (3.11). The paper says (relayed) that 'A proof of Theorem 1.1 was independently announced in [20] as paper number 148', that Thm 1.3 is a quantitative version and hence a strengthening of 'Lemma 3.2 of [20]' (= 148's pair bound, lem:pair-bound), that Lemma 3.2 does not imply Thm 1.3, and that its method can be adapted to give C_m = O(m^3).",
+   "candidate_items": {
+    "P15/P17": "close variant / same mechanism (random cuts revealed after observing the sum; cost linear in dispersion E|X-X'|; multiscale, separation-free). Found by a model 3 days after 148's stated discovery date.",
+    "P14": "replaced by variance energy (an integrated multiscale analogue of pair mass): close variant in role",
+    "P28": "close variant (separated scales + concatenation)",
+    "P22": "absent from the relayed text (uses convolution disintegrations in Sec 3.2)"
+   },
+   "verdict": "NOT a precedent: it is posterior, so Test 1 is unaffected. It is, however, a near-simultaneous MODEL-PRODUCED rediscovery of 148's key mechanism, and so bears on Test 4 (discoverability) and on the provenance picture. Whether GPT-6 Astra had any access to the 148 run is unknown; the KK chat log starts 27 Sep, before 148 was public."
+  }
+ ],
+ "candidates": [
+  {
+   "id": "C1",
+   "name": "Finite-law pair bound with the sum-observation refinement (log-free, separation-free)",
+   "paper_items": [
+    "P15 lem:pair-bound (pairs.tex:37-49, proof 51-227)",
+    "P17 one refinement after observing the sum (pairs.tex:109-160)",
+    "P16 randomized nested partitions (pairs.tex:61-87), folded in as a gadget",
+    "P18 symmetric coupling pi_h (pairs.tex:182-210), folded in"
+   ],
+   "trace": null,
+   "statement": "For every k>=1 there is C_k (=60000k^4) such that every finitely supported nu on R and every rho>0 satisfy k(H(nu)-H^0_rho(nu)) <= log|kF| + C_k sum_{l: 2^-l <= 2rho} c_l(nu), F = supp nu, with C_k independent of the minimal gap of F. Key device (P17): after revealing Y = X_1+...+X_k, refining the cells costs at most 9k sum_i p_i, LINEAR in the exceptional probabilities (no binary-entropy/Fano cost for the event B, which is determined by Y); averaging random cuts gives cost <= C k^4 E|X-X'|/rho_h, which converts to pair capacity, and the geometric sum over levels is <= 8/3.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Varju JAMS 2019 Prop 21 (in L)",
+      "relation": "single-scale: entropy between scales r|2r, under the doubling hypothesis H(mu;r/2|r) <= 1.5 H(mu;r|2r), gives Bernoulli-pair mass >= h/(128(log h^-1 + 1)) at distance in [r/2,2r]. Separation-free at one scale; log loss from the Fano-type Lemma 26.",
+      "verdict": "close variant in role; genuinely different statement (single scale, doubling hypothesis, log loss, no sumset term). Named by 148 as predecessor."
+     },
+     {
+      "ref": "Varju JAMS 2019 Lemma 27 + proof of Thm 3 (in L)",
+      "relation": "selects separated scales where Prop 21 applies; geometric decay between them. Analyst's sketch (unverified): this already yields a k=1, separation-free but log-lossy multiscale bound H(nu)-H^0_rho(nu) <= C sum_l c_l log(1/c_l) + O(1).",
+      "verdict": "close variant of the k=1 weak form; the linear form (the part 148 actually needs, since B_n is uncontrolled) is absent"
+     },
+     {
+      "ref": "Kittle-Kogler 2025, arXiv:2501.17795; Kittle PLMS 2025 (arXiv:2305.05757): variance summation, 'entropy between scales controls trace'",
+      "relation": "single-scale entropy-to-variance statement used under (sub)exponential separation; inverse-theorem-free",
+      "verdict": "genuinely different statement, same role"
+     },
+     {
+      "ref": "Hochman 2014 inverse theorem (in L)",
+      "relation": "structure of measures with small entropy growth under convolution at fixed scale windows; cannot see super-exponentially fine pairs",
+      "verdict": "genuinely different"
+     },
+     {
+      "ref": "Entropic sumset theory: Tao 2010; Madiman 2008; Kontoyiannis-Madiman (both in Varju 2019's bibliography); Haghighatshoar-Abbe-Telatar 2013/14 (integer EPI)",
+      "relation": "H(X) <= H(sum) + H(X|sum) and entropy-of-sums inequalities; no scale/pair-capacity term",
+      "verdict": "ingredient (N0)"
+     },
+     {
+      "ref": "Random grids / translation averaging: Wang 2011 Sec 4.1 (in L); Varju 2019 averaged entropy (in L)",
+      "relation": "random cut positions to avoid boundary charging",
+      "verdict": "ingredient (N0)"
+     },
+     {
+      "ref": "Rapaport 2022 (in L)",
+      "relation": "rarity of super-exponentially close pairs for algebraic contractions, via Hochman's R^d theorem and linear algebra over P(1,n)",
+      "verdict": "genuinely different"
+     },
+     {
+      "ref": "Kittle-Kogler 2026, arXiv:2610.10511 Thm 1.3 (POSTERIOR, GPT-6 Astra-produced)",
+      "relation": "sum H(X_i) - H(sum X_i) <= 30m sum E(X_i); same mechanism; the authors call it a strengthening of 148's Lemma 3.2",
+      "verdict": "close variant / equivalent mechanism, but posterior: excluded from Test 1, used for Test 4 evidence"
+     }
+    ],
+    "verdict": "No prior near-equivalent found. The closest prior item (Varju Prop 21, plus Lemma 27) is a single-scale, log-lossy relative; the log-free multiscale form with a k-fold sumset term was not found before 24 Sep 2026.",
+    "searches": "Local full-text reads (PyMuPDF extraction of PDFs saved by WebFetch): Varju JAMS 2019 arXiv:1602.00261v4 (Sec 4, Props 20-21, Lemmas 22-27, proof of Thm 3); Varju survey arXiv:2509.22042v2 (all 14 pp); Rapaport arXiv:2001.01332v2 (Sec 1.3 proof sketch). WebFetch: arXiv abs pages 2509.22042, 2507.05835, 2405.03124, 2503.21923, 2610.10511; arXiv HTML 2610.10511 (Kittle-Kogler, 3 passes) and 2501.17795v1 (Kittle-Kogler 2025); GitHub ckkogler/kk26-supplementary-material. WebSearch (standard/extended): 'entropy rate dimension conjecture self-similar measures proof 2026'; 'exact overlaps conjecture ... ChatGPT OR GPT-5 OR OpenAI OR AI-assisted'; 'Kittle detail around a scale variance summation'; 'entropy deficit finitely supported measure below scale ... two-point Bernoulli ... independent of separation'; 'entropy loss under addition ... random partitions dispersion ... conditioning on the sum'. zbMATH, Google Scholar and MathOverflow were not queried directly (Bash has no network); absence claims rest on these searches plus the full-text reads."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "The goal (dim formula) mentions neither finite-law entropy deficits, k-fold sumsets nor fair pairs. In L, Varju's Prop 21 is the only statement relating entropy and fair pairs; it is single-scale with a doubling hypothesis and a log loss. P15 is not a subterm or unfolding of it, nor of any Mathlib d13f23b statement (no Mathlib statement concerns entropy at a scale or fair pairs; the 148 Lean builds its own FiniteEntropy library, family item L01)."
+   },
+   "test3": {
+    "verdict": "pass (knockout), borderline on the share proxy",
+    "lean": "OAI FairPairs.pair_bound (SumsetBound.lean:329; pair_bound_natural :269; exists_fine_partition :120). Sub-DAG share 0.19 of declarations / 0.22 of tokens of the 749-declaration main-theorem DAG (family.json lean_summary). Lean replaces the perturbed cuts with shifted 4-adic grids on AddCircle plus an existence-of-good-shift averaging, keeping 60000k^4.",
+    "knockout": "Essential. It is the only route in the paper from the linear entropy deficit (P22) to linear pair mass over bands with uncontrolled endpoints B_n (P24). Without it, the argument needs a quantitative separation, which Baker / Barany-Kaenmaki show can fail.",
+    "note": "The 20% proxy sits at the threshold (19% decls, 22% tokens). Downstream, count_pair_budget_le (46%) and no_strict_entropy_gap (73%) depend on it."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "No trace exists. Analyst estimate from L: about 2 (Prop 21 + Lemma 27 are in L; the steps needed are (i) to identify the Fano log loss as the obstruction, and (ii) to observe the k-fold sum and pay log|kF|). If P22+P23 (small sumsets) are given, about 1.",
+    "chain_depth": 2,
+    "external_evidence": "GPT-6 Astra (Kittle-Kogler 2026) reached an equivalent-mechanism inequality within about 2.5 h on 27 Sep 2026, after a nudge (via Lindenstrauss) to simplify Hochman/Varju. This is an uncontrolled-arm hit: same problem, frontier model, hours of compute, human framing; vendor lineage and access to the 148 run are unknown. It predicts a non-trivial hit rate at least for post-2026 models.",
+    "protocol": "P-C1"
+   },
+   "final": {
+    "N": "N3 (provisional: tests 1-3 pass, test 4 pending; external evidence adverse)",
+    "F": "F3",
+    "confidence": 0.3,
+    "justification": "The only item for which no prior near-equivalent was found. The delta over L is sharp and checkable: Varju's Prop 21 (single-scale, doubling hypothesis, h/log(1/h) loss from Lemma 26) becomes a multiscale, log-free bound by observing the k-fold sum. That delta is exactly what the unbounded band endpoints B_n require, and it is the separation-free bridge that Baker / Barany-Kaenmaki make necessary. Against N3: it is a strengthening of a named predecessor in L by a single device; the sum observation is a standard information-theoretic move (H(X) <= H(Y)+H(X|Y)); and a second model run rediscovered the same mechanism within hours, three days later. It falls to N2 if Test 4 arm A hits above threshold, or if an expert regards the log-free multiscale form as folklore or derivable from Prop 21-type arguments."
+   }
+  },
+  {
+   "id": "C2",
+   "name": "Pair capacity c_l(nu)",
+   "paper_items": [
+    "P14 def:pair-capacity (pairs.tex:14-35)"
+   ],
+   "trace": null,
+   "statement": "c_l(nu) = max sum_{e in E_l(F)} w_e subject to w_e >= 0 and (1/2) sum_{e contains x} w_e <= nu({x}), with E_l(F) the pairs at distance in [2^-l, 2^{1-l}); i.e. the largest total weight of fair two-point laws in band l forming a submeasure of nu.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Varju JAMS 2019 Prop 21 and its proof (Sec 4.2.3) (in L)",
+      "relation": "decomposition mu = nu + sum eta_i into Bernoulli (equal-weight two-point) measures at distance in [r/2,2r], with ||nu|| MINIMAL. Max of sum ||eta_i|| = c over a two-band window.",
+      "verdict": "equivalent up to band width (one vs two dyadic bands)"
+     },
+     {
+      "ref": "Lindenstrauss-Varju, work in progress (2018), cited in Varju 2019 as having a 'similar' decomposition",
+      "relation": "unpublished; not located",
+      "verdict": "unknown"
+     },
+     {
+      "ref": "Fractional b-matching (Edmonds; Schrijver, Combinatorial Optimization, Ch. 30-31)",
+      "relation": "c_l is the max fractional b-matching of the band graph on F with vertex capacities 2 nu(x)",
+      "verdict": "equivalent (LP packaging)"
+     },
+     {
+      "ref": "Kittle-Kogler 2025/2026 local variance V_rho(r), variance energy",
+      "relation": "a continuous multiscale analogue of pair mass",
+      "verdict": "close variant in role"
+     }
+    ],
+    "verdict": "equivalent object exists in L (Varju 2019); the LP is a known optimisation form",
+    "searches": "Local full-text reads (PyMuPDF extraction of PDFs saved by WebFetch): Varju JAMS 2019 arXiv:1602.00261v4 (Sec 4, Props 20-21, Lemmas 22-27, proof of Thm 3); Varju survey arXiv:2509.22042v2 (all 14 pp); Rapaport arXiv:2001.01332v2 (Sec 1.3 proof sketch). WebFetch: arXiv abs pages 2509.22042, 2507.05835, 2405.03124, 2503.21923, 2610.10511; arXiv HTML 2610.10511 (Kittle-Kogler, 3 passes) and 2501.17795v1 (Kittle-Kogler 2025); GitHub ckkogler/kk26-supplementary-material. WebSearch (standard/extended): 'entropy rate dimension conjecture self-similar measures proof 2026'; 'exact overlaps conjecture ... ChatGPT OR GPT-5 OR OpenAI OR AI-assisted'; 'Kittle detail around a scale variance summation'; 'entropy deficit finitely supported measure below scale ... two-point Bernoulli ... independent of separation'; 'entropy loss under addition ... random partitions dispersion ... conditioning on the sum'. zbMATH, Google Scholar and MathOverflow were not queried directly (Bash has no network); absence claims rest on these searches plus the full-text reads."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Up to the band convention, it is the extremal quantity in the statement and proof of Varju's Prop 21 (in L): 'sum of ||eta_i|| over Bernoulli decompositions'."
+   },
+   "test3": {
+    "verdict": "pass (as a notion)",
+    "lean": "OAI FairPairs.capacity (FairPairs.lean:33), with capacity_attained :131 and capacity_eq_zero_outside_pair_bands :235. It appears in the statements of pair_bound, pair_bands_of_retained_loss and conditional_gain.",
+    "note": "Load-bearing as vocabulary; the work is done by C1."
+   },
+   "test4": {
+    "status": "not run (not needed: fails tests 1-2)",
+    "pivot_distance": "0-1 (named in L)",
+    "chain_depth": 1,
+    "protocol": "P-C2 (negative control)"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.75,
+    "justification": "A renaming, as an LP, of the maximal Bernoulli-decomposition mass in Varju's Prop 21 (in L), restricted to one dyadic band. Varju's proof literally minimises the residual, so 148's paper names this predecessor correctly. Not F1: it introduces no new variable beyond Varju's object. Reconciliation with f1_pair_capacity.json/.md (F1 agent, same day): it independently finds the same Varju Sec 4.2.3 identity, the fractional b-matching and sub-coupling forms, and that Kittle-Kogler 2026 replaced c_l by a variance energy (so the definition did not survive transfer while the mechanism did). It grades P14 'N2, bordering N1'. I keep N1 because Varju 2019 is in L and the object is its extremal quantity; the N1/N2 difference does not affect family_D."
+   }
+  },
+  {
+   "id": "C3",
+   "name": "Scale-free separated-band counting with adaptive block lengths and disjoint retained windows",
+   "paper_items": [
+    "P28 band selection (windows.tex:129-163)",
+    "P29 lem:disjoint-windows (windows.tex:171-213)",
+    "P30 final count (windows.tex:241-285)"
+   ],
+   "trace": null,
+   "statement": "Choose n_1 < ... < n_q successively with a_{n_i} - A'n_i - 1 > B_{n_h} (h<i), using no growth bound on B_n. At each target depth L the retained windows from all bands are disjoint in block index, so their gains telescope to <= 2 log M (g_j is nonincreasing). Summing over L = 1..T, each band contributes delta c T/(4D), independent of n_i, so q <= 8 D log M/(delta c), a contradiction.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Varju JAMS 2019 Lemma 27 + proof of Thm 3 (in L)",
+      "relation": "greedy 2K-separated set of scales; per-scale entropy gains from Bernoulli pieces summed via superadditivity over the separated scales",
+      "verdict": "close variant (template)"
+     },
+     {
+      "ref": "Hochman 2014; Breuillard-Varju 2019 (in L)",
+      "relation": "multiscale entropy telescoping / averaging over scales",
+      "verdict": "ingredient (N0)"
+     },
+     {
+      "ref": "Kittle-Kogler 2025, arXiv:2501.17795, Prop 4.9 / Prop 5.4",
+      "relation": "well-separated scales; additivity of variance sums across scales",
+      "verdict": "close variant (template)"
+     },
+     {
+      "ref": "Kittle-Kogler 2026 (posterior, model-produced)",
+      "relation": "scale-separated sequences s_{j+1} >= lambda^{-(n+1)} s_j; concatenation Lemma 3.11",
+      "verdict": "close variant (posterior)"
+     }
+    ],
+    "verdict": "close variant exists for the template (separated scales plus summed gains). New to 148: the adaptive diagonal choice against uncontrolled B_n and the window disjointness in block index at each physical scale.",
+    "searches": "Local full-text reads (PyMuPDF extraction of PDFs saved by WebFetch): Varju JAMS 2019 arXiv:1602.00261v4 (Sec 4, Props 20-21, Lemmas 22-27, proof of Thm 3); Varju survey arXiv:2509.22042v2 (all 14 pp); Rapaport arXiv:2001.01332v2 (Sec 1.3 proof sketch). WebFetch: arXiv abs pages 2509.22042, 2507.05835, 2405.03124, 2503.21923, 2610.10511; arXiv HTML 2610.10511 (Kittle-Kogler, 3 passes) and 2501.17795v1 (Kittle-Kogler 2025); GitHub ckkogler/kk26-supplementary-material. WebSearch (standard/extended): 'entropy rate dimension conjecture self-similar measures proof 2026'; 'exact overlaps conjecture ... ChatGPT OR GPT-5 OR OpenAI OR AI-assisted'; 'Kittle detail around a scale variance summation'; 'entropy deficit finitely supported measure below scale ... two-point Bernoulli ... independent of separation'; 'entropy loss under addition ... random partitions dispersion ... conditioning on the sum'. zbMATH, Google Scholar and MathOverflow were not queried directly (Bash has no network); absence claims rest on these searches plus the full-text reads."
+   },
+   "test2": {
+    "verdict": "pass (weak)",
+    "evidence": "Not a subterm of the goal. Varju's Lemma 27 is a statement in L of the same type (a separated-scale selection) but over physical scales with a fixed K, not block windows with adaptive lengths."
+   },
+   "test3": {
+    "verdict": "pass (knockout); low share",
+    "lean": "Typed.select_separated_bands (BandSelection.lean:34): 3% sub-DAG; Typed.count_pair_budget_le (GlobalCount.lean:34): 46%. The Lean uses a common horizon H divisible by all n_i in place of the paper's T."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "about 1 from P24 once the question is 'how to use bands with no endpoint bound' (diagonal choice is the reflex answer)",
+    "chain_depth": 3,
+    "protocol": "P-C3"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Telescoping of a monotone multiscale entropy and diagonal parameter choice are standard (Varju's Lemma 27 is the in-L template). The adaptive arrangement is a genuine but modest variant. Would be F4 if raised."
+   }
+  },
+  {
+   "id": "C4",
+   "name": "Map entropy retained by block types (types fix slopes, so translation entropy = conditional map entropy)",
+   "paper_items": [
+    "P22 Lemma 4.1 (types.tex)",
+    "P19-P21 block types and conditional laws (folded in)"
+   ],
+   "trace": null,
+   "statement": "E H(nu_{omega,n}) = H(G_{bn} | Omega_n) >= n(bh - m log(b+1)); E H^0_s(nu_{omega,n}) <= H^0_s(mu) + 1; under dimension loss E[1_{E_n}(H - H^0_{rho_n})(nu_{omega,n})] >= eps n.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Hochman 2014 Thm 1.4 (in L)",
+      "relation": "entropy of the full affine map for unequal ratios",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "GSSY 2016 Sec 6.4 / SSS 2018 Lemma 6.2 / Kaenmaki-Orponen 2023 (in L)",
+      "relation": "block-type disintegration",
+      "verdict": "equivalent ingredient"
+     },
+     {
+      "ref": "Barany-Verma Thm 3.5; Rapaport-Varju 2024 Thm A.1 (in L)",
+      "relation": "entropy-rate formula with exact collisions under WESC / rational translations",
+      "verdict": "close variant (conclusion level)"
+     },
+     {
+      "ref": "Method of types (Csiszar-Korner)",
+      "relation": "conditioning on symbol counts costs m log(b+1)",
+      "verdict": "ingredient (N0)"
+     }
+    ],
+    "verdict": "close variant",
+    "searches": "Local full-text reads (PyMuPDF extraction of PDFs saved by WebFetch): Varju JAMS 2019 arXiv:1602.00261v4 (Sec 4, Props 20-21, Lemmas 22-27, proof of Thm 3); Varju survey arXiv:2509.22042v2 (all 14 pp); Rapaport arXiv:2001.01332v2 (Sec 1.3 proof sketch). WebFetch: arXiv abs pages 2509.22042, 2507.05835, 2405.03124, 2503.21923, 2610.10511; arXiv HTML 2610.10511 (Kittle-Kogler, 3 passes) and 2501.17795v1 (Kittle-Kogler 2025); GitHub ckkogler/kk26-supplementary-material. WebSearch (standard/extended): 'entropy rate dimension conjecture self-similar measures proof 2026'; 'exact overlaps conjecture ... ChatGPT OR GPT-5 OR OpenAI OR AI-assisted'; 'Kittle detail around a scale variance summation'; 'entropy deficit finitely supported measure below scale ... two-point Bernoulli ... independent of separation'; 'entropy loss under addition ... random partitions dispersion ... conditioning on the sum'. zbMATH, Google Scholar and MathOverflow were not queried directly (Bash has no network); absence claims rest on these searches plus the full-text reads."
+   },
+   "test2": {
+    "verdict": "fail (borderline)",
+    "evidence": "h_RW is in the goal; H(G_bn|Omega_n) is an unfolding of h_RW plus a standard type-conditioning cost."
+   },
+   "test3": {
+    "verdict": "pass",
+    "lean": "Typed.retained_loss_linear (RetainedLoss.lean:100): 0.20 / 0.17."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 1,
+    "protocol": "P-common, negative-control arm"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.65,
+    "justification": "This is where exact overlaps are absorbed with no arithmetic input. It is a short adaptation of named precedents: GSSY types plus Hochman's full-map entropy."
+   }
+  },
+  {
+   "id": "C5",
+   "name": "Uniform nonsaturation for signed unequal ratios",
+   "paper_items": [
+    "P12 Lemma 2.3 (entropy.tex:140-243)"
+   ],
+   "trace": null,
+   "statement": "If d<1 then delta = inf_{v>0} Delta_v(mu) > 0, for any signed, unequal ratios (stopped self-similarity).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Breuillard-Varju 2019 Lemma 13 (in L)",
+      "relation": "same statement for Bernoulli convolutions",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Hochman 2014 (entropy porosity / dimension <1 implies non-saturation at most scales)",
+      "relation": "averaged version",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "close variant (named)",
+    "searches": "Local full-text reads (PyMuPDF extraction of PDFs saved by WebFetch): Varju JAMS 2019 arXiv:1602.00261v4 (Sec 4, Props 20-21, Lemmas 22-27, proof of Thm 3); Varju survey arXiv:2509.22042v2 (all 14 pp); Rapaport arXiv:2001.01332v2 (Sec 1.3 proof sketch). WebFetch: arXiv abs pages 2509.22042, 2507.05835, 2405.03124, 2503.21923, 2610.10511; arXiv HTML 2610.10511 (Kittle-Kogler, 3 passes) and 2501.17795v1 (Kittle-Kogler 2025); GitHub ckkogler/kk26-supplementary-material. WebSearch (standard/extended): 'entropy rate dimension conjecture self-similar measures proof 2026'; 'exact overlaps conjecture ... ChatGPT OR GPT-5 OR OpenAI OR AI-assisted'; 'Kittle detail around a scale variance summation'; 'entropy deficit finitely supported measure below scale ... two-point Bernoulli ... independent of separation'; 'entropy loss under addition ... random partitions dispersion ... conditioning on the sum'. zbMATH, Google Scholar and MathOverflow were not queried directly (Bash has no network); absence claims rest on these searches plus the full-text reads."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "BV Lemma 13 in L has the same form; the extension is a stopping-time generalisation."
+   },
+   "test3": {
+    "verdict": "pass",
+    "lean": "System.uniform_nonsaturation_of_entropy_bound: 0.27 / 0.26."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 1,
+    "protocol": "P-common, negative-control arm"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.75,
+    "justification": "A named precedent with a routine extension."
+   }
+  },
+  {
+   "id": "C6",
+   "name": "Conditional pair gain by Jensen over the unobserved future types",
+   "paper_items": [
+    "P27 Lemma 5.1 lem:conditional-gain (windows.tex:57-127)"
+   ],
+   "trace": null,
+   "statement": "E[g_j - g_{j+n} | F_{j+n}] >= (delta/2) c_{L - ceil(sigma_j)}(nu_{theta^j omega, n}).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Varju 2019 Prop 20 + Thm 3 proof (in L)",
+      "relation": "per-Bernoulli-piece gain alpha/3 under non-saturation, summed by superadditivity",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "SSS 2018 / GSSY 2016 random-environment averaging (in L)",
+      "relation": "averaging the environment returns mu",
+      "verdict": "ingredient"
+     }
+    ],
+    "verdict": "close variant",
+    "searches": "Local full-text reads (PyMuPDF extraction of PDFs saved by WebFetch): Varju JAMS 2019 arXiv:1602.00261v4 (Sec 4, Props 20-21, Lemmas 22-27, proof of Thm 3); Varju survey arXiv:2509.22042v2 (all 14 pp); Rapaport arXiv:2001.01332v2 (Sec 1.3 proof sketch). WebFetch: arXiv abs pages 2509.22042, 2507.05835, 2405.03124, 2503.21923, 2610.10511; arXiv HTML 2610.10511 (Kittle-Kogler, 3 passes) and 2501.17795v1 (Kittle-Kogler 2025); GitHub ckkogler/kk26-supplementary-material. WebSearch (standard/extended): 'entropy rate dimension conjecture self-similar measures proof 2026'; 'exact overlaps conjecture ... ChatGPT OR GPT-5 OR OpenAI OR AI-assisted'; 'Kittle detail around a scale variance summation'; 'entropy deficit finitely supported measure below scale ... two-point Bernoulli ... independent of separation'; 'entropy loss under addition ... random partitions dispersion ... conditioning on the sum'. zbMATH, Google Scholar and MathOverflow were not queried directly (Bash has no network); absence claims rest on these searches plus the full-text reads."
+   },
+   "test2": {
+    "verdict": "fail (borderline)",
+    "evidence": "Prop 20 in L plus convexity of Delta_v (concavity of G, in L via Varju Lemma 10)."
+   },
+   "test3": {
+    "verdict": "pass",
+    "lean": "Typed.conditional_gain (ScaleGain.lean:82): 0.37 / 0.33."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 2,
+    "protocol": "P-common, negative-control arm"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.55,
+    "justification": "Prop 20 composed with a standard Jensen-over-environment step (borderline N2)."
+   }
+  },
+  {
+   "id": "C7",
+   "name": "Linear pair mass in a finite band with uncontrolled endpoint",
+   "paper_items": [
+    "P24 Prop 4.2 prop:pair-bands",
+    "P23 digit-count sumset bound |kD_b| <= (k+1)^{m^b}"
+   ],
+   "trace": null,
+   "statement": "E[1_{E_n} sum_{l=a_n}^{B_n} c_l(nu_{omega,n})] >= c n with B_n finite but with no growth bound.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "C1 + C4 + elementary counting",
+      "relation": "assembly",
+      "verdict": "assembly"
+     }
+    ],
+    "verdict": "assembly of C1 and C4",
+    "searches": "Local full-text reads (PyMuPDF extraction of PDFs saved by WebFetch): Varju JAMS 2019 arXiv:1602.00261v4 (Sec 4, Props 20-21, Lemmas 22-27, proof of Thm 3); Varju survey arXiv:2509.22042v2 (all 14 pp); Rapaport arXiv:2001.01332v2 (Sec 1.3 proof sketch). WebFetch: arXiv abs pages 2509.22042, 2507.05835, 2405.03124, 2503.21923, 2610.10511; arXiv HTML 2610.10511 (Kittle-Kogler, 3 passes) and 2501.17795v1 (Kittle-Kogler 2025); GitHub ckkogler/kk26-supplementary-material. WebSearch (standard/extended): 'entropy rate dimension conjecture self-similar measures proof 2026'; 'exact overlaps conjecture ... ChatGPT OR GPT-5 OR OpenAI OR AI-assisted'; 'Kittle detail around a scale variance summation'; 'entropy deficit finitely supported measure below scale ... two-point Bernoulli ... independent of separation'; 'entropy loss under addition ... random partitions dispersion ... conditioning on the sum'. zbMATH, Google Scholar and MathOverflow were not queried directly (Bash has no network); absence claims rest on these searches plus the full-text reads."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "It follows by instantiating C1 with C4 and P23. No new concept."
+   },
+   "test3": {
+    "verdict": "pass",
+    "lean": "Typed.pair_bands_of_retained_loss (PairBands.lean:83): 0.24 / 0.25; Typed.sumset_log_bound: 0.04."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "0 given C1 and C4",
+    "chain_depth": 2,
+    "protocol": "folded into P-C1 arm A"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "Assembly. Its novelty lives in C1. P23 is a trivial count whose role (sumset sub-linear in k) is the tensor-power-style amplification that C1 needs."
+   }
+  }
+ ],
+ "excluded_from_candidates": [
+  {
+   "paper": "P13 two-point gain",
+   "reason": "N1: restatement of Varju Prop 20 / Lemma 22 in averaged-entropy calculus"
+  },
+  {
+   "paper": "P16 randomized nested partitions, P18 symmetric coupling",
+   "reason": "gadgets of C1; individually N1 (random grids: Wang 2011, Varju averaged entropy)"
+  },
+  {
+   "paper": "P01-P11, P19-P21, P25-P26, P31-P35, L01-L02",
+   "reason": "classical/cited (N0), plumbing (N1) or corollaries; see family.json"
+  },
+  {
+   "trace": "none",
+   "reason": "no reasoning trace for this family; no pivots to merge"
+  }
+ ],
+ "family_D": {
+  "label": "D3 (provisional)",
+  "confidence": 0.3,
+  "rests_on": "C1 alone: the log-free, separation-free finite-law pair bound, whose kernel is the sum-observation refinement P17. The analyst's second candidate (P28 band counting) falls to N2, and pair capacity (P14) falls to N1 against Varju Prop 21.",
+  "falls_to": "D2 if (a) Test 4 arm A or B for C1 exceeds the calibrated threshold (the GPT-6 Astra rediscovery makes this likely in at least the uncontrolled arm); (b) an expert (e.g. Varju, Hochman, Shmerkin, Kittle) identifies the log-free multiscale entropy-to-pairs bound as folklore or as a routine consequence of Prop 21-type arguments; or (c) judges rule that a strengthening of a named predecessor by one device is a 'variant' (N2).",
+  "not_transfer": "The ingredients (entropy chain rule, random grids, Varju's decomposition, method of types) are N0 or in L. The candidate is a new inequality, not an imported concept.",
+  "correctness_caveat": "Conditional on correctness. The claim is unrefereed but now corroborated in three ways: the 148 Lean comparator (not compiled here; per family.json no sorry/axiom), an independent (model-produced) proof by Kittle-Kogler 2610.10511 with its own Lean formalisation (about 47k lines, unverified here), and Kittle-Kogler's statement that 148's Lemma 3.2 is correct in kind (they call their Thm 1.3 a strengthening of it).",
+  "compression_note": "Not measured. C1 is a single-use bottleneck lemma (pair_bound sub-DAG 19-22%). Its value is qualitative (it removes the separation hypothesis), not a PHP-style size blow-up."
+ },
+ "provenance_flag": {
+  "applies": "no",
+  "builds_on_prior_model_result_strict": false,
+  "model_produced_precedent": false,
+  "parallel_model_produced_work": true,
+  "explanation": "All 2025-2026 items in 148's bibliography (Varju survey 2509.22042; Barany-Verma 2507.05835; Feng-Feng 2405.03124 / JLMS 2025) are human-authored, with no AI disclosure on their abstract pages; the survey's acknowledgements name only human readers and a referee. No model-produced work predates 148 (24 Sep 2026). However, Kittle-Kogler arXiv:2610.10511 (posted 7 Oct 2026) reports that GPT-6 Astra found an independent proof on 27 Sep 2026, built on an entropy-loss inequality they describe as a strengthening of 148's Lemma 3.2 (the pair bound). It is posterior, so it is not a precedent and the flag is 'no'. Record it as 'parallel model-produced resolution (posterior, same key mechanism)'. For contamination control, exclude any model trained after 2026-09-24 and the GPT-6 Astra lineage.",
+  "web_searches_for_model_prior_work": "Found only the posterior Kittle-Kogler paper and its GitHub supplement. No ChatGPT/GPT-5/OpenAI-assisted work on the entropy-rate or exact overlaps conjecture before 24 Sep 2026 was found."
+ },
+ "bridge_novelty": [
+  {
+   "import": "Information theory: chain rule, conditioning on the sum Y, binary-entropy/Fano bounds",
+   "status": "known route",
+   "evidence": "Entropy methods are the standard route for this problem type (Garsia 1963, Hochman 2014, Breuillard-Varju 2019, Varju 2019; all in L). The specific 'observe the sum' move is standard in entropic sumset theory (Tao 2010; Madiman; Kontoyiannis-Madiman, cited in Varju 2019). New use, not a new bridge."
+  },
+  {
+   "import": "Combinatorial optimisation: fractional (b-)matching LP for pair capacity",
+   "status": "known route (cosmetic)",
+   "evidence": "The quantity is Varju's maximal Bernoulli decomposition. The LP is packaging."
+  },
+  {
+   "import": "Additive combinatorics: k-fold sumset |kF| polynomial in k (digit counts)",
+   "status": "known route",
+   "evidence": "Additive-combinatorial inverse theorems drive Hochman 2014; sumset/entropy interplay is in Varju 2019's bibliography. The tensor-power-style amplification (sumset sub-linear in k) is a standard template. Its coupling to fine-scale pair mass is new to this paper (C1), but the field link is not."
+  },
+  {
+   "import": "Random partitions / translation averaging",
+   "status": "known route",
+   "evidence": "Wang 2011 Sec 4.1; Varju 2019 averaged entropy (both in L)."
+  },
+  {
+   "import": "Random-environment / method of types (GSSY, SSS, Kaenmaki-Orponen)",
+   "status": "known route",
+   "evidence": "Cited block-type disintegrations, used for self-similar measures since 2016."
+  },
+  {
+   "import": "Ergodic theory: Feng-Hu exact dimensionality (re-proved in Lean)",
+   "status": "known route",
+   "evidence": "Standard input since 2009."
+  }
+ ],
+ "discoverability_protocols": {
+  "common": {
+   "models": "Training-data cutoff strictly before 2026-09-24 (148's stated discovery date; openai/math went public 2026-10-06; Kittle-Kogler 2610.10511 on 2026-10-07; their GPT-6 Astra transcript runs 2026-09-27 to 10-05). Canary probe: ask whether the exact overlaps conjecture / Varju's Conjecture 3 has been resolved, and for the content of arXiv:2610.10511 or openai/math paper 148; exclude any model that knows either. Exclude the OpenAI model(s) that produced 148 and the GPT-6 Astra lineage from the main pool; run them only as an uncontrolled reference arm. No browsing or tools. The judge must differ from the proposer.",
+   "context_L": "Mathlib d13f23b (digest: MeasureTheory, Shannon entropy if any, Hausdorff dimension API) plus 148's 23-entry bibliography, given as abstracts plus the statements actually invoked. Varju 2019 is given with Props 20-21, Lemmas 22-27 and the proof of Thm 3 verbatim, since the predecessor relation is the crux.",
+   "arms": {
+    "open": "problem statement plus L only",
+    "directed": "adds the strategy: 'rule out d<1, d chi<h by producing linear fair-pair mass at fine scales with no separation bound, then summing nonsaturation gains'",
+    "reference": "post-cutoff OpenAI / GPT-6 Astra models (uncontrolled)"
+   },
+   "sampling": "n = 256 per arm, T = 1.0, fixed reasoning budget (e.g. 64k tokens). Unbiased pass@k for k in {1,2,4,...,256}; K = 256.",
+   "judging": "Two LLM judges with 148's precedent remarks (pairs.tex:8-11, introduction.tex:173-182, entropy.tex:140-141, 247-248), the Varju Prop 21 text, and the neighbour list in this file. A human fractal-geometry expert checks all hits and 10% of misses. Lean equivalence against OAI FairPairs.pair_bound where feasible.",
+   "controls": "Positive: Cook-Reckhow ER extension variables for PHP. Negative: C2 (pair capacity: expect a near-100% hit, since it is in L), C5 (nonsaturation), C4 (types). Threshold calibrated per PLAN step 4."
+  },
+  "P-C1": {
+   "item": "C1 finite-law pair bound + sum-observation refinement (P15, P17; gadgets P16, P18)",
+   "hide": "P14-P18, P23, P24 and everything downstream (P27-P30). Keep P01-P13, P19-P22 and Varju Prop 21 / Lemma 26 / Lemma 27 (all in L).",
+   "arm_A_pivot": "Give P22 and P23 (linear deficit eps n at scale 2^{-An}; sumsets polynomial in k), and state the need: 'convert a linear entropy deficit of finite laws into linear fair-pair mass over bands whose endpoints are not controlled'. Expect a high hit rate if models recognise Varju's Lemma 26 log loss as the obstacle.",
+   "arm_B_cluster_decisive": "Also hide P22 and P23. Give only the problem, L, and the directed strategy. This decides N3.",
+   "equivalence": "Hit: any inequality bounding a finite law's fine-scale entropy deficit (or the entropy lost under addition, sum H(X_i) - H(sum X_i)) by a constant times a multiscale pair/variance quantity (sum_l c_l, a variance energy, or sum over scales of E|X-X'| within scale cells), LINEAR in that quantity, with a constant independent of the minimal separation, and with an amplification (k-fold sum / sumset) or an equivalent route. Kittle-Kogler Thm 1.3 counts as a hit. Partial (not counted): single-scale or log-lossy versions (Prop 21 + Lemma 27 type), or separation-dependent versions. Lean target: OAI FairPairs.pair_bound (SumsetBound.lean:329).",
+   "k": "1..256 (powers of 2)",
+   "pivot_distance": "about 2 from L (estimate; no trace); about 1 in arm A",
+   "chain_depth": 2,
+   "external_datapoint": "GPT-6 Astra hit on 2026-09-27 in about 2.5 h, with human framing (Lindenstrauss: 'simpler proofs of Hochman and Varju'). Record it as an anecdotal reference-arm hit at k=1."
+  },
+  "P-C2": {
+   "item": "C2 pair capacity",
+   "hide": "P14 and downstream",
+   "equivalence": "Any max-mass fair-pair decomposition at a dyadic band (Varju's) counts",
+   "role": "negative control (expected hit ~1 at k=1, since it is in L)"
+  },
+  "P-C3": {
+   "item": "C3 separated-band counting",
+   "hide": "P28-P30",
+   "give": "Everything through P27, including P24's statement that B_n is uncontrolled",
+   "equivalence": "Hit: an adaptive choice of block lengths whose band starts exceed earlier band endpoints, plus a per-scale telescoping/disjointness bound and averaging over target depths so each band's contribution is independent of n_i. Lean target: Typed.select_separated_bands + count_pair_budget_le.",
+   "k": "1..64",
+   "pivot_distance": "about 1",
+   "chain_depth": 3
+  }
+ },
+ "open_questions": [
+  "Verify the Kittle-Kogler quotes against the PDF of arXiv:2610.10511v1 (WebFetch summarised; in particular 'Theorem 1.3 is a quantitative version of Lemma 3.2 of [20]' and the 27 Sep 2026 date).",
+  "Which vendor and lineage is GPT-6 Astra? Did its sessions have any access to OpenAI's internal 148 run (dated 24 Sep 2026)? If they share a lineage or context, the 'independent rediscovery' is weaker evidence.",
+  "Check the analyst's sketch: do Varju Prop 21 + Lemma 27 really yield a k=1, separation-free H(nu)-H^0_rho(nu) <= C sum c_l log(1/c_l) + O(1)? If a log-free version also follows from known arguments, C1 drops to N2.",
+  "Locate Lindenstrauss-Varju 'work in progress' (2018), which Varju 2019 cites for a decomposition similar to Prop 21. If it was published with a multiscale pair bound, re-grade C1 and C2.",
+  "Expert query (Varju, Hochman, Shmerkin, Kittle, Rapaport): is a log-free, separation-free bound of the form k(H - H_rho) <= log|kF| + C_k sum_l c_l known or folklore?",
+  "Compile the 148 Lean and run the comparator: FairPairs.pair_bound -> pair_bands_of_retained_loss -> count_pair_budget_le -> no_strict_entropy_gap -> entropy_rate_dimension.",
+  "Repeat the absence searches on zbMATH, Google Scholar and MathOverflow for 'Bernoulli decomposition entropy scale', 'fair pairs entropy', and 'entropy loss under addition variance'.",
+  "Constants in Kittle-Kogler are relayed inconsistently by the summarizer (Thm 1.3 stated with 30m; the comparison with 148 quoted as C_m = 120m^2, and the F1 agent also reports 120m^2). Check them in the PDF.",
+  "F1 agent (f1_pair_capacity.*) grades P14 N2 (bordering N1); this file grades it N1. Settle which convention the PLAN intends for an object that is the extremal quantity inside a proof in L."
+ ],
+ "sources": [
+  "data/raw/openai-math (fd4aeeb) preprints/The-entropy-rate-dimension-formula-...-September-24-2026/build: main.tex, sections/*.tex, references.bib",
+  "data/pilot/148/family.json, family.md, f1_pair_capacity.json/.md (F1 agent, read after the first draft); data/pilot/287/novelty.json (key template); docs/PLAN.md",
+  "lean/OAI/MeasureTheory/SelfSimilar: FairPairs.lean:33, SumsetBound.lean:120/269/329, BandSelection.lean:34, GlobalCount.lean:34, PairBands.lean:83, RetainedLoss.lean:100, ScaleGain.lean:82, EntropyGap.lean:12",
+  "https://arxiv.org/abs/1602.00261 (Varju, JAMS 2019): full text read locally, Sec 4 pp. 34-44",
+  "https://arxiv.org/abs/2509.22042 (Varju survey, v2 22 Mar 2026): full text read locally",
+  "https://arxiv.org/abs/2507.05835 (Barany-Verma)",
+  "https://arxiv.org/abs/2405.03124 (Feng-Feng)",
+  "https://arxiv.org/abs/2503.21923 (Wu)",
+  "https://arxiv.org/abs/2001.01332 (Rapaport): Sec 1.3 read locally",
+  "https://arxiv.org/html/2501.17795v1 (Kittle-Kogler 2025)",
+  "https://arxiv.org/abs/2610.10511 and https://arxiv.org/html/2610.10511 (Kittle-Kogler 2026, posterior, GPT-6 Astra)",
+  "https://github.com/ckkogler/kk26-supplementary-material",
+  "https://arxiv.org/abs/2103.12684, https://arxiv.org/abs/2305.05757, https://arxiv.org/abs/2409.18936 (Kittle detail / variance summation; search results only)"
+ ]
+}

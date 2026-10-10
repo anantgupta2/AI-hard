@@ -1,0 +1,1973 @@
+{
+ "family": 248,
+ "title": "Thompson's group F is nonamenable",
+ "manuscript_dir": "preprints/Thompsons-group-F-is-nonamenable-September-23-2026",
+ "source_root": "preprints/Thompsons-group-F-is-nonamenable-September-23-2026/build/ (main.tex, macros.tex, sections/{introduction,finite-proof,consequences,auxiliary}.tex, figures/mixed-pairs.tex)",
+ "commit": "fd4aeeb",
+ "analyst_role": "family analyst (paper + Lean), per docs/family_agent_prompt.md",
+ "base_library_L": "Mathlib d13f23b + the family bibliography (references/sources.bib, 17 entries)",
+ "reasoning_trace": "none released for this family",
+ "main_statement": {
+  "file_line": "sections/introduction.tex:37-39",
+  "latex": "\\begin{theorem}\\label{thm:main} Thompson's group \\(F\\) is not amenable. \\end{theorem}",
+  "paraphrase": "There is no positive, normalized, left-invariant mean on ℓ∞(F;ℝ). Equivalently (and this is what is actually proved), a fixed finite set S⊂F expands every nonempty finite A⊂F by a uniform positive factor.",
+  "constructive_core": {
+   "file_line": "sections/finite-proof.tex:194-199",
+   "latex": "For every nonempty finite set $A\\subset F$, $\\max_{h\\in S}\\frac{|hA\\triangle A|}{|A|}\\geq \\frac{\\delta^2/L^2-4/D}{4(1-1/D)}>0$.",
+   "paraphrase": "Prop avg:boundary: explicit uniform failure of the Følner condition for the transport set S, with a constant depending only on (L, δ, D)."
+  },
+  "headline_corollaries": [
+   {
+    "file_line": "sections/consequences.tex:12-24",
+    "paraphrase": "F has uniformly bounded, non-unitarizable representations with norm ≤1+ε (via companion OpenAI unitarizability theorem)."
+   },
+   {
+    "file_line": "sections/consequences.tex:38-55",
+    "paraphrase": "Percolation on any Cayley graph of F: ‖T_{p_c}‖<∞, p_c<p_{2→2}≤p_u, infinitely many infinite clusters in a nondegenerate window (via companion OpenAI percolation theorem)."
+   }
+  ],
+  "note_for_comparator": "The comparator target is exactly the headline (no invariant mean). The stronger explicit-constant Prop is formalized in Main.lean but is not a comparator target."
+ },
+ "lean": {
+  "comparator_statement": {
+   "challenge_file": "lean/ComparatorChallenges/ThompsonNonamenability.lean",
+   "config": {
+    "challenge_module": "ComparatorChallenges.ThompsonNonamenability",
+    "solution_module": "OAI.GroupTheory.Thompson.Main",
+    "theorem_names": [
+     "OAI.ThompsonNonamenability.thompson_F_nonamenable_composition"
+    ],
+    "definition_names": [],
+    "permitted_axioms": [
+     "propext",
+     "Quot.sound",
+     "Classical.choice"
+    ],
+    "enable_nanoda": false
+   },
+   "target": "OAI.ThompsonNonamenability.thompson_F_nonamenable_composition",
+   "solution_decl": "lean/OAI/GroupTheory/Thompson/Main.lean:69 (refine ⟨inferInstance, F.mul_apply, thompson_F_not_amenable⟩)",
+   "verbatim": "theorem thompson_F_nonamenable_composition :\n    ∃ group : Group F, letI := group;\n      (∀ (h g : F) (x : UnitInterval),\n        (h * g).val.toHomeomorph x = h.val.toHomeomorph (g.val.toHomeomorph x)) ∧\n      ¬ Nonempty (InvariantMean F)",
+   "readable": "There is a group structure on the set F of increasing dyadic-PL homeomorphisms of [0,1] whose multiplication is composition (h*g = h∘g), and for it no positive normalized left-invariant ℝ-linear mean on ℓ∞(F;ℝ) exists.",
+   "definitions_unfolded": [
+    {
+     "name": "UnitInterval",
+     "lean": "abbrev UnitInterval := Set.Icc (0:ℝ) 1",
+     "reading": "[0,1]"
+    },
+    {
+     "name": "IntervalHomeomorph",
+     "lean": "structure ⟨toHomeomorph : UnitInterval ≃ₜ UnitInterval⟩",
+     "reading": "self-homeomorphism of [0,1]"
+    },
+    {
+     "name": "IsDyadic",
+     "lean": "∃ (k:ℤ) (n:ℕ), x = k / 2^n",
+     "reading": "dyadic rational"
+    },
+    {
+     "name": "DyadicPLWitness",
+     "lean": "pieceCount>0, StrictMono dyadic knots from 0 to 1 covering [0,1], exponent : Fin n → ℤ, f x = f(knot_i) + 2^{e_i}(x − knot_i) on each piece",
+     "reading": "finitely many dyadic breakpoints, slopes in 2^ℤ"
+    },
+    {
+     "name": "F",
+     "lean": "{f : IntervalHomeomorph // StrictMono f ∧ HasDyadicPLPieces f}",
+     "reading": "Thompson's group F as a set (increasing)"
+    },
+    {
+     "name": "BoundedReal",
+     "lean": "lp (fun _ : G => ℝ) ∞",
+     "reading": "ℓ∞(G;ℝ)"
+    },
+    {
+     "name": "leftPull",
+     "lean": "(leftPull h f) g = f (h * g)",
+     "reading": "left translation"
+    },
+    {
+     "name": "InvariantMean",
+     "lean": "toLinearMap : ℓ∞ →ₗ[ℝ] ℝ; positive; toLinearMap 1 = 1; toLinearMap (leftPull h f) = toLinearMap f",
+     "reading": "positive normalized left-invariant mean (continuity not assumed; it follows)"
+    }
+   ],
+   "challenge_defs_identical_to_library": "Challenge lines 16-76 are textually identical to lean/OAI/GroupTheory/Thompson/Model.lean:16-76 (checked by diff).",
+   "group_structure_uniqueness": "The composition clause pins the multiplication; inverse/one are then forced, so the existential over Group F is harmless. Solution uses inferInstance from StandardF.lean:17 (subgroup of IntervalHomeomorph)."
+  },
+  "statement_vs_paper_claim": {
+   "paper_headline": "Thm main: F is not amenable (amenability defined via positive normalized left-invariant means on ℓ∞(G;ℝ), introduction.tex:9-13).",
+   "match": "EXACT. Same amenability definition (real-valued, left-invariant, positive, normalized); F faithfully modelled (increasing, finitely many dyadic breakpoints, slopes 2^ℤ; dyadic images of breakpoints follow).",
+   "formalized_in_comparator": [
+    "¬ Nonempty (InvariantMean F) for the composition group structure"
+   ],
+   "formalized_in_library_but_not_compared": [
+    "Main.lean:16 thompson_F_boundary_with_exact_constant (Prop avg:boundary with the paper's exact constant formula, f = explicit L² map, δ=1/2)",
+    "Main.lean:38 thompson_F_boundary_constant_formula (constant is literally (δ²/L²−4/D)/(4(1−1/D)))",
+    "Main.lean:45 thompson_F_uniform_boundary (∃ finite S, b>0 with b|A| ≤ |hA△A|)",
+    "FiniteBoundary.lean:16 exists_fixed_boundary (generic over any Hilbert space and displacement map)",
+    "StandardCharacterization.lean:57 standardPLEquiv (model = textbook definition)"
+   ],
+   "not_formalized": [
+    "Cor nonunitarizable (consequences.tex:12)",
+    "Cor percolation (consequences.tex:38)",
+    "historical/contextual claims"
+   ],
+   "route_differences_lean_vs_paper": [
+    "Paper CITES the forward Følner criterion; Lean RE-PROVES it (Hahn–Banach separation + Namioka coarea), MeanApproximation/ProbabilityDefects/FiniteCoarea/FiniteLevels/MeanToFolner.",
+    "Paper's parents I_j=[(2j−1)2^{-r},2j2^{-r}] with 2^r>2D; Lean uses depth 2D, index 2i+1 (IntervalFamily.lean:22). Equivalent.",
+    "Lean proves the Benyamini–Sternfeld instance completely (≈34% of proof-DAG declarations), following the appendix."
+   ],
+   "extra_hypotheses": "none",
+   "verdict": "Comparator faithfully captures the headline theorem with standard definitions; nothing weaker is being compared."
+  },
+  "axioms_and_trust": {
+   "grep_scope": "lean/OAI/GroupTheory/Thompson/*.lean (68 files, 9457 lines) and the challenge file",
+   "counts": {
+    "sorry": 0,
+    "axiom": 0,
+    "admit": "0 (one hit is the English word in a docstring, DyadicGapPartition.lean:207)",
+    "native_decide": 0,
+    "implemented_by": 0,
+    "extern": 0,
+    "unsafe": 0,
+    "opaque": 0,
+    "partial def": 0,
+    "set_option": 0,
+    "ofReduceBool/trustCompiler": 0,
+    "#eval/run_cmd/elab/macro/syntax": 0
+   },
+   "sorry_in_challenge_file": "1 (expected: the challenge statement is a sorry stub, ThompsonNonamenability.lean:83)",
+   "decide_uses": "14 lines with `decide`, all trivial numeric side conditions (0<2, 1<2, Fin index literals, pow_pos base); no computational search",
+   "custom_axioms": "none",
+   "classical_choice": "Classical.choose for transports (TransportFamily.lean:42), Classical.decEq F, classical dite in recursion; within permitted axioms",
+   "imports": "Mathlib modules only (+Lean.Elab.Tactic.Omega); no other OAI directories, no external packages",
+   "caveats": [
+    "Lean not installed here; the build itself was not reproduced",
+    "enable_nanoda=false: no independent second kernel check configured"
+   ]
+  },
+  "dag_summary": {
+   "n_files": 68,
+   "n_decls": 879,
+   "kind_counts": {
+    "theorem": 707,
+    "def": 141,
+    "structure": 12,
+    "instance": 10,
+    "abbrev": 9
+   },
+   "proof_dag_decls": 532,
+   "proof_dag_theorems": 397,
+   "dag_tokens": 50931,
+   "share_of_proof_dag_by_component (decls / tokens)": {
+    "Benyamini–Sternfeld map (Analytic*, Tube*, Correction*)": "183 decls 34.4% / 30.3% tokens",
+    "dyadic/PL plumbing (BasicInterval, partitions, images, gap chains, transport)": "158 / 29.7% / 31.4%",
+    "core coloring + correlation + variance + boundary (the new argument)": "114 / 21.4% / 25.0%",
+    "Følner criterion re-proof (Day + Namioka)": "54 / 10.2% / 11.7%",
+    "model of F": "23 / 4.3% / 1.6%"
+   },
+   "dominated_share": {
+    "exists_fixed_boundary": 0.509,
+    "exists_affine_pair_transport": 0.102,
+    "not_amenable_of_uniform_boundary": 0.102,
+    "boundaryConstant_le_of_correlations": 0.056,
+    "eventually_image_respects": 0.047,
+    "separated_correlation_bound": 0.045,
+    "finite_folner_of_small_defect": 0.041,
+    "finite_variance_bound": 0.03
+   },
+   "note": "Extractor frac_dag_dependents is small for every core item (partitionColor 0.05) because the core sits near the top of a shallow DAG; the 20% load-bearing proxy is uninformative here. Logically, partitionColor is used by the only nontrivial estimate, and the whole proof collapses without it."
+  }
+ },
+ "labels": {
+  "A": {
+   "label": "A5",
+   "secondary": {
+    "hard_direction_form": null,
+    "explicit_rate": true
+   },
+   "evidence": {
+    "quote": "Thompson's group \\(F\\) is not amenable.",
+    "file_line": "sections/introduction.tex:38"
+   },
+   "confidence": "high",
+   "note": "Impossibility: ¬∃ invariant mean. Explicit-rate flag: the proof gives an explicit uniform expansion constant (δ²/L²−4/D)/(4(1−1/D)) for an explicit S (finite-proof.tex:197-198)."
+  },
+  "B": {
+   "label": "B1",
+   "flags": {
+    "full_only_with_prior_results": false,
+    "full_only_with_prior_results_detail": "Uses only classical Følner (1955) and Benyamini–Sternfeld (1983), the latter re-proved in the appendix and both re-proved in Lean.",
+    "adds_corollaries_for_other_conjectures": true,
+    "adds_corollaries_detail": "Dixmier unitarizability problem for F (non-unitarizable uniformly bounded reps) and Benjamini–Schramm nonuniqueness phase for percolation on Cayley graphs of F, both via companion OpenAI preprints."
+   },
+   "evidence": {
+    "quote": "The latter authors record Geoghegan's 1979 conjecture that \\(F\\) is nonamenable ... We prove this conjecture.",
+    "file_line": "sections/introduction.tex:34-35"
+   },
+   "confidence": "high (as a label); correctness see audit"
+  },
+  "C": {
+   "primary": "C1",
+   "primary_evidence": {
+    "quote": "Choose ... an element $h_{I,J}\\in F$ ... Let $S$ be the finite set of these elements.",
+    "file_line": "sections/finite-proof.tex:177-182"
+   },
+   "secondaries": [
+    {
+     "label": "C4",
+     "evidence": {
+      "quote": "the coefficients of $\\alpha$ cancel and give $\\mathbb E_A\\norm{z_i-m}^2 \\leq\\frac4D+4(1-\\frac1D)\\eta$",
+      "file_line": "sections/finite-proof.tex:298-305"
+     },
+     "note": "Inner-product estimation chain is the analytic engine."
+    },
+    {
+     "label": "C3",
+     "evidence": {
+      "quote": "violate the Følner criterion ... Hence $F$ is not amenable.",
+      "file_line": "sections/finite-proof.tex:321-323"
+     },
+     "note": "Final step is a contrapositive of the Følner criterion."
+    },
+    {
+     "label": "C5",
+     "evidence": {
+      "quote": "We use the following forward implication of the F\\o lner criterion",
+      "file_line": "sections/introduction.tex:16"
+     },
+     "note": "Følner invoked without proof in the paper (re-proved in Lean). B–S is cited but also re-proved in the appendix, so it is not pure C5."
+    }
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "14 `decide` lines on literals only; no search, no native_decide",
+    "file_line": "lean/OAI/GroupTheory/Thompson/*.lean"
+   },
+   "ih_strengthened": false,
+   "ih_template": null,
+   "ih_evidence": {
+    "quote": "Define a color $p(T)\\in B$ for every basic partition $T$ by induction on its number of cells",
+    "file_line": "sections/finite-proof.tex:124"
+   },
+   "ih_note": "The only induction is a well-founded DEFINITION by recursion on cell count; no inductive proof whose hypothesis is strengthened.",
+   "confidence": "medium (C1 vs C4 primary is debatable: the 'witness' of nonamenability, S with an explicit constant, is built, so precedence gives C1; a reader who views the estimate as the content would pick C4)"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "I19 recursive Hilbert-ball coloring p(T) (provisional N3, F1)",
+   "evidence": {
+    "quote": "$p(T)= f\\left(\\frac1D\\sum_{j=1}^D p(T_{I_j})\\right)$ if $T$ respects every $I_j$, $0$ otherwise",
+    "file_line": "sections/finite-proof.tex:126-133"
+   },
+   "confidence": "medium",
+   "caveats": [
+    "Novelty search was quick; Moore's Ramsey/tree-coloring papers and Akhmedov's height functions are the nearest neighbours found and differ materially.",
+    "All ingredients (B–S map, tree restriction, Følner) are classical; a judge could call the combination N2 if a precedent for recursive vector-valued tree invariants in amenability theory turns up."
+   ],
+   "flag_builds_on_prior_model_produced_result": "No for the main theorem (no model-produced source is used). Yes for the two corollaries (OpenAIUnitarizability2026, OpenAIPercolation2026)."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Group theory",
+    "msc2020": [
+     "20F65",
+     "43A07",
+     "20E08"
+    ],
+    "evidence": {
+     "quote": "amenability problem for F",
+     "file_line": "data/catalog_families.csv row 248"
+    },
+    "confidence": "high"
+   },
+   "lean_dir_field": "GroupTheory (OAI/GroupTheory/Thompson)",
+   "method_fields": [
+    {
+     "field": "Nonlinear functional analysis / geometry of Banach spaces (46B20, 47H10, 46T20)",
+     "tag": "essential",
+     "what": "Benyamini–Sternfeld: Lipschitz self-map of the Hilbert ball with displacement ≥δ (cited, re-proved in appendix and in Lean)",
+     "evidence": {
+      "quote": "Benyamini and Sternfeld prove this assertion for every infinite-dimensional normed space",
+      "file_line": "sections/introduction.tex:92-93"
+     }
+    },
+    {
+     "field": "Abstract harmonic analysis / amenability (43A07)",
+     "tag": "essential",
+     "what": "Forward Følner criterion (cited; Lean re-proves via Hahn–Banach + Namioka)",
+     "evidence": {
+      "quote": "We use the following forward implication of the F\\o lner criterion",
+      "file_line": "sections/introduction.tex:16"
+     }
+    },
+    {
+     "field": "Hilbert space geometry (46C05), elementary",
+     "tag": "essential",
+     "what": "Squared-norm convexity, inner-product expansions, variance identity",
+     "evidence": {
+      "quote": "the convexity of the squared norm, and the Lipschitz bound give",
+      "file_line": "sections/finite-proof.tex:256"
+     }
+    },
+    {
+     "field": "Combinatorics of dyadic partitions / PL homeomorphisms (20F65, 05C05)",
+     "tag": "essential",
+     "what": "Dyadic-partition model of F, restriction, pair transitivity (CFP Lemma 2.2; re-proved)",
+     "evidence": {
+      "quote": "We use the standard dyadic-partition model of $F$",
+      "file_line": "sections/finite-proof.tex:10"
+     }
+    },
+    {
+     "field": "Differential geometry of curves in Hilbert space / real analysis",
+     "tag": "essential (appendix only)",
+     "what": "Tube around a curve, nearest-point map, cut-offs",
+     "evidence": {
+      "quote": "A tube about a curve with a bounded tail supplies $G$.",
+      "file_line": "sections/auxiliary.tex:64"
+     }
+    },
+    {
+     "field": "Convex analysis / Hahn–Banach separation (46A22)",
+     "tag": "essential (Lean only)",
+     "what": "Day's argument in MeanApproximation.lean:70 (geometric_hahn_banach_point_closed)",
+     "evidence": {
+      "quote": "Separation contradicts the existence of a positive normalized invariant mean.",
+      "file_line": "lean/OAI/GroupTheory/Thompson/MeanApproximation.lean:65"
+     }
+    },
+    {
+     "field": "Ramsey theory (05D10)",
+     "tag": "background-cited",
+     "what": "Moore's convex Ramsey characterization of amenability of F",
+     "evidence": {
+      "quote": "characterizes amenability of F by a scalar convex Ramsey property",
+      "file_line": "sections/introduction.tex:55-56"
+     }
+    },
+    {
+     "field": "Operator algebras (46L05)",
+     "tag": "background-cited",
+     "what": "Haagerup–Olesen: C*-simplicity of T would imply nonamenability",
+     "evidence": {
+      "quote": "Haagerup and Olesen prove that simplicity of the reduced group C*-algebra of Thompson's group T would imply nonamenability",
+      "file_line": "sections/introduction.tex:61-63"
+     }
+    },
+    {
+     "field": "Algebraic topology (55R35, finiteness properties)",
+     "tag": "background-cited",
+     "what": "Brown–Geoghegan F_∞",
+     "evidence": {
+      "quote": "Brown and Geoghegan construct a classifying space",
+      "file_line": "sections/introduction.tex:50-51"
+     }
+    },
+    {
+     "field": "Representation theory / Dixmier problem (22D12, 43A65)",
+     "tag": "corollary-only",
+     "what": "Non-unitarizable uniformly bounded representations",
+     "evidence": {
+      "quote": "follows from the companion unitarizability theorem",
+      "file_line": "sections/consequences.tex:22-23"
+     }
+    },
+    {
+     "field": "Probability / percolation (60K35, 82B43)",
+     "tag": "corollary-only",
+     "what": "Nonuniqueness phase on Cayley graphs",
+     "evidence": {
+      "quote": "Apply the companion percolation result",
+      "file_line": "sections/consequences.tex:52"
+     }
+    }
+   ],
+   "cross_field_count_essential_nonGroupTheory": 3,
+   "cross_field_count_note": "Counting fields: nonlinear functional analysis (B–S), Hilbert geometry, curve/tube analysis (appendix). Følner/amenability counted as home field. Lean adds convex analysis (Hahn–Banach).",
+   "share_invoked_cited_theorems_from_other_fields": "1 of 4 invoked cited results (Benyamini–Sternfeld) is cross-field, and it is re-proved in the appendix; others: Følner criterion (home), CFP Lemma 2.2 dyadic model (home), Moore 2013 Thm 1.2 Følner formulation (home).",
+   "confidence": "high"
+  }
+ },
+ "items": [
+  {
+   "id": "I01",
+   "kind": "definition (prose)",
+   "name": "Thompson's group F",
+   "file_line": "sections/introduction.tex:4-7",
+   "statement": "Increasing PL homeomorphisms of [0,1], finitely many pieces, dyadic breakpoints, slopes in 2^Z; multiplication hg = h∘g; discrete group.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "CannonFloydParry1996",
+    "cue": "none (standard)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Object of the goal."
+   },
+   "analytic_check": "Occurs in the goal (subterm).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook definition (CFP 1996)."
+   },
+   "provisional_F": null,
+   "lean_decl": "Model.lean:52 F; StandardF.lean:7 standardSubgroup; StandardCharacterization.lean:17 StandardPLCondition"
+  },
+  {
+   "id": "I02",
+   "kind": "definition (inline \\emph)",
+   "name": "amenable / invariant mean",
+   "file_line": "sections/introduction.tex:9-13",
+   "statement": "G amenable iff there is a positive normalized left-invariant mean M on ℓ∞(G;ℝ): M(1)=1, M≥0 on φ≥0, M(φ(h·))=M(φ).",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "vonNeumann1929; Day1957",
+    "cue": "\"classical theory developed by von Neumann and Day\""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Goal predicate."
+   },
+   "analytic_check": "Occurs in the goal.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical definition."
+   },
+   "provisional_F": null,
+   "lean_decl": "Model.lean:71 InvariantMean; Model.lean:58 leftPull"
+  },
+  {
+   "id": "I03",
+   "kind": "cited theorem (forward Følner criterion)",
+   "name": "Følner criterion, amenable ⇒ Følner sets",
+   "file_line": "sections/introduction.tex:16-26 (eq:folner)",
+   "statement": "If G is amenable then for every finite S and ε>0 there is nonempty finite A with |hA△A|/|A|<ε for all h∈S.",
+   "cited_or_new": {
+    "status": "cited, not re-proved in paper; RE-PROVED in Lean",
+    "bib_key": "Folner1955; Moore2013 Thm 1.2",
+    "cue": "\"We use the following forward implication of the Følner criterion\""
+   },
+   "uses_items": [
+    "I02"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The bridge from the goal to the finite estimate."
+   },
+   "analytic_check": "In L (bibliography + standard literature; not in Mathlib at d13f23b as far as the Lean dir suggests, since it is re-proved).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Følner 1955 / Namioka. Lean re-proves it by Hahn–Banach separation (Day's trick) plus a finite coarea/layer-cake argument (Namioka)."
+   },
+   "provisional_F": null,
+   "lean_decl": "MeanApproximation.lean:66 zero_mem_closure_defectSet; :87 exists_probability_small_defect; FiniteCoarea.lean:252 finite_folner_of_small_defect; MeanToFolner.lean:33 exists_folner, :47 not_amenable_of_uniform_boundary"
+  },
+  {
+   "id": "I04",
+   "kind": "theorem (headline)",
+   "name": "Thm main: F is not amenable",
+   "file_line": "sections/introduction.tex:37-39",
+   "statement": "Thompson's group F is not amenable.",
+   "cited_or_new": {
+    "status": "new (claimed resolution of Geoghegan 1979 conjecture)",
+    "bib_key": null,
+    "cue": "\"We prove this conjecture.\""
+   },
+   "uses_items": [
+    "I27",
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Headline."
+   },
+   "analytic_check": "Is the goal.",
+   "provisional_N": {
+    "grade": "n/a",
+    "justification": "Headline theorem, not an item to grade."
+   },
+   "provisional_F": null,
+   "lean_decl": "Main.lean:65 thompson_F_not_amenable; Main.lean:69 thompson_F_nonamenable_composition (comparator target)"
+  },
+  {
+   "id": "I05",
+   "kind": "cited lemma",
+   "name": "Lemma displacement (Benyamini–Sternfeld)",
+   "file_line": "sections/introduction.tex:84-96",
+   "statement": "There are a real Hilbert space H, a Lipschitz f:B→B on its closed unit ball and δ>0 with ‖f(x)−x‖≥δ for all x∈B.",
+   "cited_or_new": {
+    "status": "cited AND re-proved (appendix, Hilbert case)",
+    "bib_key": "BenyaminiSternfeld1983",
+    "cue": "\"Benyamini and Sternfeld prove this assertion for every infinite-dimensional normed space\" / \"For completeness, Appendix ... constructs such a map\""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Supplies the obstruction: no approximate fixed point. Without it the recursion gives nothing."
+   },
+   "analytic_check": "Not a subterm of the goal; it IS a theorem of L (bibliography). Analytic relative to L.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Known theorem (1983), imported from nonlinear functional analysis: cross-field TRANSFER."
+   },
+   "provisional_F": null,
+   "lean_decl": "AnalyticConstruction.lean:98 displacementMap, :104 displacementMap_displacement, :115 displacementMap_lipschitz, :121 exists_displacementMap"
+  },
+  {
+   "id": "I06",
+   "kind": "definition (inline \\emph)",
+   "name": "basic dyadic interval",
+   "file_line": "sections/finite-proof.tex:14-18",
+   "statement": "[k2^{-r},(k+1)2^{-r}] ⊆ [0,1].",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "CannonFloydParry1996",
+    "cue": "\"We use the standard dyadic-partition model of F\""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Carrier of all combinatorics."
+   },
+   "analytic_check": "In L (CFP).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null,
+   "lean_decl": "BasicInterval.lean:22 BasicInterval"
+  },
+  {
+   "id": "I07",
+   "kind": "definition (inline \\emph)",
+   "name": "basic partition; mesh",
+   "file_line": "sections/finite-proof.tex:19-21",
+   "statement": "Finite partition of [0,1] into basic dyadic intervals (cells may share endpoints); mesh = largest cell length.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "CannonFloydParry1996",
+    "cue": "none"
+   },
+   "uses_items": [
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Equivalent to a finite rooted binary tree; the colored objects."
+   },
+   "analytic_check": "In L (CFP Sec 2; Moore's tree formulation).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard (finite binary trees)."
+   },
+   "provisional_F": null,
+   "lean_decl": "BasicPartition.lean:21 BasicPartition, :36 cellCount"
+  },
+  {
+   "id": "I08",
+   "kind": "definition (inline \\emph)",
+   "name": "T respects I",
+   "file_line": "sections/finite-proof.tex:21-22",
+   "statement": "I is a union of cells of T.",
+   "cited_or_new": {
+    "status": "new name, standard notion",
+    "bib_key": null,
+    "cue": "\"A partition T respects an interval I if\""
+   },
+   "uses_items": [
+    "I06",
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Gate for the recursion and admissibility."
+   },
+   "analytic_check": "Analytic abbreviation (node I belongs to the tree).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Tree-node membership renamed."
+   },
+   "provisional_F": null,
+   "lean_decl": "BasicPartition.lean:39 Respects"
+  },
+  {
+   "id": "I09",
+   "kind": "definition (display)",
+   "name": "affine chart s_I and product I·J",
+   "file_line": "sections/finite-proof.tex:24-25,34",
+   "statement": "s_I:[0,1]→I increasing affine; I·J = s_I(J); s_{I·J}=s_I∘s_J.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Encodes self-similarity (address concatenation in the binary tree)."
+   },
+   "analytic_check": "Analytic (concatenation of tree addresses).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard dyadic address concatenation."
+   },
+   "provisional_F": null,
+   "lean_decl": "BasicInterval.lean:57 chart, :177 comp"
+  },
+  {
+   "id": "I10",
+   "kind": "definition (display)",
+   "name": "normalized restriction T_I",
+   "file_line": "sections/finite-proof.tex:25-28",
+   "statement": "T_I = {s_I^{-1}(K) : K∈T, K⊆I}, defined when T respects I.",
+   "cited_or_new": {
+    "status": "standard notion, new notation",
+    "bib_key": null,
+    "cue": "\"define its normalized restriction by\""
+   },
+   "uses_items": [
+    "I08",
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The recursion and the covariance are stated in terms of it."
+   },
+   "analytic_check": "Analytic: subtree at a node.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Subtree of a binary tree at a node."
+   },
+   "provisional_F": null,
+   "lean_decl": "BasicPartition.lean:129 restrict, :120 restrictCells"
+  },
+  {
+   "id": "I11",
+   "kind": "lemma (display, proved inline)",
+   "name": "restriction composition (dyad:restriction)",
+   "file_line": "sections/finite-proof.tex:34-39",
+   "statement": "If T respects I and I·J then T_I respects J and (T_I)_J = T_{I·J}.",
+   "cited_or_new": {
+    "status": "new statement of a standard fact",
+    "bib_key": null,
+    "cue": "\"Consequently\""
+   },
+   "uses_items": [
+    "I09",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Yields the exact recursive identity X_{I_i}=f(z_i)."
+   },
+   "analytic_check": "Analytic (subtree of subtree).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Trivial tree fact."
+   },
+   "provisional_F": null,
+   "lean_decl": "BasicPartition.lean:190 restrict_respects, :207 restrict_restrict"
+  },
+  {
+   "id": "I12",
+   "kind": "definition (display)",
+   "name": "uniform partition T^(n) and image partition gT^(n)",
+   "file_line": "sections/finite-proof.tex:41-43",
+   "statement": "T^(n) = uniform depth-n partition; gT^(n) = images of its cells under g.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "CannonFloydParry1996; Moore2013",
+    "cue": "none"
+   },
+   "uses_items": [
+    "I01",
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The map g ↦ gT^(n) pulls colors back to the group (Moore-type tree-pair encoding)."
+   },
+   "analytic_check": "Analytic (standard encoding of F by tree pairs).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard tree-pair / forest encoding."
+   },
+   "provisional_F": null,
+   "lean_decl": "UniformPartition.lean:24,39; DyadicImages.lean:15 ImageBasic, :77 imagePartition"
+  },
+  {
+   "id": "I13",
+   "kind": "lemma",
+   "name": "Lemma dyad:eventual",
+   "file_line": "sections/finite-proof.tex:45-70",
+   "statement": "For each g∈F, gT^(n) is basic for large n, with mesh→0; for finite K⊂F and finite family J of basic intervals there is n0 with gT^(n) basic and respecting every member of J for g∈K, n≥n0.",
+   "cited_or_new": {
+    "status": "new statement of standard fact",
+    "bib_key": "CannonFloydParry1996 Lemma 2.2",
+    "cue": "\"We use the standard dyadic-partition model of F; see [CFP, Section 2, Lemma 2.2]\""
+   },
+   "uses_items": [
+    "I06",
+    "I07",
+    "I08",
+    "I12"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Lets one level n serve all of A∪SA."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard (CFP Lemma 2.2)."
+   },
+   "provisional_F": null,
+   "lean_decl": "DyadicImages.lean:127,177,184,204 eventually_image_respects; GlobalColors.lean:72,80"
+  },
+  {
+   "id": "I14",
+   "kind": "definition (inline \\emph)",
+   "name": "I<J (strict separation), internal interval",
+   "file_line": "sections/finite-proof.tex:72-74",
+   "statement": "I<J iff max I < min J (positive gap); internal iff both endpoints in (0,1).",
+   "cited_or_new": {
+    "status": "new names",
+    "bib_key": null,
+    "cue": "\"Write I<J when ... An interval is internal if\""
+   },
+   "uses_items": [
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Hypotheses of the transport lemma."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Abbreviations."
+   },
+   "provisional_F": null,
+   "lean_decl": "BasicInterval.lean:51 Internal, :53 Before; IntervalFamily.lean:53 StrictlySeparated"
+  },
+  {
+   "id": "I15",
+   "kind": "lemma",
+   "name": "Lemma dyad:transport (affine pair transport)",
+   "file_line": "sections/finite-proof.tex:76-94",
+   "statement": "If I<J and I'<J' are pairs of internal basic intervals, some h∈F carries I affinely onto I' and J affinely onto J'.",
+   "cited_or_new": {
+    "status": "new statement of standard fact (re-proved)",
+    "bib_key": null,
+    "cue": "none (proved by gap subdivision)"
+   },
+   "uses_items": [
+    "I01",
+    "I06",
+    "I14"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Supplies S; this is where the PL flexibility of F (vs affine groups) enters."
+   },
+   "analytic_check": "Analytic relative to L: standard transitivity of F on dyadic tuples (CFP Lemma 4.2 type).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard folklore for F (transitivity on ordered dyadic tuples with affine control)."
+   },
+   "provisional_F": null,
+   "lean_decl": "AffineTransport.lean:62 exists_affine_pair_transport; OrderedPLInterpolation.lean:252 exists_chain_transport; DyadicGapPartition.lean:207"
+  },
+  {
+   "id": "I16",
+   "kind": "lemma (display, proved inline)",
+   "name": "exact covariance (dyad:covariance)",
+   "file_line": "sections/finite-proof.tex:96-104",
+   "statement": "If h carries I affinely onto I', and gT^(n), (hg)T^(n) are basic and respect I, I' respectively, then ((hg)T^(n))_{I'} = (gT^(n))_I.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"The relevant covariance is exact.\""
+   },
+   "uses_items": [
+    "I10",
+    "I12",
+    "I15"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Converts left translation by S into equality of pair correlations; every comparison uses it."
+   },
+   "analytic_check": "Near-analytic: unfolds to h∘s_I=s_{I'}; not a subterm of goal but a one-line consequence of definitions.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "One-line consequence of the definitions; the choice to look at it is part of candidate EC1/EC3."
+   },
+   "provisional_F": null,
+   "lean_decl": "RestrictionCovariance.lean:75 image_restrict_covariance; GlobalColors.lean:96 globalColor_covariance"
+  },
+  {
+   "id": "I17",
+   "kind": "parameter choice",
+   "name": "Lipschitz/displacement constants L, δ and branching D > 4L²/δ²",
+   "file_line": "sections/finite-proof.tex:108-119 (color:map, color:parameters)",
+   "statement": "Fix f, L, δ as in Lemma displacement; choose integer D≥2 with D > 4L²/δ².",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"Choose an integer D≥2 so that\""
+   },
+   "uses_items": [
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Makes the final constant positive; D independent of A."
+   },
+   "analytic_check": "Analytic arithmetic.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Parameter bookkeeping."
+   },
+   "provisional_F": null,
+   "lean_decl": "BoundaryAlgebra.lean:67 exists_branching_parameter"
+  },
+  {
+   "id": "I18",
+   "kind": "construction",
+   "name": "parent intervals I_1<...<I_D",
+   "file_line": "sections/finite-proof.tex:120-122",
+   "statement": "Internal basic intervals I_j = [(2j-1)2^{-r}, 2j 2^{-r}] with 2^r>2D (Lean: depth 2D, index 2i+1).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"Choose internal basic intervals\""
+   },
+   "uses_items": [
+    "I06",
+    "I14"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The D-ary self-similar structure used by the recursion."
+   },
+   "analytic_check": "Analytic (explicit dyadic cells).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Trivial choice."
+   },
+   "provisional_F": null,
+   "lean_decl": "IntervalFamily.lean:22 selectedInterval, :29 selectedInterval_internal"
+  },
+  {
+   "id": "I19",
+   "kind": "definition (display, recursive)",
+   "name": "recursive coloring p(T) (color:recursion)",
+   "file_line": "sections/finite-proof.tex:124-138",
+   "statement": "p(T) = f( (1/D) Σ_j p(T_{I_j}) ) if T respects every I_j, else 0; well founded on the number of cells; p(T)∈B.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"Define a color p(T)∈B for every basic partition T by induction on its number of cells\""
+   },
+   "uses_items": [
+    "I05",
+    "I07",
+    "I08",
+    "I10",
+    "I17",
+    "I18"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "THE new object. Every later step is about the colors X_I = p(restriction); the recursion gives the exact identity X_{I_i}=f(z_i) that the displacement bound contradicts."
+   },
+   "analytic_check": "Non-analytic: neither 'p', a recursion over binary trees, nor any Hilbert-valued function of trees occurs in the goal (¬∃ invariant mean) or in L (Følner, B–S, CFP, Moore's scalar tree colorings). It composes two L-objects (tree restriction, B–S map) in a way not present in L.",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Provisional: no near-equivalent found (Moore's Ramsey characterisation uses finite scalar colorings of trees, not recursively defined Hilbert-ball colorings; Akhmedov uses a height function; Day/Følner fixed-point theorems are for affine actions on compact convex sets). Syntactically tiny, like Cook's extension variables."
+   },
+   "provisional_F": "F1 (extension definition) with F3 flavour (auxiliary object built only to drive the proof)",
+   "lean_decl": "RecursiveColoring.lean:23 partitionColor (termination_by T.cellCount), :62 partitionColor_restrict"
+  },
+  {
+   "id": "I20",
+   "kind": "remark (worked example)",
+   "name": "p(T^(r)) = f(0), p(T^(2r)) = f(f(0))",
+   "file_line": "sections/finite-proof.tex:140-147",
+   "statement": "Uniform partitions get iterated values of f.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"For the displayed choice\""
+   },
+   "uses_items": [
+    "I19"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Illustration only."
+   },
+   "analytic_check": "n/a",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Illustrative computation."
+   },
+   "provisional_F": null,
+   "lean_decl": null
+  },
+  {
+   "id": "I21",
+   "kind": "definition (display)",
+   "name": "interval family 𝓘 (parents and descendants)",
+   "file_line": "sections/finite-proof.tex:149-153",
+   "statement": "𝓘 = {I_i} ∪ {I_i·I_j}: D parents and D² descendants, all internal.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"We use the finite family of parent intervals and their descendants\""
+   },
+   "uses_items": [
+    "I09",
+    "I18"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Only two levels of the tree are ever compared."
+   },
+   "analytic_check": "Analytic (finite list).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Finite bookkeeping set."
+   },
+   "provisional_F": null,
+   "lean_decl": "IntervalFamily.lean:81 IntervalIndex, :84 familyInterval, :96 intervalFamily"
+  },
+  {
+   "id": "I22",
+   "kind": "definition (inline \\emph)",
+   "name": "admissible (n,g)",
+   "file_line": "sections/finite-proof.tex:154-156",
+   "statement": "gT^(n) is a basic partition respecting every member of 𝓘.",
+   "cited_or_new": {
+    "status": "new name",
+    "bib_key": null,
+    "cue": "\"Call (n,g) admissible if\""
+   },
+   "uses_items": [
+    "I12",
+    "I21"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Gate for all exact identities."
+   },
+   "analytic_check": "Analytic abbreviation.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Conjunction of L-notions."
+   },
+   "provisional_F": null,
+   "lean_decl": "GlobalColors.lean:34 GlobalAdmissible; PartitionColorFamily.lean:25 PartitionAdmissible"
+  },
+  {
+   "id": "I23",
+   "kind": "definition (display)",
+   "name": "global colors X_I^(n)(g) with zero extension (color:global)",
+   "file_line": "sections/finite-proof.tex:157-165",
+   "statement": "X_I^(n)(g) = p((gT^(n))_I) if (n,g) admissible, else 0; B-valued functions on all of F.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"In particular these are globally defined B-valued functions\""
+   },
+   "uses_items": [
+    "I19",
+    "I22"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Pulls the coloring back to the group so that Følner averaging applies; zero extension keeps correlations bounded globally."
+   },
+   "analytic_check": "Not in goal or L; it is the pullback of I19 along the orbit map g↦gT^(n).",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Pullback along Moore's tree-pair encoding; new only through I19."
+   },
+   "provisional_F": null,
+   "lean_decl": "GlobalColors.lean:29 imagePartitionOption, :37 globalColor; PartitionColorFamily.lean:29,67"
+  },
+  {
+   "id": "I24",
+   "kind": "definition (display)",
+   "name": "scalar correlations φ_{I,J}^(n)",
+   "file_line": "sections/finite-proof.tex:166-171",
+   "statement": "φ_{I,J}(g) = ⟨X_I(g), X_J(g)⟩ ∈ [-1,1].",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"Their scalar correlations\""
+   },
+   "uses_items": [
+    "I23"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Scalar functions on F to which the Følner inequality applies (the trick: average scalars, not vectors)."
+   },
+   "analytic_check": "Analytic given I23.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Inner products of I23."
+   },
+   "provisional_F": null,
+   "lean_decl": "GlobalColors.lean:110 globalCorrelation; CorrelationVariance.lean:95 corr"
+  },
+  {
+   "id": "I25",
+   "kind": "construction",
+   "name": "fixed transport set S = {h_{I,J}}",
+   "file_line": "sections/finite-proof.tex:177-182",
+   "statement": "For each ordered separated pair I<J in 𝓘 choose h_{I,J}∈F carrying I,J affinely onto I_1,I_2; S is fixed before the test set A.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"All choices so far, in particular S, are independent of the finite set to be tested.\""
+   },
+   "uses_items": [
+    "I15",
+    "I21"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The explicit finite set witnessing nonamenability (uniform expansion)."
+   },
+   "analytic_check": "Analytic as a set of instances of I15; the quantifier order (S before A, level n after A) is the delicate design choice.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Instances of a standard transitivity lemma; the order-of-quantifiers design is a modest new device."
+   },
+   "provisional_F": null,
+   "lean_decl": "TransportFamily.lean:41 pairTransport (Classical.choose), :62 fixedTransportSet, :84 transportClosure, :96 exists_transport_admissible"
+  },
+  {
+   "id": "I26",
+   "kind": "lemma (display)",
+   "name": "finite translation inequality (eq:finite-translation)",
+   "file_line": "sections/finite-proof.tex:184-190",
+   "statement": "For φ:F→[-1,1], |E_A φ(h·) − E_A φ| ≤ |hA△A|/|A|.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "\"cancellation over hA∩A gives\""
+   },
+   "uses_items": [
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Couples Følner defect to correlation averages."
+   },
+   "analytic_check": "Analytic (standard).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null,
+   "lean_decl": "FiniteAverage.lean:173 abs_realAvg_translate_sub_le"
+  },
+  {
+   "id": "I27",
+   "kind": "proposition",
+   "name": "Prop avg:boundary (uniform boundary bound)",
+   "file_line": "sections/finite-proof.tex:194-199",
+   "statement": "For every nonempty finite A⊂F, max_{h∈S} |hA△A|/|A| ≥ (δ²/L² − 4/D)/(4(1−1/D)) > 0.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"proves a uniform positive boundary bound\""
+   },
+   "uses_items": [
+    "I13",
+    "I16",
+    "I19",
+    "I23",
+    "I24",
+    "I25",
+    "I26",
+    "I28",
+    "I30",
+    "I31",
+    "I33"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The theorem in Følner form, with explicit constant."
+   },
+   "analytic_check": "Statement is analytic (negation of the Følner condition, already in L); the proof is where the non-analytic item I19 enters.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Statement = 'Følner condition fails for S', an L-notion. Novelty sits in the proof."
+   },
+   "provisional_F": null,
+   "lean_decl": "FiniteBoundary.lean:16 exists_fixed_boundary (generic in f, L, δ); Main.lean:16 thompson_F_boundary_with_exact_constant, :45 thompson_F_uniform_boundary"
+  },
+  {
+   "id": "I28",
+   "kind": "lemma (display, in proof)",
+   "name": "correlation comparison / pair exchangeability (avg:correlation)",
+   "file_line": "sections/finite-proof.tex:219-239",
+   "statement": "For all strictly separated I,J∈𝓘: |E_A⟨X_I,X_J⟩ − α| ≤ η where α=E_A φ_{I_1,I_2}, η = max_{h∈S}|hA△A|/|A|.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"No condition is imposed on nested pairs.\""
+   },
+   "uses_items": [
+    "I16",
+    "I24",
+    "I25",
+    "I26"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Feeds every term of the variance estimate."
+   },
+   "analytic_check": "Not in goal or L as such; it is approximate exchangeability of the separated-pair correlation matrix.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Follows mechanically from I16+I26 once I23 exists; idea of approximate pair-invariance is classical (exchangeability)."
+   },
+   "provisional_F": null,
+   "lean_decl": "TransportFamily.lean:115 separated_correlation_bound; GlobalColors.lean:131 globalCorrelation_translate_bound"
+  },
+  {
+   "id": "I29",
+   "kind": "definition (display)",
+   "name": "parent mean m(g) and child means z_i(g)",
+   "file_line": "sections/finite-proof.tex:243-248",
+   "statement": "m = (1/D)Σ_k X_{I_k}; z_i = (1/D)Σ_j X_{I_i·I_j}.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"For g∈A, put\""
+   },
+   "uses_items": [
+    "I23"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Variables of the energy estimate."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Averages."
+   },
+   "provisional_F": null,
+   "lean_decl": "HilbertAverage.lean:28 finMean, :79 ballMean"
+  },
+  {
+   "id": "I30",
+   "kind": "lemma (display)",
+   "name": "exact recursive identity X_{I_i}=f(z_i) (avg:recursive-identity)",
+   "file_line": "sections/finite-proof.tex:249-254",
+   "statement": "For admissible g, X_{I_i}(g) = f(z_i(g)).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"Applying the recursion and (dyad:restriction) therefore yields the exact identities\""
+   },
+   "uses_items": [
+    "I11",
+    "I19",
+    "I22",
+    "I29"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Where the recursion is used."
+   },
+   "analytic_check": "Consequence of I19.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Direct unfolding of I19; inherits its novelty."
+   },
+   "provisional_F": null,
+   "lean_decl": "GlobalColors.lean:86 globalColor_parent; PartitionColorFamily.lean:57; RecursiveColoring.lean:62"
+  },
+  {
+   "id": "I31",
+   "kind": "lemma (display chain)",
+   "name": "displacement–energy inequality (avg:displacement)",
+   "file_line": "sections/finite-proof.tex:255-266",
+   "statement": "δ² ≤ ‖m−f(m)‖² = ‖(1/D)Σ(f(z_i)−f(m))‖² ≤ (L²/D) Σ‖z_i−m‖²; uses m = mean of f(z_i).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"the displacement bound, the convexity of the squared norm, and the Lipschitz bound give\""
+   },
+   "uses_items": [
+    "I05",
+    "I29",
+    "I30"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Turns the no-approximate-fixed-point property into a lower bound on spread."
+   },
+   "analytic_check": "Short chain from L (Jensen + Lipschitz).",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Elementary estimate; the observation 'm is itself the mean of f(z_i), so f(m)≈m if z_i≈m' is the hinge of the argument."
+   },
+   "provisional_F": null,
+   "lean_decl": "DisplacementEstimate.lean:23 displacement_le_mean_energy; FiniteCorrelationBoundary.lean:28 finite_energy_of_variance"
+  },
+  {
+   "id": "I32",
+   "kind": "lemma (display)",
+   "name": "parent and child energy bounds (avg:parent-bound, avg:child-bound)",
+   "file_line": "sections/finite-proof.tex:268-281",
+   "statement": "E_A‖m‖² ≤ (1−1/D)(α+η)+1/D and the same for z_i.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"Hence\""
+   },
+   "uses_items": [
+    "I28",
+    "I29"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Variance ingredients."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Expansion of squared norm."
+   },
+   "provisional_F": null,
+   "lean_decl": "CorrelationVariance.lean:43 sum_matrix_le, :141 realAvg_norm_finMean_sq_le"
+  },
+  {
+   "id": "I33",
+   "kind": "lemma (display + figure)",
+   "name": "mixed-term bound; nested pairs are a 1/D fraction (avg:mixed-bound, Fig. mixed-pairs)",
+   "file_line": "sections/finite-proof.tex:282-297; figures/mixed-pairs.tex",
+   "statement": "E_A⟨z_i,m⟩ ≥ (1−1/D)(α−η) − 1/D: only column k=i pairs a descendant with its own parent.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"The remaining D terms pair a descendant with its own parent\""
+   },
+   "uses_items": [
+    "I28",
+    "I29"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The only place where nesting (uncontrolled correlations) is handled."
+   },
+   "analytic_check": "Analytic estimate.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Counting argument; mild new device (nested pairs are negligible)."
+   },
+   "provisional_F": null,
+   "lean_decl": "CorrelationVariance.lean:65 sum_fixed_column_ge, :159 corr_finMean_ge"
+  },
+  {
+   "id": "I34",
+   "kind": "lemma (display)",
+   "name": "variance estimate (avg:variance)",
+   "file_line": "sections/finite-proof.tex:298-306",
+   "statement": "E_A‖z_i−m‖² ≤ 4/D + 4(1−1/D)η; α cancels, no sign assumption.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"the coefficients of α cancel\""
+   },
+   "uses_items": [
+    "I32",
+    "I33"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Combined with I31 gives the contradiction / the constant."
+   },
+   "analytic_check": "Not in L verbatim; finite de Finetti-type concentration.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Nearest neighbour: finite exchangeability / de Finetti (Diaconis–Freedman) style 'equal pair correlations force concentration of means'."
+   },
+   "provisional_F": null,
+   "lean_decl": "CorrelationVariance.lean:181 finite_variance_bound"
+  },
+  {
+   "id": "I35",
+   "kind": "proof",
+   "name": "proof of Thm main",
+   "file_line": "sections/finite-proof.tex:320-323",
+   "statement": "Prop avg:boundary contradicts the Følner criterion.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I03",
+    "I27"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Final step."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Contrapositive of Følner."
+   },
+   "provisional_F": null,
+   "lean_decl": "MeanToFolner.lean:47; Main.lean:65"
+  },
+  {
+   "id": "I36",
+   "kind": "corollary",
+   "name": "Cor nonunitarizable (uniformly bounded non-unitarizable reps of F)",
+   "file_line": "sections/consequences.tex:12-24",
+   "statement": "For every ε>0, F has a uniformly bounded representation with sup‖π(g)‖≤1+ε that is not unitarizable.",
+   "cited_or_new": {
+    "status": "new via companion",
+    "bib_key": "OpenAIUnitarizability2026 Thm 1.1",
+    "cue": "\"follows from the companion unitarizability theorem\""
+   },
+   "uses_items": [
+    "I04"
+   ],
+   "load_bearing_guess": {
+    "level": "none",
+    "reason": "Not used in the proof."
+   },
+   "analytic_check": "n/a",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Corollary via a cited (model-produced) theorem."
+   },
+   "provisional_F": null,
+   "lean_decl": "not formalized"
+  },
+  {
+   "id": "I37",
+   "kind": "corollary",
+   "name": "Cor percolation (p_c<p_{2→2}≤p_u, infinitely many clusters)",
+   "file_line": "sections/consequences.tex:38-55",
+   "statement": "For every finite symmetric generating set: ‖T_{p_c}‖_{2→2}<∞, p_c<p_{2→2}≤p_u, nonuniqueness phase.",
+   "cited_or_new": {
+    "status": "new via companion",
+    "bib_key": "OpenAIPercolation2026 Cor 1.2",
+    "cue": "\"Apply the companion percolation result\""
+   },
+   "uses_items": [
+    "I04"
+   ],
+   "load_bearing_guess": {
+    "level": "none",
+    "reason": "Not used in the proof."
+   },
+   "analytic_check": "n/a",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Corollary via a cited (model-produced) theorem."
+   },
+   "provisional_F": null,
+   "lean_decl": "not formalized"
+  },
+  {
+   "id": "I38",
+   "kind": "proposition",
+   "name": "Prop aux:map (explicit Hilbert B–S map)",
+   "file_line": "sections/auxiliary.tex:66-75",
+   "statement": "On H=L²([0,1];ℝ²) there is a globally Lipschitz f:B→B with ‖f(x)‖=1 and ‖f(x)−x‖≥1/2.",
+   "cited_or_new": {
+    "status": "re-proof of cited theorem",
+    "bib_key": "BenyaminiSternfeld1983",
+    "cue": "\"This proves the Hilbert-space instance of the Benyamini–Sternfeld theorem directly.\""
+   },
+   "uses_items": [
+    "I39",
+    "I40",
+    "I41",
+    "I42",
+    "I43",
+    "I44"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Makes I05 unconditional (and is ~34% of the Lean DAG)."
+   },
+   "analytic_check": "Instance of an L-theorem: analytic.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Hilbert case of a 1983 theorem (and of Lin–Sternfeld 1985)."
+   },
+   "provisional_F": null,
+   "lean_decl": "AnalyticConstruction.lean:98-121"
+  },
+  {
+   "id": "I39",
+   "kind": "construction",
+   "name": "curve γ(t)=a(t)v(t) with v(t)(w)=(cos θ(t)w, sin θ(t)w); profiles a, θ",
+   "file_line": "sections/auxiliary.tex:77-99",
+   "statement": "Straight ray for t≤1, bounded oscillating tail in the 5/16-ball whose points stay uniformly separated (sinc inner products).",
+   "cited_or_new": {
+    "status": "new explicit construction",
+    "bib_key": null,
+    "cue": "\"A tube about a curve with a bounded tail supplies G.\""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Geometric core of the appendix."
+   },
+   "analytic_check": "Not in goal; neighbours in L (Kakutani/B–S curves).",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Variant of the classical Kakutani / Benyamini–Sternfeld curve-in-infinite-dimensions constructions."
+   },
+   "provisional_F": null,
+   "lean_decl": "AnalyticCurve.lean:26-33; AnalyticScalarProfiles.lean:15-33; AnalyticOscillator.lean:51; AnalyticSinc.lean:23"
+  },
+  {
+   "id": "I40",
+   "kind": "lemma",
+   "name": "Lemma aux:tube (unique nearest point, Lipschitz parameter)",
+   "file_line": "sections/auxiliary.tex:104-214",
+   "statement": "γ injective, ‖γ'‖≥1/8, uniform separation σ(d)>0, tube of radius ρ<1/32 with unique nearest point and |t(x)−t(y)|≤16‖x−y‖.",
+   "cited_or_new": {
+    "status": "new statement of standard tube facts",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I39"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Needed for Lipschitz G."
+   },
+   "analytic_check": "Analytic (standard tubular neighbourhood).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard differential-geometric estimates."
+   },
+   "provisional_F": null,
+   "lean_decl": "AnalyticTube.lean:40,51; TubeNearest.lean; TubeTangent.lean; TubeComparison.lean; TubeRegularCurve.lean:21,46,65; AnalyticCurveSeparation.lean"
+  },
+  {
+   "id": "I41",
+   "kind": "lemma (display)",
+   "name": "uniform separation σ(d) (aux:separation)",
+   "file_line": "sections/auxiliary.tex:141-173",
+   "statement": "inf_{|t−s|≥d}‖γ(t)−γ(s)‖>0 via sinc(q)<1.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"We need the following uniform separation property\""
+   },
+   "uses_items": [
+    "I39"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Tube radius."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Compactness/sinc estimate."
+   },
+   "provisional_F": null,
+   "lean_decl": "AnalyticSeparation.lean; AnalyticCurveSeparation.lean"
+  },
+  {
+   "id": "I42",
+   "kind": "lemma",
+   "name": "Lemma aux:rotation (R_t u(t)=v(t), Lipschitz in t)",
+   "file_line": "sections/auxiliary.tex:220-240",
+   "statement": "R = Id + A + A²/(1+κ), A h = v⟨u,h⟩ − u⟨v,h⟩.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I39"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Technical."
+   },
+   "analytic_check": "Analytic (classical rotation formula).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard plane-rotation formula."
+   },
+   "provisional_F": null,
+   "lean_decl": "AnalyticRotation.lean:31 skew, :38 rotation; AnalyticCurveRotation.lean:16 R"
+  },
+  {
+   "id": "I43",
+   "kind": "construction",
+   "name": "correction G and cutoffs β, χ (aux:G)",
+   "file_line": "sections/auxiliary.tex:242-327",
+   "statement": "G(x)=x+β(r)q(t)v(t)+χ(r)(R_t−Id)e on the tube, identity elsewhere; Lipschitz, ‖G‖≥ρ/4, G(x)=x for ‖x‖≥1/2.",
+   "cited_or_new": {
+    "status": "new explicit construction",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I40",
+    "I42"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Technical."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine cut-off construction."
+   },
+   "provisional_F": null,
+   "lean_decl": "CorrectionData.lean:26,52,57,60; CorrectionLocal.lean; CorrectionNonzero.lean; AnalyticCutoffs.lean:23,26; AnalyticCorrection.lean:138"
+  },
+  {
+   "id": "I44",
+   "kind": "definition",
+   "name": "f(x) = −G(x)/‖G(x)‖",
+   "file_line": "sections/auxiliary.tex:329-338",
+   "statement": "Negative radial normalisation; ‖f(x)−x‖ ≥ 1/2.",
+   "cited_or_new": {
+    "status": "standard trick",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I43"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Gives the displacement map."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard retraction-to-sphere trick."
+   },
+   "provisional_F": null,
+   "lean_decl": "AnalyticNormalization.lean:18 normalizeNeg, :66 normalizedMap"
+  },
+  {
+   "id": "L01",
+   "kind": "Lean definitions (model)",
+   "name": "comparator model: IntervalHomeomorph, IsDyadic, DyadicPLWitness, F, BoundedReal, leftPull, InvariantMean",
+   "file_line": "lean/OAI/GroupTheory/Thompson/Model.lean:16-76",
+   "statement": "F = {f : [0,1]≃ₜ[0,1] // StrictMono f ∧ ∃ finite dyadic knots with slopes 2^e}; InvariantMean = positive, normalized, left-invariant ℝ-linear map on lp ∞.",
+   "cited_or_new": {
+    "status": "Lean-only formal model",
+    "bib_key": null,
+    "cue": "comparator definitions"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Statement carriers."
+   },
+   "analytic_check": "Formal restatement of I01/I02.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Faithful formalisation (checked: textually identical to the comparator)."
+   },
+   "provisional_F": null,
+   "lean_decl": "Model.lean"
+  },
+  {
+   "id": "L02",
+   "kind": "Lean lemma",
+   "name": "standardPLEquiv / intervalHomeomorph_standardPL_iff",
+   "file_line": "lean/OAI/GroupTheory/Thompson/StandardCharacterization.lean:17-70",
+   "statement": "The model carrier equals the textbook finite-breakpoint dyadic PL condition (coverage derived).",
+   "cited_or_new": {
+    "status": "Lean-only sanity check",
+    "bib_key": null,
+    "cue": "\"A faithful identification with the standard PL group carrier\""
+   },
+   "uses_items": [
+    "L01"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Not on the comparator DAG; faithfulness evidence."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Sanity equivalence."
+   },
+   "provisional_F": null,
+   "lean_decl": "StandardCharacterization.lean:30,57"
+  },
+  {
+   "id": "L03",
+   "kind": "Lean lemma cluster",
+   "name": "Day/Hahn–Banach approximation by finite probabilities",
+   "file_line": "lean/OAI/GroupTheory/Thompson/MeanApproximation.lean:66-101; ProbabilityDefects.lean:28-176",
+   "statement": "An invariant mean forces 0 into the closure of the ℓ¹ defect set of finite probabilities (geometric Hahn–Banach), giving finitely supported probabilities with total defect < ε.",
+   "cited_or_new": {
+    "status": "Lean re-proof of classical step (Day 1957)",
+    "bib_key": "Day1957",
+    "cue": "\"Separation contradicts the existence of a positive normalized invariant mean.\""
+   },
+   "uses_items": [
+    "L01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Half of the Følner re-proof (paper only cites Følner)."
+   },
+   "analytic_check": "Analytic relative to L.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Day's argument."
+   },
+   "provisional_F": null,
+   "lean_decl": "MeanApproximation.lean:66,87"
+  },
+  {
+   "id": "L04",
+   "kind": "Lean lemma cluster",
+   "name": "Namioka layer-cake/coarea: probability with small defect ⇒ Følner set",
+   "file_line": "lean/OAI/GroupTheory/Thompson/FiniteCoarea.lean:59-270; FiniteLevels.lean",
+   "statement": "Exact finite coarea identities for mass and translations; some superlevel set has small total boundary.",
+   "cited_or_new": {
+    "status": "Lean re-proof of classical step (Namioka)",
+    "bib_key": null,
+    "cue": "\"Finite probability with small total translation defect yields a finite Følner set.\""
+   },
+   "uses_items": [
+    "L03"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Second half of the Følner re-proof."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Namioka's trick."
+   },
+   "provisional_F": null,
+   "lean_decl": "FiniteCoarea.lean:109,155,196,212,252"
+  },
+  {
+   "id": "L05",
+   "kind": "Lean theorem",
+   "name": "exists_fixed_boundary (generic core)",
+   "file_line": "lean/OAI/GroupTheory/Thompson/FiniteBoundary.lean:16-57",
+   "statement": "For ANY real inner product space E and Lipschitz f on its unit ball with displacement ≥δ, and D≥2 with D>4L²/δ², there is a fixed finite S⊂F with uniform boundary constant for every nonempty finite A.",
+   "cited_or_new": {
+    "status": "Lean packaging of Prop avg:boundary",
+    "bib_key": null,
+    "cue": "\"This actual finite subset of F is fixed before any averaging set.\""
+   },
+   "uses_items": [
+    "I19",
+    "I23",
+    "I25",
+    "I28",
+    "I31",
+    "I34"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Dominator of ~51% of the target's proof DAG (extractor dominated_share 0.509)."
+   },
+   "analytic_check": "Same as I27.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Same content as I27."
+   },
+   "provisional_F": null,
+   "lean_decl": "FiniteBoundary.lean:16"
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Følner criterion, forward direction (amenable ⇒ Følner sets)",
+   "bib_key": "Folner1955; Moore2013",
+   "locator": "Moore2013 Theorem 1.2",
+   "field": "Abstract harmonic analysis (43A07)",
+   "used_at": "sections/introduction.tex:16-26; sections/finite-proof.tex:320-323",
+   "status": "cited, not re-proved in paper; re-proved in Lean (MeanApproximation + FiniteCoarea)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Benyamini–Sternfeld: fixed-point-free Lipschitz self-map of the unit ball with positive minimal displacement",
+   "bib_key": "BenyaminiSternfeld1983",
+   "locator": "Theorem, part (3), p.439",
+   "field": "Nonlinear functional analysis / Banach space geometry",
+   "used_at": "sections/introduction.tex:84-96; sections/finite-proof.tex:108-115",
+   "status": "cited AND re-proved (Hilbert case, appendix Prop aux:map; fully in Lean)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Dyadic-partition model of F",
+   "bib_key": "CannonFloydParry1996",
+   "locator": "Section 2, Lemma 2.2",
+   "field": "Group theory",
+   "used_at": "sections/finite-proof.tex:10-12, 45-70",
+   "status": "cited, facts re-proved inline (Lemma dyad:eventual, dyad:transport)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Companion: unitarizable ⇒ amenable for discrete groups",
+   "bib_key": "OpenAIUnitarizability2026",
+   "locator": "Theorem 1.1",
+   "field": "Representation theory",
+   "used_at": "sections/consequences.tex:19-24",
+   "status": "cited, not re-proved; model-produced",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Companion: nonuniqueness of percolation on nonamenable quasi-transitive graphs",
+   "bib_key": "OpenAIPercolation2026",
+   "locator": "Corollary 1.2",
+   "field": "Probability",
+   "used_at": "sections/consequences.tex:51-55",
+   "status": "cited, not re-proved; model-produced",
+   "essential_for_headline": false
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Fix a Lipschitz f:B→B on a Hilbert ball with ‖f(x)−x‖≥δ (Benyamini–Sternfeld; explicit on L²([0,1];ℝ²) with δ=1/2). Choose D>4L²/δ² and D separated internal dyadic parents I_1<…<I_D.",
+   "items": [
+    "I05",
+    "I17",
+    "I18",
+    "I38"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Recursive coloring: p(T)=f(mean_j p(T_{I_j})) if T respects all I_j, else 0 (well-founded on cell count). Restriction composes: (T_I)_J=T_{I·J}.",
+   "items": [
+    "I06",
+    "I07",
+    "I08",
+    "I09",
+    "I10",
+    "I11",
+    "I19"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "Pull back to F: X_I^(n)(g)=p((gT^(n))_I) for I in the two-level family 𝓘 (parents and descendants) when (n,g) is admissible, 0 otherwise; scalar correlations φ_{I,J}=⟨X_I,X_J⟩.",
+   "items": [
+    "I12",
+    "I13",
+    "I21",
+    "I22",
+    "I23",
+    "I24"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "Fix S = transports carrying each separated pair of 𝓘 onto (I_1,I_2) (before A). For given A pick one level n admissible on A∪SA. Exact covariance + finite translation inequality: every separated-pair correlation average is within η of α.",
+   "items": [
+    "I14",
+    "I15",
+    "I16",
+    "I25",
+    "I26",
+    "I28"
+   ]
+  },
+  {
+   "step": 5,
+   "claim": "Recursion gives X_{I_i}=f(z_i); since m is the mean of the f(z_i), displacement+Jensen+Lipschitz give δ² ≤ (L²/D)Σ‖z_i−m‖².",
+   "items": [
+    "I29",
+    "I30",
+    "I31"
+   ]
+  },
+  {
+   "step": 6,
+   "claim": "Variance: off-diagonal/separated terms ≈α, nested pairs only a 1/D fraction ⇒ E_A‖z_i−m‖² ≤ 4/D+4(1−1/D)η. Hence η ≥ (δ²/L²−4/D)/(4(1−1/D)) > 0 uniformly in A.",
+   "items": [
+    "I27",
+    "I32",
+    "I33",
+    "I34"
+   ]
+  },
+  {
+   "step": 7,
+   "claim": "Uniform Følner failure for the fixed S contradicts the Følner criterion; F is not amenable. Corollaries via companion results.",
+   "items": [
+    "I03",
+    "I35",
+    "I36",
+    "I37"
+   ]
+  }
+ ],
+ "eureka_candidates_ranked": [
+  {
+   "rank": 1,
+   "item": "I19 (with its pullback I23)",
+   "name": "Recursive Hilbert-ball coloring of dyadic partitions driven by a fixed-point-free Lipschitz map",
+   "provisional_N": "N3",
+   "provisional_F": "F1 (extension definition); F3 flavour",
+   "for": [
+    "A one-line definition that occurs nowhere in the goal or in L; with it the 50-year-open problem falls to ~2 pages of Hilbert-space algebra (the Cook–Reckhow profile: syntactically tiny, hard to find, huge budget drop).",
+    "It converts approximate left-invariance of finite averages of SCALARS into an approximate fixed point of a NONLINEAR map on an infinite-dimensional ball, which classical fixed-point characterisations of amenability (Day: affine actions on compact convex sets) never do.",
+    "It exploits exactly the feature distinguishing F from affine/tree-automorphism groups: transports that rescale (depth r vs 2r) while placing two intervals independently.",
+    "Quick literature check found no recursive or vector-valued tree invariant in the F-amenability literature: Moore (Fund. Math. 2013) uses finite scalar colorings of trees with a convex Ramsey property; Akhmedov uses height functions; Guba uses diagram classes/densities; Haagerup–Olesen go via C*-simplicity of T."
+   ],
+   "against": [
+    "Every ingredient is classical (B–S 1983, tree restriction/self-similarity of F, Følner), so a judge could rate it a clever COMBINATION (N2) rather than a new concept.",
+    "Infinite-dimensionality of the target is forced (Brouwer kills finite-dimensional f), and the 'no approximate fixed point' input is a known transfer; the creative step is the recursion itself.",
+    "Pivot distance is about 2 from L: one must (i) think of coloring trees recursively by a nonlinear map, and (ii) pick a map with no approximate fixed points; neither alone suffices."
+   ],
+   "nearest_neighbours": [
+    "Moore 2013 (Fund. Math. 220) convex Ramsey property for colorings of finite binary trees",
+    "Akhmedov height-function criterion (arXiv 1310.4395v3)",
+    "Benyamini–Sternfeld 1983; Lin–Sternfeld 1985",
+    "Day/Gheysens–Monod fixed-point characterizations of amenability"
+   ],
+   "discoverability_note": "No trace released. Historical hardness is extreme (Geoghegan 1979; several failed attempts), but the eventual argument is short, which is the eureka signature if correct."
+  },
+  {
+   "rank": 2,
+   "item": "I31 + I34 cluster (L05 exists_fixed_boundary)",
+   "name": "Approximate pair-exchangeability ⇒ child means ≈ parent mean ⇒ approximate fixed point of f",
+   "provisional_N": "N2 (N3 only as part of the cluster with I19)",
+   "provisional_F": null,
+   "for": [
+    "The hinge observation that m is simultaneously the parent mean and the mean of f(z_i), so concentration of z_i near m forces m≈f(m).",
+    "The Lean core theorem exists_fixed_boundary is generic over any Hilbert space and any displacement map: a reusable criterion."
+   ],
+   "against": [
+    "The variance bound is a finite de Finetti/exchangeability computation (Diaconis–Freedman flavour); Jensen+Lipschitz is textbook.",
+    "It has no force without I19."
+   ],
+   "nearest_neighbours": [
+    "finite de Finetti theorems (Diaconis–Freedman 1980)",
+    "variance bounds for exchangeable arrays (Aldous)"
+   ]
+  },
+  {
+   "rank": 3,
+   "item": "I25 + I16 + I28",
+   "name": "Fixed transport set S chosen before A, single level n after A, exact covariance of normalized restrictions",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Makes correlations comparable EXACTLY, so only the Følner defect enters; the quantifier order avoids any dependence of S on A."
+   ],
+   "against": [
+    "Standard in the tree-pair / Moore formalism for Følner sets of F; transitivity of F on dyadic pairs is folklore."
+   ],
+   "nearest_neighbours": [
+    "Moore 2013 finite-tree reformulation of Følner sets; CFP Lemma 4.2-type transitivity"
+   ]
+  },
+  {
+   "rank": 4,
+   "item": "I33",
+   "name": "Nested pairs occupy a 1/D fraction (only the own-parent column is uncontrolled)",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Removes the need for any control on nested (ancestor–descendant) correlations, which the transports cannot compare."
+   ],
+   "against": [
+    "Elementary counting."
+   ]
+  },
+  {
+   "rank": 5,
+   "item": "I38–I44",
+   "name": "Explicit Lipschitz displacement map on L²([0,1];ℝ²)",
+   "provisional_N": "N0 (as a result) / N1–N2 (as a construction)",
+   "provisional_F": null,
+   "for": [
+    "Self-contained, fully formalized; ~34% of the Lean DAG."
+   ],
+   "against": [
+    "Re-proof of the Hilbert case of Benyamini–Sternfeld (1983) using standard curve-tube constructions: transfer, not eureka."
+   ]
+  }
+ ],
+ "correctness_audit": {
+  "verdict": "No gap found. Every step of Sections 2.1–2.3 checked by hand, including the final arithmetic; and the Lean formalization is complete (no sorry/axiom), faithful to the paper step by step, and its comparator statement exactly matches the headline with standard definitions. Conditional on the Lean build succeeding (not reproduced here), the theorem is machine-verified. It remains an extraordinary claim and should get expert review.",
+  "checked": [
+   "Covariance (dyad:covariance): cells of (hg)T^(n) inside I'=h(I) are h(C) with C⊂I, and s_{I'}^{-1}∘h = s_I^{-1} on I. Correct for hg=h∘g.",
+   "Finite translation inequality: Σ_{g∈A}φ(hg) = Σ_{x∈hA}φ(x), difference ≤ |hA△A| for |φ|≤1. Correct; zero extension makes φ global so points of hA\\A cause no issue.",
+   "Single level n chosen after A for A∪SA (finite); S fixed before A. Quantifier order is correct for contradicting Følner.",
+   "Recursion well-founded: T_{I_j} has fewer cells since I_j internal and T has cells outside it. Mean of ball elements stays in B.",
+   "Recursive identity: admissibility gives (gT)_{I_i} respects I_j with ((gT)_{I_i})_{I_j} = (gT)_{I_i·I_j}, so X_{I_i}=f(z_i).",
+   "Separation: I_i·I_j vs I_i·I_l (j≠l) separated since s_{I_i} is an order-preserving affinity; I_i·I_j ⊂ I_i separated from I_k (k≠i). Both orientations handled by symmetry of ⟨·,·⟩.",
+   "Energy bounds: E‖m‖² ≤ (1−1/D)(α+η)+1/D; same for z_i; E⟨z_i,m⟩ ≥ (1−1/D)(α−η)−1/D. Sum: E‖z_i−m‖² ≤ 4/D + 4(1−1/D)η (α cancels). Verified.",
+   "Displacement chain: m = (1/D)Σf(z_i) so m−f(m) = (1/D)Σ(f(z_i)−f(m)); Jensen and Lipschitz give δ² ≤ (L²/D)Σ‖z_i−m‖². Verified.",
+   "Final: δ² ≤ L²(4/D + 4(1−1/D)η) ⇒ η ≥ (δ²/L²−4/D)/(4(1−1/D)) > 0 when D>4L²/δ². Verified (Lean BoundaryAlgebra.lean:52).",
+   "Worked example p(T^(r))=f(0), p(T^(2r))=f(f(0)) checked.",
+   "Appendix: ‖γ'‖² = a'² + a²θ'²/3 (since ∫w² = 1/3); ‖f(x)−x‖ ≥ 1/2 case split checked at the level of the argument; fully formalized in Lean."
+  ],
+  "consistency_checks_passed": [
+   "Proves-too-much (affine groups): BS(1,2)-type affine groups are amenable but cannot carry two separated intervals independently (gap ratio is preserved), so the transport lemma fails; argument does not apply.",
+   "Proves-too-much (tree automorphism groups, e.g. Grigorchuk, odometer full groups): no depth change, so the parent/descendant transports (depth r vs 2r) do not exist.",
+   "Finite-dimensional f is impossible (Brouwer), so the argument needs infinite dimension; consistent with the problem resisting scalar/finite-coloring approaches (Moore's convex Ramsey reformulation).",
+   "Implies ⟨S⟩ is nonamenable for any admissible choice of transports; consistent with Brin/Bleak structure of PL subgroups (subgroups with such scale-changing transitivity are not solvable).",
+   "Consistent with Moore's tower lower bound on Følner functions and with Haagerup–Haagerup–Ramirez-Solano numerics suggesting nonamenability."
+  ],
+  "residual_concerns": [
+   "Extraordinary claim: a 50-year-open conjecture with a history of failed/withdrawn proofs (Akhmedov 2013 v1 withdrawn, Shavgulidze 2009 refuted by Moore, Moore 2012 withdrawn); the core argument is surprisingly short. Expert review is essential even though I found no gap.",
+   "Lean build not reproduced locally; enable_nanoda=false (no second kernel check). Mathlib-level soundness is assumed.",
+   "Quick web search (Oct 2026) found no independent public confirmation or refutation of this specific proof.",
+   "Corollaries depend on two model-produced companion preprints not reviewed here.",
+   "Minor: the paper states the Følner criterion via Moore 2013 Thm 1.2 (sum of ratios); the needed per-element strict bound follows trivially (and Lean re-proves it).",
+   "Bibliographic details (e.g. Guba2026 description) not verified."
+  ]
+ },
+ "extraction_friction": [
+  "The decisive object (recursive coloring p) is a displayed equation, not a Definition environment or \\emph; most core estimates are unnumbered paragraphs inside one proof.",
+  "Only the headline is a theorem environment; Prop avg:boundary carries the content and is the natural lemma-level candidate.",
+  "The paper uses intervals I_j at depth r with 2^r>2D; the Lean uses depth 2D, index 2i+1: name-based joins fail (selectedInterval vs I_j).",
+  "Følner is cited in the paper but re-proved in Lean (MeanApproximation, ProbabilityDefects, FiniteCoarea, FiniteLevels, MeanToFolner): Lean-only items with no LaTeX counterpart.",
+  "The appendix (B–S map) is ~1/3 of the Lean proof DAG; DAG-share proxies over-weight it and under-weight the 1-line coloring definition (partitionColor frac_dag_dependents ≈0.05).",
+  "Useful cue phrases: \"For completeness\", \"The relevant covariance is exact\", \"All choices so far, in particular S, are independent of the finite set to be tested\", \"No condition is imposed on nested pairs\", \"This estimate does not require any sign assumption on α\"."
+ ],
+ "literature_check_sources": [
+  "https://arxiv.org/pdf/1209.2063 (Moore, nonassociative Ramsey theory, withdrawn)",
+  "https://ar5iv.arxiv.org/html/1106.4735 (Moore, Hindman/Ellis and F)",
+  "https://arxiv.org/pdf/1310.4395 (Akhmedov)",
+  "https://arxiv.org/pdf/2305.07113 (Guba survey, state of the art)",
+  "https://www.ams.org/proc/1983-088-03/S0002-9939-1983-0699410-7/ (Benyamini–Sternfeld)",
+  "https://arxiv.org/pdf/1508.00423 (Gheysens–Monod, fixed points for bounded orbits)",
+  "https://en.wikipedia.org/wiki/Thompson_groups"
+ ]
+}

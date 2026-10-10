@@ -1,0 +1,2534 @@
+{
+ "family": "108",
+ "title": "A cubic permanent–determinant lower bound",
+ "manuscript_title": "A cubic lower bound for border determinantal complexity of the permanent",
+ "manuscript_dir": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026",
+ "source_root": "data/raw/openai-math/preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source",
+ "tex_files_read": [
+  "main.tex",
+  "sections/introduction.tex",
+  "sections/models.tex",
+  "sections/selector.tex",
+  "sections/adjugate.tex",
+  "sections/conductor.tex",
+  "sections/dimension.tex",
+  "sections/transfer.tex",
+  "sections/polar.tex",
+  "sections/consequences.tex",
+  "figures/proof-flow.tex",
+  "figures/selector-wiring.tex (header only; picture code)",
+  "references.bib"
+ ],
+ "commit": "fd4aeeb",
+ "analyst_role": "Family analyst (paper + Lean), text-level; Lean not installed, nothing compiled. Phase 1 of the 108 pilot.",
+ "base_library_L": "Mathlib d13f23b + references.bib of the manuscript (30 entries, incl. SheshadriBorder2026 arXiv:2606.13628, KumarVolk2026 arXiv:2609.34462, CHT2023, FGvS1999, Galazka2017).",
+ "main_statement": {
+  "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/introduction.tex:41-49",
+  "latex": "\\begin{theorem}\\label{thm:main} There exist absolute constants $c>0$ and $m_0$ such that, for every integer $m\\ge m_0$, \\[ \\bdc(\\per_m)\\ge c m^3. \\] One may take $c=1/(5\\,529\\,600e)$ and $m_0=1408$. \\end{theorem}",
+  "paraphrase": "Over C, if the m x m permanent is a coefficientwise limit of determinants of n x n matrices of affine-linear forms (n fixed along the sequence, coefficients unbounded), then n >= m^3/(5,529,600 e) for all m >= 1408. Exact determinantal complexity inherits the bound (Cor 9.1), and so do vertex and edge counts of affine ABPs, including fixed-budget limits (Cor 9.2).",
+  "constructive_core": {
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/transfer.tex:217-235",
+   "latex": "Prop smooth-projection: for k>=128, q=floor((k-1)/3), r=k-2q, d=floor(k^2/100) there is a nonzero form G of degree r in d variables with smooth projective zero set and, for every m>=11k-2q, an affine map Phi_m with G = per_m o Phi_m; r-1>=k/4, d-1>=k^2/200.",
+   "paraphrase": "A linear-size permanent has an affine projection that is a smooth hypersurface of linear degree in quadratically many variables. This is then fed into the smooth-form bound bdc(G) >= (r-1)(d-1)/(4e) (Thm 2.3)."
+  },
+  "headline_corollaries": [
+   {
+    "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/consequences.tex:47-58",
+    "paraphrase": "Cor exact-complexity: dc(per_m) >= m^3/(5,529,600e) for m>=1408."
+   },
+   {
+    "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/consequences.tex:60-99",
+    "paraphrase": "Cor ABP: affine-linear ABPs for per_m need Omega(m^3) vertices and Omega(m^3) edges, also in fixed-budget border limits (via ABP -> determinant of size N+1)."
+   },
+   {
+    "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/consequences.tex:107-134",
+    "paraphrase": "Cor smooth-initial-form: if the lowest homogeneous term of g(a+x) has degree r>=2 and is smooth in P^{d-1}, then bdc(g), dc(g) >= (r-1)(d-1)/(4e). With Thm 2.3 this gives e.g. bdc(sum_i x_i^n) >= (n-1)^2/(4e), the bound claimed by the LLM-assisted Sheshadri preprint."
+   },
+   {
+    "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/models.tex:104-111",
+    "paraphrase": "Thm smooth-border (supporting): smooth nonzero form of degree r>=2 in d>=2 variables has bdc >= (r-1)(d-1)/(4e)."
+   }
+  ],
+  "lean_comparator": {
+   "challenge_files": [
+    "lean/ComparatorChallenges/PermanentCubic.{json,lean}",
+    "lean/ComparatorChallenges/SmoothInitialForm.{json,lean}"
+   ],
+   "config": {
+    "PermanentCubic": {
+     "challenge_module": "ComparatorChallenges.PermanentCubic",
+     "solution_module": "OAI.Algebra.Determinantal.Main",
+     "theorem_names": [
+      "OAI.PermanentBorder.permanent_cubic_lower_bounds"
+     ],
+     "definition_names": [],
+     "permitted_axioms": [
+      "propext",
+      "Quot.sound",
+      "Classical.choice"
+     ],
+     "enable_nanoda": false
+    },
+    "SmoothInitialForm": {
+     "challenge_module": "ComparatorChallenges.SmoothInitialForm",
+     "solution_module": "OAI.Algebra.Determinantal.InitialForm",
+     "theorem_names": [
+      "OAI.PermanentBorder.smooth_initial_form_lower_bound"
+     ],
+     "definition_names": [],
+     "permitted_axioms": [
+      "propext",
+      "Quot.sound",
+      "Classical.choice"
+     ],
+     "enable_nanoda": false
+    }
+   },
+   "verbatim_PermanentCubic": "theorem permanent_cubic_lower_bounds :\n    (∀ (m n : ℕ), 1408 ≤ m → HasBorderDeterminant n (permanentPolynomial m) →\n      (m : ℝ)^3 / (5529600 * Real.exp 1) ≤ (n : ℝ)) ∧\n    (∀ (m n : ℕ), 1408 ≤ m → HasExactDeterminant n (permanentPolynomial m) →\n      (m : ℝ)^3 / (5529600 * Real.exp 1) ≤ (n : ℝ))",
+   "definitions_unfolded": "permanentPolynomial m = Σ_{τ ∈ Perm(Fin m)} Π_i X(i,τ i) over ℂ; affineMatrixPolynomial n A₀ A = det(C(A₀ i j) + Σ_v C(A v i j) X v); HasBorderDeterminant n p := 0<n ∧ ∃ sequences A₀ j, A j with every coefficient of affineMatrixPolynomial n (A₀ j)(A j) tending to the coefficient of p; HasExactDeterminant n p := 0<n ∧ ∃ A₀ A, affineMatrixPolynomial n A₀ A = p.",
+   "verbatim_SmoothInitialForm_summary": "smooth_initial_form_lower_bound d r g a (2≤d) (2≤r): with G := homogeneousComponent r (g(a+x)) ≠ 0, all lower components zero, and (∀ y, G(y)=0 → ∇G(y)=0 → y=0), then ∀ n, HasBorderDeterminant n g → (r-1)(d-1)/(4e) ≤ n, and likewise for HasExactDeterminant.",
+   "challenge_defs_identical_to_library": "Yes: challenge Variables/Poly/permanentPolynomial/affineMatrixPolynomial/HasBorderDeterminant/HasExactDeterminant match lean/OAI/Algebra/Determinantal/Model.lean:120-141 textually; affineSubstitution matches Model.lean:264-266.",
+   "match_check": "EXACT for Thm main (border and exact, same constants c=1/(5529600e), m0=1408) and for Cor smooth-initial-form (the smoothness hypothesis 'only common zero of G and ∇G is 0' is projective smoothness of V(G) over ℂ). Thm smooth-border is the a=0 homogeneous special case; it is also a library theorem HasBorderDeterminant.smooth_lower_bound (BorderPolars.lean:391). Paper's bdc is 'least n'; the Lean form 'every admissible n is ≥ bound' is equivalent.",
+   "formalized": [
+    "Thm main (border + exact), explicit constants",
+    "Cor exact-complexity",
+    "Cor smooth-initial-form (hence Thm smooth-border)",
+    "Prop selector (exists_selector_affine_projection, AffineSelectors.lean:382)"
+   ],
+   "claimed_not_formalized": [
+    "Prop model-equivalence (orbit-closure / padded-permanent formulation, models.tex:44-97)",
+    "Cor ABP (vertex/edge bounds, consequences.tex:60-99) - explicitly excluded in lean/docs/108.md",
+    "the Euclidean=Zariski closure remark (models.tex:6-14)",
+    "the paper's own route for Prop gradient-codimension (CHT Severi theorem, Hilbert-scheme bound, Stacks semicontinuity) - Lean proves a weaker substitute, see lean_route_differences"
+   ],
+   "docs": "lean/docs/108.md: 'The paper's algebraic-branching-program consequences are outside these statements.'",
+   "formalization_yaml": "no entry for this family (catalog any_ms_formalized=False, in_formalization_yaml=False) although the Lean dir and two comparators exist."
+  }
+ },
+ "trust_surface": {
+  "grep_scope": "lean/OAI/Algebra/Determinantal/*.lean (57 files, 21,183 lines) + the two challenge files",
+  "counts": {
+   "sorry": 0,
+   "axiom": 0,
+   "admit": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque": 0,
+   "partial def": 0,
+   "ofReduceBool/trustCompiler": 0,
+   "#eval/run_cmd/elab/macro/syntax": 0,
+   "set_option (incl. maxHeartbeats)": 0,
+   "decide (kernel-checked)": 24,
+   "Classical.choose/choice/epsilon (explicit)": 10,
+   "open (scoped) Classical": 29,
+   "attribute [local instance]": 0,
+   "_root_": 12,
+   "linear_combination": 7,
+   "nlinarith": 37,
+   "omega": 287
+  },
+  "decide_uses": "All 24 are trivial side conditions: Fin literal disequalities ((0:Fin 2)≠1, (0:Fin 3)≠1 ...), 2≠0, castLE bounds, and ContDiff smoothness-order literals in differentiable/implicitFunction calls (PointBounds.lean:269-325, SmoothSlices.lean:67,139, BorderPolars.lean:276). No search.",
+  "classical_uses": "Standard noncomputable choice; within permitted axioms.",
+  "custom_axioms": "none",
+  "only_sorry": "the two comparator challenge stubs, as intended",
+  "external_packages": "none: a single `import Mathlib` (Multigraded.lean:1) plus Mathlib.Data.Finsupp.Encodable (BorderClosure.lean); no other OAI dirs imported (lean_dirs_imported empty).",
+  "third_party_build": "Guo, arXiv:2609.29568v2 (8 Oct 2026), Sec 6: rebuilt the frozen sources (openai/math commit adc7f124..., Lean 4.34.1, Mathlib d13f23b) and checked 12 declarations from this dir, including exists_effective_critical_bound and exists_selector_affine_projection, with #print axioms reporting only propext, Classical.choice and Quot.sound. This is partial independent evidence that the char-2 branch compiles. The commit differs from our pin fd4aeeb.",
+  "verdict": "Clean at text level. If the comparator run passes (not re-run here), both headline statements are machine-checked against exactly matching statements. Toolchain leanprover/lean4:v4.34.1."
+ },
+ "labels": {
+  "A": {
+   "label": "A5",
+   "secondary": {
+    "hard_direction_form": "n/a (one-directional lower bound)",
+    "explicit_rate": true,
+    "explicit_rate_detail": "c = 1/(5,529,600 e), m0 = 1408; Thm smooth-border also explicit (r-1)(d-1)/(4e)."
+   },
+   "evidence": {
+    "quote": "There exist absolute constants $c>0$ and $m_0$ such that, for every integer $m\\ge m_0$, $\\bdc(\\per_m)\\ge c m^3$.",
+    "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/introduction.tex:41-49"
+   },
+   "confidence": "medium-high",
+   "note": "Innermost conclusion is 'no (border) determinantal representation of size < c m^3 exists' = impossibility (A5) with explicit rate. A3 (quantitative) is the obvious alternative; the bound is not claimed sharp (Grenet's upper bound is 2^m - 1, introduction.tex:90-94)."
+  },
+  "B": {
+   "label": "B3",
+   "flags": {
+    "full_only_with_prior_results": false,
+    "full_only_with_prior_results_detail": "Self-contained modulo cited AG facts: CHT2023 Severi dimension (dimension.tex:68-75, essential, not re-proved) and Stacks semicontinuity/constructibility. Lean replaces these by its own proofs.",
+    "adds_corollaries_for_other_conjectures": true,
+    "adds_corollaries_detail": "Cubic ABP vertex/edge lower bounds for per_m (previous best quadratic, Kumar/CKSV for other polynomials); smooth-form bound gives bdc(sum x_i^n) >= (n-1)^2/(4e), i.e. a self-contained proof of the claim of the LLM-written Sheshadri preprint 2606.13628 that Kumar-Volk (2609.34462) could not verify."
+   },
+   "secondary_label": "B4 (raises the exponent of the Landsberg-Manivel-Ressayre m^2/2 border bound and of Mignon-Ressayre's exact m^2/2 bound to 3)",
+   "evidence": {
+    "quote": "Theorem~\\ref{thm:main} raises the lower-bound exponent from two to three in that same model. It remains a fixed polynomial bound. Whether the permanent has superpolynomial determinantal complexity ... remains open.",
+    "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/introduction.tex:105-108"
+   },
+   "confidence": "medium",
+   "note": "The posed problem (permanent vs determinant / Valiant's conjecture) is superpolynomial; this is partial progress (B3). Relative to the specific quadratic-bound literature it is B4. Recorded B3 primary because the family title frames it as a permanent-determinant result."
+  },
+  "C": {
+   "primary": "C4",
+   "primary_evidence": {
+    "quote": "$r(r-1)^{d-2} \\le 2^{d-2}\\binom{2n-1}{d-1} \\le (4en/(d-1))^{d-1}$",
+    "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/models.tex:123-127"
+   },
+   "secondaries": [
+    {
+     "label": "C5",
+     "evidence": {
+      "quote": "Applying the arbitrary-characteristic Severi dimension theorem of Christ, He and Tyomkin ... bounds the locus of curves with this defect.",
+      "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/introduction.tex:216-218"
+     },
+     "note": "Two genuine reductions: per_m -> smooth form G by a fixed affine projection (Cor selector-border), and a char-2 -> char-0 transfer of the gradient-locus bound (Lemma characteristic-transfer). CHT2023 Severi dimension is invoked without proof (essential in the paper; bypassed in Lean)."
+    },
+    {
+     "label": "C1",
+     "evidence": {
+      "quote": "two count gates and a cancellation gadget realize $G_D$, up to a fixed nonzero scalar, as an affine restriction of a permanent of size $11k-2q$",
+      "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/introduction.tex:172-175"
+     },
+     "note": "Explicit gadget construction (Prop selector). Not primary: it builds an auxiliary projection, not the witness of the headline (a universal lower bound)."
+    },
+    {
+     "label": "C3",
+     "evidence": {
+      "quote": "Specialization transfers the dimension bound to a nonempty open set of complex parameters ... a general linear section avoids that scheme",
+      "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/introduction.tex:233-238"
+     },
+     "note": "Non-constructive existence of good parameters theta and of a smooth section H (dimension counts on Grassmannians/parameter spaces); the smooth form G is never written down."
+    }
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "To verify the six balanced cases, first $\\per H=-2$.",
+    "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/selector.tex:149"
+   },
+   "computer_assisted_note": "All verifications are by hand (3x3 gadget permanents, binomial estimates). Lean decide uses are Bool/literal side conditions only. The gadget weights could have come from a search, but nothing in the proof depends on one.",
+   "ih_strengthened": false,
+   "ih_template": null,
+   "ih_note": "No induction on statements. The Hilbert-scheme bound stratifies by length types (dimension.tex:298-309); the product count uses a homotopy (polar.tex:146-176). Neither is an induction hypothesis.",
+   "confidence": "medium (C4 vs C5 primary is arguable: the cubic comes from one comparison of counts, but most of the paper is reduction + dimension theory)"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "I06 coefficient polynomial G_D = [s^q t^q] per_k(X+sI+tD) used as a smooth-after-slicing permanent projection (N3, F1/F3), with I29/I32/I35 (char-2 spectral-curve bound on the gradient locus: grad G = 0 => delta(C_X) >= T => codim >= T-k; N3, F5) as co-candidate. The smooth-form bound I13/I48 is N2 (close variant of LLM-written Sheshadri 2606.13628).",
+   "evidence": {
+    "quote": "we seek an affine restriction of a permanent of size proportional to $k$ that has degree proportional to $k$ in quadratically many variables and has a smooth projective zero set.",
+    "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/introduction.tex:156-158"
+   },
+   "confidence": "low-medium",
+   "caveats": [
+    "Quick check found a model-produced architectural precedent NOT cited by the paper: OpenAI 'Ten advances in mathematics and theoretical computer science' (Aug 1 2026), Chapter 5 / github openai/ten-proofs Permanent.lean defines minorSum t s d (sum of permanental minors), criticalLocus dimension and homogeneous linear slices with finite gradient zero sets, for an n^2 log log n circuit bound (described in Guo arXiv:2609.29568). The 'affine specialization of the permanent with small critical locus + generic slice' idea is therefore not new to 108; I06 may drop to N2.",
+    "The smooth-form half (Thm smooth-border) has the same constant 4e and the same kernel-lift + multihomogeneous Bezout architecture as Sheshadri 2606.13628 (acknowledgement: 'The author used the assistance of large language models in all stages of the effort.'). The paper cites it as the source of the kernel equations (polar.tex:9-13).",
+    "Cross-field imports (Severi dimension, conductor/delta, Hilbert schemes, polar degree, Bertini) are N0 transfer and never yield D3 on their own."
+   ],
+   "flag_builds_on_prior_model_produced_result": "yes (partial)",
+   "flag_detail": "Cites and builds on SheshadriBorder2026 (LLM-assisted in all stages, per its acknowledgement) for the kernel-equation/Schur architecture of the smooth-form bound. Does not cite the earlier OpenAI Ten Advances permanent chapter, whose critical-locus/slice architecture it follows. Also cites KumarVolk2026 (dated 28 Sep 2026, i.e. after the manuscript's 24 Sep date)."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Theoretical computer science",
+    "msc2020": [
+     "68Q17",
+     "68Q15",
+     "15A15",
+     "14N07"
+    ],
+    "evidence": {
+     "quote": "Theoretical computer science (catalog_families.csv row 108)",
+     "file_line": "data/catalog_families.csv"
+    }
+   },
+   "lean_dir_field": {
+    "dir": "OAI/Algebra/Determinantal",
+    "lean_fields": "Algebra",
+    "note": "Single dir, no imported OAI dirs. Content is mostly algebraic geometry/commutative algebra in Mathlib-level form (Krull dimension, transcendence degree, integral closure, Macaulay matrices)."
+   },
+   "method_fields": [
+    {
+     "field": "Algebraic geometry of plane curves (delta-invariant, Severi varieties, normalization)",
+     "tag": "essential",
+     "items": [
+      "I07",
+      "I08",
+      "I32",
+      "I33",
+      "I34",
+      "I35"
+     ],
+     "invoked": "CHT2023 Severi dimension (cited, not re-proved); genus/delta formula; Tyomkin2013 background"
+    },
+    {
+     "field": "Commutative algebra (conductor, Gorenstein duality, evaluation/trace ideals, DVRs)",
+     "tag": "essential",
+     "items": [
+      "I31",
+      "I32"
+     ],
+     "invoked": "FGvS method re-proved in arbitrary char; Stacks 032L, 00PD"
+    },
+    {
+     "field": "Enumerative/projective geometry (polar degree of smooth hypersurfaces, Bezout, Bertini/Kleiman transversality, Grassmannian incidence)",
+     "tag": "essential",
+     "items": [
+      "I44",
+      "I42",
+      "I13"
+     ],
+     "invoked": "Piene1978 top polar degree (re-proved via Bezout); Kleiman1974 background"
+    },
+    {
+     "field": "Multihomogeneous Bezout / homotopy continuation (numerical AG)",
+     "tag": "essential",
+     "items": [
+      "I45"
+     ],
+     "invoked": "Wampler1996 cited, bilinear case re-proved"
+    },
+    {
+     "field": "Complex analysis (implicit function theorem, persistence of simple zeros)",
+     "tag": "essential",
+     "items": [
+      "I46"
+     ],
+     "invoked": "standard"
+    },
+    {
+     "field": "Algebraic complexity / matching gadgets (Valiant projections, signed equality gadgets)",
+     "tag": "essential",
+     "items": [
+      "I17-I22"
+     ],
+     "invoked": "Valiant1979 / DHMTW2014 as precedents, gadget re-derived"
+    },
+    {
+     "field": "Scheme theory (constructibility, upper semicontinuity of fibre dimension, specialization Z[theta] -> F2bar / C, Jacobian criterion)",
+     "tag": "essential",
+     "items": [
+      "I40"
+     ],
+     "invoked": "Stacks 054K, 0D4I"
+    },
+    {
+     "field": "Hilbert schemes of points / commuting nilpotent varieties (Lie theory)",
+     "tag": "essential (re-proved)",
+     "items": [
+      "I38"
+     ],
+     "invoked": "Baranovsky1998, Premet2003 cited as background; proof given"
+    },
+    {
+     "field": "Integrable systems / spectral curves (adjugate annihilating a fixed vector)",
+     "tag": "background-cited",
+     "items": [
+      "I09",
+      "I37"
+     ],
+     "invoked": "AdamsHarnadHurtubise1993"
+    },
+    {
+     "field": "Secant/cactus varieties (catalecticant bound)",
+     "tag": "background-cited",
+     "items": [
+      "I28"
+     ],
+     "invoked": "Galazka2017; direct monomial proof given"
+    },
+    {
+     "field": "Geometric complexity theory (orbit closures, padding)",
+     "tag": "corollary-only",
+     "items": [
+      "I12"
+     ],
+     "invoked": "MulmuleySohoni2001/2008, LandsbergManivelRessayre2010 (context + model equivalence)"
+    },
+    {
+     "field": "Characteristic-p algebra (per = det mod 2; Frobenius square decomposition in Lean)",
+     "tag": "essential",
+     "items": [
+      "I25",
+      "L01"
+     ],
+     "invoked": "elementary"
+    }
+   ],
+   "cross_field_count_essential_nonTCS": 8,
+   "share_invoked_cited_theorems_from_other_fields": "about 12/13 of invoked external theorems (all except the Valiant-type gadget precedents) are from algebraic geometry / commutative algebra / analysis, not TCS",
+   "confidence": "medium-high"
+  }
+ },
+ "items": [
+  {
+   "id": "I01",
+   "kind": "definition (classical)",
+   "name": "permanent per_m",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/introduction.tex:4-7",
+   "statement": "per_m(X)=sum_sigma prod_i x_{i,sigma(i)}",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": null,
+    "cue": "standard"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "goal object"
+   },
+   "analytic_check": {
+    "verdict": "in goal",
+    "note": "Comparator permanentPolynomial"
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I02",
+   "kind": "definition (\\emph, inline)",
+   "name": "determinantal complexity dc(f)",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/introduction.tex:21-26",
+   "statement": "least n with f = det(A0 + sum x_j A_j)",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "MignonRessayre2004",
+    "cue": "'its \\emph{determinantal complexity}'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "goal object"
+   },
+   "analytic_check": {
+    "verdict": "in goal",
+    "note": "HasExactDeterminant"
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard (Valiant, MR2004)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I03",
+   "kind": "definition (\\emph, inline)",
+   "name": "border determinantal complexity bdc(f) (coefficientwise closure, fixed n, unbounded coefficients)",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/introduction.tex:27-39",
+   "statement": "least n with f in coefficientwise closure of affine n x n determinants",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "LandsbergManivelRessayre2010",
+    "cue": "'Its \\emph{border determinantal complexity}'"
+   },
+   "uses_items": [
+    "I02"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "goal object"
+   },
+   "analytic_check": {
+    "verdict": "in goal",
+    "note": "HasBorderDeterminant"
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "LMR/GCT standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I04",
+   "kind": "theorem (headline)",
+   "name": "Thm main: bdc(per_m) >= m^3/(5529600e), m>=1408",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/introduction.tex:41-49",
+   "statement": "see main_statement",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "'raises the lower-bound exponent from two to three'"
+   },
+   "uses_items": [
+    "I13",
+    "I43",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "level": "target",
+    "reason": "headline"
+   },
+   "analytic_check": {
+    "verdict": "is the goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "n/a",
+    "justification": "headline"
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I05",
+   "kind": "definition (inline)",
+   "name": "affine-linear algebraic branching program",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/introduction.tex:56-60; consequences.tex:60-66",
+   "statement": "DAG with source/sink, affine forms on edges, output = path sum",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": null,
+    "cue": "standard notion"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "corollary only"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I06",
+   "kind": "definition / key construction",
+   "name": "coefficient polynomial G_D(X) = [s^q t^q] per_k(X + sI + tD), D = diag(theta), q = floor((k-1)/3), r = k-2q",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/introduction.tex:159-170; selector.tex:13-38",
+   "statement": "Homogeneous of degree r in k^2 entries; equals sum over disjoint S,T of size q of (prod_{i in T} theta_i) per(X_{C,C}), C = [k] minus (S u T).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "'we seek an affine restriction of a permanent ... smooth projective zero set' (intro:156-158); no precedent named"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "Every later step is about this polynomial: projection (I17), critical locus (I29-I41), transfer (I42), slicing (I44)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Does not occur in the goal or in L (Mathlib, bib). Nearest objects: characteristic-polynomial coefficients / sums of principal (permanental) minors e_r(X); OpenAI Ten Advances minorSum t s d (not in bib)."
+   },
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Provisional: a two-parameter shifted-permanent coefficient chosen so that (i) it is a linear-size permanent projection and (ii) in char 2 its critical points force singular spectral curves. Possible downgrade to N2 vs Ten Advances minorSum (model-produced, uncited)."
+   },
+   "provisional_F": "F1/F3"
+  },
+  {
+   "id": "I07",
+   "kind": "definition (key construction)",
+   "name": "spectral plane curve C_X = V(det(sI + t Dbar + uX)) over F2bar",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/introduction.tex:181-191; adjugate.tex:37-44",
+   "statement": "degree-k plane curve with fixed distinct fibre {[-theta_i:1:0]} on u=0",
+   "cited_or_new": {
+    "status": "new (use); classical object",
+    "bib_key": "AdamsHarnadHurtubise1993",
+    "cue": "'Since permanent and determinant agree over K, every matrix X defines a plane curve'"
+   },
+   "uses_items": [
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "Change of representation: critical matrices -> singular curves."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Spectral curves of matrix pencils are classical (Beauville 1990, AHH 1993); using char 2 to turn a permanent coefficient into a determinantal spectral curve is the bridge."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Object classical; its use here is the bridge (see I29/I34)."
+   },
+   "provisional_F": "F5"
+  },
+  {
+   "id": "I08",
+   "kind": "definition (\\emph)",
+   "name": "normalization defect delta(C)",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/introduction.tex:206-208; conductor.tex:4-10",
+   "statement": "length of nu_* O_Ctilde / O_C",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "FGvS1999",
+    "cue": "'the \\emph{normalization defect}'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "middle term of T <= length Z <= delta"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "classical delta-invariant"
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I09",
+   "kind": "definition",
+   "name": "row adjugate R_X = (1,...,1) adj(sI+tD+uX) and row subscheme Z'_X",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/introduction.tex:220-224; dimension.tex:127-140",
+   "statement": "ideal on C generated by entries of R_X",
+   "cited_or_new": {
+    "status": "new (use)",
+    "bib_key": "AdamsHarnadHurtubise1993",
+    "cue": "'Adams, Harnad and Hurtubise use equations of this form for spectral divisors' (dimension.tex:142-145)"
+   },
+   "uses_items": [
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "level": "medium-high",
+    "reason": "Determines X on a fixed curve (matrix-fibre bound)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "spectral divisor (AHH, Beauville)"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Spectral-divisor construction, named precedent."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I10",
+   "kind": "lemma",
+   "name": "Lemma affine-substitution: bdc(a f o A) <= bdc(f)",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/models.tex:16-32",
+   "statement": "projection monotonicity in border model",
+   "cited_or_new": {
+    "status": "folklore",
+    "bib_key": null,
+    "cue": "standard"
+   },
+   "uses_items": [
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "used for per -> G"
+   },
+   "analytic_check": {
+    "verdict": "in L (folklore)",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I11",
+   "kind": "definition",
+   "name": "padded permanent P_{n,m} = z^{n-m} per_m, orbit closure D_n",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/models.tex:34-42",
+   "statement": "GCT formulation",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "MulmuleySohoni2001",
+    "cue": "standard GCT padding"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "only for Prop model-equivalence"
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "GCT standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I12",
+   "kind": "proposition",
+   "name": "Prop model-equivalence: bdc(per_m) <= n iff [P_{n,m}] in D_n",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/models.tex:44-97",
+   "statement": "coefficientwise model = projective orbit closure",
+   "cited_or_new": {
+    "status": "folklore (proved)",
+    "bib_key": "LandsbergManivelRessayre2010",
+    "cue": "'identifies this coefficientwise model with the projective determinant-orbit closure formulation'"
+   },
+   "uses_items": [
+    "I11"
+   ],
+   "load_bearing_guess": {
+    "level": "none",
+    "reason": "corollary-only; not formalized"
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Known equivalence (Buergisser/LMR)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I13",
+   "kind": "theorem",
+   "name": "Thm smooth-border: smooth form of degree r in d vars has bdc >= (r-1)(d-1)/(4e)",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/models.tex:104-111; polar.tex:408-434",
+   "statement": "see statement",
+   "cited_or_new": {
+    "status": "new (variant)",
+    "bib_key": "SheshadriBorder2026",
+    "cue": "'The determinant kernel-incidence count and its Schur-complement reduction build on [Sheshadri, Thm 3, Sec 3.1]' (polar.tex:9-11)"
+   },
+   "uses_items": [
+    "I44",
+    "I45",
+    "I46"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "Half of the proof; Lean cone of smooth_lower_bound = 32% of target cone."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Not a subterm of goal. In L via Sheshadri 2606.13628 for the Fermat case with identical constant 4e and same Gauss-point/kernel-lift/multihomogeneous-Bezout architecture (whose target-side lemma is stated for any smooth hypersurface)."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Close variant of an LLM-assisted precedent in L; persistence via IFT on finitely many simple polar points replaces Sheshadri's flat specialization of conormal cycles."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I14",
+   "kind": "definition (\\emph)",
+   "name": "first polar / ambient first polar partial_w G; simple zero",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/models.tex:113-118; polar.tex:15-22",
+   "statement": "directional derivative; zero with invertible Jacobian",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "Piene1978",
+    "cue": "'first directional derivative, or \\emph{first polar}'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "vocabulary"
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I15",
+   "kind": "formula",
+   "name": "subset expansion of G_D (no factorial)",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/selector.tex:22-38",
+   "statement": "G_D = sum_{S,T disjoint, |S|=|T|=q} prod_T theta_i per(X_CC)",
+   "cited_or_new": {
+    "status": "new (elementary)",
+    "bib_key": null,
+    "cue": "'Thus no additional factorial occurs'"
+   },
+   "uses_items": [
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "feeds selector"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Direct expansion."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I16",
+   "kind": "convention",
+   "name": "matching interpretation of the permanent with signed weights",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/selector.tex:40-44",
+   "statement": "permanent = weighted perfect matchings of bipartite graph",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "Valiant1979Algebra",
+    "cue": "'Weighted matching gadgets and cancellation are classical tools of Valiant's projection framework'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "vocabulary"
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I17",
+   "kind": "proposition",
+   "name": "Prop selector (coefficient projection): per_m(A(X)) = (-2)^{2k}((k-q)!)^4 G_D(X), m >= 11k-2q, any complex D",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/selector.tex:55-243",
+   "statement": "linear-size permanent projection of the coefficient",
+   "cited_or_new": {
+    "status": "new (assembly of classical gadgets)",
+    "bib_key": "Valiant1979Algebra; Valiant1979Permanent; DellHusfeldtMarxTaslamanWahlen2014",
+    "cue": "'Here we give the weights and completion counts needed for a construction of linear size.' (selector.tex:52-53)"
+   },
+   "uses_items": [
+    "I18",
+    "I19",
+    "I15"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Needed to transfer smoothness of G to per_m; Lean cone 13%."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Valiant-style gadgets in L; this specific two-gate selector is not."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Count gate is the classical permanent of [diag J; J 0] giving elementary symmetric coefficients; equality gadget is a signed 3x3 variant of DHMTW/Valiant gadgets. Linear size is the point."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I18",
+   "kind": "key construction (\\emph)",
+   "name": "count gate imposing exactly q distinguished edges (multiplicity (h!)^2)",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/selector.tex:91-110",
+   "statement": "k original + h=k-q extra rows/cols, complete bipartite to the other side",
+   "cited_or_new": {
+    "status": "new (classical pattern)",
+    "bib_key": null,
+    "cue": "'\\emph{A gate imposing one prescribed count.}'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "selects s-degree and t-degree"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Equivalent to per [[diag(x), J],[J, 0]] = (h!)^2 e_{k-h}(x), a classical identity."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Classical elementary-symmetric gadget."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I19",
+   "kind": "key construction (\\emph)",
+   "name": "equality gadget H = [[-1,-1,1],[-1,-1,1],[1,1,1]] with -2w input weight",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/selector.tex:112-162",
+   "statement": "boundary table: only empty/full states survive, both with factor -2",
+   "cited_or_new": {
+    "status": "new (variant)",
+    "bib_key": "DellHusfeldtMarxTaslamanWahlen2014",
+    "cue": "'Signed gadgets enforcing equality of edge choices also appear in Dell, Husfeldt, Marx, Taslaman and Wahlen'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "couples main special edges to gate edges"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Checked by hand: per H = -2, 2x2 minors 0, H33 = 1."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Small signed gadget of a known type; tuning is routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I20",
+   "kind": "definition",
+   "name": "boundary weight Phi_w(I,O) and outer vertices (\\emph)",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/selector.tex:112-147",
+   "statement": "completion weight table",
+   "cited_or_new": {
+    "status": "new (plumbing)",
+    "bib_key": null,
+    "cue": "'Call the main and gate vertices \\emph{outer}'"
+   },
+   "uses_items": [
+    "I19"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "bookkeeping"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Plumbing."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I21",
+   "kind": "corollary",
+   "name": "Cor selector-border: bdc(G_D o Lambda) <= bdc(per_m)",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/selector.tex:247-263",
+   "statement": "",
+   "cited_or_new": {
+    "status": "new (immediate)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I17",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "glue"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Immediate."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I22",
+   "kind": "remark",
+   "name": "Rem selector-characteristic: a0 vanishes in char 2; char-2 argument uses integral formula",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/selector.tex:265-272",
+   "statement": "",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I17"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "explains split"
+   },
+   "analytic_check": {
+    "verdict": "n/a",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Remark."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I23",
+   "kind": "definition",
+   "name": "parameters q = floor((k-1)/3), r, c = r-1, T = binom(q+2,2)",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/adjugate.tex:13-24",
+   "statement": "2q + c = k-1, q <= c",
+   "cited_or_new": {
+    "status": "new (tuning)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "the exponent balance that makes the catalecticant trick work"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Parameter choice."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I24",
+   "kind": "lemma",
+   "name": "Lemma adjugate-projection: C_X reduced, pi:C_X->P^1 finite flat degree k, generically etale; pi_* O_C splits",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/adjugate.tex:46-117",
+   "statement": "",
+   "cited_or_new": {
+    "status": "new (elementary)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "infrastructure for I28-I32"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard monic-polynomial arguments."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I25",
+   "kind": "fact",
+   "name": "per = det over F2bar; G_D(X) = [s^q t^q u^r] F_X; dF_X/dX_ij = u adj(M)_ji",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/adjugate.tex:28-32, 260-271",
+   "statement": "",
+   "cited_or_new": {
+    "status": "classical",
+    "bib_key": null,
+    "cue": "'In this characteristic the permanent equals the determinant'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "the char-2 bridge from permanent coefficient to determinantal geometry"
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical (per = det mod 2)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I26",
+   "kind": "definition",
+   "name": "adjugate ideal J and finite scheme Z on C_X",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/adjugate.tex:123-137",
+   "statement": "J = image of adjugate entries, Z = V(J)",
+   "cited_or_new": {
+    "status": "new (use)",
+    "bib_key": "FGvS1999",
+    "cue": ""
+   },
+   "uses_items": [
+    "I24"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Fitting/adjugate ideal of a pencil"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard construction."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I27",
+   "kind": "lemma",
+   "name": "Lemma adjugate-generation: degree-(k-1) forms vanishing on Z are constant combinations of adjugate entries",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/adjugate.tex:139-248",
+   "statement": "via H^1(ker psi) = 0 using the commutator image [A,-]",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I24",
+    "I26"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "turns coefficient vanishing on adj entries into vanishing on all of H^0(I_Z(k-1))"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Lean adjugate_generation (AdjugateNormalForm.lean:567), cone 3%."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "A neat cohomological lemma; spectral-sheaf flavour (Beauville) but no named precedent found."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I28",
+   "kind": "functional / trick",
+   "name": "coefficient functional Lambda = [s^q t^q u^c] and complementary-monomial (catalecticant) argument",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/adjugate.tex:260-308",
+   "statement": "if a degree-q form P vanishes on Z then Lambda(s^{q-i}t^{q-j}u^{c-l} P) = a_{ijl} = 0",
+   "cited_or_new": {
+    "status": "cited (method)",
+    "bib_key": "Galazka2017",
+    "cue": "'The next comparison is the line-bundle case of Galazka's catalecticant bound'"
+   },
+   "uses_items": [
+    "I23",
+    "I27"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Catalecticant/apolarity argument in L (Galazka)."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Named precedent; elementary."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I29",
+   "kind": "proposition",
+   "name": "Prop adjugate-length: grad G_D(X) = 0 => length Z >= T",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/adjugate.tex:250-309",
+   "statement": "",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I25",
+    "I27",
+    "I28"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "first half of 'critical => singular curve'"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Lean critical_cofactor_length (AdjugateNormalForm.lean:687)"
+   },
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Provisional: the key lemma that converts vanishing of a permanent-coefficient gradient into a length bound; no neighbour found in quick search. Part of the I29+I32 'critical matrix => delta >= T' bridge."
+   },
+   "provisional_F": "F5"
+  },
+  {
+   "id": "I30",
+   "kind": "definition",
+   "name": "conductor c, evaluation ideal tau_B(L), coefficient pairing Phi",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/conductor.tex:28-33, 84-89, 143-157",
+   "statement": "",
+   "cited_or_new": {
+    "status": "cited (method)",
+    "bib_key": "FGvS1999",
+    "cue": "'follows the evaluation-ideal argument of Fantechi--Goettsche--van Straten'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical commutative algebra (Gorenstein duality)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I31",
+   "kind": "lemma",
+   "name": "Lemma conductor-local: c subset J_0 and length(B/J_0) <= length(B/c) = length(R/B), arbitrary char",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/conductor.tex:18-199",
+   "statement": "",
+   "cited_or_new": {
+    "status": "cited (re-proved in char p)",
+    "bib_key": "FGvS1999",
+    "cue": "'Their setting is over C; we give the local proof needed here in arbitrary characteristic.'"
+   },
+   "uses_items": [
+    "I30"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": "FGvS Prop C.2/Cor C.3 over C"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Char-p re-proof of a cited result."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I32",
+   "kind": "proposition",
+   "name": "Prop conductor-length: length Z <= delta(C); hence grad G_D(X)=0 => delta(C_X) >= T",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/conductor.tex:201-253",
+   "statement": "",
+   "cited_or_new": {
+    "status": "new (assembly)",
+    "bib_key": "FGvS1999",
+    "cue": ""
+   },
+   "uses_items": [
+    "I29",
+    "I31"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "completes the bridge"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Lean critical_normalization_defect (PencilSeparability.lean:182)"
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Globalization of I31; the novelty sits in I29."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I33",
+   "kind": "fact (cited theorem)",
+   "name": "Severi dimension in arbitrary characteristic: integral degree-b plane curves of geometric genus g form a locus of dim 3b+g-1",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/dimension.tex:68-75",
+   "statement": "",
+   "cited_or_new": {
+    "status": "cited, not re-proved",
+    "bib_key": "CHT2023",
+    "cue": "'[Lemma 2.6, Proposition 2.7, and Remark 2.8]{CHT2023}'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "very high (paper)",
+    "reason": "essential cited input; Lean bypasses it"
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Cited theorem (transfer)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I34",
+   "kind": "lemma",
+   "name": "Lemma severi-dimension: reduced degree-k curves with delta >= T have dim <= k(k+3)/2 - T",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/dimension.tex:77-116",
+   "statement": "",
+   "cited_or_new": {
+    "status": "new (corollary of I33)",
+    "bib_key": "CHT2023",
+    "cue": ""
+   },
+   "uses_items": [
+    "I33"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Standard reduction to integral components via genus formula"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Direct corollary."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I35",
+   "kind": "proposition",
+   "name": "Prop gradient-codimension: dim{X: grad G_D(X)=0} <= k^2 + k - T over F2bar",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/dimension.tex:10-28, 353-367",
+   "statement": "curve-count + fibre-count",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I32",
+    "I34",
+    "I39"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "the quadratic codimension result; Lean critical_dimension_effective cone 52% of target cone"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Provisional: together with I06/I29 this is the 'permanent coefficient with quadratic-codimension critical locus' result. Precedent check needed against OpenAI Ten Advances critical-locus bound for minorSum (combinatorial, different polynomial)."
+   },
+   "provisional_F": "F5"
+  },
+  {
+   "id": "I36",
+   "kind": "definition",
+   "name": "morphism f_D: X -> [F_X] and gradient locus Gamma_D",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/dimension.tex:31-56",
+   "statement": "",
+   "cited_or_new": {
+    "status": "new (plumbing)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Plumbing."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I37",
+   "kind": "lemma",
+   "name": "Lemma row-adjugate-scheme: Z'_X finite of length N = k(k-1)/2 and determines X on a fixed curve",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/dimension.tex:150-230",
+   "statement": "boundary frame at [1:0] rigidifies",
+   "cited_or_new": {
+    "status": "new (variant)",
+    "bib_key": "AdamsHarnadHurtubise1993",
+    "cue": "'Here we prove the uniform finite length of Z'_X directly.'"
+   },
+   "uses_items": [
+    "I09",
+    "I24"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "fibre bound"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Spectral correspondence (Beauville 1990; AHH)"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Matrices with given spectral curve <-> divisors/line bundles; classical."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I38",
+   "kind": "lemma",
+   "name": "Lemma hilbert-curve-dimension: dim Hilb^N(C) <= N for reduced plane C, any char",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/dimension.tex:246-310",
+   "statement": "via commuting nilpotent pairs + cyclic vector",
+   "cited_or_new": {
+    "status": "cited (re-proved)",
+    "bib_key": "Baranovsky1998; Premet2003",
+    "cue": "'The centralizer count below supplies the dimension bound needed here in every characteristic.'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": "Briancon/Iarrobino-type bound"
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical bound re-proved."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I39",
+   "kind": "proposition",
+   "name": "Prop matrix-fiber: every fibre of f_D has dim <= N",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/dimension.tex:317-351",
+   "statement": "",
+   "cited_or_new": {
+    "status": "new (assembly)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I37",
+    "I38"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Lean matrix_field_bound_over_curve cone 21%"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Generic fibre dimension is exactly N (Beauville count)"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Classical count, made uniform."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I40",
+   "kind": "lemma",
+   "name": "Lemma characteristic-transfer: gradient-locus dimension bound at one F2bar point transfers to a nonempty open set of complex parameters",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/transfer.tex:18-121",
+   "statement": "proper projective family over Spec Z[theta], upper semicontinuity, Euler identity in char 0",
+   "cited_or_new": {
+    "status": "folklore (proved)",
+    "bib_key": "StacksProject",
+    "cue": "Tag 0D4I"
+   },
+   "uses_items": [
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "char 2 -> C bridge"
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard specialization argument; the idea of proving a char-0 genericity fact in char 2 is classical."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I41",
+   "kind": "remark/fact",
+   "name": "integral coefficients: no division by 2 or r before char 0",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/transfer.tex:123-128",
+   "statement": "",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I40"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "n/a",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Remark."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I42",
+   "kind": "proposition",
+   "name": "Prop smooth-slice: if dim Sing Y <= v-1-delta and d-1 < delta, a generic d-dim linear section is smooth",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/transfer.tex:137-209",
+   "statement": "Bertini-type incidence count",
+   "cited_or_new": {
+    "status": "folklore (proved)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium-high",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": "Bertini"
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Bertini."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I43",
+   "kind": "proposition",
+   "name": "Prop smooth-projection: smooth G of degree r in d=floor(k^2/100) vars with G = per_m o Phi_m",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/transfer.tex:217-309",
+   "statement": "",
+   "cited_or_new": {
+    "status": "new (assembly)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I17",
+    "I35",
+    "I40",
+    "I42"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "constructive core"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Assembly; its novelty is inherited from I06/I35."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I44",
+   "kind": "lemma",
+   "name": "Lemma polar:simple-points: d-2 general polars meet smooth Y in r(r-1)^{d-2} simple points",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/polar.tex:33-83",
+   "statement": "",
+   "cited_or_new": {
+    "status": "cited (re-proved)",
+    "bib_key": "Piene1978; Kleiman1974",
+    "cue": "'classical top polar degree'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical polar degree."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I45",
+   "kind": "lemma",
+   "name": "Lemma polar:product-count: simple common zeros of bilinear multihomogeneous system <= multihomogeneous Bezout number, excess components allowed",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/polar.tex:94-177",
+   "statement": "homotopy from a product-of-linear-forms start system",
+   "cited_or_new": {
+    "status": "cited (re-proved)",
+    "bib_key": "Wampler1996",
+    "cue": "'Its standard specialization bound controls nonsingular isolated zeros ... We give a direct proof of the bilinear case'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard (homotopy continuation)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I46",
+   "kind": "proposition",
+   "name": "Prop polar:ambient-bound: mu simple polar zeros of a border limit => mu <= [H^{h+1}U^{n-1}V^{n-1}](H+U)^n(H+V)^{n-1}(U+V)^h <= 2^h binom(2n-1,h+1)",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/polar.tex:185-399",
+   "statement": "persistence by IFT in one close determinant; kernel lift; Schur elimination; product count",
+   "cited_or_new": {
+    "status": "new (variant)",
+    "bib_key": "SheshadriBorder2026",
+    "cue": "'build on [Sheshadri, Thm 3 and Sec 3.1]. We give the argument needed here for finitely many simple polar intersections, including unrestricted affine limits'"
+   },
+   "uses_items": [
+    "I44",
+    "I45"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "core of Thm smooth-border; Lean affine_polar_count cone 16%"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Sheshadri Thm 1.4 'Determinantal conormal bound' has the same Bezout coefficient formula"
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Close variant of LLM-assisted precedent."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I47",
+   "kind": "key construction",
+   "name": "kernel-lift system A^hom p = 0, (b^T A^hom)_j = 0 (j>=2), b^T B_i p = 0 on P^{h+1} x P^{n-1} x P^{n-1}",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/polar.tex:252-278",
+   "statement": "",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "SheshadriBorder2026",
+    "cue": ""
+   },
+   "uses_items": [
+    "I46"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "in L (Sheshadri)",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Taken from Sheshadri (and folklore adjugate = rho p b^T)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I48",
+   "kind": "lemma (inline)",
+   "name": "Schur-complement elimination: f = c s, q_i = c g_i + c_i s => simplicity of lifts",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/polar.tex:284-363",
+   "statement": "",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "SheshadriBorder2026",
+    "cue": "'Schur-complement reduction ... also appear in Sheshadri'"
+   },
+   "uses_items": [
+    "I47"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Named precedent."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I49",
+   "kind": "corollary",
+   "name": "Cor exact-complexity",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/consequences.tex:47-58",
+   "statement": "",
+   "cited_or_new": {
+    "status": "new (immediate)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I04"
+   ],
+   "load_bearing_guess": {
+    "level": "none",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "n/a",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Immediate."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I50",
+   "kind": "corollary",
+   "name": "Cor ABP: Omega(m^3) vertices and edges, incl. fixed-budget limits",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/consequences.tex:60-99",
+   "statement": "ABP -> det [[I-A, e_s],[-e_t^T, 0]] of size N+1",
+   "cited_or_new": {
+    "status": "new (corollary)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I04"
+   ],
+   "load_bearing_guess": {
+    "level": "none",
+    "reason": "corollary-only; not formalized"
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": "ABP-to-determinant is classical (Valiant/Toda)"
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard reduction."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I51",
+   "kind": "corollary",
+   "name": "Cor smooth-initial-form",
+   "file_line": "preprints/A-cubic-lower-bound-for-border-determinantal-complexity-of-the-permanent-September-24-2026/build/source/sections/consequences.tex:107-134",
+   "statement": "dilation t^{-r} g(a+tx) -> G_r",
+   "cited_or_new": {
+    "status": "new (immediate)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I13",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Lean comparator SmoothInitialForm"
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Immediate extension."
+   },
+   "provisional_F": null
+  }
+ ],
+ "lean_items": [
+  {
+   "id": "L01",
+   "kind": "Lean",
+   "name": "squareForm a b c d = a^2 + x b^2 + y c^2 + xy d^2, exists_squareForm (perfect char-2 field), halfIdeal = (a,b,c,d)",
+   "file_line": "lean/OAI/Algebra/Determinantal/SingularValues.lean:173-195; DegreeBounds.lean:350",
+   "statement": "Frobenius (p-basis) decomposition of a plane polynomial in char 2",
+   "cited_or_new": {
+    "status": "new (Lean-only; classical decomposition)",
+    "bib_key": null,
+    "cue": "no docstring"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "basis of the Lean Severi replacement"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "p-basis decomposition is classical"
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical char-p fact."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L02",
+   "kind": "Lean",
+   "name": "normalization_length_le_half: delta(C) <= 5*dim K[x,y]/(a,b,c,d) + #{singular points with d != 0}",
+   "file_line": "lean/OAI/Algebra/Determinantal/ConductorDimension.lean:290",
+   "statement": "char-2 bound of the normalization defect by 'wild' (half-ideal) and 'ordinary' singularities, via derivations and conductor membership (LocalDerivations.lean four_form_conductor_membership, radical_gradient_conductor; BranchConductor.lean)",
+   "cited_or_new": {
+    "status": "new (Lean-only)",
+    "bib_key": null,
+    "cue": "no docstring; not in paper"
+   },
+   "uses_items": [
+    "L01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "cone 9% of target"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "No neighbour found in quick search; replaces delta = p_a - sum g_i + a - 1 + Severi"
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Lean-only elementary char-2 substitute; provisional N2 pending precedent search (char-2 Frobenius singularity analysis is standard in positive-char curve theory)."
+   },
+   "provisional_F": "F5"
+  },
+  {
+   "id": "L03",
+   "kind": "Lean",
+   "name": "half_curve_parameter_bound / spectral_effective_bound: curves with delta >= T live in a family of transcendence degree n with 18n + T <= 9(k+1)(k+2)",
+   "file_line": "lean/OAI/Algebra/Determinantal/ConductorDimension.lean:430; Main.lean:131",
+   "statement": "Lean substitute for the Severi dimension theorem (CHT2023), weaker by a factor ~18 in T",
+   "cited_or_new": {
+    "status": "new (Lean-only)",
+    "bib_key": null,
+    "cue": "not in paper or lean/docs"
+   },
+   "uses_items": [
+    "L02",
+    "L04"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "spectral_effective_bound cone 34% of target"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Elementary parameter count replacing CHT2023 (Tyomkin2013); loses constant"
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Novel route to a weak Severi-type bound; load-bearing in Lean only."
+   },
+   "provisional_F": "F5"
+  },
+  {
+   "id": "L04",
+   "kind": "Lean",
+   "name": "four_polynomial_bound / node_parameter_bound / wild_parameter_bound_even/odd / frobenius_quotient_bound",
+   "file_line": "lean/OAI/Algebra/Determinantal/HalfPolynomials.lean:256; SingularValues.lean:125; WildParameters.lean:38-115, 325",
+   "statement": "transcendence-degree budgets for polynomials whose top coefficients are fixed over K and which share many zeros",
+   "cited_or_new": {
+    "status": "new (Lean-only)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "L01"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "feeds L03"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Technical parameter counts."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L05",
+   "kind": "Lean",
+   "name": "matrix_field_bound_over_curve (+ chart_field_bound, nilpotent_pair_field_bound, generated_chart_field_bound, canonical_nilpotent_form)",
+   "file_line": "lean/OAI/Algebra/Determinantal/FiberDimension.lean:165; PunctualCharts.lean:10-338; Nilpotents.lean:420",
+   "statement": "trdeg(matrix entries) <= trdeg(curve coefficients) + binom(k+1,2): Lean version of Prop matrix-fiber + Hilbert-scheme bound via commuting nilpotent pairs",
+   "cited_or_new": {
+    "status": "new (formal encoding of I37-I39)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I39"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "cone 21%"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Note: matrix_eq_of_rowIdeal_eq (RowIdeals.lean:409, the formal I37 uniqueness) has 0 dependents; the Lean fibre bound goes through quotient-field charts instead"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Encoding."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L06",
+   "kind": "Lean",
+   "name": "krullDim_le_of_field_images / critical_dimension_effective: ringKrullDim(K[X]/gradIdeal) <= k^2 - T/18",
+   "file_line": "lean/OAI/Algebra/Determinantal/DeterminantFields.lean; Main.lean:214",
+   "statement": "dimension via transcendence degree of field-valued points",
+   "cited_or_new": {
+    "status": "new (Lean)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "L03",
+    "L05",
+    "L07"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "cone 52% of target"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Paper: <= k^2 + k - T"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Encoding with weaker constant."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L07",
+   "kind": "Lean",
+   "name": "gradient_forces_normalization_defect / critical_cofactor_length / adjugate_generation / normalization_conductor_le_adjugate_global",
+   "file_line": "lean/OAI/Algebra/Determinantal/Centralizers.lean:19; AdjugateNormalForm.lean:567-687; ConductorLocalization.lean:304",
+   "statement": "formal I27-I32",
+   "cited_or_new": {
+    "status": "new (formal encoding)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I29",
+    "I32"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "gradient_forces_normalization_defect cone 13%"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Encoding of I29/I32."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L08",
+   "kind": "Lean",
+   "name": "transfer_section_certificate / generic_slice_certificate / exists_complex_smooth_section_finite (Macaulay-matrix certificates)",
+   "file_line": "lean/OAI/Algebra/Determinantal/ConditionalBound.lean:48-225; Transcendence.lean:351; SmoothSlices.lean",
+   "statement": "char-2 -> C transfer and smooth slicing via surjectivity of a Macaulay matrix for the singular system, with algebraically independent slice coefficients",
+   "cited_or_new": {
+    "status": "new (Lean route)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I40",
+    "I42"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "cone 5%"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Effective Nullstellensatz/resultant certificate replaces Stacks semicontinuity"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard elimination-theoretic substitute."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L09",
+   "kind": "Lean",
+   "name": "HasBorderDeterminant.smooth_lower_bound / affine_polar_count / smooth_polar_count / bilinear_simple_point_count_multichart",
+   "file_line": "lean/OAI/Algebra/Determinantal/BorderPolars.lean:391; BilinearCounts.lean:333; RankTransfer.lean:323; ProjectiveCounts.lean",
+   "statement": "formal Thm smooth-border",
+   "cited_or_new": {
+    "status": "new (formal encoding)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I13",
+    "I46"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "cone 32%"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Encoding."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L10",
+   "kind": "Lean",
+   "name": "exists_selector_affine_projection, selectorScalar, coefficientPolynomial",
+   "file_line": "lean/OAI/Algebra/Determinantal/AffineSelectors.lean:382",
+   "statement": "formal Prop selector",
+   "cited_or_new": {
+    "status": "new (formal encoding)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "I17"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "cone 13%"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Encoding."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L11",
+   "kind": "Lean",
+   "name": "selector_lower_of_critical_dimension",
+   "file_line": "lean/OAI/Algebra/Determinantal/ConditionalBound.lean:393",
+   "statement": "glue: critical-dimension bound + selector + smooth bound => numeric lower bound",
+   "cited_or_new": {
+    "status": "new (glue)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "L06",
+    "L09",
+    "L10",
+    "L08"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "cone 49%"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Glue."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L12",
+   "kind": "Lean",
+   "name": "Model.lean: permanentPolynomial, affineMatrixPolynomial, HasBorderDeterminant, HasExactDeterminant",
+   "file_line": "lean/OAI/Algebra/Determinantal/Model.lean:120-141",
+   "statement": "comparator definitions",
+   "cited_or_new": {
+    "status": "new (formal encoding of I01-I03)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "target signature",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Definitions."
+   },
+   "provisional_F": null
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Severi dimension theorem in arbitrary characteristic (integral plane curves of degree b and geometric genus g: dim 3b+g-1)",
+   "bib_key": "CHT2023 (builds on Tyomkin2013 Thm 1.2(1))",
+   "locator": "Lemma 2.6, Prop 2.7, Remark 2.8",
+   "field": "Algebraic geometry",
+   "used_at": "dimension.tex:68-75, 87-116",
+   "status": "cited, not re-proved",
+   "essential_for_headline": true,
+   "lean": "bypassed: Lean proves a weaker elementary char-2 bound (L02-L03)"
+  },
+  {
+   "name": "Conductor inclusion and colength (evaluation-ideal argument)",
+   "bib_key": "FGvS1999",
+   "locator": "Prop C.2, Cor C.3",
+   "field": "Algebraic geometry / commutative algebra",
+   "used_at": "conductor.tex:12-199",
+   "status": "method re-proved in arbitrary char",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Catalecticant bound under annihilation (line-bundle case)",
+   "bib_key": "Galazka2017",
+   "locator": "Thm 4, Props 6,7,9",
+   "field": "Secant/cactus varieties",
+   "used_at": "adjugate.tex:276-281",
+   "status": "cited as precedent; direct proof given",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Top polar degree r(r-1)^{d-2} of a smooth hypersurface",
+   "bib_key": "Piene1978",
+   "locator": "Cor 3.7",
+   "field": "Enumerative AG",
+   "used_at": "polar.tex:26-83",
+   "status": "re-proved (generic smoothness + Bezout)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Multihomogeneous Bezout bound on nonsingular isolated zeros",
+   "bib_key": "Wampler1996",
+   "locator": "Sec 3-3.2",
+   "field": "Numerical AG",
+   "used_at": "polar.tex:89-177",
+   "status": "re-proved (bilinear case)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Kernel equations and Schur-complement reduction for determinantal polar counts",
+   "bib_key": "SheshadriBorder2026",
+   "locator": "Thm 3, Sec 3.1",
+   "field": "Algebraic complexity (LLM-assisted preprint)",
+   "used_at": "introduction.tex:141-145; polar.tex:9-13",
+   "status": "architecture source; re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Constructibility of images / Euclidean=Zariski closure",
+   "bib_key": "StacksProject",
+   "locator": "Tag 054K",
+   "field": "AG",
+   "used_at": "models.tex:6-14",
+   "status": "cited",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Upper semicontinuity of fibre dimension for proper morphisms",
+   "bib_key": "StacksProject",
+   "locator": "Tag 0D4I",
+   "field": "Scheme theory",
+   "used_at": "transfer.tex:74-76",
+   "status": "cited",
+   "essential_for_headline": true,
+   "lean": "replaced by Macaulay-matrix certificates"
+  },
+  {
+   "name": "Finiteness of normalization; normal 1-dim local domains are DVRs",
+   "bib_key": "StacksProject",
+   "locator": "Tags 032L, 00PD",
+   "field": "Commutative algebra",
+   "used_at": "conductor.tex:55-62",
+   "status": "cited (also argued directly)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Punctual Hilbert/Quot schemes via commuting nilpotents; nilpotent commuting variety dims",
+   "bib_key": "Baranovsky1998; Premet2003",
+   "locator": "Sec 2 Lemma 2.2; Cor 4.1",
+   "field": "AG / Lie theory",
+   "used_at": "dimension.tex:238-243",
+   "status": "background; bound re-proved",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Spectral divisor equations (adjugate annihilating a fixed vector)",
+   "bib_key": "AdamsHarnadHurtubise1993",
+   "locator": "Sec 1b eq (1.29)",
+   "field": "Integrable systems",
+   "used_at": "dimension.tex:142-148",
+   "status": "background-cited",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Transversality of a general translate",
+   "bib_key": "Kleiman1974",
+   "locator": "Cor 5",
+   "field": "AG",
+   "used_at": "polar.tex:28-31",
+   "status": "background-cited",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Weighted matching gadgets / fixing external choices",
+   "bib_key": "Valiant1979Algebra; Valiant1979Permanent; DellHusfeldtMarxTaslamanWahlen2014",
+   "locator": "Lemma 3.1; Sec 3 Fig 2",
+   "field": "Algebraic/counting complexity",
+   "used_at": "selector.tex:44-53",
+   "status": "precedent; gadget re-derived",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Implicit function theorem; generic smoothness (char 0); projective dimension theorem; Jacobian criterion; Euler identity",
+   "bib_key": null,
+   "locator": "standard",
+   "field": "Analysis / AG",
+   "used_at": "polar.tex, transfer.tex",
+   "status": "standard, used without citation",
+   "essential_for_headline": true
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Model: bdc monotone under fixed affine substitution; coefficientwise = orbit-closure model.",
+   "items": [
+    "I10",
+    "I12"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Selector: G_D = [s^q t^q] per_k(X+sI+tD) is (up to a0 != 0) an affine projection of per_m for m >= 11k-2q, any complex D.",
+   "items": [
+    "I06",
+    "I15",
+    "I17",
+    "I18",
+    "I19",
+    "I21"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "Char 2: per = det, so a critical X of G_Dbar (distinct theta) gives a spectral curve C_X whose adjugate scheme has length >= T (catalecticant trick) and length Z <= delta(C_X) (conductor). Hence delta(C_X) >= T.",
+   "items": [
+    "I07",
+    "I25",
+    "I24",
+    "I26",
+    "I27",
+    "I28",
+    "I29",
+    "I31",
+    "I32"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "Count: curves with delta >= T have dim <= k(k+3)/2 - T (Severi, CHT2023); matrices over a fixed curve have dim <= k(k-1)/2 (row subscheme + Hilb^N bound). So codim of the gradient locus >= T - k ~ k^2/18.",
+   "items": [
+    "I33",
+    "I34",
+    "I36",
+    "I37",
+    "I38",
+    "I39",
+    "I35"
+   ]
+  },
+  {
+   "step": 5,
+   "claim": "Transfer to C for generic theta (proper family over Z[theta]); Euler identity identifies gradient locus with Sing; a generic d = k^2/100-dimensional linear section is smooth.",
+   "items": [
+    "I40",
+    "I42",
+    "I43"
+   ]
+  },
+  {
+   "step": 6,
+   "claim": "Smooth-form bound: a border limit of n x n affine determinants with a smooth degree-r form in d variables has r(r-1)^{d-2} simple polar points, which persist in one close determinant, lift uniquely and simply to the bilinear kernel system, and are bounded by the multihomogeneous Bezout number 2^{d-2} binom(2n-1, d-1). Hence n >= (r-1)(d-1)/(4e).",
+   "items": [
+    "I13",
+    "I44",
+    "I45",
+    "I46",
+    "I47",
+    "I48"
+   ]
+  },
+  {
+   "step": 7,
+   "claim": "Combine: bdc(per_m) >= (r-1)(d-1)/(4e) >= k^3/(3200e) with k = floor(m/11); corollaries for dc, ABPs, initial forms.",
+   "items": [
+    "I04",
+    "I49",
+    "I50",
+    "I51"
+   ]
+  }
+ ],
+ "lean_route_differences": [
+  "Severi step (paper: CHT2023 cited, codim T) -> Lean: elementary char-2 Frobenius 'squareForm' analysis bounding delta by 5*dim(half-ideal quotient) + #ordinary singular points, then a transcendence-degree parameter count giving 18n + T <= 9(k+1)(k+2) (ConductorDimension.lean:290,430; Main.lean:131). Weaker by ~18x in T; not described in the paper or lean/docs/108.md.",
+  "Dimension notion: paper uses scheme dimension; Lean uses ringKrullDim of the quotient by the gradient ideal, bounded through transcendence degrees of field-valued points (DeterminantFields.krullDim_le_of_field_images).",
+  "Gradient-locus bound: paper dim <= k^2 + k - T; Lean ringKrullDim <= k^2 - T/18 (Main.lean:214-257). Section size: paper d = floor(k^2/100); Lean sectionSize = T/18 with (d-1) >= k^2/330 and r-1 >= 0.33k (Main.lean:259-311). The final constant 1/(5529600e) is the same because the paper's constant had slack.",
+  "Matrix fibre / Hilbert scheme: paper uses a Hilbert-scheme incidence; Lean uses trdeg bounds over quotient-field charts and canonical nilpotent forms (PunctualCharts, Nilpotents, QuotientFields). The paper's row-uniqueness lemma is formalized (RowIdeals.matrix_eq_of_rowIdeal_eq) but is not on the target's dependency path.",
+  "Char transfer and smooth slicing: paper uses proper-family semicontinuity (Stacks 0D4I) and a Grassmannian incidence; Lean uses Macaulay-matrix surjectivity certificates with algebraically independent slice coefficients (ConditionalBound, Transcendence, SmoothSlices).",
+  "Smooth-form bound: the Lean polar count goes through a homotopy/covering argument (RegularSections.proper_localHomeomorph_card) and Vandermonde product charts (ProjectiveCounts, LinearForms), as in the paper."
+ ],
+ "lean_dag_summary": {
+  "n_files": 57,
+  "n_decls": 1494,
+  "kind_counts": {
+   "theorem": 1125,
+   "def": 313,
+   "abbrev": 46,
+   "instance": 8,
+   "structure": 2
+  },
+  "proof_dag_decls": 1258,
+  "proof_dag_theorems": 927,
+  "target_cone_decls": 1246,
+  "target_cone_tokens": 187795,
+  "cone_share_of_main_branches (decls / tokens)": {
+   "critical_dimension_effective (char-2 gradient-locus bound)": [
+    0.52,
+    0.53
+   ],
+   "spectral_effective_bound (delta -> curve-parameter count; Lean-only Severi substitute)": [
+    0.34,
+    0.36
+   ],
+   "smooth_lower_bound (Thm smooth-border)": [
+    0.32,
+    0.33
+   ],
+   "half_curve_parameter_bound": [
+    0.23,
+    0.24
+   ],
+   "matrix_field_bound_over_curve (fibre bound)": [
+    0.21,
+    0.19
+   ],
+   "affine_polar_count": [
+    0.16,
+    0.17
+   ],
+   "exists_selector_affine_projection (selector)": [
+    0.13,
+    0.09
+   ],
+   "gradient_forces_normalization_defect (grad=0 => delta>=T)": [
+    0.13,
+    0.12
+   ],
+   "normalization_length_le_half (Lean-only delta bound)": [
+    0.09,
+    0.1
+   ],
+   "exists_complex_smooth_section_finite (transfer + slice)": [
+    0.05,
+    0.06
+   ],
+   "critical_cofactor_length (I29)": [
+    0.04,
+    0.04
+   ],
+   "adjugate_generation (I27)": [
+    0.03,
+    0.03
+   ]
+  },
+  "initial_form_comparator_cone": "414 decls, 402 shared with the cubic target (the smooth-form branch).",
+  "proxy_note": "Cone share = fraction of the target's transitive-uses cone that the item's own cone covers (upstream share), computed from data/items/108_lean.json 'uses' edges. The extractor's frac_dag_dependents (downstream) is < 0.08 for every decl because the DAG is wide; use the cone shares. At k = 20%, the char-2 branch, its Severi substitute, the smooth-form branch and the fibre bound pass; the selector (13%) and the paper's I29 key lemma (4%) do not, though both lie on every path to the target."
+ },
+ "eureka_candidates_ranked": [
+  {
+   "rank": 1,
+   "item": "I06 (+I43)",
+   "name": "Coefficient polynomial G_D = [s^q t^q] per_k(X + sI + tD) as a linear-size permanent projection that is smooth after a quadratic-dimensional slice",
+   "provisional_N": "N3",
+   "provisional_F": "F1/F3",
+   "for": [
+    "Converts the permanent's linear-codimension singular locus (<= 2m) into a projection with quadratic singular codimension and linear degree, which is exactly what the smooth-form bound needs for m^3. Sheshadri's own paper says it makes 'No permanent claim' because the permanent's conormal input is unknown.",
+    "Syntactically tiny, not a subterm of the goal or of L; everything downstream depends on it (Lean cone of the selector + critical-dimension branches > 60%).",
+    "The second parameter t with distinct theta is what makes the char-2 spectral curve have a reduced fibre; with D = I the curve is k concurrent lines and the argument fails."
+   ],
+   "against": [
+    "Model-produced architectural precedent (uncited): OpenAI Ten Advances (Aug 2026) Chapter 5 / ten-proofs Permanent.lean specializes the permanent to minorSum t s d (sum of permanental minors), bounds its critical locus dimension and takes finite gradient slices. G_D is a two-parameter variant of the same 'coefficient of a shifted permanent' idea.",
+    "Characteristic-polynomial coefficients / sums of principal minors e_r(X) are classical; count-gate projections of elementary symmetric polynomials are standard.",
+    "Guo (arXiv:2609.29568 v2, Codex GPT-5.6-Sol-assisted) remarks that higher orders 'would require substantially higher degree together with a quadratic-dimensional finite slice', which is the target 108 meets; the target was visible in the model-produced literature."
+   ],
+   "nearest_neighbour_quick_check": "OpenAI Ten Advances Ch.5 minorSum (model-produced, Aug 2026; not in bib); Guo 2609.29568 (matching-minor critical locus bound dim Crit(M_{t,s,d}) <= R_{t,d} + s(d-2)); e_r(X) / principal minor sums; Kumar 2019 / CKSV 2020 ABP bounds via dimension of the variety of first partials (power sums, elementary symmetric). None uses the two-parameter coefficient or obtains quadratic codimension with linear degree."
+  },
+  {
+   "rank": 2,
+   "item": "I29 + I32 + I35",
+   "name": "Char-2 spectral-curve bridge: grad G_D(X) = 0 => length(adjugate scheme) >= T (catalecticant on [s^q t^q u^{r-1}]) => delta(C_X) >= T => codim >= T - k",
+   "provisional_N": "N3",
+   "provisional_F": "F5",
+   "for": [
+    "Change of representation: a critical point of a permanent coefficient becomes a plane curve with large delta-invariant, using per = det in char 2. No neighbour combining these found.",
+    "The complementary-monomial trick (I28) is what makes the exponent choice q = floor((k-1)/3) work; tiny and non-analytic.",
+    "Lean: the char-2 branch is 52% of the target cone."
+   ],
+   "against": [
+    "Each ingredient is classical: per = det mod 2, spectral curves (Beauville, AHH), adjugate/conductor (FGvS), catalecticant (Galazka), Severi dims (CHT). It could be scored as a skilled assembly (N2).",
+    "Proving char-0 genericity statements by reduction to char p is a standard trick."
+   ],
+   "nearest_neighbour_quick_check": "FGvS1999 (conductor vs adjugate/evaluation ideal for rational curves); Beauville 1990 / AHH 1993 spectral correspondence; Galazka 2017 catalecticant; Ten Advances Ch.5 critical-locus bound (combinatorial recurrence, not curves). No source found linking permanent-coefficient critical loci to delta-invariants of spectral curves."
+  },
+  {
+   "rank": 3,
+   "item": "I13 / I46",
+   "name": "Smooth-form border bound bdc(G) >= (r-1)(d-1)/(4e) via persistence of simple polar points and kernel-lift multihomogeneous Bezout",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Handles unrestricted border limits with a simple IFT persistence argument instead of conormal-cycle specialization.",
+    "Self-contained version of a result Kumar-Volk could not verify."
+   ],
+   "against": [
+    "Sheshadri 2606.13628 (LLM-assisted 'in all stages') has the same constant 4e, same Gauss-point / kernel-lift / Schur / multihomogeneous-Bezout architecture; its target-side lemma is for any smooth hypersurface. The paper cites it as the source.",
+    "Kumar 2019 (homogeneous ABPs) already has 'singular-variety dimension x degree' lower bounds."
+   ],
+   "nearest_neighbour_quick_check": "Sheshadri 2606.13628 Thm 1.4 (close variant); Sheshadri 2606.11090 (symmetric, polar degree, exact); Kumar-Volk 2609.34462 (exact quadratic for power sums); Kumar 2019 / CKSV 2020."
+  },
+  {
+   "rank": 4,
+   "item": "L02 + L03",
+   "name": "Lean-only Frobenius 'square-form' delta bound and transcendence-degree Severi substitute",
+   "provisional_N": "N2",
+   "provisional_F": "F5",
+   "for": [
+    "Replaces a deep cited theorem (CHT2023) with an elementary char-2 argument that is enough for the cubic bound; appears nowhere in the paper.",
+    "Load-bearing in Lean (34% of the target cone)."
+   ],
+   "against": [
+    "Weaker by a constant factor; only a substitute for a known theorem (Tyomkin's char-p Zariski theorem).",
+    "Only a quick search was done."
+   ],
+   "nearest_neighbour_quick_check": "Tyomkin 2013 (char-p Zariski theorem); classical p-basis decomposition. No elementary char-2 Severi-type bound found in a quick search."
+  },
+  {
+   "rank": 5,
+   "item": "I17-I19",
+   "name": "Linear-size two-gate coefficient selector with signed equality gadget",
+   "provisional_N": "N2",
+   "provisional_F": "F3",
+   "for": [
+    "Coefficient extraction by projection at linear size (interpolation would cost quadratic factors)."
+   ],
+   "against": [
+    "Count gate is the classical elementary-symmetric permanent identity; signed equality gadgets are Valiant/DHMTW-type. Ten Advances uses a 'root-of-unity block specialization' for the same purpose."
+   ],
+   "nearest_neighbour_quick_check": "Valiant 1979; DHMTW 2014; Guo 2609.29568 Sec 4 'root-of-unity specialization of the permanent' (Ten Advances lineage)."
+  }
+ ],
+ "correctness_audit": {
+  "verdict": "Plausible and largely checked at sketch level, with strong formal support. Headline and smooth-initial-form statements have exact comparators, the library has no sorry/axioms, and Lean independently re-proves the steps that depend on cited heavy AG (Severi), so the Lean result does not rest on CHT2023. Lean was not run here. The claim would be a major advance (first super-quadratic border/exact dc bound for per; first cubic ABP bound for per), so an external referee check of the paper route is still warranted.",
+  "checked": [
+   "Gadget arithmetic: per H = -2; deleting one interface row and column gives [[-1,1],[1,1]] with permanent 0; H33 = 1 with external product -2w. Size count k + 2(2k-q) + 6k = 11k-2q.",
+   "Count gate forces exactly q diagonal edges with multiplicity (h!)^2.",
+   "dF_X/dX_ij = u adj(M)_ji, so grad G_D = 0 iff [s^q t^q u^{r-1}] adj M = 0. The catalecticant step recovers every coefficient of a degree-q form since q <= c = r-1.",
+   "Dimension count: generic fibre dim k^2 - k(k+1)/2 = k(k-1)/2 = N, consistent with Prop matrix-fiber. Using the full linear-system Severi bound (k(k+3)/2 - T) instead of the fixed-fibre subspace costs only +k.",
+   "Polar count: (h+2n-1) equations on P^{h+1} x P^{n-1} x P^{n-1}; coefficient <= 2^h binom(2n-1,h+1); root extraction gives n >= (r-1)(d-1)/(4e).",
+   "Sanity vs upper bounds: the det-analogue [s^q t^q] det(X+sI+tD) is congruent to G_D mod 2, so the same argument gives it dc >= c k^3; its trivial upper bound is about T*k ~ k^3/18 (interpolation over T determinants). No contradiction. Smooth Fermat forms: dc O(rd) vs bound (r-1)(d-1)/4e, consistent."
+  ],
+  "consistency_checks_passed": [
+   "constants: k >= m/12, (r-1)(d-1) >= k^3/800 => k^3/(3200e) => m^3/(5,529,600e)",
+   "Lean final constant equals paper's",
+   "comparator defs identical to library"
+  ],
+  "residual_concerns": [
+   "CHT2023 Severi dimension in characteristic 2 for all integral curves (not only nodal) is cited precisely but not re-proved; the Lean route avoids it.",
+   "Anachronism: the manuscript is dated 24 Sep 2026 but cites KumarVolk2026 'note = 28 September 2026' (arXiv v1 confirmed 28 Sep 2026). The text was revised after its stated date, or the date is not the writing date.",
+   "SheshadriNoGo2026 is in references.bib but never cited in the text.",
+   "Kumar-Volk could not verify Sheshadri's LLM-written argument, which is the architecture source for Thm smooth-border. The 108 version is self-contained and formalized, which mitigates this.",
+   "Comparator/compilation not re-run (Lean not installed); family absent from lean/formalization.yaml."
+  ]
+ },
+ "extraction_friction": [
+  "Lean route substantially differs from the paper in the char-2 dimension half (Frobenius square-form + transcendence degrees instead of Severi + Hilbert schemes). A LaTeX<->Lean name join fails for about half the DAG.",
+  "No Lean docstrings or module headers in any of the 57 files; meanings were reconstructed from signatures.",
+  "Extractor frac_dag_dependents is uniformly tiny (wide DAG). Upstream cone shares computed ad hoc are more informative.",
+  "Main.lean reuses short names (explicit_constant also in ConditionalBound; chart_field_bound in two namespaces). Join by full name.",
+  "Paper items are mostly un-numbered inline constructions (\\emph gate/gadget, R_X, Lambda functional); the eureka candidates are a definition (G_D) and a lemma cluster (I29/I32/I35), not environments with names.",
+  "Two comparators: the second (SmoothInitialForm) is a sibling headline whose DAG is 97% contained in the main target's.",
+  "Provenance requires sources outside the bib (OpenAI Ten Advances, Guo 2609.29568) found only by web search."
+ ],
+ "sources_quick_lit_check": [
+  "https://arxiv.org/abs/2606.13628 (Sheshadri, border bound for sum x_i^n; v1 11 Jun 2026, v2 7 Oct 2026; PDF acknowledgement: 'The author used the assistance of large language models in all stages of the effort.')",
+  "https://arxiv.org/abs/2606.15970 (Sheshadri, conormal no-go theorem)",
+  "https://arxiv.org/abs/2606.11090 (Sheshadri, symmetric polar-degree bound)",
+  "https://arxiv.org/abs/2609.34462 (Kumar-Volk, 28 Sep 2026: Sheshadri's proof is 'AI-assisted and AI-written'; they could not verify it)",
+  "https://arxiv.org/abs/2609.29568 (Guo, n^2 log log n permanent circuits; cites OpenAI Ten Advances Ch.5 critical-locus method; Codex GPT-5.6-Sol acknowledgement)",
+  "https://github.com/openai/ten-proofs (Permanent.lean: minorSum, criticalLocus, homogeneousLinearSliceIdeal)",
+  "https://www.openai.com/index/ten-advances-in-mathematics/ (403 to fetch; date Aug 1 2026 per secondary reports)",
+  "https://arxiv.org/abs/1911.11793 (Chatterjee-Kumar-She-Volk; singular-variety dimension in ABP bounds)",
+  "https://arxiv.org/pdf/1505.02205 (Alper-Bogart-Velasco)",
+  "Beauville 1990 / AHH 1993 spectral-curve literature (search results)"
+ ]
+}

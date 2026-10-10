@@ -1,0 +1,939 @@
+<style>
+/* Layout: header + tabs; Families = table then a detail panel for the picked family;
+   Traces = comparison charts + metrics table; Candidates = filterable item table + detail. */
+#dash-root .ax { display: grid; gap: var(--cds-gap-lg); font-family: var(--font-anthropic-sans); color: var(--color-fg); }
+#dash-root .ax h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+#dash-root .ax h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; }
+#dash-root .ax h3 { font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); margin: 0; }
+.ax-take { color: var(--color-fg-muted); margin: var(--cds-gap-xs) 0 0; max-width: 70ch; }
+.ax-take b { color: var(--color-fg); font-weight: 600; }
+.ax-tabs { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs); border-bottom: 1px solid var(--color-border-line); }
+.ax-tab { appearance: none; background: none; border: 0; border-bottom: 2px solid transparent; padding: var(--cds-pad-xs) var(--cds-pad-sm); font: inherit; color: var(--color-fg-muted); cursor: pointer; }
+.ax-tab[aria-selected="true"] { color: var(--color-fg); border-bottom-color: var(--color-fg); }
+.ax-tab:focus-visible, .ax-chip:focus-visible, .ax-rowbtn:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+.ax-page { display: grid; gap: var(--cds-gap-md); }
+.ax-grid { display: grid; gap: var(--cds-gap-md); grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
+.ax-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: grid; gap: var(--cds-gap-sm); min-width: 0; align-content: start; }
+.ax-note { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); margin: 0; }
+.ax-scroll { overflow: auto; max-height: 34rem; }
+.ax table { border-collapse: collapse; width: 100%; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.ax th { position: sticky; top: 0; background: var(--color-panel); text-align: left; font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); white-space: nowrap; cursor: pointer; }
+.ax td { padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); vertical-align: top; }
+.ax tbody tr { cursor: pointer; }
+.ax tbody tr:hover { background: var(--cds-surface-popover); }
+.ax tbody tr[aria-selected="true"] { background: var(--cds-surface-popover); box-shadow: inset 3px 0 0 var(--color-fg); }
+.ax td.num, .ax th.num { text-align: right; }
+.ax-badge { display: inline-block; padding: 0 .45em; border-radius: 999px; font-size: var(--cds-font-size-caption); border: 1px solid var(--color-border-line); white-space: nowrap; }
+.ax-badge.n3 { background: var(--ax-n3); color: var(--color-bg); border-color: transparent; }
+.ax-badge.n2 { border-color: var(--ax-n2); color: var(--color-fg); box-shadow: inset 0 0 0 1px var(--ax-n2); }
+.ax-badge.d3 { background: var(--ax-n3); color: var(--color-bg); border-color: transparent; }
+.ax-kv { display: grid; grid-template-columns: max-content 1fr; gap: var(--cds-gap-xs) var(--cds-gap-md); margin: 0; font-size: var(--cds-font-size-caption); }
+.ax-kv dt { color: var(--color-fg-muted); }
+.ax-kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.ax-figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr)); gap: var(--cds-gap-sm); }
+.ax-fig { display: grid; gap: 2px; }
+.ax-fig .v { font-family: var(--font-anthropic-serif); font-size: var(--cds-font-size-title); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.ax-fig .l { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.ax details { border-top: 1px solid var(--color-border-line); padding: var(--cds-pad-xs) 0; }
+.ax details > summary { cursor: pointer; display: flex; gap: var(--cds-gap-sm); align-items: baseline; flex-wrap: wrap; list-style: none; }
+.ax details > summary::before { content: "▸"; color: var(--color-fg-muted); width: 1em; flex: none; }
+.ax details[open] > summary::before { content: "▾"; }
+.ax details > .body { padding: var(--cds-pad-xs) 0 var(--cds-pad-xs) 1.4em; display: grid; gap: var(--cds-gap-xs); font-size: var(--cds-font-size-caption); }
+.ax-tree details details { margin-left: 1.1em; }
+.ax-lvl { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ax-out { font-size: var(--cds-font-size-caption); padding: 0 .4em; border-radius: 4px; white-space: nowrap; }
+.ax-out.kept { color: var(--color-ok); box-shadow: inset 0 0 0 1px var(--color-ok); }
+.ax-out.abandoned { color: var(--color-bad); box-shadow: inset 0 0 0 1px var(--color-bad); }
+.ax-out.other { color: var(--color-fg-muted); box-shadow: inset 0 0 0 1px var(--color-border-line); }
+.ax-filters { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs); align-items: center; }
+.ax-chip { appearance: none; font: inherit; font-size: var(--cds-font-size-caption); border: 1px solid var(--color-border-line); background: none; color: var(--color-fg); padding: 2px 10px; border-radius: 999px; cursor: pointer; }
+.ax-chip[aria-pressed="true"] { background: var(--color-fg); color: var(--color-bg); border-color: var(--color-fg); }
+.ax-legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.ax-legend span::before { content: ""; display: inline-block; width: .7em; height: .7em; border-radius: 2px; margin-right: .35em; background: var(--sw); vertical-align: -1px; }
+.ax-chart { position: relative; min-height: 8rem; }
+.ax-chart svg { display: block; overflow: visible; }
+.ax-chart text { fill: var(--color-fg-muted); font-size: 11px; font-family: var(--font-anthropic-sans); }
+.ax-tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); max-width: 22rem; z-index: 2; }
+.ax-tip .h { color: var(--cds-text-secondary); }
+.ax-empty { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.ax-pivot { display: grid; gap: 2px; padding: var(--cds-pad-xs) 0; border-top: 1px solid var(--color-border-line); font-size: var(--cds-font-size-caption); }
+.ax-rowbtn { all: unset; cursor: pointer; }
+.ax-code { margin: 0; padding: var(--cds-pad-sm); background: var(--color-bg); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); overflow-x: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; line-height: 1.45; white-space: pre; max-height: 28rem; }
+.ax-def-p { margin: 0; max-width: 72ch; line-height: 1.5; }
+.ax-deflink { margin-left: var(--cds-gap-xs); }
+#definitions .ax-kv { font-size: var(--cds-font-size-body); }
+#definitions .ax-kv dt { font-weight: var(--cds-font-weight-medium); color: var(--color-fg); }
+[data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+[data-dash-source-state=empty] { color: transparent; }
+#dash-root .ax { --ax-n3: var(--cds-chart-status-critical); --ax-n2: var(--cds-chart-reference); }
+</style>
+
+<div class="ax">
+  <header id="top">
+    <h1>OpenAI math release atlas</h1>
+    <p class="ax-take">
+      <b data-source="summary" data-field="families" data-row="0">—</b> families analysed,
+      <b data-source="summary" data-field="traces" data-row="0">—</b> reasoning traces coded,
+      <b data-source="summary" data-field="items" data-row="0">—</b> lemmas and definitions extracted, of which
+      <b data-source="summary" data-field="n3" data-row="0">—</b> are eureka-step candidates (N3).
+      Grades are provisional until the novelty check runs on each family.
+    </p>
+  </header>
+
+  <nav class="ax-tabs" role="tablist" aria-label="Views">
+    <button class="ax-tab" role="tab" id="tab-families" data-tab="families" aria-selected="true">Families</button>
+    <button class="ax-tab" role="tab" id="tab-traces" data-tab="traces" aria-selected="false">Trace comparison</button>
+    <button class="ax-tab" role="tab" id="tab-candidates" data-tab="candidates" aria-selected="false">Lemmas and definitions</button>
+    <button class="ax-tab" role="tab" id="tab-shortlist" data-tab="shortlist" aria-selected="false">Eureka shortlist</button>
+    <button class="ax-tab" role="tab" id="tab-f1" data-tab="f1" aria-selected="false">F1 definitions</button>
+    <button class="ax-tab" role="tab" id="tab-definitions" data-tab="definitions" aria-selected="false">Label definitions</button>
+  </nav>
+
+  <section class="ax-page" id="families" role="tabpanel" aria-labelledby="tab-families">
+    <div class="ax-card" id="families-card">
+      <h2>Families</h2>
+      <p class="ax-note">Codebook buckets per family: A logical form, B relation to the problem, C proof method, D novelty of machinery. Click a family to open its full record below. <button type="button" class="ax-chip ax-deflink" data-def="def-axes">What the labels mean</button></p>
+      <div class="ax-scroll">
+        <table class="ax-fam" data-source="families" data-row-key="fid">
+          <thead><tr>
+            <th data-field="fid">Family</th><th data-field="title">Result</th><th data-field="subject">Subject</th>
+            <th data-field="A">A</th><th data-field="B">B</th><th data-field="C_primary">C</th><th data-field="D">D</th><th class="num" data-field="D_confidence">D conf.</th><th data-field="priority_label">Eureka priority</th>
+            <th data-field="top_candidate">Strongest candidate</th><th data-field="top_candidate_N">N</th><th data-field="analyses">Analyses done</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="family-detail" class="ax-page"></div>
+  </section>
+
+  <section class="ax-page" id="traces" role="tabpanel" aria-labelledby="tab-traces" hidden>
+    <p class="ax-note">Each reasoning trace is coded as a CDCL-style search: decisions, conflicts, backtracks (distance d = levels jumped back), restarts (strategy switches) and learned lessons. Traces are curated summaries, so counts are lower bounds. <button type="button" class="ax-chip ax-deflink" data-def="def-search">Definitions of each measure</button></p>
+    <div class="ax-grid">
+      <div class="ax-card" id="chart-distance-card">
+        <h2>Backtracks by distance</h2>
+        <p class="ax-note">d=1 tries a sibling approach; d≥2 jumps further up the search tree.</p>
+        <div class="ax-legend" id="legend-distance"></div>
+        <div class="ax-chart" id="chart-distance" data-source="trace_metrics"></div>
+      </div>
+      <div class="ax-card" id="chart-trigger-card">
+        <h2>Backtracks by trigger</h2>
+        <p class="ax-note">Conflict: the approach failed. Insight: abandoned for a simpler route that a new idea opened.</p>
+        <div class="ax-legend" id="legend-trigger"></div>
+        <div class="ax-chart" id="chart-trigger" data-source="trace_metrics"></div>
+      </div>
+    </div>
+    <div class="ax-card" id="chart-branches-card">
+      <h2>How long each abandoned branch ran</h2>
+      <p class="ax-note">One dot per backtrack: words of trace spent on the branch before it was dropped (log scale). Ringed dots are restarts. Hover for the reason it was dropped.</p>
+      <div class="ax-legend" id="legend-branches"></div>
+      <div class="ax-chart" id="chart-branches" data-source="backtracks"></div>
+    </div>
+    <div class="ax-card" id="backtrack-table-card">
+      <h2>All backtracks</h2>
+      <p class="ax-note">Every backtrack across the coded traces. Filter by trace, sort any column, click a row for the obstruction and the lesson learned.</p>
+      <div class="ax-filters" id="bt-filter" role="group" aria-label="Trace"></div>
+      <div class="ax-scroll">
+        <table class="ax-bt" data-source="backtracks" data-row-key="key">
+          <thead><tr>
+            <th data-field="key">Backtrack</th>
+            <th data-field="from_node">From</th><th data-field="to_node">To</th>
+            <th class="num" data-field="distance">d</th><th data-field="trigger">Trigger</th>
+            <th data-field="restart">Restart</th><th class="num" data-field="length_words">Branch words</th>
+            <th data-field="conflict">Why it was dropped</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="bt-detail"></div>
+    </div>
+    <div class="ax-card" id="trace-table-card">
+      <h2>Search metrics per trace</h2>
+      <p class="ax-note">Click a trace to open that family's search tree.</p>
+      <div class="ax-scroll">
+        <table class="ax-tm" data-source="trace_metrics" data-row-key="fid">
+          <thead><tr>
+            <th data-field="fid">Family</th>
+            <th class="num" data-field="trace_words">Words</th>
+            <th class="num" data-field="n_decisions">Decisions</th>
+            <th class="num" data-field="n_conflicts">Conflicts</th>
+            <th class="num" data-field="n_backtracks">Backtracks</th>
+            <th class="num" data-field="bt_insight">Insight</th>
+            <th class="num" data-field="max_distance">Max d</th>
+            <th class="num" data-field="n_restarts">Restarts</th>
+            <th class="num" data-field="max_depth">Depth</th>
+            <th class="num" data-field="clause_reuse_rate">Lesson reuse</th>
+            <th class="num" data-field="frac_before_final">Before final route</th>
+            <th class="num" data-field="branch_len_median">Median branch</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="ax-page" id="candidates" role="tabpanel" aria-labelledby="tab-candidates" hidden>
+    <div class="ax-card" id="items-card">
+      <h2>Lemmas, definitions and constructions</h2>
+      <p class="ax-note">Every item the analysts extracted, with its novelty grade: N0 exists already (including transfer from another field), N1 repackages existing concepts, N2 close variant, N3 eureka-step candidate. Click a row for the reasoning. <button type="button" class="ax-chip ax-deflink" data-def="def-novelty">How grades are assigned</button></p>
+      <div class="ax-filters" id="grade-filter" role="group" aria-label="Novelty grade"></div>
+      <div class="ax-scroll">
+        <table class="ax-items" data-source="items" data-row-key="key">
+          <thead><tr>
+            <th data-field="key">Item</th><th data-field="N">N</th><th data-field="F">F</th>
+            <th data-field="name">Name</th><th data-field="kind">Kind</th><th data-field="cited_or_new">Cited or new</th><th data-field="source">Analyst</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="ax-card" id="item-detail"></div>
+  </section>
+
+  <section class="ax-page" id="shortlist" role="tabpanel" aria-labelledby="tab-shortlist" hidden>
+    <div class="ax-card" id="shortlist-intro">
+      <h2>Which surviving items are most plausibly eureka steps</h2>
+      <p class="ax-note">The items that survived the novelty pass at N3, ranked into four priority tiers for the next experiments: the discoverability test and the speedup test. Tiers weigh the novelty confidence, how far the step sits from known material or from the model's own learned lessons, whether anyone found it independently, and how strong the nearest precedent is. This is a judgement for prioritising, not a result: none is a confirmed eureka step.</p>
+      <p class="ax-note">The tests run in Lean, so only items formalized in the openai/math Lean library are ranked. Each item shows where it lives in the Lean, whether the comparator target depends on it, and the related problems to try it on, with how easily each can be stated in Lean. Items with no Lean counterpart are listed at the bottom as excluded.</p>
+    </div>
+    <div id="shortlist-tiers" class="ax-page" data-source="shortlist"></div>
+  </section>
+
+  <section class="ax-page" id="f1" role="tabpanel" aria-labelledby="tab-f1" hidden>
+    <div class="ax-card" id="f1-intro">
+      <h2>F1 extension definitions and where they might reach</h2>
+      <p class="ax-note">Every item graded as an F1 extension definition, a new defined object like Cook's pigeonhole variables. For each: the definition, its abstract mechanism, the precedent check, newer open problems it might help with, known theorems to use as speedup-test targets, and the exact Lean source.</p>
+      <div class="ax-filters" id="f1-filter" role="group" aria-label="F1 item"></div>
+    </div>
+    <div id="f1-detail" class="ax-page"></div>
+  </section>
+
+  <section class="ax-page" id="definitions" role="tabpanel" aria-labelledby="tab-definitions" hidden>
+    <div class="ax-card" id="def-intro">
+      <h2>What this atlas is testing</h2>
+      <p class="ax-def-p">The hypothesis: a model can resolve anything reachable by recombining existing definitions and theorems (AI-easy), but struggles where a proof needs a <b>eureka step</b>, a non-analytic cut. The anchor example is the pigeonhole principle: plain resolution proofs are exponential, but Cook and Reckhow's few extension variables make them polynomial. A eureka step is hard to construct and buys a large drop in proof budget. Importing a known concept from another field is <b>transfer</b>, not a eureka step.</p>
+      <dl class="ax-kv">
+        <dt>Eureka step</dt><dd>A new definition, lemma or construction that occurs nowhere in the goal or the existing library, is hard to find, and makes other theorems much cheaper to prove. Also called a non-analytic cut.</dd>
+        <dt>Transfer</dt><dd>Using a concept or theorem that already exists in another field. Recorded under fields and graded N0.</dd>
+        <dt>New bridge</dt><dd>A first-ever connection between one field's tools and a problem type, built from existing parts.</dd>
+        <dt>Base library L</dt><dd>Mathlib at the pinned commit plus the family's cited bibliography. Analyticity is judged against L; existence (N0) against all of mathematics.</dd>
+        <dt>Provisional vs final</dt><dd>Paper, Lean, family and trace analysts give provisional grades. Only the separate novelty pass gives final grades; in family 287 it kept one of six provisional N3 candidates.</dd>
+        <dt>Builds on model output</dt><dd>Flags a result whose closest precedent was itself produced by a model, such as a ChatGPT-assisted preprint.</dd>
+        <dt>Analyses done</dt><dd>paper: LaTeX analyst; lean: formal-proof analyst; family: combined paper and Lean analyst; trace: reasoning-trace analyst; novelty: literature and grading pass.</dd>
+      </dl>
+    </div>
+    <div class="ax-grid" id="def-axes">
+      <div class="ax-card" id="def-A">
+        <h2>A · Logical form</h2>
+        <p class="ax-note">Read from the innermost conclusion of the headline claim. Parameters that only index a family of witnesses count as an outer “for all”.</p>
+        <dl class="ax-kv">
+          <dt>A1</dt><dd>Universal: a property holds for every object in a class (∀).</dd>
+          <dt>A2</dt><dd>Existential: some object exists, including counterexamples (∃).</dd>
+          <dt>A3</dt><dd>Quantitative or sharp: determines an exact value, formula or optimal rate.</dd>
+          <dt>A4</dt><dd>Characterization: an if-and-only-if or complete classification (⇔). The form of its hard direction is recorded too.</dd>
+          <dt>A5</dt><dd>Impossibility: non-existence, hardness, undecidability or independence (¬∃).</dd>
+        </dl>
+      </div>
+      <div class="ax-card" id="def-B">
+        <h2>B · Relation to the posed problem</h2>
+        <dl class="ax-kv">
+          <dt>B1</dt><dd>Confirms the conjecture or open question in full.</dd>
+          <dt>B2</dt><dd>Refutes it.</dd>
+          <dt>B3</dt><dd>Partial: a special case, a conditional result, or an improved bound short of the target.</dd>
+          <dt>B4</dt><dd>Extends or generalizes a known result; no conjecture is settled.</dd>
+          <dt>Flags</dt><dd>“Full only with prior results” when cited theorems are needed to reach the headline. “Adds corollaries” when it also settles other questions.</dd>
+        </dl>
+      </div>
+      <div class="ax-card" id="def-C">
+        <h2>C · Proof method</h2>
+        <p class="ax-note">One primary label plus secondaries.</p>
+        <dl class="ax-kv">
+          <dt>C1</dt><dd>Construction: an explicit object, gadget or counterexample. Primary whenever the witness is built.</dd>
+          <dt>C2</dt><dd>Induction or iteration: induction, descent, bootstrapping, iterative or multiscale schemes.</dd>
+          <dt>C3</dt><dd>Indirect: contradiction, minimal counterexample, compactness, probabilistic method, pigeonhole.</dd>
+          <dt>C4</dt><dd>Estimation chain: inequalities, energy or a-priori estimates, asymptotics.</dd>
+          <dt>C5</dt><dd>Reduction or transfer: a cited result invoked without being re-proved.</dd>
+          <dt>Computer-assisted</dt><dd>Set only when computation carries real search (SAT, enumeration, certified numerics), not for trivial decision procedures.</dd>
+          <dt>Induction strengthened by</dt><dd>Whether the induction hypothesis was strengthened, and by which standard template: add a parameter, carry an extra tracked quantity, uniform version, or all substructures. A templated strengthening caps at N2.</dd>
+        </dl>
+      </div>
+      <div class="ax-card" id="def-D">
+        <h2>D · Novelty of machinery</h2>
+        <p class="ax-note">A family takes the highest novelty grade among its extracted items.</p>
+        <dl class="ax-kv">
+          <dt>D1</dt><dd>Recombination: every item is N0 or N1.</dd>
+          <dt>D2</dt><dd>Variants: the best item is N2.</dd>
+          <dt>D3</dt><dd>At least one item is an N3 eureka candidate. Cross-field transfer alone never gives D3.</dd>
+        </dl>
+      </div>
+      <div class="ax-card" id="def-E">
+        <h2>E · Fields</h2>
+        <dl class="ax-kv">
+          <dt>Problem field</dt><dd>OpenAI's subject label for the family.</dd>
+          <dt>Method fields</dt><dd>Fields of theorems the proof actually invokes, each tagged essential, corollary-only or background-cited. Cited but unused work does not count.</dd>
+          <dt>Lean-directory field</dt><dd>Where the formalization lives. It often differs from both of the above.</dd>
+        </dl>
+      </div>
+      <div class="ax-card" id="def-F">
+        <h2>F · Eureka type</h2>
+        <p class="ax-note">Assigned to N3 items only.</p>
+        <dl class="ax-kv">
+          <dt>F1</dt><dd>Extension definition: a new defined object or variable, like Cook's pigeonhole variables.</dd>
+          <dt>F2</dt><dd>Strengthened hypothesis or invariant.</dd>
+          <dt>F3</dt><dd>Auxiliary construction: a gadget built only to drive the proof.</dd>
+          <dt>F4</dt><dd>Potential or monovariant.</dd>
+          <dt>F5</dt><dd>Change of representation, including embedding into a larger structure.</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="ax-card" id="def-novelty">
+      <h2>N · Novelty grade of each lemma or definition</h2>
+      <dl class="ax-kv">
+        <dt>N0 Existing</dt><dd>It, or an equivalent, already exists in some field, including concepts transplanted from another field.</dd>
+        <dt>N1 Abbreviation</dt><dd>A renaming, special case or conjunction of concepts already in L.</dd>
+        <dt>N2 Variant</dt><dd>A close neighbour exists, including precedents the paper names itself, or a templated strengthening.</dd>
+        <dt>N3 Eureka candidate</dt><dd>Passes all four tests below.</dd>
+        <dt>Confirmed eureka step</dt><dd>N3, and adding it lets a prover resolve other theorems with much less budget. None is confirmed yet.</dd>
+      </dl>
+      <h3>The four N3 tests</h3>
+      <dl class="ax-kv">
+        <dt>1 · No near-equivalent</dt><dd>Nearest-neighbour search over Mathlib and the literature in every field, then an equivalence check.</dd>
+        <dt>2 · Non-analytic</dt><dd>Does not occur, up to unfolding, as a subterm of the goal or of L. Syntactic size is irrelevant.</dd>
+        <dt>3 · Load-bearing</dt><dd>A substantial share of the proof's dependency graph rests on it.</dd>
+        <dt>4 · Discoverability</dt><dd>With the item hidden, models trained before the release rarely propose it, measured as a discovery rate over many samples.</dd>
+      </dl>
+    </div>
+    <div class="ax-card" id="def-search">
+      <h2>Search dynamics in the reasoning traces</h2>
+      <p class="ax-note">Each trace is coded like a SAT solver's conflict-driven search. Traces are OpenAI's curated summaries, so counts are lower bounds and lengths measure summary text, not compute.</p>
+      <dl class="ax-kv">
+        <dt>Decision level</dt><dd>L1 is a top-level strategy such as prove vs disprove; L2 an approach within it; L3 and deeper are sub-approaches.</dd>
+        <dt>Conflict</dt><dd>An approach fails: a counterexample, a missing estimate, circularity, an invariant that is constant on the family, or no way to transport structure.</dd>
+        <dt>Learned lesson</dt><dd>What the model concluded from a failure. Lesson reuse is the share of lessons that later shape a choice.</dd>
+        <dt>Backtrack distance d</dt><dd>Levels jumped back after a failure. d = 1 tries a sibling approach; d ≥ 2 jumps further up the tree.</dd>
+        <dt>Insight-driven backtrack</dt><dd>An approach dropped not because it failed but because a new idea solved things more simply, like subsumption in a SAT solver. Retrieved ideas grade N0; constructed ones become novelty candidates.</dd>
+        <dt>Restart</dt><dd>Abandoning the whole strategy and returning to level 1, for example switching from disproving to proving.</dd>
+        <dt>Branch length</dt><dd>Words of trace spent on an abandoned branch before the backtrack.</dd>
+        <dt>Before final route</dt><dd>Share of the trace written before the successful route begins.</dd>
+        <dt>Conflict-driven final route</dt><dd>Whether the successful idea traces back to a learned lesson, or appears with no visible trigger.</dd>
+      </dl>
+      <h3>Pivot classifications</h3>
+      <dl class="ax-kv">
+        <dt>Known technique</dt><dd>A standard method of the problem's own field.</dd>
+        <dt>Transfer</dt><dd>A concept or theorem imported from another field.</dd>
+        <dt>Known route</dt><dd>A cross-field connection already used in the literature for this kind of problem.</dd>
+        <dt>New bridge</dt><dd>A cross-field connection with no prior use for this problem type.</dd>
+        <dt>New concept</dt><dd>A constructed object or lemma with no visible precedent.</dd>
+        <dt>Pivot distance</dt><dd>Steps between the new idea and the nearest thing the model had just invoked.</dd>
+        <dt>Chain depth</dt><dd>How many other new items must exist before this one pays off.</dd>
+      </dl>
+    </div>
+  </section>
+</div>
+
+<script>
+dash.calc('summary', {
+  inputs: ['families', 'trace_metrics', 'items'],
+  title: 'Coverage so far',
+  description: 'Counts of analysed families, coded traces, extracted items and N3 items.',
+  fn: (families, trace_metrics, items) => [{
+    families: families.length,
+    traces: trace_metrics.length,
+    items: items.length,
+    n3: items.filter((i) => i.N === 'N3').length,
+  }],
+});
+</script>
+
+<script>
+(() => {
+  const S = window.AX = { tab: 'families', fam: null, item: null, grade: 'all', sort: {} };
+  const tabs = [...document.querySelectorAll('.ax-tab')];
+  S.show = (id, push = true) => {
+    S.tab = id;
+    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === id)));
+    ['families', 'traces', 'candidates', 'shortlist', 'f1', 'definitions'].forEach((p) => { document.getElementById(p).hidden = p !== id; });
+    if (push) dash.setLink(id);
+    S.redraw && S.redraw();
+  };
+  tabs.forEach((t) => t.addEventListener('click', () => S.show(t.dataset.tab)));
+  document.querySelectorAll('.ax-deflink').forEach((b) => b.addEventListener('click', () => {
+    S.show('definitions');
+    const el = document.getElementById(b.dataset.def);
+    if (el) el.scrollIntoView({ block: 'start' });
+  }));
+  const h = location.hash.slice(1);
+  if (['families', 'traces', 'candidates', 'shortlist', 'f1', 'definitions'].includes(h)) S.show(h, false);
+
+  S.rows = (id) => { const d = dash.data(id); return d.status === 'ok' && Array.isArray(d.data) ? d.data : []; };
+  S.el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  S.badge = (v) => { const b = S.el('span', 'ax-badge' + (/N3/.test(v || '') ? ' n3' : /N2/.test(v || '') ? ' n2' : /D3/.test(v || '') ? ' d3' : ''), v || '–'); return b; };
+  S.pct = d3.format('.0%');
+  S.sortable = (table, key, render) => {
+    table.querySelectorAll('th').forEach((th) => {
+      th.setAttribute('aria-sort', 'none');
+      th.onclick = () => {
+        const f = th.dataset.field, cur = S.sort[key];
+        const dir = cur && cur.f === f && cur.dir === 'ascending' ? 'descending' : 'ascending';
+        S.sort[key] = { f, dir };
+        table.querySelectorAll('th').forEach((x) => x.setAttribute('aria-sort', x === th ? dir : 'none'));
+        render();
+      };
+    });
+  };
+  S.sorted = (rows, key) => {
+    const s = S.sort[key]; if (!s) return rows;
+    const num = rows.every((r) => r[s.f] == null || typeof r[s.f] === 'number');
+    return [...rows].sort((a, b) => {
+      const x = a[s.f], y = b[s.f];
+      const c = num ? (x ?? -Infinity) - (y ?? -Infinity) : String(x ?? '').localeCompare(String(y ?? ''), 'en', { numeric: true });
+      return s.dir === 'ascending' ? c : -c;
+    });
+  };
+  S.tip = (box) => { let t = box.querySelector('.ax-tip'); if (!t) { t = S.el('div', 'ax-tip'); t.hidden = true; box.append(t); } return t; };
+  S.place = (box, tip, ev) => {
+    const r = box.getBoundingClientRect(); tip.hidden = false;
+    let x = ev.clientX - r.left + 12, y = ev.clientY - r.top + 12;
+    x = Math.min(x, r.width - tip.offsetWidth - 4); tip.style.left = Math.max(0, x) + 'px'; tip.style.top = y + 'px';
+  };
+})();
+</script>
+
+<script>
+(() => {
+  const S = window.AX;
+  const table = document.querySelector('.ax-fam'), tbody = table.querySelector('tbody');
+  const detail = document.getElementById('family-detail');
+  const cols = ['fid', 'title', 'subject', 'A', 'B', 'C_primary', 'D', 'D_confidence', 'priority_label', 'top_candidate', 'top_candidate_N', 'analyses'];
+
+  const kv = (pairs, fid) => {
+    const dl = S.el('dl', 'ax-kv');
+    pairs.forEach(([label, field]) => {
+      const dt = S.el('dt', null, label), dd = S.el('dd');
+      dd.dataset.source = 'families'; dd.dataset.field = field; dd.dataset.where = 'fid=' + fid;
+      dl.append(dt, dd);
+    });
+    return dl;
+  };
+
+  function renderTable() {
+    const rows = S.sorted(S.rows('families'), 'fam');
+    tbody.replaceChildren(...rows.map((r) => {
+      const tr = S.el('tr'); tr.dataset.key = r.fid; tr.tabIndex = 0;
+      tr.setAttribute('aria-selected', String(r.fid === S.fam));
+      cols.forEach((c) => {
+        const td = S.el('td');
+        if (c === 'D' || c === 'top_candidate_N') td.append(S.badge(r[c]));
+        else if (c === 'priority_label') { const t = r.priority_tier; const b = S.el('span', 'ax-badge' + (t === 1 ? ' n3' : t === 2 ? ' n2' : ''), r[c] || '–'); td.append(b); }
+        else if (c === 'D_confidence') { td.className = 'num'; td.textContent = r[c] == null ? '–' : d3.format('.2f')(r[c]); }
+        else td.textContent = r[c] ?? '–';
+        tr.append(td);
+      });
+      const pick = () => { S.fam = r.fid; renderTable(); renderDetail(); detail.scrollIntoView({ block: 'start', behavior: 'smooth' }); };
+      tr.addEventListener('click', pick);
+      tr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+      return tr;
+    }));
+  }
+
+  function nodeTree(fid) {
+    const nodes = S.rows('trace_nodes').filter((n) => n.fid === fid);
+    if (!nodes.length) return null;
+    const kids = d3.group(nodes, (n) => n.parent ?? '');
+    const ids = new Set(nodes.map((n) => n.node));
+    const roots = nodes.filter((n) => !n.parent || !ids.has(n.parent));
+    const make = (n) => {
+      const d = S.el('details');
+      const s = S.el('summary');
+      const out = String(n.outcome || '');
+      const cls = /kept/.test(out) ? 'kept' : /abandon|supersed|fail/.test(out) ? 'abandoned' : 'other';
+      s.append(S.el('span', 'ax-lvl', 'L' + (n.level ?? '?') + ' · ' + (n.node ?? '')), S.el('span', null, n.description || ''),
+        S.el('span', 'ax-out ' + cls, out || 'n/a'), S.el('span', 'ax-lvl', n.length_words != null ? d3.format(',')(n.length_words) + ' words' : ''));
+      d.append(s);
+      const body = S.el('div', 'body');
+      [['Obstruction', n.obstruction], ['Lesson learned', n.lesson], ['Form', n.lesson_form], ['Generality', n.generality],
+        ['Known in literature', n.known_in_literature], ['Salvaged', n.salvage], ['Influence later', n.influence], ['Where', n.location]]
+        .filter(([, v]) => v).forEach(([k, v]) => { const p = S.el('div'); p.append(S.el('b', null, k + ': '), document.createTextNode(v)); body.append(p); });
+      (kids.get(n.node) || []).forEach((c) => body.append(make(c)));
+      d.append(body);
+      return d;
+    };
+    const wrap = S.el('div', 'ax-tree'); wrap.dataset.source = 'trace_nodes';
+    roots.forEach((r) => { const t = make(r); t.open = true; wrap.append(t); });
+    return wrap;
+  }
+
+  function renderDetail() {
+    const fid = S.fam;
+    const fam = S.rows('families').find((r) => r.fid === fid);
+    if (!fam) {
+      detail.replaceChildren(Object.assign(S.el('p', 'ax-empty', 'Pick a family above to see its buckets, extracted items, pivots and search tree.')));
+      return;
+    }
+    const head = S.el('div', 'ax-card'); head.id = 'family-record';
+    head.append(S.el('h2', null, fid + ' · ' + (fam.title || '')),
+      kv([['Subject', 'subject'], ['Main statement', 'main_statement'], ['A logical form', 'A'], ['B relation to problem', 'B'],
+        ['C primary method', 'C_primary'], ['C secondary', 'C_secondary'], ['Computer-assisted', 'computer_assisted'],
+        ['Induction strengthened by', 'ih_template'], ['D novelty', 'D'], ['D graded by', 'D_source'], ['D confidence', 'D_confidence'], ['D rests on', 'D_rests_on'],
+        ['Would drop to D2 if', 'D_downgrade_if'], ['Bridge novelty', 'bridge_novelty'],
+        ['Builds on model output?', 'provenance_flag'], ['Strongest candidate', 'top_candidate'], ['Its grade', 'top_candidate_N'],
+        ['Lean trust surface', 'trust'], ['Correctness concerns', 'concerns'], ['Analyses done', 'analyses']], fid));
+    head.querySelectorAll('dd').forEach((dd) => { dd.textContent = fam[dd.dataset.field] ?? '–'; });
+    const blocks = [head];
+
+    const tm = S.rows('trace_metrics').find((r) => r.fid === fid);
+    if (tm) {
+      const c = S.el('div', 'ax-card'); c.id = 'family-trace';
+      c.append(S.el('h2', null, 'Reasoning trace: search dynamics'));
+      const figs = S.el('div', 'ax-figs');
+      [['n_backtracks', 'backtracks', d3.format(',')], ['bt_insight', 'insight-driven', d3.format(',')], ['max_distance', 'max backtrack distance', d3.format(',')],
+        ['n_restarts', 'restarts', d3.format(',')], ['clause_reuse_rate', 'lessons reused', S.pct], ['frac_before_final', 'trace before final route', S.pct]]
+        .forEach(([f, l, fmt]) => {
+          const box = S.el('div', 'ax-fig'), v = S.el('span', 'v', tm[f] == null ? '–' : fmt(tm[f]));
+          v.dataset.source = 'trace_metrics'; v.dataset.field = f; v.dataset.where = 'fid=' + fid;
+          box.append(v, S.el('span', 'l', l)); figs.append(box);
+        });
+      const conc = S.el('p', 'ax-note'), cv = S.el('span', null, tm.final_route_conflict_driven || '–');
+      cv.dataset.source = 'trace_metrics'; cv.dataset.field = 'final_route_conflict_driven'; cv.dataset.where = 'fid=' + fid;
+      conc.append(S.el('b', null, 'Was the final route conflict-driven? '), cv);
+      c.append(figs, conc);
+      blocks.push(c);
+
+      const pv = S.rows('pivots').filter((p) => p.fid === fid);
+      if (pv.length) {
+        const pc = S.el('div', 'ax-card'); pc.id = 'family-pivots';
+        pc.append(S.el('h2', null, 'Decisive pivots'), S.el('p', 'ax-note', 'Where the search changed direction, and whether the new idea was a known technique, transfer, a new bridge or a new concept.'));
+        const list = S.el('div'); list.dataset.source = 'pivots';
+        pv.forEach((p) => {
+          const row = S.el('div', 'ax-pivot');
+          const top = S.el('div'); top.append(S.el('b', null, (p.pivot || '') + ' '), S.badge(p.classification), document.createTextNode(p.F_type ? '  ' + p.F_type : ''));
+          row.append(top, S.el('div', null, p.new_idea || ''), S.el('div', 'ax-note', 'Trigger: ' + (p.trigger || '–') + ' · Distance: ' + (p.pivot_distance || '–') + ' · Chain depth: ' + (p.chain_depth || '–') + ' · Became: ' + (p.final_item || '–')));
+          list.append(row);
+        });
+        pc.append(list); blocks.push(pc);
+      }
+
+      const bts = S.rows('backtracks').filter((b) => b.fid === fid).sort((a, b) => (a.seq ?? 0) - (b.seq ?? 0));
+      if (bts.length) {
+        const bc = S.el('div', 'ax-card'); bc.id = 'family-backtracks';
+        bc.append(S.el('h2', null, 'Every backtrack, in order'),
+          S.el('p', 'ax-note', 'Each time the model abandoned a branch: where it jumped from and to, how far, why, how long the branch ran, and what it learned. Expand a row for the full record.'));
+        const list = S.el('div'); list.dataset.source = 'backtracks';
+        bts.forEach((b) => {
+          const d = S.el('details'), s = S.el('summary');
+          const trig = S.el('span', 'ax-out ' + (b.trigger === 'insight' ? 'kept' : b.trigger === 'conflict' ? 'abandoned' : 'other'), b.trigger || 'unclear');
+          s.append(S.el('span', 'ax-lvl', '#' + b.seq), S.el('span', null, (b.from_node || '?') + ' → ' + (b.to_node || '?')),
+            S.el('span', 'ax-badge', 'd = ' + (b.distance ?? '?')), trig);
+          if (b.restart) s.append(S.el('span', 'ax-badge n3', 'restart'));
+          if (b.repair) s.append(S.el('span', 'ax-badge', 'repair'));
+          s.append(S.el('span', 'ax-lvl', b.length_words != null ? d3.format(',')(b.length_words) + ' words' : ''), S.el('span', 'ax-note', b.conflict || ''));
+          const body = S.el('div', 'body');
+          [['Abandoned', b.from_desc], ['Resumed at', b.to_desc], ['Levels', (b.from_level ?? '?') + ' → ' + (b.to_level ?? '?')],
+            ['Obstruction', b.obstruction], ['Lesson learned', b.lesson], ['Lesson form', b.lesson_form], ['Influence later', b.influence],
+            ['Origin of the new idea', b.origin], ['Simplification', b.simplification], ['Where', b.location]]
+            .filter(([, v]) => v).forEach(([k, v]) => { const p = S.el('div'); p.append(S.el('b', null, k + ': '), document.createTextNode(v)); body.append(p); });
+          d.append(s, body); list.append(d);
+        });
+        bc.append(list); blocks.push(bc);
+      }
+
+      const tree = nodeTree(fid);
+      if (tree) {
+        const tc = S.el('div', 'ax-card'); tc.id = 'family-tree';
+        tc.append(S.el('h2', null, 'Search tree'), S.el('p', 'ax-note', 'Every approach the model committed to, with what it learned when it backtracked. Expand a node for the obstruction and the lesson.'), tree);
+        blocks.push(tc);
+      }
+    }
+
+    const items = S.rows('items').filter((i) => i.fid === fid);
+    if (items.length) {
+      const ic = S.el('div', 'ax-card'); ic.id = 'family-items';
+      ic.append(S.el('h2', null, 'Extracted lemmas and definitions'), S.el('p', 'ax-note', 'Sorted by novelty grade, strongest first. Expand for the statement and the grading argument.'));
+      const order = (n) => ({ N3: 0, N2: 1, N1: 2, N0: 3 }[n] ?? 4);
+      const list = S.el('div'); list.dataset.source = 'items';
+      [...items].sort((a, b) => order(a.N) - order(b.N) || (a.rank ?? 99) - (b.rank ?? 99)).forEach((i) => {
+        const d = S.el('details'), s = S.el('summary');
+        s.append(S.badge(i.N), S.el('span', null, i.name || i.id), S.el('span', 'ax-lvl', [i.kind, i.F, i.rank ? 'ranked #' + i.rank : '', i.source].filter(Boolean).join(' · ')));
+        const body = S.el('div', 'body');
+        [['Statement', i.statement], ['Why this grade', i.why], ['Cited or new', i.cited_or_new], ['Load-bearing', i.load_bearing], ['Where', i.where]]
+          .filter(([, v]) => v).forEach(([k, v]) => { const p = S.el('div'); p.append(S.el('b', null, k + ': '), document.createTextNode(v)); body.append(p); });
+        d.append(s, body); list.append(d);
+      });
+      ic.append(list); blocks.push(ic);
+    }
+    detail.replaceChildren(...blocks);
+  }
+
+  S.sortable(table, 'fam', renderTable);
+  dash.onData(() => {
+    const fams = S.rows('families');
+    if (!S.fam && fams.length) S.fam = fams[0].fid;
+    renderTable(); renderDetail();
+  });
+  window.AX.pickFamily = (fid) => { S.fam = fid; S.show('families'); renderTable(); renderDetail(); };
+})();
+</script>
+
+<script>
+(() => {
+  const S = window.AX;
+  const fmt = d3.format(',');
+
+  function stacked(boxId, legendId, keys, labels) {
+    const box = document.getElementById(boxId);
+    const rows = S.rows('trace_metrics');
+    const leg = document.getElementById(legendId);
+    leg.replaceChildren(...keys.map((k, i) => { const s = S.el('span', null, labels[i]); s.style.setProperty('--sw', dash.colors[i]); return s; }));
+    box.querySelector('svg')?.remove();
+    if (!rows.length || box.closest('[hidden]')) return;
+    const W = box.clientWidth, bar = 18, gap = 8, left = 44, right = 36;
+    const H = rows.length * (bar + gap) + 22;
+    const x = d3.scaleLinear([0, d3.max(rows, (r) => d3.sum(keys, (k) => r[k] || 0)) || 1], [left, W - right]).nice();
+    const y = d3.scaleBand(rows.map((r) => r.fid), [0, H - 22]).paddingInner(gap / (bar + gap));
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    svg.append('g').selectAll('line').data(x.ticks(4)).join('line').attr('x1', x).attr('x2', x).attr('y1', 0).attr('y2', H - 22).attr('stroke', 'var(--cds-chart-grid)');
+    svg.append('g').attr('transform', `translate(0,${H - 22})`).call(d3.axisBottom(x).ticks(4).tickSize(0).tickPadding(6)).call((g) => g.select('.domain').remove()).attr('font-size', null).attr('font-family', null);
+    svg.append('g').selectAll('text').data(rows).join('text').attr('x', left - 8).attr('y', (r) => y(r.fid) + y.bandwidth() / 2).attr('dy', '0.35em').attr('text-anchor', 'end').text((r) => r.fid);
+    const tip = S.tip(box);
+    rows.forEach((r) => {
+      let acc = 0;
+      keys.forEach((k, i) => {
+        const v = r[k] || 0; if (!v) return;
+        const x0 = x(acc), x1 = x(acc + v); acc += v;
+        svg.append('rect').attr('x', x0 + (acc - v > 0 ? 1 : 0)).attr('y', y(r.fid)).attr('width', Math.max(1, x1 - x0 - (acc - v > 0 ? 1 : 0))).attr('height', y.bandwidth()).attr('rx', 3)
+          .style('fill', dash.colors[i]).style('cursor', 'pointer')
+          .on('mousemove', (ev) => { tip.replaceChildren(S.el('div', 'h', 'Family ' + r.fid), S.el('div', null, labels[i] + ': ' + fmt(v)), S.el('div', null, 'Total backtracks: ' + fmt(r.n_backtracks ?? acc))); S.place(box, tip, ev); })
+          .on('mouseleave', () => { tip.hidden = true; })
+          .on('click', () => S.pickFamily(r.fid));
+      });
+      svg.append('text').attr('x', x(acc) + 6).attr('y', y(r.fid) + y.bandwidth() / 2).attr('dy', '0.35em').text(fmt(acc));
+    });
+  }
+
+  function branches() {
+    const box = document.getElementById('chart-branches');
+    const rows = S.rows('backtracks').filter((b) => b.length_words > 0);
+    const trig = ['conflict', 'insight', 'unclear'];
+    const leg = document.getElementById('legend-branches');
+    leg.replaceChildren(...trig.map((t, i) => { const s = S.el('span', null, t); s.style.setProperty('--sw', dash.colors[i]); return s; }));
+    box.querySelector('svg')?.remove();
+    if (!rows.length || box.closest('[hidden]')) return;
+    const fids = [...new Set(rows.map((r) => r.fid))].sort();
+    const W = box.clientWidth, left = 44, right = 16, band = 34;
+    const H = fids.length * band + 24;
+    const x = d3.scaleLog([Math.max(5, d3.min(rows, (r) => r.length_words)), d3.max(rows, (r) => r.length_words)], [left, W - right]).nice();
+    const y = d3.scaleBand(fids, [0, H - 24]).padding(0.2);
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    svg.append('g').selectAll('line').data(x.ticks(5)).join('line').attr('x1', x).attr('x2', x).attr('y1', 0).attr('y2', H - 24).attr('stroke', 'var(--cds-chart-grid)');
+    svg.append('g').attr('transform', `translate(0,${H - 24})`).call(d3.axisBottom(x).ticks(5, ',').tickSize(0).tickPadding(6)).call((g) => g.select('.domain').remove()).attr('font-size', null).attr('font-family', null);
+    svg.append('g').selectAll('text').data(fids).join('text').attr('x', left - 8).attr('y', (f) => y(f) + y.bandwidth() / 2).attr('dy', '0.35em').attr('text-anchor', 'end').text((f) => f);
+    const tip = S.tip(box);
+    const jitter = (k) => { let h = 0; for (const c of String(k)) h = (h * 31 + c.charCodeAt(0)) % 997; return (h / 997 - 0.5) * y.bandwidth() * 0.8; };
+    svg.append('g').selectAll('circle').data(rows).join('circle')
+      .attr('cx', (r) => x(r.length_words)).attr('cy', (r) => y(r.fid) + y.bandwidth() / 2 + jitter(r.key))
+      .attr('r', (r) => 3.5 + Math.min(3, (r.distance || 1) - 1) * 1.5)
+      .style('fill', (r) => dash.colors[Math.max(0, trig.indexOf(r.trigger))])
+      .attr('stroke', (r) => (r.restart ? 'var(--color-fg)' : 'var(--color-panel)')).attr('stroke-width', (r) => (r.restart ? 2 : 1))
+      .style('cursor', 'pointer')
+      .on('mousemove', (ev, r) => {
+        tip.replaceChildren(S.el('div', 'h', `Family ${r.fid} · ${r.from_node} → ${r.to_node}`),
+          S.el('div', null, `${fmt(r.length_words)} words · d=${r.distance} · ${r.trigger}${r.restart ? ' · restart' : ''}`),
+          S.el('div', null, r.conflict || ''));
+        S.place(box, tip, ev);
+      })
+      .on('mouseleave', () => { tip.hidden = true; })
+      .on('click', (ev, r) => S.pickFamily(r.fid));
+  }
+
+  const tmTable = document.querySelector('.ax-tm'), tmBody = tmTable.querySelector('tbody');
+  const tmCols = ['fid', 'trace_words', 'n_decisions', 'n_conflicts', 'n_backtracks', 'bt_insight', 'max_distance', 'n_restarts', 'max_depth', 'clause_reuse_rate', 'frac_before_final', 'branch_len_median'];
+  function renderTm() {
+    const rows = S.sorted(S.rows('trace_metrics'), 'tm');
+    tmBody.replaceChildren(...rows.map((r) => {
+      const tr = S.el('tr'); tr.dataset.key = r.fid; tr.tabIndex = 0;
+      tmCols.forEach((c, i) => {
+        const v = r[c];
+        const t = v == null ? '–' : (c === 'clause_reuse_rate' || c === 'frac_before_final') ? S.pct(v) : typeof v === 'number' ? fmt(v) : v;
+        tr.append(S.el('td', i ? 'num' : null, t));
+      });
+      tr.addEventListener('click', () => S.pickFamily(r.fid));
+      tr.addEventListener('keydown', (e) => { if (e.key === 'Enter') S.pickFamily(r.fid); });
+      return tr;
+    }));
+  }
+  S.sortable(tmTable, 'tm', renderTm);
+
+  const btTable = document.querySelector('.ax-bt'), btBody = btTable.querySelector('tbody');
+  const btFilter = document.getElementById('bt-filter'), btDetail = document.getElementById('bt-detail');
+  S.btFid = 'all'; S.bt = null;
+  function renderBtFilter() {
+    const rows = S.rows('backtracks');
+    const fids = ['all', ...[...new Set(rows.map((r) => r.fid))].sort()];
+    btFilter.replaceChildren(...fids.map((f) => {
+      const n = f === 'all' ? rows.length : rows.filter((r) => r.fid === f).length;
+      const b = S.el('button', 'ax-chip', (f === 'all' ? 'All traces' : f) + ' · ' + fmt(n));
+      b.type = 'button'; b.setAttribute('aria-pressed', String(S.btFid === f));
+      b.addEventListener('click', () => { S.btFid = f; renderBtFilter(); renderBt(); });
+      return b;
+    }));
+  }
+  function renderBt() {
+    let rows = S.rows('backtracks');
+    if (S.btFid !== 'all') rows = rows.filter((r) => r.fid === S.btFid);
+    rows = S.sort.bt ? S.sorted(rows, 'bt') : [...rows].sort((a, b) => String(a.fid).localeCompare(String(b.fid)) || (a.seq ?? 0) - (b.seq ?? 0));
+    btBody.replaceChildren(...rows.map((r) => {
+      const tr = S.el('tr'); tr.dataset.key = r.key; tr.tabIndex = 0;
+      tr.setAttribute('aria-selected', String(r.key === S.bt));
+      tr.append(S.el('td', null, r.key), S.el('td', null, r.from_node || '–'), S.el('td', null, r.to_node || '–'),
+        S.el('td', 'num', r.distance ?? '–'), S.el('td', null, r.trigger || '–'), S.el('td', null, r.restart ? 'yes' : 'no'),
+        S.el('td', 'num', r.length_words != null ? fmt(r.length_words) : '–'), S.el('td', null, r.conflict || '–'));
+      const pick = () => { S.bt = r.key; renderBt(); };
+      tr.addEventListener('click', pick);
+      tr.addEventListener('keydown', (e) => { if (e.key === 'Enter') pick(); });
+      return tr;
+    }));
+    const r = S.rows('backtracks').find((x) => x.key === S.bt);
+    if (!r) { btDetail.replaceChildren(S.el('p', 'ax-empty', 'Click a backtrack to read the obstruction and the lesson learned.')); return; }
+    const dl = S.el('dl', 'ax-kv');
+    [['Abandoned', 'from_desc'], ['Resumed at', 'to_desc'], ['Obstruction', 'obstruction'], ['Lesson learned', 'lesson'], ['Lesson form', 'lesson_form'],
+      ['Influence later', 'influence'], ['Origin of the new idea', 'origin'], ['Simplification', 'simplification'], ['Where', 'location']]
+      .forEach(([label, f]) => {
+        if (r[f] == null || r[f] === '') return;
+        const dd = S.el('dd', null, String(r[f]));
+        dd.dataset.source = 'backtracks'; dd.dataset.field = f; dd.dataset.where = 'key=' + encodeURIComponent(r.key);
+        dl.append(S.el('dt', null, label), dd);
+      });
+    const open = S.el('button', 'ax-chip', 'Open family ' + r.fid); open.type = 'button';
+    open.addEventListener('click', () => S.pickFamily(r.fid));
+    btDetail.replaceChildren(S.el('h3', null, 'Backtrack ' + r.key), dl, open);
+  }
+  S.sortable(btTable, 'bt', renderBt);
+  dash.onData(() => { renderBtFilter(); renderBt(); });
+
+  S.redraw = () => {
+    stacked('chart-distance', 'legend-distance', ['d1', 'd2', 'd3plus'], ['d = 1', 'd = 2', 'd ≥ 3']);
+    stacked('chart-trigger', 'legend-trigger', ['bt_conflict', 'bt_insight', 'bt_unclear'], ['conflict', 'insight', 'unclear']);
+    branches();
+  };
+  dash.onData(() => { renderTm(); S.redraw(); });
+})();
+</script>
+
+<script>
+(() => {
+  const S = window.AX;
+  const table = document.querySelector('.ax-items'), tbody = table.querySelector('tbody');
+  const detail = document.getElementById('item-detail');
+  const filt = document.getElementById('grade-filter');
+  const grades = ['all', 'N3', 'N2', 'N1', 'N0'];
+
+  function renderFilter() {
+    const rows = S.rows('items');
+    filt.replaceChildren(...grades.map((g) => {
+      const n = g === 'all' ? rows.length : rows.filter((r) => r.N === g).length;
+      const b = S.el('button', 'ax-chip', (g === 'all' ? 'All' : g) + ' · ' + d3.format(',')(n));
+      b.type = 'button'; b.setAttribute('aria-pressed', String(S.grade === g));
+      b.addEventListener('click', () => { S.grade = g; renderFilter(); renderTable(); });
+      return b;
+    }));
+  }
+
+  function renderTable() {
+    let rows = S.rows('items');
+    if (S.grade !== 'all') rows = rows.filter((r) => r.N === S.grade);
+    const order = (n) => ({ N3: 0, N2: 1, N1: 2, N0: 3 }[n] ?? 4);
+    rows = S.sort.items ? S.sorted(rows, 'items') : [...rows].sort((a, b) => order(a.N) - order(b.N) || String(a.fid).localeCompare(String(b.fid)));
+    tbody.replaceChildren(...rows.map((r) => {
+      const tr = S.el('tr'); tr.dataset.key = r.key; tr.tabIndex = 0;
+      tr.setAttribute('aria-selected', String(r.key === S.item));
+      tr.append(S.el('td', null, r.key));
+      const n = S.el('td'); n.append(S.badge(r.N)); tr.append(n);
+      ['F', 'name', 'kind', 'cited_or_new', 'source'].forEach((c) => tr.append(S.el('td', null, r[c] || '–')));
+      const pick = () => { S.item = r.key; renderTable(); renderDetail(); };
+      tr.addEventListener('click', pick);
+      tr.addEventListener('keydown', (e) => { if (e.key === 'Enter') pick(); });
+      return tr;
+    }));
+  }
+
+  function renderDetail() {
+    const r = S.rows('items').find((i) => i.key === S.item);
+    if (!r) { detail.replaceChildren(S.el('p', 'ax-empty', 'Click an item to read its statement and the argument for its grade.')); return; }
+    const dl = S.el('dl', 'ax-kv');
+    [['Family', 'fid'], ['Name', 'name'], ['Kind', 'kind'], ['Grade', 'N'], ['Eureka type', 'F'], ['Statement', 'statement'],
+      ['Why this grade', 'why'], ['Cited or new', 'cited_or_new'], ['Load-bearing', 'load_bearing'], ['Where', 'where'], ['Analyst', 'source']]
+      .forEach(([label, f]) => {
+        const dd = S.el('dd', null, r[f] == null || r[f] === '' ? '–' : String(r[f]));
+        dd.dataset.source = 'items'; dd.dataset.field = f; dd.dataset.where = 'key=' + encodeURIComponent(r.key);
+        dl.append(S.el('dt', null, label), dd);
+      });
+    const open = S.el('button', 'ax-chip', 'Open family ' + r.fid); open.type = 'button';
+    open.addEventListener('click', () => S.pickFamily(r.fid));
+    detail.replaceChildren(S.el('h2', null, r.name || r.key), dl, open);
+  }
+
+  S.sortable(table, 'items', renderTable);
+  dash.onData(() => { renderFilter(); renderTable(); renderDetail(); });
+})();
+</script>
+
+<script>
+(() => {
+  const S = window.AX;
+  const filt = document.getElementById('f1-filter'), out = document.getElementById('f1-detail');
+  S.f1 = null;
+  const kvRow = (dl, label, src, field, key, val) => {
+    if (val == null || val === '') return;
+    const dd = S.el('dd', null, String(val));
+    dd.dataset.source = src; dd.dataset.field = field; dd.dataset.where = 'key=' + encodeURIComponent(key);
+    dl.append(S.el('dt', null, label), dd);
+  };
+  const section = (title, note, rows, id) => {
+    const c = S.el('div', 'ax-card'); c.id = id;
+    c.append(S.el('h2', null, title), S.el('p', 'ax-note', note));
+    const list = S.el('div'); list.dataset.source = 'f1_targets';
+    if (!rows.length) list.append(S.el('p', 'ax-empty', 'None recorded.'));
+    rows.forEach((t) => {
+      const d = S.el('details'), s = S.el('summary');
+      if (t.rank) s.append(S.el('span', 'ax-badge n3', '#' + t.rank));
+      s.append(S.el('span', null, t.title || '–'));
+      if (t.status) s.append(S.el('span', 'ax-lvl', t.status));
+      if (t.confidence) s.append(S.el('span', 'ax-badge', 'confidence ' + t.confidence));
+      const body = S.el('div', 'body');
+      const speed = t.list === 'speedup target';
+      [['Reference', t.reference],
+        [speed ? 'Current proof size' : 'Obstruction match', t.match],
+        [speed ? 'How the definition shortens it' : 'Expected payoff', t.payoff],
+        [t.list === 'top5' ? 'Argument' : speed ? 'Caveat' : 'Adaptation sketch', t.detail]]
+        .filter(([, v]) => v).forEach(([k, v]) => { const p = S.el('div'); p.append(S.el('b', null, k + ': '), document.createTextNode(v)); body.append(p); });
+      d.append(s, body); list.append(d);
+    });
+    c.append(list);
+    return c;
+  };
+
+  function render() {
+    const items = S.rows('f1_items');
+    if (!S.f1 && items.length) S.f1 = items[0].key;
+    filt.replaceChildren(...items.map((r) => {
+      const b = S.el('button', 'ax-chip', r.fid + ' · ' + (r.review_status ? '[' + r.review_status + '] ' : '') + (r.name || r.slug).slice(0, 44));
+      b.type = 'button'; b.setAttribute('aria-pressed', String(S.f1 === r.key));
+      b.addEventListener('click', () => { S.f1 = r.key; render(); });
+      return b;
+    }));
+    const r = items.find((x) => x.key === S.f1);
+    if (!r) { out.replaceChildren(S.el('p', 'ax-empty', 'No F1 items yet.')); return; }
+
+    const head = S.el('div', 'ax-card'); head.id = 'f1-item';
+    const dl = S.el('dl', 'ax-kv');
+    [['Definition', 'definition'], ['Abstract mechanism', 'mechanism'], ['Obstruction it dissolves', 'obstruction'],
+      ['Precedent verdict', 'precedent'], ['Precedent detail', 'precedent_detail'], ['Reuse inside the release', 'release_reuse']]
+      .forEach(([l, f]) => kvRow(dl, l, 'f1_items', f, r.key, r[f]));
+    const open = S.el('button', 'ax-chip', 'Open family ' + r.fid); open.type = 'button';
+    open.addEventListener('click', () => S.pickFamily(r.fid));
+    head.append(S.el('h2', null, r.fid + ' · ' + (r.name || r.slug)));
+    if (r.review_verdict) {
+      const v = S.el('div', 'ax-card'); v.id = 'f1-verdict';
+      const live = String(r.review_status).startsWith('live');
+      const h = S.el('h3'); h.append(S.el('span', 'ax-badge' + (live ? ' n3' : ''), r.review_status), document.createTextNode(' Claude’s verdict · ' + r.review_grade));
+      v.append(h, S.el('p', 'ax-note', 'Checked against the strict jump definition: transfer is N0, novelty is judged against all of mathematics, and only a downstream speedup confirms a jump. The probabilities are rough judgements for prioritising, not measurements.'));
+      [['Chance it survives tests 1–4 at N3', d3.format('.0%')(r.p_n3)], ['Chance it also passes the speedup test (a confirmed jump)', d3.format('.0%')(r.p_jump)],
+        ['Verdict', r.review_verdict], ['Decisive test', r.review_test]]
+        .forEach(([k, val]) => { const p = S.el('div'); p.append(S.el('b', null, k + ': '), document.createTextNode(val)); v.append(p); });
+      head.append(v);
+    }
+    head.append(dl, open);
+
+    const tg = S.rows('f1_targets').filter((t) => t.fid === r.fid && t.slug === r.slug);
+    const blocks = [head,
+      section('Top 5 downstream targets', 'The research agent’s ranked shortlist, with its argument for each.',
+        tg.filter((t) => t.list === 'top5').sort((a, b) => (a.rank ?? 9) - (b.rank ?? 9)), 'f1-top5'),
+      section('Newer open problems it might help with', 'Problems where the same obstruction appears, and how the definition would be adapted.',
+        tg.filter((t) => t.list === 'open problem'), 'f1-open'),
+      section('Speedup-test targets', 'Known theorems whose proofs might become much shorter with this definition. These are the measurable test cases.',
+        tg.filter((t) => t.list === 'speedup target'), 'f1-speedup')];
+
+    const lean = S.rows('f1_lean').filter((l) => l.fid === r.fid && l.slug === r.slug).sort((a, b) => a.order - b.order);
+    const lc = S.el('div', 'ax-card'); lc.id = 'f1-lean';
+    lc.append(S.el('h2', null, 'Exact Lean source'),
+      S.el('p', 'ax-note', 'Verbatim declarations from the openai/math Lean library at commit fd4aeeb: the definition itself and the key lemmas that state or use its defining property. Theorem proofs are omitted.'));
+    const ll = S.el('div'); ll.dataset.source = 'f1_lean';
+    if (!lean.length) ll.append(S.el('p', 'ax-empty', 'This family has no Lean formalization of the item.'));
+    lean.forEach((l, i) => {
+      const d = S.el('details'); if (i === 0) d.open = true;
+      const s = S.el('summary');
+      s.append(S.el('span', 'ax-badge', l.kind || 'decl'), S.el('span', null, l.name || ''), S.el('span', 'ax-lvl', (l.file || '') + (l.line ? ':' + l.line : '')));
+      const body = S.el('div', 'body');
+      if (l.note) body.append(S.el('div', 'ax-note', l.note));
+      body.append(S.el('pre', 'ax-code', l.text || ''));
+      d.append(s, body); ll.append(d);
+    });
+    lc.append(ll); blocks.push(lc);
+    out.replaceChildren(...blocks);
+  }
+  dash.onData(render);
+})();
+</script>
+
+<script>
+(() => {
+  const S = window.AX;
+  const host = document.getElementById('shortlist-tiers');
+  function render() {
+    const rows = S.rows('shortlist').slice().sort((a, b) => a.rank - b.rank);
+    if (!rows.length) { host.replaceChildren(S.el('p', 'ax-empty', 'No shortlist yet.')); return; }
+    const tiers = [...new Set(rows.map((r) => r.tier))].sort();
+    host.replaceChildren(...tiers.map((t) => {
+      const group = rows.filter((r) => r.tier === t);
+      const card = S.el('div', 'ax-card'); card.id = 'tier-' + t;
+      const h = S.el('h2'); h.append(S.el('span', 'ax-badge' + (t === 1 ? ' n3' : t === 2 ? ' n2' : ''), t === 9 ? 'Excluded' : 'Tier ' + t), document.createTextNode(' ' + (group[0].tier_label || '')));
+      card.append(h);
+      group.forEach((r, i) => {
+        const d = S.el('details'); if (t === 1) d.open = true;
+        const s = S.el('summary');
+        s.append(S.el('span', 'ax-lvl', '#' + r.rank), S.el('span', null, r.fid + ' · ' + r.item),
+          S.el('span', 'ax-badge', 'conf ' + d3.format('.2f')(r.novelty_conf)), S.el('span', 'ax-lvl', r.F || ''));
+        const body = S.el('div', 'body');
+        [['Distance from known material', r.pivot_distance], ['For', r['for']], ['Against', r.against], ['Claude’s verdict', r.verdict],
+          ['Chance of a confirmed jump (rough judgement)', r.p_jump != null ? d3.format('.0%')(r.p_jump) : null], ['Next test', r.next_test],
+          ['Why excluded', r.excluded_reason], ['Lean status', r.lean_status], ['Lean status, why', r.lean_status_why], ['Lean declarations', r.lean_decls],
+          ['Comparator chain', r.comparator_chain], ['Gaps between paper and Lean', r.lean_gaps]]
+          .filter(([, v]) => v).forEach(([k, v]) => { const p = S.el('div'); p.append(S.el('b', null, k + ': '), document.createTextNode(v)); body.append(p); });
+        const tg = S.rows('downstream').filter((x) => x.fid === r.fid);
+        if (tg.length) {
+          const LISTS = [['top5', 'Top 5 to try (Lean-usable first)'], ['speedup_targets', 'Speedup targets: known theorems'], ['open_problems', 'Open or newer problems'],
+            ['negative_controls', 'Negative controls: where it should not help'], ['theorem_corollaries', 'Corollaries of the theorem (not device reuse)']];
+          const box = S.el('div'); box.dataset.source = 'downstream';
+          box.append(S.el('h3', null, 'Related problems to try it on'));
+          LISTS.forEach(([lst, title]) => {
+            const rows = tg.filter((x) => x.list === lst).sort((a, b) => a.order - b.order);
+            if (!rows.length) return;
+            const sec = S.el('details'); if (lst === 'top5') sec.open = true;
+            sec.append(S.el('summary', null, title + ' (' + rows.length + ')'));
+            const inner = S.el('div', 'body');
+            rows.forEach((x) => {
+              const dd = S.el('details'); dd.dataset.rowKey = x.key;
+              const ss = S.el('summary');
+              ss.append(S.el('span', 'ax-lvl', '#' + x.order), S.el('span', null, x.title || '(untitled)'));
+              if (x.lean_score) ss.append(S.el('span', 'ax-badge' + (/now/i.test(x.lean_score) ? ' n3' : /300/.test(x.lean_score) ? ' n2' : ''), 'Lean: ' + x.lean_score));
+              const b2 = S.el('div', 'body');
+              [['Statement', x.statement], ['Reference', x.reference], ['Status', x.status], ['How the item helps', x.how], ['Payoff or speedup', x.payoff],
+                ['Confidence', x.confidence], ['Lean: what it needs', x.lean_needs], ['Formal proof to compare', x.lean_compare]]
+                .filter(([, v]) => v).forEach(([k, v]) => { const p = S.el('div'); p.append(S.el('b', null, k + ': '), document.createTextNode(v)); b2.append(p); });
+              dd.append(ss, b2); inner.append(dd);
+            });
+            sec.append(inner); box.append(sec);
+          });
+          body.append(box);
+        }
+        const open = S.el('button', 'ax-chip', 'Open family ' + r.fid); open.type = 'button';
+        open.addEventListener('click', () => S.pickFamily(r.fid));
+        body.append(open);
+        d.append(s, body); card.append(d);
+      });
+      return card;
+    }));
+  }
+  dash.onData(render);
+})();
+</script>

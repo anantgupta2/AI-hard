@@ -1,0 +1,415 @@
+{
+ "item": {
+  "family": 148,
+  "family_title": "The entropy-rate dimension formula for self-similar measures",
+  "slug": "pair_capacity",
+  "item_id": "P14",
+  "name": "Pair capacity c_ell(nu)",
+  "paper_location": "data/raw/openai-math/preprints/The-entropy-rate-dimension-formula-for-self-similar-measures-on-the-line-September-24-2026/build/sections/pairs.tex:13-35 (Definition, label def:pair-capacity)",
+  "analyst_grade": "N2 / F1 (Varju 2019 Prop 21 named as predecessor); companion lemma P15 (finite-law pair bound, pairs.tex:37-227) borderline N3 / F3",
+  "used_in": [
+   "P15 Lemma 3.2 finite-law pair bound (pairs.tex:37-49)",
+   "P24 Prop 4.2 pair mass in finite scale bands (types.tex:244-312)",
+   "P27 conditional pair gain (windows.tex:56-110)",
+   "P28-P29 separated-band counting (windows.tex)"
+  ],
+  "lean_footprint": "FairPairs.lean (416 lines); capacity is used in 7 files: FairPairs, SumsetBound, PairGain, ScaleGain, PairBands, WindowGain, GlobalCount"
+ },
+ "definition": {
+  "verbatim_paper": "Let nu be a probability law with finite support F subset R. For ell in Z, let E_ell(F) be the set of unordered pairs {x,y} subset F satisfying 2^{-ell} <= |x-y| < 2^{1-ell}. Define c_ell(nu) as the maximum of sum_{e in E_ell(F)} w_e subject to w_e >= 0, (1/2) sum_{e containing x} w_e <= nu({x}) (x in F). When E_ell(F) is empty, this maximum is zero.",
+  "plain": "c_ell(nu) is the largest total mass of fair (equal-weight) two-point laws whose two points lie at a distance in the dyadic band [2^-ell, 2^{1-ell}), subject to their weighted sum being a submeasure of nu. 0 <= c_ell <= 1. Example: nu = p delta_x + (1-p) delta_y has capacity 2 min{p,1-p} in the band containing |x-y|, and 0 in every other band.",
+  "equivalent_forms": [
+   "LP form: the fractional b-matching value, with b = 2 nu, of the distance-band graph G_ell(F). Its vertices are F and its edges are the pairs at distance in the band.",
+   "Coupling form (elementary, derived here): c_ell(nu) = the maximum mass of a sub-coupling pi <= (nu, nu) supported on ordered pairs with |x-y| in the band. Any sub-coupling can be symmetrised without changing its mass; set w_{xy} = pi(x,y)+pi(y,x). This is exactly how the pair-bound proof deposits mass into the capacity (pairs.tex:182-204; Lean coupling_band_le_capacity).",
+   "Dual / Hall form (derived here by max-flow min-cut on the bipartite double cover; not stated in the paper): c_ell(nu) = 1 - max_{A subset F} [ nu(A) - nu(N_ell(A)) ], where N_ell(A) is the set of points at band distance from some point of A. This is a Strassen / defect-Hall type quantity."
+  ],
+  "lean": "FairPairs.capacity nu ell := sSup {t | exists w : nu.edges ell -> R, Feasible w and sum_e w e = t}. capacity_attained proves the sup is a max, by compactness of the feasible polytope."
+ },
+ "obstruction_dissolved": "Without any separation hypothesis, the exact Shannon entropy of a finite law nu can sit far above its entropy at a grid scale rho. Here nu is the law of translations of n-block composed maps with fixed slope type. The excess may be stored in atoms that are closer together than ANY prescribed scale, even a super-exponential one: Baker 2021 and Barany-Kaenmaki 2021 construct IFSs without exact overlaps whose cylinders condense super-exponentially. Hochman's route needs the hidden information to be visible in a bounded window of scales, which is what exponential separation provides. Varju's Prop 21 converts entropy at ONE scale r into fair-pair mass at that same scale, and only under the single-scale doubling hypothesis H(mu; r/2|r) <= 1.5 H(mu; r|2r). A contradiction argument therefore needs a currency with three properties. (a) It absorbs hidden information from all finer scales at once, without knowing where that information sits; there is no bound on the separating depth J. (b) It can be redeemed scale by scale as entropy gain, with a payoff that does not depend on the scale. (c) It is bounded in each band, so finite band sums stay controlled. c_ell is that currency. Because it is a MAXIMUM, every band-restricted symmetric sub-coupling produced by the randomised-partition averaging is a lower bound for it; this is the deposit side, the pair bound P15. Because it is ATTAINED by an explicit fair-pair packing, each unit can be fed to the two-point gain lemma (Varju Lemma 22 / paper Lemma 2.4), giving an entropy gain of delta/2 in the window at the matching physical scale; this is the withdrawal side, P27. Finally, c_ell <= 1 in each band. Caveat: the hard, non-obvious content is in the pair bound, not in the definition. There the sum observation (P17) and the random cuts (P16) make the per-level cost linear, so it sums geometrically over levels. The definition is the clean interface between the two halves of the argument.",
+ "abstract_mechanism": "Measure an obstruction by a scale-stratified packing LP: the maximum mass of a measure that can be packed into balanced two-element witnesses whose separation lies in a given dyadic band. Because it is a maximum, any coupling or averaging certificate the proof produces bounds it from below, band by band. Because it is attained, it can be cashed out witness by witness through a local gain lemma whose payoff does not depend on the band. Summing over bands turns information hidden at unknown, arbitrarily fine scales into a scale-free budget. That budget is then played against a bounded telescoping monovariant.",
+ "candidates": [
+  {
+   "id": "C1",
+   "problem": "Entropy-rate (generalised exact-overlaps) dimension formula for contracting-on-average self-similar measures on R: dim nu = min{1, h_RW/|chi|}. Here mu is finitely supported on Sim(R), contracting on average (its support may contain expanding maps), and no separation is assumed.",
+   "reference": "Kittle-Kogler, Dimension of contracting on average self-similar measures, arXiv:2501.17795 (2025); companion paper arXiv:2409.18936",
+   "url": "https://arxiv.org/abs/2501.17795",
+   "status": "Partially solved. It is proved under M_n >= e^{-cn} for infinitely many n, and under the weak all-scales condition log M_n >= -n exp((log n)^{1/3-eps}). The no-separation (exact-overlaps) version is not stated as proved there. Kittle-Kogler arXiv:2610.10511 (Oct 7 2026) treats only finitely many contracting similarities.",
+   "obstruction_match": "Exact match on the hidden-fine-scale-entropy side. Block laws of stopped random walks are finite real laws that can condense arbitrarily. The pair bound is a statement about a single finite law, so it does not matter whether the maps contract.",
+   "adaptation": "Replace fixed-length n-blocks by stopping-time blocks: stop when |product of slopes| first drops below 2^{-An}. Slopes in Sim(R) commute, so block types (letter counts) still fix the signed slope product. Apply the pair bound to each typed block law to get expected sum_ell c_ell >= c n in a finite band. Redeem this through the two-point gain against the stationary measure, which is still nonsaturated because d<1. The separated-band count is unchanged. New inputs needed: uniform nonsaturation (P12), and the Feng-Hu-type upper bound and exact dimensionality for contracting-on-average stationary measures (exact dimensionality is known in this setting, cf. Kittle-Kogler).",
+   "payoff": "Would prove the separation-free formula in this setting (a new theorem), or give an alternative to Kittle-Kogler variance summation.",
+   "confidence": "medium",
+   "difficulty": "medium-high (stopping-time types; tails of expanding maps; window bookkeeping)"
+  },
+  {
+   "id": "C2",
+   "problem": "Exact-overlaps / entropy-rate dimension formula for self-similar measures in R^d whose linear parts commute (e.g. scalar contractions r_i I, or a common rotation). Claim: dim mu = min{d, h_RW/chi} unless mu saturates along an invariant subspace. This is the Hochman trichotomy without the super-exponential-condensation alternative.",
+   "reference": "Hochman, On self-similar sets with overlaps and inverse theorems for entropy in R^d, arXiv:1503.09043 (Memoirs AMS); Kittle-Kogler arXiv:2610.10511 Sec. 1 (claims the method extends when the rotation parts generate a virtually solvable group)",
+   "url": "https://arxiv.org/abs/1503.09043",
+   "status": "Open in the literature before Oct 2026: Hochman requires exponential separation, and in R^d the conjecture must include a saturation alternative. Kittle-Kogler 2610.10511 claim an extension, not carried out in detail, for virtually solvable rotation groups; this covers d=2 and the commuting case.",
+   "obstruction_match": "Pair-bound side: the k-fold-sum observation and random nested grids work in R^d with cubes, and the capacity becomes a packing over annulus bands. Gain side: the two-point gain needs mu to be nonsaturated in the DIRECTION of the pair. That is exactly Hochman saturation, and it is the new difficulty.",
+   "adaptation": "Define c_{ell,theta}(nu) using bands of |x-y| AND direction sectors theta, from a finite cover of the sphere. Pair bound: run the randomised partition with cubes. The cost per level is controlled by the mean |x-y| within cells, which splits into direction sectors, giving k(H - H_rho) <= log|kF| + C_{k,d} sum_{ell,theta} c_{ell,theta}. Gain: if mu is not saturated on lines in direction theta, the directional analogue of Delta_v is uniformly positive and the two-point gain carries over. If mu is saturated on an invariant subspace, we are in the third alternative of the trichotomy. Block types fix the (commuting) linear part, so P22 survives.",
+   "payoff": "A new proof of a separation-free R^d trichotomy in the commuting case, and a first one there if Kittle-Kogler do not write theirs out. It would also give the planar case independently of Kittle-Kogler.",
+   "confidence": "medium (commuting case); low for general rotation groups",
+   "difficulty": "high (directional nonsaturation; uniformity across sectors)"
+  },
+  {
+   "id": "C3",
+   "problem": "Dimension of random, non-autonomous or inhomogeneous self-similar measures on R without exponential separation: a.s. dim = min{1, (map entropy rate)/chi}. Examples: random Bernoulli convolutions, the Galicer-Saglietti-Shmerkin-Yavicoli random IFS, and the Saglietti-Shmerkin-Solomyak non-homogeneous families.",
+   "reference": "Galicer-Saglietti-Shmerkin-Yavicoli, L^q dimensions and projections of random measures, Nonlinearity 2016 (arXiv:1504.04893); Saglietti-Shmerkin-Solomyak, Adv. Math. 2018 (arXiv:1709.05092)",
+   "url": "https://arxiv.org/abs/1709.05092",
+   "status": "Known results use transversality or separation, or hold only for almost every parameter. A separation-free formula for every realisation or parameter is open in general.",
+   "obstruction_match": "The 148 proof already uses the GSSY block-type disintegration, and the random environment is exactly where the types machinery originated. The obstruction is the same: hidden fine-scale entropy in the typed block laws.",
+   "adaptation": "Condition on the environment. The typed block law nu_{omega,n} is again a finite law with fixed slope, so the pair bound applies. The Jensen-over-future-types step (P27) becomes Jensen over the future environment. This requires the environment to be stationary and ergodic, so that the averaged tail is a scaled copy of a fixed nonsaturated measure. The pair capacity needs no change.",
+   "payoff": "New theorems: quenched separation-free dimension formulas for random self-similar families. Medium novelty.",
+   "confidence": "medium",
+   "difficulty": "medium"
+  },
+  {
+   "id": "C4",
+   "problem": "Exact-overlaps analogue for self-conformal measures of real-analytic IFS on R: dimension = min{1, h_RW/chi}, assuming only that composed maps have no exact overlaps.",
+   "reference": "Rapaport, Dimension of self-conformal measures associated to an exponentially separated analytic IFS on R, arXiv:2412.16753; holomorphic version arXiv:2608.17137; Kaenmaki, Exponential separation of self-conformal systems, arXiv:2609.23743 (Sept 2026)",
+   "url": "https://arxiv.org/abs/2412.16753",
+   "status": "Open without exponential separation. Rapaport proves the formula under ESC; Kaenmaki 2026 proves ESC is C^2-generic, but not that it always holds.",
+   "obstruction_match": "Hidden fine-scale entropy among composed analytic maps, with the same Baker-type condensation possible. The pair bound applies verbatim to finite laws of positions.",
+   "adaptation": "Linearise at the relevant scale. Typed blocks fix derivatives only up to bounded distortion, so the block law is an almost-affine image. Apply the pair bound to the finite law of block positions. The two-point gain then needs a distortion-robust form, in which the pair distance is known only within a factor 1+o(1); the window margin 5/M already absorbs this. Main gap: there is no analogue of \"types identify the complete composed map\" (P22), because analytic maps of equal derivative type need not be translates of each other.",
+   "payoff": "Possibly a resolution of the analytic exact-overlaps conjecture on R. A partial result is more likely, e.g. for systems where the derivative type is rigid.",
+   "confidence": "low-medium",
+   "difficulty": "high"
+  },
+  {
+   "id": "C5",
+   "problem": "Dimension of projections of shift-invariant ergodic (Gibbs or Markov) measures onto self-similar sets with overlaps, without separation: dim pi m = min{1, h_RW(m)/chi(m)}, with the map-entropy rate in place of h(m).",
+   "reference": "Jordan-Rapaport, Dimension of ergodic measures projected onto self-similar sets with overlaps, Proc. LMS 2021 (arXiv:1908.00271); universal version arXiv:2412.03529",
+   "url": "https://arxiv.org/abs/1908.00271",
+   "status": "Proved under exponential separation; the separation-free version is open.",
+   "obstruction_match": "Same hidden-entropy obstruction; the pair bound applies to the finite conditional block laws.",
+   "adaptation": "For Markov measures, replace Bernoulli block types by Markov types (transition counts). The conditional block laws are then finite laws with fixed slope. Nonsaturation of the projected measure and the Jensen-over-future step both need the future to be conditionally independent given the boundary state, i.e. the Markov property.",
+   "payoff": "A new theorem for Markov and Gibbs measures. The general ergodic case is unlikely.",
+   "confidence": "low-medium",
+   "difficulty": "medium-high"
+  },
+  {
+   "id": "C6",
+   "problem": "Furstenberg (stationary) measures of a finitely supported mu on SL_2(R): dim nu_F = min{1, h_RW/(2 chi)}, without exponential separation or Diophantine hypotheses.",
+   "reference": "Hochman-Solomyak, Invent. Math. 2017 (arXiv:1610.02641); Kittle, Absolutely continuous Furstenberg measures (arXiv:2305.05757); Rapaport-Ren arXiv:2511.00729",
+   "url": "https://arxiv.org/abs/1610.02641",
+   "status": "Open in general. Hochman-Solomyak need exponential separation; without it they obtain the formula only with h_F, the Furstenberg entropy.",
+   "obstruction_match": "Partial: fine-scale entropy of finite laws of group elements acting on P^1. The pair bound for the finite law of image points is fine; the gain side needs a local linearisation of the projective action.",
+   "adaptation": "In a non-abelian group, types (letter counts) do NOT fix the products, so the \"types identify the composed map\" step (P22) fails. One would need a different conditioning that fixes the derivative cocycles. Kittle-Kogler 2610.10511 explicitly name non-abelian addition as the obstruction for their analogue.",
+   "payoff": "Would resolve a well-known problem, but the pair capacity is not the bottleneck.",
+   "confidence": "low",
+   "difficulty": "very high"
+  },
+  {
+   "id": "C7",
+   "problem": "Planar self-affine measures with overlaps: dimension = Lyapunov dimension (or its entropy-rate analogue), without exponential separation.",
+   "reference": "Hochman-Rapaport, Hausdorff dimension of planar self-affine sets and measures with overlaps, JEMS 2022 (arXiv:1904.09812); Barany-Hochman-Rapaport Invent. 2019",
+   "url": "https://arxiv.org/abs/1904.09812",
+   "status": "Open without ESC.",
+   "obstruction_match": "The 1-D step of the self-affine argument (entropy growth of projections convolved with fibre measures) suffers from the same hidden-fine-scale-entropy problem.",
+   "adaptation": "Apply the pair bound to the finite laws of projected cylinder positions in a fixed Furstenberg direction, and redeem through the two-point gain against the projected measure. Non-commuting linear parts again break the type conditioning.",
+   "payoff": "Partial only (diagonal or triangular commuting cases).",
+   "confidence": "low",
+   "difficulty": "very high"
+  },
+  {
+   "id": "C8",
+   "problem": "Separation-free L^q-dimension formula for self-similar measures on R: D(mu,q) equals the minimum of 1 and the similarity value from tau_q, assuming only no exact overlaps. Shmerkin proves it under ESC.",
+   "reference": "Shmerkin, Annals 2019 (arXiv:1609.07802); survey arXiv:1907.07121",
+   "url": "https://arxiv.org/abs/1609.07802",
+   "status": "Open without exponential separation.",
+   "obstruction_match": "The same separation obstruction, but in L^q rather than Shannon entropy.",
+   "adaptation": "Would need an L^q pair bound. The proof of the pair bound uses the Shannon chain rule (conditioning on Y and on the cell flags), which has no Renyi analogue. A capacity for collision-type norms is conceivable but unclear.",
+   "payoff": "Would be significant, but there is no clear adaptation path.",
+   "confidence": "low",
+   "difficulty": "very high"
+  },
+  {
+   "id": "C9",
+   "problem": "Self-similar measures generated by countably many similarities on R with finite entropy: dim = min{1, h_RW/chi}, without separation.",
+   "reference": "Status per the Varju survey arXiv:2509.22042, which covers finite IFS only",
+   "url": "https://arxiv.org/abs/2509.22042",
+   "status": "Open; the finite-IFS case is now claimed by 148 and by Kittle-Kogler.",
+   "obstruction_match": "Hidden fine-scale entropy as in 148, plus a tail.",
+   "adaptation": "Truncate to finitely many maps at a small cost in entropy and probability. The pair bound is for finite laws, so it applies to the truncated block laws. The sumset bound |kD_b| <= (k+1)^{m^b} grows with the truncation level, so k must be chosen after the truncation.",
+   "payoff": "A new theorem, though mostly routine given the finite case.",
+   "confidence": "medium",
+   "difficulty": "medium"
+  },
+  {
+   "id": "C10",
+   "problem": "Explicit degrees-of-freedom characterisations for K-user scalar interference channels, via the information dimension of self-similar inputs (Wu-Shamai-Verdu framework).",
+   "reference": "Wu-Shamai-Verdu IEEE TIT 2015; Stotz-Bolcskei, Explicit and almost sure conditions for K/2 DoF (arXiv:1404.7374); Gul-Bolcskei-Shamai arXiv:1805.03100",
+   "url": "https://arxiv.org/abs/1404.7374",
+   "status": "Stotz-Bolcskei use Hochman parametric theorem, so they must choose the contraction parameter r outside an exceptional set of zero packing dimension.",
+   "obstruction_match": "Only indirect. The application needs the dimension formula under no exact overlaps, which the main theorem of 148 (or Kittle-Kogler) supplies; it does not use the pair capacity itself.",
+   "adaptation": "Replace Hochman parametric step by the separation-free formula. The Q-linear-independence condition already ensures the IFS built from the channel gains has no exact overlaps, so every r works.",
+   "payoff": "Simplifies a known proof by removing the exceptional-parameter selection. No new DoF values are expected.",
+   "confidence": "medium as a consequence of the main theorem; low as evidence for c_ell",
+   "difficulty": "low"
+  },
+  {
+   "id": "C11",
+   "problem": "Entropy-loss-under-addition inequalities for finitely supported real random variables (scale-free entropic sumset and inverse theorems).",
+   "reference": "Kittle-Kogler arXiv:2610.10511 Thm 1.3 (sum H(X_i) - H(sum X_i) <= 30 m sum E(X_i)); Tao, Sumset and inverse sumset theory for Shannon entropy (2010); Kontoyiannis-Madiman IEEE TIT 2014",
+   "url": "https://arxiv.org/abs/2610.10511",
+   "status": "Kittle-Kogler (Oct 7, 2026) have already proved a quantitative, cleaner version of the 148 pair bound. It uses a LINEAR multiscale variance energy in place of pair capacities.",
+   "obstruction_match": "This is the pair bound itself, generalised to summands that are not identically distributed.",
+   "adaptation": "State the pair bound with capacities for non-identically distributed X_i. The proof uses only per-coordinate mean deviations, so sum_i sum_ell (2^-ell/rho_h) c_ell(nu_i) replaces k sum_ell c_ell(nu). Comparison with E(X): the variance energy is roughly a geometrically weighted sum of pair capacities (heuristic, not proved here).",
+   "payoff": "Parallels or simplifies a known (post-release) result. Its main value is to show that c_ell can be replaced by a linear functional.",
+   "confidence": "high that this works; low that c_ell adds value over E",
+   "difficulty": "low-medium"
+  },
+  {
+   "id": "C12",
+   "problem": "Varju survey questions on entropy rates: Q8 (dimension drop for non-Pisot Bernoulli convolutions), Q9 (lower semicontinuity of lambda -> h(lambda)), and Q11 (Mahler-measure bounds for low-entropy parameters of the two-parameter family).",
+   "reference": "Varju, Entropy rates in the dimension theory of self-similar measures, arXiv:2509.22042v2",
+   "url": "https://arxiv.org/abs/2509.22042",
+   "status": "Open.",
+   "obstruction_match": "None. These questions ask to COMPUTE h_RW, which is number theory of polynomial coincidences, whereas c_ell converts a dimension deficit into fine-scale pair mass. No strong candidate.",
+   "adaptation": "None found.",
+   "payoff": "None expected.",
+   "confidence": "low (negative finding)",
+   "difficulty": "n/a"
+  },
+  {
+   "id": "C13",
+   "problem": "Absolute continuity of self-similar measures and Bernoulli convolutions beyond algebraic parameters, which needs entropy growth at a polynomial rate.",
+   "reference": "Varju JAMS 2019 (arXiv:1602.00261); Kittle, Absolute continuity of self similar measures, arXiv:2103.12684; Kittle-Kogler arXiv:2409.18936",
+   "url": "https://arxiv.org/abs/2103.12684",
+   "status": "Open in general.",
+   "obstruction_match": "Weak. The pair-capacity argument is ineffective (the band endpoint B_n has no growth bound), while absolute continuity requires quantitative rates. No strong candidate.",
+   "adaptation": "Would need an effective version of the band count. The Kittle-Kogler variance energy, which is quantitative, is the better tool here.",
+   "payoff": "None expected from c_ell.",
+   "confidence": "low (negative finding)",
+   "difficulty": "n/a"
+  }
+ ],
+ "release_reuse": {
+  "searched": "data/raw/openai-math/CONTENTS.md, grepped for self-similar, Bernoulli convolution, entropy, sumset, fractional matching, stationary measure, overlap, self-affine, self-conformal and random walk. All preprint .tex files, grepped for fair pair, fair two-point, pair capacity, two-point law, Bernoulli measure and Varju Prop 21.",
+  "uses_device": [
+   "Only family 148 (pairs.tex, types.tex, windows.tex; Lean FairPairs/SumsetBound/PairGain/ScaleGain/PairBands/WindowGain/GlobalCount)."
+  ],
+  "could_use": [
+   "Family 153 (Arithmetic classification and non-Pisot singularity for Bernoulli convolutions, Oct 3 2026) uses a related but different device. It takes a common submeasure xi <= mu_0, mu_1 of the first-bit measures (classification.tex:223-280) and counts pairs of words with nearby sums at the single scale lambda^n (Prop cls:cross-pairs). That is a zero-distance overlap plus a single-scale pair count tied to algebraic realisation; c_ell would not shorten it. Weak.",
+   "Family 113 (perfect-matching entropy) and other matching-polytope families share only the LP vocabulary, not the mechanism."
+  ],
+  "verdict": "No reuse within the release."
+ },
+ "speedup_targets": [
+  {
+   "theorem": "Hochman 2014, Thm 1.3: exponential separation implies dim mu = min{1, h/chi} for self-similar measures on R",
+   "reference": "Annals 180 (2014) 773-822, arXiv:1212.1873",
+   "current_proof_size": "~50 pp, of which ~20-25 pp are the inverse theorem for entropy; no known Lean formalisation",
+   "with_item": "A corollary of 148, since ESC implies h_RW = H(p) (up to the weak-ESC refinement). 148 is ~15 pp and fully formalised (12,093 Lean lines in total). The c_ell-specific part replaces the inverse theorem: FairPairs, SumsetBound, GridCoupling, RandomGrid and FiniteRefinement, ~1,580 Lean lines.",
+   "caveat": "The saving comes from the whole 148 pipeline, not from c_ell in isolation."
+  },
+  {
+   "theorem": "Varju 2019: the Bernoulli convolution nu_lambda has dimension 1 for every transcendental lambda in (1/2,1)",
+   "reference": "Annals 189 (2019), arXiv:1810.08905",
+   "current_proof_size": "a short paper (~11 pp, approx.) resting on Breuillard-Varju 2019 (~25 pp), Hochman 2014 and Diophantine approximation",
+   "with_item": "Immediate from 148: a transcendental lambda gives no exact overlaps, hence h_RW = log 2.",
+   "caveat": "Uses the main theorem, not c_ell alone."
+  },
+  {
+   "theorem": "Rapaport 2022: exact overlaps conjecture for algebraic contraction ratios",
+   "reference": "Ann. Sci. ENS, arXiv:2001.01332",
+   "current_proof_size": "~35 pp (approx.)",
+   "with_item": "A corollary (Cor 6.2 of 148).",
+   "caveat": "Same as above."
+  },
+  {
+   "theorem": "Rapaport-Varju 2024: three-map family {lambda x, lambda x+1, lambda x+t}",
+   "reference": "Duke 173 (2024), arXiv:2010.01022",
+   "current_proof_size": "~60-70 pp (approx.)",
+   "with_item": "Cor 6.5 of 148, already formalised: OAI.EntropyRateDimension.Extensions.homogeneous_dimension_direct (HomogeneousDimension.lean:97), a 63-line file on top of the library.",
+   "caveat": "Same as above."
+  },
+  {
+   "theorem": "Feng-Feng 2025: homogeneous IFS with algebraic translations",
+   "reference": "JLMS 2025, arXiv:2405.03124",
+   "current_proof_size": "~25-30 pp (approx.)",
+   "with_item": "A corollary of 148.",
+   "caveat": "Same as above."
+  },
+  {
+   "theorem": "Varju 2019 JAMS Prop 21: a finitely supported mu decomposes into Bernoulli (fair two-point) measures at distances in [r/2,2r], with total mass >= c H(mu;r|2r)/(log H^{-1}+1), provided H(mu;r/2|r) <= 1.5 H(mu;r|2r)",
+   "reference": "JAMS 32 (2019) 351-397, arXiv:1602.00261, Sec. 4.2 (Lemmas 23-26 and 4.2.3)",
+   "current_proof_size": "~5 pp",
+   "with_item": "The proof starts from an extremal decomposition, which is the pair capacity for the band [r/2,2r]. With FairPairs.capacity, capacity_attained and the Hall form, the existence step becomes a one-liner in Lean; the entropy estimates (Lemmas 23-26) remain. This is the best Mathlib-scale test case.",
+   "caveat": "Modest saving; this is a precedent rather than a downstream target."
+  },
+  {
+   "theorem": "Kittle-Kogler 2025 Thm 1.3 restricted to d=1: the formula under the weak all-scales separation log M_n >= -n exp((log n)^{1/3-eps})",
+   "reference": "arXiv:2501.17795",
+   "current_proof_size": "~50+ pp (variance summation)",
+   "with_item": "Subsumed by 148 for contracting similarities on R. The contracting-on-average case needs candidate C1.",
+   "caveat": "Partly a target, partly a candidate."
+  }
+ ],
+ "precedent_check": {
+  "verdict": "There is a strong precedent for the definition itself. P14 is N2 bordering on N1, not an N3/F1 eureka step. The analyst grade N2 is confirmed, and there is no case for raising it.",
+  "pre_release": [
+   "Varju, JAMS 2019 (arXiv:1602.00261), Sec. 4.2.3, proof of Prop 21. It takes a decomposition mu = nu + eta_1 + ... + eta_N in which each eta_i is a Bernoulli measure on a pair of points at distance between r/2 and 2r, and ||nu|| is minimal among all such decompositions. Here a \"Bernoulli measure\" is an equal-weight two-point measure, not normalised. So 1 - min||nu|| is exactly the pair capacity for the single band [r/2, 2r], a ratio-4 band rather than the dyadic ratio-2 band. Varju also mentions a similar decomposition in unpublished Lindenstrauss-Varju work (his ref [17], \"work in progress 2018\"). He then uses the decomposition across many scale ranges B, together with Prop 20 / Lemma 22, to collect gains (Sec. 4.3). This is the same two-sided pattern: decompose into fair pairs at a scale, then gain from each pair. The 148 paper itself names Prop 21 as a predecessor (pairs.tex:8-9).",
+   "Combinatorial optimisation: c_ell is the fractional b-matching number of the distance-band graph (b = 2 nu). Equivalently, it is the maximum mass of a sub-coupling of (nu, nu) on band pairs, or, by max-flow min-cut / defect Hall / a Strassen 1965-type argument, 1 - max_A [nu(A) - nu(N_ell(A))]. These are classical objects. The only new aspects are the stratification into dyadic bands and the use as an entropy currency.",
+   "Kittle-Kogler 2025 (arXiv:2501.17795) and Kittle 2021 (arXiv:2103.12684) use scale-local currencies: \"variance/trace at scale r\" and \"detail\", with tr(g; 2ar) >> H(g; r|2r). These are linear, non-LP near-neighbours of a scale-indexed pair-mass currency, and they are used to accumulate gains across separated scales."
+  ],
+  "post_release": [
+   "Kittle-Kogler, The exact overlaps conjecture for self-similar measures on the real line, arXiv:2610.10511, posted Oct 7 2026, one day after the Oct 6 release. They state that GPT-6 Astra found their first proof, which was presented to them on Sept 27 2026. They cite the 148 paper as \"independently announced in [20] as paper number 148\". They describe their Thm 1.3, sum H(X_i) - H(sum X_i) <= 30 m sum E(X_i), as \"a quantitative version of Lemma 3.2 of [20]\", with constant C_m = 120 m^2 against O(m^3) for the 148 method. Their currency is the variance energy E(rho) = int_0^infty V_rho(r) dr/r, where V_rho(r) is the normalised local variance in intervals of length r. The proof uses Poisson point-process cuts and Margulis-Russo formulas, and the words \"pair\" and \"fair\" do not occur. So another model found the pair-bound MECHANISM (random cuts plus a scale-free fine-scale currency) independently, and it was reused immediately. The DEFINITION c_ell, however, was replaced by a linear functional. This is evidence that c_ell is replaceable and is not the indispensable eureka object.",
+   "No other post-release use of \"pair capacity\" was found: searches for \"pair capacity\" with self-similar or entropy returned nothing."
+  ],
+  "contamination_note": "Kittle-Kogler is an independent, near-simultaneous (AI-assisted) proof, not a copy. It is the most important datum for the discoverability test of P15: a different model found an equivalent separation-free bridge for fine-scale entropy within days."
+ },
+ "top5": [
+  {
+   "rank": 1,
+   "candidate": "C1 contracting-on-average self-similar measures on R (separation-free)",
+   "argument": "This is the structurally closest setting to 148. It is one-dimensional and the slopes commute, so block types still fix the signed contraction and the typed block laws are finite real laws to which the pair bound applies verbatim. The only new work is stopping-time blocks (for expanding maps), uniform nonsaturation for the contracting-on-average stationary measure, and window bookkeeping. The current literature (Kittle-Kogler 2501.17795) needs an all-scales weak separation, so this would be a genuine new theorem. However, the Kittle-Kogler variance energy is a ready-made competitor, so c_ell is unlikely to be the decisive device."
+  },
+  {
+   "rank": 2,
+   "candidate": "C9 countably infinite IFS on R",
+   "argument": "Pair capacity is defined for finite laws. Truncating the IFS gives finite typed block laws at a controlled entropy cost, and the sumset bound only needs k to be chosen after the truncation. The transfer is likely routine given 148, which makes it a good test of whether the device transfers with little extra budget. It is also weak evidence of eureka value, because the transfer stays within the same problem family."
+  },
+  {
+   "rank": 3,
+   "candidate": "C3 random / non-autonomous self-similar measures",
+   "argument": "148 already imports the GSSY random-IFS type machinery. In a random environment the typed block law is still a finite law, and the Jensen-over-future step becomes Jensen over the environment. Expected payoff: quenched separation-free dimension formulas. Medium confidence, medium difficulty; again an extension within the same family."
+  },
+  {
+   "rank": 4,
+   "candidate": "C2 R^d with commuting linear parts (separation-free Hochman trichotomy)",
+   "argument": "The pair bound generalises with capacities c_{ell,theta} over annulus bands and direction sectors. The genuinely new issue is directional nonsaturation (Hochman saturation), which naturally produces the third alternative of the trichotomy. Kittle-Kogler claim their method extends to virtually solvable rotation groups (including d=2), so the payoff is an independent proof rather than a first resolution. High difficulty."
+  },
+  {
+   "rank": 5,
+   "candidate": "C4 real-analytic self-conformal IFS on R",
+   "argument": "The hidden-fine-scale-entropy obstruction is identical, and the pair bound applies to finite position laws. The obstacle is that derivative types do not identify composed maps up to translation (P22 fails), so c_ell would carry only half the argument. Low-medium confidence. It is worth listing because Rapaport and Kaenmaki (2024-2026) leave exactly the ESC-free case open."
+  }
+ ],
+ "lean_source": [
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.Law",
+   "kind": "structure",
+   "file": "data/raw/openai-math/lean/OAI/MeasureTheory/SelfSimilar/FairPairs.lean",
+   "line": 14,
+   "text": "structure Law where\n  support : Finset ℝ\n  prob : ℝ → ℝ\n  prob_pos : ∀ x ∈ support, 0 < prob x\n  prob_sum : ∑ x ∈ support, prob x = 1"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.Law.edges",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/MeasureTheory/SelfSimilar/FairPairs.lean",
+   "line": 20,
+   "text": "noncomputable def Law.edges (ν : Law) (ℓ : ℤ) : Finset (ℝ × ℝ) := by\n  classical\n  exact (ν.support ×ˢ ν.support).filter fun e =>\n    e.1 < e.2 ∧ (2 : ℝ) ^ (-ℓ) ≤ e.2 - e.1 ∧ e.2 - e.1 < (2 : ℝ) ^ (1 - ℓ)"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.incident",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/MeasureTheory/SelfSimilar/FairPairs.lean",
+   "line": 25,
+   "text": "noncomputable def incident {ν : Law} {ℓ : ℤ} (w : ν.edges ℓ → ℝ) (x : ℝ) : ℝ := by\n  classical\n  exact ∑ e, ((if e.val.1 = x then w e / 2 else 0) +\n      (if e.val.2 = x then w e / 2 else 0))"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.Feasible",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/MeasureTheory/SelfSimilar/FairPairs.lean",
+   "line": 30,
+   "text": "def Feasible {ν : Law} {ℓ : ℤ} (w : ν.edges ℓ → ℝ) : Prop :=\n  (∀ e, 0 ≤ w e) ∧ ∀ x ∈ ν.support, incident w x ≤ ν.prob x"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.capacity",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/MeasureTheory/SelfSimilar/FairPairs.lean",
+   "line": 33,
+   "text": "noncomputable def capacity (ν : Law) (ℓ : ℤ) : ℝ :=\n  sSup {t : ℝ | ∃ w : ν.edges ℓ → ℝ, Feasible w ∧ ∑ e, w e = t}"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.capacity_le_one",
+   "kind": "theorem (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/MeasureTheory/SelfSimilar/FairPairs.lean",
+   "line": 88,
+   "text": "theorem capacity_le_one (ν : Law) (ℓ : ℤ) : capacity ν ℓ ≤ 1"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.capacity_attained",
+   "kind": "theorem (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/MeasureTheory/SelfSimilar/FairPairs.lean",
+   "line": 131,
+   "text": "theorem capacity_attained (ν : Law) (ℓ : ℤ) :\n    ∃ w : ν.edges ℓ → ℝ, Feasible w ∧ ∑ e, w e = capacity ν ℓ"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.coupling_band_le_capacity",
+   "kind": "theorem (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/MeasureTheory/SelfSimilar/FairPairs.lean",
+   "line": 189,
+   "text": "theorem coupling_band_le_capacity {ν : Law} (ℓ : ℤ) (π : ℝ → ℝ → ℝ)\n    (hπ : ∀ x ∈ ν.support, ∀ y ∈ ν.support, 0 ≤ π x y)\n    (hsym : ∀ x ∈ ν.support, ∀ y ∈ ν.support, π x y = π y x)\n    (hrow : ∀ x ∈ ν.support, ∑ y ∈ ν.support, π x y ≤ ν.prob x) :\n    (∑ x ∈ ν.support, ∑ y ∈ ν.support,\n      if (2 : ℝ) ^ (-ℓ) ≤ |y - x| ∧ |y - x| < (2 : ℝ) ^ (1 - ℓ)\n      then π x y else 0) ≤ capacity ν ℓ"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.Law.bandCost",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/MeasureTheory/SelfSimilar/SumsetBound.lean",
+   "line": 19,
+   "text": "noncomputable def Law.bandCost (ν : Law) (R : ℝ) : ℝ := by\n  classical\n  exact ∑ ℓ ∈ ν.bandSupport.filter (fun ℓ => (2 : ℝ)^(-ℓ) ≤ R),\n    (2 : ℝ)^(1-ℓ)*capacity ν ℓ"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.pair_bound",
+   "kind": "theorem (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/MeasureTheory/SelfSimilar/SumsetBound.lean",
+   "line": 329,
+   "text": "theorem pair_bound (ν : Law) (k : ℕ) (hk : 1 ≤ k) (ρ : ℝ) (hρ : 0 < ρ) :\n    k*(ν.shannonEntropy-ν.gridEntropy ρ) ≤ Real.log (ν.sumset k).card / Real.log 2 +\n      60000*k^4 * ∑ ℓ ∈ ν.bandSupport.filter (fun ℓ => (2 : ℝ)^(-ℓ) ≤ 2*ρ), capacity ν ℓ"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.MeasureEntropy.finiteConv_mean_gain",
+   "kind": "theorem (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/MeasureTheory/SelfSimilar/PairGain.lean",
+   "line": 258,
+   "text": "theorem finiteConv_mean_gain {β : Type uβ} [Fintype β]\n    (ν : FairPairs.Law) (a b : ℝ) (hb : b ≠ 0)\n    (μ : Measure ℝ) [IsProbabilityMeasure μ] (hμ : CompactlyCarried μ)\n    (τ : β → Measure ℝ) [∀ z, IsProbabilityMeasure (τ z)]\n    (hτ : ∀ z, CompactlyCarried (τ z))\n    (p : β → ℝ) (hp : ∀ z, 0 ≤ p z) (hp1 : ∑ z, p z=1)\n    (hm : μ.map (fun x => b*x) = ∑ z, ENNReal.ofReal (p z) • τ z)\n    {δ η s : ℝ} (hδ : ∀ v, 0 < v → δ ≤ deficit μ v) (hs : 0 < s)\n    {N : ℕ} (hN : 0 < N) (ℓ : ℤ)\n    (hv : ∀ e : ν.edges ℓ, s < |a*e.val.2-a*e.val.1| ∧ |a*e.val.2-a*e.val.1| < N*s)\n    (herr : ∀ e : ν.edges ℓ,\n      (s/|a*e.val.2-a*e.val.1|+|a*e.val.2-a*e.val.1|/(N*s))*Real.log 2 ≤ η) :\n    (δ-η)*FairPairs.capacity ν ℓ ≤\n      ∑ z, p z*(window (finiteConv ν a (τ z)) s (N*s)-window (τ z) s (N*s))"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.Typed.conditional_gain",
+   "kind": "theorem (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/MeasureTheory/SelfSimilar/ScaleGain.lean",
+   "line": 82,
+   "text": "theorem conditional_gain (S : System α) (tag : α → β)\n    (hr : ∀ a v, tag a=tag v → S.ratio a=S.ratio v)\n    (μ : Measure ℝ) [IsProbabilityMeasure μ] (hμ : S.SelfSimilar μ)\n    (hc : CompactlyCarried μ) {δ : ℝ}\n    (hδ : ∀ v, 0 < v → δ ≤ deficit μ v) {M : ℕ} (hM : 4 < M)\n    (he : 5/(M : ℝ)*Real.log 2 ≤ δ/2)\n    {j n : ℕ} (u : Fin j → α) (w : Fin n → α) (t : ℕ) (L : ℤ) :\n    δ/2*capacity (law S tag w) (L-⌈S.wordDepth u⌉) ≤\n      ∑ z : Fin t → α, S.wordWeight z*\n        (window (scaledTail S tag μ (S.completeMap u).1 (Fin.append w z))\n          ((2 : ℝ)^(-L)/M) (((M*M : ℕ) : ℝ)*((2 : ℝ)^(-L)/M))-\n        window (scaledTail S tag μ ((S.completeMap u).1*(S.completeMap w).1) z)\n          ((2 : ℝ)^(-L)/M) (((M*M : ℕ) : ℝ)*((2 : ℝ)^(-L)/M)))"
+  }
+ ],
+ "lean_source_notes": "These declarations have no docstrings. All are in namespace OAI.EntropyRateDimension, in the FairPairs, MeasureEntropy or Typed sub-namespaces. Theorem proof bodies are omitted (text cut at \":= by\"); definitions are given verbatim in full.",
+ "sources": [
+  "data/raw/openai-math/preprints/The-entropy-rate-dimension-formula-for-self-similar-measures-on-the-line-September-24-2026/build/sections/pairs.tex",
+  "data/raw/openai-math/preprints/The-entropy-rate-dimension-formula-for-self-similar-measures-on-the-line-September-24-2026/build/sections/introduction.tex:160-215",
+  "data/raw/openai-math/preprints/The-entropy-rate-dimension-formula-for-self-similar-measures-on-the-line-September-24-2026/build/sections/entropy.tex:240-300",
+  "data/raw/openai-math/preprints/The-entropy-rate-dimension-formula-for-self-similar-measures-on-the-line-September-24-2026/build/sections/windows.tex:40-110",
+  "data/pilot/148/family.json, family.md",
+  "data/raw/openai-math/lean/OAI/MeasureTheory/SelfSimilar/{FairPairs,SumsetBound,PairGain,ScaleGain,PairBands,WindowGain}.lean",
+  "https://arxiv.org/abs/1602.00261 (Varju JAMS 2019; Prop 20, Prop 21, Lemma 22 and Sec. 4.2.3 read from the PDF text)",
+  "https://arxiv.org/abs/2610.10511 (Kittle-Kogler, Oct 7 2026)",
+  "https://arxiv.org/abs/2509.22042 (Varju survey v2; conjecture and question list read from the PDF text)",
+  "https://arxiv.org/abs/2501.17795 (Kittle-Kogler, contracting on average)",
+  "https://arxiv.org/abs/1503.09043 (Hochman, R^d)",
+  "https://arxiv.org/abs/1610.02641 (Hochman-Solomyak)",
+  "https://arxiv.org/abs/1904.09812 (Hochman-Rapaport)",
+  "https://arxiv.org/abs/1908.00271 (Jordan-Rapaport)",
+  "https://arxiv.org/abs/2412.16753 (Rapaport, analytic IFS)",
+  "https://arxiv.org/abs/2609.23743 (Kaenmaki 2026)",
+  "https://arxiv.org/abs/2609.29301 (Jin-Sahlsten 2026; checked, not relevant)",
+  "https://arxiv.org/abs/1609.07802 (Shmerkin, L^q)",
+  "https://arxiv.org/abs/1404.7374 and https://arxiv.org/abs/1805.03100 (DoF of interference channels)",
+  "https://arxiv.org/abs/1709.05092 and https://arxiv.org/abs/1504.04893 (random / non-homogeneous self-similar measures)",
+  "https://arxiv.org/abs/2103.12684 (Kittle, detail)"
+ ],
+ "search_log": [
+  "Read docs/f1_transfer_prompt.md, docs/PLAN.md (novelty grades, speedup test), data/pilot/148/family.md, and items P13-P17 and P24 of family.json.",
+  "Read pairs.tex in full, introduction.tex 160-215, entropy.tex 240-300 (two-point gain) and windows.tex 40-110 (conditional gain); grepped for c_ell/capacity across all sections.",
+  "Read Lean FairPairs.lean in full; SumsetBound.lean (bandCost, pair_bound_natural, pair_bound); PairGain.lean finiteConv_mean_gain; ScaleGain.lean conditional_gain. Grepped for capacity across the 64 files (7 files use it).",
+  "WebFetch of the arXiv 1602.00261v4 PDF, with the text extracted locally. Located Prop 20, Prop 21, Lemma 22 and Sec 4.2.3 (extremal decomposition = pair capacity at band [r/2,2r]), and ref [17] (Lindenstrauss-Varju, work in progress).",
+  "WebSearch \"pair capacity\" self-similar entropy fair pairs: no hits for the term.",
+  "WebSearch entropy rate dimension formula 2026 exact overlaps: found Kittle-Kogler arXiv:2610.10511 (Oct 7 2026). Fetched the HTML twice (main text and tail): it cites paper 148, calls its Thm 1.3 a quantitative version of 148 Lemma 3.2, defines the variance energy, credits GPT-6 Astra, and remarks on extensions.",
+  "WebFetch of the 2609.29301 (Jin-Sahlsten) and 2609.23743 (Kaenmaki) abstracts.",
+  "WebFetch of the Varju survey 2509.22042v2 PDF, with the text extracted; listed Conjecture 3 and Questions 8, 9 and 11.",
+  "WebSearch on: Furstenberg measure dimension and exponential separation; planar self-affine (Hochman-Rapaport); open R^d self-similar case; Jordan-Rapaport; Kittle-Kogler contracting on average. Fetched the 2501.17795 HTML: main theorems, variance summation, no two-point decompositions.",
+  "WebSearch DoF interference channel information dimension Hochman. Fetched the 1805.03100 abstract and 1404.7374 (ar5iv) to see the role of Hochman theorem.",
+  "WebSearch \"Bernoulli measures supported on pairs of points\" decomposition: no precedent beyond Varju.",
+  "Release search: grepped CONTENTS.md for related topics and all preprint .tex for fair pair / two-point law / pair capacity / Prop 21; inspected family 153 classification.tex 215-300.",
+  "Derived the coupling and defect-Hall characterisations of c_ell myself (elementary); they are not taken from a source."
+ ]
+}

@@ -1,0 +1,2366 @@
+{
+ "family": 75,
+ "family_id": "075",
+ "title": "The L log L Fourier-convergence conjecture",
+ "manuscript_title": "Almost-everywhere Fourier convergence in L log L (OpenAI, September 23, 2026)",
+ "manuscript_dir": "data/raw/openai-math/preprints/Almost-everywhere-Fourier-convergence-in-L-log-L-September-23-2026",
+ "source_root": "data/raw/openai-math/preprints/Almost-everywhere-Fourier-convergence-in-L-log-L-September-23-2026/build",
+ "tex_files": [
+  "main.tex",
+  "macros.tex",
+  "sections/01-introduction.tex",
+  "sections/02-preliminaries.tex",
+  "sections/03-entropy-foundations.tex",
+  "sections/04-entropy-refinement.tex",
+  "sections/05-thermal.tex",
+  "sections/06-procedure.tex",
+  "sections/07-capture.tex",
+  "sections/08-paths.tex",
+  "sections/09-assembly.tex",
+  "sections/11-fourier.tex",
+  "figures/entropy-skip.tex",
+  "figures/snapshot-timing.tex"
+ ],
+ "commit": "fd4aeeb",
+ "analyst_role": "family analyst (paper + Lean, text level; Lean not built). Lean Procedure/Paths/Assembly layer mapped from signatures plus a delegated read; Compress/Finite/Thermal and Fourier/Dyadic/Weak layers mapped by delegated full reads, spot-checked.",
+ "base_library_L": "Mathlib d13f23b + references.bib of this manuscript (23 entries). Note: the lake manifest also pins the fpvandoorn/carleson library, but this family does NOT import it (only `import Mathlib` and OAI/Analysis/Fourier/HeightLayers.lean).",
+ "lean_dirs": [
+  "lean/OAI/Analysis/FourierLLogL (156 files, ~29.2k lines)",
+  "lean/OAI/Analysis/Fourier/HeightLayers.lean (484 lines; only file of OAI/Analysis/Fourier imported; SphereExtension.lean is unrelated)"
+ ],
+ "context_vs_known_results": {
+  "summary": "The claim sits strictly inside the open gap. Positive side before this paper: Carleson 1966 (L2), Hunt 1968 (Lp, p>1), Sjolin 1969 (L log L log log L), Antonov 1996 (L log L log log log L), Arias de Reyna 2002 (QA), Carro-Mastylo-Rodriguez-Piazza 2012, Lie 2013 (time-frequency proof of QA -> weak L1), Di Plinio-Fragkos 2025. Negative side: Kolmogorov 1923 (L1), Konyagin 2000 (phi(L) with phi(u) = o(u sqrt(log u / log log u)) has everywhere-divergent Fourier series). L log L (phi(u) = u log u) is not excluded by Konyagin, since u log u is not o(u sqrt(log u/log log u)). The claim is therefore consistent with all known results and exactly resolves Lie's Conjecture 1 (JEMS 2017, 'L log L is a C-space', a weak-L1 bound for the full Carleson operator), which the paper's Corollary (via Stein 1961) matches, Orlicz vs Lorentz L log L norms being equivalent on a finite measure space.",
+  "lie2017_check": "Verified from arXiv 1408.4783 v2: Definition 1 (C-space: ||Cf||_{1,inf} <= C0 ||f||_Y) and 'Conjecture 1. The Lorentz space Y = L log L is a C-space.' The paper cites it as [Lie2017, Definition 1.1 and Conjecture 1]; the published numbering may differ (arXiv: 'Definition 1').",
+  "omissions": [
+   "Konyagin's divergence results (the negative side of the gap) are not cited.",
+   "Lie's heuristic that the maximal Lorentz C-space might be L sqrt(log L) (so L log L would not be sharp) is not discussed.",
+   "No discussion of the Walsh analogue (Walsh-Carleson near L1, Do-Lacey, Di Plinio), where the same proof template would presumably apply."
+  ],
+  "also_implied": "Since L2 is contained in L log L and the proof never invokes Carleson/Hunt or time-frequency analysis, the paper (and the Lean, which imports only Mathlib and not the carleson library) contains an independent proof of Carleson's theorem."
+ },
+ "main_statement": {
+  "file_line": "sections/01-introduction.tex:94-103",
+  "latex": "\\begin{theorem}[Almost-everywhere convergence in $L\\log L$] For every complex-valued $f\\in L\\log L(\\mathbb T)$, there is a measurable set $N_f$ of measure zero such that $\\lim_{N\\to\\infty}S_Nf(x)=f(x)$ $(x\\in\\mathbb T\\setminus N_f)$. The limit is along the full sequence $N=0,1,2,\\ldots$. \\end{theorem}",
+  "paraphrase": "If int |f| log(2+|f|) < infinity on the circle, then the symmetric Fourier partial sums S_N f converge to f almost everywhere, along all N (not a subsequence).",
+  "hypothesis_class": "sections/01-introduction.tex:88-92: L log L = {f : int |f| log(2+|f|) dmu < infinity}, mu = dx/2pi.",
+  "key_estimate": {
+   "file_line": "sections/11-fourier.tex:33-40 (Thm good-set) and sections/06-procedure.tex:10-49 (Prop dyadic)",
+   "paraphrase": "For rho >= 0 of mass 1 and height <= e^d, int over {M rho <= (log d)^4} of sup_N |S_N rho| <= C d; it follows from a finite stopped 'modulated delayed Haar' estimate with the same Cd bound uniformly in depth and number of frequencies."
+  },
+  "headline_corollaries": [
+   {
+    "file_line": "sections/11-fourier.tex:357-392",
+    "paraphrase": "Weak-L1 maximal bound sup_lambda lambda mu{S* f > lambda} <= C ||f||_Phi (Luxemburg, Phi(t) = t log(2+t)), via Stein 1961. This is the form of Lie's Conjecture 1."
+   }
+  ],
+  "comparator": {
+   "config": "lean/ComparatorChallenges/FourierLLogL.json",
+   "challenge_file": "lean/ComparatorChallenges/FourierLLogL.lean:12-22",
+   "challenge_module": "ComparatorChallenges.FourierLLogL",
+   "solution_module": "OAI.Analysis.FourierLLogL.PaperMain",
+   "theorem_names": [
+    "OAI.FourierLLogL.paperMain"
+   ],
+   "definition_names": [],
+   "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+   ],
+   "enable_nanoda": false,
+   "formalization_yaml": "lean/formalization.yaml:1237-1239 lists comparator_config FourierLLogL.json, declaration OAI.FourierLLogL.paperMain, file OAI/Analysis/FourierLLogL/PaperMain.lean.",
+   "verbatim": "theorem paperMain (f : AddCircle (2 * Real.pi) → ℂ) (hfm : AEStronglyMeasurable f AddCircle.haarAddCircle) (hfi : Integrable (fun x ↦ ‖f x‖ * Real.log (2 + ‖f x‖)) AddCircle.haarAddCircle) : ∃ E : Set (AddCircle (2 * Real.pi)), MeasurableSet E ∧ AddCircle.haarAddCircle E = 0 ∧ ∀ x ∉ E, Tendsto (fun N : ℕ ↦ ∑ k ∈ Finset.Icc (-(N : ℤ)) (N : ℤ), fourierCoeff f k * fourier k x) atTop (𝓝 (f x))",
+   "solution_proof": "lean/OAI/Analysis/FourierLLogL/PaperMain.lean:17-19: simpa using almost_everywhere_fourier_convergence f ⟨hfm, hfi⟩ (Main.lean:25 := main_of_grid Dyadic.gridProof hf).",
+   "match_check": {
+    "verdict": "exact match with Thm main",
+    "details": [
+     "Domain AddCircle(2pi) with haarAddCircle (probability-normalised) = T = R/2piZ with dmu = dx/2pi.",
+     "fourierCoeff (Mathlib, w.r.t. haarAddCircle) and fourier k x = e^{ikx}: identical to hat f(k) and S_N f.",
+     "Symmetric sum over Icc(-N, N), N : Nat, full sequence (no subsequence).",
+     "Limit is f x itself (not some function), exceptional set measurable and null.",
+     "Hypothesis: AEStronglyMeasurable f plus integrability of ||f|| log(2+||f||), exactly the paper's L log L class (integrability of f follows since log(2+t) >= log 2).",
+     "Complex-valued, as in the paper."
+    ]
+   },
+   "formalized_vs_claimed": {
+    "formalized_and_compared": [
+     "Thm main (a.e. convergence in L log L)"
+    ],
+    "formalized_not_compared": [
+     "Cor weak-L1 maximal bound: OAI.FourierLLogL.weak_L1_maximal_bound (Main.lean:36-41), proved directly from GoodBound with a re-proved Stein-type argument",
+     "OAI.FourierLLogL.maximal_good_sets : GoodBound (Main.lean:31) = Lean form of Thm good-set (with d = 2^j, |G^c| <= C/(j+1)^2)",
+     "Dyadic.GridBound (= finite form of Prop dyadic, special case)"
+    ],
+    "claimed_not_formalized_as_stated": [
+     "Prop dyadic in full generality (arbitrary F_{j+1}-measurable multipliers eps_j, arbitrary d, stopping time at e^{4h}); Lean proves only the eps_j = r_{j+1} Haar-shift case needed, for d = 2^j, threshold (j+1)^3, as a good-set majorant on a finite grid",
+     "Thm good-set for all d (Lean: d = 2^j only, which suffices for layers)",
+     "The paper's exact parameter choices (h, T, w, L, m_*, k_b, search schedule) - Lean uses different explicit ones"
+    ]
+   }
+  }
+ },
+ "trust_surface": {
+  "grep_scope": "lean/OAI/Analysis/FourierLLogL/**/*.lean (156 files), lean/OAI/Analysis/Fourier/HeightLayers.lean, ComparatorChallenges/FourierLLogL.lean",
+  "counts": {
+   "sorry": "0 in library (1 in the comparator challenge file, by design)",
+   "axiom": 0,
+   "admit": "0 (2 false positives: lemma name scale_admit, Weak/Modular.lean:69,97)",
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque": 0,
+   "partial def": 0,
+   "set_option": "8: linter.unusedSectionVars false x7 (Compress/Context:14, Freeze:12, Low:13, Observe:13, Phase:13, Projection:14, Thinning:13); maxHeartbeats 600000 x1 (Compress/Search.lean:8)",
+   "decide": "~29 occurrences in 10 files; all Bool coercions of decidable predicates (decide (x ∈ block), decide (1/H j ≤ m)) or (by decide) on numerals; no kernel search",
+   "Classical": "open scoped Classical / classical tactic for decidability; Classical.choose in Scene.actor (Procedure/Play.lean:27-29) to pick a PieceLaw; permitted axiom"
+  },
+  "custom_axioms": "none",
+  "external_libraries": "Mathlib only (lake manifest pins ~30 packages incl. fpvandoorn/carleson, none imported by this family)",
+  "verdict": "Clean at text level: no sorry/axiom/native_decide/implemented_by/extern/unsafe; decide only on Bool coercions. Not built here, so compilation and the comparator run are not verified by us.",
+  "computer_assisted": false
+ },
+ "labels": {
+  "A": {
+   "label": "A1",
+   "secondary": {
+    "hard_direction_form": null,
+    "explicit_rate": false,
+    "note_explicit_rate": "Headline is qualitative; the key estimates are quantitative (Cd per layer, |G^c| <= C (log d)^{-4}); the Lean has explicit constants (C = 10^222 in gridProof)."
+   },
+   "evidence": {
+    "quote": "For every complex-valued $f\\in L\\log L(\\mathbb T)$, there is a measurable set $N_f$ of measure zero such that",
+    "file_line": "sections/01-introduction.tex:96-97"
+   },
+   "confidence": "high",
+   "note": "Universal statement over the function class; existence of the null set is the standard form of 'a.e.'."
+  },
+  "B": {
+   "label": "B1",
+   "flags": {
+    "full_only_with_prior_results": false,
+    "full_only_with_prior_results_detail": "Self-contained: Carleson/Hunt/Antonov are background only; the only cited theorem invoked without proof is Stein 1961, and only for the weak-L1 corollary (the Lean re-proves it).",
+    "adds_corollaries_for_other_conjectures": true,
+    "adds_corollaries_detail": "The weak-L1 Luxemburg bound (Cor) is Lie's Conjecture 1 (L log L is a C-space). Implicitly also a new proof of Carleson's theorem (L2 subset of L log L) without time-frequency analysis."
+   },
+   "evidence": {
+    "quote": "\\Cref{thm:main} establishes the conjectured sufficiency of $L\\log L$ for the ordinary Fourier sums along the full sequence.",
+    "file_line": "sections/01-introduction.tex:131-132"
+   },
+   "evidence_conjecture": {
+    "quote": "The $L\\log L$ conjecture is also formulated through a weak-$L^1$ maximal estimate in \\cite[Definition~1.1 and Conjecture~1]{Lie2017}.",
+    "file_line": "sections/01-introduction.tex:129-130"
+   },
+   "confidence": "high (as a claim); correctness unverified"
+  },
+  "C": {
+   "primary": "C4",
+   "primary_evidence": {
+    "quote": "\\int_I\\max_{\\substack{u\\in\\Z\\\\|u|\\le Q}} |\\mathcal H_{I,J}^{u}\\rho(x)|\\,\\frac{dx}{|I|} \\le Cd.",
+    "file_line": "sections/06-procedure.tex:41-45"
+   },
+   "primary_note": "The proof is one long estimation chain: entropy/Fisher/likelihood budgets, each O(d) or O(h), multiplied into an O(d) bound for a stopped dyadic model operator, then transferred to the Fourier maximal function and summed over layers.",
+   "secondaries": [
+    {
+     "label": "C1",
+     "evidence": {
+      "quote": "Three constructions make these estimates compatible.",
+      "file_line": "sections/01-introduction.tex:122"
+     },
+     "note": "Heavy auxiliary construction: a finite splitting procedure (plateaus, membership tests), thermal noisy labels, frequency lists and snapshots. These are constructed devices, not witnesses of the theorem, so C1 is secondary."
+    },
+    {
+     "label": "C2",
+     "evidence": {
+      "quote": "The form cap is also inductive.",
+      "file_line": "sections/06-procedure.tex:277"
+     },
+     "note": "Iterative procedure with inductively maintained caps (count, form, charge, gap potential); refinement search in Section 4 is an iteration with telescoping potentials."
+    },
+    {
+     "label": "C5",
+     "evidence": {
+      "quote": "Stein's theorem \\cite[Appendix, Theorem~10]{Stein1961}, applied to the sequence $S_0,-S_0,S_1,-S_1,\\ldots$, therefore gives",
+      "file_line": "sections/11-fourier.tex:384-386"
+     },
+     "note": "Only for the corollary. Other cited results (Ginibre, Chang/Lee, Petermichl/Hytonen, Ville) are re-proved inline; Cover-Thomas chain rules and Pinsker are textbook."
+    }
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": "No computation in the paper; Lean decide uses are Bool coercions only (see trust_surface).",
+   "ih_strengthened": true,
+   "ih_template": "carry an extra tracked quantity",
+   "ih_evidence": {
+    "quote": "A live state also carries a main thermal form $A$, a count $n$ of successful main additions, and the charge $\\mathcal Q=\\sum_{\\text{regular successes so far}}t.$ ... These three quantities carry along the entire branch",
+    "file_line": "sections/06-procedure.tex:83-91"
+   },
+   "ih_note": "The procedure's inductive invariant carries the form A, count n, charge Q, the tracked radius r and the gap potential, plus the hypotheses F(A) <= log R_* + C_* d and the flat-increment condition. The Lean makes this explicit as Fund.Ok with 8 fields (Procedure/Capital.lean:31-40). It matches the template 'carry an extra tracked quantity'; the gap-potential part is also 'potential/monovariant'.",
+   "confidence": "medium-high"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "I12 entropy compression lemma; I26 thermal labels; I29 gap potential; I30 spectral update; I32 Prop dyadic (cluster)",
+   "evidence": {
+    "quote": "The compression lemma starts with a finite set of integer frequencies and a uniform bound on noisy sums of independent samples from any probability law on that set.",
+    "file_line": "sections/01-introduction.tex:127-129"
+   },
+   "confidence": "medium",
+   "caveats": [
+    "Grades are provisional; quick literature check found no information-theoretic proof of Carleson-type bounds and no exact analogue of the compression lemma, but neighbours exist (Chang's lemma and Lee's entropy-maximization proof; pinning lemma; Bohr-set density increment; Bellman functions).",
+    "The claim is extraordinary and unreviewed; a eureka grade is meaningless if the proof fails. The sorry-free Lean (if it compiles) substantially mitigates this."
+   ],
+   "flag_builds_on_prior_model_produced_result": false,
+   "flag_detail": "All 23 bibliography entries are human literature (latest Di Plinio-Fragkos 2025). No OpenAI/model-produced precedent cited."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Real and complex analysis",
+    "msc2020": [
+     "42A20",
+     "42A50",
+     "42B25",
+     "42A24"
+    ],
+    "evidence": {
+     "quote": "\\resultentry{075}{The $L\\log L$ Fourier-convergence conjecture}",
+     "file_line": "overview.tex:224 (section \\cataloguesection{Real and complex analysis} at overview.tex:214)"
+    },
+    "confidence": "high"
+   },
+   "lean_dir_field": {
+    "dir": "OAI/Analysis/FourierLLogL (+ OAI/Analysis/Fourier/HeightLayers.lean)",
+    "lean_fields": "Analysis",
+    "note": "Lean subdirectories mirror the method mix: Compress, Finite (information theory), Thermal (stat mech), Procedure/Capture/Snapshot/Edges/Plateau/Paths/Assembly (probability on dyadic trees), Fourier/Dyadic/Weak (harmonic analysis)."
+   },
+   "method_fields": [
+    {
+     "field": "Harmonic analysis: dyadic Haar shifts, Hilbert transform, Dirichlet kernel, maximal functions (42A/42B)",
+     "tag": "essential",
+     "what": "Petermichl-Hytonen averaging of Haar shifts to the Hilbert kernel; Carleson maximal operator as modulated Hilbert transforms; weak (1,1) covering",
+     "evidence": {
+      "quote": "The averaging follows the dyadic representation method of Petermichl and Hyt\\\"onen",
+      "file_line": "sections/01-introduction.tex:181-182"
+     }
+    },
+    {
+     "field": "Information theory (94A17): Shannon entropy, relative entropy, mutual information, chain rules, Pinsker, data processing",
+     "tag": "essential",
+     "what": "Currency of the whole proof: compression lemma, Fisher-sum budget, membership and spatial entropy budgets",
+     "evidence": {
+      "quote": "We use nonnegativity, the chain rules, and contraction of relative entropy under measurable maps.",
+      "file_line": "sections/02-preliminaries.tex:316-318"
+     }
+    },
+    {
+     "field": "Probability: martingales and supermartingales, optional sampling, change of measure, exchangeability (60G42, 60G09)",
+     "tag": "essential",
+     "what": "Ville maximal inequality for predictable signs; L_sp and failure-stretch supermartingales; score supermartingale under a reference law; pinning by random prefix",
+     "evidence": {
+      "quote": "We use the standard exponential-supermartingale proof of a maximal inequality, based on Ville's stopping argument",
+      "file_line": "sections/08-paths.tex:36-38"
+     }
+    },
+    {
+     "field": "Statistical mechanics (82B20): Griffiths-Ginibre correlation inequalities, free energy, Gibbs variational principle",
+     "tag": "essential",
+     "what": "Thermal forms (one-site plane-rotator Gibbs densities), covariance positivity, monotone free energy; finite Gibbs duality for the noisy-sum law",
+     "evidence": {
+      "quote": "The covariance argument below belongs to the Griffiths--Ginibre positive-correlation method \\cite{Ginibre1970}.",
+      "file_line": "sections/05-thermal.tex:30-31"
+     }
+    },
+    {
+     "field": "Additive combinatorics (11B30, 11P70): Chang's lemma / dissociated sets, sumsets, Riesz products, Bohr-type balls",
+     "tag": "essential",
+     "what": "Sumset size bound for the high spectrum; positive products for capture; B_A(r) packing in the gap potential",
+     "evidence": {
+      "quote": "We use the dissociated-spectrum method underlying Chang's lemma \\cite[Section~3]{Chang2002}, in its entropy and positive-product form \\cite[Section~3.2]{Lee2017}.",
+      "file_line": "sections/05-thermal.tex:293-295"
+     }
+    },
+    {
+     "field": "Convex analysis / optimization (90C25, 49N15): finite convex duality",
+     "tag": "essential",
+     "what": "Dual of the noisy-sum entropy minimization (Lean: Hahn-Banach separation)",
+     "evidence": {
+      "quote": "The optimization below uses finite Gibbs variational duality",
+      "file_line": "sections/03-entropy-foundations.tex:90-91"
+     }
+    },
+    {
+     "field": "Functional analysis: Stein's continuity principle, Orlicz/Luxemburg spaces (46E30)",
+     "tag": "corollary-only",
+     "what": "Weak-L1 maximal bound from a.e. convergence",
+     "evidence": {
+      "quote": "Stein's theorem \\cite[Appendix, Theorem~10]{Stein1961}",
+      "file_line": "sections/11-fourier.tex:384"
+     }
+    },
+    {
+     "field": "Extrapolation theory / time-frequency analysis (Soria, Arias de Reyna, Lie, Lacey-Thiele, Fefferman)",
+     "tag": "background-cited",
+     "what": "Context only; the proof uses neither tiles nor extrapolation",
+     "evidence": {
+      "quote": "Lacey and Thiele later gave a simplified proof of its weak-$(2,2)$ bound using phase-plane tiles and trees",
+      "file_line": "sections/01-introduction.tex:189-190"
+     }
+    }
+   ],
+   "cross_field_count_essential_non_harmonic": 5,
+   "share_invoked_cited_theorems_from_other_fields": "Of the invoked (used, not merely background) citations - Petermichl2000/Hytonen2008 (harmonic analysis), Lie2013 (harmonic analysis, template only), CoverThomas2006 (information theory), Ville1939 (probability), Ginibre1970 (stat mech), Chang2002 and Lee2017 (additive combinatorics/TCS), Stein1961 (harmonic/functional analysis) - 5 of 8 are from outside harmonic analysis. All except Stein are re-proved in the text.",
+   "confidence": "medium-high"
+  }
+ },
+ "items": [
+  {
+   "id": "I01",
+   "kind": "definition (display)",
+   "name": "L log L Orlicz class",
+   "file_line": "sections/01-introduction.tex:88-92",
+   "statement": "L log L(T) = {f : int |f| log(2+|f|) dmu < infinity}, mu normalized Lebesgue measure on T = R/2piZ.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none (classical Zygmund class)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Hypothesis class of the headline."
+   },
+   "analytic_check": "Occurs verbatim in the goal (hypothesis of Thm main).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook Zygmund class."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I02",
+   "kind": "definition (display)",
+   "name": "Fourier coefficients and symmetric partial sums S_N f",
+   "file_line": "sections/01-introduction.tex:80-87",
+   "statement": "hat f(k) = int f e^{-ikx} dmu, S_N f = sum_{|k|<=N} hat f(k) e^{ikx}.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Object of the headline."
+   },
+   "analytic_check": "Subterm of the goal.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I03",
+   "kind": "theorem",
+   "name": "Thm main: a.e. convergence in L log L (thm:main)",
+   "file_line": "sections/01-introduction.tex:94-103",
+   "statement": "For every complex f in L log L(T) there is a null set N_f with S_N f(x) -> f(x) for x outside N_f, along the full sequence N = 0,1,2,...",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"Theorem~\\ref{thm:main} establishes the conjectured sufficiency of L log L\" (01:131-132)"
+   },
+   "uses_items": [
+    "I04",
+    "I05",
+    "I06",
+    "I44"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Headline."
+   },
+   "analytic_check": "It is the goal.",
+   "provisional_N": {
+    "grade": "n/a (goal)",
+    "justification": "Headline claim; graded via its machinery."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I04",
+   "kind": "definition (display)",
+   "name": "Uncentred interval maximal function M rho and good set G_rho = {M rho <= e^{4h}}, h = log log d",
+   "file_line": "sections/01-introduction.tex:141-152; sections/11-fourier.tex:10-31",
+   "statement": "M rho(x) = sup over arcs I containing x of the average of rho on I; G_rho = {M rho <= e^{4h}}; weak (1,1) gives |G_rho^c| <= C e^{-4h} = C (log d)^{-4}.",
+   "cited_or_new": {
+    "status": "standard+adapted",
+    "bib_key": "Lie2013",
+    "cue": "\"Good-set integral estimates also occur in Lie's near-endpoint argument [Lie2013, Prop 3.1 and (3.13)]\" (01:159-160)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The exceptional set G^c has summable measure over doubly exponential layers; this is what lets the layer summation close."
+   },
+   "analytic_check": "Hardy-Littlewood maximal function is in L (Mathlib has MeasureTheory maximal function / Vitali); the specific threshold e^{4h} is a parameter choice.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Maximal function is N0; restricting to its sublevel set at height (log d)^4 is a parameter choice of a known good-set strategy (Lie 2013)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I05",
+   "kind": "theorem",
+   "name": "Thm good-set: truncated integral estimate (thm:good-set)",
+   "file_line": "sections/11-fourier.tex:33-40",
+   "statement": "Absolute C, d_*: if d >= d_*, rho >= 0 periodic, int rho = 1, rho <= e^d a.e., then int over G_rho of sup_N |S_N rho| <= C d.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "Lie2013",
+    "cue": "intro: \"Here the bounded-density estimate and exceptional-set bound are quantified for the summation at the L log L endpoint\" (01:160-162)"
+   },
+   "uses_items": [
+    "I04",
+    "I37",
+    "I38",
+    "I39",
+    "I40"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Every downstream step (bounded inputs, layer summation, weak-L1 corollary) is a consequence of this single estimate."
+   },
+   "analytic_check": "Not a subterm of the goal. It is the natural 'one layer' form of the conjecture: the known restricted weak-type bound |{S* rho > lambda}| <~ d/lambda (for rho = 1_E/|E|) is weak-L1; this is an L1 bound on a good set.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "A good-set L1 estimate for one height layer is a known reduction template (Lie 2013 Prop 3.1); the novelty is the endpoint quantification (loss exactly d, exceptional set (log d)^{-4}), which is the whole difficulty but not a new concept."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I06",
+   "kind": "proposition",
+   "name": "Prop bounded inputs: a.e. convergence for bounded f (prop:fourier-bounded)",
+   "file_line": "sections/11-fourier.tex:231-275",
+   "statement": "Every bounded complex periodic function has a.e. convergence of S_N f along the full sequence; proof via Fejer means P_l, Thm good-set with d_l = d_* + log(2B/m_l), Markov.",
+   "cited_or_new": {
+    "status": "classical result, new proof",
+    "bib_key": null,
+    "cue": "no citation; Carleson/Hunt are not invoked"
+   },
+   "uses_items": [
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Supplies convergence for each bounded layer; note it makes the paper independent of Carleson's theorem."
+   },
+   "analytic_check": "Classical (Carleson 1966 implies it); analytic relative to L if Carleson is in L.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Statement is classical (a special case of Carleson-Hunt). The proof route is new only in that it goes through Thm good-set."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I07",
+   "kind": "construction (display)",
+   "name": "Doubly exponential height layers f_j and d_j = 2^{j+1} + log^- m_j",
+   "file_line": "sections/11-fourier.tex:280-311",
+   "statement": "f = f_bd + sum_j f_j, f_j = f 1{e^{2^j} <= |f| < e^{2^{j+1}}}; four nonnegative parts q_j with mass m_j, rho_j = q_j/m_j <= e^{d_j}; sum m_j d_j < infinity iff int |f| log|f| < infinity (plus an entropy term).",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "no cue; classical layer decomposition (Sjolin/Antonov style)"
+   },
+   "uses_items": [
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Converts the one-layer estimate into the L log L theorem by Borel-Cantelli (sum (log d_j)^{-4} < infinity) and triangle inequality in L1."
+   },
+   "analytic_check": "Analytic: unfolds from the hypothesis int |f| log|f| < infinity.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard dyadic-in-log layer decomposition; the doubly exponential spacing is what makes (log d_j)^{-4} summable."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I08",
+   "kind": "corollary",
+   "name": "Cor weak-L1 maximal bound with Luxemburg norm (cor:fourier-weak-l1)",
+   "file_line": "sections/11-fourier.tex:357-392",
+   "statement": "Phi(t) = t log(2+t), ||f||_Phi Luxemburg; sup_lambda lambda mu{S* f > lambda} <= C ||f||_Phi for all f in L log L(T; C).",
+   "cited_or_new": {
+    "status": "new (statement) / cited method",
+    "bib_key": "Stein1961",
+    "cue": "\"Stein's theorem [Stein1961, Appendix, Theorem 10] ... therefore gives\" (11:384-387)"
+   },
+   "uses_items": [
+    "I03",
+    "I44"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Corollary only; not used for Thm main."
+   },
+   "analytic_check": "It is the weak-L1 form of [Lie2017, Conjecture 1] (L log L is a C-space).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Direct application of Stein's 1961 continuity principle to the a.e.-finite maximal function."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I09",
+   "kind": "definition (display)",
+   "name": "Signed span [D] of a finite list",
+   "file_line": "sections/02-preliminaries.tex:330-337",
+   "statement": "[D] = { sum_{v in D} eps_v v : eps_v in {-1,0,1} }.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "notation"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Frequency approximation by signed sums (capture)."
+   },
+   "analytic_check": "Standard additive-combinatorics notation (Chang-type spans).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I10",
+   "kind": "definition (prose)",
+   "name": "Two laws: uniform output law U versus true input law P (dP = rho/m_top dU)",
+   "file_line": "sections/02-preliminaries.tex:339-347; sections/06-procedure.tex:72-78",
+   "statement": "U follows a uniformly chosen output point (fair bits); P is weighted by the current input; noisy labels are observations of the input point; processing choices depend only on spatial and membership state.",
+   "cited_or_new": {
+    "status": "new (framing)",
+    "bib_key": null,
+    "cue": "intro: \"Information is counted under the first law and converted to path estimates under the second\" (01:120-121)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The whole architecture rests on charging information under P and converting it to output-path estimates under U via the Fisher-sum identity (I27)."
+   },
+   "analytic_check": "Not in the goal. The input-law vs output-law split is reminiscent of dual (adjoint) formulations of the Carleson operator, but not in L.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "A change-of-measure / duality framing; the specific coupling of the two laws through a Fisher-information identity is new, but the device of weighting by the density is classical."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I11",
+   "kind": "definition (display)",
+   "name": "Compression parameters h, T, w, L, m_*",
+   "file_line": "sections/03-entropy-foundations.tex:15-21",
+   "statement": "h = log log d, T = floor(d h^{-5}), w = (log d)^{1/4}, L = d exp(w), m_* = floor(exp(w^3)).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "plumbing"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Parameter plumbing."
+   },
+   "analytic_check": "n/a",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Parameter choices."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I12",
+   "kind": "lemma",
+   "name": "Lemma entropy compression (lemma:compression)",
+   "file_line": "sections/03-entropy-foundations.tex:26-69",
+   "statement": "q strictly positive pmf on Z with q(x)/q(0) = int chi_{gx} d omega, -log q(0) <= D0 d; finite S with log|nS| <= D0 d h^{P0} log d for n <= d^2; d/h^2 <= E <= D0 d and -log E_lambda H_q(X_1+..+X_T - X'_1-..-X'_T) <= E for every prob lambda on S. Then there are x0 in S and S' subset S with log|S| - log|S'| <= C(D0) d^2/(E h^2) and, for EVERY probability v on S', int exp(-L sum_x v(x)(1 - Re chi_{g(x-x0)})) d omega >= e^{-CE}.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "Lee2017",
+    "cue": "no precedent named for the lemma; components credited: \"Related entropy-minimization arguments appear in [Lee2017, Section 2.1]\" (03:92-93)"
+   },
+   "uses_items": [
+    "I13",
+    "I14",
+    "I15",
+    "I16",
+    "I17",
+    "I18",
+    "I19",
+    "I20",
+    "I21",
+    "I22",
+    "I23"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Supplies the large frequency subset with a common phase region; used at every spectral update (I30), hence for the k_b budget and the gap potential."
+   },
+   "analytic_check": "Not a subterm of the goal. Nearest statements in L: Chang's lemma (large spectrum lies in a low-dimensional Bohr set) and Lee's entropy-maximization covering of the large spectrum; neither has the noisy-sum moment hypothesis, the 'for every v on S'' uniformity, or the d^2/(E h^2) cardinality loss.",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Passes a quick no-near-equivalent check: its conclusion (one centre and one omega-region good for all weights on S') and its hypothesis (uniform bound on noisy 2T-fold sums) do not match Chang/Lee/Bloom/Kelley-Meka statements. Risk: a judge may call it an entropy variant of Chang's lemma (N2)."
+   },
+   "provisional_F": {
+    "type": "F3",
+    "justification": "Auxiliary statement built only to drive the spectral update; also has an F5 flavour (frequency-separation problem recast as an entropy-of-noisy-sums problem)."
+   }
+  },
+  {
+   "id": "I13",
+   "kind": "lemma",
+   "name": "Lemma noisy sum with prescribed marginals (entropy-foundations:variational)",
+   "file_line": "sections/03-entropy-foundations.tex:97-200",
+   "statement": "There is an exchangeable law of X^T with uniform marginals on S and Gamma in TS-TS such that D(X^T || U_S^T) + I(X^T; Z) + E c(Gamma) <= E, Z = sum X_i + Gamma; proved by finite Gibbs variational duality (dual: sup over multipliers a of sum E a - log max_z sum e^{sum a(x_i)} H_q(z - sum x_i)).",
+   "cited_or_new": {
+    "status": "new (adapted)",
+    "bib_key": "Lee2017",
+    "cue": "\"finite Gibbs variational duality ... Related entropy-minimization arguments appear in [Lee2017, Section 2.1] ... We give the duality calculation for this precise setting\" (03:90-95)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Starts the compression proof."
+   },
+   "analytic_check": "Gibbs variational principle / convex duality are in L (textbook); the specific primal (noisy-sum cost with marginal constraints) is not.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Close neighbour named by the paper (Lee 2017 entropy maximization)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I14",
+   "kind": "definition (display)",
+   "name": "Noisy-sum entropy cost C_p(X^s, Gamma) = D(X^s||p^s) + I(X^s; Z) + E c(Gamma)",
+   "file_line": "sections/03-entropy-foundations.tex:204-221",
+   "statement": "Cost of a correlated letter vector with an error Gamma relative to a product law p; nonnegative, convex in the joint law.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Currency of all of Sections 3-4."
+   },
+   "analytic_check": "Not in L as a named functional; sum of three standard information quantities.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "A conjunction of standard quantities (relative entropy, mutual information, expected cost); new as a packaged potential. Borderline N1/N2."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I15",
+   "kind": "lemma",
+   "name": "Lemma projection and conditioning rules (entropy-foundations:cost-rules)",
+   "file_line": "sections/03-entropy-foundations.tex:223-290",
+   "statement": "(i) dropping letters and keeping the error does not increase C_p; (ii) conditioning on finite J costs at most H(J); (iii) conditioning on a prefix is free and the comparison product can be changed to nu^k.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I14"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Bookkeeping rules used repeatedly."
+   },
+   "analytic_check": "Chain-rule consequences.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Direct chain-rule consequences."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I16",
+   "kind": "lemma",
+   "name": "Lemma selection of a conditional marginal (entropy-foundations:exchangeable)",
+   "file_line": "sections/03-entropy-foundations.tex:299-396",
+   "statement": "Conditioning the exchangeable law on a random prefix of length in [T/4, T/2] gives a marginal nu with log|S| - H(nu) <= CE/T, cost <= CE, and m_*-blocks within TV C m_* sqrt(E)/T of nu^{m_*}.",
+   "cited_or_new": {
+    "status": "new (uncited precedent)",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I13",
+    "I15"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Gives approximately iid short blocks."
+   },
+   "analytic_check": "This is the 'pinning lemma' mechanism (Montanari 2008; Raghavendra-Tan 2012), here via exchangeability and a telescoping entropy-deficit sum. Uncited.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Pinning lemma is a close known neighbour (not cited by the paper)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I17",
+   "kind": "definition (display)",
+   "name": "Context W, refinement, and the functionals G_s(W), I_r(W), K_m(W; r)",
+   "file_line": "sections/03-entropy-foundations.tex:405-432, 587-604",
+   "statement": "Context = finite variable jointly distributed with X ~ nu; G_s = H(sum of s iid letters | contexts); I_r = inf over couplings of r H(X|W) - H(X^r | sum, W^r); K_m(W; r) = noisy block cost with error Gamma.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\\emph{context} (03:406)"
+   },
+   "uses_items": [
+    "I14"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "State variables of the refinement search."
+   },
+   "analytic_check": "Not in L. G_s is a conditional sumset entropy (entropic additive combinatorics, Tao 2010 / GGMT 2023 vocabulary); I_r and K_m are new coupling functionals.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Built from entropic-sumset vocabulary; new functionals but close to known quantities."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I18",
+   "kind": "lemma",
+   "name": "Lemma monotonicities and uniform entropy bounds (entropy-foundations:context-bounds)",
+   "file_line": "sections/03-entropy-foundations.tex:474-583",
+   "statement": "G_s nondecreasing in s, nonincreasing under refinement, <= D_* = C(D0) d for s <= m_*; I_r nonnegative, nondecreasing in r, nonincreasing under refinement, <= D_* for r <= T0.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I16",
+    "I17"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Boundedness that makes the search terminate."
+   },
+   "analytic_check": "Standard entropy monotonicities.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I19",
+   "kind": "lemma",
+   "name": "Lemma lifting block sums and refining contexts (entropy-foundations:block-cost)",
+   "file_line": "sections/03-entropy-foundations.tex:606-663",
+   "statement": "K_m unchanged if block sums are replaced by full iid m-letter rows; K_m nonincreasing under refinement.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I17"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Technical."
+   },
+   "analytic_check": "Chain rule.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine coupling lemma."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I20",
+   "kind": "lemma",
+   "name": "Lemma low-end noisy cost via thinning (entropy-foundations:thinning)",
+   "file_line": "sections/03-entropy-foundations.tex:672-826",
+   "statement": "For m <= m_*, 2mr <= T0, r <= T e^{-w^2}/2: K_m(W; r) <= CE, by tagging blocks with the common submeasure min(mu, Q), weighted acceptance B/(2r), and filling with R = (Q - eta)/delta.",
+   "cited_or_new": {
+    "status": "new (technique standard)",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I16",
+    "I19"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Base case of the search."
+   },
+   "analytic_check": "Maximal coupling / rejection sampling are standard.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Coupling bookkeeping."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I21",
+   "kind": "lemma",
+   "name": "Lemma gluing two couplings (entropy-refinement:gluing)",
+   "file_line": "sections/04-entropy-refinement.tex:19-107",
+   "statement": "Observing (sum of m letters, other contexts) refines W to W' with G_1(W)-G_1(W') = G_m(W)-G_{m-1}(W) and I_r(W)-I_r(W') >= K_m(W;r) - K_{m-1}(W;r); partial (Bernoulli-marked) observations scale both.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I17"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The exchange inequality that turns a noisy-cost increase into a decrease of the exact-sum cost; drives every search step."
+   },
+   "analytic_check": "Not in L; an entropy submodularity computation.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Elementary but well-aimed inequality; a judge would likely see it as a variant of entropy-increment arguments."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I22",
+   "kind": "proposition",
+   "name": "Prop finite refinement search with two visit orders (entropy-refinement:search)",
+   "file_line": "sections/04-entropy-refinement.tex:109-377",
+   "statement": "There is a finite refinement W and index j with G_1(empty) - G_1(W) <= C D_*^2/(E h^2) and K_{m_{j,1}}(W; r_j) <= K_{m_{j,0}}(W; r_j) + E. Proof: macroblocks ascending, subblocks descending, indices ascending, with skip rules p > c0/alpha0 + delta0 and P > c1/alpha1 + delta1; two telescopes (endpoint telescope for skips, exact-cost telescope for completed targets).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"Why two visit orders are needed\" (04:193); figure entropy-skip"
+   },
+   "uses_items": [
+    "I18",
+    "I20",
+    "I21"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Pays only O(h^{-2}) entropy for the block-length jump m_{j,0} -> m_{j,1}; without it the cardinality loss is too large for the L log L endpoint."
+   },
+   "analytic_check": "Not in L. Multi-scale pigeonholing with double telescoping is reminiscent of energy-increment / regularity-lemma iterations but the two-order schedule is specific.",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Weak N3: a hard-to-find combinatorial schedule that buys the h^{-2} saving the endpoint needs; nearest neighbours are generic increment/pigeonhole schedules. Could be graded N2 (it is a scheduling device inside a templated increment argument)."
+   },
+   "provisional_F": {
+    "type": "F4",
+    "justification": "A potential-driven search with two monotone telescoping quantities (g-values and a_j)."
+   }
+  },
+  {
+   "id": "I23",
+   "kind": "proof step",
+   "name": "Freezing contexts and extracting one phase region (completion of lemma:compression)",
+   "file_line": "sections/04-entropy-refinement.tex:381-558",
+   "statement": "Freeze a context stack, compare with independent law p x q, find an atom z_* with Q_Z(z_*) >= q(0) e^{-CE}, write it as int prod |E chi_{gX}| d omega, restrict to R = {sum(1-|phi_i|^2) <= C_R E}, pick a coordinate and centre x0 by Markov, prune to S' of mass >= 1/2.",
+   "cited_or_new": {
+    "status": "new (routine steps)",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I22",
+    "I20"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Converts entropy bound into the phase-volume conclusion."
+   },
+   "analytic_check": "Characteristic-function / Markov steps standard.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard extraction."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I24",
+   "kind": "definition (environment)",
+   "name": "Thermal forms A = sum lambda_s (1 - Re chi_s), form order, q_A, F(A), K_A, Delta_A, B_A(r) (Definition Thermal forms)",
+   "file_line": "sections/05-thermal.tex:11-28",
+   "statement": "q_A(u) = Fourier coefficients of e^{-A}; F(A) = -log q_A(0) (free energy); K_A = e^{F-A} probability density; Delta_A(u) = ||1 - chi_u||_{L2(K_A)}; B_A(r) = {u : Delta_A(u) <= r}.",
+   "cited_or_new": {
+    "status": "new (name) / standard objects",
+    "bib_key": "Ginibre1970",
+    "cue": "Definition environment; \"The covariance argument below belongs to the Griffiths-Ginibre positive-correlation method\" (05:30-31)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Noise laws of all labels, the metric for frequency separation, and the free energy in all costs."
+   },
+   "analytic_check": "Gibbs measures of a ferromagnetic plane-rotator (XY) Hamiltonian on one site; F is the log partition function; B_A(r) is a Bohr-set-like ball. Objects exist in statistical mechanics; their use as observation channels on the circle is new.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Transfer of XY-model Gibbs densities plus a Bohr-type metric; new packaging, close neighbours in stat mech and additive combinatorics (Bohr sets)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I25",
+   "kind": "lemma",
+   "name": "Lemma thermal positivity and monotonicity (lemma:thermal-monotonicity)",
+   "file_line": "sections/05-thermal.tex:35-109",
+   "statement": "q_A is a nonnegative even pmf; Cov_{K_A}(Re chi_u, Re chi_v) >= 0; hence coefficients increase and Delta_A decreases in form order, Delta_A is subadditive, F is increasing with decreasing increments; envelope bound for products of shifted thermal weights.",
+   "cited_or_new": {
+    "status": "cited method, re-proved",
+    "bib_key": "Ginibre1970",
+    "cue": "\"belongs to the Griffiths-Ginibre positive-correlation method [Ginibre1970]. We include the circle calculation\" (05:30-33)"
+   },
+   "uses_items": [
+    "I24"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Every monotonicity used in costs, tightening, and evidence."
+   },
+   "analytic_check": "Second Griffiths inequality for plane rotators (Ginibre 1970) is the exact statement.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Cross-field transfer from statistical mechanics (Griffiths-Ginibre inequalities); re-proved for this one-site case."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I26",
+   "kind": "construction (prose)",
+   "name": "Thermal labels Z = Y + theta, theta ~ K_A; label updates A+ = A + S_p + D_i; spatial forms S_p = R_p^2 (1 - Re chi_1)",
+   "file_line": "sections/05-thermal.tex:111-158",
+   "statement": "A noisy observation of the input point with XY-Gibbs noise; on each success the form is tightened by a spatial term at the current interval and a metric term D_i = lambda B; label errors independent given Y; choices never inspect sampled labels.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "intro item 2: \"For an input point Y, a label has the form Z = Y + theta ... noise density proportional to e^{-A}\" (01:140-145)"
+   },
+   "uses_items": [
+    "I24",
+    "I25"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The side information whose Fisher information pays for frequency choices on live plateaus (I27, I35); decoding (I41) recovers the scalar transform at shifted frequency times c_A(n)."
+   },
+   "analytic_check": "Not in L or the goal. No analogue known in Carleson-operator literature (time-frequency proofs use tiles, not noisy observations).",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "An auxiliary random variable built only to transfer frequency information into information-theoretic currency; no near neighbour found in the Carleson literature (quick search). Risk: noisy-channel/Gaussian-smoothing devices are common in information theory (e.g. de Bruijn identity, stochastic localization), so a judge may see transfer (N2)."
+   },
+   "provisional_F": {
+    "type": "F1",
+    "justification": "An extension variable in the literal sense: a new random variable added to the probability space whose only role is to shorten the proof (F3/F5 flavours)."
+   }
+  },
+  {
+   "id": "I27",
+   "kind": "proposition (statement within prop:live-budgets)",
+   "name": "Global label Fisher sum: sum over live jumping pieces of U(p) alpha_e J_p <= C d, with J_p = int |D|^2/M",
+   "file_line": "sections/06-procedure.tex:170-183, 228-233, 611-630",
+   "statement": "M_pm, M, D are the label-weighted child masses; the Fisher sum is bounded by the total information budget d + log h + E B_mem + O(d) via the chain rule and 'squared bias <= 2 x relative entropy to a fair bit'.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I10",
+    "I26",
+    "I29"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "This is where information charged under P becomes a bound under U; the absolute Fisher coefficient in I37 is what lets it sum to O(d)."
+   },
+   "analytic_check": "Not in L as stated; the mechanism (bit-bias^2 <= 2 KL, chain rule) is textbook information theory.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Known mechanism (entropy chain rule over a dyadic filtration, cf. Friedgut-style entropy proofs, martingale square function), new application."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I28",
+   "kind": "subsection (constructions + verification)",
+   "name": "Separated spectrum -> compression problem: high integers, separated collections avoiding B_A(r_sep) + {|j| <= sigma R_p}, snapping to gZ, polarizing v_x, sumset bound via dissociated sets, uniform moment cap",
+   "file_line": "sections/05-thermal.tex:217-403",
+   "statement": "Verifies the hypotheses of I12 for the label-weighted child moments: sumset size via a positive Riesz-type product over a dissociated subset (|Lambda| <= C d/beta^2) and the moment cap E_T(nu) <= D0 d via thermal envelope bounds.",
+   "cited_or_new": {
+    "status": "cited method, re-proved",
+    "bib_key": "Chang2002; Lee2017",
+    "cue": "\"We use the dissociated-spectrum method underlying Chang's lemma [Chang2002, Section 3], in its entropy and positive-product form [Lee2017, Section 3.2]\" (05:293-295)"
+   },
+   "uses_items": [
+    "I12",
+    "I24",
+    "I25",
+    "I26"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Feeds the compression lemma."
+   },
+   "analytic_check": "Chang's dissociated-set argument is in L.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Transfer of Chang/Lee dissociated-spectrum argument; the label side information is the only adaptation."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I29",
+   "kind": "definition (display)",
+   "name": "Gap potential F(A) - log|B_A(r)| with tracked radius r = r_sep/4 + eta x (number of additions)",
+   "file_line": "sections/05-thermal.tex:447-452, 547-608; sections/06-procedure.tex:250-275",
+   "statement": "Starts at 0, bounded below by a numerical constant, increases by <= C2 t at a regular success, decreases by >= k_b/2 at a cheap success; telescoping gives sum_cheap k_b <= 2 C2 sum_regular t + C.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I24",
+    "I30"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Converts deterministic (cheap) updates into charges against regular updates, whose total is bounded by likelihood evidence; this closes the k_b budget sum <= Cd and the count n <= Ch."
+   },
+   "analytic_check": "Not in L or the goal. Combines free energy (stat mech) with log-cardinality of a Bohr-type ball (packing); nearest neighbours: density/energy-increment potentials over Bohr sets (Bourgain 1999, Sanders) and free-energy monovariants.",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "A non-obvious monovariant mixing two currencies (free energy and packing entropy) whose drop at cheap updates is exactly what is needed; no near-equivalent found. Risk: increment-potential arguments are a standard template (N2)."
+   },
+   "provisional_F": {
+    "type": "F4",
+    "justification": "Potential / monovariant."
+   }
+  },
+  {
+   "id": "I30",
+   "kind": "lemma",
+   "name": "Lemma spectral update (lemma:spectral-update)",
+   "file_line": "sections/05-thermal.tex:407-608",
+   "statement": "Under count/form caps, a request at level b yields t in [d/h^2, D0 d], t >= eps k_b, a metric form D_i = lambda B with flat free-energy increment, and an input-only success set; either (i) regular test with success probability >= beta/2 and E_T(nu) >= t/4, or (ii) cheap deterministic update with t = eps k_b and uniform nu; log|S'| >= 0.8 k_b; gap potential bounds as in I29.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I12",
+    "I24",
+    "I25",
+    "I26",
+    "I28",
+    "I29"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The single engine of the live procedure; all budgets in Prop live budgets are telescopes of its outputs."
+   },
+   "analytic_check": "Not in L or the goal.",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "The regular/cheap dichotomy with an iterated compression (t shrinks by 4 each round) and a flat-increment selection is specific to this proof; components are N0-N2 but the update as a whole has no near neighbour found."
+   },
+   "provisional_F": {
+    "type": "F3",
+    "justification": "Auxiliary construction (test, success set, form update) built only to drive the procedure."
+   }
+  },
+  {
+   "id": "I31",
+   "kind": "proposition",
+   "name": "Prop regular evidence (prop:thermal-evidence)",
+   "file_line": "sections/05-thermal.tex:645-771",
+   "statement": "With N_h = ceil(h^{120}) fresh evidence clones per regular success, the observable event {some clone Z' with A(Z'-Z) <= 4 s_d and |sum nu(x) v_x(Z') chi_{gx}(V)| >= beta/4} has reference probability <= e^{-t/8}, while under the true law it occurs at every regular success except with probability o(h^{-20}).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I25",
+    "I26",
+    "I30"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Makes regular charges t payable by likelihood ratio (score supermartingale in I33)."
+   },
+   "analytic_check": "Likelihood-ratio / change-of-measure reasoning is standard; the clone device is specific.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Standard hypothesis-testing logic with a specific device (evidence clones)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I32",
+   "kind": "proposition",
+   "name": "Prop modulated delayed Haar estimate (prop:dyadic)",
+   "file_line": "sections/06-procedure.tex:10-49",
+   "statement": "For d >= d0, interval I with |I| in [1/2,1], rho <= e^d, mean <= 2, F_{j+1}-measurable multipliers |eps_j| <= 1 shared by all modulations, stopping time tau(x) = first j with E_{p_j(x)} rho > e^{4h}: int over I of max_{|u| <= Q} |sum_{j < tau} E_{p_j}[rho chi_u r_{j+1}] eps_j r_{j+2}| dx/|I| <= C d, uniformly in I, rho, J, Q, multipliers.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "intro: \"Prop dyadic bounds the integral of the supremum over all integer modulations of the resulting sum by Cd, uniformly in the tree depth\" (01:172-174)"
+   },
+   "uses_items": [
+    "I10",
+    "I30",
+    "I33",
+    "I34",
+    "I35",
+    "I36",
+    "I37",
+    "I38",
+    "I39",
+    "I40",
+    "I41"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The finite estimate from which everything follows (via I38-I40 to Thm good-set)."
+   },
+   "analytic_check": "Not a subterm of the goal; a dyadic model (delayed Haar shift) of the Carleson operator at the L log L endpoint. Walsh/dyadic Carleson models exist (Walsh-Carleson, Thiele), but none at this endpoint with this stopping rule.",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "The lemma itself is a strong eureka candidate: a model-operator estimate whose statement encodes the right endpoint (L1 bound Cd per layer, stopping at (log d)^4) and whose proof is wholly new. As a statement it is a 'dyadic version of the conjecture', which a judge could call analytic (N2)."
+   },
+   "provisional_F": {
+    "type": "F5",
+    "justification": "Change of representation: Fourier partial sums -> stopped delayed Haar shifts on a finite binary tree, with a probabilistic (two-law) reading."
+   }
+  },
+  {
+   "id": "I33",
+   "kind": "definition (prose list)",
+   "name": "Finite procedure: live/static pieces, epochs, plateaus (normalization alpha, reset if m > 2 alpha), transfer rules (m < e^{-d}, Q > R0 d, n >= C0 h), membership splits a1_E / a1_{E^c}, post-processing survivor",
+   "file_line": "sections/06-procedure.tex:51-166",
+   "statement": "A deterministic stopping/splitting procedure on the dyadic tree that partitions rho into plateau pieces whose normalized contributions sum exactly to the transform.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\\emph{post-processing survivor} (06:159); intro: \"A part of the tree with fixed noise law and mass normalization is called a live plateau\" (01:156-158)"
+   },
+   "uses_items": [
+    "I30",
+    "I26"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Organizes the entire estimate."
+   },
+   "analytic_check": "Stopping-time / Calderon-Zygmund-type decompositions are classical; the membership splitting by spectral tests is new.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "A stopping-tree decomposition (classical template: CZ / Carleson-measure stopping times, Lacey-Thiele tree selection) with new splitting rules."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I34",
+   "kind": "proposition",
+   "name": "Prop live budgets (prop:live-budgets)",
+   "file_line": "sections/06-procedure.tex:185-646",
+   "statement": "(i) per-branch sum k_b + sum t + sum relative metric costs <= Cd, n <= Ch; (ii) ||B_mem||_{L2(P)} + ||X_*||_{L2(P)} <= Ch, P(transfer) <= C h^{-10}; (iii) sum_live U(p_e) alpha_e <= Ch and kill sums <= 1; (iv) global label Fisher sum <= Cd (I27); (v) spatial bit relative entropies O(d), O(h) if stopped at the cutoff.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I29",
+    "I30",
+    "I31",
+    "I27",
+    "I33"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "All global budgets used in the assembly."
+   },
+   "analytic_check": "Built from supermartingale/likelihood-ratio tools (Ville, optional sampling) which are in L.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Many budgets, each by a standard probabilistic tool; the inductive caps (form cap, count cap) are an IH strengthening by tracked quantities (templated)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I35",
+   "kind": "definition (display)",
+   "name": "Reference law Q (fair membership coins) and score supermartingale S with factor exp((t/16) 1{success and evidence}) / (1 + e^{-t/16})",
+   "file_line": "sections/06-procedure.tex:389-467",
+   "statement": "Change of measure: P(S > R e^d) <= e^{-d}; combined with R <= exp(d + log h + B_mem) excludes Q > 1000 d outside probability O(h^{-10}).",
+   "cited_or_new": {
+    "status": "new (standard technique)",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I31"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Bounds the transfer probability."
+   },
+   "analytic_check": "Likelihood-ratio supermartingale (Ville) in L.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard change-of-measure."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I36",
+   "kind": "proposition",
+   "name": "Prop capture on a plateau (prop:capture) incl. trimmed masks, polynomial products Q_z, edge charges, snapshots, activation",
+   "file_line": "sections/07-capture.tex:164-766",
+   "statement": "Cumulative list D with appends at jumping post states; non-bad high u is within poly(1+|D|, d_1, 1/b)/|p| of [D]; E|D|_final <= C d_1 b^{-C}; bad-edge charges O(d) (one scalar level) and poly(h)(h + log d) (all main levels); snapshots of <= ceil(e^{k_{b/2}}) main or exp(C(d_1 + log 1/b)) scalar representatives with expected count poly(D_max, d_1, 1/b); non-bad high jumps before activation lie in one block of <= H_b depths.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "no cue; \\emph{bad}, \\emph{marked} (07:183, 434)"
+   },
+   "uses_items": [
+    "I09",
+    "I27",
+    "I33"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Supplies the representatives used to recover every modulation u with a log-count cost charged separately from Fisher information."
+   },
+   "analytic_check": "Polynomial products 1 + eta b^k Re[v chi_u P_p] are Riesz products (Lee 2017's entropy-increment); edge charges via likelihood windows; snapshots via generalized relative entropy. Components in L; combination new.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Riesz-product entropy increment (Lee 2017) + windowed likelihood charging; strong but templated."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I37",
+   "kind": "lemma",
+   "name": "Lemma predictable signs (lemma:paths-sign)",
+   "file_line": "sections/08-paths.tex:42-70",
+   "statement": "For fair signs r_{i+1} and F_i-measurable c_i: outside probability e^{-t}, sum c_i r_{i+1} <= (theta/2) sum c_i^2 + t/theta for every prefix.",
+   "cited_or_new": {
+    "status": "cited, re-proved",
+    "bib_key": "Ville1939",
+    "cue": "\"We use the standard exponential-supermartingale proof of a maximal inequality, based on Ville's stopping argument [Ville1939]\" (08:36-38)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Every path estimate."
+   },
+   "analytic_check": "In L (Ville / Freedman / Azuma-type maximal inequality).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I38",
+   "kind": "proposition",
+   "name": "Prop scalar plateau paths (prop:scalar-path) with potential psi(x) = b^{1/2}((|x|^2+b^2)^{3/4} - b^{3/2})",
+   "file_line": "sections/08-paths.tex:74-153",
+   "statement": "Masked delayed transform on any contiguous interval is <= C b^{1/4}(1 + K_e + t) outside probability C e^{-t}.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I37"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Small-amplitude levels and static plateaus."
+   },
+   "analytic_check": "Convex-potential (Bellman-function) argument for martingale transforms; psi is a specific Bellman-type function.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Bellman-function technique (Burkholder; Nazarov-Treil-Volberg) with a new specific potential."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I39",
+   "kind": "lemma",
+   "name": "Lemma energy drift and innovations (lemma:paths-innovation)",
+   "file_line": "sections/08-paths.tex:190-256",
+   "statement": "G_pre = G + g + r U_p; |a - vD|^2 <= M g_z; |U_p|^2 <= C max(G_pm)(J + g); (int|a|)^2 <= C(GJ + g); forward budgets E sum g <= C, E sum J <= Cd, E sum xi <= 2.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I27"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Energy identities for label-valued moments."
+   },
+   "analytic_check": "Martingale energy identities.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I40",
+   "kind": "lemma",
+   "name": "Lemma delayed norm estimate on a run with absolute Fisher coefficient (lemma:paths-run-norm)",
+   "file_line": "sections/08-paths.tex:302-493",
+   "statement": "On an outer-valid run, outside probability C e^{-t}, int |W_P(z)| dz <= C sum J_p + C lambda^{-1}(1 + sum xi + sum e') + C lambda t, lambda = b^{1/2}; proof via two-step blocks and concavity of the norm of X_0 = (W, f, lambda M).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"In particular, the coefficient of the Fisher sum is absolute, independent of b and of the number of representatives\" (08:315-316); \"The absolute Fisher coefficient results from the estimates of v_0 D_i with q\" (08:428-429)"
+   },
+   "uses_items": [
+    "I37",
+    "I39"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The absolute (b-independent) coefficient on the Fisher sum is what lets Fisher charges be summed once globally (O(d)) while representative-choice costs carry the log factors separately; this is the 'separate costs for information and for choosing frequencies' idea."
+   },
+   "analytic_check": "Not in L; a vector-valued Bellman/concavity argument.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Likely N2: a Bellman-function-style concavity estimate; the augmentation of the state by lambda M to get an absolute Fisher coefficient is clever but templated (add a tracked coordinate)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I41",
+   "kind": "proposition",
+   "name": "Prop vector estimates on inner-valid intervals with Fisher checkpoints (prop:vector-path) and Lemma simultaneous representatives / random dyadic list caps (lemma:paths-simultaneous)",
+   "file_line": "sections/08-paths.tex:502-723",
+   "statement": "Predictable origins (run starts + checkpoints whenever accumulated J reaches 1) with expected number <= P(d, 1/b0); every inner-valid interval I satisfies int|sum a_p eps r| <= C sum_I J + C b^{-1/2}(1 + K_e + E_{e,b}) + C b^{1/2} t; parameters t_b, H_b chosen simultaneously over all representatives and all dyadic caps with E t_b <= C k_{b/4} + C log(Cd/b).",
+   "cited_or_new": {
+    "status": "new (technique)",
+    "bib_key": null,
+    "cue": "\"We introduce predictable checkpoints so that this extra Fisher charge is bounded by an absolute constant\" (08:499-500)"
+   },
+   "uses_items": [
+    "I40",
+    "I36"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Uniformity over all modulations."
+   },
+   "analytic_check": "Union bounds and stopping arguments, standard.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Bookkeeping."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I42",
+   "kind": "proof",
+   "name": "Assembly of Prop dyadic: plateau reduction, exact decoding c_A(n) = 1 - Delta_A(n)^2/2 >= 1/2, scalar prefix, static families, rare transfers",
+   "file_line": "sections/09-assembly.tex:9-455",
+   "statement": "sup_u |T_e^u| is bounded by a frequency-independent majorant (eq 09-live-majorant); main levels cost O(d/h) per live plateau, times total live weight O(h) gives O(d); static families cost C U(q) m (1 + h + log^- m)(d + 2 + log^- m); transfers controlled by P(transfer) <= C h^{-10} and ||X_*||_2 <= Ch.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I32",
+    "I34",
+    "I36",
+    "I38",
+    "I40",
+    "I41"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Closes the proof."
+   },
+   "analytic_check": "The decoding identity int chi_n a^s = c_A(n) c^{s+n} is an exact Fourier identity (analytic).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Summation bookkeeping; the key 'O(d/h) per plateau x O(h) weight' split is the design choice of I33/I27."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I43",
+   "kind": "construction (display)",
+   "name": "Haar profiles h, g, finite shift S_{a,s,J}, kernel kappa(u) = int g(v) h(v-u) dv, K_J(t) = int_{2^{-J}}^1 kappa(t/r) dr/r^2, c = int_0^1 kappa = -1/8",
+   "file_line": "sections/11-fourier.tex:46-135",
+   "statement": "Translation and scale averaging of the delayed Haar shift is convolution with K_J; kappa is odd, Lipschitz, supported in [-1,1]; c = -1/8 agrees with Hytonen's Haar-shift kernel evaluation.",
+   "cited_or_new": {
+    "status": "cited method, re-proved",
+    "bib_key": "Petermichl2000; Hytonen2008",
+    "cue": "\"The averaging follows the dyadic representation method of Petermichl and Hytonen\" (01:181-182); \"This calculation agrees with the Haar-shift kernel evaluation in [Hytonen2008, Section 3]\" (11:134-135)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Transfers the dyadic estimate to the Hilbert kernel."
+   },
+   "analytic_check": "Petermichl's dyadic shift representation of the Hilbert transform is in L.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Transfer of Petermichl-Hytonen dyadic representation."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I44",
+   "kind": "proof step",
+   "name": "Hilbert transform to Fourier projections: H_delta -> H in L2, Pi_{>=0} = (I + iH + P0)/2, S_N rho = chi_{-N} Pi(rho chi_N) - chi_{N+1} Pi(rho chi_{-(N+1)}), sup_N |S_N rho| <= rho + 1 + sup_n |H(rho chi_n)|",
+   "file_line": "sections/11-fourier.tex:137-226",
+   "statement": "Standard reduction of the Carleson maximal operator to maximally modulated Hilbert transforms, with symbol identity int sin(2 pi k t) cot(pi t) dt = 1.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I43"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Final transfer step."
+   },
+   "analytic_check": "Textbook (Carleson operator = modulated Hilbert transform).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook."
+   },
+   "provisional_F": null
+  }
+ ],
+ "lean_items": [
+  {
+   "id": "L01",
+   "kind": "theorem",
+   "lean_name": "OAI.FourierLLogL.paperMain",
+   "file_line": "FourierLLogL/PaperMain.lean:8-19",
+   "meaning": "Comparator target: a.e. convergence of symmetric Fourier partial sums for AEStronglyMeasurable f on AddCircle(2pi) with Integrable(||f|| log(2+||f||)) w.r.t. haarAddCircle; measurable null exceptional set.",
+   "paper_counterpart": "I03",
+   "plumbing": false,
+   "load_bearing_guess": "target",
+   "provisional_N": {
+    "grade": "n/a",
+    "justification": "Goal."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L02",
+   "kind": "def",
+   "lean_name": "OAI.FourierLLogL.Torus / circleMeasure / MemLLogL / symmetricPartialSum",
+   "file_line": "Fourier/HeightLayers.lean:14-30",
+   "meaning": "AddCircle(2pi), haarAddCircle, the L log L predicate, sum over Icc(-N,N) of fourierCoeff * fourier.",
+   "paper_counterpart": "I01, I02",
+   "plumbing": true,
+   "load_bearing_guess": "statement vocabulary",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Mathlib renamings."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L03",
+   "kind": "def (Prop)",
+   "lean_name": "OAI.FourierLLogL.Dyadic.GridBound",
+   "file_line": "FourierLLogL/Dyadic/Grid.lean:248-254",
+   "meaning": "exists C >= 0, eventually in j, for all J, eventually in M: for rho : ZMod(2^M) -> R, rho >= 0, uniform mean <= 2, rho <= exp(2^j), exists W >= 0 with mean <= C 2^j and, at every x whose dyadic ancestors at levels < J all have rho-average <= (j+1)^3, |FinShift J (finMod rho u) x| <= W x for all u.",
+   "paper_counterpart": "I32 (special case: eps_j = r_{j+1}, d = 2^j, cutoff (log d)^3 instead of e^{4h}, good-set majorant instead of stopping time, finite grid)",
+   "plumbing": false,
+   "load_bearing_guess": "high (the finite estimate)",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Lean form of Prop dyadic; same grading as I32."
+   },
+   "provisional_F": "F5"
+  },
+  {
+   "id": "L04",
+   "kind": "theorem",
+   "lean_name": "OAI.FourierLLogL.Dyadic.gridProof",
+   "file_line": "FourierLLogL/Assembly/Endpoint.lean:18-58",
+   "meaning": "Proves GridBound with C = 10^222 from plant (procedure exists), grossDry/grossOur (static/live budgets), annual_valid, stage_shift (transform identity).",
+   "paper_counterpart": "I42 + I32",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "n/a",
+    "justification": "Assembly."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L05",
+   "kind": "def (Prop chain)",
+   "lean_name": "Period.UnitTreeBound / AffineTreeBound / RealGoodBound / GoodBound",
+   "file_line": "FourierLLogL/Fourier/Haar.lean:124; Fourier/Affine.lean:220; Fourier/Coordinates.lean:104; Fourier/Endpoint.lean:26",
+   "meaning": "Successive transfers: grid -> unit interval (lift, monotone convergence in frequency) -> affine tops [a,a+s) (frequency rounding n s -> floor(ns)) -> periodic real good-set bound (|G^c| <= C/(j+1)^2, int_G maxReal <= C 2^j) -> complex torus GoodBound.",
+   "paper_counterpart": "I05 and Section 11",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Transfer plumbing; GoodBound is the Lean form of Thm good-set (I05), graded there."
+   },
+   "provisional_F": null,
+   "note": "Transformers: GridBound.unitTreeBound (Dyadic/Lift.lean:242), UnitTreeBound.affine (Fourier/Affine.lean:240), AffineTreeBound.realGoodBound (Fourier/Good.lean:193), RealGoodBound.goodBound (Fourier/Coordinates.lean:177), GoodBound.main_bound_consequence (Fourier/Endpoint.lean:311)."
+  },
+  {
+   "id": "L06",
+   "kind": "theorem",
+   "lean_name": "kernel_compare_result + dirichlet_id + diffK_major",
+   "file_line": "FourierLLogL/Fourier/Good.lean:59; Fourier/Dirichlet.lean:81,136",
+   "meaning": "|S_N rho(x)| <= 41 + 4 sup_u |K_delta * (rho e_u)(x)| for rho >= 0 bounded, via D_N(t) = cos(2piNt) + sin(2piNt)cot(pit) and kernel comparison; NO Hilbert transform, Riesz projection or L2 limit (route difference from paper 11:174-226).",
+   "paper_counterpart": "I44",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical Dirichlet-kernel / cot identity; re-proved."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L07",
+   "kind": "theorem",
+   "lean_name": "kappa_eq / kappa_integral (constK = -1/8), convolution_average, convolution_cost",
+   "file_line": "FourierLLogL/Fourier/Kappa.lean:87,186; Fourier/Scale.lean:133,205",
+   "meaning": "Exact finite-J averaging identity of the Haar shift over origins and scales; closed form of kappa via tent functions; c = -1/8.",
+   "paper_counterpart": "I43",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Petermichl-Hytonen averaging, re-proved."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L08",
+   "kind": "theorem",
+   "lean_name": "density_good_set",
+   "file_line": "FourierLLogL/Fourier/Interval.lean:80",
+   "meaning": "Good set = [0,1) minus balls of radius <= 1 with average > D; Vitali covering (Mathlib) gives |G^c| <= 64/D.",
+   "paper_counterpart": "I04",
+   "plumbing": false,
+   "load_bearing_guess": "medium",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Weak (1,1) covering, re-proved from Mathlib Vitali."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L09",
+   "kind": "theorem",
+   "lean_name": "GoodBound.ae_convergence_bounded / GoodBound.main_bound_consequence",
+   "file_line": "FourierLLogL/Fourier/Endpoint.lean:265,311",
+   "meaning": "Bounded case via L1 approximation by trigonometric polynomials (span_fourier_closure_eq_top), not Fejer means; layer summation with padded masses w_j = m_j + 4^{-j} instead of d_j = 2^{j+1} + log^- m_j; Borel-Cantelli = ae_eventually_notMem.",
+   "paper_counterpart": "I06, I07",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard; route differs slightly from paper."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L10",
+   "kind": "theorem",
+   "lean_name": "OAI.FourierLLogL.weak_L1_maximal_bound / Weak.consequence_maximal",
+   "file_line": "FourierLLogL/Main.lean:36-41; Weak/Endpoint.lean:47; Weak/Quantile.lean:73; Weak/Cover.lean:92; Weak/Signed.lean:113",
+   "meaning": "Weak-L1 Luxemburg bound proved directly from GoodBound with a re-proved Stein-type translate/sign-averaging argument (Stein 1961 not invoked as a black box).",
+   "paper_counterpart": "I08",
+   "plumbing": false,
+   "load_bearing_guess": "low (not used by paperMain)",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Re-proof of Stein's continuity principle specialised."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L11",
+   "kind": "theorem",
+   "lean_name": "OAI.FourierLLogL.Compress.entropy_compression (finite core compress_arrays)",
+   "file_line": "FourierLLogL/Compress/Endpoint.lean:125-145; Compress/Theorem.lean:27",
+   "meaning": "Finite-group version of Lemma compression: injective tag : A -> G into a finite abelian group, phase law Q on a finite Theta with unitary characters; sumset hypothesis log|nS| <= d j^2 for n <= 2^{2j}; heat-moment hypothesis exp(-F) <= heatMoment for all p; conclusion: centre a and subset s with log|A| - log|s| <= 300000 D^2 d^2/(F h^2) and small_defects ... (long j) s a (350 F).",
+   "paper_counterpart": "I12",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Same as I12; Lean version is slightly more general in the group, weaker in L (d 2^w vs d e^{(log d)^{1/4}})."
+   },
+   "provisional_F": "F3"
+  },
+  {
+   "id": "L12",
+   "kind": "theorem",
+   "lean_name": "Compress.noisy_symm / Law.primal_feasible",
+   "file_line": "FourierLLogL/Compress/Variational.lean:184; Finite/Alternative.lean:42",
+   "meaning": "Exchangeable noisy-sum law with uniform marginals and bill <= E; Gibbs dual replaced by abstract Hahn-Banach separation (Mathlib geometric_hahn_banach_point_closed) plus weak duality from Gibbs trials.",
+   "paper_counterpart": "I13",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Same as I13."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L13",
+   "kind": "def",
+   "lean_name": "Compress.bill",
+   "file_line": "FourierLLogL/Compress/Cost.lean:24",
+   "meaning": "C_p noisy-sum cost.",
+   "paper_counterpart": "I14",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Same as I14."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L14",
+   "kind": "theorem",
+   "lean_name": "Compress.select_context",
+   "file_line": "FourierLLogL/Compress/Select.lean:88",
+   "meaning": "Conditional-marginal selection (pinning).",
+   "paper_counterpart": "I16",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Same as I16."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L15",
+   "kind": "def",
+   "lean_name": "Compress.Labelled / fundG / fundI / fundK / rent / opt",
+   "file_line": "FourierLLogL/Compress/Context.lean:17-55; Compress/Rent.lean:21,64",
+   "meaning": "Contexts and the G_s, I_r, K_m functionals (opt = attained infimum over couplings via compactness).",
+   "paper_counterpart": "I17",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Same as I17."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L16",
+   "kind": "theorem",
+   "lean_name": "Compress.observe_cost / observe_save / blend_I / blend_G1",
+   "file_line": "FourierLLogL/Compress/Observe.lean:106,171; Compress/Fraction.lean:137,163",
+   "meaning": "Gluing inequality and Bernoulli-marked partial observations.",
+   "paper_counterpart": "I21",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Same as I21."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L17",
+   "kind": "theorem",
+   "lean_name": "Compress.Arena.complete_search (+ budget_index, budget_ascending, budget_sub, budget_macro) and Schedule/reach",
+   "file_line": "FourierLLogL/Compress/Search.lean:16-325; Compress/Schedule.lean:51-145; Compress/Params.lean:144-200",
+   "meaning": "Abstract two-order search arena proved once and instantiated; schedule N = n = 2^{16h}, q = 2h^2, u = 1/h^2, alpha = 32/h^2 (differs from paper's M^{1/10}, M^{1/2}); loss <= 66/h^2.",
+   "paper_counterpart": "I22",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Same as I22 (weak N3)."
+   },
+   "provisional_F": "F4",
+   "note": "Lean abstracts the search into a reusable 'Arena' structure, which makes the scheduling device a separable lemma."
+  },
+  {
+   "id": "L18",
+   "kind": "theorem",
+   "lean_name": "Compress.freeze / phase_region / alignment",
+   "file_line": "FourierLLogL/Compress/Freeze.lean:154; Compress/Phase.lean:81,188",
+   "meaning": "Completion: freeze contexts, extract phase region, centre and subset.",
+   "paper_counterpart": "I23",
+   "plumbing": false,
+   "load_bearing_guess": "medium",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Same as I23."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L19",
+   "kind": "def+theorems",
+   "lean_name": "Law, entropy, kl, Hcond, chain rules, Pinsker (tv^2 <= kl), data processing",
+   "file_line": "FourierLLogL/Finite/Law.lean:13-43; Finite/Entropy.lean:17-245; Finite/Comparison.lean:83; Finite/Mixture.lean:89-135",
+   "meaning": "Home-built finite information theory (Mathlib has no usable KL/entropy API here); mutual information never defined (H - Hcond).",
+   "paper_counterpart": "I10-I23 infrastructure (Cover-Thomas ch. 2)",
+   "plumbing": true,
+   "load_bearing_guess": "infrastructure",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook information theory re-built."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L20",
+   "kind": "def",
+   "lean_name": "Thermal.Form / form / q / F / K / label / cred / delta / ball",
+   "file_line": "FourierLLogL/Thermal/Form.lean:16-181; Thermal/Order.lean:89; Thermal/Bias.lean:16",
+   "meaning": "Thermal forms on Grid M, free energy, K_A label density, Delta_A metric, B_A(r).",
+   "paper_counterpart": "I24",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Same as I24."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L21",
+   "kind": "theorem",
+   "lean_name": "Thermal.ginibre (+ cred_mono, delta_mono, delta_triangle, F_mono, F_increment, envelope)",
+   "file_line": "FourierLLogL/Thermal/Ginibre.lean:212; Thermal/Order.lean:45-113; Thermal/Positive.lean:158",
+   "meaning": "0 <= A -> cred A s * cred A t <= E_{label A}(wave s * wave t) (covariance >= 0) and consequences.",
+   "paper_counterpart": "I25",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Griffiths-Ginibre transfer."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L22",
+   "kind": "def",
+   "lean_name": "Thermal.channel / Thermal.label (type-A label channel)",
+   "file_line": "FourierLLogL/Thermal/Form.lean:163; Thermal/*",
+   "meaning": "Discrete version of the noisy thermal label Z = Y + theta on ZMod(2^M).",
+   "paper_counterpart": "I26",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Same as I26."
+   },
+   "provisional_F": "F1"
+  },
+  {
+   "id": "L23",
+   "kind": "def",
+   "lean_name": "Thermal.gap / gap_zero / gap_lower / gap_packing / step_gap",
+   "file_line": "FourierLLogL/Thermal/Packing.lean:16-172; Thermal/Stretch.lean:115",
+   "meaning": "Gap potential F(A) - log|B_A(r)|.",
+   "paper_counterpart": "I29",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Same as I29."
+   },
+   "provisional_F": "F4"
+  },
+  {
+   "id": "L24",
+   "kind": "theorem",
+   "lean_name": "Thermal.spectral_compression / choose_compression / obtain_compressed / make_update; structure Update, Update.Good",
+   "file_line": "FourierLLogL/Thermal/Shrink.lean:66,126; Thermal/Obtain.lean:118; Thermal/Update.lean:18,47-62,113",
+   "meaning": "Spectral update: from a request, an Update with Good fields (t in [d/h^2, reserve d], t >= eps k, lambda >= d h^200, flat plate, F increment <= 400 t, energy <= 400 t/lambda, success prob >= beta/2, cheap => t = eps k, regular => t/4 <= levelCost, gap step <= 402 t or <= -k/2).",
+   "paper_counterpart": "I30",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Same as I30."
+   },
+   "provisional_F": "F3"
+  },
+  {
+   "id": "L25",
+   "kind": "theorem",
+   "lean_name": "Thermal.conditional_bound / one_clone_tail / quiet_scale / posterior_denominator",
+   "file_line": "FourierLLogL/Thermal/Reference.lean:92; Thermal/Alarm.lean:143; Thermal/True.lean:62; Thermal/Posterior.lean:169",
+   "meaning": "Evidence: reference-law bound e^{-t/8} per regular attempt and true-law bound 2/h^40 per attempt.",
+   "paper_counterpart": "I31",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Same as I31."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L26",
+   "kind": "theorem",
+   "lean_name": "Thermal.cheap_span / product_entropy_bound / sumset_est / side_entropy",
+   "file_line": "FourierLLogL/Thermal/Product.lean:134,162; Thermal/Side.lean:42,89",
+   "meaning": "Sumset bound via greedy span collection and a positive product (Chang/Lee).",
+   "paper_counterpart": "I28",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Transfer."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L27",
+   "kind": "structure/inductive",
+   "lean_name": "Procedure.Scene / Play / Play.Follows / Scene.Safe",
+   "file_line": "FourierLLogL/Procedure/Play.lean:16-113",
+   "meaning": "Processing state (node, current subdensity 'wage', Fund, live flag, plateau normalization 'norm'); the procedure is an inductive tree with constructors rest / freeze (transfer to static) / ticket (plateau reset when 2 norm < mass) / jump (spatial split) / attempt (membership split by an Update); Follows encodes the paper's processing rules; cutoff j = (j+1)^3.",
+   "paper_counterpart": "I33",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Same as I33."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L28",
+   "kind": "structure",
+   "lean_name": "Procedure.Fund / Fund.Ok (capA = 10^16)",
+   "file_line": "FourierLLogL/Procedure/Capital.lean:11-41",
+   "meaning": "Branch-carried invariants: form 'mood', anchor node, number of uses, spend, bank (charge Q); Ok bundles 8 inductive invariants (domain, Certified flat increments, uses <= capA H, 0 <= bank <= spend, solvent bank <= (1000+reserve) d, floor, relative F bound F(A) <= log invlen + 3000 uses + 400 spend, verified gap bound).",
+   "paper_counterpart": "I34 (inductive caps)",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "This is the strengthened induction hypothesis of the procedure (carry extra tracked quantities); templated."
+   },
+   "provisional_F": null,
+   "note": "Explicit evidence for C2 flag ih_strengthened = yes, template 'carry an extra tracked quantity'."
+  },
+  {
+   "id": "L29",
+   "kind": "theorem",
+   "lean_name": "Procedure.plant",
+   "file_line": "FourierLLogL/Procedure/Tree.lean:58",
+   "meaning": "Eventually in j, for all M, J <= M, admissible f and flag b, there exists a Play from beginPlay f b that Follows the rules (existence/termination of the procedure, using make_update and Fund.fund_est).",
+   "paper_counterpart": "I33 / I34 (finite termination)",
+   "plumbing": false,
+   "load_bearing_guess": "high",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Construction by strong induction on depth and stage."
+   },
+   "provisional_F": null
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Continuity principle: a.e.-finite maximal function of translation-commuting operators on a Banach space implies weak-type bound",
+   "bib_key": "Stein1961",
+   "locator": "Appendix, Theorem 10",
+   "field": "Harmonic / functional analysis",
+   "used_at": "sections/11-fourier.tex:383-387",
+   "status": "cited, not re-proved (Lean re-proves a specialised version: Weak/*.lean)",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Second Griffiths inequality for plane rotators (covariance positivity of cos-observables under ferromagnetic Gibbs measures)",
+   "bib_key": "Ginibre1970",
+   "locator": "general formulation",
+   "field": "Statistical mechanics",
+   "used_at": "sections/05-thermal.tex:30-109",
+   "status": "re-proved for the one-site circle case (Lean: Thermal/Ginibre.lean:212)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Dissociated-spectrum / Chang's lemma argument (positive Riesz product, entropy form)",
+   "bib_key": "Chang2002; Lee2017",
+   "locator": "Chang Sec 3; Lee Sec 3.2",
+   "field": "Additive combinatorics",
+   "used_at": "sections/05-thermal.tex:292-347",
+   "status": "method re-proved with label side information (Lean: Thermal/Product.lean:134-162)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Entropy-maximization / Gibbs variational duality for approximating measures",
+   "bib_key": "Lee2017",
+   "locator": "Section 2.1",
+   "field": "TCS / additive combinatorics",
+   "used_at": "sections/03-entropy-foundations.tex:90-200",
+   "status": "related argument named; duality re-done (Lean: Hahn-Banach separation, Finite/Alternative.lean:42)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Dyadic representation of the Hilbert transform by averaging Haar shifts (kernel constant)",
+   "bib_key": "Petermichl2000; Hytonen2008",
+   "locator": "Hytonen Sec 3, pp. 1135-1136",
+   "field": "Harmonic analysis",
+   "used_at": "sections/11-fourier.tex:86-135",
+   "status": "re-proved (c = -1/8; Lean Fourier/Kappa.lean:186)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Good-set integral estimate template near L1",
+   "bib_key": "Lie2013",
+   "locator": "Proposition 3.1 and (3.13)",
+   "field": "Harmonic analysis",
+   "used_at": "sections/01-introduction.tex:159-162",
+   "status": "precedent named; no result imported",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Entropy chain rules, nonnegativity, data processing, Pinsker",
+   "bib_key": "CoverThomas2006",
+   "locator": "Chapter 2",
+   "field": "Information theory",
+   "used_at": "sections/02-preliminaries.tex:316-326 and throughout",
+   "status": "cited textbook facts (Lean re-builds them: Finite/Entropy.lean, Comparison.lean)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Ville's maximal inequality for nonnegative supermartingales",
+   "bib_key": "Ville1939",
+   "locator": "Ch. V, Thm 1, pp. 84-85",
+   "field": "Probability",
+   "used_at": "sections/08-paths.tex:36-70; 06-procedure.tex:356-372",
+   "status": "re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Vitali-type covering / weak (1,1) bound for the uncentred maximal function",
+   "bib_key": null,
+   "locator": "folklore",
+   "field": "Harmonic analysis",
+   "used_at": "sections/11-fourier.tex:16-31",
+   "status": "sketched (Lean: Mathlib Vitali, Fourier/Interval.lean:94)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Fejer means approximate identity; Parseval; Borel-Cantelli; Tonelli; monotone convergence",
+   "bib_key": null,
+   "locator": "textbook",
+   "field": "Real analysis / probability",
+   "used_at": "sections/11-fourier.tex:195-350",
+   "status": "used as standard facts (Lean: Mathlib span_fourier_closure_eq_top, ae_eventually_notMem, lintegral_iSup)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Carleson 1966 / Hunt 1968 / Sjolin 1969 / Antonov 1996 / Arias de Reyna 2002 / Kolmogorov 1923",
+   "bib_key": "Carleson1966; Hunt1968; Sjolin1969; Antonov1996; AriasDeReyna2002; Kolmogorov1923",
+   "locator": "-",
+   "field": "Harmonic analysis",
+   "used_at": "sections/01-introduction.tex:105-119",
+   "status": "background only; NOT invoked (the proof is independent of Carleson's theorem)",
+   "essential_for_headline": false
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Reduction to one height layer: Thm main follows from Thm good-set (int over G_rho of sup_N |S_N rho| <= Cd for mass-one rho <= e^d, |G_rho^c| <= C (log d)^{-4}) by splitting f into doubly exponential layers, Borel-Cantelli on G_j^c and L1 summation of sum m_j d_j < infinity; bounded layers converge by Prop bounded inputs.",
+   "items": [
+    "I03",
+    "I04",
+    "I05",
+    "I06",
+    "I07"
+   ],
+   "lean": [
+    "L05",
+    "L09"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Fourier transfer: sup_N |S_N rho| <= rho + 1 + sup_n |H(rho chi_n)|; truncated H_delta ~ (1/(pi c)) K_J up to bounded error and an inner window <= C M rho; K_J is the translation-and-scale average of the delayed Haar shift (kappa, c = -1/8). So Thm good-set follows from the finite dyadic estimate. (Lean replaces the Hilbert transform by a direct Dirichlet-kernel comparison.)",
+   "items": [
+    "I43",
+    "I44",
+    "I32"
+   ],
+   "lean": [
+    "L06",
+    "L07",
+    "L08"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "Entropy compression (Secs 3-4): from a uniform bound on noisy 2T-fold sums of frequencies, extract a large subset S' and a centre x0 whose phase defects are small on one common omega-region, valid for every weight on S'. Proof: Gibbs-dual noisy-sum law -> pinning to nearly iid blocks -> thinning to exact iid -> two-order refinement search raising block length at O(h^{-2}) entropy cost -> freeze and extract phase region.",
+   "items": [
+    "I12",
+    "I13",
+    "I14",
+    "I15",
+    "I16",
+    "I17",
+    "I18",
+    "I19",
+    "I20",
+    "I21",
+    "I22",
+    "I23"
+   ],
+   "lean": [
+    "L11",
+    "L12",
+    "L13",
+    "L14",
+    "L15",
+    "L16",
+    "L17",
+    "L18",
+    "L19"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "Thermal labels and spectral update (Sec 5): the input point carries a noisy label with XY-Gibbs noise e^{-A}. If many label-weighted high frequencies are separated, compression yields either a regular test (success probability >= beta/2, later paid by likelihood evidence e^{-t/8}) or a cheap deterministic update that lowers the gap potential F(A) - log|B_A(r)| by k_b/2.",
+   "items": [
+    "I24",
+    "I25",
+    "I26",
+    "I28",
+    "I29",
+    "I30",
+    "I31"
+   ],
+   "lean": [
+    "L20",
+    "L21",
+    "L22",
+    "L23",
+    "L24",
+    "L25",
+    "L26"
+   ]
+  },
+  {
+   "step": 5,
+   "claim": "Finite procedure and global budgets (Sec 6): split the input on the dyadic tree into live/static plateaus by spectral tests; per-branch k_b + t <= Cd, n <= Ch; membership surprisal O(h) in L2; plateau weights sum to O(h); transfer probability O(h^{-10}); global label Fisher sum O(d).",
+   "items": [
+    "I10",
+    "I27",
+    "I33",
+    "I34",
+    "I35"
+   ],
+   "lean": [
+    "L27",
+    "L28",
+    "L29"
+   ]
+  },
+  {
+   "step": 6,
+   "claim": "Capture and snapshots (Sec 7): cumulative signed-span frequency lists via Riesz-product entropy increments; edge charges via likelihood windows; snapshots of representatives refreshed by a generalized-relative-entropy trigger; one miss block before activation.",
+   "items": [
+    "I36"
+   ],
+   "lean": []
+  },
+  {
+   "step": 7,
+   "claim": "Path estimates (Sec 8): predictable-sign maximal inequality; scalar Bellman-type potential for small amplitudes; vector (label-valued) delayed estimate with an absolute coefficient on the Fisher sum; checkpoints and simultaneous parameters over all representatives and dyadic caps.",
+   "items": [
+    "I37",
+    "I38",
+    "I39",
+    "I40",
+    "I41"
+   ],
+   "lean": []
+  },
+  {
+   "step": 8,
+   "claim": "Assembly (Sec 9): per live plateau the frequency-independent majorant has expectation O(d/h) (main levels decoded via c_A(n) >= 1/2) plus globally charged Fisher/edge terms; times total live weight O(h) gives O(d); static families and rare transfers add O(d). This proves Prop dyadic.",
+   "items": [
+    "I42"
+   ],
+   "lean": [
+    "L04"
+   ]
+  }
+ ],
+ "eureka_candidates_ranked": [
+  {
+   "rank": 1,
+   "item": "I26 + I27 + I10 (cluster): thermal noisy labels of the input point, read through the two-law (true input vs uniform output) Fisher-sum identity",
+   "provisional_N": "N3",
+   "provisional_F": "F1 (extension variable), with F5 flavour",
+   "for": "This is the device that converts frequency selection into information-theoretic currency: a new random variable Z = Y + theta, never present in the goal or in L, whose Fisher information along output paths is globally bounded by O(d) via the entropy chain rule, while decoding int chi_n a^s = c_A(n) c^{s+n} recovers each modulation. It is the literal analogue of an extension variable: tiny to state, absent from the problem, and it makes the 'separate costs for information and for choosing frequencies' accounting possible. A quick literature check found no information-theoretic or noisy-observation proof of Carleson-type bounds; all known proofs (Carleson, Fefferman, Lacey-Thiele, Lie, Di Plinio) are combinatorial time-frequency arguments.",
+   "against": "Adding Gaussian-type noise to a random variable and tracking Fisher information is standard in information theory (de Bruijn identity, stochastic localization, entropy-increment proofs). A judge may grade this as cross-field transfer (N2) rather than a new idea. Its payoff also depends on the rest of the cluster (chain depth > 1).",
+   "nearest_neighbour": "Stochastic-localization / noisy-channel smoothing in information theory (e.g. El Alaoui-Montanari, Eldan); in harmonic analysis, Lacey-Thiele energy/size (not information-based).",
+   "lean": "L22 (Thermal.channel/label), procedure Fisher bound (Procedure/Fisher.lean:118 fisher_bound)"
+  },
+  {
+   "rank": 2,
+   "item": "I12 (with I22): entropy compression lemma and its two-order refinement search",
+   "provisional_N": "N3",
+   "provisional_F": "F3 (with F5 flavour); I22 itself F4",
+   "for": "Not a subterm of the goal; its conclusion is uniform over all weights on the retained subset (one centre, one omega-region), which is what lets the spectral update choose the weight afterwards. The cardinality loss d^2/(E h^2) is exactly calibrated to the endpoint. The two-visit-order search buys an O(h^{-2}) entropy cost for the block-length jump, which the endpoint needs. Lean isolates the search as an abstract reusable Arena (Compress/Search.lean:16-325).",
+   "against": "Conceptually a member of the Chang's-lemma family (large spectrum lies in a low-dimensional Bohr set), with an entropy-maximization proof explicitly credited to Lee 2017 and a pinning step (Montanari; Raghavendra-Tan) that is uncited. A judge could call it an entropy variant of Chang (N2). The search is a schedule inside a templated increment argument.",
+   "nearest_neighbour": "Chang 2002; Lee 2017 'Covering the large spectrum and generalized Riesz products'; Bloom's Chang variant; pinning lemma (Montanari 2008, Raghavendra-Tan 2012).",
+   "lean": "L11, L17"
+  },
+  {
+   "rank": 3,
+   "item": "I29 + I30: gap potential F(A) - log|B_A(r)| and the regular/cheap spectral update",
+   "provisional_N": "N3",
+   "provisional_F": "F4 (potential) + F3 (update construction)",
+   "for": "A monovariant that mixes free energy with packing entropy of a Bohr-type ball. Cheap deterministic updates lower it by k_b/2 and regular ones raise it by at most C t, so cheap updates are charged to regular ones, whose total is bounded by likelihood evidence. This closes the per-branch budget sum k_b + t <= Cd and the count n <= Ch. No near-equivalent was found.",
+   "against": "Density-increment and energy-increment potentials on Bohr sets (Bourgain 1999, Sanders, Bloom) are a standard template; the free-energy monotonicity is Griffiths-Ginibre (N0 transfer). The grade could be N2.",
+   "nearest_neighbour": "Bohr-set density increment (Bourgain 1999; Sanders 2011); energy increment (Green-Tao).",
+   "lean": "L23, L24"
+  },
+  {
+   "rank": 4,
+   "item": "I32: Prop modulated delayed Haar estimate (the finite statement itself)",
+   "provisional_N": "N3 (as a lemma statement), possibly N2",
+   "provisional_F": "F5",
+   "for": "A dyadic model of the Carleson operator at the exact L log L endpoint: stopped at (log d)^4, L1 bound Cd, uniform in depth and frequencies, with delayed multipliers. It is the right intermediate target and carries all the difficulty; DAG-wise everything flows through it (Lean: GridBound).",
+   "against": "Dyadic/Walsh models of the Carleson operator are a standard first step (Thiele's Walsh model, Petermichl representation); the statement is essentially 'the conjecture on a dyadic tree', so a judge may deem it analytic relative to the goal plus the Petermichl representation.",
+   "nearest_neighbour": "Walsh-Carleson operator near L1 (Do-Lacey; Di Plinio 2014 weak-Lp bounds); Lie 2013 good-set estimates.",
+   "lean": "L03"
+  },
+  {
+   "rank": 5,
+   "item": "I40: delayed vector norm estimate with an absolute Fisher coefficient (concavity of |(W, f, lambda M)| on two-step blocks)",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "The b-independent coefficient on the Fisher sum is what allows Fisher charges to be summed once globally while representative-choice costs carry the logarithmic factors in a separate tail.",
+   "against": "Bellman-function / concave-potential technique for martingale transforms (Burkholder; Nazarov-Treil-Volberg); adding the coordinate lambda M is a templated 'track an extra quantity' move.",
+   "nearest_neighbour": "Bellman functions for Haar multipliers (Nazarov-Treil-Volberg 1999).",
+   "lean": "Paths/Flash.lean, Paths/Run.lean (see lean_items)"
+  }
+ ],
+ "correctness_audit": {
+  "verdict": "No gap found at the level of a careful read of all sections, but the claim is extraordinary: it resolves a 60-year question and gives a new proof of Carleson's theorem. The paper is dense, with many 'sufficiently large d' and polylog(h) bookkeeping steps that we could not check line by line. The strongest evidence for correctness is the sorry-free, axiom-free, Mathlib-only Lean formalization, whose comparator statement exactly matches Thm main. We did not build it, so this evidence is conditional on the release's own claim that it compiles and passes the comparator.",
+  "checked": [
+   "Layer summation (11:279-353): rho_j <= e^{d_j}, sum m_j d_j < infinity from int |f| log|f| < infinity plus the entropy term; sum |G_j^c| <= C sum (log d_j)^{-4} < infinity; Borel-Cantelli and L1 summation are correct.",
+   "Bounded-input proposition (11:237-275): d_l chosen so rho_l <= e^{d_l}; m_l d_l -> 0; convergence in measure argument is correct.",
+   "Fourier transfer (11:42-227): kappa odd and Lipschitz, c = -1/8 (tent primitive; Lean kappa_integral agrees), K_J = c/t + O(1) on delta < |t| <= 1, inner window <= C M rho <= C e^{4h} = o(d) on G_rho; Pi_{>=0} = (I + iH + P0)/2 and the S_N identity are correct.",
+   "Consistency with known lower bounds: Konyagin's divergence threshold phi(u) = o(u sqrt(log u / log log u)) does not reach L log L, so no contradiction; a single layer rho = 1_E/|E| gives S* ~ log(1/|E|) = d on a large set, consistent with the Cd bound.",
+   "Stein corollary (11:357-392): hypotheses of Stein's theorem (Banach space, translation-commuting bounded S_N, a.e.-finite maximal function) hold.",
+   "Section 3 spot checks: dual formula and weak duality (03:124-188); monotone deficits s_j and the telescoping prefix average (03:320-377); thinning acceptance error delta <= 3 epsilon (03:708-726).",
+   "Section 4 spot check: search cost bounds 4 alpha_1 = O(h^{-2}) with N, n ~ exp(h)."
+  ],
+  "residual_concerns": [
+   "Extraordinary claim, unreviewed, author 'OpenAI'. Expert review and an independent Lean build are needed.",
+   "The paper's Prop regular evidence (05:645-771) asserts a simultaneous true-law statement over all regular successes; the Lean Thermal layer proves only per-attempt bounds. Where the simultaneous version (or a substitute) lives is reported under lean_procedure_notes.",
+   "Paper and Lean use different parameters: cutoff (log d)^4 vs (j+1)^3 ~ (log d)^3; h = log log d vs ~ log j/1000; L = d e^{(log d)^{1/4}} vs d 2^{2^h}; k_b quadratic vs linear in log(1/b); search schedule M^{1/10}, M^{1/2} vs 2^{16h}. So the Lean certifies the theorem, not every intermediate statement of the paper as written.",
+   "Lean replaces the paper's Hilbert-transform route by a direct Dirichlet-kernel comparison and the Fejer/d_j layer bookkeeping by padded masses; the paper's own text for these steps is therefore not what is formalized (both routes look correct).",
+   "Konyagin's results (the negative side) are not cited; the paper also does not discuss why the method fails below L log L (e.g. at L sqrt(log L), which Lie suggests may be the true threshold). A 'proves too much' test is therefore missing from the paper: which step uses the full log factor? Our reading: the Cd per-layer bound summed against m_j 2^j uses exactly int |f| log|f|, and every budget is O(d), so the method is calibrated to L log L and does not obviously give more.",
+   "Prop dyadic allows arbitrary F_{j+1}-measurable multipliers eps_j shared across modulations; the Lean proves only the eps_j = r_{j+1} case needed. The general statement is unverified."
+  ]
+ },
+ "extraction_friction": [
+  "Core definitions live in display math and prose (labels Z = Y + theta, gap potential, plateaus, J_p, snapshots); only 'context', 'post-processing survivor', 'bad', 'marked', 'inner-/outer-valid' are \\emph. A naive extractor would miss the thermal labels and the gap potential.",
+  "Lean names are whimsical and opaque (Scene, Play, Fund, Festival, Gross, Chill, Troupe, Frost, Lamp, Wire, Pulse, wage, mood, bank, annual, yieldA); mapping to paper items needs the docstrings and the structure, not the names.",
+  "The Lean proves a different but sufficient finite statement (GridBound) with different parameters and constants (10^222, capA = 10^16, 300000 D^2); paper and Lean items do not join one-to-one.",
+  "Namespace collision: OAI.Release075.main (formalization.yaml:1698) belongs to the torsion-free hyperbolic groups family, not to family 075; the extractor must not key on namespace numbers.",
+  "The extractor's candidate_defs (288) are dominated by plumbing (Node, Law.send, Grid aliases); its candidate_lemmas list is a better guide (entropy_compression, spectral_compression, make_update, plant, gridProof).",
+  "The headline proof never cites Carleson, so a cross-field/citation extractor would underrate harmonic-analysis dependence and overrate background citations.",
+  "Line numbers: the section files are \\input from main.tex; file:line references here are per section file."
+ ],
+ "lean_summary": {
+  "size": "156 files, ~29.2k lines in FourierLLogL + 484 lines HeightLayers; extractor: 2448 decls (1688 theorems, 681 defs, 37 structures, 24 abbrevs, 9 inductives, 9 instances), proof DAG 2010 decls",
+  "layers": {
+   "Fourier/, Dyadic/, Weak/ (top chain)": "GridBound -> UnitTreeBound -> AffineTreeBound -> RealGoodBound -> GoodBound -> main_bound_consequence -> paperMain; weak-L1 corollary separately.",
+   "Compress/, Finite/": "Entropy compression (finite group version) with home-built finite information theory (no Mathlib KL/entropy).",
+   "Thermal/": "Thermal forms, Griffiths-Ginibre, spectral update, gap potential, evidence bounds.",
+   "Procedure/, Capture/, Snapshot/, Edges/, Plateau/, Paths/, Assembly/": "Inductive procedure tree (Play), budgets, capture, snapshots, path estimates, assembly to gridProof."
+  },
+  "route_differences_lean_vs_paper": [
+   "Finite model ZMod(2^M) with one dyadic grid; good-set majorant W (shared by all frequencies) instead of a stopping time; only the eps_j = r_{j+1} Haar shift.",
+   "Layers d = 2^j only; threshold (j+1)^3 instead of e^{4h} = (log d)^4; |G^c| <= C/(j+1)^2 instead of (log d)^{-4} (still summable).",
+   "No Hilbert transform: S_N compared directly to the averaged kernel via D_N(t) = cos(2piNt) + sin(2piNt) cot(pit) (Fourier/Dirichlet.lean:81, Good.lean:59).",
+   "Rescaling a top [a, a+s) to [0,1) turns integer frequency n into ns; Lean rounds to floor(ns) at O((j+1)^3) cost (Fourier/Affine.lean:121); the paper avoids this by working on the line.",
+   "Bounded inputs via L1-dense trigonometric polynomials (Mathlib span_fourier_closure_eq_top) instead of Fejer means; layer masses padded by 4^{-j} instead of d_j = 2^{j+1} + log^- m_j (HeightLayers log^- lemmas are dead code).",
+   "Weak-L1 corollary proved directly from GoodBound by a re-proved Stein-type argument (translates + sign averaging), not via a.e. convergence + Stein's theorem.",
+   "Compression stated for an injective tag into an arbitrary finite abelian group with finite phase law; Gibbs duality replaced by Hahn-Banach separation; Pinsker as tv^2 <= kl.",
+   "Parameters: h = slow j ~ log j/1000; T = d/h^6; w = 2^h; L = d 2^w; m_* = 2^{w^64}; k_b linear in log2(1/b); search schedule N = n = 2^{16h}; explicit constants (300000 D^2, 350 F, capA = 10^16, C = 10^222).",
+   "Update.Good omits two paper conclusions (h^140 lambda <= L; log|S'| >= 0.8 k_b), which are proved and consumed internally."
+  ],
+  "mathlib_substantive": [
+   "geometric_hahn_banach_point_closed",
+   "IsCompact.sInf_mem",
+   "Vitali.exists_disjoint_subfamily_covering_enlargement_ball",
+   "span_fourier_closure_eq_top",
+   "Integrable.exists_boundedContinuous_integral_sub_le",
+   "ae_eventually_notMem (Borel-Cantelli)",
+   "tendsto_tsum_of_dominated_convergence",
+   "integral_integral_swap / lintegral_lintegral_swap",
+   "lintegral_iSup",
+   "ZMod.stdAddChar / AddChar orthogonality",
+   "Real.negMulLog"
+  ],
+  "home_built": [
+   "finite laws, entropy, conditional entropy, KL, chain rules, data processing, Pinsker (Finite/)",
+   "finite supermartingale / likelihood bookkeeping on the procedure tree (Procedure/)",
+   "Griffiths-Ginibre for one-site forms (Thermal/Ginibre.lean)",
+   "Dirichlet kernel identity, kappa closed form, Haar-shift averaging (Fourier/)",
+   "Stein-type weak-L1 amplification (Weak/)"
+  ],
+  "lean_procedure_notes": {
+   "status": "Procedure/Capture/Snapshot/Edges/Plateau/Paths/Assembly layer mapped from signatures only (L27-L29 plus Procedure/Rare.lean:66 rare: P(froze) <= 1/H^10, the Lean analogue of P(transfer) <= C h^-10, proved via rating_bound, a score/temperature supermartingale). A full delegated read was still running at handback; the location of the simultaneous true-law evidence statement is not confirmed. Likely absorbed into rating_bound/tempered (Procedure/Rating.lean:19-93)."
+  },
+  "dag_metrics_from_extractor": {
+   "source": "data/items/075_lean.json (scripts/extract_lean.py; identifier-matching DAG, rough). frac = frac_dag_dependents (share of the target's proof DAG depending on the item; 20% load-bearing proxy); dom = dominated_share (share reachable only through the item).",
+   "caveat": "The extractor misses the top chain (field-notation calls such as h.unitTreeBound.affine...; main_bound_consequence and kernel_compare_result get 0), so shares are relative to the GridBound subtree in practice.",
+   "rows": [
+    {
+     "decl": "Thermal.label (Thermal/Form.lean:163)",
+     "frac": 0.2552,
+     "dom": 0.001,
+     "files_using": 18,
+     "paper": "I26"
+    },
+    {
+     "decl": "Thermal.channel (Thermal/Piece.lean:30)",
+     "frac": 0.2061,
+     "dom": 0.0005,
+     "files_using": 22,
+     "paper": "I26"
+    },
+    {
+     "decl": "Procedure.Scene (Procedure/Play.lean:16)",
+     "frac": 0.285,
+     "dom": 0.0005,
+     "files_using": 64,
+     "paper": "I33 (plumbing carrier)"
+    },
+    {
+     "decl": "Procedure.Fund (Procedure/Capital.lean:16)",
+     "frac": 0.2909,
+     "dom": 0.0005,
+     "files_using": 15,
+     "paper": "I34 tracked invariants"
+    },
+    {
+     "decl": "Thermal.gap (Thermal/Packing.lean:16)",
+     "frac": 0.0573,
+     "dom": 0.0005,
+     "files_using": 3,
+     "paper": "I29"
+    },
+    {
+     "decl": "Thermal.ginibre (Thermal/Ginibre.lean:212)",
+     "frac": 0.0514,
+     "dom": 0.0045,
+     "files_using": 1,
+     "paper": "I25"
+    },
+    {
+     "decl": "Compress.bill (Compress/Cost.lean:24)",
+     "frac": 0.029,
+     "dom": 0.0005,
+     "files_using": 5,
+     "paper": "I14"
+    },
+    {
+     "decl": "Compress.entropy_compression (Compress/Endpoint.lean:125)",
+     "frac": 0.0052,
+     "dom": 0.1473,
+     "paper": "I12"
+    },
+    {
+     "decl": "Compress.compress_arrays (Compress/Theorem.lean:27)",
+     "frac": 0.006,
+     "dom": 0.1323,
+     "paper": "I12"
+    },
+    {
+     "decl": "Thermal.make_update (Thermal/Update.lean:113)",
+     "frac": 0.003,
+     "dom": 0.1935,
+     "paper": "I30"
+    },
+    {
+     "decl": "Thermal.obtain_compressed (Thermal/Obtain.lean:118)",
+     "frac": 0.0037,
+     "dom": 0.1846,
+     "paper": "I30"
+    },
+    {
+     "decl": "Thermal.spectral_compression (Thermal/Shrink.lean:66)",
+     "frac": 0.0045,
+     "dom": 0.1502,
+     "paper": "I30"
+    },
+    {
+     "decl": "Procedure.plant (Procedure/Tree.lean:58)",
+     "frac": 0.0022,
+     "dom": 0.1945,
+     "paper": "I33/I34"
+    },
+    {
+     "decl": "Dyadic.gridProof (Assembly/Endpoint.lean:18)",
+     "frac": 0.0015,
+     "dom": 0.898,
+     "paper": "I32/I42"
+    }
+   ],
+   "reading": "The thermal label (label/channel) is the only paper-level new object that passes the 20% frac proxy (Scene and Fund are carriers). The compression lemma and spectral update each dominate 13-19% of the DAG (everything below them is used only through them). This supports candidates 1-3 as load-bearing; the proxy says nothing about discoverability."
+  }
+ }
+}

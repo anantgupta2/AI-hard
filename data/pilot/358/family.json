@@ -1,0 +1,1940 @@
+{
+ "family": 358,
+ "title": "A three-manifold without conjugate points or nonpositive curvature",
+ "manuscript": "A Three-Manifold Without Conjugate Points and Without a Nonpositively Curved Metric (OpenAI, September 24, 2026)",
+ "manuscript_dir": "data/raw/openai-math/preprints/A-Three-Manifold-Without-Conjugate-Points-and-Without-a-Nonpositively-Curved-Metric-September-24-2026",
+ "source_root": "data/raw/openai-math/preprints/A-Three-Manifold-Without-Conjugate-Points-and-Without-a-Nonpositively-Curved-Metric-September-24-2026/build",
+ "tex_files": [
+  "main.tex",
+  "sections/introduction.tex",
+  "sections/topology.tex",
+  "sections/cometric.tex",
+  "sections/variations.tex",
+  "sections/turning.tex",
+  "sections/global.tex",
+  "sections/punctured-torus.tex",
+  "figures/neck-gluing.tex",
+  "references.bib"
+ ],
+ "commit": "fd4aeeb",
+ "analyst_role": "family analyst (paper + Lean); reasoning trace: none for this family",
+ "base_library_L": "Mathlib d13f23b + references.bib of this manuscript (8 entries: BridsonHaefliger1999, BurnsMatveev2021, Gulliver1975, IvanovKapovitch2014, Leeb1995, KapovichLeeb1996, Milnor1963, Bonahon2009)",
+ "main_statement": {
+  "file_line": "sections/introduction.tex:27-29",
+  "latex": "\\begin{theorem}\\label{thm:main}\nThere exists a closed connected orientable smooth three-manifold $M$ with a $C^\\infty$ Riemannian metric without conjugate points, such that $M$ admits no $C^\\infty$ Riemannian metric whose sectional curvature is everywhere at most zero.\n\\end{theorem}",
+  "paraphrase": "Some closed orientable 3-manifold (a two-piece graph manifold made of two copies of (punctured torus) x S^1, glued by h2=h1+f1, f2=h1) carries a smooth metric with no conjugate points, yet carries no nonpositively curved metric. This answers negatively, already in dimension 3, the question (Ivanov-Kapovitch Q1.1/Q8.1; Burns-Matveev Q4.1.2) whether a closed manifold without conjugate points must admit a nonpositively curved metric.",
+  "stronger_claims_in_paper": [
+   {
+    "file_line": "sections/topology.tex:87-91",
+    "paraphrase": "pi_1(M) admits no proper cocompact isometric action on a nonempty proper CAT(0) space (Thm no-cat0-action)."
+   },
+   {
+    "file_line": "sections/topology.tex:186-189",
+    "paraphrase": "M admits no locally CAT(0) length metric inducing its topology (Cor no-local-cat0)."
+   },
+   {
+    "file_line": "sections/introduction.tex:38-46",
+    "paraphrase": "M admits no metric without focal points (via IvanovKapovitch2014 Thm 7.1, cited)."
+   }
+  ],
+  "comparator": {
+   "challenge_file": "lean/ComparatorChallenges/ConjugatePoints.lean",
+   "config": {
+    "challenge_module": "ComparatorChallenges.ConjugatePoints",
+    "solution_module": "OAI.Geometry.ConjugatePoints.ThreeManifold",
+    "theorem_names": [
+     "OAI.ThreeManifold.main_theorem"
+    ],
+    "definition_names": [],
+    "permitted_axioms": [
+     "propext",
+     "Quot.sound",
+     "Classical.choice"
+    ],
+    "enable_nanoda": false
+   },
+   "verbatim": "def MainStatement : Prop :=\n  ∃ (M : Type) (top : TopologicalSpace M),\n    letI := top\n    ∃ (_ : T2Space M) (_ : SecondCountableTopology M) (_ : CompactSpace M)\n      (_ : ConnectedSpace M) (charts : ChartedSpace E3 M),\n      letI := charts\n      ∃ (smooth : IsManifold I3 ∞ M),\n        letI := smooth\n        OrientedAtlas (M := M) ∧\n          (∃ g : SmoothMetric M, NoConjugatePoints g) ∧\n          ¬ ∃ g : SmoothMetric M, NonpositiveSectionalCurvature g\n\ntheorem main_theorem : MainStatement := by\n  sorry",
+   "readable": "There is a compact, connected, Hausdorff, second-countable smooth (C^infinity) 3-manifold with an oriented atlas, a smooth Riemannian metric g with no conjugate points, and no smooth Riemannian metric with nonpositive sectional curvature. Curvature and Christoffel symbols are defined chart-wise from the metric matrix; NPC means g(R(u,v)v,u)<=0 for all u,v in every atlas chart; NoConjugatePoints quantifies over every open interval U, every geodesic on U (including constant and non-unit-speed ones) and every chart-wise smooth Jacobi field on U vanishing at two distinct times, concluding that J vanishes on U.",
+   "solution_decl": "lean/OAI/Geometry/ConjugatePoints/ThreeManifold.lean:260 (main_theorem: witness GluedConstruction.Manifold with realCharts, realSmooth, manifold_oriented, realCompactMetric(delta) from exists_uniform_compact_noConjugatePoints, and realCompact_noNPC)",
+   "definitions_check": "The 18 definitions of ComparatorChallenges/ConjugatePoints.lean are textually identical to OAI/Geometry/ConjugatePoints/Basic.lean (diff empty). I checked the curvature sign by hand: curvatureCoefficient l k i j = d_i Gamma^l_{jk} - d_j Gamma^l_{ik} + Gamma^l_{ia}Gamma^a_{jk} - Gamma^l_{ja}Gamma^a_{ik} = R^l_{kij} for R(X,Y)=nabla_X nabla_Y - nabla_Y nabla_X - nabla_[X,Y], so sum g_ij R(u,v)v^i u^j = g(R(u,v)v,u) = K(u,v)|u^v|^2. The NPC sign is correct. Christoffel formula correct. The 'infinity' is C^infinity (ContDiff scope), not analytic.",
+   "match_check": "Exact match with Thm main, including closed (compact, no boundary via E3-model charts), connected, orientable (positive-Jacobian atlas) and C^infinity. Only atlas charts are quantified, but every point lies in chartAt, and both properties are chart-invariant, so this is faithful. No vacuity loophole found: NoConjugatePoints covers all intervals and constant geodesics; the non-NPC conjunct quantifies over all smooth metrics on the chosen smooth structure.",
+   "formalized": [
+    "Thm main (both conjuncts)",
+    "Riemannian NPC obstruction for this M (Prop no-npc) by a different route",
+    "the full no-conjugate-points proof (Sections 3-6)"
+   ],
+   "claimed_not_formalized": [
+    "Thm no-cat0-action for general proper CAT(0) spaces",
+    "Cor no-local-cat0 (locally CAT(0) length metrics)",
+    "no-focal-points remark (cited IK Thm 7.1)"
+   ],
+   "lean_doc": "lean/docs/358.md: 'The separate no-focal-points and CAT(0) consequences are not included.'"
+  }
+ },
+ "trust_surface": {
+  "grep_scope": "lean/OAI/Geometry/ConjugatePoints/*.lean (19 files, 24,974 lines) and ComparatorChallenges/ConjugatePoints.lean",
+  "counts": {
+   "sorry": 0,
+   "axiom": 0,
+   "admit": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque": 0,
+   "partial def": 0,
+   "ofReduceBool/trustCompiler": 0,
+   "set_option": 0,
+   "#eval/run_cmd/macro/elab": 0,
+   "decide (kernel-checked)": 23,
+   "Classical.choice (explicit)": 2,
+   "local instance": 46
+  },
+  "decide_uses": "Quotient.lean (21 uses): finite checks in SL(2,ZMod 2), SL(2,ZMod 3) and explicit 2x2 integer matrix identities (e.g. psi^-1 phi^-1 psi phi = -(T^6), S = -phi psi T^3). Index.lean:873,1062: `(by decide : (2:ℕ) ≠ 0)` side conditions. No search.",
+  "local_instances": "Rechart.charts / isManifold to give auxiliary spaces E3 charts; ContinuousLinearMap normed-space instances (Coordinates.lean:1819-1829). Not trust-relevant.",
+  "imports": "Only `import Mathlib` (Basic.lean, Convexity.lean) plus the family's own linear chain; no external lake packages; no other OAI dirs.",
+  "comparator_axioms": [
+   "propext",
+   "Quot.sound",
+   "Classical.choice"
+  ],
+  "build_status": "Lean is not installed here; claims are text-level. The repository lists this family as formalized (comparator present).",
+  "verdict": "Clean trust surface. Kernel decide only on fixed finite computations."
+ },
+ "labels": {
+  "A": {
+   "label": "A2",
+   "secondary": {
+    "hard_direction_form": null,
+    "explicit_rate": false,
+    "contains_impossibility_conjunct": true
+   },
+   "evidence": {
+    "quote": "There exists a closed connected orientable smooth three-manifold $M$ with a $C^\\infty$ Riemannian metric without conjugate points, such that $M$ admits no $C^\\infty$ Riemannian metric",
+    "file_line": "sections/introduction.tex:28"
+   },
+   "confidence": "high",
+   "note": "A counterexample (exists M). Its second conjunct is an impossibility statement (no NPC metric on M), proved by a group-theoretic obstruction; the first conjunct is a construction. The comparator is the same exists-statement."
+  },
+  "B": {
+   "label": "B2",
+   "flags": {
+    "full_only_with_prior_results": false,
+    "full_only_with_prior_results_detail": "Self-contained modulo standard cited theorems (flat torus theorem and cyclic minset theorem of Bridson-Haefliger, metric Cartan-Hadamard, Milnor's index-form framework). The obstruction is Leeb's example, re-proved. No prior model output used.",
+    "adds_corollaries_for_other_conjectures": true,
+    "adds_corollaries_detail": "The same M has no proper cocompact CAT(0) action of pi_1, no locally CAT(0) metric, and (via IK Thm 7.1) no metric without focal points. It also answers Burns-Matveev Question 4.1.2 in dimension three.",
+    "does_not_address": "Ivanov-Kapovitch Question 8.2 (two copies of Sigma x S^1 glued by A in SL(2,Z) with |tr A|>2). With the natural (boundary, fibre) bases and an orientation correction, the paper's gluing [[1,1],[1,0]] (det -1) has |trace| = 1, so it is a different gluing; the paper does not claim to settle Q8.2, though its intro sentence 'ask about gluings of two punctured-torus products' could be misread that way."
+   },
+   "evidence": {
+    "quote": "We give a negative answer in dimension three, using a metric on a two-piece graph manifold whose topology obstructs nonpositive curvature.",
+    "file_line": "sections/introduction.tex:24-25"
+   },
+   "confidence": "high",
+   "note": "The posed problem is a yes/no question (IK Q1.1/Q8.1 'Does every closed Riemannian manifold without conjugate points admit a metric of nonpositive curvature?'). Answering 'no' with a counterexample is B2. IK expected 'probably no' in general but allowed that dimension 3 might be different."
+  },
+  "C": {
+   "primary": "C1",
+   "primary_evidence": {
+    "quote": "The main work is the metric construction and its geodesic estimate.",
+    "file_line": "sections/introduction.tex:64"
+   },
+   "secondaries": [
+    {
+     "label": "C4",
+     "evidence": {
+      "quote": "0<\\delta\\le \\min\\left\\{1,\\frac1{2C_m}, \\frac{1-\\beta}{2C_m+C_ea(0)}\\right\\}",
+      "file_line": "sections/turning.tex:293-295"
+     },
+     "note": "Long estimation chain: cometric bounds, timing margin, S-bounds, Schur-complement inequality, choice of delta."
+    },
+    {
+     "label": "C3",
+     "evidence": {
+      "quote": "Suppose that $\\Gamma$ acts properly and cocompactly by isometries on a nonempty proper $\\operatorname{CAT}(0)$ space $X$.",
+      "file_line": "sections/topology.tex:94-95"
+     },
+     "note": "The non-NPC half is a proof by contradiction (orthogonality conditions incompatible with the gluing)."
+    },
+    {
+     "label": "C5",
+     "evidence": {
+      "quote": "Apply the flat torus theorem \\cite[Theorem~II.7.1(1)--(3)]{BridsonHaefliger1999}",
+      "file_line": "sections/topology.tex:122-123"
+     },
+     "note": "Cited and not re-proved: flat torus theorem, cyclic minset product decomposition (BH II.6.8), metric Cartan-Hadamard and Hopf-Rinow (BH I.3.7, II.4.1), Riemannian NPC => locally CAT(0) (BH II.1A.6), van Kampen + amalgam normal form; IK Thm 7.1 for the focal-points corollary."
+    }
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "rcases hb with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;> decide",
+    "file_line": "lean/OAI/Geometry/ConjugatePoints/Quotient.lean:363"
+   },
+   "computer_assisted_note": "Paper: no computation. Lean: 23 kernel `decide` calls on fixed 2x2 matrix identities and membership in small finite groups SL(2,Z/2), SL(2,Z/3); no search.",
+   "ih_strengthened": false,
+   "ih_template": null,
+   "ih_evidence": {
+    "quote": "The estimates must allow arbitrary field values at the ends of an entire neck passage, so that they can be combined with the estimates in the product pieces.",
+    "file_line": "sections/introduction.tex:81-83"
+   },
+   "ih_note": "There is no induction (C2 absent; the global step is countable additivity, global.tex:32-41). The closest analogue is the strengthened local estimate: per-passage nonnegativity with arbitrary endpoint data, uniform in all passage parameters. If coded as a strengthening, it would match the templates 'uniform/quantitative version' and 'strengthen to all substructures'.",
+   "confidence": "high (C1 primary); medium (secondaries)"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "P29 Prop turning-index (uniform free-endpoint index estimate for returning passages), provisional N3 weak; P19/P20 (concave-cometric coordinate second variation with nonnegative boundary term) N2 leaning N3",
+   "evidence": {
+    "quote": "For such an excursion, a positive boundary term controls one component of the endpoint change in the torus part of the variation field.",
+    "file_line": "sections/introduction.tex:87-89"
+   },
+   "confidence": "low",
+   "caveats": [
+    "Every ingredient of P29 is elementary (Cauchy-Schwarz, Schur complement, convexity of v); its N3 status rests on the hard-to-find combination (boundary penalty on one component + |p1|-relative mixed bound + strict timing margin). A judge could put it at N2, making the family D2.",
+    "It is a one-off device tailored to this metric, so it is unlikely to pass the downstream speedup test even if it reaches N3.",
+    "The topological half is entirely N0 (Leeb 1995 Example 4.1, re-proved)."
+   ],
+   "flag_builds_on_prior_model_produced_result": false,
+   "flag_note": "All 8 references are classical human works (1963-2021). None is a 2026 preprint."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Differential geometry",
+    "msc2020": [
+     "53C22",
+     "53C20",
+     "53C23",
+     "57K30"
+    ],
+    "evidence": {
+     "quote": "\\cataloguesection / catalog subject: Differential geometry",
+     "file_line": "data/catalog_families.csv:354"
+    },
+    "confidence": "high"
+   },
+   "lean_dir_field": {
+    "dir": "lean/OAI/Geometry/ConjugatePoints",
+    "lean_field": "Geometry",
+    "other_oai_dirs": [],
+    "mathlib_areas_by_usage": "Geometry.Manifold (ContMDiff, IsManifold, ChartedSpace, Riemannian metrics/riemannianEDist), Topology.Covering + FundamentalGroupoid, TopCat.GlueData, UpperHalfPlane/SL(2,Z) action, Matrix (2x2 cometrics; namespace refs 272), MeasureTheory/interval integrals, ODE (HasDerivAt, uniqueness), expNegInvGlue/smoothTransition."
+   },
+   "method_fields": [
+    {
+     "field": "Riemannian geometry: second variation, index form, Jacobi fields (53C20, 53C22)",
+     "tag": "essential",
+     "what": "Milnor's index-form framework; second variation with boundary term; index criterion re-proved",
+     "evidence": {
+      "quote": "For the absence of conjugate points, we use the classical index-form framework \\cite[Sections~13--15]{Milnor1963}.",
+      "file_line": "sections/introduction.tex:78-79"
+     }
+    },
+    {
+     "field": "Metric geometry / CAT(0) spaces (53C23, 20F65)",
+     "tag": "essential",
+     "what": "Flat torus theorem, cyclic minset splitting, semisimplicity, metric Cartan-Hadamard (invoked, cited)",
+     "evidence": {
+      "quote": "Apply the flat torus theorem",
+      "file_line": "sections/topology.tex:122"
+     }
+    },
+    {
+     "field": "3-manifold topology / graph manifolds (57K30, 57M50)",
+     "tag": "essential",
+     "what": "Leeb's two-piece graph-manifold obstruction (re-proved); van Kampen and amalgams",
+     "evidence": {
+      "quote": "This is an instance of Leeb's two-piece graph-manifold obstruction",
+      "file_line": "sections/topology.tex:6"
+     }
+    },
+    {
+     "field": "Hyperbolic surfaces (30F40, 32G15)",
+     "tag": "essential",
+     "what": "Hyperbolic punctured torus with cusp normal form (re-derived, Bonahon)",
+     "evidence": {
+      "quote": "Fix a complete finite-area hyperbolic punctured torus.",
+      "file_line": "sections/cometric.tex:244"
+     }
+    },
+    {
+     "field": "Matrix analysis (15A45, 15B48)",
+     "tag": "essential",
+     "what": "Loewner order, concave matrix paths, inverse-derivative identities, Cauchy-Schwarz for PSD forms",
+     "evidence": {
+      "quote": "Concavity of $P$ implies $D(t)\\succeq0$",
+      "file_line": "sections/turning.tex:239-240"
+     }
+    },
+    {
+     "field": "Functional analysis / Sobolev spaces (46E35, 46C05)",
+     "tag": "essential",
+     "what": "H_0^1 with weighted inner product, Riesz duality, Poincare inequality, H^1 density (standard, inline)",
+     "evidence": {
+      "quote": "equip $\\mathcal D=H_0^1(0,L)$ with the inner product",
+      "file_line": "sections/turning.tex:117"
+     }
+    },
+    {
+     "field": "ODEs (34A12, 34C11)",
+     "tag": "essential",
+     "what": "Uniqueness, 1-D motion in a concave potential, convexity of solutions",
+     "evidence": {
+      "quote": "Smooth ODE uniqueness forces this solution locally.",
+      "file_line": "sections/variations.tex:199"
+     }
+    },
+    {
+     "field": "Calculus of variations (49K05)",
+     "tag": "essential (implicit, uncited)",
+     "what": "Joint convexity of the coordinate Lagrangian (concave cometric) => nonnegative coordinate second variation",
+     "evidence": {
+      "quote": "Concavity of $P$ makes the coordinate second variation nonnegative",
+      "file_line": "sections/introduction.tex:79-80"
+     }
+    },
+    {
+     "field": "Measure theory (28A25)",
+     "tag": "essential",
+     "what": "Countable additivity over passages",
+     "evidence": {
+      "quote": "Countable additivity gives",
+      "file_line": "sections/global.tex:35"
+     }
+    },
+    {
+     "field": "Manifolds without focal points (53C20)",
+     "tag": "corollary-only",
+     "what": "IK Thm 7.1 equivalence for the focal-point remark",
+     "evidence": {
+      "quote": "\\cite[Theorem~7.1]{IvanovKapovitch2014}",
+      "file_line": "sections/introduction.tex:45"
+     }
+    },
+    {
+     "field": "Riemannian geometry with mixed curvature (Gulliver)",
+     "tag": "background-cited",
+     "what": "Gulliver's local modifications preserving no conjugate points",
+     "evidence": {
+      "quote": "Gulliver showed that the converse fails for an individual metric",
+      "file_line": "sections/introduction.tex:5-6"
+     }
+    }
+   ],
+   "lean_method_fields_extra": [
+    {
+     "field": "Smooth Cartan-Hadamard, Rauch-type comparison, Gauss lemma (53C20)",
+     "tag": "essential (Lean only)",
+     "what": "re-proved from scratch: npc_exponential_isCoveringMap, npc_jacobiNorm_lower, exponential_gauss"
+    },
+    {
+     "field": "Covering space theory / fundamental groups (55Q05, 57M10)",
+     "tag": "essential (Lean only)",
+     "what": "deck group = pi_1; closed geodesics essential under no conjugate points"
+    },
+    {
+     "field": "Modular group / congruence reductions (11F06, 20H10)",
+     "tag": "essential (Lean only)",
+     "what": "Gamma=<phi,psi,-1> torsion-free via reductions mod 2 and mod 3"
+    }
+   ],
+   "cross_field_metrics": {
+    "n_method_fields_essential": 9,
+    "n_cross_field_essential_excluding_DG": 7,
+    "invoked_cited_theorems": 9,
+    "invoked_cited_from_other_fields": 6,
+    "share_cross_field": 0.67,
+    "note": "Invoked cited theorems: 5 from Bridson-Haefliger (metric geometry), van Kampen/amalgam (topology), Milnor (Riemannian), Bonahon (hyperbolic), IK Thm 7.1 (Riemannian, corollary-only). Most cross-field content is re-proved inline."
+   }
+  }
+ },
+ "items": [
+  {
+   "id": "P01",
+   "side": "paper",
+   "kind": "definition (inline \\emph)",
+   "name": "no conjugate points",
+   "file_line": "sections/introduction.tex:3-4",
+   "statement": "A metric has no conjugate points if no nonzero Jacobi field along a geodesic vanishes at two distinct times.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "It is the property being constructed (goal vocabulary)."
+   },
+   "analytic_check": "Occurs verbatim in the goal (comparator NoConjugatePoints). Analytic.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook notion."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "OAI.ThreeManifold.NoConjugatePoints (Basic.lean:96; identical in ComparatorChallenges/ConjugatePoints.lean:91)"
+  },
+  {
+   "id": "P02",
+   "side": "paper",
+   "kind": "definition (inline \\emph)",
+   "name": "no focal points",
+   "file_line": "sections/introduction.tex:38-41",
+   "statement": "For every nonzero normal Jacobi field J along a unit-speed geodesic with J(0)=0, d/ds|J(s)|^2>0 for s>0.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "Recall that a metric has \\emph{no focal points}"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Used only for a corollary remark via IK Thm 7.1."
+   },
+   "analytic_check": "Not in goal; in L via IK2014.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard (O'Sullivan, Eberlein)."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "not formalized"
+  },
+  {
+   "id": "P03",
+   "side": "paper",
+   "kind": "definition (inline \\emph)",
+   "name": "cometric P = Q^{-1}",
+   "file_line": "sections/introduction.tex:70-71; sections/cometric.tex:44-46",
+   "statement": "The inverse torus metric P(t)=Q(t)^{-1} of the neck metric dt^2+dx^T Q(t) dx; 'concave' means -P'' is positive semidefinite.",
+   "cited_or_new": {
+    "status": "new name",
+    "bib_key": null,
+    "cue": "We call $P$ the \\emph{cometric}, since it is the inverse torus metric"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "All neck estimates are phrased in P; concavity of P is the design criterion of the whole construction."
+   },
+   "analytic_check": "The inverse metric is a standard object; the name and the concavity requirement are new to this problem. Not a subterm of the goal.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Renaming of the inverse metric tensor. The concavity requirement is graded separately (P19/P20)."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "OAI.ThreeManifold.Cometric.P, Q (Neck.lean:759-764); coordinateCometric (Neck.lean:1448)"
+  },
+  {
+   "id": "P04",
+   "side": "paper",
+   "kind": "construction",
+   "name": "manifold M: two copies of Sigma_{1,1} x S^1 glued by h2=h1+f1, f2=h1",
+   "file_line": "sections/topology.tex:13-35",
+   "statement": "N_i = Sigma x S^1 (Sigma genus one, one boundary circle); gluing phi_* = [[1,1],[1,0]], det -1, so M is closed, connected, orientable; a product collar [0,1] x T^2 is inserted.",
+   "cited_or_new": {
+    "status": "cited (instance)",
+    "bib_key": "Leeb1995",
+    "cue": "This is an instance of Leeb's two-piece graph-manifold obstruction \\cite[Section~4.1, Example~4.1]{Leeb1995}"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Fixes the manifold; every later step uses the gluing convention."
+   },
+   "analytic_check": "Instance of a cited example; analytic relative to L (Leeb1995).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Explicitly cited as an instance of Leeb Example 4.1."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "GluedConstruction.Manifold (Gluing.lean:329), collar (227), collarFlip x->16/x (284), torusShear (304), gluingMap (312)"
+  },
+  {
+   "id": "P05",
+   "side": "paper",
+   "kind": "construction (display math)",
+   "name": "lattice and period choice B1 = eps*B2, end frames T1=(e1,e2), T2=(e2+eps e1, e1)",
+   "file_line": "sections/topology.tex:37-56; sections/cometric.tex:48-65",
+   "statement": "On T^2=R^2/(Z B1 e1 + Z B2 e2) with B1=eps B2, the frames realise h1:B1e1, f1:B2e2, h2:B1e1+B2e2, f2:B1e1. The integral gluing [[1,1],[1,0]] becomes a coordinate swap plus a shear of size eps=delta^2.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "The periods $B_1=\\epsilon B_2$ then turn this small coordinate shear into the fixed integral gluing"
+   },
+   "uses_items": [
+    "P04"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Makes the gluing a near-diagonal frame change, so a concave cometric path can connect the two product structures."
+   },
+   "analytic_check": "Not a subterm of the goal or of L. Realising a monodromy by choosing torus periods is routine in graph-manifold geometry.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Choosing the flat torus lattice to fit the gluing is standard in constructions of metrics on graph manifolds (Leeb; Buyalo-Svetlov). The specific swap+small-shear normalisation is new but it is one step from L."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "CompactMetric.period, leftLength, leftCircleScale, rightCircleScale (CompactMetric.lean:777-781); Coordinates3.shearD (Gluing.lean:1245); switchLift (CompactMetric.lean:869)"
+  },
+  {
+   "id": "P06",
+   "side": "paper",
+   "kind": "computation (prose)",
+   "name": "pi_1 as amalgam and boundary-commutator relation",
+   "file_line": "sections/topology.tex:58-83",
+   "statement": "G_i = F(a_i,b_i) x <f_i>, boundary groups inject, Gamma = G_1 *_{Z^2} G_2; G_i in C(f_i) and h_i in [C(f_i),C(f_i)].",
+   "cited_or_new": {
+    "status": "standard (re-derived)",
+    "bib_key": null,
+    "cue": "Van Kampen's theorem and the normal form for an amalgamated product give"
+   },
+   "uses_items": [
+    "P04"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Supplies the relations used in the obstruction."
+   },
+   "analytic_check": "Analytic (van Kampen, amalgam normal form in L).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "GluedConstruction.actual_loop_relations (FundamentalGroup.lean:521). Lean does NOT prove injectivity via amalgams; nontriviality of fibre classes comes from closed geodesics (L06)."
+  },
+  {
+   "id": "P07",
+   "side": "paper",
+   "kind": "theorem",
+   "name": "Thm no-cat0-action",
+   "file_line": "sections/topology.tex:87-184",
+   "statement": "pi_1(M) admits no proper cocompact isometric action on a nonempty proper CAT(0) space. Proof: semisimplicity; flat torus theorem for Gamma_T; cyclic minset splitting Min(f_i)=Y_i x R with translation homomorphism tau_i vanishing on commutators; Pythagoras on a common flat gives <v(h_i),v(f_i)>=0; the gluing gives |u|^2=0.",
+   "cited_or_new": {
+    "status": "cited (re-proved)",
+    "bib_key": "Leeb1995; KapovichLeeb1996; BridsonHaefliger1999",
+    "cue": "We give the group-theoretic argument explicitly, since it fixes the gluing convention"
+   },
+   "uses_items": [
+    "P06"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The entire 'no nonpositive curvature' half of the theorem."
+   },
+   "analytic_check": "Re-proof of Leeb / Kapovich-Leeb using Bridson-Haefliger II.6.8, II.6.10, II.7.1 (all in L). Analytic relative to L.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Leeb1995 Ex 4.1 and KapovichLeeb1996 Thm 2.4 contain it; the paper says so."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "Not formalized for general CAT(0) spaces. The Riemannian case is formalized by a different route: realCompact_noNPC (ThreeManifold.lean:233) via npc_deck_shear_impossible (196) and CNMidpoint.cyclic_shear_obstruction (Convexity.lean:696)."
+  },
+  {
+   "id": "P08",
+   "side": "paper",
+   "kind": "corollary",
+   "name": "Cor no-local-cat0",
+   "file_line": "sections/topology.tex:186-200",
+   "statement": "M admits no locally CAT(0) length metric inducing its topology (metric Cartan-Hadamard + Hopf-Rinow + P07).",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "BridsonHaefliger1999",
+    "cue": "see \\cite[Proposition~I.3.7(1) and Theorem~II.4.1(2)]{BridsonHaefliger1999}"
+   },
+   "uses_items": [
+    "P07"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Bridge from the group statement to the Riemannian statement."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard corollary."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "not formalized (only the smooth Riemannian case, via a smooth Cartan-Hadamard proof)"
+  },
+  {
+   "id": "P09",
+   "side": "paper",
+   "kind": "proposition",
+   "name": "Prop no-npc",
+   "file_line": "sections/topology.tex:202-213",
+   "statement": "M admits no smooth Riemannian metric of nonpositive sectional curvature (Riemannian NPC metric is locally CAT(0), BH II.1A.6).",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "BridsonHaefliger1999",
+    "cue": "\\cite[Theorem~II.1A.6]{BridsonHaefliger1999}"
+   },
+   "uses_items": [
+    "P08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Second conjunct of the headline."
+   },
+   "analytic_check": "Analytic: occurs in the goal.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "CompactMetric.realCompact_noNPC (ThreeManifold.lean:233)"
+  },
+  {
+   "id": "P10",
+   "side": "paper",
+   "kind": "definition (display)",
+   "name": "cutoff a(u)=exp(-1/(2/3-u)), primitive A, transition chi",
+   "file_line": "sections/cometric.tex:22-34, 115-121",
+   "statement": "a smooth, vanishing for u>=2/3; A=int_0^u a; chi=0 on (-inf,5/12], 1 on [7/12,inf). Key property a^2 <= -a' and |a'|<=1 on [0,1].",
+   "cited_or_new": {
+    "status": "standard (bump function)",
+    "bib_key": null,
+    "cue": "Define the smooth function $a$"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Its differential inequality a^2<=-a' is what makes the domination |P'p|^2 <= C delta p^T(-P'')p hold where -P'' degenerates."
+   },
+   "analytic_check": "Standard exp(-1/x) bump. Mathlib has expNegInvGlue and Real.smoothTransition, used verbatim in Lean.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard bump functions; only the inequality a^2<=-a' is problem-specific."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "Cometric.a, A, chi (Cometric.lean:126-130), via Mathlib expNegInvGlue / Real.smoothTransition"
+  },
+  {
+   "id": "P11",
+   "side": "paper",
+   "kind": "construction (display)",
+   "name": "concave cometric path P(t)=d1 e1e1^T + d2 H H^T, H=e2+eps chi e1, d1=1+delta A(t), d2=1+delta A(1-t), eps=delta^2",
+   "file_line": "sections/cometric.tex:35-46, 66-82",
+   "statement": "Diagonal concave variation of size delta, plus a shear of size delta^2 introduced only on [5/12,7/12] where both diagonal second derivatives are strictly negative. In the end frames P_i(tau)=diag(1+delta A(tau), b) exactly for tau<=1/4, P_i'(0)=kappa e1e1^T.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "To arrange concavity, we start with a diagonal path and introduce the shear only where both diagonal coefficients have strictly negative second derivative."
+   },
+   "uses_items": [
+    "P03",
+    "P05",
+    "P10"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The constructed metric; every neck estimate depends on it."
+   },
+   "analytic_check": "Not a subterm of the goal or of L. Interpolating flat torus metrics across a neck dt^2+Q(t) is a standard device; the concavity requirement on Q^{-1} and the delta/delta^2 scaling are new.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "A neck metric dt^2+g(t) between two flat tori is the natural first try (the obstruction forces Q(0) and Q(1) to be different flat metrics). New: choosing the path so that its inverse is matrix-concave, with the shear subordinated (eps=delta^2) to the diagonal concavity. Close neighbour: warped/torus-bundle necks in Gulliver-type and graph-manifold constructions."
+   },
+   "provisional_F": {
+    "type": "F3",
+    "justification": "Auxiliary object built only to carry the estimates; graded F3 if it survives to N3."
+   },
+   "lean_counterpart": "Cometric.P / d1 / d2 / shear / H (Neck.lean:753-764), P_source_formula; PEnd (right end)"
+  },
+  {
+   "id": "P12",
+   "side": "paper",
+   "kind": "definition (display)",
+   "name": "neck metric g=dt^2+dx^T Q(t) dx and endpoint germs",
+   "file_line": "sections/cometric.tex:53-82; sections/variations.tex:11-27",
+   "statement": "Neck metric on [0,1] x T^2 in original and end coordinates; constants b=1+delta A(1), kappa=delta a(0).",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "use the neck metric"
+   },
+   "uses_items": [
+    "P11"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Definition of the metric in the neck."
+   },
+   "analytic_check": "Routine.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard metric ansatz."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "Passages.normalizedNeck (332), framedNeck (1271); CompactMetric.neck (CompactMetric.lean:83)"
+  },
+  {
+   "id": "P13",
+   "side": "paper",
+   "kind": "lemma",
+   "name": "Lemma cometric-bounds (uniform bounds, concavity, domination)",
+   "file_line": "sections/cometric.tex:87-189",
+   "statement": "For 0<delta<=delta_0: Id/9 <= P <= 18 Id, Id/18 <= Q <= 9 Id, ||P'||<=C delta, -P''>=0 and |P'p|^2 <= C delta p^T(-P'')p, in original and both end frames; constants independent of B1,B2.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "There are constants $\\delta_0>0$ and $C<\\infty$, depending only on the fixed function $\\chi$"
+   },
+   "uses_items": [
+    "P10",
+    "P11"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The domination inequality is the quantitative input to S(e,e) and S(p,e) bounds (P28)."
+   },
+   "analytic_check": "Not in goal or L. Routine matrix-calculus estimates; the domination form is designed for the later Cauchy-Schwarz.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Routine to verify; the specific domination inequality is a new, designed hypothesis."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "Cometric.uniform_cometric_bounds (Neck.lean:1451); uniform_original_bounds (1274); middle_domination (1206), outside_domination (1249)"
+  },
+  {
+   "id": "P14",
+   "side": "paper",
+   "kind": "construction",
+   "name": "convex warped collars ell, k, r",
+   "file_line": "sections/cometric.tex:191-240",
+   "statement": "End surface metric dtau^2+ell_0^2 dy1^2 has K=-ell_0''/ell_0 <= 0; extended over [-1,0] by ell=exp(-int k), k=1-lambda+lambda r, so ell''=(k^2-k')ell>0, exactly matching (1+delta A)^{-1/2} near 0 and the hyperbolic cusp germ ell(-1)e^{-(tau+1)} near -1.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "We next extend each endpoint surface metric inward to a hyperbolic cusp by an explicit convex warping function."
+   },
+   "uses_items": [
+    "P10",
+    "P12"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Makes the metric nonpositively curved outside the open neck."
+   },
+   "analytic_check": "Analytic: convex warping functions give K<=0 (textbook).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard warped-product gluing."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "Collar.lam, denom, rate, k, ell (Cometric.lean:367-395); exact_convex_collar (564); CompactMetric.ell_convex_left (Curvature.lean:651)"
+  },
+  {
+   "id": "P15",
+   "side": "paper",
+   "kind": "construction",
+   "name": "punctured-torus cores, hyperbolic cusp, final gluing; Appendix explicit punctured torus",
+   "file_line": "sections/cometric.tex:242-290; sections/punctured-torus.tex:1-36",
+   "statement": "Truncate a complete finite-area hyperbolic punctured torus (ideal quadrilateral, side pairings phi(z)=(z+1)/(z+2), psi(z)=(z-1)/(2-z), peripheral element = [[1,6],[0,1]] up to sign) at horocycles of lengths B_i ell(-1); product with circles of length B_{3-i}; attach to neck. delta fixed first, then B2.",
+   "cited_or_new": {
+    "status": "cited (re-proved)",
+    "bib_key": "Bonahon2009",
+    "cue": "following \\cite[Section~5.5]{Bonahon2009}"
+   },
+   "uses_items": [
+    "P14",
+    "P05"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Supplies the NPC product pieces."
+   },
+   "analytic_check": "Analytic relative to Bonahon2009.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook hyperbolic punctured torus."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "HyperbolicCore.phi, psi, Gamma (Quotient.lean:345-347), Surface (563), cusp/height (857,1059); torsion-freeness via reductions mod 2 and mod 3 (red_two_mem, red_three_mem, not_elliptic: Quotient.lean:384-504); CompactMetric.realCompactMetric (CompactMetric.lean:1573)"
+  },
+  {
+   "id": "P16",
+   "side": "paper",
+   "kind": "definition (display)",
+   "name": "index form I_J and normal index form I_J^perp",
+   "file_line": "sections/variations.tex:31-43",
+   "statement": "I_J(V)=int_J(|D_sV|^2-<R(V,T)T,V>), q_V=<V,T>, I_J^perp = I_J - int |q_V'|^2.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "define"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Quantity summed over passages."
+   },
+   "analytic_check": "In L (Milnor1963).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook; I^perp is the index of the normal part."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "RiemannianCoordinates.indexPairDensity (Index.lean:603), NonnegativeIndexOn (611); Neck.normalDensity (Returning.lean:60)"
+  },
+  {
+   "id": "P17",
+   "side": "paper",
+   "kind": "lemma",
+   "name": "Lemma tangential-invariance",
+   "file_line": "sections/variations.tex:45-66",
+   "statement": "I_J^perp(V+hT)=I_J^perp(V) pointwise for any smooth h, no endpoint condition.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "P16"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Licenses all per-passage gauges."
+   },
+   "analytic_check": "Analytic (curvature symmetries).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "Neck.normalDensity_gauge (Returning.lean:65), normalDensity_deriv_gauge (1691)"
+  },
+  {
+   "id": "P18",
+   "side": "paper",
+   "kind": "lemma (inline)",
+   "name": "neck geodesic equations: p=Q xdot constant, F(t)=p^T P(t) p, v^2=1-F, vdot=-F'/2; F concave",
+   "file_line": "sections/variations.tex:68-80",
+   "statement": "Momentum conservation in the cyclic torus variable; effective potential F is concave because P''<=0.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "the geodesic equations imply"
+   },
+   "uses_items": [
+    "P11",
+    "P12"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Reduces neck geodesics to 1-D motion in a concave potential."
+   },
+   "analytic_check": "Analytic (Noether/Clairaut).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard conservation law; concavity of F is immediate from P11."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "ReturningPassage.potential, force (Returning.lean:1189-1192), momentumVelocity (1966)"
+  },
+  {
+   "id": "P19",
+   "side": "paper",
+   "kind": "definition (display)",
+   "name": "coordinate (linear) energy E_[a,c](V)=int(wdot^2+|zdot-P'p w|_Q^2 - F''w^2/2)",
+   "file_line": "sections/variations.tex:82-92",
+   "statement": "Second derivative of energy along the coordinate-linear variation (t+rw, x+rz); every term is nonnegative because P is concave.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "define"
+   },
+   "uses_items": [
+    "P18"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Nonnegative 'bulk' term of every passage estimate."
+   },
+   "analytic_check": "Not in goal; it is the Hessian of the coordinate Lagrangian ttdot^2+xdot^T Q(t) xdot. Concavity of P(t) in t is the partial-Legendre-dual form of joint convexity of the Lagrangian in (t, xdot).",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Transfer of the classical calculus-of-variations fact that a Lagrangian jointly convex in (position, velocity) has nonnegative second variation; the observation that concave cometric = joint convexity for dt^2+Q(t) is not cited and is the key change of representation (coordinate-linear instead of intrinsic variations)."
+   },
+   "provisional_F": {
+    "type": "F5",
+    "justification": "Change of representation: measure second variation along coordinate-linear variations, where it is manifestly a sum of squares."
+   },
+   "lean_counterpart": "Neck.coordinateEnergyDensity (Neck.lean:239); ReturningPassage.energy_nonnegative (Returning.lean:1399)"
+  },
+  {
+   "id": "P20",
+   "side": "paper",
+   "kind": "lemma",
+   "name": "Lemma coordinate-index (endpoint correction and boundary Christoffel term)",
+   "file_line": "sections/variations.tex:94-156",
+   "statement": "I_[a,c](V)=E_[a,c](V)-[<T,Gamma(V,V)>]_a^c; at a neck boundary with w=0, Gamma(V,V)=(kappa/2) z1^2 d_tau, so the endpoint contribution is nonnegative at every entry and exit.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "Thus the endpoint contribution in \\eqref{eq:coordinate-index} is nonnegative"
+   },
+   "uses_items": [
+    "P16",
+    "P19",
+    "P12"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Every passage estimate starts from this identity; the positive boundary term is what pays for returning passages."
+   },
+   "analytic_check": "The identity is the textbook second-variation formula for a non-geodesic variation (boundary term <T,D_rW>). The sign observation at the neck ends is new and problem-specific.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Textbook formula (do Carmo / Milnor) specialised; the nonnegativity of the boundary term, from P_i'(0)=kappa e1e1^T, is a designed feature of the construction."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "Neck.boundaryTerm (Neck.lean:243); Neck.turning_boundary_term, turning_boundary_reduction (Returning.lean:1701-1708); Neck.normal_index_integral (1816)"
+  },
+  {
+   "id": "P21",
+   "side": "paper",
+   "kind": "definition (inline \\emph)",
+   "name": "neck passage",
+   "file_line": "sections/variations.tex:160-164",
+   "statement": "A connected component J of {s : 0<t(gamma(s))<1}.",
+   "cited_or_new": {
+    "status": "new name",
+    "bib_key": null,
+    "cue": "A \\emph{neck passage} is"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Unit of the global decomposition."
+   },
+   "analytic_check": "Trivial (component of a preimage).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Abbreviation."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "GlobalAssembly.Passages (Index.lean:1271ff); CompactMetric.openNeck (Curvature.lean:1267)"
+  },
+  {
+   "id": "P22",
+   "side": "paper",
+   "kind": "lemma",
+   "name": "Lemma neck-passages (classification)",
+   "file_line": "sections/variations.tex:166-245",
+   "statement": "Finite endpoints are transverse; a passage is (1) J=R at constant height, (2) monotone (crossing or half-infinite to an interior equilibrium), or (3) a symmetric return [0,L] with one turn at L/2, 0<F'<=kappa p1^2, p1 != 0, 0<v0^2<=kappa p1^2.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "Exactly one of the following alternatives holds."
+   },
+   "uses_items": [
+    "P18",
+    "P12"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Case split for the passage estimates."
+   },
+   "analytic_check": "Analytic: 1-D ODE motion in a concave potential.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine phase-plane analysis."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "ReturningPassage.returning_dynamics (Returning.lean:1234), incidence_bound (1284); PassageDynamics.* (Returning.lean:978-1182); FinitePassage.endpoint_alternative (Passages.lean:636)"
+  },
+  {
+   "id": "P23",
+   "side": "paper",
+   "kind": "lemma",
+   "name": "Lemma elementary-passages",
+   "file_line": "sections/variations.tex:249-300",
+   "statement": "I_J^perp(V)>=0 for J=R, monotone passages (gauge Vtilde=V-(w/v)T kills the interval component; Cauchy-Schwarz (p^T xi)^2 <= F |xi|_Q^2 with F<1), and returns inside an end collar (NPC).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "Replace $V$ by"
+   },
+   "uses_items": [
+    "P17",
+    "P19",
+    "P20",
+    "P22"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Handles every passage except deep returns."
+   },
+   "analytic_check": "Not in goal; standard Cauchy-Schwarz once P19/P20 are in place.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Variant of the standard proof that monotone (graph-like) geodesics have no conjugate points; one step from P19/P20."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "CompactMetric.framed_monotone_index (NoConjugatePoints.lean:1153)"
+  },
+  {
+   "id": "P24",
+   "side": "paper",
+   "kind": "lemma",
+   "name": "Lemma turning-gauge",
+   "file_line": "sections/variations.tex:306-363",
+   "statement": "For every smooth V on a returning passage there is a tangentially equivalent field with w(0)=w(L)=0 and <V,T> affine; then I^perp = E + (kappa v0/2)(z1(0)^2+z1(L)^2) - (p^T Delta z)^2/L >= E + mu (e^T Delta z)^2 - (p^T Delta z)^2/L, mu=kappa v0/4.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "We next normalize their fields without imposing any condition on the original endpoint values."
+   },
+   "uses_items": [
+    "P17",
+    "P20",
+    "P22"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Turns the free-endpoint returning problem into the scalar target |p^T X|^2 <= L(E+mu(e^T X)^2)."
+   },
+   "analytic_check": "Not in goal or L.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "A designed gauge; elementary once one decides to allow arbitrary endpoint data."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "Neck.turningAffine, turningChange, turningField (Returning.lean:1623-1631); turningField_tangential (1658); ReturningPassage.returning_normal_identity (2027)"
+  },
+  {
+   "id": "P25",
+   "side": "paper",
+   "kind": "lemma",
+   "name": "Lemma turning-time (chord bound and strict timing margin)",
+   "file_line": "sections/turning.tex:42-85",
+   "statement": "int_0^L v^2 <= L v0^2/3 (v convex on the first half); if t_*>1/4 then 4 v0 <= beta kappa p1^2 L with beta=(1+exp(-9/26))/2<1, from a(1/8)/a(0)=exp(-9/26).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "A strict timing margin for excursions leaving an endpoint collar makes the estimate uniform"
+   },
+   "uses_items": [
+    "P10",
+    "P22"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The margin beta<1 is what makes the final inequality uniform in entry angle, height and duration."
+   },
+   "analytic_check": "Not in goal or L. Elementary convexity estimates.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Elementary; the idea of a strict timing margin to get uniformity is the non-obvious part."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "ReturningTime.turning_time_margin (Returning.lean:644), full_chord_integral (538); ReturningPassage.actual_timing_margin (1311); Turning.beta (126)"
+  },
+  {
+   "id": "P26",
+   "side": "paper",
+   "kind": "definition (display)",
+   "name": "Hilbert space D=H_0^1(0,L) with (w1,w2)_D=int(w1'w2'-F''w1w2/2), functional Phi_q(w)=int q^T P'(t) p w, form S(q,r)=int q^T P r + (Phi_q,Phi_r)_{D*}",
+   "file_line": "sections/turning.tex:110-144",
+   "statement": "Squared norm of the functional (xi,w) -> q^T X on L^2(Q) (+) D; positive definite.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "equip $\\mathcal D=H_0^1(0,L)$ with the inner product"
+   },
+   "uses_items": [
+    "P19",
+    "P24"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Core device of the returning-passage estimate."
+   },
+   "analytic_check": "Not in goal or L. A dual-norm (Riesz) computation.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Standard functional-analytic packaging of a Cauchy-Schwarz bound; new as applied here."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "Replaced in Lean by an explicit pointwise quadratic: DirectTurning.direct_pointwise_quadratic, direct_endpoint_functional, direct_endpoint_cauchy (Returning.lean:267-453); no H_0^1 or Riesz representative."
+  },
+  {
+   "id": "P27",
+   "side": "paper",
+   "kind": "lemma",
+   "name": "Lemma turning-duality",
+   "file_line": "sections/turning.tex:146-181",
+   "statement": "|q^T X|^2 <= S(q,q) E; with the boundary penalty, |p^T X|^2 <= (S(p-alpha e,p-alpha e)+alpha^2/mu)(E+mu(e^T X)^2), minimised at alpha=S(p,e)/(S(e,e)+1/mu) to S(p,p)-S(p,e)^2/(S(e,e)+1/mu).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "By Lemma~\\ref{lem:turning-duality}, it suffices"
+   },
+   "uses_items": [
+    "P26",
+    "P24"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Reduces the target to a 2x2 Schur-complement inequality."
+   },
+   "analytic_check": "Cauchy-Schwarz plus completing the square; analytic as a technique.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Cauchy-Schwarz and Schur complement; the content is in what it is applied to."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "DirectTurning.add_boundary_cauchy (Returning.lean:319); Turning.minimize_quadratic (205)"
+  },
+  {
+   "id": "P28",
+   "side": "paper",
+   "kind": "lemma",
+   "name": "Lemma turning-S-bounds",
+   "file_line": "sections/turning.tex:195-263",
+   "statement": "S(p,p)<=L(1+v0^2) (via Phi_p(w)=2 int v w'); S(e,e)<=C_e L (via domination); |S(p,e)-L p1| <= C_m delta L |p1| (via D(t)=P'(0)-P'(t)>=0 and Cauchy-Schwarz for the PSD form D).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "An error controlled merely by $|p|$ would not suffice when $p_1$ is small."
+   },
+   "uses_items": [
+    "P13",
+    "P25",
+    "P26"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Supplies the three coefficient bounds; the |p1|-relative error on S(p,e) is the delicate point."
+   },
+   "analytic_check": "Not in goal or L.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Technical estimates; the |p1|-relative bound on the mixed term (exploiting P'(0)=kappa e e^T and concavity) is the clever part."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "ReturningCoefficients.first_coefficient_bound, second_coefficient_bound, mixed_* , actual_mixed_bound (Returning.lean:678-975)"
+  },
+  {
+   "id": "P29",
+   "side": "paper",
+   "kind": "proposition",
+   "name": "Prop turning-index (returning passages have I^perp>=0, uniformly)",
+   "file_line": "sections/turning.tex:11-17, 265-316",
+   "statement": "For all small delta, every returning passage has I^perp(V)>=0 for every smooth V with no endpoint restriction; delta<=min{1,1/(2C_m),(1-beta)/(2C_m+C_e a(0))} works for both ends, arbitrarily shallow incidence and arbitrarily long excursions.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "This is what permits one metric to handle every complete geodesic."
+   },
+   "uses_items": [
+    "P24",
+    "P25",
+    "P27",
+    "P28"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The one estimate that is not routine; without it the positive-curvature region could create conjugate points along returning geodesics."
+   },
+   "analytic_check": "Not a subterm of the goal or of L. The statement (free-endpoint nonnegativity of the normal index along every returning passage, uniform in L) has no analogue in L.",
+   "provisional_N": {
+    "grade": "N3 (weak)",
+    "justification": "No near-equivalent found in a quick search: Gulliver-type constructions control conjugate points by radial comparison/Riccati arguments in a ball, not by a free-endpoint index estimate summed over passages. Against: each ingredient (Cauchy-Schwarz, Schur complement, convexity of v) is elementary and the estimate is a one-off device for this metric; a judge may call it N2."
+   },
+   "provisional_F": {
+    "type": "F2",
+    "justification": "Strengthened local invariant: a per-passage estimate with arbitrary endpoint data and uniform constants, strong enough to be summed (P31)."
+   },
+   "lean_counterpart": "ReturningPassage.returning_arbitrary_field_nonnegative (Returning.lean:2265), returning_normal_nonnegative (2156), actual_returning_energy_bound (1421), uniform_turning_parameters (1558); Turning.endpoint_gain, returning_quadratic_bound (171-237); DirectTurning.returning_endpoint_bound (455)"
+  },
+  {
+   "id": "P30",
+   "side": "paper",
+   "kind": "proposition",
+   "name": "Prop passage-index (all neck passages)",
+   "file_line": "sections/turning.tex:318-341",
+   "statement": "With delta as above and periods chosen afterwards, every passage J of every complete unit-speed geodesic has I_J^perp(V)>=0 and I_J(V)>=0.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "Lemma~\\ref{lem:neck-passages} lists every possible passage"
+   },
+   "uses_items": [
+    "P22",
+    "P23",
+    "P29"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Combines the cases."
+   },
+   "analytic_check": "Combination.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Case assembly."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "CompactMetric.finite_neck_index (NoConjugatePoints.lean:1471), actual_finite_neck_index (1531), finite_unit_index (1407), unit_entry_index (1330), framed_turn_index (305), framed_truncated_return_index (117)"
+  },
+  {
+   "id": "P31",
+   "side": "paper",
+   "kind": "proposition",
+   "name": "Prop global-assembly",
+   "file_line": "sections/global.tex:9-65",
+   "statement": "If K<=0 off an open set U and I_J(V)>=0 on every component J of gamma^{-1}(U), then I_R(V)>=0. Countable additivity; infinitely many passages allowed; per-passage gauges need not match.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "This argument allows infinitely many passages and accumulating passage endpoints."
+   },
+   "uses_items": [
+    "P16",
+    "P30"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Localises the global no-conjugate-points problem to free-endpoint estimates on passages."
+   },
+   "analytic_check": "Measure-theoretically trivial; not in L as a stated principle.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "The localisation principle (free-endpoint index nonnegativity on each visit to the bad region + NPC elsewhere) is natural but, as far as a quick search shows, not a stated tool; one step from L."
+   },
+   "provisional_F": {
+    "type": "F5",
+    "justification": "If promoted: reformulates a global Jacobi-field problem as a sum of local free-boundary problems."
+   },
+   "lean_counterpart": "GlobalAssembly.integral_nonneg_of_passages (Index.lean:1310); CompactMetric.realCompactMetric_nonnegative_index (NoConjugatePoints.lean:1575) using compact windows (compact_interval_window)"
+  },
+  {
+   "id": "P32",
+   "side": "paper",
+   "kind": "lemma",
+   "name": "Lemma index-criterion",
+   "file_line": "sections/global.tex:67-135",
+   "statement": "If I_R(V)>=0 for all compactly supported smooth fields along all complete geodesics then no conjugate points (H^1 density, broken Jacobi field, derivative-jump contradiction).",
+   "cited_or_new": {
+    "status": "standard (re-proved)",
+    "bib_key": "Milnor1963",
+    "cue": "the classical index-form framework \\cite[Sections~13--15]{Milnor1963}"
+   },
+   "uses_items": [
+    "P16"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Converts index nonnegativity into the goal."
+   },
+   "analytic_check": "Analytic relative to L (Milnor).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook Morse theory."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "RiemannianCoordinates.noConjugatePoints_of_intrinsic_index (Index.lean:1240), intrinsic_index_criterion (1231), jacobi_initial_covariantDerivative_zero (1218)"
+  },
+  {
+   "id": "P33",
+   "side": "paper",
+   "kind": "theorem",
+   "name": "Thm main",
+   "file_line": "sections/introduction.tex:27-29; proof sections/global.tex:137-153",
+   "statement": "There is a closed connected orientable smooth 3-manifold with a C^infinity metric without conjugate points that admits no C^infinity metric of everywhere nonpositive sectional curvature.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "We give a negative answer in dimension three"
+   },
+   "uses_items": [
+    "P09",
+    "P31",
+    "P32",
+    "P30",
+    "P15"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Headline."
+   },
+   "analytic_check": "Is the goal.",
+   "provisional_N": {
+    "grade": "n/a",
+    "justification": "Headline theorem, not graded."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "OAI.ThreeManifold.main_theorem (ThreeManifold.lean:260)"
+  },
+  {
+   "id": "P34",
+   "side": "paper",
+   "kind": "remark (prose)",
+   "name": "No metric without focal points on M",
+   "file_line": "sections/introduction.tex:38-46",
+   "statement": "By IK Thm 7.1 (no focal points iff NPC for closed 3-manifolds) and Thm main.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "IvanovKapovitch2014",
+    "cue": "Their equivalence and Theorem~\\ref{thm:main} give the stated additional obstruction."
+   },
+   "uses_items": [
+    "P09"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Corollary only."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Direct consequence of a cited theorem."
+   },
+   "provisional_F": null,
+   "lean_counterpart": "not formalized (lean/docs/358.md: 'The separate no-focal-points and CAT(0) consequences are not included')"
+  },
+  {
+   "id": "L01",
+   "side": "lean",
+   "kind": "definitions (comparator)",
+   "name": "coordinate Riemannian geometry: metricMatrix, christoffel, curvatureCoefficient, curvatureTerm, NonpositiveSectionalCurvature, IsGeodesicOn, IsJacobiFieldOn, NoConjugatePoints, OrientedAtlas, MainStatement",
+   "file_line": "lean/OAI/Geometry/ConjugatePoints/Basic.lean:15-112",
+   "statement": "Chart-wise Christoffel symbols and Riemann tensor of a ContMDiffRiemannianMetric; NPC: g(R(u,v)v,u)<=0 in every atlas chart; geodesic/Jacobi equations in every atlas chart on an open interval U.",
+   "cited_or_new": {
+    "status": "new (formalization of standard notions)",
+    "bib_key": null,
+    "cue": "identical to ComparatorChallenges/ConjugatePoints.lean"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Statement vocabulary."
+   },
+   "analytic_check": "Analytic (goal vocabulary). Mathlib d13f23b has ContMDiffRiemannianMetric but no Levi-Civita curvature, so these are written from scratch in coordinates.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Coordinate definitions of textbook notions."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L02",
+   "side": "lean",
+   "kind": "lemma (Lean-only route)",
+   "name": "closedGeodesic_essential + ncp_exponential_isCoveringMap",
+   "file_line": "lean/OAI/Geometry/ConjugatePoints/Continuation.lean:852-899",
+   "statement": "If g has no conjugate points, exp_p is a covering map (Hadamard-Cartan for no conjugate points), hence a nonconstant closed geodesic is not null-homotopic.",
+   "cited_or_new": {
+    "status": "standard (re-proved)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "L01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Used to prove the fibre classes are nontrivial in pi_1 (L03)."
+   },
+   "analytic_check": "In L as classical theory (Morse-Hedlund, Hadamard), not in Mathlib.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L03",
+   "side": "lean",
+   "kind": "theorem (Lean-only device)",
+   "name": "fiberClass_ne_one via the constructed metric",
+   "file_line": "lean/OAI/Geometry/ConjugatePoints/ThreeManifold.lean:22-70",
+   "statement": "The circle fibre of each piece is a closed geodesic of realCompactMetric (which has no conjugate points), so by L02 its class in pi_1(M) is nontrivial.",
+   "cited_or_new": {
+    "status": "new (proof device)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "L02",
+    "P29",
+    "P31"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Replaces van Kampen / amalgam normal form (P06), which Mathlib lacks in usable form. Couples the topological half to the metric half: the cone of realCompact_noNPC is 97% of the DAG."
+   },
+   "analytic_check": "Not analytic in the paper's sense; a cross-use of the paper's own construction.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Known principle (closed geodesics in NCP manifolds are essential) used as a shortcut around van Kampen; clever engineering, not new mathematics."
+   },
+   "provisional_F": {
+    "type": "F5",
+    "justification": "Uses the metric (analysis) to certify a topological fact."
+   }
+  },
+  {
+   "id": "L04",
+   "side": "lean",
+   "kind": "theorems (Lean-only route)",
+   "name": "smooth Cartan-Hadamard: npc_exponential_isCoveringMap, exponentialMetric_expanding, npc_jacobiNorm_lower, universalMetric, universalMetric_radial_CN, universalCN",
+   "file_line": "lean/OAI/Geometry/ConjugatePoints/Continuation.lean:808; Distance.lean:264-1100; Geodesics.lean:2033; ThreeManifold.lean:81-107",
+   "statement": "For an NPC metric, exp_p is a covering, the pulled-back length metric on E3 is proper and satisfies the Bruhat-Tits CN inequality; deck transformations act by isometries with attained minimal displacement.",
+   "cited_or_new": {
+    "status": "standard (re-proved)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "L01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Supplies the CAT(0)-type space for the obstruction."
+   },
+   "analytic_check": "In L (Cartan-Hadamard, Rauch comparison; BridsonHaefliger1999) but not in Mathlib d13f23b; re-proved from scratch.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical theorems formalized."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L05",
+   "side": "lean",
+   "kind": "theorem (Lean-only route)",
+   "name": "CNMidpoint.cyclic_shear_obstruction",
+   "file_line": "lean/OAI/Geometry/ConjugatePoints/Convexity.lean:696-729",
+   "statement": "In a proper CN-midpoint metric space with linear geodesic segments, no isometries f,h (fixed-point free, nonempty minsets) can satisfy [f,h]=1, h=[a,b] with a,b in C(f), hf=[c,d] with c,d in C(h).",
+   "cited_or_new": {
+    "status": "new (variant)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "L04"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The obstruction actually used in Lean; avoids the flat torus theorem."
+   },
+   "analytic_check": "Relations are exactly those of the goal's manifold; the method is the cyclic-minset half of Kapovich-Leeb.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Variant of the Leeb/Kapovich-Leeb orthogonality argument using only common minimum points, axes and axis shifts (no flat torus theorem). The paper-style Euclidean orthogonality lemmas (NoNPC.shear_orthogonality_impossible, Distance.lean:574) are present but not on the proof DAG."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L06",
+   "side": "lean",
+   "kind": "definitions (Lean-only)",
+   "name": "HyperbolicCore.Gamma = <phi,psi,-1> in SL(2,Z), Surface = H / Gamma, height, cusp, clipCusp",
+   "file_line": "lean/OAI/Geometry/ConjugatePoints/Quotient.lean:343-1150",
+   "statement": "Explicit model of the punctured torus; torsion-freeness/no elliptics via reductions mod 2 and mod 3 checked by decide.",
+   "cited_or_new": {
+    "status": "cited (Bonahon2009)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Topological and metric model of the cores."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook model; decide used on finite group tables."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L07",
+   "side": "lean",
+   "kind": "construction (Lean-only form)",
+   "name": "TwoGluing.Space / GluedConstruction.Manifold with collar im z in (2,8), collarFlip x->16/x, torusShear (z1,z2)->(z1+z2,z1)",
+   "file_line": "lean/OAI/Geometry/ConjugatePoints/Gluing.lean:36-405, 1530-1559",
+   "statement": "Gluing of two open pieces along a collar; compact, T2, connected, second countable, oriented (manifold_oriented, Gluing.lean:1541).",
+   "cited_or_new": {
+    "status": "new (formalization)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "L06"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The manifold in the comparator witness."
+   },
+   "analytic_check": "Routine.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Formal realisation of P04."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L08",
+   "side": "lean",
+   "kind": "lemmas (Lean-only variant)",
+   "name": "DirectTurning.direct_pointwise_quadratic / direct_endpoint_cauchy / returning_endpoint_bound",
+   "file_line": "lean/OAI/Geometry/ConjugatePoints/Returning.lean:267-487",
+   "statement": "Pointwise quadratic inequality whose integral gives ((p-alpha e)^T X)^2 <= (int P(q,q)+4v^2+alpha^2 K)(int energy density), using p^T P' p = -2 vdot and integration by parts against w; then add the boundary term.",
+   "cited_or_new": {
+    "status": "new (variant)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "P19",
+    "P20",
+    "P24"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Lean's replacement for P26-P28's H_0^1/Riesz argument."
+   },
+   "analytic_check": "Elementary.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Simplification of the paper's dual-norm argument to an explicit pointwise Cauchy-Schwarz."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L09",
+   "side": "lean",
+   "kind": "lemma (Lean-only)",
+   "name": "truncated_return_nonnegative / framed_truncated_return_index",
+   "file_line": "lean/OAI/Geometry/ConjugatePoints/NoConjugatePoints.lean:20, 117",
+   "statement": "Returning-type estimate for a passage cut by the edge of a compact support window where the field vanishes.",
+   "cited_or_new": {
+    "status": "new (formalization artefact)",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "P29"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Needed because Lean works on compact windows instead of half-infinite passages."
+   },
+   "analytic_check": "Routine.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Bookkeeping variant."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L10",
+   "side": "lean",
+   "kind": "theorem",
+   "name": "exists_uniform_compact_noConjugatePoints",
+   "file_line": "lean/OAI/Geometry/ConjugatePoints/NoConjugatePoints.lean:1630",
+   "statement": "There is delta_0 in (0,1/2] such that realCompactMetric(delta) has no conjugate points for all delta<=delta_0.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": ""
+   },
+   "uses_items": [
+    "P29",
+    "P31",
+    "P32",
+    "P30"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "First conjunct of the comparator; also used by L03."
+   },
+   "analytic_check": "Goal conjunct.",
+   "provisional_N": {
+    "grade": "n/a",
+    "justification": "Headline half."
+   },
+   "provisional_F": null
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Flat torus theorem",
+   "bib_key": "BridsonHaefliger1999",
+   "locator": "Theorem II.7.1(1)-(3)",
+   "field": "Metric geometry (CAT(0))",
+   "used_at": "topology.tex:122-134",
+   "status": "cited, not re-proved",
+   "essential_for_headline": true,
+   "lean": "not used (L05 avoids it)"
+  },
+  {
+   "name": "Isometries commuting with a hyperbolic isometry preserve Min(f)=Y x R and act by a translation tau(g)",
+   "bib_key": "BridsonHaefliger1999",
+   "locator": "Theorem II.6.8(4)-(5)",
+   "field": "Metric geometry",
+   "used_at": "topology.tex:143-157",
+   "status": "cited, sketched",
+   "essential_for_headline": true,
+   "lean": "re-proved in CN form (axisShift, centralizer_line_distance, Convexity.lean:479-550)"
+  },
+  {
+   "name": "Semisimplicity of cocompact proper actions",
+   "bib_key": "BridsonHaefliger1999",
+   "locator": "Proposition II.6.10(2)",
+   "field": "Metric geometry",
+   "used_at": "topology.tex:105-120",
+   "status": "re-proved, citation for comparison",
+   "essential_for_headline": true,
+   "lean": "npc_deck_displacement_minimum (Distance.lean:632), NoNPC.displacement_attains_minimum (510)"
+  },
+  {
+   "name": "Metric Cartan-Hadamard and Hopf-Rinow",
+   "bib_key": "BridsonHaefliger1999",
+   "locator": "Proposition I.3.7(1), Theorem II.4.1(2)",
+   "field": "Metric geometry",
+   "used_at": "topology.tex:195-197",
+   "status": "cited, not re-proved",
+   "essential_for_headline": true,
+   "lean": "smooth version re-proved (L04)"
+  },
+  {
+   "name": "Riemannian NPC is locally CAT(0)",
+   "bib_key": "BridsonHaefliger1999",
+   "locator": "Theorem II.1A.6",
+   "field": "Metric/Riemannian geometry",
+   "used_at": "topology.tex:209-211",
+   "status": "cited, not re-proved",
+   "essential_for_headline": true,
+   "lean": "replaced by universalMetric_radial_CN (Distance.lean:1082)"
+  },
+  {
+   "name": "Van Kampen + normal form for amalgamated products",
+   "bib_key": null,
+   "locator": "standard",
+   "field": "Algebraic topology / combinatorial group theory",
+   "used_at": "topology.tex:70-76",
+   "status": "invoked, uncited",
+   "essential_for_headline": true,
+   "lean": "not used; replaced by L03"
+  },
+  {
+   "name": "Leeb's two-piece graph-manifold obstruction",
+   "bib_key": "Leeb1995",
+   "locator": "Section 4.1, Example 4.1",
+   "field": "3-manifolds / NPC geometry",
+   "used_at": "topology.tex:6-11; introduction.tex:55-57",
+   "status": "cited, re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Kapovich-Leeb group-theoretic framework",
+   "bib_key": "KapovichLeeb1996",
+   "locator": "Theorem 2.4",
+   "field": "Geometric group theory",
+   "used_at": "topology.tex:8-10",
+   "status": "background citation",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Index-form framework (second variation, index lemma)",
+   "bib_key": "Milnor1963",
+   "locator": "Sections 13-15",
+   "field": "Riemannian geometry",
+   "used_at": "introduction.tex:78-79; global.tex:67-135",
+   "status": "cited, criterion re-proved",
+   "essential_for_headline": true,
+   "lean": "re-proved (Index.lean:1218-1240)"
+  },
+  {
+   "name": "Hyperbolic punctured torus from an ideal quadrilateral",
+   "bib_key": "Bonahon2009",
+   "locator": "Section 5.5",
+   "field": "Hyperbolic geometry",
+   "used_at": "cometric.tex:250-253; punctured-torus.tex",
+   "status": "cited, re-derived in appendix",
+   "essential_for_headline": true,
+   "lean": "re-built (Quotient.lean HyperbolicCore)"
+  },
+  {
+   "name": "Closed 3-manifold: no focal points iff NPC",
+   "bib_key": "IvanovKapovitch2014",
+   "locator": "Theorem 7.1",
+   "field": "Riemannian geometry",
+   "used_at": "introduction.tex:42-46",
+   "status": "cited, not re-proved",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Gulliver's local modifications",
+   "bib_key": "Gulliver1975",
+   "locator": "Section 3",
+   "field": "Riemannian geometry",
+   "used_at": "introduction.tex:5-9",
+   "status": "background citation",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Problem sources",
+   "bib_key": "IvanovKapovitch2014; BurnsMatveev2021",
+   "locator": "Questions 1.1, 8.1; Question 4.1.2",
+   "field": "Riemannian geometry",
+   "used_at": "introduction.tex:14-17",
+   "status": "problem statement",
+   "essential_for_headline": false
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Topology: M = N_1 cup_phi N_2 with N_i = Sigma_{1,1} x S^1 and h2=h1+f1, f2=h1; pi_1 is an amalgam over Z^2 with f_i central in G_i and h_i a commutator in C(f_i).",
+   "items": [
+    "P04",
+    "P06"
+   ],
+   "lean": "GluedConstruction.Manifold; actual_loop_relations (FundamentalGroup.lean:521); fibre classes nontrivial by L03"
+  },
+  {
+   "step": 2,
+   "claim": "Obstruction: in any proper cocompact CAT(0) action, a common flat for Gamma_T gives v(h_i) perpendicular to v(f_i) (tau_i(h_i)=0 + Pythagoras), so 0=<u+v,u>=|u|^2, a contradiction. Hence no locally CAT(0) metric and no NPC Riemannian metric.",
+   "items": [
+    "P07",
+    "P08",
+    "P09"
+   ],
+   "lean": "realCompact_noNPC: Cartan-Hadamard (L04) -> CN space E3 with deck isometries -> cyclic_shear_obstruction (L05). No flat torus theorem."
+  },
+  {
+   "step": 3,
+   "claim": "Metric: concave cometric neck P(t) (diagonal variation delta, shear delta^2 on [5/12,7/12]) with exact diagonal end germs, periods B1=delta^2 B2 chosen after delta; convex warped collars to hyperbolic cusps; NPC everywhere except the middle of the neck.",
+   "items": [
+    "P05",
+    "P10",
+    "P11",
+    "P12",
+    "P13",
+    "P14",
+    "P15"
+   ],
+   "lean": "Cometric.P, uniform_cometric_bounds (Neck.lean:1451), Collar.ell, realCompactMetric (CompactMetric.lean:1573), realCompactMetric_nonpositive_off_neck (Curvature.lean:1277)"
+  },
+  {
+   "step": 4,
+   "claim": "Neck variational identities: momentum p conserved, F=p^T P p concave; I=E-[<T,Gamma(V,V)>] with E>=0 (concavity) and nonnegative endpoint terms (Gamma(V,V)=kappa z1^2/2 at the ends).",
+   "items": [
+    "P16",
+    "P17",
+    "P18",
+    "P19",
+    "P20"
+   ],
+   "lean": "Neck.coordinateEnergyDensity, boundaryTerm, normal_index_integral"
+  },
+  {
+   "step": 5,
+   "claim": "Passage classification and easy passages: constant-height, monotone and shallow returns have I^perp>=0 (gauge to kill w; Cauchy-Schwarz with F<1; NPC in end collars).",
+   "items": [
+    "P21",
+    "P22",
+    "P23"
+   ],
+   "lean": "returning_dynamics, framed_monotone_index"
+  },
+  {
+   "step": 6,
+   "claim": "Returning passages: gauge to w(0)=w(L)=0 with affine tangential part; target |p^T X|^2 <= L(E+mu(e^T X)^2). Cauchy-Schwarz in L^2(Q)+H_0^1 gives |q^T X|^2<=S(q,q)E; boundary penalty and Schur complement reduce to S(p,p)-S(p,e)^2/(S(e,e)+1/mu) <= L; S-bounds + timing margin beta<1 + small delta close it, uniformly in L, v0, t_*.",
+   "items": [
+    "P24",
+    "P25",
+    "P26",
+    "P27",
+    "P28",
+    "P29"
+   ],
+   "lean": "returning_arbitrary_field_nonnegative (Returning.lean:2265) via DirectTurning (explicit pointwise quadratic instead of H_0^1)"
+  },
+  {
+   "step": 7,
+   "claim": "Assembly: I_R(V) = sum over passages + integral over the NPC complement >= 0 (countable additivity), then the index criterion gives no conjugate points; combine with step 2.",
+   "items": [
+    "P30",
+    "P31",
+    "P32",
+    "P33"
+   ],
+   "lean": "realCompactMetric_nonnegative_index (compact windows), noConjugatePoints_of_intrinsic_index, exists_uniform_compact_noConjugatePoints, main_theorem"
+  }
+ ],
+ "lean_summary": {
+  "n_files": 19,
+  "n_lines": 24974,
+  "n_decls": 2179,
+  "kind_counts": {
+   "theorem": 1634,
+   "def": 400,
+   "instance": 104,
+   "abbrev": 36,
+   "structure": 5
+  },
+  "n_docstrings": 0,
+  "proof_dag_decls": 1753,
+  "proof_dag_theorems": 1346,
+  "decls_off_dag": 426,
+  "target_signature_closure": "18 definitions (Basic.lean), identical to the comparator file",
+  "cone_shares_of_target_dag (share of the 1753 DAG decls / of DAG tokens that each item depends on)": {
+   "exists_uniform_compact_noConjugatePoints (no-conjugate-points half)": [
+    0.765,
+    0.695
+   ],
+   "realCompact_noNPC (non-NPC half; includes the NCP metric through fiberClass_ne_one)": [
+    0.972,
+    0.966
+   ],
+   "npc_deck_shear_impossible (non-NPC half without fibre nontriviality)": [
+    0.259,
+    0.364
+   ],
+   "cyclic_shear_obstruction": [
+    0.035,
+    0.034
+   ],
+   "universalMetric_radial_CN (Cartan-Hadamard CN)": [
+    0.205,
+    0.306
+   ],
+   "ncp_exponential_isCoveringMap": [
+    0.129,
+    0.205
+   ],
+   "realCompactMetric_nonpositive_off_neck": [
+    0.406,
+    0.266
+   ],
+   "returning_arbitrary_field_nonnegative": [
+    0.131,
+    0.139
+   ],
+   "uniform_cometric_bounds": [
+    0.068,
+    0.038
+   ],
+   "noConjugatePoints_of_intrinsic_index": [
+    0.103,
+    0.131
+   ]
+  },
+  "dependents_share (frac of DAG depending on item)": {
+   "Cometric.a": 0.215,
+   "Cometric.A": 0.192,
+   "Cometric.chi": 0.143,
+   "Cometric.P": 0.097,
+   "Collar.ell": 0.079,
+   "Neck.boundaryTerm": 0.023
+  },
+  "route_differences_vs_paper": [
+   "No flat torus theorem: the obstruction is a CN-space 'cyclic shear' lemma using only common minimum points, axes and axis shifts (Convexity.lean:696).",
+   "Smooth Cartan-Hadamard, Gauss lemma and an NPC Jacobi-norm lower bound are re-proved from scratch to get the CN universal-cover metric (Distance.lean, Geodesics.lean, Continuation.lean).",
+   "Nontriviality of the fibre classes is proved with the constructed no-conjugate-points metric (fibres are closed geodesics, hence essential), not with van Kampen; so the non-NPC half depends on the whole metric construction.",
+   "The H_0^1 / Riesz dual-norm argument (S(q,r)) is replaced by an explicit pointwise quadratic and integration by parts (DirectTurning).",
+   "Passages are taken inside a compact window containing the field's support, so half-infinite passages are replaced by 'truncated returns' with vanishing field at the window edge.",
+   "The punctured torus is H/<phi,psi,-1> in SL(2,Z) with torsion-freeness by reductions mod 2 and mod 3; the neck sits in the cusp collar 2<Im z<8 with flip x->16/x and a radial reparametrisation."
+  ]
+ },
+ "eureka_candidates_ranked": [
+  "P29",
+  "P19/P20",
+  "P31",
+  "P11/P05",
+  "L05"
+ ],
+ "eureka_candidates": [
+  {
+   "rank": 1,
+   "item": "P29 (+P24-P28) returning-passage estimate",
+   "provisional_N": "N3 (weak)",
+   "provisional_F": "F2",
+   "for": "Nothing in L or the goal resembles a free-endpoint nonnegativity statement for the normal index along every returning geodesic segment through a positively curved neck, uniform in duration and incidence. It needs three coordinated insights: the boundary term controls only the e-component of the endpoint change; the mixed coefficient S(p,e) must be within O(delta|p1|) of L p1 (not O(delta|p|)); and a strict timing margin beta<1 for excursions leaving the end collar. The paper itself flags it as what 'permits one metric to handle every complete geodesic'.",
+   "against": "Each step is elementary (Cauchy-Schwarz, Schur complement, convexity), and once P19/P20/P24 are set up the target inequality is forced; an expert may see it as routine bookkeeping. It is a one-off device for this metric, so it would fail the downstream speedup test.",
+   "nearest_neighbour": "Gulliver 1975 (local modification in a ball with radial comparison, keeping no conjugate points); Riccati/Green-bundle arguments for no conjugate points (Eberlein, Ruggiero survey). None localises to free-endpoint passage estimates. Quick search found no match.",
+   "lit_check": "WebSearch 2026-10-09: no paper with this estimate or with a concave-cometric neck; no prior resolution of IK Q1.1/8.1 found."
+  },
+  {
+   "rank": 2,
+   "item": "P19/P20 concave cometric => nonnegative coordinate second variation, with nonnegative boundary Christoffel term",
+   "provisional_N": "N2 (leaning N3)",
+   "provisional_F": "F5",
+   "for": "The change of representation (second variation along coordinate-linear variations, where concavity of Q^{-1} makes it a sum of squares) turns a positively curved neck into one where the index form is 'almost' manifestly nonnegative; the defect is a single boundary term whose sign is engineered via P'(0)=kappa e1e1^T. It is not cited from anywhere and is the conceptual core.",
+   "against": "It is the classical calculus-of-variations fact that a Lagrangian jointly convex in (position, velocity) has nonnegative second variation, transferred via partial Legendre duality (y^T Q(t) y convex in (t,y) iff p^T P(t) p concave in t). Transfer is N0/N2, not N3.",
+   "nearest_neighbour": "Jointly convex (Tonelli) Lagrangians: extremals are global minimisers; second-variation formula with boundary term <T,D_rW> (do Carmo, Milnor).",
+   "lit_check": "WebSearch found joint-convexity minimality statements in calculus of variations but no Riemannian 'concave inverse metric' criterion."
+  },
+  {
+   "rank": 3,
+   "item": "P31 localisation of the index form to neck passages (with per-passage gauges)",
+   "provisional_N": "N2",
+   "provisional_F": "F5",
+   "for": "Reduces a global question about Jacobi fields on all complete geodesics, with infinitely many visits, to independent free-endpoint estimates per visit; gauges need not match across passages.",
+   "against": "Measure-theoretically trivial once one asks for free-endpoint estimates; a natural strategy for any 'bad region' argument.",
+   "nearest_neighbour": "Gulliver-type 'bounded time in the positive region' arguments; Morse index additivity.",
+   "lit_check": "not found as a named tool"
+  },
+  {
+   "rank": 4,
+   "item": "P11/P05 cometric path with delta/delta^2 scaling and period choice B1=delta^2 B2",
+   "provisional_N": "N2",
+   "provisional_F": "F3",
+   "for": "Realises an integral gluing that is far from the identity as a coordinate swap plus a tiny shear, so a concave path can do the job; the order (diagonal concavity first, shear only where both second derivatives are strictly negative) is what makes concavity possible.",
+   "against": "Necks dt^2+g(t) between flat tori, and choosing lattice periods to fit gluings, are standard in graph-manifold geometry (Leeb; Buyalo-Svetlov).",
+   "nearest_neighbour": "Leeb 1995 metrics on graph manifolds with flat gluing tori.",
+   "lit_check": "standard technique"
+  },
+  {
+   "rank": 5,
+   "item": "L05 cyclic_shear_obstruction (Lean only) + L03 fibre nontriviality via closed geodesics",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "Avoids the flat torus theorem and van Kampen entirely; a leaner proof of the obstruction.",
+   "against": "Variant of Kapovich-Leeb; L03 uses a classical fact (Hadamard-Cartan for no conjugate points).",
+   "nearest_neighbour": "Kapovich-Leeb 1996 Thm 2.4; BH II.6.8.",
+   "lit_check": "standard"
+  }
+ ],
+ "correctness_audit": {
+  "verdict": "No gap found. I re-derived the key computations by hand (below). The Lean development proves the comparator statement with a clean trust surface (not built here), and the comparator definitions are faithful. Confidence in correctness is high.",
+  "checked": [
+   "End germs: for t<=1/3, A(1-t)=A(1), so P=diag(1+delta A(t), b); in frame T2=(e2+eps e1, e1), T2^{-1}H=e1 and T2^{-1}e1=e2 give diag(d2,b). Matches (cometric.tex:72-75).",
+   "a(0)=e^{-3/2} and a(1/8)/a(0)=exp(-24/13+3/2)=exp(-9/26), as claimed; Lean aZero=exp(-3/2), beta identical.",
+   "a^2<=-a' and |a'|<=1 on [0,1]: with x=1/(2/3-u)>=3/2, e^{-x}<=x^2 and x^2 e^{-x}<=4e^{-2}<1.",
+   "Coordinate energy: with Q'=-QP'Q, Q''=2QP'QP'Q-QP''Q and xdot=Pp, the coordinate second variation equals int(wdot^2+|zdot-wP'p|_Q^2 - F''w^2/2).",
+   "Boundary term: Gamma^t_ij=-Q'_ij/2 and Q'(0)=-kappa e1e1^T give Gamma(V,V)=(kappa/2)z1^2 d_tau; signs at entry (taudot>0, added) and exit (taudot<0, subtracted) are both nonnegative.",
+   "Turning identity: q(0)=p^T z(0) when w(0)=0; int qdot^2=(p^T Delta z)^2/L for affine q; (a^2+b^2)>=(b-a)^2/2 gives mu=kappa v0/4.",
+   "Timing: vddot=-F''v/2>=0 on the first half, chord bound gives int v^2<=Lv0^2/3; int F'=4v0 split over the middle and outer halves gives 4v0<=beta kappa p1^2 L.",
+   "S-bounds: Phi_p(w)=2 int v wdot gives S(p,p)<=L+3int v^2<=L(1+v0^2); domination gives ||Phi_e||^2<=2C0 delta L; D(t)=P'(0)-P'(t)>=0 and PSD Cauchy-Schwarz give |e^T P' p|<=(a(0)+sqrt(2C0 a(0))) delta|p1|.",
+   "Final inequality: L mu>=r/beta, x/(1+C_e x) increasing, r<=a(0)delta, and the delta-choice give S(p,e)^2/(S(e,e)+1/mu)>=Lv0^2, so the Schur complement is <=L. Lean's SmallParameter is the same delta-choice.",
+   "Obstruction: tau_i(h_i)=0 and Pythagoras on a common flat give orthogonality; v(h2)=u+v, v(f2)=u gives |u|^2=0. Lean's actual_loop_relations encode f2=h1 and h2=h1 f1 (FundamentalGroup.lean:491-519), matching (topology.tex:22-24).",
+   "Comparator curvature sign and Christoffel formula (see main_statement.comparator.definitions_check)."
+  ],
+  "consistency_checks_passed": [
+   "Green's theorem (total scalar curvature <=0 for compact manifolds without conjugate points): satisfied, since the hyperbolic cores dominate.",
+   "IK centralizer splitting: C(f_1) contains G_1=F_2 x Z, which splits. Dibble 2018 (abelian subgroups are Z^k, solvable subgroups Bieberbach): satisfied by a graph-manifold group.",
+   "IK Thm 7.1 forces focal points on M; the metric does have them (positive curvature in the neck middle), consistent.",
+   "Free-endpoint I^perp_J>=0 with parallel normal V means the integral of K(V,T) along each passage is <=0; this is compatible with positive curvature being met only briefly with compensating negative curvature near the ends of each excursion."
+  ],
+  "residual_concerns": [
+   "Scope wording: the intro says IK 'ask about gluings of two punctured-torus products'. IK's Q8.2 test case requires |tr A|>2, while the paper's gluing has |trace|=1 in natural conventions. The general question Q1.1/Q8.1 is answered; Q8.2 is not.",
+   "The Lean build was not run here; correctness of the formal proof is taken from the repository's formalization status and the clean grep.",
+   "Burns-Matveev Q4.1.2 was not re-read; the claim that it 'explicitly includes dimension three' is unchecked.",
+   "Possible unknown recent work: a quick search found no prior resolution, but full novelty is not settled (Tchuiaga 2025 is a rigidity preprint for Sigma x S^1 with closed Sigma and does not bear on this)."
+  ]
+ },
+ "extraction_friction": [
+  "Lean has 0 docstrings across 2,179 declarations; meaning must be read from names and statements. Namespaces are OAI.ThreeManifold.* (not the family ID).",
+  "The load-bearing paper objects are defined in display math, not environments: E_[a,c], S(q,r), Phi_q, the space D, mu, beta, X, the turning gauge. The only \\emph definitions are 'no conjugate points', 'no focal points', 'cometric' and 'neck passage'.",
+  "The Lean route differs in four places (no flat torus theorem; smooth Cartan-Hadamard + CN inequality; fibre nontriviality via the constructed metric; no Riesz duality), so a name/docstring join of paper and Lean items is many-to-one or absent for Section 2.",
+  "The extractor's dominated_share is tiny for every item (max 0.35, for the NCP half), because the two halves share infrastructure and the non-NPC half depends on the NCP metric. Cone share (fraction of the target DAG an item depends on) is more informative here.",
+  "426 declarations are off the proof DAG, including the paper-style orthogonality lemmas NoNPC.shear_orthogonality_impossible / zero_shift_pythagoras (Distance.lean:565-583): residue of an abandoned route that matches the paper's text.",
+  "The extractor's candidate_defs list is led by metric-construction plumbing (triangularMetric, wholeMetric, pullback operations). The real candidates (Cometric.P, the returning estimate) appear lower.",
+  "Cue phrases: 'This is an instance of Leeb's ... obstruction' (N0), 'We include the group-theoretic proof' (re-proved), 'For completeness, we recall the model in [Bonahon]' (N0), 'This is what permits one metric to handle every complete geodesic' (candidate)."
+ ]
+}

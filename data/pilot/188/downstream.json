@@ -1,0 +1,457 @@
+{
+ "fid": "188",
+ "item": "Max-norm semigroup via star averaging (random triangle removal): A/D = P + R with P = sum of star averages = UV, VU = I + W, ||exp(-sP)||_inf <= 1+2s, plus a mixed-norm (l_inf head / l2 remainder) Dyson expansion giving sup_{s<=log n} ||exp(-sA/D)||_inf <= C1 (1+log n)^J",
+ "item_type": "lemma (F5 change of representation edge space -> vertex space, F2 flavour)",
+ "lean_status": "as in paper",
+ "lean_status_why": "The paper's P = UV factorization, the bound ||exp(-sP)||_inf <= 1+2s, the mixed-norm perturbation expansion and the uniform semigroup bound are all formalized (graph_star_semigroup_bound, goodPrefix_semigroup_quantitative, goodPrefix_uniform_semigroup) and lie on the comparator's proof path; in addition the Lean re-derives the device a second time, in discrete time on a shrinking edge set, for its self-contained prefix.",
+ "lean_gaps": [
+  "Text-level only: the Lean was NOT compiled (no local toolchain); dependency chains come from scripts/extract_lean.py name resolution (data/items/188_lean.json) plus hand reading.",
+  "Route for ||exp(-sP)||_inf <= 1+2s: the paper uses the push-through identity (UV)^j = U(VU)^{j-1}V and E0(s) = Id - U int_0^s e^{-v(Id+W)} dv V; the Lean (star_semigroup_bound) applies an abstract rectangular_semigroup_bound to U, V = starAverage U and W = V*U - 1 with ||W|| <= 1 (starAverage_neighbor_norm). Same content, slightly different packaging.",
+  "The abstract Lean lemma star_semigroup_bound hard-codes row sum 2 (each edge has exactly two endpoints) and 0/1 entries. It does not cover hypergraph incidence (row sum r >= 3), where ||W||_inf = r-1 > 1 and the one-line bound fails (see negative controls).",
+  "Mixed-norm Dyson expansion: Lean states it abstractly over an algebra hom into continuous linear maps (Stability/Volterra.lean:190 perturbation_mixed_norm_bound) with explicit constants; the final bound is C1(1+log n)^{2K+1} with K > 4/gamma, versus the paper's unspecified J.",
+  "Quasirandomness input differs in constants: Lean's GoodPrefixGraph uses c = 1/80000-type exponents and cycle length 8000 (prefixSpectralError), with the prefix proved in Lean rather than cited from Joos-Kuhn.",
+  "Reuse signal, precisely: the Lean prefix (uniform_prefix_obligation) does NOT call graph_star_semigroup_bound, star_semigroup_bound or perturbation_mixed_norm_bound. It re-implements the device as movingStarMean/movingStarLift (P_k = U V_k on a nested active set), movingStar_trajectory_representation (x = M - U b with a vertex trajectory b), movingStarResponse_linf (bound 1 + 2 sum a_k) and movingStar_mixed_stability (discrete mixed-norm absorption via moving_perturbation_mixed_norm_absorb). Declarations shared by the two uses are only globalStarAverage, globalLinkAdjacency and graph_star_approximation. So the second use re-derives the same device in a new setting (moving support, discrete time); it is not a library call.",
+  "graph_star_approximation (Spectral/GraphStarApproximation.lean:26), listed in the shortlist hint, is the trace-method step (cycle counts give ||A/D - J/N||_2 small, Chung-Graham style). It is an ingredient for R's l2 bound, classical in substance, not the device itself. Both the continuation (via goodPrefix_star_approximation) and the prefix (via density_global_spectral) use it.",
+  "Comparator is exact (sharp_terminal_leave = paper Thm main, all three parts). No statement mentions the semigroup, so the device is visible only as an internal lemma (dominated share 0.035 for goodPrefix_uniform_semigroup; 0.032 for movingStar_mixed_stability; the whole prefix cone uniform_prefix_obligation 0.269).",
+  "Family 188 is absent from lean/formalization.yaml (comparator present in ComparatorChallenges and docs/188.md)."
+ ],
+ "comparator_chain": [
+  "OAI.SharpTerminalLeave.sharp_terminal_leave (Main.lean:79; comparator target)",
+  "sharp_terminal_leave_l2",
+  "main_l2_prefix_failure_bound",
+  "goodPrefix_normalized_l2",
+  "goodPrefix_relative_l2",
+  "goodPrefix_relative_l2_bound",
+  "goodPrefix_survival_moments",
+  "goodPrefix_cavity_stability",
+  "goodPrefix_cavity_relative",
+  "goodPrefix_cavity_semigroup",
+  "goodPrefix_uniform_semigroup (Process/GraphCardSqrt.lean:38)",
+  "goodPrefix_semigroup_quantitative (Spectral/GlobalLinkAdjacencyHermitian.lean:26)",
+  "graph_star_semigroup_bound (Process/EdgeIncidence.lean:62)",
+  "globalStarAverage_factorization (EdgeIncidence.lean:48) + star_semigroup_bound (Process/IncidenceDegree.lean:218) -> starAverage, rectangular_semigroup_bound",
+  "[side branch] goodPrefix_semigroup_quantitative -> goodPrefix_global_spectral -> goodPrefix_star_fixed -> goodPrefix_star_approximation -> graph_star_approximation (Spectral/GraphStarApproximation.lean:26)",
+  "[side branch] goodPrefix_semigroup_quantitative -> perturbation_mixed_norm_bound (Stability/Volterra.lean:190)",
+  "[second use, prefix] sharp_terminal_leave_l2 -> uniform_prefix_obligation -> prefix_good_history -> prefix_present_edge_closure -> prefix_edge_barrier_improvement -> movingStar_mixed_stability -> movingStar_actual_response -> movingStar_trajectory_representation; movingStar_mixed_stability -> movingStarResponse_linf; prefix_edge_barrier_improvement -> prefix_edge_residual_bounds -> density_global_spectral -> graph_star_approximation"
+ ],
+ "lean_source": [
+  {
+   "name": "incidenceDegree",
+   "kind": "def",
+   "file": "lean/OAI/Combinatorics/TriangleRemoval/Process/IncidenceDegree.lean",
+   "line": 151,
+   "text": "def incidenceDegree {ι κ : Type*} [Fintype ι] (U : Matrix ι κ ℝ) (v : κ) : ℝ :=\n  ∑ e, U e v"
+  },
+  {
+   "name": "starAverage",
+   "kind": "def",
+   "file": "lean/OAI/Combinatorics/TriangleRemoval/Process/IncidenceDegree.lean",
+   "line": 154,
+   "text": "noncomputable def starAverage {ι κ : Type*} [Fintype ι] (U : Matrix ι κ ℝ) :\n    Matrix κ ι ℝ := fun v e => U e v / incidenceDegree U v"
+  },
+  {
+   "name": "star_semigroup_bound",
+   "kind": "theorem",
+   "file": "lean/OAI/Combinatorics/TriangleRemoval/Process/IncidenceDegree.lean",
+   "line": 218,
+   "text": "theorem star_semigroup_bound {ι κ : Type*} [Fintype ι] [Fintype κ]\n    [DecidableEq ι] [DecidableEq κ] [Nonempty ι] [Nonempty κ]\n    (U : Matrix ι κ ℝ) (hU : ∀ e v, 0 ≤ U e v)\n    (hidem : ∀ e v, U e v * U e v = U e v)\n    (hrow : ∀ e, ∑ v, U e v = 2)\n    (hdeg : ∀ v, 0 < incidenceDegree U v) (s : ℝ) (hs : 0 ≤ s) :\n    ‖NormedSpace.exp ((-s) • (U * starAverage U))‖ ≤ 1 + 2 * s"
+  },
+  {
+   "name": "edgeIncidence",
+   "kind": "def",
+   "file": "lean/OAI/Combinatorics/TriangleRemoval/Process/EdgeIncidence.lean",
+   "line": 25,
+   "text": "noncomputable def edgeIncidence {n : ℕ} (G : Graph n) : Matrix G (Fin n) ℝ :=\n  fun e u => if u ∈ e.val then 1 else 0"
+  },
+  {
+   "name": "globalLinkAdjacency",
+   "kind": "def",
+   "file": "lean/OAI/Combinatorics/TriangleRemoval/Spectral/LinkStarMatrix.lean",
+   "line": 52,
+   "text": "noncomputable def globalLinkAdjacency {n : ℕ} (G : Graph n) (hG : G ⊆ completeGraph n) :\n    Matrix G G ℝ := ∑ u, extendStar (edgeStar G u) (linkStarMatrix G hG u)"
+  },
+  {
+   "name": "globalStarAverage",
+   "kind": "def",
+   "file": "lean/OAI/Combinatorics/TriangleRemoval/Spectral/LinkStarMatrix.lean",
+   "line": 55,
+   "text": "noncomputable def globalStarAverage {n : ℕ} (G : Graph n) : Matrix G G ℝ :=\n  ∑ u, extendStar (edgeStar G u) averagingProjector"
+  },
+  {
+   "name": "globalStarAverage_factorization",
+   "kind": "theorem",
+   "file": "lean/OAI/Combinatorics/TriangleRemoval/Process/EdgeIncidence.lean",
+   "line": 48,
+   "text": "theorem globalStarAverage_factorization {n : ℕ} (G : Graph n)\n    (hG : G ⊆ completeGraph n) :\n    globalStarAverage G = edgeIncidence G * starAverage (edgeIncidence G)"
+  },
+  {
+   "name": "graph_star_semigroup_bound",
+   "kind": "theorem",
+   "file": "lean/OAI/Combinatorics/TriangleRemoval/Process/EdgeIncidence.lean",
+   "line": 62,
+   "text": "theorem graph_star_semigroup_bound {n : ℕ} [NeZero n] (G : Graph n)\n    [Nonempty G] (hG : G ⊆ completeGraph n) (hdeg : ∀ u, 0 < currentDegree G u)\n    (s : ℝ) (hs : 0 ≤ s) :\n    ‖NormedSpace.exp ((-s) • globalStarAverage G)‖ ≤ 1 + 2*s"
+  },
+  {
+   "name": "goodPrefix_semigroup_quantitative",
+   "kind": "theorem",
+   "file": "lean/OAI/Combinatorics/TriangleRemoval/Spectral/GlobalLinkAdjacencyHermitian.lean",
+   "line": 26,
+   "text": "theorem goodPrefix_semigroup_quantitative {n : ℕ} [NeZero n] {G : Graph n} [Nonempty G]\n    {c C : ℝ} (h : GoodPrefixGraph n c C G) (hne : ∀ u, (neighbors G u).Nonempty)\n    (hD : 1 ≤ prefixD n) (hδ : (n : ℝ)^(-c) ≤ 1)\n    (T : ℝ) (hT : 0 ≤ T) (K : ℕ) (s : ℝ) (hs : s ∈ Set.Icc (0 : ℝ) T) :\n    ‖NormedSpace.exp ((-s) • ((prefixD n)⁻¹ • globalLinkAdjacency G h.1))‖ ≤\n      (∑ j ∈ Finset.range K, ((1+2*T)*6*T)^j*(1+2*T)) +\n      Real.sqrt G.card * ((2*prefixSpectralError n c*T)^K *\n        Real.exp (T*(2*prefixSpectralError n c)))"
+  },
+  {
+   "name": "goodPrefix_uniform_semigroup",
+   "kind": "theorem",
+   "file": "lean/OAI/Combinatorics/TriangleRemoval/Process/GraphCardSqrt.lean",
+   "line": 38,
+   "text": "theorem goodPrefix_uniform_semigroup {c : ℝ} (hc : 0 < c) :\n    ∃ C₁ : ℝ, 0 < C₁ ∧ ∃ J : ℕ, ∀ᶠ n : ℕ in atTop,\n      ∀ (C : ℝ) (G : Graph n) (h : GoodPrefixGraph n c C G),\n      ∀ s ∈ Set.Icc (0 : ℝ) (Real.log n),\n        ‖NormedSpace.exp ((-s) • ((prefixD n)⁻¹ • globalLinkAdjacency G h.1))‖ ≤\n          C₁*(1+Real.log n)^J"
+  },
+  {
+   "name": "graph_star_approximation",
+   "kind": "theorem",
+   "file": "lean/OAI/Combinatorics/TriangleRemoval/Spectral/GraphStarApproximation.lean",
+   "line": 26,
+   "text": "theorem graph_star_approximation (n : ℕ) (hr : Even (n+3)) (D δ : ℝ)\n    (hD : 1 ≤ D) (hδ0 : 0 ≤ δ) (hδ1 : δ ≤ 1)\n    (hrow : ∀ x : V, |((Finset.univ.filter (G.Adj x)).card : ℝ) - D| ≤ δ*D)\n    (hmain : |((graphEmbeddings (SimpleGraph.cycleGraph (n+3)) G).card : ℝ) - D^(n+3)| ≤\n      δ * D^(n+3))\n    (hcyc : ∀ b, 3 ≤ b → b < n+3 →\n      ((graphEmbeddings (SimpleGraph.cycleGraph b) G).card : ℝ) ≤ 2 * D^b) :\n    ‖D⁻¹ • G.adjMatrix ℝ - averagingProjector‖ ≤\n      4 * (((n+4 : ℕ) : ℝ) * δ + ((n+3 : ℕ) : ℝ)^(n+4) * 2^(n+3) *\n        ((Fintype.card V : ℝ) / D^((n+3)/2) + 1/D)) ^ (1 / ((n+3 : ℕ) : ℝ)) + 7*δ"
+  },
+  {
+   "name": "movingStarMean",
+   "kind": "def",
+   "file": "lean/OAI/Combinatorics/TriangleRemoval/Spectral/MovingStarDegree.lean",
+   "line": 20,
+   "text": "noncomputable def movingStarMean {E V : Type*} [Fintype E] [Fintype V]\n    (ends : E → Finset V) (active : Finset E) (x : E → ℝ) (u : V) : ℝ := by\n  classical\n  exact (∑ e ∈ active.filter (fun e => u ∈ ends e), x e) / movingStarDegree ends active u"
+  },
+  {
+   "name": "movingStarLift",
+   "kind": "def",
+   "file": "lean/OAI/Combinatorics/TriangleRemoval/Spectral/MovingStarDegree.lean",
+   "line": 25,
+   "text": "noncomputable def movingStarLift {E V : Type*} [Fintype E] [Fintype V]\n    (ends : E → Finset V) (b : V → ℝ) (e : E) : ℝ := ∑ u ∈ ends e, b u"
+  },
+  {
+   "name": "movingStar_trajectory_representation",
+   "kind": "theorem",
+   "file": "lean/OAI/Combinatorics/TriangleRemoval/Spectral/MovingStarDegree.lean",
+   "line": 195,
+   "text": "theorem movingStar_trajectory_representation {E V : Type*} [Fintype E] [Fintype V]\n    (ends : E → Finset V) (active : ℕ → Finset E) (a : ℕ → ℝ)\n    (M x : ℕ → E → ℝ) (T : ℕ)\n    (hnest : ∀ k < T, active (k+1) ⊆ active k)\n    (hinit : ∀ e ∈ active 0, x 0 e = M 0 e)\n    (hstep : ∀ k < T, ∀ e ∈ active (k+1), x (k+1) e = x k e -\n      a k*movingStarLift ends (movingStarMean ends (active k) (x k)) e + (M (k+1) e-M k e)) :\n    ∀ e ∈ active T, x T e = M T e-movingStarLift ends (movingStarVertices ends active a M T) e"
+  },
+  {
+   "name": "movingStarResponse_linf",
+   "kind": "lemma",
+   "file": "lean/OAI/Combinatorics/TriangleRemoval/Asymptotics/ActiveL2Map.lean",
+   "line": 290,
+   "text": "lemma movingStarResponse_linf {E V : Type*} [Fintype E] [Fintype V]\n    (ends : E → Finset V) (hends : ∀ e, (ends e).card = 2)\n    (active : ℕ → Finset E) (a : ℕ → ℝ) (T : ℕ)\n    (hnest : ∀ k < T, active (k+1) ⊆ active k)\n    (ha : ∀ k < T, 0 ≤ a k ∧ a k ≤ 1) (M : ℕ → E → ℝ) :\n    trajectorySeminorm (fun t => activeLinf (active t)) T (movingStarResponse ends active a M) ≤\n      (1+2*∑ k ∈ Finset.range T, a k)*trajectorySeminorm (fun t => activeLinf (active t)) T M"
+  },
+  {
+   "name": "movingStar_mixed_stability",
+   "kind": "theorem",
+   "file": "lean/OAI/Combinatorics/TriangleRemoval/Stability/MovingResidualForcing.lean",
+   "line": 115,
+   "text": "theorem movingStar_mixed_stability {E V : Type*} [Fintype E] [Fintype V]\n    (ends : E → Finset V) (hends : ∀ e, (ends e).card = 2)\n    (active : ℕ → Finset E) (a : ℕ → ℝ) (R : ℕ → Module.End ℝ (E → ℝ))\n    (M x : ℕ → E → ℝ) (T K : ℕ)\n    (hnest : ∀ k < T, active (k+1) ⊆ active k)\n    (ha : ∀ k < T, 0 ≤ a k ∧ a k ≤ 1)\n    (hinit : ∀ e ∈ active 0, x 0 e = M 0 e)\n    (hstep : ∀ k < T, ∀ e ∈ active (k+1), x (k+1) e = x k e -\n      a k*(movingStarLift ends (movingStarMean ends (active k) (x k)) e+R k (x k) e) +\n        (M (k+1) e-M k e))\n    {B δ : ℝ} (hB : 0 ≤ B) (hδ : 0 ≤ δ)\n    (hRinf : ∀ k < T, ∀ z, activeLinf (active k) (R k z) ≤ B*activeLinf (active k) z)\n    (hR₂ : ∀ k < T, ∀ z, activeL2 (active k) (R k z) ≤ δ*activeL2 (active k) z)\n    (hK : ((1+2*∑ k ∈ Finset.range T, a k)*(∑ k ∈ Finset.range T, a k)*δ)^K*\n      (Fintype.card E : ℝ) ≤ 1/2) :\n    trajectorySeminorm (fun t => activeLinf (active t)) T x ≤\n      2*(∑ j ∈ Finset.range K,\n        ((1+2*∑ k ∈ Finset.range T, a k)*(∑ k ∈ Finset.range T, a k)*B)^j)*\n        (1+2*∑ k ∈ Finset.range T, a k)*trajectorySeminorm (fun t => activeLinf (active t)) T M"
+  },
+  {
+   "name": "prefix_centered_edge_recurrence",
+   "kind": "lemma",
+   "file": "lean/OAI/Combinatorics/TriangleRemoval/Process/CompleteEdgePair.lean",
+   "line": 124,
+   "text": "lemma prefix_centered_edge_recurrence {n i : ℕ} (ω : History (Graph n) (prefixTime n))\n    (hω : ω ∈ (historyLaw (PMF.pure (completeGraph n)) (fun _ => step) (prefixTime n) (prefixTime n)).support)\n    (hi : i < prefixTime n) (hs : earlyTemplateScale 1 2 n i ≠ 0)\n    (e : CompleteEdge n) (he : e ∈ graphActive (ω (historyIndex (prefixTime n) (i+1)))) :\n    prefixCenteredEdge ω (i+1) e = prefixCenteredEdge ω i e-\n      prefixEdgeRate ω i*(movingStarLift (fun e : CompleteEdge n => e.val)\n        (movingStarMean (fun e : CompleteEdge n => e.val)\n          (graphActive (ω (historyIndex (prefixTime n) i))) (prefixCenteredEdge ω i)) e+\n        prefixEdgeResidual ω hω i (prefixCenteredEdge ω i) e)+\n      (prefixEdgeForcing ω (i+1) e-prefixEdgeForcing ω i e)"
+  }
+ ],
+ "speedup_targets": [
+  {
+   "title": "Triangle-removal prefix: codegree tracking to density n^{-1/2+eps} (BFL 2015 tracking / Joos-Kuhn specialised to triangles)",
+   "statement": "Run random triangle removal from K_n to density p = n^{-1/2+eps}. With failure probability <= exp(-(log n)^{4/3}), every codegree is (1 +- n^{-c}) times its prediction, every degree likewise, and link-cycle and rooted-extension counts are as predicted. Lean form: OAI.SharpTerminalLeave.uniform_prefix_obligation (Tracking/NormalizedTrackingAbsolute.lean:84); key internal step prefix_edge_barrier_improvement (Process/CenteredEdgeVectorTriangle.lean:19).",
+   "reference": "Bohman-Frieze-Lubetzky, Random triangle removal, Adv. Math. 280 (2015), arXiv:1203.4223 (tracking part); Joos-Kuhn, The hypergraph removal process, arXiv:2412.15039 (the paper's black box); Lean: OAI TriangleRemoval prefix cone.",
+   "status": "known (BFL for triangles; JK in general); proved in the OAI Lean by the moving-star device",
+   "current_size": "BFL ~45 pp. total, most of it tracking; JK ~87 pp. (general F). Lean: prefix cone 623 decls / 8,837 lines (452 decls / 6,991 lines exclusive); the moving-star device files are ~940 lines (MovingStarDegree 327, ActiveL2Map 342, MovingResidualForcing 171, MovingPerturbationFiniteExpansion 96).",
+   "how_item_helps": "BFL needed scalar self-correcting martingales for every codegree, plus carefully designed triangular extensions to pass the n^{7/4} barrier. With the device, the whole centred codegree vector x_k obeys x_{k+1} = x_k - a_k(P_k + R_k)x_k + noise, where P_k is a moving star average, ||R_k||_2 is small from link spectra and ||R_k||_inf <= 6. movingStar_mixed_stability turns this into an l_inf barrier improvement in one step, so self-correction becomes a single linear stability statement instead of a per-variable drift analysis.",
+   "expected_speedup": "high (within Lean: give vs withhold the movingStar_* lemmas and graph_star_approximation; otherwise the prover must build per-codegree self-correcting martingales)",
+   "confidence": 0.6,
+   "caveat": "Same family, same model, same process: this is the in-family reuse the shortlist cites, NOT a held-out test. It shows the device adapts to moving supports and discrete time.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI TriangleRemoval: Graph, completeGraph, step, History, historyLaw, GoodPrefixGraph, prefixD, prefixDensity, PrefixRootedUpper etc.; Mathlib PMF, Matrix norms",
+    "missing": [],
+    "formal_proof_to_compare": "Yes: the OAI proof itself (~7k exclusive lines). No device-free formal proof exists; the test measures prover budget with the device lemmas given vs withheld."
+   }
+  },
+  {
+   "title": "Uniform max-norm semigroup for the linearized continuation (paper Prop. semigroup) without the star factorization (ablation)",
+   "statement": "For every graph satisfying the degree, codegree and link-cycle conditions, sup_{0<=s<=log n} ||exp(-sA/D)||_inf <= C1(1+log n)^J. Lean: goodPrefix_uniform_semigroup.",
+   "reference": "Paper stability.tex:116-316; Lean Process/GraphCardSqrt.lean:38.",
+   "status": "proved (this family)",
+   "current_size": "paper ~3 pp.; Lean semigroup cone ~720 lines (IncidenceDegree 240, EdgeIncidence 78, Volterra 231, GlobalLinkAdjacencyHermitian 85, GraphCardSqrt 83) on top of the trace-method files.",
+   "how_item_helps": "Ablation target: withhold graph_star_semigroup_bound/star_semigroup_bound and ask for the statement given only graph_star_approximation and the perturbation expansion. Without the UV factorization the natural route loses e^{O(D)} (paper stability.tex:100-103).",
+   "expected_speedup": "high, but this is the item's own proposition (calibration arm, not evidence of reach)",
+   "confidence": 0.7,
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI TriangleRemoval GoodPrefixGraph, globalLinkAdjacency, prefixD; Mathlib NormedSpace.exp, Matrix.linfty_opNorm",
+    "missing": [],
+    "formal_proof_to_compare": "Yes: OAI proof."
+   }
+  },
+  {
+   "title": "Triangle-free process: early evolution / R(3,t) >= c t^2/log t (Bohman 2009) and dynamic concentration (Bohman-Keevash 2021; Fiz Pontiveros-Griffiths-Morris 2020)",
+   "statement": "The triangle-free process on n vertices runs for Omega(n^{3/2} sqrt(log n)) steps whp, and the tracked statistics (open-pair degrees and similar) follow their trajectories within self-correcting error windows. Consequence: R(3,t) >= (1/4 - o(1)) t^2/log t.",
+   "reference": "Bohman, The triangle-free process, Adv. Math. 221 (2009), arXiv:0806.4375; Bohman-Keevash, Dynamic concentration of the triangle-free process, RSA 58 (2021), arXiv:1302.5963; Fiz Pontiveros-Griffiths-Morris, Mem. AMS 263 (2020), arXiv:1302.6279.",
+   "status": "known",
+   "current_size": "Bohman 2009 ~30 pp.; BK ~70 pp.; FGM ~125 pp. No formal proof anywhere.",
+   "how_item_helps": "Hypothesis, NOT verified. The linearized drift of the vector of open-pair statistics is indexed by pairs and couples pairs that share a vertex through a potential triangle, so its leading part may again be a sum of star averages over vertices. If so, the per-variable self-correction could be replaced by one l_inf stability statement, as in the Lean prefix. This matches only the tracking layer, not the independence-number layer.",
+   "expected_speedup": "med (tracking part only); low if the drift operator has non-star terms",
+   "confidence": 0.3,
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Clone of OAI TriangleRemoval Model.lean: Graph n, PMF step; Mathlib SimpleGraph",
+    "missing": [
+     "triangle-free process step/evolve on Graph n (~60 lines)",
+     "open-pair statistics and their trajectory functions (~100-150 lines)",
+     "independence-number / Ramsey statement if the R(3,t) consequence is wanted (~50 lines)"
+    ],
+    "formal_proof_to_compare": "None (no formalization of the triangle-free process in Mathlib or OAI)."
+   }
+  },
+  {
+   "title": "Random greedy triangle packing as used for random Steiner triple systems (Kwan 2020: almost all STS have perfect matchings)",
+   "statement": "Kwan's random-STS analysis runs random greedy triangle packing (the same process as triangle removal) and imports quasirandom statistics of the partial packing from BFL-type tracking before an absorption/completion step.",
+   "reference": "M. Kwan, Almost all Steiner triple systems have perfect matchings, Proc. LMS 121 (2020), arXiv:1611.02246.",
+   "status": "known",
+   "current_size": "~50 pp.; the process-tracking input is a few pages plus the cited BFL analysis.",
+   "how_item_helps": "Same process as 188; the moving-star prefix tracking provides the quasirandomness input in Lean-ready form. The speedup is on the imported tracking lemmas, not on the matching/absorption argument.",
+   "expected_speedup": "low-med",
+   "confidence": 0.35,
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI TriangleRemoval process + Mathlib Finset",
+    "missing": [
+     "Steiner triple system and uniform STS measure (~80 lines)",
+     "perfect matching in a 3-graph (~40 lines)"
+    ],
+    "formal_proof_to_compare": "None."
+   }
+  },
+  {
+   "title": "Random greedy hypergraph matching: the Bennett-Bohman natural barrier",
+   "statement": "For a D-regular k-uniform hypergraph with small codegrees, the random greedy matching leaves at most n D^{-1/(2(k-1))+o(1)} vertices uncovered (Bennett-Bohman); conjecturally n D^{-1/(k-1)+o(1)}.",
+   "reference": "Bennett-Bohman, A natural barrier in random greedy hypergraph matching, CPC 28 (2019), arXiv:1210.3581; JK arXiv:2412.15039 for the removal-process version.",
+   "status": "known bound; the status of the sharper conjecture was not re-verified this session",
+   "current_size": "~25 pp.",
+   "how_item_helps": "The linearized vector of a greedy matching process lives on an incidence structure of row sum k. The factorization P = UV still exists, but VU = I + W with ||W||_inf = k-1, so the one-line bound on ||exp(-sP)||_inf FAILS for k >= 3: exp(-v(I+W)) can grow like e^{(k-2)v}. A second-level star decomposition of W would be needed. Partial match only.",
+   "expected_speedup": "low",
+   "confidence": 0.2,
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib Finset/PMF; OAI TriangleRemoval patterns",
+    "missing": [
+     "k-uniform hypergraph with regularity/codegree hypotheses (~60 lines)",
+     "random greedy matching law (~60 lines)"
+    ],
+    "formal_proof_to_compare": "None."
+   }
+  }
+ ],
+ "open_problems": [
+  {
+   "title": "Joos-Kuhn sharp-leave conjecture for other strictly 2-balanced F (e.g. K_4-removal, C_5-removal)",
+   "statement": "For random greedy F-removal from K_n, the leave divided by its predicted order converges to the explicit constant from the JK heuristic. JK Conj. 16.2 asks this for general F; 188 proves only F = K_3.",
+   "reference": "Joos-Kuhn, The hypergraph removal process, arXiv:2412.15039, Conjecture 16.2 (as cited by 188's paper); https://arxiv.org/abs/2412.15039",
+   "status": "open except F = K_3 (188, unrefereed)",
+   "obstruction_match": "Same obstruction: a linearized edge-survival ODE whose error must be controlled in max norm over time log n while the generator has norm ~D. Key difference: for K_3 any two edges of a common copy share a unique vertex, so A is a sum of link matrices M_u (stability.tex, 'Summing the star averages'); for K_4 two edges of a copy can be disjoint, so A has a non-star part that is not small in l2.",
+   "adaptation_sketch": "Split A_F = A_star + A_far. Apply star averaging to A_star. Show A_far/D is l2-small and has bounded l_inf norm, so it can go into R in the mixed-norm expansion. If A_far is not l2-small, look for a second factorization through vertex-pair space.",
+   "payoff": "high (new sharp constants)",
+   "confidence": 0.3,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Generalize OAI Model.lean (Graph n) to copies of F instead of triangles",
+    "missing": [
+     "F-copies in a Finset-graph and the F-removal step (~80 lines)",
+     "JK constant for a given F (~40 lines)"
+    ],
+    "formal_proof_to_compare": "None (the K_3 case is in OAI)."
+   }
+  },
+  {
+   "title": "Sharp leave for random greedy Steiner-system packing (K_{r+1}^{(r)}-removal in K_n^{(r)}), r >= 3",
+   "statement": "Determine the leading constant of the leave (order as predicted by JK) for random greedy packing of (r+1)-cliques of the complete r-graph, e.g. r = 3 (Steiner quadruple systems).",
+   "reference": "Joos-Kuhn arXiv:2412.15039 (order of magnitude); Rodl-Thoma, RSA 8 (1996); Spencer, RSA 7 (1995).",
+   "status": "open (constant); order of magnitude from JK",
+   "obstruction_match": "Two r-sets in a common (r+1)-clique share r-1 vertices, so the edge operator IS a sum of averages over (r-1)-set stars: the star structure matches. But each r-set lies in r stars, so VU = I + W with ||W||_inf = r-1, and the 1+2s bound does not transfer.",
+   "adaptation_sketch": "Iterate the device: W is itself a sum of (r-2)-set star averages plus an l2-small error. Bound exp(-v(I+W)) in l_inf by a nested mixed-norm expansion, and check whether the nesting closes with only a polylog loss.",
+   "payoff": "high",
+   "confidence": 0.3,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Finset (Finset (Fin n)) r-graphs as in OAI Model.lean",
+    "missing": [
+     "r-uniform version of Model.lean (~80 lines)",
+     "JK constant for K_{r+1}^{(r)} (~40 lines)"
+    ],
+    "formal_proof_to_compare": "None."
+   }
+  },
+  {
+   "title": "Fluctuations of the triangle-removal leave F_n",
+   "statement": "Find the order of Var(F_n) and a limit law for (F_n - E F_n)/sd.",
+   "reference": "188 paper scope note (introduction.tex:52-54) excludes fluctuations; Erdős problem #1155 asks related finer questions: https://www.erdosproblems.com/1155",
+   "status": "open",
+   "obstruction_match": "The linear response of the edge-survival profile to prefix perturbations must be controlled uniformly in l_inf. This is exactly what ||exp(-sA/D)||_inf <= polylog provides.",
+   "adaptation_sketch": "Write F_n as a sum of edge-survival indicators. Use the semigroup to propagate prefix fluctuations (the Freedman noise in the codegree vector) through the continuation, and get covariances of two-root queries from the collision bound.",
+   "payoff": "med-high",
+   "confidence": 0.4,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI TriangleRemoval terminalLaw, expectation; Mathlib variance and weak convergence",
+    "missing": [],
+    "formal_proof_to_compare": "None."
+   }
+  },
+  {
+   "title": "Random triangle removal from other starting graphs (G(n,p) with p fixed, or quasirandom graphs)",
+   "statement": "For triangle removal started from a (p, beta)-quasirandom graph, is the leave ~ c(p) n^{3/2} with an explicit c(p)?",
+   "reference": "188 scope note (introduction.tex:52-54); BFL 2015.",
+   "status": "open as far as we know (no web re-verification this session)",
+   "obstruction_match": "The device needs only degree, codegree and link-cycle quasirandomness of the current graph, which a quasirandom start supplies.",
+   "adaptation_sketch": "Replace the prefix by moving-star tracking from the quasirandom start, then reuse the continuation verbatim.",
+   "payoff": "med",
+   "confidence": 0.5,
+   "difficulty": "med",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI evolve with an arbitrary initial Graph; Mathlib",
+    "missing": [
+     "quasirandom-start hypothesis (~40 lines)"
+    ],
+    "formal_proof_to_compare": "None."
+   }
+  },
+  {
+   "title": "Final size of the H-free process for strictly 2-balanced H (C_4-free, K_4-free)",
+   "statement": "Bohman-Keevash conjecture: the H-free process ends with Theta(n^{2-(v_H-2)/(e_H-1)} (log n)^{1/(e_H-1)}) edges whp.",
+   "reference": "Bohman-Keevash, The early evolution of the H-free process, Invent. Math. 181 (2010), arXiv:0908.0429; Warnke, When does the K_4-free process stop?, RSA 44 (2014), arXiv:1007.3037; Picollelli, The final size of the C_4-free process, CPC 20 (2011).",
+   "status": "open in general (known for some H, partly up to constants; not re-verified this session)",
+   "obstruction_match": "Matching lower bounds need tracking of open-pair statistics to the end, a self-correction problem of the same linear-stability type. However the H-free process adds edges instead of removing them, so its drift operator differs.",
+   "adaptation_sketch": "Write the drift of the open-pair vector and check whether its leading part factors through vertex space. For H = C_4, pairs in a potential C_4 can be disjoint, so it probably does not.",
+   "payoff": "med",
+   "confidence": 0.2,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib SimpleGraph, Finset graphs",
+    "missing": [
+     "H-free process law (~80 lines)"
+    ],
+    "formal_proof_to_compare": "None."
+   }
+  },
+  {
+   "title": "R(3,k) lower-bound constant via steered triangle-free processes",
+   "statement": "Improve R(3,k) >= c k^2/log k beyond the 2025 constants (1/3 by Campos-Jenssen-Michelen-Sahasrabudhe; 1/2 claimed in 'Improving R(3,k) in just two bites').",
+   "reference": "arXiv:2505.13371 https://arxiv.org/abs/2505.13371 ; arXiv:2510.19718 https://arxiv.org/abs/2510.19718 (seen only via search snippets this session)",
+   "status": "open (Shearer's upper bound has constant 1)",
+   "obstruction_match": "Weak. CJMS explicitly avoid martingale self-correction by steering the process. A linear l_inf stability tool would be an alternative way to analyse denser steered processes. The analogy is superficial unless the steered process's tracked vector has star structure.",
+   "adaptation_sketch": "Identify the codegree-type vector in the steered process and test whether its linearization is star-averaged.",
+   "payoff": "high",
+   "confidence": 0.1,
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "Ramsey numbers and the steered process construction",
+    "missing": [
+     "process + independence-number tail machinery (>1000 lines)"
+    ],
+    "formal_proof_to_compare": "None."
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "Bohman-Frieze-Lubetzky 2015 Theorem 1 (F_n = n^{3/2+o(1)} whp) and the Bollobas-Erdős Theta(n^{3/2}) conjecture follow from the sharp theorem. These are corollaries, not device reuse.",
+  "Erdős problem #1155 (erdosproblems.com/1155) asks whether E F_n is of order n^{3/2}, among finer questions. The sharp L^2 statement answers the question about the mean (corollary).",
+  "Joos-Kuhn Conjecture 16.2 for F = K_3 (convergence in probability) is the theorem itself."
+ ],
+ "release_reuse": [
+  "Inside 188 only. The device is re-derived for the Lean-only prefix (a moving star average on a nested active edge set, in discrete time): movingStar_mixed_stability, movingStarResponse_linf, movingStar_trajectory_representation. This is a genuine second application to a different statement (codegree tracking, i.e. the JK black box). But it was made by the same model on the same problem, and implemented as fresh code rather than as a call to graph_star_semigroup_bound.",
+  "Grep over lean/OAI for starAverage|movingStar|globalStarAverage|edgeIncidence outside TriangleRemoval: no hits. No other family in the release uses the device, and CONTENTS.md lists no other random-greedy or removal-process family."
+ ],
+ "negative_controls": [
+  {
+   "setting": "Random greedy processes with bounded degree (D = O(1)), e.g. greedy matching/independent set on random d-regular graphs with fixed d",
+   "reason": "The naive bound ||exp(-sA/D)||_inf <= e^{s||A/D||_inf} already costs only O(1) over the relevant time, so the device gives no gain.",
+   "expected": "no speedup"
+  },
+  {
+   "setting": "Hypergraph incidence with r >= 3 ends per edge (abstract star_semigroup_bound with row sum r)",
+   "reason": "VU = I + W with ||W||_inf = r-1 > 1, so exp(-v(I+W)) is not l_inf-contractive and the one-line bound fails. The Lean lemma hard-codes row sum 2.",
+   "expected": "device fails as stated (a proved-false analogue of the one-line bound)"
+  },
+  {
+   "setting": "K_4-removal linearization",
+   "reason": "Edges of a common K_4 can be disjoint, so A is not a sum of star (link) matrices and P no longer approximates A/D in l2.",
+   "expected": "device does not apply without new ideas"
+  },
+  {
+   "setting": "Any argument that needs only l2 control (spectral-gap mixing, l2 stability)",
+   "reason": "P is PSD, so ||exp(-sP)||_2 <= 1 is trivial; the device's content is the l_inf bound.",
+   "expected": "no speedup"
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "title": "Triangle-removal prefix (uniform_prefix_obligation / prefix_edge_barrier_improvement)",
+   "lean": "statable now",
+   "argument": "This is the only place where the device demonstrably did work on a statement other than its own proposition: the Lean replaces the paper's JK black box (87 pp.) with codegree-vector stability driven by a moving star average. Everything needed is already defined in OAI, and the OAI proof gives a size baseline. Run the speedup test by giving vs withholding the movingStar_* lemmas (and graph_star_approximation). Caveat: same model and same process, so this is reuse evidence, not a held-out discoverability test."
+  },
+  {
+   "rank": 2,
+   "title": "Uniform semigroup proposition without the star factorization (ablation)",
+   "lean": "statable now",
+   "argument": "Calibration arm. Withholding graph_star_semigroup_bound should force e^{O(D)} losses or a long detour, which measures how much of the proposition the factorization carries. It is the item's own result, so it cannot confirm a jump."
+  },
+  {
+   "rank": 3,
+   "title": "Random triangle removal from quasirandom starting graphs",
+   "lean": "statable now",
+   "argument": "The closest genuinely new statement. The continuation needs only quasirandom link data, and so does the moving-star prefix. It is statable in OAI with a ~40-line hypothesis, and the device should transfer almost verbatim. A short proof would be a clean downstream demonstration, but it is close to a corollary of the method, so treat it as low-novelty transfer."
+  },
+  {
+   "rank": 4,
+   "title": "Triangle-free process tracking (Bohman 2009 / Bohman-Keevash / FGM)",
+   "lean": "statable with < 300 lines of new definitions",
+   "argument": "The best external speedup candidate: a long, famous self-correction analysis of edge-indexed statistics with triangle-induced interactions. Whether its drift operator is star-averaged has not been checked. If it is, the device could shorten the tracking substantially."
+  },
+  {
+   "rank": 5,
+   "title": "Fluctuations of F_n",
+   "lean": "statable now",
+   "argument": "Open, and statable now with OAI definitions. The obstruction (uniform l_inf linear response) is exactly what the device controls. The payoff would be a new theorem rather than a shorter proof."
+  }
+ ],
+ "precedent_check": {
+  "after_2026_10_06": "None found. Web search on 2026-10-09 returned only BFL 2015, BFL's 7/4-barrier paper, the triangle-free process papers and Erdős problem #1155; no post-release paper uses star-averaged max-norm semigroups. Web access ended after 3 queries (session limit), so coverage is thin.",
+  "earlier_equivalent": "None found, here or in the earlier novelty pass (BFL full text, JK, Spencer 1995). The Chung-Graham trace method and the Engel-Nagel Dyson expansion are neighbours for sub-steps only. The push-through identity (UV)^j = U(VU)^{j-1}V and the line-graph identity B^T B = 2I + A(L(G)) are classical, but we found no use of them to get an l_inf semigroup bound for a process. No downgrade.",
+  "note": "The 2025 R(3,k) works (arXiv:2505.13371, 2510.19718) avoid self-correction by steering the process. That is a different idea, not an equivalent."
+ },
+ "sources": [
+  "data/pilot/188/novelty.json, novelty.md, family.json; data/eureka_shortlist.json",
+  "data/items/188_lean.json (extract_lean v2 DAG)",
+  "lean/OAI/Combinatorics/TriangleRemoval/** (files cited in lean_source); lean/ComparatorChallenges/TriangleRemoval.json; lean/docs/188.md",
+  "preprints/The-Sharp-Terminal-Leave-in-Random-Triangle-Removal-September-25-2026/build/stability.tex:95-316",
+  "https://arxiv.org/pdf/1203.4223 (BFL)",
+  "https://arxiv.org/pdf/1302.6279 (FGM)",
+  "https://arxiv.org/pdf/1108.1781 (BFL 7/4)",
+  "https://www.erdosproblems.com/1155",
+  "https://arxiv.org/pdf/2412.15039 (JK)",
+  "https://arxiv.org/html/2505.13371v1 (CJMS)",
+  "https://arxiv.org/html/2510.19718v2"
+ ],
+ "search_log": [
+  "Local: read the brief, the shortlist entry and novelty/family JSON; extracted verbatim Lean with scratchpad leansrc.py; ran BFS dependency paths over data/items/188_lean.json from sharp_terminal_leave to every item declaration and to the moving-star cone.",
+  "Local: grep of lean/OAI for starAverage|movingStar|globalStarAverage|edgeIncidence outside TriangleRemoval: 0 hits.",
+  "Web 2026-10-09: 'random triangle removal process sharp constant 1/(2√2) n^{3/2} 2026' -> BFL, FGM, Erdős #1155; no sharp-constant precedent.",
+  "Web 2026-10-09: 'Joos Kühn random greedy F-removal leave conjecture strictly 2-balanced arXiv 2412.15039' -> JK paper (title 'The hypergraph removal process'), Bennett-Bohman 1308.3732.",
+  "Web 2026-10-09: 'R(3,k) lower bound 2025 new constant triangle-free process improvement' -> arXiv:2505.13371 (1/3), arXiv:2510.19718 (1/2 claimed).",
+  "WebFetch of the arXiv 2412.15039 abstract and erdosproblems.com/1155 FAILED (session limit), and further searches also failed. Other references are from memory and were not re-verified this session; the md flags this."
+ ],
+ "analysis_mode": "Text level only; the Lean was not compiled (no local toolchain)."
+}

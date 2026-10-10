@@ -1,0 +1,471 @@
+{
+ "fid": "271",
+ "item": "Splice: the contraction x_q = y_q = t, coefficient of t, turning the stable permutation-law symbol into a stable symbol of the 2^{#pin-free cycles}-weighted next-pin law (loop weight 2; Heisenberg magnetization)",
+ "item_type": "F5",
+ "lean_status": "as in paper",
+ "lean_status_why": "The splice, its action on permutation symbols (fixed point gives a factor 2, otherwise the path is spliced), stability preservation and the cycle-weight bookkeeping are all formalized and lie on the proof DAG of the comparator OAI.Heisenberg.spontaneous_magnetization, matching lem:pin-splicing of the Sep 24 paper.",
+ "lean_gaps": [
+  "Checked at text level only; the Lean was not compiled (no local toolchain).",
+  "Lean splices one vertex at a time (Option V -> V) and iterates by strong induction on |V| in stable_pinLaw; the paper deletes all non-pins at once. Equivalent.",
+  "Lean laws are finite mixtures (Fintype Ω with weights μ); Poisson exchange laws enter through limits elsewhere (PolynomialLimits.lean, Hurwitz), not in PinSplicing.",
+  "Lean 'Stable' means nonvanishing on the open upper half-plane, with nonzero-ness proved separately (lawSymbol_ne_zero_general). This matches the paper's 'stable up to zero' convention.",
+  "The cycle weight 2^{n_P} is tracked by missingCount (Nat.card of MissingClasses), and cycle_weight_splice shows it factorizes under one splice. Output extraction G_T is in stable_outputSymbol / stable_pinDensity, not in PinSplicing.",
+  "Only the half-plane (B+C) splice is formalized. The disk / A+D contraction of the spherical companion, and the Bloch and lattice-correction companions, are not in the Lean (lean/docs/271.md covers only the Sep 24 theorem).",
+  "No declaration in PinSplicing.lean has a docstring.",
+  "The dominated share of stable_spliced_law in the comparator DAG is small (0.013 per extract_lean.py), but it cannot be bypassed: every pin-test path goes through stable_pinLaw -> stable_spliced_law."
+ ],
+ "comparator": "ComparatorChallenges/Heisenberg.json: solution_module OAI.MathematicalPhysics.Heisenberg.Main, theorem OAI.Heisenberg.spontaneous_magnetization",
+ "comparator_chain": [
+  "OAI.Heisenberg.spontaneous_magnetization (Main.lean:60)",
+  "OAI.Heisenberg.ordered_state_exists (Main.lean:27)",
+  "OAI.Heisenberg.Selection.field_ordered_cubes (CubeSelection.lean:45)",
+  "OAI.Heisenberg.Surface.physical_surface_bound (PhysicalSurface.lean:33)",
+  "OAI.Heisenberg.Surface.symmetrized_surface_bound (SymmetrizedSurface.lean:29)",
+  "OAI.Heisenberg.Surface.completed_surface_bound (CompletedSurface.lean:19)",
+  "OAI.Heisenberg.Surface.mesh_matrix_surface (MeshMatrixSurface.lean:17)",
+  "OAI.Heisenberg.Surface.mesh_surface_tail (MeshSurface.lean:54)",
+  "OAI.Heisenberg.Bootstrap.mesh_pin_bound (MeshPin.lean:25)",
+  "OAI.Heisenberg.Pin.finite_pin_induction (TwoEndedReturns.lean:45)",
+  "OAI.Heisenberg.Pin.finite_simultaneous_pin_test (PinDensity.lean:92)",
+  "OAI.Heisenberg.Pin.pinned_input_return_bound (PinDensity.lean:81)",
+  "OAI.Heisenberg.Pin.stable_pinDensity (SimultaneousPins.lean:267)",
+  "OAI.Heisenberg.Pin.stable_pinLaw (StablePinLaw.lean:218)",
+  "OAI.Heisenberg.Pin.stable_spliced_law (PinSplicing.lean:203) [with OAI.Heisenberg.Cycle.cycle_weight_splice (PinSplicing.lean:417), used at StablePinLaw.lean:272]",
+  "OAI.Heisenberg.Pin.splice_lawSymbol (PinSplicing.lean:180)",
+  "OAI.Heisenberg.Pin.splice_permutationSymbol (PinSplicing.lean:171)",
+  "OAI.Heisenberg.Pin.splice_permutationSymbol_fixed (PinSplicing.lean:69) / splice_permutationSymbol_nonfixed (PinSplicing.lean:110)",
+  "OAI.Heisenberg.Pin.splice (PinSplicing.lean:27)"
+ ],
+ "lean_source": [
+  {
+   "name": "OAI.Heisenberg.Pin.spliceVariables",
+   "kind": "def",
+   "file": "OAI/MathematicalPhysics/Heisenberg/PinSplicing.lean",
+   "line": 18,
+   "text": "def spliceVariables : Option V ⊕ Option V → Option (V ⊕ V)\n  | Sum.inl none => none\n  | Sum.inr none => none\n  | Sum.inl (some i) => some (Sum.inl i)\n  | Sum.inr (some i) => some (Sum.inr i)"
+  },
+  {
+   "name": "OAI.Heisenberg.Pin.eraseNone",
+   "kind": "def",
+   "file": "OAI/MathematicalPhysics/Heisenberg/PinSplicing.lean",
+   "line": 24,
+   "text": "def eraseNone {σ : Type*} : MvPolynomial (Option σ) ℂ →ₐ[ℂ] MvPolynomial σ ℂ :=\n  MvPolynomial.aeval (fun j => j.elim 0 MvPolynomial.X)"
+  },
+  {
+   "name": "OAI.Heisenberg.Pin.splice",
+   "kind": "def",
+   "file": "OAI/MathematicalPhysics/Heisenberg/PinSplicing.lean",
+   "line": 27,
+   "text": "def splice (p : MvPolynomial (Option V ⊕ Option V) ℂ) : MvPolynomial (V ⊕ V) ℂ :=\n  eraseNone (MvPolynomial.pderiv none (MvPolynomial.rename spliceVariables p))"
+  },
+  {
+   "name": "OAI.Heisenberg.Pin.spliceWeight",
+   "kind": "def",
+   "file": "OAI/MathematicalPhysics/Heisenberg/PinSplicing.lean",
+   "line": 164,
+   "text": "def spliceWeight (π : Equiv.Perm (Option V)) : ℝ := if π none = none then 2 else 1"
+  },
+  {
+   "name": "OAI.Heisenberg.Pin.splice_permutationSymbol_fixed",
+   "kind": "theorem",
+   "file": "OAI/MathematicalPhysics/Heisenberg/PinSplicing.lean",
+   "line": 69,
+   "text": "theorem splice_permutationSymbol_fixed (π : Equiv.Perm (Option V)) (h : π none = none) :\n    splice (permutationSymbol π) = 2 * permutationSymbol (Equiv.removeNone π)"
+  },
+  {
+   "name": "OAI.Heisenberg.Pin.splice_permutationSymbol_nonfixed",
+   "kind": "theorem",
+   "file": "OAI/MathematicalPhysics/Heisenberg/PinSplicing.lean",
+   "line": 110,
+   "text": "theorem splice_permutationSymbol_nonfixed (π : Equiv.Perm (Option V))\n    (h : π none ≠ none) :\n    splice (permutationSymbol π) = permutationSymbol (Equiv.removeNone π)"
+  },
+  {
+   "name": "OAI.Heisenberg.Pin.stable_splice",
+   "kind": "theorem",
+   "file": "OAI/MathematicalPhysics/Heisenberg/PinSplicing.lean",
+   "line": 138,
+   "text": "theorem stable_splice {p : MvPolynomial (Option V ⊕ Option V) ℂ}\n    (hp : Stable p) (hn : splice p ≠ 0) : Stable (splice p)"
+  },
+  {
+   "name": "OAI.Heisenberg.Pin.stable_spliced_law",
+   "kind": "theorem",
+   "file": "OAI/MathematicalPhysics/Heisenberg/PinSplicing.lean",
+   "line": 203,
+   "text": "theorem stable_spliced_law (μ : Ω → ℝ) (π : Ω → Equiv.Perm (Option V))\n    (hμ : ∀ ω, 0 ≤ μ ω) (hpos : 0 < ∑ ω, μ ω) (hs : Stable (lawSymbol μ π)) :\n    Stable (lawSymbol (fun ω => μ ω * spliceWeight (π ω))\n      (fun ω => Equiv.removeNone (π ω)))"
+  },
+  {
+   "name": "OAI.Heisenberg.Cycle.cycle_weight_splice",
+   "kind": "theorem",
+   "file": "OAI/MathematicalPhysics/Heisenberg/PinSplicing.lean",
+   "line": 417,
+   "text": "theorem cycle_weight_splice (π : Perm (Option V)) (P : Set V) :\n    (2 : ℝ) ^ missingCount π (some '' P) =\n      (if π none = none then 2 else 1) * (2 : ℝ) ^ missingCount (removeNone π) P"
+  },
+  {
+   "name": "OAI.Heisenberg.Pin.pinLaw",
+   "kind": "def",
+   "file": "OAI/MathematicalPhysics/Heisenberg/StablePinLaw.lean",
+   "line": 183,
+   "text": "def pinLaw (μ : Ω → ℝ) (π : Ω → Perm V) (P : Set V) : MvPolynomial (P ⊕ P) ℂ :=\n  lawSymbol (fun ω => μ ω * (2 : ℝ) ^ missingCount (π ω) P)\n    (fun ω => nextPermutation (π ω) P)"
+  },
+  {
+   "name": "OAI.Heisenberg.Pin.stable_pinLaw",
+   "kind": "theorem",
+   "file": "OAI/MathematicalPhysics/Heisenberg/StablePinLaw.lean",
+   "line": 218,
+   "text": "theorem stable_pinLaw {V : Type u} [Fintype V] (μ : Ω → ℝ) (π : Ω → Perm V)\n    (hμ : ∀ ω, 0 ≤ μ ω) (hpos : 0 < ∑ ω, μ ω) (hs : Stable (lawSymbol μ π))\n    (P : Set V) : Stable (pinLaw μ π P)"
+  },
+  {
+   "name": "OAI.Heisenberg.Pin.finite_simultaneous_pin_test",
+   "kind": "theorem",
+   "file": "OAI/MathematicalPhysics/Heisenberg/PinDensity.lean",
+   "line": 92,
+   "text": "theorem finite_simultaneous_pin_test (μ : Ω → ℝ) (π : Ω → Equiv.Perm V)\n    (hμ : ∀ ω, 0 ≤ μ ω) (hpos : 0 < ∑ ω, μ ω) (hs : Stable (lawSymbol μ π))\n    (E : Set V) (T : Finset V) (hT : T.Nonempty) (hET : Disjoint E (T : Set V)) :\n    (∑ ω, if ∀ i ∈ T, ¬ HasHit (π ω) E i then pinDensity μ π E ω else 0) ≤\n      (2 * returnFraction μ π E T) ^ T.card"
+  },
+  {
+   "name": "OAI.Heisenberg.Pin.permutationSymbol",
+   "kind": "def",
+   "file": "OAI/MathematicalPhysics/Heisenberg/PermutationSymbols.lean",
+   "line": 15,
+   "text": "def permutationSymbol (π : Equiv.Perm V) : MvPolynomial (V ⊕ V) ℂ :=\n  ∏ i, (MvPolynomial.X (Sum.inl i) + MvPolynomial.X (Sum.inr (π i)))"
+  },
+  {
+   "name": "OAI.Heisenberg.Pin.lawSymbol",
+   "kind": "def",
+   "file": "OAI/MathematicalPhysics/Heisenberg/PermutationSymbols.lean",
+   "line": 70,
+   "text": "def lawSymbol (μ : Ω → ℝ) (π : Ω → Equiv.Perm V) : MvPolynomial (V ⊕ V) ℂ :=\n  ∑ ω, MvPolynomial.C (μ ω : ℂ) * permutationSymbol (π ω)"
+  },
+  {
+   "name": "OAI.Heisenberg.Pin.Stable",
+   "kind": "def",
+   "file": "OAI/MathematicalPhysics/Heisenberg/StablePolynomials.lean",
+   "line": 13,
+   "text": "def Stable {σ : Type*} (p : MvPolynomial σ ℂ) : Prop :=\n  ∀ z ∈ Upper, MvPolynomial.eval z p ≠ 0"
+  }
+ ],
+ "speedup_targets": [
+  {
+   "id": "S1",
+   "title": "Suzuki–Fisher Lee–Yang theorem for the spin-1/2 quantum Heisenberg ferromagnet",
+   "statement": "For a finite graph with ferromagnetic couplings J_xy >= 0 (isotropic, or XXZ with |Delta| <= 1), Z(h) = Tr exp(-beta H_0 + beta h sum_x S^z_x) has all its zeros in e^{-beta h} on the unit circle; equivalently Z != 0 when Re h != 0, also for site-dependent fields with real parts of one sign.",
+   "reference": "M. Suzuki, M. E. Fisher, J. Math. Phys. 12 (1971) 235–246; T. Asano, PRL 24 (1970) 1409 and J. Phys. Soc. Japan 29 (1970) 350; restated as Thms 45–47 of Harrow–Mehraban–Soleimanifar, arXiv:1910.09071.",
+   "status": "known (1971)",
+   "current_proof_size": "About 10–12 journal pages in SF71 (Trotter mapping to a classical multilayer model, an Asano contraction per layer, then a limit). No formalization found in Mathlib or elsewhere.",
+   "how_item_helps": "In Toth's loop representation with a site field, a closed loop of length L gets weight z^{L/2} + z^{-L/2} instead of 2. The spherical companion does exactly this with the disk symbol E prod(1 + x_i y_pi(i)) and the A+D contraction (Lemma trace-zero-free). That contraction step replaces SF71's Trotter-to-Ising mapping. The Lean has only the half-plane splice (the B+C coefficient), so a disk variant or a Moebius bridge must be added first.",
+   "expected_speedup": "med (1–2 pages instead of 10–12 for the zero-freeness core; the Lean saving is uncertain because the disk variant is missing)",
+   "confidence": "medium-low; this is where the device sits closest to its precedent, so a hit shows the splice can reproduce Asano/SF, not that it is new",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib Matrix.trace, NormedSpace.exp, MvPolynomial; OAI Heisenberg Model.lean (spinX/Y/Z, hamiltonian, box)",
+    "missing": "complex-field finite-volume partition function on a general finite graph (~60–100 lines); for the device route, a disk symbol plus an A+D contraction lemma (~150–250 lines, proof side)",
+    "formal_proof_to_compare": "none found (no Lee–Yang theorem in Mathlib)"
+   }
+  },
+  {
+   "id": "S2",
+   "title": "Liggett negative correlation for symmetric exclusion from a deterministic start (control: unspliced half)",
+   "statement": "For SEP, or any finite product of Bernoulli transpositions and deterministic permutations, started from a deterministic set B: P(A ⊆ pi(B)) <= prod_{a in A} P(a in pi(B)). Equivalently, pi(B) is strongly Rayleigh (BBL Thm 5.2 for deterministic initial data).",
+   "reference": "T. M. Liggett, Interacting Particle Systems (1985) Ch. VIII; Borcea–Brändén–Liggett, JAMS 22 (2009) Thms 4.20 and 5.2, arXiv:0707.2340.",
+   "status": "known",
+   "current_proof_size": "Liggett: several pages (duality plus comparison with independent walks). BBL: 3–5 pages on top of the Borcea–Brändén symbol theorem (Invent. Math. 2009, 25 pp). The OAI Lean already contains the ingredients: PermutationSymbols.lean 264, StableSections.lean 253 and PinSymmetrization.lean 308 lines.",
+   "how_item_helps": "Does NOT use the splice; it uses the law symbol, stable_lawSymbol_bernoulli, stable_outputSymbol and presence_product. Run it as the baseline arm, so that a speedup elsewhere can be credited to the splice rather than to the BB symbol.",
+   "expected_speedup": "high for the library as a whole, none attributable to the splice",
+   "confidence": "high (as a control)",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI Heisenberg lawSymbol, Stable, stable_lawSymbol_bernoulli, stable_outputSymbol, presence_product; Mathlib Equiv.Perm, Finset",
+    "missing": "none for the finite-mixture statement; continuous-time SEP needs the Poisson limit (PolynomialLimits.lean already has the Hurwitz step)",
+    "formal_proof_to_compare": "the OAI proof itself; no Mathlib or other Lean proof"
+   }
+  },
+  {
+   "id": "S3",
+   "title": "Strongly Rayleigh projection of the S_k block shuffle (control: unspliced half)",
+   "statement": "For the S_k shuffle (uniform permutations on random blocks), the positions of the first K cards form a strongly Rayleigh set at every time.",
+   "reference": "Nestoridi, Priestley, Schmid, arXiv:2304.02588, Cor. 3.6.",
+   "status": "known (2023)",
+   "current_proof_size": "Half a page, citing the Borcea–Brändén symbol theorem and a Trotter argument.",
+   "how_item_helps": "Uniform block laws are limits of Poisson exchanges (stable_lawSymbol_bernoulli plus limits), and output extraction gives SR. The splice is not used.",
+   "expected_speedup": "med (removes the BB/Trotter citation), not attributable to the splice",
+   "confidence": "high (as a control)",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI lawSymbol, Stable; Mathlib Equiv.Perm, uniform weights on a Finset of permutations",
+    "missing": "none for a fixed-time finite statement",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "S4",
+   "title": "Asano's contraction proof of the Lee–Yang circle theorem for the Ising ferromagnet (stretch, near-negative)",
+   "statement": "For J_xy >= 0 on a finite graph, the multiaffine Ising polynomial Z(z) = sum_A prod_{x in A} z_x prod_{xy in dA} e^{-2 J_xy} has no zeros with all |z_x| < 1.",
+   "reference": "T. D. Lee, C. N. Yang (1952); T. Asano (1970); Borcea–Brändén, Lee–Yang problems and the geometry of multivariate polynomials (2009).",
+   "status": "known",
+   "current_proof_size": "Asano: 1–2 pages given the contraction lemma; the Lee–Yang original is longer.",
+   "how_item_helps": "Same architecture: a product of two-site polynomials, then contract the duplicated variables. But the contraction needed is A+D in the disk, while the Lean splice is the half-plane B+C contraction. So it mainly measures whether a prover can adapt the splice idea to a sister contraction.",
+   "expected_speedup": "low",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib SimpleGraph, MvPolynomial, Complex.abs",
+    "missing": "Ising multiaffine partition polynomial (~50 lines)",
+    "formal_proof_to_compare": "none found"
+   }
+  },
+  {
+   "id": "S5",
+   "title": "In-family positive control: simultaneous pin test for the Toth theta=2 cycle measure",
+   "statement": "For any finite permutation law with a stable law symbol, the 2^{#cycles avoiding E}-weighted probability that every point of T lies on an E-avoiding cycle is at most (2r)^{|T|}.",
+   "reference": "Family 271, Sep 24 manuscript, Prop. prop:pin-test; Lean finite_simultaneous_pin_test (PinDensity.lean:92).",
+   "status": "proved in-family (unrefereed); formalized",
+   "current_proof_size": "Paper sec. 2 (~6 pages). Lean: PinSplicing + StablePinLaw + SimultaneousPins + PinDensity, about 1,340 lines.",
+   "how_item_helps": "This is the device's own use. It is the positive control for the speedup harness: hide PinSplicing.lean and measure the cost of re-deriving stable_pinLaw.",
+   "expected_speedup": "high (by construction)",
+   "confidence": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI Heisenberg lawSymbol, pinDensity, returnFraction, HasHit",
+    "missing": "none",
+    "formal_proof_to_compare": "yes: the OAI proof"
+   }
+  }
+ ],
+ "open_problems": [
+  {
+   "id": "O1",
+   "title": "Long loops / order for Ueltschi's theta=2 loop model with u in (1/2, 1) (easy-plane spin-1/2 XXZ ferromagnet), d >= 3",
+   "statement": "For H = -sum (S^1 S^1 + S^3 S^3 + Delta S^2 S^2) with Delta = 2u - 1 in (0, 1), on Z^d with d >= 3, prove long-range order (or macroscopic loops) at low temperature.",
+   "reference": "D. Ueltschi, J. Math. Phys. 54 (2013), arXiv:1301.0811; Betz–Klippel–Nauth, arXiv:2503.17857 (RP methods, u <= 1/2 only).",
+   "url": "https://arxiv.org/abs/1301.0811",
+   "status": "open for u in (1/2, 1)",
+   "obstruction_match": "Exact: theta = 2, no reflection positivity, and a need for product bounds on simultaneous avoidance events.",
+   "adaptation_sketch": "Replace permutation symbols by Brauer-pairing symbols. The f1 analysis verified that the two-strand mixture symbol is real stable (Lorentzian, eigenvalues {2, -2u, -2v, -2(1-u-v)}) and that splicing still gives weight 2 per loop. Missing: a presence inequality for non-orientable pairings, and an easy-plane leakage estimate.",
+   "payoff": "new theorem (first non-RP result for the easy-plane XXZ ferromagnet)",
+   "confidence": "medium-low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI Heisenberg Model.lean (spin operators, box, State/KMS), Mathlib",
+    "missing": "XXZ Hamiltonian variant and its dynamics (~50–100 lines); the Brauer symbol is needed only for the proof",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O2",
+   "title": "Spontaneous magnetization of the Heisenberg ferromagnet on other transient graphs (regular trees of every degree, nonamenable Cayley graphs, long-range couplings in d = 1, 2)",
+   "statement": "Show long-range order, or macroscopic theta=2 cycles, at low temperature on these graphs.",
+   "reference": "Björnberg–Ueltschi, arXiv:1803.11430 (large-degree trees only); Björnberg, arXiv:1505.06716 (complete graph); Adamczak–Kotowski–Miłoś, AIHP 57 (2021) (Hamming graph).",
+   "url": "https://arxiv.org/abs/1803.11430",
+   "status": "open (small-degree trees, general transient graphs)",
+   "obstruction_match": "Same model and same need. The splice is graph-independent: the Lean statements are over an arbitrary Fintype V.",
+   "adaptation_sketch": "Reuse stable_pinLaw and finite_simultaneous_pin_test verbatim; redo the return-fraction and leakage geometry (paper sections 3–6) for the new graph.",
+   "payoff": "new theorems, but weak evidence of cross-problem power (same model)",
+   "confidence": "medium",
+   "difficulty": "medium-high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib SimpleGraph, Matrix; OAI spin operators",
+    "missing": "Hamiltonian and finite-volume LRO statement on a general finite graph (~100–150 lines); an infinite-volume KMS version on trees needs more",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O3",
+   "title": "Zero-free strips for quantum Heisenberg partition functions and Barvinok-type algorithms",
+   "statement": "Find zero-free regions in complex field or temperature for the quantum Heisenberg ferromagnet beyond Lee–Yang, and use them for classical approximation algorithms.",
+   "reference": "Harrow–Mehraban–Soleimanifar, arXiv:1910.09071; Bravyi–Gosset, arXiv:1612.05602; Bravyi–Gosset–Liu–Wong, arXiv:2607.14401; spherical companion, Lemma trace-zero-free.",
+   "url": "https://arxiv.org/abs/1910.09071",
+   "status": "partly open",
+   "obstruction_match": "Zero-freeness of a quantum trace is the contraction of a zero-free layered symbol; the disk analogue of the splice gives it.",
+   "adaptation_sketch": "Disk symbol plus A+D contraction per layer, combined with Barvinok interpolation.",
+   "payoff": "new zero-free regions; an algorithm only if the regions are wide enough",
+   "confidence": "low-medium",
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib Matrix.exp, Complex; OAI spin operators",
+    "missing": "complex partition function (~80 lines); algorithmic statements would need a complexity library (major)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O4",
+   "title": "Poisson–Dirichlet PD(2) law of macroscopic cycles in Toth's model on Z^d, d >= 3",
+   "statement": "The ordered macroscopic cycle lengths converge to PD(2).",
+   "reference": "Goldschmidt–Ueltschi–Windridge, arXiv:1104.0983; Elboim–Sly, arXiv:2211.17023 (theta = 1, d >= 5).",
+   "url": "https://arxiv.org/abs/1104.0983",
+   "status": "open",
+   "obstruction_match": "Partial: weight-2 negative dependence of next-pin outputs is one ingredient of split–merge arguments.",
+   "adaptation_sketch": "Use the pin test to control simultaneous hitting of many test points, combined with an Elboim–Sly-type mixing argument.",
+   "payoff": "partial progress",
+   "confidence": "low",
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "Mathlib has no Poisson–Dirichlet law",
+    "missing": "PD(theta) via stick-breaking, and convergence of ordered partitions (>500 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O5",
+   "title": "Néel order for the spin-1/2 antiferromagnet without reflection positivity (bipartite, non-RP couplings)",
+   "statement": "Long-range Néel order at low temperature for bipartite finite-range couplings that are not reflection positive.",
+   "reference": "Aizenman–Nachtergaele, CMP 164 (1994); Dyson–Lieb–Simon (1978); Ueltschi, arXiv:1211.4141.",
+   "url": "https://arxiv.org/abs/1211.4141",
+   "status": "open beyond RP",
+   "obstruction_match": "On bipartite graphs, reversing time on one sublattice orients the double-bar loops, so the next-pin map is a bijection and the spliced symbol applies. The spin-wave half does not match.",
+   "adaptation_sketch": "Orientation trick plus the splice for the pin step; a new antiferromagnetic return analysis.",
+   "payoff": "new theorem if the geometric half closes",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI spin operators",
+    "missing": "AF Hamiltonian plus staggered order parameter (~80 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O6",
+   "title": "Lorentz mirror model with loop weight 2 in d >= 2 / weight-2 Brauer loops",
+   "statement": "Correlation inequalities, or long loops, for the mirror model with weight 2 per loop.",
+   "reference": "K. Ryan, arXiv:2608.21306 (Aug 2026; 1D via the six-vertex model).",
+   "url": "https://arxiv.org/abs/2608.21306",
+   "status": "recent; higher d open",
+   "obstruction_match": "Loop weight 2 is exactly what the splice produces, and a mirror is a Brauer-type local move.",
+   "adaptation_sketch": "Per-site stable Brauer symbol plus the splice; extract negative dependence of loop-hitting events.",
+   "payoff": "new correlation inequality",
+   "confidence": "low",
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib SimpleGraph, Equiv.Perm",
+    "missing": "mirror configurations and loop count (~150 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "Spontaneous magnetization for every d >= 3 and every spin S (the comparator theorem itself).",
+  "Bloch's T^{3/2} law with exact coefficient for finite-range anisotropic couplings (Oct 5 companion; re-derives the splice in 02-pins.tex L300–345).",
+  "First lattice correction to Bloch's law (Oct 5; imports the pin test).",
+  "Spherical magnetization law (Oct 5; uses the disk analogue of the contraction).",
+  "Pinned negative dependence for theta=2 cycle measures on any finite graph and any stable exchange law: finite_simultaneous_pin_test is already stated over an arbitrary Fintype V, so these are instances, not reuse."
+ ],
+ "release_reuse": [
+  {
+   "where": "Bloch's law companion (Oct 5)",
+   "use": "re-derives the layered symbol, the splice and G_T for finite-range couplings",
+   "counts_as_device_reuse": "in-family only"
+  },
+  {
+   "where": "Spherical law companion (Oct 5)",
+   "use": "disk symbol E prod(1 + x_i y_pi(i)) with the A+D (Asano) contraction, giving zero-free layered traces",
+   "counts_as_device_reuse": "in-family; a sister contraction, not the Lean splice"
+  },
+  {
+   "where": "First lattice correction (Oct 5)",
+   "use": "imports prop:pin-test",
+   "counts_as_device_reuse": "in-family, black box"
+  },
+  {
+   "where": "Family 238 (Thorp shuffle)",
+   "use": "BBL strongly Rayleigh occupancy only",
+   "counts_as_device_reuse": "no (the precedent ingredient, not the splice)"
+  },
+  {
+   "where": "Lean outside OAI/MathematicalPhysics/Heisenberg",
+   "use": "extract_lean.py reports no OAI imports into or out of the Heisenberg dir that touch the splice; the f1 grep of CONTENTS.md found no other user",
+   "counts_as_device_reuse": "no"
+  }
+ ],
+ "negative_controls": [
+  {
+   "id": "N1",
+   "setting": "Loop weight theta != 2 (SU(n) / spin-1 bilinear-biquadratic with theta = 3; theta = 4 via a doubled symbol)",
+   "expected": "fails",
+   "why": "The splice gives tr(I_{C^2}) = 2 per loop by construction. A weighted contraction x_q = a t, y_q = b t gives a + b per loop but path-dependent factors, which forces a = b. f1 numerics: the doubled symbol for theta = 4 is not stable (3/3 trials)."
+  },
+  {
+   "id": "N2",
+   "setting": "Toth's theta = 1 interchange conjecture in d = 3, 4",
+   "expected": "no help",
+   "why": "No stability-preserving contraction gives loop weight 1; x_q = t, y_q = -t leaves the half-plane."
+  },
+  {
+   "id": "N3",
+   "setting": "Spatial random permutations / Feynman–Kac Bose gas (permanental laws)",
+   "expected": "fails",
+   "why": "Permanental symbols per[a_ij (x_i + y_j)] are not stable in general (f1 counterexamples, including a Gaussian kernel), and the law is not generated by transpositions."
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "id": "S1",
+   "title": "Suzuki–Fisher Lee–Yang via the contraction",
+   "argument": "This is the only known theorem whose proof the contraction itself (not the BB symbol) could shorten. The step 'trace = contract each output with its input, so each closed loop gets weight 2' replaces SF71's Trotter-to-Ising mapping. It is statable in < 300 lines from the OAI spin operators. Caveats: the Lean splice is the half-plane B+C version, so the harness must allow a disk variant; and a success shows reach toward the precedent, not novelty."
+  },
+  {
+   "rank": 2,
+   "id": "O1",
+   "title": "Easy-plane XXZ / Ueltschi u in (1/2, 1)",
+   "argument": "The one open problem that matches the obstruction exactly: theta = 2, no RP, positive simultaneous events. The statement needs only an XXZ Hamiltonian on top of the OAI model (< 300 lines). The stability half provably extends to Brauer mixtures; the presence inequality for pairings and the leakage half are open. This is the best genuine cross-model test."
+  },
+  {
+   "rank": 3,
+   "id": "S2",
+   "title": "Liggett/BBL negative correlation for exclusion (control)",
+   "argument": "Statable now from existing OAI declarations. It isolates the unspliced half, so it is the baseline arm: compare prover cost with and without PinSplicing.lean in the library. No difference should appear; if one does, the harness is crediting the splice for BB-symbol work."
+  },
+  {
+   "rank": 4,
+   "id": "O2",
+   "title": "Heisenberg ferromagnet on trees / other transient graphs",
+   "argument": "The splice transfers verbatim, since the Lean statements are graph-agnostic; only the geometry changes. Statable on finite graphs in < 300 lines. Most likely to succeed, but it is the same model, so it is weak evidence for a jump."
+  },
+  {
+   "rank": 5,
+   "id": "S3",
+   "title": "S_k shuffle SR projection (control)",
+   "argument": "A second statable-now control. Together with S2 it measures how much of any speedup belongs to the precedent symbol."
+  }
+ ],
+ "precedent_check": {
+  "earlier_equivalent": "partial (the mechanism, not the application)",
+  "summary": "Checked against Asano 1970 and Suzuki–Fisher 1971. Asano's contraction maps A + B z1 + C z2 + D z1 z2 to A + D z and preserves zero-freeness outside products of closed sets (the disk / Lee–Yang setting). Suzuki–Fisher apply it, after a Trotter mapping, to the quantum Heisenberg model: contracting each layer's variables is a qubit trace, so every closed world-line loop gets weight 2. The splice is the half-plane sister operation: set x_q = y_q = t and take the t-coefficient, i.e. A + Bx + Cy + Dxy -> B + C. It is a composite of standard stability-preserving closure operations (diagonalization, partial derivative, real specialization: Borcea–Brändén; Wagner's survey arXiv:0911.3569, Lemma 2.4). The Lean proof stable_splice uses exactly stable_pderiv and stable_boundarySection. So 'contraction = trace = weight 2 per loop' has an earlier equivalent for this very model, in the zero-freeness setting, and the operation itself is N0. Not found anywhere: applying it to Borcea–Brändén permutation symbols to get stability, and hence BBL negative dependence, of the 2^{cycles}-weighted next-pin law. Verdict: the item is a new bridge, not a new object; the earlier equivalent of the mechanism downgrades it to N2 (agreeing with the f1 analysis).",
+  "post_oct6": "No use of the spliced symbol outside the OAI release found (web searches for strongly Rayleigh with cycle-weighted / Toth / interchange). Ryan, arXiv:2608.21306, predates the release and uses six-vertex methods."
+ },
+ "sources": [
+  "https://arxiv.org/abs/0707.2340 (BBL 2009)",
+  "https://arxiv.org/abs/0809.0401 (Borcea–Brändén)",
+  "https://arxiv.org/abs/0911.3569 (Wagner survey)",
+  "https://arxiv.org/pdf/1907.06156 (statement of the Asano contraction)",
+  "Suzuki & Fisher, J. Math. Phys. 12 (1971) 235",
+  "Asano, PRL 24 (1970) 1409",
+  "https://arxiv.org/abs/1910.09071",
+  "https://arxiv.org/abs/1301.0811",
+  "https://arxiv.org/abs/2503.17857",
+  "https://arxiv.org/abs/1803.11430",
+  "https://arxiv.org/abs/1505.06716",
+  "https://arxiv.org/abs/1104.0983",
+  "https://arxiv.org/abs/2211.17023",
+  "https://arxiv.org/abs/2304.02588",
+  "https://arxiv.org/abs/1612.05602",
+  "https://arxiv.org/abs/2607.14401",
+  "https://arxiv.org/abs/2608.21306",
+  "https://arxiv.org/abs/1211.4141",
+  "data/pilot/271/f1_stable_permutation_symbol.json (reused targets and numerics)"
+ ],
+ "search_log": [
+  "Read docs/downstream_agent_prompt.md, the shortlist entry, data/pilot/271/novelty.md and f1_stable_permutation_symbol.{md,json}.",
+  "Read PinSplicing.lean (full), StablePinLaw.lean 180–288, the defs in StablePolynomials.lean and PermutationSymbols.lean, and PinDensity.lean:92.",
+  "Ran scripts/extract_lean.py 271 (output to the scratchpad) and a BFS from OAI.Heisenberg.spontaneous_magnetization to the splice declarations.",
+  "Read the paper's 02-pin-test.tex L180–330 (lem:pin-splicing) to compare with the Lean.",
+  "Web: 'Asano contraction half-plane stable polynomial loop weight 2 random permutation interchange negative dependence' -> Asano contraction statements (A + Dz), BBL, Pemantle; nothing combining them.",
+  "Web: 'Heisenberg ferromagnet spontaneous magnetization stable polynomial splicing loop representation 2026' -> only the classical loop literature.",
+  "Web: '\"strongly Rayleigh\" permutation symbol cycle weight Toth interchange Heisenberg arXiv 2026' -> nothing after Oct 6.",
+  "Reused the f1 web log (BB symbol, Ueltschi / BKN, HMS, Bravyi–Gosset, Ryan 2026)."
+ ]
+}

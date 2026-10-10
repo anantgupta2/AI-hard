@@ -1,0 +1,541 @@
+{
+ "family": 112,
+ "title": "Beyond the square-root exponent for depth-three circuits",
+ "analyst_role": "novelty",
+ "date": "2026-10-09",
+ "inputs": [
+  "docs/PLAN.md",
+  "docs/novelty_agent_prompt.md",
+  "data/pilot/287/novelty.json + novelty.md (keys reused); data/pilot/330/novelty.json (format)",
+  "data/pilot/112/family.json + family.md (no trace.json, no f1_*.json exist for 112)",
+  "preprint source preprints/Beyond-the-Square-Root-Exponent-for-Depth-Three-Boolean-Circuits-September-23-2026/build/latex at fd4aeeb",
+  "arXiv abstract pages: 2601.04446, 1206.1775v1",
+  "lacker.io depth-3 problem page (verified 2026-08-10)",
+  "WebSearch: 10 queries (listed in sources)"
+ ],
+ "base_library_L": "Mathlib d13f23b + the 12-entry inline bibliography (ABI86, DHMTW14, ER60, GKPRT26, GPPST24, H89, HJP95, IPZ01, Krawczyk94, PPSZ05, PPZ99, PSZ00). No model-produced item in L; L- (contamination control) = L.",
+ "precedent_checks": [
+  {
+   "work": "Gurumukhani, Kleber, Paturi, Rosin, Talebanfard, \"Optimal depth-three circuits for inner product\", arXiv 2601.04446 (CCC 2026) = GKPRT26",
+   "role_in_112": "only cited work from 2025-2026; cited as stating the 2^{omega(sqrt n)} problem open (00:88-89)",
+   "dates": "v1 2026-01-07, v2 2026-02-12",
+   "ai_disclosure": "none on the abstract page (WebFetch summary; unverified against full text). Uses computer search for 2-CNF building blocks (not model assistance).",
+   "access": "arXiv abstract page via WebFetch (summarised)",
+   "contains": {
+    "C1 restriction lemma": "absent (upper-bound paper: inner product with bottom fan-in 2)",
+    "C2-C6": "absent"
+   }
+  },
+  {
+   "work": "Gurumukhani, Paturi, Pudlak, Saks, Talebanfard, \"Local enumeration and majority lower bounds\", CCC 2024 (arXiv 2403.09134) = GPPST24",
+   "role_in_112": "states the problem (Sec 1.1); bottom fan-in 3 bounds (00:96-100)",
+   "dates": "2024",
+   "ai_disclosure": "none known (pre-2025; not fetched)",
+   "access": "via lacker.io summary and paper citation only",
+   "contains": {
+    "all candidates": "absent (local-enumeration route to Majority lower bounds)"
+   }
+  },
+  {
+   "work": "Dell, Husfeldt, Marx, Taslaman, Wahlen, arXiv 1206.1775v1 (2012) Appendix A = DHMTW14",
+   "role_in_112": "named source of the disjointness device in the sparse partition (03:8-9, 94-95)",
+   "dates": "2012-06-08",
+   "ai_disclosure": "none (2012)",
+   "access": "arXiv abstract via WebFetch: \"transfer the sparsification lemma for d-CNF formulas to the counting setting\" (summarised)",
+   "contains": {
+    "C6 disjoint sparse partition": "same (counting-setting sparsification requires disjoint pieces; occurrence-bounded pieces have O(m) clauses)"
+   }
+  },
+  {
+   "work": "Impagliazzo, Paturi, Zane, JCSS 63(4) 2001 = IPZ01",
+   "role_in_112": "sparsification method (03:5-7); \"Sparse normal forms and random polynomial families also occur in [IPZ01, Section 1.2]\" (00:154-155)",
+   "dates": "2001",
+   "ai_disclosure": "n/a",
+   "access": "abstract via WebSearch summary of the Northeastern PDF",
+   "contains": {
+    "C4 good slices": "close variant: random degree-2 GF(2) polynomials need strongly exponential Sigma_3^k circuits for k = o(log log n), via sparsification + union bound; no random restrictions, no constant-pk lift",
+    "C6 sparse partition": "same up to disjointness"
+   }
+  },
+  {
+   "work": "Paturi, Saks, Zane, Comput. Complexity 9 (2000) Sec 5 = PSZ00",
+   "role_in_112": "named precedent for the evaluator-and-hard-subfunction language (00:138-140; 04:10-13)",
+   "dates": "2000",
+   "ai_disclosure": "n/a",
+   "access": "citation only (not fetched)",
+   "contains": {
+    "C5 language": "close variant (input-index function: parameter bits select a hard subfunction; bottom fan-in 2 model)"
+   }
+  },
+  {
+   "work": "Problem-level search: depth-3 2^{omega(sqrt n)} with ChatGPT / GPT-5 / OpenAI / AI-assisted; exact title search",
+   "role_in_112": "model-produced prior work check",
+   "dates": "2026-10-09 searches",
+   "ai_disclosure": "n/a",
+   "access": "WebSearch (3 queries); lacker.io problem page (verified 2026-08-10) lists the problem as open with no AI mention",
+   "contains": {
+    "all candidates": "absent; no model-produced attack found"
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "id": "C1",
+   "name": "Restriction lemma: clause-count-free expansion of a p-restricted width-k CNF into width-b CNF tests with E W <= 1/(1-theta), valid for ANY constant pk (b = b(pk))",
+   "paper_items": [
+    "I07 lem:restriction (02_restriction.tex:14-34)",
+    "I11 telescoping violation-path expansion (02:63-131)",
+    "I15 backward averaging count F_s(R) <= theta^s (02:235-342)",
+    "bookkeeping I08 easy/hard counts, I10 paths, I13 path weights, I14 reweighting",
+    "uses C2 (I12 marker mixture)"
+   ],
+   "trace": "no reasoning trace exists for family 112",
+   "statement": "For H width <= k on [d], b >= 1, theta = sum_{l=b+1}^k C(k,l)(2p/(1-p))^l < 1: exists W(H,T,rho) >= 0 with E W <= 1/(1-theta) and |E_z G H_{T,rho}| <= W corr_b(G) for all G simultaneously. Proof: H_{T,rho} = K + K sum_j (-1)^j sum_{paths} prod v_{i_h}/prod a_{U_h}; each term = omega(P) E[J_P] (marker mixture); count paths backwards from the terminal live set with weight 1/|V_R| averaging over eligible violated clauses.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Hastad 1989 (H89) Main Lemma, switching lemma",
+      "relation": "random restriction simplifies width-k CNFs, clause-count free; but conclusion is a DNF/decision tree of small depth and needs pk below an absolute constant (Pr <= (5pk)^s)",
+      "verdict": "genuinely different (paper contrasts it explicitly, 02:9-12)"
+     },
+     {
+      "ref": "Razborov encoding proof of the switching lemma; Beame primer",
+      "relation": "injective encoding of bad restrictions, auxiliary info d log w",
+      "verdict": "close in proof technique for I15 (encoding), genuinely different object and regime; I15 averages (1/|V_R|) where Razborov pays log w bits"
+     },
+     {
+      "ref": "Rossman, \"An entropy proof of the switching lemma and tight bounds on the decision-tree size of AC0\" (2017)",
+      "relation": "clause count enters as O(p log(m+1))^t; entropy/encoding style",
+      "verdict": "genuinely different (still small-p regime; DT conclusion)"
+     },
+     {
+      "ref": "Segerlind-Buss-Impagliazzo FOCS 2002 / SICOMP 2004; Razborov improvement",
+      "relation": "switching for small restrictions of k-DNFs, (13pk)^s with p <= 1/13",
+      "verdict": "genuinely different (regime and conclusion)"
+     },
+     {
+      "ref": "Lovett-Wu-Zhang, \"Decision list compression by mild random restrictions\", STOC 2020, arXiv 1909.10658",
+      "relation": "closest in spirit: a restriction lemma valid at ANY constant restriction rate with a bounded first moment ((4/alpha)^w expected useful terms of a width-w DNF)",
+      "verdict": "close in spirit, genuinely different conclusion (term-count compression of a DNF, not a correlation-preserving signed expansion into narrow CNFs; width does not drop)"
+     },
+     {
+      "ref": "Gopalan-Meka-Reingold DNF sparsification (CC 2013)",
+      "relation": "approximate width-w DNF by (w log 1/eps)^{O(w)} terms",
+      "verdict": "genuinely different"
+     },
+     {
+      "ref": "Impagliazzo-Matthews-Paturi, \"A satisfiability algorithm for AC0\" (SODA 2012, arXiv 1107.3127): extended switching lemma partitioning into narrow CNFs",
+      "relation": "clause-count-free decomposition of restricted CNFs into narrow pieces, regime p = 1/O(k)",
+      "verdict": "genuinely different (decision-tree partition in the small-pk regime; no signed mixture)"
+     },
+     {
+      "ref": "Cluster/polymer expansions; Moser-Tardos witness trees",
+      "relation": "alternating expansions over chains of violated constraints",
+      "verdict": "structural analogue only for I11"
+     }
+    ],
+    "verdict": "no near-equivalent found",
+    "searches": "WebSearch (Oct 2026): \"random restriction CNF signed combination small width CNFs bounded coefficient mass independent of number of clauses\"; \"Lovett Wu Zhang decision list compression by mild random restrictions\"; \"switching lemma random restriction pk any constant ... Razborov encoding violated clauses\"; extended search \"switching lemma CNF restricted linear combination of CNFs narrow width correlation bound number of clauses\". MathOverflow/zbMATH not queried directly."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "Goal: an OR-AND-OR size lower bound for a P language. Neither the goal nor any statement in L (H89, HJP95, PPZ99, PPSZ05, PSZ00, IPZ01, DHMTW14, Mathlib) contains a signed expansion of H_{T,rho} into narrow CNFs with an L1 cost, nor the quantities a_U, c_U, 1/|V_R|. The paper's nearest L statement (H89 Main Lemma) is used only as a contrast. The constituent identities (1 = sum v_i/q; c/(c+w) as a first-marker probability) are tiny and appear nowhere in the goal, in the Cook-PHP sense."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "lean": "Dependency closure of restrictionAvg_cnfRestrictionCost_le_two + cnf_restricted_correlation_le_cost: 346/2046 proof-DAG decls = 16.9% of the whole DAG, ~38% of the 906-decl lower-bound subDAG (the rest of the DAG is Turing-machine plumbing, 60%). wide_correlation_of_good_restrictions dominated share 0.131. The 20% frac_dag_dependents proxy is NOT passed on the full DAG (diluted by TM plumbing); it is passed on the lower-bound subDAG.",
+    "paper": "Sole route from width k = Theta(sqrt d) to constant width b (05:48-79). Knockout: without it, the only width-lifting tool in L is the switching lemma, which forces pk < const and returns the classical 2^{O(sqrt n)} ceiling."
+   },
+   "test4": {
+    "run": false,
+    "hide": "Section 2 entirely; intro paragraph 00:116-128 (\"Our main ingredient ... clause-count independence\"); 05:48-79 (transfer step); 02 figure; the I32 parameter paragraph that reveals \"pk bounded by Q\".",
+    "arms": {
+     "open": "problem only: find an explicit P language with a 2^{omega(sqrt n)} depth-3 lower bound (L as context)",
+     "directed": "problem + Prop good-slices (I26) + sparse partition + the circuit-counting skeleton (I35) + the explicit gap: \"need: for p = B/sqrt d and width k = C sqrt d CNFs, bound |E gH| by restricted corr_b with b independent of clause count\"",
+     "lemma_given": "statement of I07 given; ask for a proof (measures discoverability of I11+I12+I15 separately from the statement)"
+    },
+    "equivalence_criterion": "A proposal hits if it yields, for every constant pk, a nonnegative cost W independent of G with E W bounded by a function of (pk, b) only (no dependence on clause count or d) and |E_z G H_{T,rho}| <= W * corr_C(G) for a class C of constant-width tests on which the slice can be shown pseudorandom (C closed under conjunction with cylinders). Lean equivalence: derive cnf_restriction_bound (Restriction.lean:59) or its corollary wide_correlation_of_good_restrictions. Proofs via Hastad-type DT depth bounds that require pk < 1/5 do NOT count.",
+    "k_values": "k in {1,2,4,...,256}, K = 256, n = 256 samples per arm, temperature 1.0, fixed reasoning budget",
+    "models": "see discoverability_protocols.common",
+    "pivot_distance": "no reasoning trace exists for 112"
+   },
+   "final": {
+    "N": "N3",
+    "F": "F3 (auxiliary construction: violation-path expansion + marker mixtures + backward averaging) with F5 flavour (representation of H_{T,rho} as a signed mixture of narrow CNFs)",
+    "confidence": 0.5,
+    "justification": "No neighbour found in four searches over the switching-lemma family (Hastad, Razborov, Rossman, SBI, Lovett-Wu-Zhang, GMR, IMP12); the conclusion (clause-count-free L1 expansion into narrow CNFs at arbitrary constant pk) differs from all of them; non-analytic; the knockout shows it is the step that breaks the sqrt n ceiling. Not templated (the IH F_s(R) <= theta^s is incidental). Confidence held at 0.5 because the switching-lemma neighbourhood is dense and expert-heavy, zbMATH/MathOverflow were not queried, and the whole result is extraordinary and unreviewed (Lean-formalized but not built here)."
+   }
+  },
+  {
+   "id": "C2",
+   "name": "Marker mixture: c/(c+w) realised as a convex mixture of conjunctions of the indexed clauses (random order of clauses and c markers)",
+   "paper_items": [
+    "I12 (02_restriction.tex:168-193)"
+   ],
+   "trace": "no reasoning trace exists for family 112",
+   "statement": "Uniformly permute a clause objects and c markers; the conjunction of clauses before the first marker holds w.p. c/(c+w) at a point violating w of them. Applied independently per path step, K prod v/prod a = omega(P) E[J_P] with J_P in C_b(T).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Classical random-ordering / first-arrival symmetry (P[first of w+c uniformly ordered objects is a marker] = c/(c+w))",
+      "relation": "the identity itself",
+      "verdict": "equivalent (for the identity)"
+     },
+     {
+      "ref": "Random-ordering arguments in combinatorics (e.g. LYM-type/Lubell permutations; random-order analyses)",
+      "relation": "using a random order to realise rational weights as averages of combinatorial objects",
+      "verdict": "close variant (generic)"
+     }
+    ],
+    "verdict": "identity N0; its use to keep reciprocal-count weights inside a CNF class has no neighbour found",
+    "searches": "covered by C1 searches; no separate query"
+   },
+   "test2": {
+    "verdict": "pass vs goal (weak)",
+    "evidence": "Not a subterm of the goal; the identity is elementary and classical, so analytic vs general mathematics."
+   },
+   "test3": {
+    "verdict": "pass (inside C1)",
+    "lean": "pathMixture_scaled_average closure 156/2046 (7.6%); marker_product_mixture_ratio dominated 0.009.",
+    "paper": "Without it the expansion terms are rational functions of violation counts, not CNFs, and corr_b would not apply."
+   },
+   "test4": {
+    "run": false,
+    "hide": "I12 and 02:168-193; keep the expansion I11 visible",
+    "arms": {
+     "directed": "given eq. (restriction-expansion), ask how to bound |E G * term| by corr_b(G)"
+    },
+    "equivalence_criterion": "Any representation of K prod v/prod a as a nonnegative combination of width-b CNFs with total weight omega(P) (or a constant multiple).",
+    "k_values": "k in {1,2,4,...,256}, K = 256, n = 256 samples per arm, temperature 1.0, fixed reasoning budget",
+    "models": "see discoverability_protocols.common",
+    "pivot_distance": "no reasoning trace exists for 112"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Classical identity in a new role; graded as part of the C1 cluster. Standalone it is N1-N2."
+   }
+  },
+  {
+   "id": "C3",
+   "name": "Strategy/quantifier insight: choose b after A so pk may be any constant, with a slice whose restricted correlation exponent (1/8) does not depend on b",
+   "paper_items": [
+    "I32 (05_lower_bound.tex:9-46)",
+    "uses I26, I07"
+   ],
+   "trace": "no reasoning trace exists for family 112",
+   "statement": "Fix A; s = 3A, B = 64(s+1), k = ceil(3(s+1) sqrt d), Q = 4B[3(s+1)+1]; choose b with sum_{l>b} Q^l/l! <= 1/2; then choose the slice for (b, B).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Standard random-restriction parameter tuning (H89, HJP95): p ~ 1/k with pk below a constant",
+      "relation": "same template, but there the constant is absolute",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "IPZ01 Sec 1.2 / PSZ00: pseudorandom-like functions against bounded-width CNFs with exponents independent of width",
+      "relation": "supplies the \"b-independent exponent\" half",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "close variant (forced once C1 is stated)",
+    "searches": "covered by C1 and IPZ01 searches"
+   },
+   "test2": {
+    "verdict": "borderline fail",
+    "evidence": "Given C1 and C4, the parameter order is arithmetic; it is analytic relative to the statements of C1 and C4 (both in the extended context)."
+   },
+   "test3": {
+    "verdict": "pass",
+    "lean": "exists_final_parameter_width (FinalParameterBounds.lean:124) dominated 0.003; conceptually load-bearing, formally small.",
+    "paper": "Source of omega(sqrt n)."
+   },
+   "test4": {
+    "run": false,
+    "hide": "05:26-46 and 00:166-175",
+    "arms": {
+     "directed": "given C1 and C4 statements, ask for a parameter choice proving 2^{A sqrt n} for every A"
+    },
+    "equivalence_criterion": "Any choice with pk = Theta_A(1), b = b(A), slice chosen after b, closing the final inequality.",
+    "k_values": "k in {1,2,4,...,256}, K = 256, n = 256 samples per arm, temperature 1.0, fixed reasoning budget",
+    "models": "see discoverability_protocols.common",
+    "pivot_distance": "no reasoning trace exists for 112"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Conceptual crux but arithmetically forced by C1 + C4; its novelty is inherited from C1."
+   }
+  },
+  {
+   "id": "C4",
+   "name": "Prop good-slices: a k-wise independent slice whose random restrictions have corr_b <= 2^{-|T|/8} simultaneously over all width-b CNFs",
+   "paper_items": [
+    "I26 (04_construction.tex:118-299)",
+    "uses I17, I27-I31"
+   ],
+   "trace": "no reasoning trace exists for family 112",
+   "statement": "For fixed b, B and large n, some parameter bits give Pr_{T,rho}[|T| out of [m0/2, 2m0] or corr_b(g_{T,rho}) > 2^{-|T|/8}] <= 4 2^{-m0/16}.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "IPZ01 Sec 1.2 (random degree-2 polynomials require strongly exponential Sigma_3^k circuits, k = o(log log n), via sparsification + union bound)",
+      "relation": "same mechanism (sparse normal forms + random function family + union bound) without restrictions",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "PSZ00 Sec 5",
+      "relation": "parameter bits select a hard subfunction",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "ABI86; Krawczyk94",
+      "relation": "k-wise independence via polynomials over GF(2^r) and Toeplitz hashing",
+      "verdict": "equivalent (ingredients)"
+     }
+    ],
+    "verdict": "close variant",
+    "searches": "IPZ01 abstract search; paper's own precedent remarks (00:154-155, 04:10-13, 04:49-56)"
+   },
+   "test2": {
+    "verdict": "weak pass",
+    "evidence": "The restricted-cube form (pseudorandom on almost every p-restriction, with an exponent independent of b) is not stated in L, but it is the IPZ01 argument applied cube-by-cube."
+   },
+   "test3": {
+    "verdict": "pass",
+    "lean": "exists_good_language_slice_eventually closure 552/2046 (27%; includes the sparse partition); dominated share 0.195.",
+    "paper": "Supplies the b-independent correlation bound used in 05:48-79."
+   },
+   "test4": {
+    "run": false,
+    "hide": "04:118-299",
+    "arms": {
+     "directed": "given the language and the needed property, ask for a proof"
+    },
+    "equivalence_criterion": "Proof of a corr_b bound 2^{-c|T|} with c independent of b, uniform over all width-b tests, for most restrictions.",
+    "k_values": "k in {1,2,4,...,256}, K = 256, n = 256 samples per arm, temperature 1.0, fixed reasoning budget",
+    "models": "see discoverability_protocols.common",
+    "pivot_distance": "no reasoning trace exists for 112"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.65,
+    "justification": "Close variant of IPZ01 Sec 1.2 transplanted to restricted cubes; the paper names the precedent."
+   }
+  },
+  {
+   "id": "C5",
+   "name": "The language: Hankel/Toeplitz hash + degree-<t polynomial over F_2[Z]/(P), with hash seed, modulus and coefficients as input bits",
+   "paper_items": [
+    "I23 (04_construction.tex:15-47)",
+    "I37 slice"
+   ],
+   "trace": "no reasoning trace exists for family 112",
+   "statement": "d = floor(n/5), r = ceil(d^{2/3}), t ~ d^{1/6}; accept iff lambda(sum beta_j h(x)^j) = 0.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "PSZ00 Sec 5 input-index construction",
+      "relation": "evaluator-and-hard-subfunction method",
+      "verdict": "close variant (named by the paper)"
+     },
+     {
+      "ref": "ABI86 Sec 6 / standard k-wise independent families; Krawczyk94 Toeplitz hashing",
+      "relation": "components",
+      "verdict": "equivalent (components)"
+     }
+    ],
+    "verdict": "conjunction of known constructions",
+    "searches": "paper's precedent remarks; no separate search"
+   },
+   "test2": {
+    "verdict": "fail (analytic)",
+    "evidence": "A composition of concepts in L (hash, polynomial evaluation, parameter-bit inputs)."
+   },
+   "test3": {
+    "verdict": "pass (carrier)",
+    "lean": "language closure enters both halves; TM implementation 60% of DAG (plumbing).",
+    "paper": "Witness object."
+   },
+   "test4": {
+    "run": false,
+    "hide": "n/a (not N3-eligible)",
+    "arms": {},
+    "equivalence_criterion": "n/a",
+    "k_values": "k in {1,2,4,...,256}, K = 256, n = 256 samples per arm, temperature 1.0, fixed reasoning budget",
+    "models": "see discoverability_protocols.common",
+    "pivot_distance": "no reasoning trace exists for 112"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Downgraded from the analyst's N2: a conjunction of L concepts with the paper's own named precedent (PSZ00); parameter tuning only."
+   }
+  },
+  {
+   "id": "C6",
+   "name": "Disjoint sparse partition with linear clause count",
+   "paper_items": [
+    "I17 (03_sparse_partition.tex:14-25)",
+    "I20-I22"
+   ],
+   "trace": "no reasoning trace exists for family 112",
+   "statement": "Width-b CNF on m vars = disjoint sum of <= 2^{eta m} width-b CNFs with <= M(b,eta) m clauses each.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "DHMTW14 App. A (arXiv 1206.1775) counting-setting sparsification",
+      "relation": "disjoint version of IPZ01",
+      "verdict": "equivalent (occurrence-bounded pieces have O(m) clauses)"
+     },
+     {
+      "ref": "IPZ01; Calabro-Impagliazzo-Paturi 2006",
+      "relation": "sparsification lemma",
+      "verdict": "equivalent up to disjointness"
+     }
+    ],
+    "verdict": "exists",
+    "searches": "WebFetch arXiv 1206.1775 abstract"
+   },
+   "test2": {
+    "verdict": "fail (analytic: in L)",
+    "evidence": "DHMTW14 and IPZ01 are in the bibliography."
+   },
+   "test3": {
+    "verdict": "pass",
+    "lean": "closure 196/2046 (9.6%); Sparse* carriers frac_dag_dependents ~0.22 (over-ranked by the proxy).",
+    "paper": "Needed for the union bound in C4."
+   },
+   "test4": {
+    "run": false,
+    "hide": "n/a (not N3-eligible)",
+    "arms": {},
+    "equivalence_criterion": "n/a",
+    "k_values": "k in {1,2,4,...,256}, K = 256, n = 256 samples per arm, temperature 1.0, fixed reasoning budget",
+    "models": "see discoverability_protocols.common",
+    "pivot_distance": "no reasoning trace exists for 112"
+   },
+   "final": {
+    "N": "N0",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "Re-proof of the disjoint sparsification lemma; downgraded from the analyst's N1 because DHMTW14 already states the needed form up to the trivial occurrence-to-clause-count conversion."
+   }
+  }
+ ],
+ "excluded_from_candidates": [
+  {
+   "paper": "I01-I06, I18, I19, I22, I24, I25, I27-I31, I35, I36",
+   "reason": "N0 background and standard tools (circuit model, restrictions, Erdos-Rado, hashing, interpolation, moments, tails, top-down counting, field existence)"
+  },
+  {
+   "paper": "I04, I09, I16, I33, I34, I37",
+   "reason": "N1 abbreviations / direct combinations"
+  },
+  {
+   "lean": "I38 comparator defs, I39 Turing-machine compilation",
+   "reason": "N0/N1 formal plumbing (negative control for the load-bearing proxy)"
+  },
+  {
+   "trace": "none",
+   "reason": "no reasoning trace exists for 112; no pivots or insight-driven steps to add"
+  }
+ ],
+ "family_D": {
+  "label": "D3 (provisional)",
+  "confidence": 0.5,
+  "rests_on": "C1 alone (restriction lemma cluster I07 + I11 + I15, with C2 marker mixture as a sub-device). All other candidates are N0-N2.",
+  "falls_to": "D2 if (a) an expert identifies a known clause-count-free narrow-CNF expansion valid at arbitrary constant pk (most likely places: Razborov/Hastad switching-lemma variants for proof complexity, Lovett-Wu-Zhang follow-ups, Tal/Rossman AC0 correlation work, IMP12-style SAT-algorithm decompositions), or (b) Test 4 directed arm exceeds the calibrated threshold.",
+  "not_transfer": "C1 is a home-field (TCS) tool with no cross-field import; the cross-field imports (sunflowers, finite fields) sit in N0 items.",
+  "correctness_caveat": "Grades assume correctness. family.md re-derived the restriction lemma and parameter arithmetic and found no gap; Lean proves the comparator end to end (no sorry/axiom), but was not compiled here. The result would break a decades-old barrier, so external verification matters.",
+  "compression_note": "C1 is a single-use bottleneck lemma between the pseudorandom slice and the counting step, but it is also a reusable tool (any function pseudorandom against narrow CNFs on restrictions inherits width-sqrt(n) bounds). Downstream speedup targets: depth-3 bounds for other pseudorandom families, AC0 correlation bounds at depth 3, Res(k)/depth-2 Frege where clause-count-free width reduction is useful."
+ },
+ "provenance_flag": {
+  "applies": "no",
+  "builds_on_prior_model_result_strict": false,
+  "model_produced_precedent": false,
+  "explanation": "The only 2025-2026 cited work (GKPRT26, arXiv 2601.04446) shows no AI disclosure on its abstract page and contains none of the candidates. The named precedents (PSZ00, IPZ01, DHMTW14, ABI86, Krawczyk94, ER60) predate LLMs. Searches pairing the problem with ChatGPT/GPT-5/OpenAI/AI-assisted, and an exact-title search, found nothing; the lacker.io problem page (verified 2026-08-10) still lists the problem as open and mentions no AI work.",
+  "adjacent_model_work": "none found"
+ },
+ "bridge_novelty": [
+  {
+   "import": "SAT/exact-algorithm sparsification (IPZ01, DHMTW14) -> depth-3 lower bound",
+   "classification": "known route",
+   "evidence": "IPZ01 itself derives Sigma_3^k lower bounds for random polynomials from sparsification; PPZ/PPSZ and GPPST24 tie SAT algorithms to depth-3 bounds."
+  },
+  {
+   "import": "k-wise independence / universal hashing (ABI86, Krawczyk94) -> hard slices",
+   "classification": "known route",
+   "evidence": "IPZ01 random polynomial families; PSZ00 parameterized hard subfunctions."
+  },
+  {
+   "import": "Erdos-Rado sunflower lemma (extremal set theory)",
+   "classification": "known route",
+   "evidence": "Core of IPZ01 sparsification."
+  },
+  {
+   "import": "Finite fields GF(2^r), Lagrange interpolation",
+   "classification": "known route",
+   "evidence": "Standard in pseudorandomness."
+  },
+  {
+   "import": "Random-ordering identity c/(c+w) -> CNF mixtures (C2)",
+   "classification": "new bridge (minor)",
+   "evidence": "No prior use found of random-order markers to realise reciprocal violation counts as CNF mixtures; the identity itself is elementary probability."
+  }
+ ],
+ "discoverability_protocols": {
+  "common": {
+   "models": "Training cutoff strictly before 2026-09-23 (preprint date; release 2026-10-06). No model-produced precedent exists, so the binding date is the preprint itself. Canary probe: ask whether an explicit (P) function with a 2^{omega(sqrt n)} depth-3 lower bound is known, and whether a restricted width-k CNF can be expanded into width-b CNF tests with clause-count-free L1 mass; exclude any model that answers yes or describes violation-path expansions or marker mixtures. No browsing or retrieval. Exclude the OpenAI model lineage that produced the release from the main pool (run it only as an uncontrolled reference arm). Judge model differs from proposer.",
+   "excluded_sources": "openai/math repo (preprint 112, lean/OAI/Computability/DepthThree, CONTENTS.md, lean/docs/112.md), press coverage of the release, and this project's data/pilot/112 files.",
+   "context_L": "Mathlib d13f23b digest (Finset sums, Turing.Tape, Lagrange, GaloisField) + 112's 12-entry bibliography as abstracts plus invoked statements (H89 switching lemma, IPZ01 sparsification + Sec 1.2, DHMTW14 App. A, PSZ00 Sec 5, ABI86 Prop 6.3, Krawczyk94, ER60).",
+   "arms": {
+    "open": "problem only",
+    "directed": "problem + C4 + C6 + I35 skeleton + explicit gap statement (see C1.test4)",
+    "lemma_given": "C1 statement given; prove it",
+    "L_minus_switching": "directed arm with H89 removed from context, to test whether the switching lemma anchors proposals in the pk < const regime"
+   },
+   "sampling": "n = 256 samples per arm, temperature 1.0, fixed reasoning budget (e.g. 32k tokens); unbiased pass@k for k in {1,2,4,...,256}; K = 256.",
+   "judging": "Two independent LLM judges given the paper's contrast remark (02:9-12) and the C1 neighbour list; a circuit-complexity specialist checks all hits and 10% of misses; Lean equivalence where possible (cnf_restriction_bound, Restriction.lean:59).",
+   "controls": "Positive: Cook-Reckhow ER extension variables for PHP. Negative: C6 (disjoint sparsification), C5 (the language), I35 (wide-clause truncation) in the same format. Threshold calibrated as in PLAN step 4.",
+   "redaction": "Strip 00:116-128 (\"Our main ingredient ... clause-count independence\"), all of section 2, 05:26-79, and the abstract-level claim if the open arm is to test the barrier itself."
+  },
+  "C1": {
+   "hide": "I07, I08, I10-I16 and everything downstream (05:48-136)",
+   "chain_depth": 2,
+   "chain_note": "C1 pays off only together with C4 (b-independent slice); C2 is an internal sub-device of C1.",
+   "pivot_distance": "no trace; text-level estimate: one step from H89 in statement shape (\"restricted CNF -> simpler object, clause-count free\"), but several non-obvious moves from L in proof (partition of unity over violated clauses, marker mixture, backward averaging)."
+  },
+  "C2": {
+   "hide": "I12 only",
+   "chain_depth": 1
+  },
+  "C3": {
+   "hide": "I32",
+   "chain_depth": 2
+  }
+ },
+ "open_questions": [
+  "Expert query (Hastad, Razborov, Rossman, Tal, Lovett, Paturi, Talebanfard, Impagliazzo): is a clause-count-free signed expansion of restricted width-k CNFs into width-b CNFs, valid for arbitrary constant pk, known (e.g. in proof-complexity switching lemmas or AC0 correlation work)? This is the main risk to C1's N3.",
+  "External verification of the headline (2^{omega(sqrt n)} would be a landmark): build the Lean (lake build) and run the comparator for DepthThree.",
+  "Quantify the effective rate: b(A) and M(b, 1/8) are tower-like; is there a version with explicit omega (e.g. 2^{sqrt n log* n})?",
+  "Downstream speedup targets: does C1 give new bounds for Majority (needs corr_b decay independent of b, false for majority?), for depth-3 with other pseudorandom families, or for Res(k)/narrow-CNF proof systems?",
+  "zbMATH and MathOverflow were not queried directly; repeat for \"switching lemma\" + \"signed\" / \"linear combination of CNFs\" / \"L1 approximation by narrow CNFs\".",
+  "Read GKPRT26 full text for AI disclosure (only the abstract page was summarised)."
+ ],
+ "sources": [
+  "https://arxiv.org/abs/2601.04446",
+  "https://arxiv.org/abs/1206.1775v1",
+  "https://lacker.io/complexity/problems/depth3-circuits-past-sqrt-n.html",
+  "https://arxiv.org/abs/1909.10658",
+  "https://mathweb.ucsd.edu/~sbuss/ResearchWeb/resK/focs02.pdf",
+  "https://www.math.utoronto.ca/rossman/logsize.pdf",
+  "https://arxiv.org/abs/1107.3127",
+  "https://khoury.northeastern.edu/~viola/classes/papers/ImpagliazzoPaturiZane01Which.pdf",
+  "WebSearch queries: depth-three circuit lower bound 2^{omega(sqrt n)} explicit open problem; random restriction CNF signed combination small width bounded mass clause-count independent; \"Beyond the square-root exponent\" depth-three OpenAI; Lovett Wu Zhang mild random restrictions; depth-3 correlation with CNFs random restriction t-wise independent; switching lemma any constant pk Razborov encoding; IPZ01 random polynomial depth-3; depth-3 + GPT-5/ChatGPT/AI-assisted/OpenAI 2026; extended: switching lemma CNF linear combination narrow width clause count"
+ ]
+}

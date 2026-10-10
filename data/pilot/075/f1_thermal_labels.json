@@ -1,0 +1,408 @@
+{
+ "item": "Family 075, I26+I27+I10 cluster: thermal noisy labels Z = Y + theta (theta ~ K_A), label updates A+ = A + S_p + D_i, and the two-law (true input P vs uniform output U) Fisher-sum identity; provisional N3, F1 (F5 flavour). Slug thermal_labels.",
+ "definition": "Thermal noisy labels (paper 05-thermal.tex:11-28, 111-158; 06-procedure.tex:72-78, 170-183, 611-630; 09-assembly.tex:159-170). (1) A thermal form on the circle is A(y)=sum_s lambda_s (1 - Re chi_s(y)), lambda_s>=0; q_A(u) = Fourier coefficients of e^{-A}; free energy F(A)=-log q_A(0); K_A = e^{F(A)-A} (a probability density: a centred generalised von Mises / one-site plane-rotator Gibbs density); Delta_A(u)=||1-chi_u||_{L^2(K_A)}; B_A(r)={u: Delta_A(u)<=r}. (2) LABEL: the random input point Y (law P, dP = rho/m_top dU, i.e. sampled proportionally to the input density) is observed through a noisy label Z = Y + theta mod 1 with theta ~ K_A, errors independent given Y; no choice of the procedure ever inspects a sampled label. (3) LABEL UPDATE: on each successful spectral update at interval p the main channel is tightened, A+ = A + S_p + D_i, with spatial form S_p = R_p^2 (1 - Re chi_1), R_p=|p|^{-1}, and a metric form D_i = lambda * (averaged cost over a compressed frequency set) chosen on a flat stretch of free energy; a fresh label of type A+ is drawn. (4) TWO-LAW FISHER SUM: at a live jumping node p of plateau e with post-density a, put M_pm(z) = E_{p_pm}[a(Y) K_A(z-Y)]/alpha_e, M=(M_+ + M_-)/2, D=(M_+ - M_-)/2, J_p = int |D|^2/M dz. Under the TRUE input law, alpha_e/m_p * J_p is exactly the expected squared bias of the next spatial bit of Y given the label Z; bias^2 <= 2 KL(bit || fair) and the entropy chain rule give, summed with UNIFORM output weights, sum_{live jumping p} U(p) alpha_e J_p <= C d (Prop live-budgets (iv)). (5) DECODING: with a^s_p(z) = E_p[a_p(Y) chi_s(Y) r_{j+1}(Y) K_A(z-Y)]/alpha_e and c_A(n) = int chi_n K_A = 1 - Delta_A(n)^2/2 >= 1/2, one has exactly int chi_n(z) a^s_p(z) dz = c_A(n) c_p^{s+n}: a single label-valued moment encodes every modulation s+n with n in the ball B_A(r_sep). Lean (finite version on ZMod 2^M, labels integrated not sampled): Thermal.label, Thermal.channel, Update.next, Procedure.fisher, fisher_bound, duet_decode.",
+ "obstruction_dissolved": "Prop dyadic needs int max_u |sum_j c_p^u eps_j r_{j+2}| <= C d uniformly in the number of modulation frequencies u, where d ~ log ||rho||_inf (the L log L layer height). For ONE fixed frequency the bound is a scalar martingale/entropy estimate: the squared biases of the modulated output bits are paid by the relative entropy of the input density (<= d) via the chain rule. For a supremum over many frequencies the scalar route loses a union-bound/chaining factor that grows with the number of frequencies (log N type losses as in Kolmogorov-Seliverstov-Plessner, Rademacher-Menshov, Bourgain's multi-frequency lemma); every known Carleson proof (Carleson, Fefferman, Lacey-Thiele) instead kills this loss by time-frequency tile combinatorics, which is lossy at the L log L endpoint (best previous: Antonov L log L log log log L). The label converts the problem: information about Y available through Z is a SINGLE budget (the Fisher sum, O(d) by the chain rule, independent of how many frequencies are decoded), and every frequency in a Delta_A-ball around a representative is read off the same label-valued moment with loss factor c_A(n) >= 1/2. Frequencies not yet in the ball force a 'separated high collection', which triggers a label update whose cost is paid either by likelihood evidence (regular update) or by the gap potential F(A) - log|B_A(r)| (cheap update). Thus the cost of choosing frequencies is decoupled from the cost of information (the paper's 'separate costs for information and for choosing frequencies'), and the information is charged under the true input law P but converted into output-path bounds under the uniform law U.",
+ "abstract_mechanism": "To bound a supremum over many linear statistics (characters) of a hidden variable Y, adjoin an auxiliary noisy observation Z = Y + theta whose noise law is shift-invariant with nonnegative Fourier coefficients (a ferromagnetic Gibbs density). Then (a) every statistic chi_{s+n} with n in the noise metric ball is recovered EXACTLY from the Z-conditional moments of chi_s, with multiplicative loss c_A(n) close to 1 (decoding); (b) the per-step squared bias of the filtration given Z is a Fisher information, and its sum along the filtration is bounded by the total relative entropy of Y (chain rule + Pinsker) - one budget regardless of how many statistics are decoded; (c) information is counted under the input-weighted law and transferred to bounds along the uniform/output law by a Radon-Nikodym identity; (d) when too many separated statistics are large, tighten the noise (add terms to the Gibbs energy) and pay with a monovariant (free energy minus log packing number of the metric ball) or with likelihood evidence. In one line: replace a union bound over frequencies by a single noisy side-channel whose Fisher information is paid by entropy and whose positive-definite noise makes a whole ball of frequencies decodable at once.",
+ "candidates": [
+  {
+   "id": "C1",
+   "problem": "Almost-everywhere convergence of Walsh-Fourier series for f in L log L (Walsh analogue of the L log L conjecture). Best known: L log L log log log L (Sjolin-Soria / Antonov method; Di Plinio weak-L^p bounds for Walsh-Carleson).",
+   "reference": "Di Plinio, 'Weak-L^p bounds for the Carleson and Walsh-Carleson operators', arXiv:1312.0398; Sjolin-Soria 2003; Oniani arXiv:2002.00350 (context)",
+   "url": "https://arxiv.org/abs/1312.0398",
+   "status": "open (no resolution found as of Oct 2026)",
+   "obstruction_match": "Exact: Walsh partial sums are modulated dyadic martingales; sup over Walsh frequencies with no loss in their number at the L log L endpoint. The paper's Prop dyadic is already a dyadic statement; the Fourier transfer step (Sec 11) is not even needed.",
+   "adaptation": "Replace the circle by the Cantor group Z_2^M (the Lean already works on Grid M = ZMod 2^M and the Compress layer over an arbitrary finite abelian group). Thermal forms A = sum_s lambda_s (1 - w_s) with Walsh characters w_s (Ising-type ferromagnetic energy); Griffiths/GKS second inequality gives Cov_{K_A}(w_u, w_v) >= 0, so cred-monotonicity, Delta_A subadditivity and F monotonicity transfer. Decoding is exact: w_n(Y xor theta) = w_n(Y) w_n(theta). Spatial forms S_p become indicator-type energies of the dyadic digits below |p|. The Fisher-sum lemmas (bit_def, space_deficit, fisher_bound) are channel-agnostic in Lean (k : Grid M -> Law alpha) and transfer verbatim.",
+   "payoff": "Resolves (a.e. Walsh-Fourier convergence in L log L, plus weak-type L log L bound for Walsh-Carleson).",
+   "confidence": "medium-high that the device adapts; medium that the whole argument goes through (the spatial forms and the 'delayed' sign structure need re-checking in the Walsh geometry)",
+   "difficulty": "moderate (largely a transcription)"
+  },
+  {
+   "id": "C2",
+   "problem": "A.e. convergence of Vilenkin-Fourier series on bounded-type Vilenkin groups for f in L log L. Best known: L log+L log+log+log+L (Oniani 2020).",
+   "reference": "G. Oniani, 'On Sjolin-Soria-Antonov type extrapolation for locally compact groups', arXiv:2002.00350",
+   "url": "https://arxiv.org/abs/2002.00350",
+   "status": "open",
+   "obstruction_match": "Same as C1 with Z_m-adic trees (m_j bounded): maximal modulated martingale over many characters.",
+   "adaptation": "Thermal forms sum lambda_s (1 - Re psi_s) on prod Z_{m_j}; positivity of Fourier coefficients of e^{-A} holds for each factor (same expansion as in the paper's proof); covariance positivity for Z_m clock models is Ginibre's inequality (valid for plane rotators and Z_N clock models). Fisher bound: replace 'bias of a fair bit' by KL of an m_j-ary digit to uniform (Pinsker) - constant depends on sup m_j, which is why bounded type is needed.",
+   "payoff": "Resolves (L log L for bounded Vilenkin systems).",
+   "confidence": "medium",
+   "difficulty": "moderate"
+  },
+  {
+   "id": "C3",
+   "problem": "Sharp logarithmic loss in Bourgain's multi-frequency lemma: || sup_j | sum_{theta in Lambda} (Phi_j * (f-hat restricted near theta))^vee | ||_2 <= C (log N)^2 ||f||_2 for |Lambda| = N separated frequencies; the optimal power of log N is not known (lower bounds of fractional power only).",
+   "reference": "Bourgain 1989 (IHES) Lemma 4.11; Nazarov-Oberlin-Thiele arXiv:0912.3010; Krause-Mirek-Trojan arXiv:1504.04132; Krause arXiv:2502.12887",
+   "url": "https://arxiv.org/abs/0912.3010",
+   "status": "open (exact exponent)",
+   "obstruction_match": "Strong: the loss is precisely a loss in the number of frequencies of a maximal modulated average, the obstruction the paper says the label removes ('control many modulation frequencies without a loss that grows with their number').",
+   "adaptation": "Model on a dyadic tree; attach a thermal label whose form is the sum of (1 - cos 2 pi theta y) over the N frequency centres (cheap updates correspond to adding a frequency to the ball). The Fisher sum is paid by the L^2 'entropy' (Gaussian/variance analogue of the chain rule, since here the input is L^2 not a density). The key question is whether the gap potential gives cost O(log N) total (packing entropy of N points) instead of O(log^2 N).",
+   "payoff": "Possible improvement of (log N)^2 to log N (or a new proof of the known bound); not a guaranteed resolution.",
+   "confidence": "low-medium",
+   "difficulty": "hard (L^2 input is not a density; need an L^2 version of the two-law transfer)"
+  },
+  {
+   "id": "C4",
+   "problem": "Konyagin's lacunary conjecture: for lacunary (n_k), S_{n_k} f -> f a.e. for every f in L log log L. Best known: L log log L log log log log L (Lie; Di Plinio); Lie 2019 proved the lacunary Carleson operator maps L log L to L^1 (sharp).",
+   "reference": "Lie, arXiv:1902.03630 and arXiv:1408.4783; Di Plinio, 'Lacunary Fourier and Walsh-Fourier series near L^1', arXiv:1304.3943; Di Plinio-Lerner",
+   "url": "https://arxiv.org/abs/1304.3943",
+   "status": "open",
+   "obstruction_match": "Partial: the endpoint loss comes from tracking the selected frequency across scales; the label separates information cost from frequency-choice cost. But lacunary frequencies are ~1 per scale, so the multi-frequency obstruction is weak; the binding constraint is the budget calibration (d vs log d).",
+   "adaptation": "Run the procedure with budget log d instead of d per layer: the Fisher sum is O(d) by entropy, which is too large; one would need a label whose information is charged only at the O(log d) scales where the lacunary frequency changes behaviour. Unclear.",
+   "payoff": "New bound at best",
+   "confidence": "low",
+   "difficulty": "hard"
+  },
+  {
+   "id": "C5",
+   "problem": "Konyagin's optimal Orlicz class: between the divergence class (phi(u)=o(u sqrt(log u/log log u)), Konyagin 2000) and L log L; does a.e. convergence hold in some class strictly larger than L log L (Lie suggests L sqrt(log L) for the Lorentz C-space question)?",
+   "reference": "Konyagin, ICM 2006 / Konyagin 2000; Lie, 'The pointwise convergence of Fourier series (I)', arXiv:1408.4783",
+   "url": "https://arxiv.org/abs/1408.4783",
+   "status": "open (gap now between L log L and the Konyagin divergence class, if 075 is correct)",
+   "obstruction_match": "The paper's method is calibrated to L log L: every budget is O(d) and sum m_j 2^j = int |f| log|f|. Pushing below needs an o(d) Fisher sum, i.e. a label that reveals less than the full entropy.",
+   "adaptation": "Use a coarser label (tighten A only until c_A >= 1/2 on fewer frequencies) and pay the residual frequency choices by a sqrt(d) Gaussian-chaining bound; speculative.",
+   "payoff": "New bound / possible resolution of the optimal-space question",
+   "confidence": "low",
+   "difficulty": "very hard"
+  },
+  {
+   "id": "C6",
+   "problem": "Pointwise ergodic theorem along squares (n^2), polynomials or primes in L log L (or any Orlicz class between L^1 and L^p, p>1). Fails in L^1 (Buczolich-Mauldin; LaVictoire); holds in L^p, p>1 (Bourgain).",
+   "reference": "Buczolich-Mauldin, 'Divergent square averages', arXiv:math/0504067; Buczolich-Eisner arXiv:1907.11060; Bourgain 1989",
+   "url": "https://arxiv.org/abs/math/0504067",
+   "status": "open as far as found (no source stating it closed)",
+   "obstruction_match": "Partial: Bourgain's L^p proof passes through the multi-frequency lemma at the rationals a/q (loss in number of frequencies) and interpolation; the label device addresses the frequency-count loss but the arithmetic (major/minor arc) structure and the L^1 counterexample constrain the endpoint.",
+   "adaptation": "Transfer to Z, attach thermal labels whose forms are built from the major-arc frequencies a/q, decode each major-arc projection by integrating against a label character.",
+   "payoff": "New bound at best",
+   "confidence": "low",
+   "difficulty": "very hard"
+  },
+  {
+   "id": "C7",
+   "problem": "Bourgain's return-times theorem beyond the known range (Demeter-Lacey-Tao-Thiele: p>1, q>=2; Demeter: 1/p+1/q<3/2); fails for p=q=1 (Assani-Buczolich-Mauldin). Endpoint questions near L^1 (e.g. L log L x L log L) remain.",
+   "reference": "Demeter-Lacey-Tao-Thiele, Duke 2008, arXiv:math/0601455; Demeter arXiv:0904.1254; Assani-Presser survey arXiv:1209.0856",
+   "url": "https://arxiv.org/abs/math/0601455",
+   "status": "open (range near the endpoint)",
+   "obstruction_match": "Medium: the difficulty 'is at the level of Carleson-Hunt' (survey): one needs Carleson-type control of sup over frequencies selected by the second system. A Carleson-free information-theoretic engine is exactly what is missing for endpoint cases.",
+   "adaptation": "Use the paper's Prop dyadic (with labels) as the Carleson input for the first function, uniformly over the frequency selector; the labels need to be compatible with the second (independent) system's selector.",
+   "payoff": "Possible extension of range",
+   "confidence": "low",
+   "difficulty": "hard"
+  },
+  {
+   "id": "C8",
+   "problem": "a.e. convergence of cubic (square) partial sums of multiple Fourier series on T^d for f in L log L (best known Antonov: L (log L)^d log log log L).",
+   "reference": "Antonov 2004 (Izvestiya); Sjolin 1975 Ark. Mat. 14",
+   "url": "https://www.mathnet.ru/eng/sm8303",
+   "status": "open as far as found (optimal class not established)",
+   "obstruction_match": "Medium: cube partial sums reduce to products of one-dimensional modulated operators; the extra (log L)^{d-1} comes from iterating 1-D bounds; a joint label on T^d with a single Fisher budget could avoid iteration.",
+   "adaptation": "Thermal forms on T^d (sums of 1 - cos(2 pi s.y)), positivity survives (product of one-site densities and multi-site Ginibre); dyadic cubes as the spatial tree with 2^d children (bit -> d-bit digit; Pinsker constant depends on d).",
+   "payoff": "Improvement from L(log L)^d to L log L for cubes (if the reduction is not intrinsically iterative)",
+   "confidence": "low-medium",
+   "difficulty": "hard"
+  },
+  {
+   "id": "C9",
+   "problem": "Polynomial Carleson operator (sup over polynomial phases of degree <= k) near L^1, e.g. L log L-type weak bound / a.e. convergence of polynomially modulated partial sums.",
+   "reference": "Lie, 'The polynomial Carleson operator', arXiv:1105.4504; Zorin-Kranich",
+   "url": "https://arxiv.org/abs/1105.4504",
+   "status": "endpoint near L^1 open (as far as found)",
+   "obstruction_match": "Medium: many (polynomial) frequencies. But the decoding identity uses that linear characters factor under translation, chi_n(Y+theta)=chi_n(Y)chi_n(theta); polynomial phases do not.",
+   "adaptation": "Noise would have to live on a nilmanifold/Heisenberg group (translation by theta acts on polynomial phases via a group law) with a positivity property replacing Ginibre; no such positivity theorem is known to us.",
+   "payoff": "New bound at best",
+   "confidence": "low",
+   "difficulty": "very hard"
+  },
+  {
+   "id": "C10",
+   "problem": "Nonlinear (SU(2)) Carleson conjecture / weak-L^2 bound for the nonlinear Carleson operator.",
+   "reference": "Alexis-Mnatsakanyan-Thiele arXiv:2507.05124; SU(1,1) counterexample preprint arXiv:2605.25108; Poltoratski Annals 2024",
+   "url": "https://arxiv.org/abs/2507.05124",
+   "status": "open (SU(2)); strong SU(1,1) version reported false",
+   "obstruction_match": "Weak: the nonlinear partial sums are products of SU(2) matrices, not linear statistics; decoding by label characters has no analogue.",
+   "adaptation": "None convincing.",
+   "payoff": "none expected",
+   "confidence": "low",
+   "difficulty": "n/a"
+  },
+  {
+   "id": "C11",
+   "problem": "Stein's conjecture for the Hilbert transform along Lipschitz vector fields beyond the short-scale L^2 bound (release family 083), and Zygmund's maximal-average conjecture; these reduce (Lacey-Li) to Carleson-type control along lines uniformly over directions.",
+   "reference": "Release family 083 (A uniform Hilbert transform estimate for Lipschitz directions); Lacey-Li, Mem. AMS 2010",
+   "url": "data/raw/openai-math/preprints/A-uniform-Hilbert-transform-estimate-for-Lipschitz-directions-September-25-2026",
+   "status": "open beyond the short-scale case",
+   "obstruction_match": "Medium-weak: the time-frequency (Lacey-Thiele tiles) machinery used by 083 is what the label replaces in 075, but the directional geometry (Kakeya-type) is a separate obstruction the label does not touch.",
+   "adaptation": "Replace 083's tile analysis of the one-dimensional Carleson-along-lines input by the label-based Prop dyadic; the directional maximal part remains.",
+   "payoff": "Possible simplification of the 1-D Carleson input; not a resolution",
+   "confidence": "low",
+   "difficulty": "hard"
+  },
+  {
+   "id": "C12",
+   "problem": "Variational Carleson near L^1: r-variation (r>2) of partial Fourier sums for f in L log L (OSTTW proved L^p, p>1).",
+   "reference": "Oberlin-Seeger-Tao-Thiele-Wright, 'A variation norm Carleson theorem', JEMS 2012",
+   "url": "(JEMS 14 (2012) 421-464; arXiv id not verified in this search)",
+   "status": "endpoint near L^1 open as far as found",
+   "obstruction_match": "Strong but 'same family': the variation norm is a sup over partitions, i.e. over many frequency families; the label budget is frequency-count-free.",
+   "adaptation": "Replace max_u by a variation over u in Prop dyadic; the delayed vector estimate (Sec 8) must control sum over jumps of label-decoded increments; the Fisher budget is unchanged.",
+   "payoff": "Likely extension (L log L variational bound)",
+   "confidence": "medium",
+   "difficulty": "moderate-hard"
+  }
+ ],
+ "release_reuse": "No other family in the release uses thermal labels, the label-update rule, or the two-law Fisher-sum identity (grep over all preprint .tex for 'Ginibre', 'noisy label', 'noisy observation', 'thermal form', 'Fisher sum', 'label character'; Ginibre hits elsewhere are ordinary stat-mech uses in Ising/XY/O(n) papers). Closest sibling device: family 093 (dimension-free log-Sobolev for subgaussian log-concave measures, 01-introduction.tex:166-178) predicts w(Y) from a noisy observation Y + sqrt(r) G with repeated Gaussian observations and entropy-loss accounting - the same 'noisy side-channel + entropy budget' pattern but with standard Gaussian noise, no decoding of characters, no adaptive tightening; it is in the stochastic-localization tradition. Families that could use the device: 083 (Hilbert transform along Lipschitz directions; uses Lacey-Thiele tiles for the Carleson-along-lines input, 03-ordinary-tiles.tex:6), 082 (maximal/variational triangular Hilbert transform, time-frequency), 154 (pointwise multiple ergodic averages for mixing transformations), 080 (Schrodinger maximal estimates). None of them currently uses it; only 083 has a clear Carleson-operator sub-step where it could slot in.",
+ "speedup_targets": [
+  {
+   "theorem": "Carleson's theorem (a.e. convergence of Fourier series of L^2 functions on the circle)",
+   "reference": "Carleson 1966; Lean: fpvandoorn/carleson (Becker et al., arXiv:2609.31334; blueprint arXiv:2405.06423, 130 pp)",
+   "current_size": "Lean carleson repo ~2.41 MB of Lean (GitHub language stats; proves a generalisation on doubling metric measure spaces); blueprint 130 pages. The 075 Lean (no Carleson import) proves the stronger L log L statement in 1.28 MB / 29.2k lines, of which ~10k lines (53/155 files) touch the label channel/Fisher machinery.",
+   "test": "Add Thermal.label/channel + fisher_bound + duet_decode to L; ask a prover for the L^2 a.e. statement on AddCircle via a GridBound-type route; compare against the budget needed with only Mathlib + Carleson's original tools. Confounded by the rest of the 075 cluster (compression lemma)."
+  },
+  {
+   "theorem": "Walsh-Carleson theorem (Billard 1967: a.e. convergence of Walsh-Fourier series for L^2; Sjolin: L^p)",
+   "reference": "Billard 1967; Sjolin 1969; Thiele, 'Wave packet analysis' (CBMS 105, 2006) Walsh model chapters",
+   "current_size": "~20-30 pages for the Walsh model via Lacey-Thiele tiles (Thiele's notes); no Lean formalization known",
+   "test": "Formalise on ZMod 2^M with Walsh characters; with the label device (Ising-type forms) the proof should reduce to the Dyadic+Thermal+Procedure layers without the Fourier transfer. Clean measurement of the device on its home turf."
+  },
+  {
+   "theorem": "Bourgain's multi-frequency lemma (log^2 N loss) in a finite/dyadic model",
+   "reference": "Bourgain 1989 IHES Lemma 4.11; Nazarov-Oberlin-Thiele arXiv:0912.3010",
+   "current_size": "~8-12 pages (Bourgain's proof via Rademacher-Menshov chaining + Littlewood-Paley); not formalised",
+   "test": "Does adding the label device let a prover obtain the bound (or log N) faster? This is the cleanest 'frequency-count-free' test."
+  },
+  {
+   "theorem": "Kolmogorov-Seliverstov-Plessner theorem: Fourier series converge a.e. if sum |c_n|^2 log n < infinity",
+   "reference": "Kolmogorov-Seliverstov 1925, Plessner 1926; Zygmund, Trigonometric Series Vol. I, Ch. XIII",
+   "current_size": "~3-4 pages classical (dyadic chaining)",
+   "test": "Positive-direction sanity check: with labels the log n loss should disappear entirely (it is subsumed by Carleson), so the test measures whether a prover finds the label route at all; short classical proof makes the speedup ratio small."
+  },
+  {
+   "theorem": "Scalar entropy bound for the dyadic Fisher/square function: sum_I |I| (<rho>_{I+} - <rho>_{I-})^2 / <rho>_I <= C int rho log(rho/<rho>) (the label-free special case A = 0)",
+   "reference": "folklore (chain rule + Pinsker); Bellman-function literature on dyadic Carleson embeddings",
+   "current_size": "~1 page on paper; Lean: special case of bit_def/space_deficit with k = no_label (Procedure/Fisher.lean:51)",
+   "test": "Control: the device should give NO speedup here (A=0 is the trivial channel); confirms the measurement is not just rewarding the entropy chain rule."
+  },
+  {
+   "theorem": "Rademacher-Menshov theorem (a.e. convergence of orthogonal series with sum |a_n|^2 log^2 n < infinity; sharp for general ONS)",
+   "reference": "Rademacher 1922, Menshov 1923",
+   "current_size": "~3 pages",
+   "test": "Negative control: the loss is sharp for general orthonormal systems with no translation structure, so a shift-invariant positive-definite label cannot help; a 'speedup' here would indicate a flawed evaluation."
+  }
+ ],
+ "precedent_check": "No earlier equivalent of the full device (noisy label of the input point with ferromagnetic thermal noise, adaptive tightening A+ = A + S_p + D_i, two-law Fisher sum, exact character decoding) was found in harmonic analysis: searches for information-theoretic / noisy-observation proofs of Carleson-type theorems returned only tile-based proofs (Carleson, Fefferman, Lacey-Thiele, Lie, Di Plinio) and the 2026 Lean formalisation of Carleson's theorem. However, every ingredient has a precedent: (i) the noise law K_A is a centred generalised von Mises distribution (Maksimov 1967; Gatto-Jammalamadaka 2007) = one-site plane-rotator Gibbs measure; its covariance positivity is Ginibre 1970 (cited); (ii) 'observe a hidden variable through progressively less noisy channels and bound the total information by the entropy via the chain rule' is stochastic localization in its information-theoretic form (Eldan; El Alaoui-Montanari arXiv:2109.00709, where the I-MMSE/chain-rule identity bounds the integrated estimation error by the entropy) and the pinning lemma (Montanari 2008; Raghavendra-Tan 2012), already noted as an uncited precedent for item I12; (iii) 'sum over scales of squared conditional biases <= relative entropy via chain rule + Pinsker' is Tao's entropy-decrement method (arXiv:1509.05422; Tao-Teravainen arXiv:1710.02112) and the folklore dyadic entropy bound; (iv) 'cost of an adaptively selected statistic is paid by mutual information rather than by a union bound over the statistics' is Russo-Zou (arXiv:1511.05219) / information-theoretic generalisation bounds, and noise injection to limit information is the Gaussian mechanism of differential privacy; (v) recovering characters from a positive-definite smoothing kernel with coefficient close to 1 on a metric ball is the Bohr-set / large-spectrum duality of additive combinatorics. Verdict: the combination (a label whose information is charged under the input law, whose decoding is exact and frequency-count-free, and whose noise is tightened adaptively with a free-energy/packing potential) has no equivalent found; the abstract mechanism is a cross-field transfer of stochastic-localization / information-budget ideas into Carleson theory. Recommend keeping N3 provisionally but flag a real N2 risk (transfer of the stochastic-localization template). Post-release (after Oct 6, 2026): no paper, blog or forum post found that uses or discusses the device; press coverage only lists family 075 by title; the release's history.md has no entry for 075.",
+ "top5": [
+  {
+   "rank": 1,
+   "target": "C1 Walsh-Fourier series in L log L",
+   "argument": "The best fit by far. The obstruction is identical (sup over characters of a modulated dyadic martingale at the L log L endpoint), and the decoding identity is exact for Walsh characters because the noise acts by dyadic addition. The Ginibre input becomes the GKS/Griffiths second inequality for Ising-type ferromagnets, which is classical. The Lean is already finite and dyadic (Grid M = ZMod 2^M, compression over an arbitrary finite abelian group, channel-agnostic Fisher lemmas), so a Walsh version is mostly a change of characters plus removal of the Fourier-transfer layer. It is a separate open problem. A sceptic will call it 'the same theorem in a different group', so it shows portability rather than a cross-problem eureka."
+  },
+  {
+   "rank": 2,
+   "target": "C3 Bourgain's multi-frequency lemma (sharp power of log N)",
+   "argument": "This is the canonical place where a loss in the number of frequencies is the whole difficulty, and it feeds Bourgain's polynomial ergodic theorems. If the label plus gap-potential bookkeeping gives a frequency-count-free information cost, then the packing term log|B_A(r)| ~ log N should be the only loss, which would improve (log N)^2 towards log N. The input is in L^2 rather than a density, so the 'two-law' transfer needs an L^2 analogue. Confidence is low-medium, but this is the most informative test of whether the device is a genuine eureka beyond its own theorem."
+  },
+  {
+   "rank": 3,
+   "target": "C12 Variational Carleson near L^1",
+   "argument": "The variation norm replaces a single frequency selector by many. The label's Fisher budget does not depend on the number of decoded frequencies, so the extension looks natural through the delayed vector estimate. The payoff is a likely new endpoint result. It sits in the same family of problems, so as evidence it is weaker than C3."
+  },
+  {
+   "rank": 4,
+   "target": "C2 Vilenkin bounded-type L log L",
+   "argument": "The same mechanism with m-ary digits. Pinsker for m-ary digits and Ginibre for clock models are standard. This is a genuine open problem with a clear adaptation path, but it is a corollary-type extension of C1."
+  },
+  {
+   "rank": 5,
+   "target": "C8 Cubic partial sums on T^d in L log L",
+   "argument": "Antonov's L(log L)^d endpoint looks like an artefact of iterating one-dimensional bounds. A single joint label on T^d, with one Fisher budget over 2^d-ary digits, might avoid the iteration. This is speculative: the cube partial-sum operator may not reduce to a single modulated dyadic estimate. It is a different problem, though, and the obstruction (iterated frequency-selection losses) is a reasonable match."
+  }
+ ],
+ "lean_source": [
+  {
+   "name": "OAI.FourierLLogL.Dyadic.Thermal.Form",
+   "kind": "abbrev",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Form.lean",
+   "line": 15,
+   "text": "/-- coefficient form. Throughout, nonnegativity of the coefficients means `0 ≤ A`. -/\nabbrev Form (M : ℕ) := Grid M → ℝ"
+  },
+  {
+   "name": "Thermal.wave / cost / form",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Form.lean",
+   "line": 18,
+   "text": "def wave (s y : Grid M) : ℝ := (chi s y).re\ndef cost (s y : Grid M) : ℝ := 1-wave s y\ndef form (A : Form M) : Grid M → ℝ := fun y => ∑ s, A s * cost s y"
+  },
+  {
+   "name": "Thermal.boltz / q",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Form.lean",
+   "line": 89,
+   "text": "def boltz (A : Form M) (y : Grid M) : ℝ := exp (-form A y)\ndef q (A : Form M) (u : Grid M) : ℝ := (fc (fun y => (↑(boltz A y):ℂ)) u).re"
+  },
+  {
+   "name": "Thermal.F / K (free energy, label density K_A = e^{F-A})",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Form.lean",
+   "line": 132,
+   "text": "def F (A : Form M) := -log (q A 0)\ndef K (A : Form M) (x : Grid M) : ℝ := boltz A x / q A 0"
+  },
+  {
+   "name": "Thermal.label (noise law theta ~ K_A)",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Form.lean",
+   "line": 162,
+   "text": "/-- Label noise law centered at zero relative to counting measure. -/\ndef label (A : Form M) : Law (Grid M) :=\n  ⟨fun x => side M * K A x, fun x => mul_nonneg (side_pos _).le (K_pos _ _).le, by\n    rw [← Finset.mul_sum]\n    exact K_total _⟩"
+  },
+  {
+   "name": "Thermal.cred (thermal Fourier coefficient c_A(u) = int chi_u K_A)",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Form.lean",
+   "line": 181,
+   "text": "def cred (A : Form M) (u : Grid M) := q A u/q A 0"
+  },
+  {
+   "name": "Thermal.delta (metric Delta_A)",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Order.lean",
+   "line": 89,
+   "text": "def delta (A : Form M) (s : Grid M) := √((label A).Ex fun i => ‖1-chi s i‖^2)"
+  },
+  {
+   "name": "Thermal.channel (the label Z = Y + theta)",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Piece.lean",
+   "line": 29,
+   "text": "/-- Observation type-A. -/\ndef channel (A : Form M) (x : Grid M) : Law (Grid M) :=\n  (label A).send (fun z => x+z)"
+  },
+  {
+   "name": "Thermal.omegaObs / Mz / fz (label-weighted masses M(z) and moments f(z))",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Piece.lean",
+   "line": 97,
+   "text": "/-- Observation law weighted by the local subpiece. -/\ndef omegaObs (p : Node) (a : Grid M → ℝ) (α : ℝ) (A : Form M) (y z : Grid M) :=\n    wt p a α y * channel A y z\ndef Mz (p : Node) (a : Grid M → ℝ) (α : ℝ) (A : Form M) (z : Grid M) :=\n    ∑ y, omegaObs p a α A y z\ndef fz (p : Node) (a : Grid M → ℝ) (α : ℝ) (A : Form M) (u z : Grid M) : ℂ :=\n    ∑ y, (omegaObs p a α A y z:ℂ) * chi u y"
+  },
+  {
+   "name": "Thermal.S (spatial form S_p = R^2 (1 - Re chi_1))",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Spatial.lean",
+   "line": 50,
+   "text": "/-- Spatial form, specified by inverse width -/\ndef S (M : ℕ) (R : ℝ) : Form M := fun s => if s=1 then R^2 else 0"
+  },
+  {
+   "name": "Thermal.place",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/History.lean",
+   "line": 15,
+   "text": "def place (p : Node) (M : ℕ) := S M p.invlen"
+  },
+  {
+   "name": "Thermal.Update.next (label update A+ = A + S_p + D_i)",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Update.lean",
+   "line": 33,
+   "text": "def next (u : Update j M p) (A : Form M) : Form M := A+place p M+u.changeForm"
+  },
+  {
+   "name": "Procedure.Fund.advance (main channel 'mood' replaced by u.next)",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Procedure/Capital.lean",
+   "line": 25,
+   "text": "def advance (p : Node) (c : Fund M) (u : Update j M p) : Fund M :=\n    ⟨u.next c.mood,p,c.uses+1,c.spend+u.credit,c.bank+u.bill⟩"
+  },
+  {
+   "name": "Procedure.hist / diff / fisher (J_p = sum |D|^2/M)",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Procedure/Deficit.lean",
+   "line": 69,
+   "text": "/-- Observation mass relative to s.norm. -/\ndef hist (s : Scene M) (k : Grid M → Law α) (i : α) :=\n    ∑ x : Grid M, wt s.here s.wage s.norm x*k x i\ndef diff (s : Scene M) (k : Grid M → Law α) (i : α) :=\n    (hist (s.smaller false) k i - hist (s.smaller true) k i)/2\n\ndef fisher (s : Scene M) (k : Grid M → Law α) :=\n    ∑ i : α, (diff s k i)^2 / hist s k i"
+  },
+  {
+   "name": "Procedure.givenD / massInfo (per-node label Fisher charge)",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Procedure/Fisher.lean",
+   "line": 55,
+   "text": "def givenD (s : Scene M) := deficit s (channel s.fund.mood)\n\ndef massInfo (s : Scene M) :=\n    1/4*(s.norm/s.mass)*fisher s (channel s.fund.mood)"
+  },
+  {
+   "name": "Thermal.ginibre (key lemma: Griffiths-Ginibre covariance positivity)",
+   "kind": "theorem (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Ginibre.lean",
+   "line": 212,
+   "text": "theorem ginibre {A : Form M} (hA : 0 ≤ A) (s t : Grid M) :\n    cred A s * cred A t ≤ (label A).Ex (fun i => wave s i * wave t i)"
+  },
+  {
+   "name": "Procedure.bit_def (key lemma: Fisher information of label <= 4 x bit relative-entropy deficit)",
+   "kind": "lemma (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Procedure/Deficit.lean",
+   "line": 100,
+   "text": "lemma bit_def (s : Scene M) (k : Grid M → Law α) (hp : s.here.valid)\n    (he : s.here.lev < M) (hh : 0 ≤ s.wage) (hm : 0 < s.mass) (hn : 0 < s.norm) :\n    s.norm/s.mass * fisher s k ≤ 4*(log 2-sideH (step s) k)"
+  },
+  {
+   "name": "Procedure.space_deficit (key lemma: one-step chain-rule identity charging the Fisher term to the entropy deficit)",
+   "kind": "lemma (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Procedure/Deficit.lean",
+   "line": 147,
+   "text": "lemma space_deficit (s : Scene M) (k : Grid M → Law α) (hp : s.here.valid)\n    (he : s.here.lev < M) (hh : 0 ≤ s.wage) (hm : 0 < s.mass) (hn : 0 < s.norm) :\n    (step s).probs.Ex (fun b => deficit (s.smaller b) k) +\n      (1/4:ℝ)*(s.norm/s.mass)*fisher s k ≤ deficit s k"
+  },
+  {
+   "name": "Procedure.Road.fisher_bound (key lemma: global label Fisher sum <= limitC * height j, i.e. O(d))",
+   "kind": "lemma (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Procedure/Fisher.lean",
+   "line": 118,
+   "text": "lemma fisher_bound :\n    ∀ᶠ j : ℕ in atTop, ∀ M J : ℕ, ∀ f : Grid M → ℝ,\n      (∀ x, f x ≤ exp (height j)) →\n      let s := beginPlay f true\n      ∀ t : Road j M s, Trusted J f t → 1/Thermal.H j ≤ s.mass →\n        t.flatFee infoFee ≤ limitC* height j"
+  },
+  {
+   "name": "Procedure.Paths.Troupe.duet_decode (key lemma: exact decoding identity int chi_k a^v = c_A(k) * scalar(v+k))",
+   "kind": "lemma (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Assembly/Phase.lean",
+   "line": 28,
+   "text": "lemma duet_decode (s : Scene M) (v k : Grid M) :\n    ∑ z, chi k z*letter s v z = (cred (dye s) k:ℂ)*scalar s (v+k)"
+  },
+  {
+   "name": "Procedure.Paths.Troupe.energy_near_channel (label energy of v controlled by that of v+k plus Delta_A(k)^2)",
+   "kind": "lemma (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Assembly/Phase.lean",
+   "line": 55,
+   "text": "lemma energy_near_channel (s : Scene M) (h : Fit s) (v k : Grid M) :\n    energy s v ≤ 2*energy s (v+k)+2*(share s*delta (dye s) k^2)"
+  }
+ ],
+ "sources": [
+  "data/pilot/075/family.json, family.md, lean_layer_notes.md",
+  "preprints/Almost-everywhere-Fourier-convergence-in-L-log-L-September-23-2026/build/sections/01-introduction.tex:108-188; 05-thermal.tex:1-210; 06-procedure.tex:60-240, 590-650; 08-paths.tex:155-245; 09-assembly.tex:100-210",
+  "Lean: FourierLLogL/Thermal/{Form,Order,Piece,Spatial,History,Update,Ginibre}.lean; Procedure/{Capital,Deficit,Fisher}.lean; Assembly/Phase.lean",
+  "https://arxiv.org/abs/1312.0398 (Di Plinio, Walsh-Carleson weak L^p)",
+  "https://arxiv.org/abs/2002.00350 (Oniani, Vilenkin)",
+  "https://arxiv.org/abs/0912.3010 (Nazarov-Oberlin-Thiele)",
+  "https://arxiv.org/abs/1504.04132 (Krause-Mirek-Trojan)",
+  "https://arxiv.org/abs/2502.12887 (Krause 2025)",
+  "https://arxiv.org/abs/1902.03630 and https://arxiv.org/abs/1408.4783 (Lie)",
+  "https://arxiv.org/abs/1304.3943 (Di Plinio lacunary)",
+  "https://arxiv.org/abs/math/0504067 (Buczolich-Mauldin)",
+  "https://arxiv.org/abs/1907.11060 (Buczolich-Eisner)",
+  "https://arxiv.org/abs/math/0601455 (DLTT)",
+  "https://arxiv.org/abs/0904.1254 (Demeter)",
+  "https://arxiv.org/abs/1209.0856 (return times survey)",
+  "https://arxiv.org/abs/1105.4504 (polynomial Carleson)",
+  "https://arxiv.org/abs/2507.05124, https://arxiv.org/abs/2605.25108 (nonlinear Carleson)",
+  "https://www.mathnet.ru/eng/sm8303 (Antonov, multiple Fourier series)",
+  "https://arxiv.org/abs/2609.31334 (Carleson in Lean), https://arxiv.org/abs/2405.06423 (blueprint), https://api.github.com/repos/fpvandoorn/carleson/languages",
+  "https://arxiv.org/abs/2109.00709 (El Alaoui-Montanari, stochastic localization)",
+  "https://arxiv.org/abs/1509.05422, https://arxiv.org/abs/1710.02112 (Tao entropy decrement)",
+  "https://arxiv.org/abs/1511.05219 (Russo-Zou)",
+  "https://arxiv.org/abs/2105.00833 (generalised von Mises; Gatto-Jammalamadaka 2007)",
+  "https://redreamality.com/blog/ai-math-verification-lean-faithfulness/ (post-release corrections; no 075 mention)"
+ ],
+ "search_log": [
+  "Local: read family.json items I10,I12,I24-I27,I29-I31,I33,I34 and lean_items L20-L26; read paper sections 01,05,06,08,09; read Lean Thermal/Form, Piece, Update, History, Spatial, Order, Ginibre; Procedure/Capital, Deficit, Fisher; Assembly/Phase.",
+  "Local: grep CONTENTS.md for fisher|noisy|thermal|Griffiths|Ginibre|label|Carleson|modulat|maximal|ergodic|Walsh|lacunary|Chowla|variation -> families 080, 082, 083, 093, 154, 007 inspected by title; grep all preprint .tex for Ginibre|noisy label|noisy observation|thermal form|Fisher sum|label character and for stochastic localization|de Bruijn|I-MMSE -> only 093 has a related noisy-observation device.",
+  "Local: history.md has no 075 entry. Lean footprint: 53/155 FourierLLogL files (~10.0k/29.2k lines) reference channel/label/fisher/mood.",
+  "Web: 'Bourgain multi-frequency lemma logarithmic loss sharp' -> NOT, KMT, Krause 2025.",
+  "Web: 'Walsh-Fourier series a.e. convergence L log L open' -> Di Plinio 1312.0398, Oniani; still open.",
+  "Web (extended): 'information-theoretic proof Carleson theorem entropy noisy observation' -> nothing; only tile proofs and the Lean formalisation.",
+  "Web (extended): 'L log L Fourier OpenAI proof October 2026' -> press coverage of release, no technical discussion of 075.",
+  "Web: 'thermal labels noisy label Fisher information dyadic martingale Carleson' -> nothing relevant.",
+  "WebFetch androma.org (403); redreamality.com correction-week post (no 075 mention).",
+  "Web: dyadic square function relative entropy chain rule Pinsker -> no explicit source (folklore).",
+  "Web: Russo-Zou adaptive data analysis; Tao entropy decrement; Montanari pinning / stochastic localization (El Alaoui-Montanari).",
+  "Web: lacunary Carleson L log log L (Lie, Di Plinio); squares ergodic L log L (Buczolich-Mauldin); return times endpoint (DLTT, Demeter, survey); Carleson Lean size (GitHub API); nonlinear Carleson status; Vilenkin (Oniani); cubic sums (Antonov 2004); generalised von Mises."
+ ]
+}

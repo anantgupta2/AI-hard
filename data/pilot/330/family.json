@@ -1,0 +1,2924 @@
+{
+ "family": 330,
+ "title": "A uniformly discrete counterexample to bounded approximation in Lipschitz-free spaces",
+ "manuscript_dir": "data/raw/openai-math/preprints/Failure-of-Bounded-Approximation-in-a-Lipschitz-Free-Space-over-a-Uniformly-Discrete-Metric-Space-September-26-2026",
+ "source_root": "data/raw/openai-math/preprints/Failure-of-Bounded-Approximation-in-a-Lipschitz-Free-Space-over-a-Uniformly-Discrete-Metric-Space-September-26-2026/build (main.tex -> common.tex + sections/{introduction,reduction,blocks,operators,walks,tests,references}.tex)",
+ "commit": "fd4aeeb",
+ "analyst_role": "family analyst (paper + Lean, text level; Lean not built); no reasoning trace exists for this family",
+ "base_library_L": "Mathlib d13f23b + the 17 entries of the inline thebibliography (sections/references.tex)",
+ "main_statement": {
+  "file_line": "sections/introduction.tex:39-43",
+  "latex": "\\begin{theorem}\\label{thm:main}\nThere is a countable, unbounded, nonproper pointed metric space $(M,d,o)$\nsuch that $d(x,y)\\ge1$ for distinct points and $\\F(M)$ has AP but fails\n$\\lambda$-BAP for every finite $\\lambda\\ge1$.\n\\end{theorem}",
+  "paraphrase": "There is a countable metric space in which distinct points are at distance at least 1, whose real Lipschitz-free space has the approximation property but no bounded approximation property. This answers Kalton's question negatively.",
+  "constructive_core": {
+   "file_line": "sections/introduction.tex:92-105",
+   "paraphrase": "Thm blocks: for each p there is a bounded, 1-separated, countably infinite block M_p (diam <= 300p^2+150p+5) and a finite anchor set A_p such that every finite-rank operator of norm <= p moves some anchor evaluation by at least 1/2."
+  },
+  "headline_corollaries": [
+   {
+    "file_line": "sections/introduction.tex:119-127",
+    "paraphrase": "Equivalent norms on real ell_1 with 2B_p-BAP but not p-BAP; for p=1, not MAP (formalized)."
+   },
+   {
+    "file_line": "sections/introduction.tex:60-68; reduction.tex:246-270",
+    "paraphrase": "F(M) is a separable Banach space that is not approximable, answering Kalton's Problem 1 negatively (NOT formalized)."
+   }
+  ],
+  "lean_comparator": [
+   {
+    "name": "DiscreteLipschitzFree",
+    "challenge_file": "lean/ComparatorChallenges/DiscreteLipschitzFree.lean",
+    "config": "lean/ComparatorChallenges/DiscreteLipschitzFree.json",
+    "target": "OAI.DiscreteFree.source_endpoints",
+    "solution_module": "OAI.Analysis.LipschitzFree.Main",
+    "solution_decl": "lean/OAI/Analysis/LipschitzFree/Main.lean:92 (term: ⟨blocks_proved, main_proved⟩)",
+    "verbatim": "theorem source_endpoints : BlockStatement ∧ MainStatement",
+    "definitions_unfolded": {
+     "Lip0 / lipSubmodule / Lip0.slope": "pointed real Lipschitz functions; norm = sup over pairs of |f x - f y|/dist x y, via an ell_infinity(M x M) embedding (DiscreteLipschitzFree.lean:16-92)",
+     "evaluation / freeSubmodule / FreeSpace / delta": "F(M) = topological closure of span{evaluations} inside the continuous dual of Lip0 (lines 96-125)",
+     "HasAP": "∀ compact C, ∀ ε>0, ∃ T continuous linear with finite-dimensional range, ∃ η<ε, ∀u∈C, ‖Tu-u‖≤η (lines 127-130)",
+     "HasBAP X Λ": "as HasAP plus ‖T‖≤Λ (lines 132-135)",
+     "blockBound p": "300p^2+150p+5 (line 137)",
+     "BlockStatement": "∀ p≥1, ∃ M:Type, metric d, o: Countable M ∧ 1-separated ∧ dist ≤ blockBound p ∧ ∃ A:Finset M, o∈A ∧ ∀ T finite rank with ‖T‖≤p, ∃ a∈A, 1/2 ≤ ‖T δ_a - δ_a‖ (lines 139-146)",
+     "MainStatement": "∃ M:Type, metric, o: Countable ∧ 1-separated ∧ ¬Bornology.IsBounded univ ∧ ¬ProperSpace M ∧ HasAP (FreeSpace o) ∧ ∀ Λ≥1, ¬HasBAP (FreeSpace o) Λ (lines 148-154)"
+    },
+    "readable": "Thm blocks (for every p) together with Thm main.",
+    "match_check": {
+     "thm:main": "Exact. Countable, d>=1, unbounded, nonproper, AP, no lambda-BAP for lambda>=1 all present. HasAP's 'exists eta < eps with all errors <= eta' is equivalent to sup < eps on a compact set.",
+     "thm:blocks": "Exact up to presentation: 'diam M_p <= B_p' is encoded as ∀x y, dist x y ≤ blockBound p; 'countably infinite' is only 'Countable', but infinitude follows from the obstruction (a finite M would make F(M) finite-dimensional and the identity a norm-1 finite-rank operator with zero error).",
+     "not_in_comparator": [
+      "the nonlinear corollary (F(M) not approximable; reduction.tex:246-270)",
+      "Kalton's AP theorem (not needed)",
+      "the explicit 2B_p-BAP of each block (it is proved in Lean as bounded_separated_hasBAP and used, but not stated in MainStatement)"
+     ]
+    }
+   },
+   {
+    "name": "RealL1Renorming",
+    "challenge_file": "lean/ComparatorChallenges/RealL1Renorming.lean",
+    "config": "lean/ComparatorChallenges/RealL1Renorming.json",
+    "target": "OAI.DiscreteFree.real_l1_quantitative_renorming",
+    "solution_module": "OAI.Analysis.LipschitzFree.Renorming",
+    "solution_decl": "lean/OAI/Analysis/LipschitzFree/Renorming.lean:41",
+    "verbatim": "theorem real_l1_quantitative_renorming : RealL1RenormingStatement",
+    "definitions_unfolded": {
+     "RealL1": "lp (fun _ : ℕ => ℝ) 1",
+     "RealL1RenormingStatement": "∀ p≥1, ∃ N:AddGroupNorm RealL1, absolutely homogeneous, (1/2)‖c‖ ≤ N c ≤ blockBound p ‖c‖, and with the norm N and the SAME module structure there is a NormedSpace instance under which RealL1 is complete, has HasBAP (2 blockBound p), fails HasBAP p, and (p=1 → fails HasBAP 1)."
+    },
+    "match_check": {
+     "cor:renorming": "Exact. The p=1 clause is redundant with ¬HasBAP p. The fixed-module requirement s.toModule = m rules out cheating by changing the vector-space structure."
+    }
+   }
+  ],
+  "match_summary": "Both comparator statements match the paper exactly (Thm main, Thm blocks for all p, Cor renorming). Not compared/formalized: the nonlinear corollary.",
+  "formalized_vs_claimed": {
+   "formalized": [
+    "Thm main (all clauses)",
+    "Thm blocks for every p>=1 with the explicit B_p",
+    "Cor renorming (all clauses)",
+    "Prop coefficients (Coefficients.equiv, equiv_bounds, bounded_separated_hasBAP)"
+   ],
+   "claimed_not_formalized": [
+    "Failure of Kalton approximability (Kalton's Problem 1) for F(M) (reduction.tex:246-270); it relies on Kalton12 Thm 4.4 and Kalton04 Lemma 3.2",
+    "Lemma local-limit for the random permutation model (replaced, see route_differences)",
+    "Remark non-tree-bad-set (unused)"
+   ]
+  }
+ },
+ "trust_surface": {
+  "grep_scope": "lean/OAI/Analysis/LipschitzFree/*.lean (34 files, ~4614 lines) and the two challenge files",
+  "counts": {
+   "sorry": 0,
+   "axiom": 0,
+   "admit": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque": 0,
+   "partial def": 0,
+   "decide": 0,
+   "set_option": 0,
+   "#eval/run_cmd": 0
+  },
+  "notes": [
+   "The only grep hit for 'admit' is the English word in the docstring 'Finite-rank operators admit finite-support perturbations' (SupportReduction.lean:6).",
+   "The challenge files contain the expected `sorry` placeholders (DiscreteLipschitzFree.lean:157, RealL1Renorming.lean:49).",
+   "Classical choice is used in definitions (ballPerm via Classical.choose of exists_extending_pair; labels via Nat.find; Denumerable.ofEncodableOfInfinite).",
+   "permitted_axioms in both configs: propext, Quot.sound, Classical.choice; enable_nanoda false.",
+   "Family 330 has no entry in lean/formalization.yaml; it is imported in lean/OAI.lean:143-144 and documented in lean/docs/330.md."
+  ],
+  "computer_assisted": "No: no decide/native_decide, no computational search; omega/positivity/nlinarith only."
+ },
+ "labels": {
+  "A": {
+   "label": "A2",
+   "secondary": {
+    "hard_direction_form": null,
+    "explicit_rate": true,
+    "explicit_rate_detail": "Thm blocks and Cor renorming are quantitative: B_p = 300p^2+150p+5, 2B_p-BAP vs failure of p-BAP."
+   },
+   "evidence": {
+    "quote": "There is a countable, unbounded, nonproper pointed metric space $(M,d,o)$",
+    "file_line": "sections/introduction.tex:40"
+   },
+   "confidence": "high",
+   "note": "Existence of a counterexample space. Thm blocks is 'for every p there exist (M_p, A_p) such that for all T ...'; p indexes the family. Lean MainStatement is ∃M ... ∧ ∀Λ ¬HasBAP, matching A2."
+  },
+  "B": {
+   "label": "B2",
+   "flags": {
+    "full_only_with_prior_results": false,
+    "full_only_with_prior_results_detail": "The headline needs no cited theorem: Prop coefficients is re-proved and AP of the wedge is proved directly (Kalton04 Prop 4.4 mentioned as an alternative). The Lean proves it from Mathlib alone.",
+    "adds_corollaries_for_other_conjectures": true,
+    "adds_corollaries_detail": "(1) Cor renorming: real ell_1 has an equivalent norm failing MAP, answering negatively whether every equivalent norm on ell_1 has MAP (a classical open question; Kalton12 p.1260); formalized. (2) F(M) is a separable Banach space that is not approximable, answering Kalton's Problem 1 (Kalton12 p.1260) negatively; NOT formalized and depends on Kalton's net theorem."
+   },
+   "evidence": {
+    "quote": "answering Kalton's question negatively",
+    "file_line": "main.tex:10 (abstract)"
+   },
+   "confidence": "high",
+   "note": "Kalton's question (Kalton04 p.185; Godefroy-Ozawa Q1; Godefroy survey Problem 6.2) asked whether uniformly discrete free spaces always have BAP; the paper refutes it. A web check (Oct 2026) found the question listed as open before this release; Smith26 (countable complete discrete, non-uniformly-discrete, non-constructive via Bossard) is the closest prior result."
+  },
+  "C": {
+   "primary": "C1",
+   "primary_evidence": {
+    "quote": "We now construct the metric space and anchors in \\Cref{thm:blocks}.",
+    "file_line": "sections/blocks.tex:4"
+   },
+   "secondaries": [
+    {
+     "label": "C3",
+     "evidence": {
+      "quote": "Suppose that a bounded finite-rank operator $T_0$ of norm at most $p$ has error less than $1/2$ on every anchor.",
+      "file_line": "sections/tests.tex:74-75"
+     },
+     "note": "The obstruction is a proof by contradiction, and the graph sequence is obtained probabilistically (choose a realization occurring with positive probability, blocks.tex:100-107), i.e. non-constructively in the paper; Lean derandomizes it."
+    },
+    {
+     "label": "C4",
+     "evidence": {
+      "quote": "2p>\\frac{3L}{2}-\\frac{4L}{10}",
+      "file_line": "sections/tests.tex:125"
+     },
+     "note": "Parameter budget L,R,K,D,B,V,Delta,Q,H,k and a chain of inequalities (bump loss <= L/5, TV <= V, average discarded variation < 1/10)."
+    },
+    {
+     "label": "C5",
+     "evidence": {
+      "quote": "Kalton's characterization by nets \\cite[Theorem~4.4 and p.~1260]{Kalton12}",
+      "file_line": "sections/reduction.tex:249"
+     },
+     "note": "Only for the nonlinear corollary. Prop coefficients (AACD20/Cuth-Kalenda) and McShane are re-proved, so they are not C5."
+    }
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "The precise colored limit and deterministic selection needed here follow from the elementary exploration argument below",
+    "file_line": "sections/blocks.tex:30-31"
+   },
+   "ih_strengthened": false,
+   "ih_template": null,
+   "ih_evidence": {
+    "quote": "Thus the maximum is well-defined.",
+    "file_line": "sections/walks.tex:151"
+   },
+   "ih_note": "No induction on statements. The records are maxima over a finite set, not an induction hypothesis. Lean inductions (StatePaths, Matched.take, ballRep_word) are routine structural inductions.",
+   "confidence": "high"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "I32 Lemma edge-test, taken together with I30 exceptional sets, I31 and I33 incidence averaging (the 'opposing tests with discarded exceptional states' complex)",
+   "evidence": {
+    "quote": "We prescribe $b_x$ on $S\\setminus E_e$ and $-b_y$ on $S\\setminus E_{\\bar e}$",
+    "file_line": "sections/introduction.tex:210-211"
+   },
+   "confidence": "low-medium",
+   "caveats": [
+    "The record/exceptional lemma (I31) has a close, named precedent (Ben-David et al., arXiv 2006.12760 Lemma 58 / SICOMP Lemma 6.3); if a judge regards the edge test as a forced consequence of choosing opposing bumps, the complex drops to N2 and the family to D2.",
+    "Most other ingredients are N0/N1 transfer: local weak convergence (Friedman, Benjamini-Schramm), first-moment counting, McShane, ell_1 coefficients (AACD20), Frechet/Bourgain-type labels.",
+    "The label-anchor block (I18) is N2 leaning N3; the design of the block plus tests is the real new idea and is distributed across several items, which makes single-item grading unstable."
+   ],
+   "flag_builds_on_prior_model_produced_result": "no (all cited works are human-authored as far as can be checked: Smith26 = R. J. Smith, CuthKalenda26 = Cuth & Kalenda, BenDavidEtAl24; no OpenAI/model-produced preprint is cited)"
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Functional analysis",
+    "msc2020": [
+     "46B20",
+     "46B28",
+     "46B80",
+     "51F30"
+    ],
+    "evidence": {
+     "quote": "subject: Functional analysis (data/catalog_families.csv row 330)",
+     "file_line": "data/catalog_families.csv"
+    },
+    "confidence": "high"
+   },
+   "lean_dir_field": {
+    "dir": "lean/OAI/Analysis/LipschitzFree",
+    "lean_fields": "Analysis",
+    "imported_oai_dirs": []
+   },
+   "method_fields": [
+    {
+     "field": "Banach space theory / Lipschitz-free spaces (46B20, 46B28)",
+     "tag": "essential",
+     "what": "free spaces, linearization, ell_1 coefficients of bounded separated spaces, approximation properties",
+     "evidence": {
+      "quote": "We use the elementary linearization property of free spaces",
+      "file_line": "sections/reduction.tex:147"
+     }
+    },
+    {
+     "field": "Random graphs / local weak convergence (05C80, 60C05)",
+     "tag": "essential",
+     "what": "permutation-model regular multigraphs, Benjamini-Schramm local limits with iid colours (re-proved); Lean replaces with large-girth Cayley quotients",
+     "evidence": {
+      "quote": "We use the independent-permutation multigraph model described by Friedman",
+      "file_line": "sections/blocks.tex:27"
+     }
+    },
+    {
+     "field": "Combinatorics of walks on graphs (05C38, 05C81)",
+     "tag": "essential",
+     "what": "nonbacktracking walks, matched walks, continuation records, first-moment counting",
+     "evidence": {
+      "quote": "On the tree there are at most $\\Delta^n$ nonbacktracking walks of length $n$ from the root",
+      "file_line": "sections/walks.tex:92-93"
+     }
+    },
+    {
+     "field": "Quantum query complexity / property testing (68Q12, 68W20)",
+     "tag": "background-cited",
+     "what": "named precedent for comparing nonbacktracking continuation lengths (Ben-David et al.); the lemma is re-proved self-contained",
+     "evidence": {
+      "quote": "The argument below is self-contained.",
+      "file_line": "sections/walks.tex:140"
+     }
+    },
+    {
+     "field": "Metric geometry / Lipschitz extension (26A16, 54C20)",
+     "tag": "essential",
+     "what": "McShane extension (re-proved; Mathlib extend_real in Lean); label maps into ell_infinity",
+     "evidence": {
+      "quote": "The scalar extension step is an instance of McShane's classical extension principle",
+      "file_line": "sections/introduction.tex:247-248"
+     }
+    },
+    {
+     "field": "Nonlinear geometry of Banach spaces (46B80)",
+     "tag": "corollary-only",
+     "what": "Kalton's net characterization of approximability and Banach-valued linearization",
+     "evidence": {
+      "quote": "If $X$ were approximable, Kalton's theorem would give one Lipschitz bound",
+      "file_line": "sections/reduction.tex:255-256"
+     }
+    },
+    {
+     "field": "Descriptive set theory (03E15) via Smith26",
+     "tag": "background-cited",
+     "what": "prior non-uniformly-discrete counterexample",
+     "evidence": {
+      "quote": "Smith gives countable complete discrete spaces whose free spaces have AP",
+      "file_line": "sections/introduction.tex:46-47"
+     }
+    },
+    {
+     "field": "Combinatorial group theory (20E05) [Lean only]",
+     "tag": "essential",
+     "what": "finite permutation quotients of free groups injective on word balls (large girth)",
+     "evidence": {
+      "quote": "theorem ballRep_injective_on (N : ℕ)",
+      "file_line": "lean/OAI/Analysis/LipschitzFree/FiniteQuotients.lean:114"
+     }
+    }
+   ],
+   "cross_field_count_essential_nonFA": 3,
+   "share_invoked_cited_theorems_from_other_fields": "In the main proof essentially no cited theorem is invoked without proof (Prop coefficients, local limit, McShane, record lemma are re-proved). Cited-and-invoked: Kalton12 Thm 4.4 and Kalton04 Lemma 3.2 (nonlinear corollary; same field). So 0/2 from other fields; the cross-field content (random graphs, walk combinatorics, a TCS lemma) is re-proved inline.",
+   "confidence": "medium-high"
+  }
+ },
+ "items": [
+  {
+   "id": "I01",
+   "origin": "paper",
+   "kind": "definition (inline \\emph)",
+   "name": "Lip_0(M) and the Lipschitz-free space F(M)",
+   "file_line": "sections/introduction.tex:13-22",
+   "statement": "Lip_0(M) = real Lipschitz functions vanishing at o with the Lipschitz constant as norm; F(M) = closed span of the evaluations delta_x in Lip_0(M)^*; ||delta_x - delta_y|| = d(x,y).",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "ArensEells56; GodefroyKalton03",
+    "cue": "originates in the molecular spaces of Arens and Eells"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Ambient object of every statement."
+   },
+   "analytic_check": "Analytic: occurs verbatim in the goal (Thm main).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Arens-Eells / Godefroy-Kalton free space."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.lipSubmodule",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Model.lean:17",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.3202,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.Lip0",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Model.lean:45",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.3202,
+     "dominated_share": 0.0053
+    },
+    {
+     "decl": "OAI.DiscreteFree.Lip0.slope",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Model.lean:70",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.3004,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.evaluation",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Model.lean:154",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.2806,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.FreeSpace",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Model.lean:179",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.2648,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.delta",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Model.lean:187",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.2451,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.evaluation_sub_norm",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Evaluation.lean:30",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.119,
+     "dominated_share": 0.0079
+    }
+   ]
+  },
+  {
+   "id": "I02",
+   "origin": "paper",
+   "kind": "definition (inline \\emph)",
+   "name": "AP, lambda-BAP, BAP, MAP; proper metric space",
+   "file_line": "sections/introduction.tex:28-37",
+   "statement": "AP: finite-rank T with sup_{u in C}||Tu-u||<eps on every compact C; lambda-BAP adds ||T||<=lambda; BAP = lambda-BAP for some lambda; MAP = 1-BAP. Proper = closed bounded balls compact.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none (textbook)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Goal vocabulary."
+   },
+   "analytic_check": "Analytic: in the goal.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Grothendieck approximation properties."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.HasAP",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Model.lean:191",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0158,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.HasBAP",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/RenormingModel.lean:18",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0474,
+     "dominated_share": 0.0026
+    }
+   ]
+  },
+  {
+   "id": "I03",
+   "origin": "paper",
+   "kind": "definition (inline \\emph)",
+   "name": "approximable separable Banach space (Kalton)",
+   "file_line": "sections/introduction.tex:60-66",
+   "statement": "X is approximable if there are equi-uniformly continuous psi_n: X->X with relatively compact ranges and psi_n(x)->x for all x.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "Kalton12",
+    "cue": "Kalton asked whether every separable Banach space is \\emph{approximable}"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Corollary only."
+   },
+   "analytic_check": "Analytic (Kalton's Problem 1 statement).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Kalton 2012."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I04",
+   "origin": "paper",
+   "kind": "theorem",
+   "name": "Thm main (thm:main): countable uniformly discrete M with F(M) AP but not BAP",
+   "file_line": "sections/introduction.tex:39-43 (proof: reduction.tex:96-244, assuming thm:blocks)",
+   "statement": "There is a countable, unbounded, nonproper pointed metric space with d(x,y)>=1 for distinct points such that F(M) has AP but fails lambda-BAP for every finite lambda>=1.",
+   "cited_or_new": {
+    "status": "new result",
+    "bib_key": null,
+    "cue": "We construct a countable uniformly discrete space for which no such bound exists."
+   },
+   "uses_items": [
+    "I05",
+    "I09",
+    "I10",
+    "I11",
+    "I12",
+    "I13"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Headline."
+   },
+   "analytic_check": "n/a",
+   "provisional_N": {
+    "grade": "n/a (result)",
+    "justification": "Results are not graded as machinery."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.MainStatement",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Model.lean:205",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0079,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.main_proved",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Main.lean:82",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.004,
+     "dominated_share": 0.1632
+    },
+    {
+     "decl": "OAI.DiscreteFree.MainConstruction.unbounded",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Main.lean:31",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0079,
+     "dominated_share": 0.0053
+    },
+    {
+     "decl": "OAI.DiscreteFree.MainConstruction.nonproper",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Main.lean:50",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0079,
+     "dominated_share": 0.0053
+    },
+    {
+     "decl": "OAI.DiscreteFree.MainConstruction.noBAP",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Main.lean:69",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0079,
+     "dominated_share": 0.0237
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricWedge.hasAP",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/WedgeApproximation.lean:156",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0119,
+     "dominated_share": 0.0737
+    },
+    {
+     "decl": "OAI.DiscreteFree.source_endpoints",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Main.lean:92",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0,
+     "dominated_share": 0.0
+    }
+   ]
+  },
+  {
+   "id": "I05",
+   "origin": "paper",
+   "kind": "theorem",
+   "name": "Thm blocks (thm:blocks): finite anchor obstruction in a bounded 1-separated block",
+   "file_line": "sections/introduction.tex:92-105 (proof: tests.tex:71-135)",
+   "statement": "For each integer p>=1 there are a bounded countably infinite pointed space M_p, 1-separated, diam <= B_p = 300p^2+150p+5, and a finite A_p containing o such that every finite-rank T_0 on F(M_p) with ||T_0||<=p has max_{a in A_p}||T_0 delta_a - delta_a|| >= 1/2.",
+   "cited_or_new": {
+    "status": "new result",
+    "bib_key": null,
+    "cue": "Our block is infinite, and its fixed finite anchor set obstructs approximation by every operator of norm at most $p$"
+   },
+   "uses_items": [
+    "I17",
+    "I18",
+    "I19",
+    "I20",
+    "I21",
+    "I22",
+    "I23",
+    "I24",
+    "I25",
+    "I26",
+    "I27",
+    "I28",
+    "I29",
+    "I30",
+    "I31",
+    "I32",
+    "I33",
+    "I34",
+    "I35"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "All of the new mathematics sits under this theorem; the wedge step is soft."
+   },
+   "analytic_check": "n/a",
+   "provisional_N": {
+    "grade": "n/a (result)",
+    "justification": "Result; the strongest machinery is I31-I34."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.BlockStatement",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Model.lean:196",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0079,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.blocks_proved",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/BlockObstruction.lean:210",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.004,
+     "dominated_share": 0.0053
+    },
+    {
+     "decl": "OAI.DiscreteFree.BlockConstruction.obstruction",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/BlockObstruction.lean:176",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0238,
+     "dominated_share": 0.3868
+    },
+    {
+     "decl": "OAI.DiscreteFree.BlockConstruction.finite_support_impossible",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/BlockObstruction.lean:102",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0278,
+     "dominated_share": 0.3711
+    }
+   ]
+  },
+  {
+   "id": "I06",
+   "origin": "paper",
+   "kind": "corollary",
+   "name": "Cor renorming (cor:renorming): equivalent norms on real ell_1 with 2B_p-BAP but not p-BAP; for p=1 not MAP",
+   "file_line": "sections/introduction.tex:119-127 (proof: reduction.tex:79-94)",
+   "statement": "For each p>=1, ell_1 has an equivalent norm with (1/2)||c||_1 <= ||c||_p <= B_p||c||_1, having 2B_p-BAP but failing p-BAP; for p=1 it fails MAP.",
+   "cited_or_new": {
+    "status": "new result",
+    "bib_key": "Kalton12",
+    "cue": "The case $p=1$ below gives a direct negative answer."
+   },
+   "uses_items": [
+    "I05",
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Transfers the block to ell_1; answers 'does every equivalent norm on ell_1 have MAP?'."
+   },
+   "analytic_check": "n/a",
+   "provisional_N": {
+    "grade": "n/a (result)",
+    "justification": "Transport of structure."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.RealL1RenormingStatement",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/RenormingModel.lean:41",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.004,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.real_l1_quantitative_renorming",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Renorming.lean:41",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0,
+     "dominated_share": 0.0
+    },
+    {
+     "decl": "OAI.DiscreteFree.Coefficients.equiv",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Coefficients.lean:151",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0079,
+     "dominated_share": 0.0105
+    },
+    {
+     "decl": "OAI.DiscreteFree.Coefficients.equiv_bounds",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Coefficients.lean:163",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.004,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.hasBAP_linearIsometryEquiv_iff",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Renorming.lean:27",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.004,
+     "dominated_share": 0.0053
+    }
+   ]
+  },
+  {
+   "id": "I07",
+   "origin": "paper",
+   "kind": "claim (displayed construction)",
+   "name": "finite-block reduction of the problem (blocks + wedge strategy)",
+   "file_line": "sections/introduction.tex:70-90, 129-145",
+   "statement": "Reduce the infinite problem to a sequence of bounded blocks, each with its own finite anchor obstruction at level p, glued by a metric wedge; each block individually has BAP.",
+   "cited_or_new": {
+    "status": "new framing",
+    "bib_key": "BrudnyiBrudnyi07; GodefroyOzawa14",
+    "cue": "The distinction from earlier finite extension obstructions is important."
+   },
+   "uses_items": [
+    "I05",
+    "I12"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Organizes the proof; the obstruction is per-operator, not per-projection-with-prescribed-range."
+   },
+   "analytic_check": "Partly analytic: 'BAP fails' unfolds to 'for each lambda some compact set and eps defeat all lambda-bounded finite-rank operators'; choosing the compact set to be a finite anchor set inside a bounded piece is a natural specialization.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Decomposing via contractive retractions onto pieces is a standard device (ell_1-sums of free spaces, Kalton 2004); the novelty is the content of each block, not the reduction."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I08",
+   "origin": "paper",
+   "kind": "definition/construction (displayed)",
+   "name": "metric wedge M of the blocks, d(x,y)=d_p(x,o)+d_q(y,o) across blocks",
+   "file_line": "sections/reduction.tex:96-134 (also introduction.tex:129-138)",
+   "statement": "Identify basepoints; cross-block distance is the sum of distances to o. M is countable, 1-separated, unbounded (Thm blocks + Prop coefficients or Lemma block-geometry (iii)), nonproper (M_1 is infinite 1-separated in a ball).",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "GodefroyKalton03",
+    "cue": "Take disjoint copies of the spaces $M_p$ and identify only their basepoints."
+   },
+   "uses_items": [
+    "I05",
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Carrier of Thm main."
+   },
+   "analytic_check": "Not in goal, but a standard construction in L (pointed sums).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard pointed metric sum; F of a wedge is the ell_1-sum of the F(M_p)."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.MetricWedge.Point",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Wedge.lean:18",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.1304,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricWedge.distance",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Wedge.lean:25",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0949,
+     "dominated_share": 0.0026
+    }
+   ]
+  },
+  {
+   "id": "I09",
+   "origin": "paper",
+   "kind": "proposition",
+   "name": "Prop coefficients (prop:coefficients): bounded 1-separated N has F(N) ~ ell_1(N\\{o}) with (1/2)||c||_1 <= ||Jc|| <= B||c||_1, and 2B-BAP",
+   "file_line": "sections/reduction.tex:18-77",
+   "statement": "J c = sum c_x delta_x is an isomorphism; coordinate truncations S_m = J q_m J^{-1} give 2B-BAP.",
+   "cited_or_new": {
+    "status": "known, re-proved",
+    "bib_key": "AACD20; CuthKalenda26",
+    "cue": "The coefficient identification below appears in \\cite[Theorem~4.14]{AACD20}; the coefficient bounds are stated in \\cite[Lemma~3.4]{CuthKalenda26}. We include the proof"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Gives BAP of each block (for AP of the wedge), the renorming corollary, and (in Lean) the finite-support reduction."
+   },
+   "analytic_check": "Analytic relative to L (bib contains it).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Cited by the paper to AACD20 Thm 4.14 and Cuth-Kalenda Lemma 3.4."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.indicator",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Coordinates.lean:72",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.1621,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.coordinate",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Coordinates.lean:83",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.1581,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.sum_abs_coordinate_le",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Coordinates.lean:92",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0913,
+     "dominated_share": 0.0079
+    },
+    {
+     "decl": "OAI.DiscreteFree.supportProjection",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Coordinates.lean:122",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.1225,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.projection_compact",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/CompactApproximation.lean:93",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0476,
+     "dominated_share": 0.0105
+    },
+    {
+     "decl": "OAI.DiscreteFree.bounded_separated_hasBAP",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/CompactApproximation.lean:118",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0198,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.Coefficients.equiv",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Coefficients.lean:151",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0079,
+     "dominated_share": 0.0105
+    }
+   ]
+  },
+  {
+   "id": "I10",
+   "origin": "paper",
+   "kind": "claim (in proof)",
+   "name": "linearization of pointed 1-Lipschitz maps; inclusion/retraction contractions I_p, P_p with P_p I_p = Id",
+   "file_line": "sections/reduction.tex:136-174",
+   "statement": "Pointed 1-Lipschitz u: N->N' induces a norm-one linear map F(N)->F(N'); inclusion and retraction onto a block give P_p I_p = Id, so I_p is an isometry.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "GodefroyKalton03",
+    "cue": "We use the elementary linearization property of free spaces"
+   },
+   "uses_items": [
+    "I01",
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Transfers BAP bounds from the wedge to blocks."
+   },
+   "analytic_check": "Analytic (universal property of F).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Godefroy-Kalton linearization."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.freeMap",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Functor.lean:59",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0632,
+     "dominated_share": 0.0053
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricWedge.retraction",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Wedge.lean:115",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0277,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.hasBAP_of_contractive_retract",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/WedgeApproximation.lean:37",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0238,
+     "dominated_share": 0.0026
+    }
+   ]
+  },
+  {
+   "id": "I11",
+   "origin": "paper",
+   "kind": "claim (in proof)",
+   "name": "failure of lambda-BAP for the wedge via compression P_p U I_p",
+   "file_line": "sections/reduction.tex:176-189",
+   "statement": "If F(M) had lambda-BAP, choose integer p>=lambda; compress an approximating U to P_p U I_p, contradicting Thm blocks at the anchors.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "All blocks and their anchor sets were fixed before $\\lambda$ and $U$ were chosen."
+   },
+   "uses_items": [
+    "I05",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Closes the BAP half of Thm main."
+   },
+   "analytic_check": "Analytic given I05.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine complemented-subspace argument."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.MainConstruction.noBAP",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Main.lean:69",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0079,
+     "dominated_share": 0.0237
+    },
+    {
+     "decl": "OAI.DiscreteFree.BlockConstruction.noBAP",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/BlockBAP.lean:33",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0159,
+     "dominated_share": 0.0053
+    }
+   ]
+  },
+  {
+   "id": "I12",
+   "origin": "paper",
+   "kind": "claim (in proof)",
+   "name": "finite-block projection R_N = sum_{p<=N} I_p P_p and AP of the wedge",
+   "file_line": "sections/reduction.tex:191-244 (eq:finite-block-projection at 200-202)",
+   "statement": "R_N is the linearization of the retraction keeping N blocks; R_N u -> u uniformly on compacta; then compose with per-block 2B_p-BAP operators; norm sum_{p<=N} 2B_p is finite but grows with C, eps.",
+   "cited_or_new": {
+    "status": "new (routine); Kalton's general AP theorem cited as alternative",
+    "bib_key": "Kalton04",
+    "cue": "Kalton's general theorem \\cite[Proposition~4.4]{Kalton04} gives AP for free spaces over uniformly discrete metric spaces; the wedge structure provides a direct proof here."
+   },
+   "uses_items": [
+    "I09",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "AP half of Thm main."
+   },
+   "analytic_check": "Analytic (AP for uniformly discrete free spaces is in the bibliography: Kalton04 Prop 4.4).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "AP itself is Kalton's theorem; the direct proof is a standard exhaustion."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.MetricWedge.retain",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Wedge.lean:169",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0791,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricWedge.hasAP",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/WedgeApproximation.lean:156",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0119,
+     "dominated_share": 0.0737
+    }
+   ]
+  },
+  {
+   "id": "I13",
+   "origin": "paper",
+   "kind": "claim (section)",
+   "name": "nonlinear corollary: F(M) is not approximable (Kalton's Problem 1)",
+   "file_line": "sections/reduction.tex:246-270",
+   "statement": "Extend {delta_x} to a maximal 1-separated net N_X; Kalton's net characterization would give uniformly Lipschitz maps g: N_X->N_X with finite range fixing any finite set of evaluations; their linearizations T_F give Lambda-BAP, contradiction.",
+   "cited_or_new": {
+    "status": "new result via cited theorems",
+    "bib_key": "Kalton12; Kalton04",
+    "cue": "We verify the nonlinear consequence stated in the introduction using Kalton's characterization by nets"
+   },
+   "uses_items": [
+    "I04",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Corollary only; NOT formalized in Lean."
+   },
+   "analytic_check": "n/a",
+   "provisional_N": {
+    "grade": "n/a (result)",
+    "justification": "C5 transfer: Kalton12 Thm 4.4 + Kalton04 Lemma 3.2."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I14",
+   "origin": "paper",
+   "kind": "definition (inline \\emph)",
+   "name": "graph conventions: oriented incidences e, e-bar; nonbacktracking walk; rooted radius-r colored ball type",
+   "file_line": "sections/blocks.tex:12-23",
+   "statement": "Multigraph with distinct edge instances, two oriented incidences per edge (loops count twice); a walk is nonbacktracking if it never immediately takes the reverse incidence.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "BenjaminiSchramm01",
+    "cue": "A walk is \\emph{nonbacktracking} if"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Vocabulary for walks/records."
+   },
+   "analytic_check": "Analytic (standard graph theory in L).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.PortGraph",
+     "kind": "structure",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/PortGraphs.lean:17",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.3478,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.PortGraph.Reduced",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/PortGraphs.lean:48",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.083,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.PortGraph.Near",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/PortGraphs.lean:50",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0988,
+     "dominated_share": 0.0026
+    }
+   ]
+  },
+  {
+   "id": "I15",
+   "origin": "paper",
+   "kind": "lemma",
+   "name": "Lemma local-limit (lem:local-limit): deterministic Delta-regular multigraphs G_m whose colored neighborhoods converge to the independently uniformly colored Delta-regular tree",
+   "file_line": "sections/blocks.tex:33-108",
+   "statement": "Permutation model (Delta/2 uniform permutations) + independent uniform k-colorings; exploration gives collision probability O(N^{-1}); two-root exploration gives variance -> 0; choose realizations N_m with all radius<=m frequencies within 1/m.",
+   "cited_or_new": {
+    "status": "known (model cited), proof re-done",
+    "bib_key": "Friedman04; BenjaminiSchramm01",
+    "cue": "We use the independent-permutation multigraph model described by Friedman ... in the empirical rooted-neighborhood viewpoint of Benjamini and Schramm ... no spectral estimate is used."
+   },
+   "uses_items": [
+    "I14"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Supplies the colored-tree statistics that make long matched walks rare."
+   },
+   "analytic_check": "Analytic: Benjamini-Schramm local convergence of random regular graphs with iid marks is standard.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Local weak convergence of random regular (permutation-model) graphs to the regular tree, with iid marks; textbook (Bordenave's notes; Benjamini-Schramm)."
+   },
+   "provisional_F": null,
+   "lean_counterpart": {
+    "note": "NOT formalized. Lean replaces it with a deterministic family: Cayley graphs of the finite permutation group generated by the free group acting on its radius-N word ball (reduced words of length <= N act injectively, i.e. girth > N) times ALL colorings, so colour statistics are exact counts, not limits.",
+    "decls": [
+     {
+      "decl": "OAI.DiscreteFree.GraphProducer.WordBall",
+      "kind": "def",
+      "file_line": "lean/OAI/Analysis/LipschitzFree/FiniteQuotients.lean:16",
+      "in_proof_dag": true,
+      "frac_dag_dependents": 0.1462,
+      "dominated_share": 0.0026
+     },
+     {
+      "decl": "OAI.DiscreteFree.GraphProducer.ballPerm",
+      "kind": "def",
+      "file_line": "lean/OAI/Analysis/LipschitzFree/FiniteQuotients.lean:52",
+      "in_proof_dag": true,
+      "frac_dag_dependents": 0.1423,
+      "dominated_share": 0.0026
+     },
+     {
+      "decl": "OAI.DiscreteFree.GraphProducer.ballRep",
+      "kind": "def",
+      "file_line": "lean/OAI/Analysis/LipschitzFree/FiniteQuotients.lean:72",
+      "in_proof_dag": true,
+      "frac_dag_dependents": 0.1344,
+      "dominated_share": 0.0026
+     },
+     {
+      "decl": "OAI.DiscreteFree.GraphProducer.prefixes_injective",
+      "kind": "theorem",
+      "file_line": "lean/OAI/Analysis/LipschitzFree/FiniteQuotients.lean:130",
+      "in_proof_dag": true,
+      "frac_dag_dependents": 0.0437,
+      "dominated_share": 0.0184
+     },
+     {
+      "decl": "OAI.DiscreteFree.GraphProducer.cayleyGraph",
+      "kind": "def",
+      "file_line": "lean/OAI/Analysis/LipschitzFree/GraphGirth.lean:30",
+      "in_proof_dag": true,
+      "frac_dag_dependents": 0.1186,
+      "dominated_share": 0.0079
+     },
+     {
+      "decl": "OAI.DiscreteFree.GraphProducer.cayley_prefix_injective",
+      "kind": "theorem",
+      "file_line": "lean/OAI/Analysis/LipschitzFree/GraphGirth.lean:60",
+      "in_proof_dag": true,
+      "frac_dag_dependents": 0.0397,
+      "dominated_share": 0.0316
+     },
+     {
+      "decl": "OAI.DiscreteFree.GraphProducer.allColoringsGraph",
+      "kind": "def",
+      "file_line": "lean/OAI/Analysis/LipschitzFree/GraphGirth.lean:66",
+      "in_proof_dag": true,
+      "frac_dag_dependents": 0.1067,
+      "dominated_share": 0.0026
+     },
+     {
+      "decl": "OAI.DiscreteFree.GraphProducer.Vertex",
+      "kind": "def",
+      "file_line": "lean/OAI/Analysis/LipschitzFree/GraphColoring.lean:85",
+      "in_proof_dag": true,
+      "frac_dag_dependents": 0.0988,
+      "dominated_share": 0.0026
+     },
+     {
+      "decl": "OAI.DiscreteFree.GraphProducer.sequenceGraph",
+      "kind": "def",
+      "file_line": "lean/OAI/Analysis/LipschitzFree/GraphColoring.lean:92",
+      "in_proof_dag": true,
+      "frac_dag_dependents": 0.0988,
+      "dominated_share": 0.0026
+     }
+    ]
+   }
+  },
+  {
+   "id": "I16",
+   "origin": "paper",
+   "kind": "construction (displayed)",
+   "name": "scale parameters L=10p, R=3L, K=10p(R+1), D=K+2L+5, B=4R+D, V=1+4pB; Delta even with V/Delta<1/20; Q=Delta^{2L+1}, H=Delta^{D+1}; k>2 Delta Q H colors",
+   "file_line": "sections/blocks.tex:112-152 (eq:parameters at 122-127)",
+   "statement": "Chosen so that R>2L (small balls stay in one source graph), (2pR+1)/K<=1/5 (bump loss), K+2L+1<D (compatibility below cap), Delta dilutes the one-exceptional-direction loss, k makes Delta*Q*H/k<1/2.",
+   "cited_or_new": {
+    "status": "new (bookkeeping)",
+    "bib_key": null,
+    "cue": "We choose the metric scales to meet two requirements of the obstruction."
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Every inequality of the final contradiction uses these."
+   },
+   "analytic_check": "Not a subterm of the goal, but pure bookkeeping.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Parameter budget; checked arithmetically (B = 300p^2+150p+5)."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.BlockParameters.bump_loss",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Parameters.lean:59",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0357,
+     "dominated_share": 0.0026
+    }
+   ]
+  },
+  {
+   "id": "I17",
+   "origin": "paper",
+   "kind": "definition (inline \\emph + display)",
+   "name": "source vertices and capped color-distance labels h(x) in {0..D}^k",
+   "file_line": "sections/blocks.tex:154-163",
+   "statement": "h_i(x) = min{D, dist_{G_m}(x, color class i)}; labels vary by <=1 along edges; own-color coordinate is 0; at most H coordinates are below the cap.",
+   "cited_or_new": {
+    "status": "new use of a classical device",
+    "bib_key": null,
+    "cue": "define $h(x)\\in\\{0,\\ldots,D\\}^k$ by"
+   },
+   "uses_items": [
+    "I15",
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Labels drive anchors, bumps, compatibility and the colour restriction; the Lean label definitions pass the 20% proxy (frac_dag_dependents 0.21-0.23)."
+   },
+   "analytic_check": "Not a subterm of the goal. Up to equivalence it is a truncated Frechet/Bourgain-type map (distances to random subsets) into ell_infinity^k, which is in the wider literature, not in L.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Truncated distance-to-random-colour-class coordinates = Frechet/Bourgain-style random-set embedding into ell_infinity; capping is routine. Transfer (N0/N1), not a eureka step by itself."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.PortGraph.label",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/PortGraphs.lean:64",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.2332,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.originalLabel",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/MetricBlock.lean:19",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.2095,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.BoxLabel",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/BoxLabels.lean:16",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.2332,
+     "dominated_share": 0.0026
+    }
+   ]
+  },
+  {
+   "id": "I18",
+   "origin": "paper",
+   "kind": "definition (inline \\emph) / construction",
+   "name": "anchors a_v (one per realized label v), attachment edges of length R, anchor-anchor edges of length 2R+||v-w||_inf, metric d_p = weighted path metric; basepoint an anchor",
+   "file_line": "sections/blocks.tex:165-196 (fig:anchors)",
+   "statement": "Join every source vertex to the anchor of its label by length R; join anchors by 2R + label sup-distance. Finitely many labels => finitely many anchors; the block becomes bounded (diam <= 4R+D) while small balls (radius 2L<R) stay inside one source graph.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "For each $v\\in\\mathcal H$, add one new vertex $a_v$, called an \\emph{anchor}"
+   },
+   "uses_items": [
+    "I16",
+    "I17"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Makes the block bounded (hence ell_1 with BAP) while keeping local graph structure; makes the label map 1-Lipschitz on all of M_p; and provides the finite anchor set A_p of Thm blocks."
+   },
+   "analytic_check": "Non-analytic: the goal mentions only 'finite set A_p'; nothing in L or the bibliography glues a family of graphs through label-indexed hubs. (Coning/hub constructions to bound a metric are generic, which weakens this.)",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Leaning N3 as a component of the block. Hub/cone attachments to make a metric bounded are generic, and the label-indexed choice is natural once labels exist; graded N2 on its own. It is load-bearing only together with I17 and I23."
+   },
+   "provisional_F": {
+    "type": "F3",
+    "justification": "Auxiliary construction (hubs indexed by labels) built only to make the block bounded and to give the anchor approximation a lever on every source vertex. F5 flavour (embedding the graphs into a bounded space)."
+   },
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.Point",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/MetricBlock.lean:26",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.2055,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.Anchor",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/MetricBlock.lean:22",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.2055,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.weight",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/MetricBlock.lean:48",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.1462,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.NatMetricClosure.distance",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/MetricClosure.lean:41",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.1581,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.label",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/MetricBlock.lean:36",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.083,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.BlockConstruction.Block",
+     "kind": "abbrev",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/BlockObstruction.lean:29",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.083,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.BlockConstruction.anchors",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/BlockObstruction.lean:36",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0435,
+     "dominated_share": 0.0026
+    }
+   ]
+  },
+  {
+   "id": "I19",
+   "origin": "paper",
+   "kind": "lemma",
+   "name": "Lemma block-geometry (lem:block-geometry): separation 1, diam <= B_p, h 1-Lipschitz, d(x,a)>=R, |ball(2L)|<=Q, <=H uncapped label coordinates",
+   "file_line": "sections/blocks.tex:198-284",
+   "statement": "Integer edge lengths give separation and attained infima; diameter via attachment-anchor-attachment; label differences sum along paths; short paths use only source edges; walk counts bound balls and uncapped colours.",
+   "cited_or_new": {
+    "status": "new statement, routine proof",
+    "bib_key": null,
+    "cue": "proof given"
+   },
+   "uses_items": [
+    "I17",
+    "I18",
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Every quantitative input of the obstruction."
+   },
+   "analytic_check": "Analytic once I17/I18 are given (direct consequences).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine verification."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.label_lipschitz",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/MetricBlock.lean:170",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0437,
+     "dominated_share": 0.0079
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.diameter_bound",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/MetricBlock.lean:105",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0437,
+     "dominated_share": 0.0053
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.short_distance",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Attachment.lean:73",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0556,
+     "dominated_share": 0.0211
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.closedBall_card_le",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Attachment.lean:145",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0397,
+     "dominated_share": 0.0053
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.color_in_support",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Attachment.lean:177",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0357,
+     "dominated_share": 0.0132
+    },
+    {
+     "decl": "OAI.DiscreteFree.BlockConstruction.original_radius",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/BlockObstruction.lean:188",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0119,
+     "dominated_share": 0.0026
+    }
+   ]
+  },
+  {
+   "id": "I20",
+   "origin": "paper",
+   "kind": "claim (paragraph)",
+   "name": "colour restriction: compatibility with a fixed point t permits at most H source colours",
+   "file_line": "sections/blocks.tex:291-298 (used in walks.tex:62-73)",
+   "statement": "If x has colour i and ||h(x)-h(t)||_inf < D then h_i(t) < D, so the colour of x lies in C_t = {i : h_i(t) < D}, |C_t| <= H.",
+   "cited_or_new": {
+    "status": "new (one line)",
+    "bib_key": null,
+    "cue": "proximity of labels therefore permits at most $H$ source colors"
+   },
+   "uses_items": [
+    "I17",
+    "I19"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Converts label compatibility (which is not independent across vertices) into a colour constraint that is."
+   },
+   "analytic_check": "Not in the goal; a one-step consequence of I17.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Immediate from the own-colour coordinate being 0; the useful idea is to forget labels and keep only colours (an independence trick)."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.supportColors",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/ScalarTests.lean:25",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0435,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.color_in_support",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Attachment.lean:177",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0357,
+     "dominated_share": 0.0132
+    }
+   ]
+  },
+  {
+   "id": "I21",
+   "origin": "paper",
+   "kind": "lemma",
+   "name": "Lemma finite-support (lem:finite-support): perturb T_0 to T with range in span{delta_j: j in S}, S finite, ||T||<=2p, anchor errors <1",
+   "file_line": "sections/operators.tex:17-59",
+   "statement": "Write T_0 = sum phi_i(.) v_i and replace v_i by finitely supported w_i with total error < eta < min{p,1/(2B)}.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "Finite rank does not imply that the range is supported on finitely many evaluations."
+   },
+   "uses_items": [
+    "I01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Gives the finite state set S on which all combinatorics runs."
+   },
+   "analytic_check": "Analytic (density of finitely supported elements; standard perturbation).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard small-perturbation of finite-rank operators."
+   },
+   "provisional_F": null,
+   "lean_counterpart": {
+    "note": "Lean proves it differently: T = (coordinate truncation onto a finite S) o T_0, using the ell_1 structure of the bounded block (projection_finiteRank_approx).",
+    "decls": [
+     {
+      "decl": "OAI.DiscreteFree.finite_support_reduction",
+      "kind": "theorem",
+      "file_line": "lean/OAI/Analysis/LipschitzFree/SupportReduction.lean:60",
+      "in_proof_dag": true,
+      "frac_dag_dependents": 0.0278,
+      "dominated_share": 0.0132
+     }
+    ]
+   }
+  },
+  {
+   "id": "I22",
+   "origin": "paper",
+   "kind": "definition (display)",
+   "name": "label bump b_x(t) = L(1 - ||h(x)-h(t)||_inf / K)_+",
+   "file_line": "sections/operators.tex:63-72 (eq:bump)",
+   "statement": "Nonnegative, height L at the anchor a(x), Lipschitz constant <= L/K <= 1; positive only where the label is within K of h(x).",
+   "cited_or_new": {
+    "status": "new (simple)",
+    "bib_key": null,
+    "cue": "define a function on all of $M_p$ by"
+   },
+   "uses_items": [
+    "I17",
+    "I18"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Detects mass near the label; becomes the two halves of every edge test."
+   },
+   "analytic_check": "Not in goal; a tent function composed with the label map (standard shape).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Tent/hat function of a 1-Lipschitz map; routine once labels and anchors exist."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.labelBump",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/LabelBumps.lean:17",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0711,
+     "dominated_share": 0.0026
+    }
+   ]
+  },
+  {
+   "id": "I23",
+   "origin": "paper",
+   "kind": "lemma",
+   "name": "Lemma measure-bounds (lem:measure-bounds): affine signed representation mu_x of T delta_x on S, TV <= V = 1+4pB, and int b_x d mu_x >= 3L/4",
+   "file_line": "sections/operators.tex:80-150",
+   "statement": "mu_x puts c_x(j) on j != o and the balance at o, so int g d mu_x = (T delta_x)(g - g(o)) + g(o); a sign test (Lip <= 2 by separation) bounds TV; comparing T delta_x with delta_{a(x)} (distance R, anchor error <1) and pairing with the small-slope bump gives the mass bound.",
+   "cited_or_new": {
+    "status": "new statement; affine signed representation is standard",
+    "bib_key": "Naor21",
+    "cue": "Signed representations also occur in Lipschitz almost extension; \\cite[Proposition~6 and Remark~7]{Naor21} distinguishes them"
+   },
+   "uses_items": [
+    "I21",
+    "I22",
+    "I19"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Two inputs of the final contradiction: bounded variation (for averaging) and large bump mass (for the lower bound)."
+   },
+   "analytic_check": "TV bound analytic (ell_1 coefficient bound, I09). Bump-mass inequality is not a subterm of the goal: it is the point where 'small anchor error + small operator norm' is converted into mass near the label.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Affine signed representation + TV bound are standard (Naor21 named); the anchor-to-vertex bump-mass transfer is a short new step."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.affineWeights",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/AffineWeights.lean:19",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0553,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.affineWeights_pairing",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/AffineWeights.lean:27",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0516,
+     "dominated_share": 0.0053
+    },
+    {
+     "decl": "OAI.DiscreteFree.affineWeights_variation",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/AffineWeights.lean:45",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0357,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.affine_bump_mass",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/LabelBumps.lean:73",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0357,
+     "dominated_share": 0.0053
+    },
+    {
+     "decl": "OAI.DiscreteFree.BlockConstruction.bump_mass",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/BlockObstruction.lean:76",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0317,
+     "dominated_share": 0.0158
+    }
+   ]
+  },
+  {
+   "id": "I24",
+   "origin": "paper",
+   "kind": "definition (inline \\emph)",
+   "name": "compatible (graph vertex x, state j): ||h(x)-h(j)||_inf <= K+2L+1 = D-4",
+   "file_line": "sections/walks.tex:24-26 (also introduction.tex:186-191)",
+   "statement": "Threshold allows label distance < K (bump positive), one source-edge step, one state step of length <= 2L.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "A graph vertex $x$ and a state $j\\in S$ are \\emph{compatible} when"
+   },
+   "uses_items": [
+    "I17",
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Hypothesis of matched walks and of the exceptional lemma."
+   },
+   "analytic_check": "Not in goal; a threshold relation on labels.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "A thresholded proximity relation."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.Compatible",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/ScalarTests.lean:20",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0514,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.Transition",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/ScalarTests.lean:23",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0514,
+     "dominated_share": 0.0026
+    }
+   ]
+  },
+  {
+   "id": "I25",
+   "origin": "paper",
+   "kind": "definition (inline \\emph)",
+   "name": "matched nonbacktracking walk: states j_0..j_t in S, (x_s,j_s) compatible, d_p(j_{s-1},j_s) <= 2L",
+   "file_line": "sections/walks.tex:27-36 (also introduction.tex:185-195)",
+   "statement": "A source walk 'tracked' by a sequence of support points with compatible labels and bounded jumps; states and vertices may repeat.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "A nonbacktracking walk ... is \\emph{matched} if there are states"
+   },
+   "uses_items": [
+    "I14",
+    "I24"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Defines good/bad vertices and records."
+   },
+   "analytic_check": "Non-analytic: not a subterm of the goal; it is a product-automaton (finite state set S x graph walk) notion invented for the proof.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Close in spirit to 'a finite automaton tracking a random coloured tree' and to graph homomorphism/tracking arguments; as a definition it is small. Graded N2; it is part of the N3 complex I31-I34."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.PortGraph.Matched",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/GraphWalks.lean:20",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0988,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.PortGraph.Good",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/GraphWalks.lean:42",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0711,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.StatePaths.Based",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/StatePaths.lean:20",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0514,
+     "dominated_share": 0.0026
+    }
+   ]
+  },
+  {
+   "id": "I26",
+   "origin": "paper",
+   "kind": "lemma",
+   "name": "Lemma rare-walks (lem:rare-walks): fraction beta_m of roots starting a matched walk of length n has limsup <= |S|(H/k)(Delta Q H / k)^n",
+   "file_line": "sections/walks.tex:50-110",
+   "statement": "Weaken 'matched' to 'colour of x_s in C_{j_s} with allowed state transitions' (determined by the radius-n coloured ball); count Delta^n walks x |S|Q^n state paths x (H/k)^{n+1}; local limit transfers the bound to G_m. Choose n then m with beta < 1/(20V).",
+   "cited_or_new": {
+    "status": "new statement, first-moment proof",
+    "bib_key": null,
+    "cue": "Choosing many colors therefore makes long matched walks rare."
+   },
+   "uses_items": [
+    "I15",
+    "I19",
+    "I20",
+    "I25"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Makes bad vertices rare, which the averaging needs."
+   },
+   "analytic_check": "Not in goal; the proof is a textbook first-moment/union bound once the event is phrased.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard first-moment count on an iid-coloured tree; the order-of-choices remark (S fixed before n,m) is the only subtlety."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.GraphProducer.rare_matched_bound",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/GraphColoring.lean:20",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0357,
+     "dominated_share": 0.0763
+    },
+    {
+     "decl": "OAI.DiscreteFree.GraphProducer.exists_rare_component",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/GraphSequence.lean:17",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0317,
+     "dominated_share": 0.0868
+    },
+    {
+     "decl": "OAI.DiscreteFree.ColorCounting.cardinal_identity",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/ColorCounting.lean:63",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0516,
+     "dominated_share": 0.0079
+    },
+    {
+     "decl": "OAI.DiscreteFree.ColorCounting.colored_roots_bound",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/ColorCounting.lean:133",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0397,
+     "dominated_share": 0.0211
+    },
+    {
+     "decl": "OAI.DiscreteFree.StatePaths.card_path_le",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/StatePaths.lean:94",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0397,
+     "dominated_share": 0.0053
+    }
+   ]
+  },
+  {
+   "id": "I27",
+   "origin": "paper",
+   "kind": "remark",
+   "name": "Remark non-tree-bad-set (rem:non-tree-bad-set)",
+   "file_line": "sections/walks.tex:112-122",
+   "statement": "Bad set may be enlarged by roots with non-tree neighbourhoods at no cost.",
+   "cited_or_new": {
+    "status": "new (side remark)",
+    "bib_key": null,
+    "cue": "One may enlarge the set counted by"
+   },
+   "uses_items": [
+    "I26",
+    "I15"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Not used in the main proof."
+   },
+   "analytic_check": "n/a",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Commentary."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I28",
+   "origin": "paper",
+   "kind": "definition (inline \\emph)",
+   "name": "good / bad vertex",
+   "file_line": "sections/walks.tex:126-127 (also introduction.tex:197-198)",
+   "statement": "Bad if a matched walk of length n starts there; good otherwise.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "Call a vertex \\emph{bad} if"
+   },
+   "uses_items": [
+    "I25"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Records are finite only at good vertices."
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Thresholded predicate."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.PortGraph.Good",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/GraphWalks.lean:42",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0711,
+     "dominated_share": 0.0026
+    }
+   ]
+  },
+  {
+   "id": "I29",
+   "origin": "paper",
+   "kind": "definition (display)",
+   "name": "continuation record r_x(e,j) = max length of matched walks starting through incidence e with initial state j (0 if none)",
+   "file_line": "sections/walks.tex:142-153",
+   "statement": "Finite (< n) at good vertices because any longer matched walk has a matched prefix of length n.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "BenDavidEtAl24",
+    "cue": "A related comparison of nonbacktracking continuation lengths appears in Ben-David, Childs, Gily\\'en, Kretschmer, Podder, and Wang"
+   },
+   "uses_items": [
+    "I25",
+    "I28"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Input of the exceptional-direction rule."
+   },
+   "analytic_check": "Not in goal or L; nearest neighbour is outside L's fields (quantum query complexity / property testing).",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Named precedent: Ben-David et al. Algorithm 1 FindParent picks the direction with the longest nonbacktracking continuation (arXiv 2006.12760 Sec 6.1.2). Here records are deterministic and indexed by support states."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.PortGraph.RecordLength",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/GraphWalks.lean:54",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0593,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.PortGraph.record",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/GraphWalks.lean:58",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0593,
+     "dominated_share": 0.0026
+    }
+   ]
+  },
+  {
+   "id": "I30",
+   "origin": "paper",
+   "kind": "definition (inline \\emph + display)",
+   "name": "exceptional incidence at (x,j) (record strictly larger than all others; at most one; ties give none); E_e = states for which e is exceptional at its tail; all states at bad vertices",
+   "file_line": "sections/walks.tex:155-162",
+   "statement": "At a good vertex each state is exceptional in at most one direction.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "BenDavidEtAl24",
+    "cue": "Declare $e$ \\emph{exceptional at $(x,j)$} if its record is strictly greater than every other outgoing record"
+   },
+   "uses_items": [
+    "I29",
+    "I28"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The sets E_e are where the edge test is allowed to fail; their 'at most one direction per state' property is what averaging exploits."
+   },
+   "analytic_check": "Non-analytic: not in goal or L.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Strict-argmax parent direction, as in Ben-David et al. (argmax of continuation lengths). The state indexing and the use as 'discard set' for scalar tests are new."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.Exceptional",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/SignedTests.lean:18",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0553,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.exceptional_unique",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/SignedTests.lean:21",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0357,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.exceptionSet",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/ScalarTests.lean:59",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0435,
+     "dominated_share": 0.0026
+    }
+   ]
+  },
+  {
+   "id": "I31",
+   "origin": "paper",
+   "kind": "lemma",
+   "name": "Lemma exceptional-directions (lem:exceptional-directions): if (x,j),(y,j') compatible across incidence e:x->y and d(j,j')<=2L then j in E_e or j' in E_{e-bar}",
+   "file_line": "sections/walks.tex:164-202",
+   "statement": "Prepending e to a longest walk in another direction at y gives r_x(e,j) >= 1+A_y and symmetrically r_y(e-bar,j') >= 1+A_x; if neither were exceptional, A_x >= 1+A_y >= 2+A_x.",
+   "cited_or_new": {
+    "status": "adapted (precedent named)",
+    "bib_key": "BenDavidEtAl24",
+    "cue": "their consistency lemma excludes an incompatible pair of choices by symmetric length inequalities. Here the records are deterministic and indexed by support states"
+   },
+   "uses_items": [
+    "I29",
+    "I30",
+    "I24",
+    "I25"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Exactly what makes opposing prescriptions compatible (I32)."
+   },
+   "analytic_check": "Non-analytic: the statement is not a subterm of the goal or L.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Very close to Ben-David et al. Lemma 58 (arXiv numbering; Lemma 6.3 in SICOMP), whose proof derives l_v > l_u and l_v < l_u from prepending an edge. The paper names this precedent. Transfer from TCS, adapted."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.PortGraph.record_extension",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/GraphWalks.lean:74",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0437,
+     "dominated_share": 0.0105
+    },
+    {
+     "decl": "OAI.DiscreteFree.exceptional_of_extensions",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/SignedTests.lean:26",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0437,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.PortGraph.matched_exceptional_endpoint",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/GraphWalks.lean:88",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0397,
+     "dominated_share": 0.0158
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.exceptional_endpoint",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/ScalarTests.lean:74",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0357,
+     "dominated_share": 0.0184
+    }
+   ]
+  },
+  {
+   "id": "I32",
+   "origin": "paper",
+   "kind": "lemma",
+   "name": "Lemma edge-test (lem:edge-test): 1-Lipschitz f_e: M_p->[-L,L] equal to b_x on S\\E_e and to -b_y on S\\E_{e-bar}",
+   "file_line": "sections/tests.tex:11-61",
+   "statement": "Within each set the bump's Lipschitz bound suffices; cross pairs at distance >= 2L are fine since values lie in [0,L]; for closer cross pairs a positive value forces compatibility of both pairs, which I31 forbids; then McShane extension + clipping.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "McShane34",
+    "cue": "For an incidence $e:x\\to y$, we will prescribe the bump $b_x$ on states outside $E_e$ and the negative bump $-b_y$ on states outside $E_{\\bar e}$."
+   },
+   "uses_items": [
+    "I22",
+    "I24",
+    "I30",
+    "I31",
+    "I19"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Produces the test functionals whose pairing with mu_x - mu_y is both large (lower bound) and small (operator norm upper bound)."
+   },
+   "analytic_check": "Non-analytic: neither the opposing prescription nor the exceptional discard sets occur in the goal or L (McShane extension inside it is in L: Mathlib LipschitzOnWith.extend_real).",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Weak N3 (as the core of the complex I30-I34). No near-equivalent found: a 1-Lipschitz test that is +bump(x) and -bump(y) on a finite support except on a combinatorially selected discard set. Against: once one decides to compare mu_x and mu_y with opposing bumps, the need to discard close cross pairs is forced and the record trick is imported from TCS."
+   },
+   "provisional_F": {
+    "type": "F3",
+    "justification": "Auxiliary test functions built only to drive the contradiction; an F2 flavour (an invariant that is consistent across every incidence)."
+   },
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.positive_bump_compatible",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/ScalarTests.lean:94",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0357,
+     "dominated_share": 0.0053
+    },
+    {
+     "decl": "OAI.DiscreteFree.opposing_scalar_extension",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/SignedTests.lean:117",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0357,
+     "dominated_share": 0.0053
+    },
+    {
+     "decl": "OAI.DiscreteFree.bounded_scalar_extension",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/SignedTests.lean:100",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0397,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.edge_test",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/ScalarTests.lean:119",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0317,
+     "dominated_share": 0.0342
+    }
+   ]
+  },
+  {
+   "id": "I33",
+   "origin": "paper",
+   "kind": "claim (proof of Thm blocks)",
+   "name": "edge lower/upper bounds and incidence averaging: int f_e d(mu_x - mu_y) >= 3L/2 - 2L(|mu_x|(E_e)+|mu_y|(E_{e-bar})) and <= 2p; average over oriented incidences: E|mu_x|(E_e) <= V/Delta + V beta < 1/10; so 2p > 11p",
+   "file_line": "sections/tests.tex:71-135 (eq:edge-lower 82-90, eq:edge-upper 96-104, eq:average-error 115-117)",
+   "statement": "Each state is exceptional in at most one of the Delta directions at a good vertex, so averaging over incidences divides the discarded variation by Delta; bad vertices are rare. Regularity makes the uniform vertex-then-incidence sampling uniform on incidences and reversal-invariant.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "Averaging over all oriented incidences therefore divides the corresponding variation loss by the graph degree"
+   },
+   "uses_items": [
+    "I23",
+    "I26",
+    "I30",
+    "I32"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The contradiction itself."
+   },
+   "analytic_check": "Non-analytic in its combination; each inequality is elementary.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Averaging-over-edges contradictions are standard (Poincare-type/expander arguments); the specific accounting (one exceptional direction per state, diluted by degree) is new but follows once I30-I32 exist. Part of the N3 complex."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.totalVariation",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/SignedTests.lean:46",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0514,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.variationOn",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/SignedTests.lean:48",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0514,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.pairing",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/SignedTests.lean:52",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0632,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.opposing_pairing_lower",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/SignedTests.lean:72",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0317,
+     "dominated_share": 0.0053
+    },
+    {
+     "decl": "OAI.DiscreteFree.sum_variationOn_le",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/SignedTests.lean:174",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0357,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.signed_incidence_obstruction",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/SignedTests.lean:207",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0317,
+     "dominated_share": 0.0079
+    },
+    {
+     "decl": "OAI.DiscreteFree.BlockConstruction.finite_support_impossible",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/BlockObstruction.lean:102",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0278,
+     "dominated_share": 0.3711
+    },
+    {
+     "decl": "OAI.DiscreteFree.BlockConstruction.obstruction",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/BlockObstruction.lean:176",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0238,
+     "dominated_share": 0.3868
+    }
+   ]
+  },
+  {
+   "id": "I34",
+   "origin": "paper",
+   "kind": "conceptual device (intro + proofs)",
+   "name": "order of choices: graph sequence, block and anchors fixed before the operator; S from the operator; then n, then one large graph G_m",
+   "file_line": "sections/introduction.tex:233-239; walks.tex:3-8, 82-90; tests.tex:130-134",
+   "statement": "Local convergence applies to every finite coloured event, including events specified by an already-fixed support, so no independence between the operator and the graph is needed.",
+   "cited_or_new": {
+    "status": "new (framing)",
+    "bib_key": null,
+    "cue": "The order of choices is essential."
+   },
+   "uses_items": [
+    "I15",
+    "I26"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Makes a single deterministic block defeat every operator."
+   },
+   "analytic_check": "Analytic in the quantifier sense: it is reading the goal's 'exists M, A for all T' correctly; the content is that the block must contain graphs of every size (a sequence), not one graph.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "A quantifier-order observation, but it dictates that the block is an infinite union of ever larger graphs (so the block is infinite while A_p is finite)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I35",
+   "origin": "paper",
+   "kind": "remark",
+   "name": "Remark abstract-obstruction (rem:abstract-obstruction): sufficient criterion (i)-(iv) for the finite-anchor obstruction",
+   "file_line": "sections/tests.tex:143-174",
+   "statement": "Any countable pointed 1-separated space of diameter <= B with finite A, disjoint Delta-regular coloured graphs with tree-like colour statistics, a 1-Lipschitz label map with own-colour zero and anchors at distance <= R, and ball/label bounds, satisfies the obstruction.",
+   "cited_or_new": {
+    "status": "new (abstraction)",
+    "bib_key": null,
+    "cue": "The preceding proof gives the same finite-anchor obstruction for any data satisfying the following assumptions."
+   },
+   "uses_items": [
+    "I15",
+    "I17",
+    "I18",
+    "I19",
+    "I26",
+    "I32",
+    "I33"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "This is effectively the interface the Lean instantiates with a different graph family."
+   },
+   "analytic_check": "Analytic restatement of the proof's hypotheses.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Abstraction of the proof."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I36",
+   "origin": "paper",
+   "kind": "lemma (re-proved inline)",
+   "name": "McShane extension formula F(z)=min_j {v(j)+d(z,j)} followed by clipping",
+   "file_line": "sections/tests.tex:47-60",
+   "statement": "Finite 1-Lipschitz data extend to a 1-Lipschitz function; clipping to [-L,L] keeps values and bound.",
+   "cited_or_new": {
+    "status": "classical, re-proved",
+    "bib_key": "McShane34",
+    "cue": "The scalar extension step is an instance of McShane's classical extension principle"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Used in I32."
+   },
+   "analytic_check": "Analytic: in L (Mathlib LipschitzOnWith.extend_real).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "McShane 1934."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.bounded_scalar_extension",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/SignedTests.lean:100",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0397,
+     "dominated_share": 0.0026
+    }
+   ]
+  },
+  {
+   "id": "I37",
+   "origin": "lean",
+   "kind": "construction (Lean only)",
+   "name": "finite permutation quotients of free-group word balls and their Cayley port graphs (girth > N)",
+   "file_line": "lean/OAI/Analysis/LipschitzFree/FiniteQuotients.lean:16-147; GraphGirth.lean:30-64",
+   "statement": "WordBall A N = reduced words of length <= N; extend left multiplication by each generator to a permutation (Equiv.Perm.exists_extending_pair); the induced action of FreeGroup A is injective on words of length <= N, so reduced walks of length <= N in the Cayley graph of Perm(WordBall) visit distinct vertices.",
+   "cited_or_new": {
+    "status": "standard (not cited in paper)",
+    "bib_key": null,
+    "cue": "Cayley graphs with injective bounded reduced walks (module docstring)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Replaces the random-graph local limit in Lean; dominated_share of cayley_prefix_injective 0.03."
+   },
+   "analytic_check": "Analytic relative to the literature: finite quotients of free groups separating a ball (residual finiteness / Schreier graphs of large girth) are classical.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Residual finiteness of free groups / large-girth Schreier graphs (e.g. Margulis, Erdos-Sachs style); a standard derandomization."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.GraphProducer.WordBall",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/FiniteQuotients.lean:16",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.1462,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.GraphProducer.ballPerm",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/FiniteQuotients.lean:52",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.1423,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.GraphProducer.ballRep",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/FiniteQuotients.lean:72",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.1344,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.GraphProducer.prefixes_injective",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/FiniteQuotients.lean:130",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0437,
+     "dominated_share": 0.0184
+    },
+    {
+     "decl": "OAI.DiscreteFree.GraphProducer.cayleyGraph",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/GraphGirth.lean:30",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.1186,
+     "dominated_share": 0.0079
+    },
+    {
+     "decl": "OAI.DiscreteFree.GraphProducer.cayley_prefix_injective",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/GraphGirth.lean:60",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0397,
+     "dominated_share": 0.0316
+    }
+   ]
+  },
+  {
+   "id": "I38",
+   "origin": "lean",
+   "kind": "construction (Lean only)",
+   "name": "all-colourings graph: vertex set (colourings of Cayley_N) x Cayley_N, one component per colouring; exact colour counting replaces probability",
+   "file_line": "lean/OAI/Analysis/LipschitzFree/GraphGirth.lean:66-90; ColorCounting.lean:63-131; GraphColoring.lean:20-80; GraphSequence.lean:17-63",
+   "statement": "Because reduced walks are injective, the number of colourings making a walk's colours land in prescribed sets is exactly prod|P_i| k^{|X|-(n+1)} (cardinal_identity); a union bound over walks and state paths gives the bad-root fraction with walk length n = component index N.",
+   "cited_or_new": {
+    "status": "new to this formalization (paper uses random colourings)",
+    "bib_key": null,
+    "cue": "Rare matched walks and the fixed all-colorings graph sequence (module docstring)"
+   },
+   "uses_items": [
+    "I37",
+    "I25"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Lean's substitute for I15+I26."
+   },
+   "analytic_check": "Analytic: averaging over all colourings is the counting form of the first-moment method.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard derandomization (sum over the whole probability space)."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.GraphProducer.allColoringsGraph",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/GraphGirth.lean:66",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.1067,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.GraphProducer.Vertex",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/GraphColoring.lean:85",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0988,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.GraphProducer.sequenceGraph",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/GraphColoring.lean:92",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0988,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.ColorCounting.cardinal_identity",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/ColorCounting.lean:63",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0516,
+     "dominated_share": 0.0079
+    },
+    {
+     "decl": "OAI.DiscreteFree.ColorCounting.colored_roots_bound",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/ColorCounting.lean:133",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0397,
+     "dominated_share": 0.0211
+    },
+    {
+     "decl": "OAI.DiscreteFree.GraphProducer.rare_matched_bound",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/GraphColoring.lean:20",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0357,
+     "dominated_share": 0.0763
+    },
+    {
+     "decl": "OAI.DiscreteFree.GraphProducer.exists_rare_component",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/GraphSequence.lean:17",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0317,
+     "dominated_share": 0.0868
+    }
+   ]
+  },
+  {
+   "id": "I39",
+   "origin": "lean",
+   "kind": "construction (Lean only)",
+   "name": "complete weighted graph metric with fallback weight 4R+cap and integer metric closure",
+   "file_line": "lean/OAI/Analysis/LipschitzFree/MetricBlock.lean:48-108; MetricClosure.lean:41-136; Attachment.lean:73-150",
+   "statement": "weight = 1 on graph edges, R vertex-to-own-anchor, 2R+label distance between anchors, 4R+cap otherwise; NatMetricClosure gives an integer metric; short_distance shows any path of length < R is a source-graph walk.",
+   "cited_or_new": {
+    "status": "variant of paper's construction",
+    "bib_key": null,
+    "cue": "Metric blocks obtained by adjoining finite label anchors (module docstring)"
+   },
+   "uses_items": [
+    "I18"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Lean form of I18/I19; makes the diameter bound immediate."
+   },
+   "analytic_check": "Analytic (equivalent to paper's metric up to the fallback edges, which never shorten distances below the paper's bounds).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Engineering variant of I18."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.weight",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/MetricBlock.lean:48",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.1462,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.NatMetricClosure.distance",
+     "kind": "def",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/MetricClosure.lean:41",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.1581,
+     "dominated_share": 0.0026
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.diameter_bound",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/MetricBlock.lean:105",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0437,
+     "dominated_share": 0.0053
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.short_distance",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Attachment.lean:73",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0556,
+     "dominated_share": 0.0211
+    },
+    {
+     "decl": "OAI.DiscreteFree.MetricBlock.closedBall_card_le",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Analysis/LipschitzFree/Attachment.lean:145",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0397,
+     "dominated_share": 0.0053
+    }
+   ]
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Coefficient identification F(N) ~ ell_1 for bounded uniformly discrete N",
+   "bib_key": "AACD20; CuthKalenda26",
+   "locator": "Thm 4.14; Lemma 3.4",
+   "field": "Lipschitz-free spaces",
+   "used_at": "reduction.tex:13-16",
+   "status": "cited and re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "AP of free spaces over uniformly discrete spaces",
+   "bib_key": "Kalton04",
+   "locator": "Prop 4.4",
+   "field": "Lipschitz-free spaces",
+   "used_at": "introduction.tex:3-8; reduction.tex:191-193",
+   "status": "background (direct proof given)",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Kalton's question (BAP for uniformly discrete free spaces)",
+   "bib_key": "Kalton04; GodefroyOzawa14; Godefroy15",
+   "locator": "p.185; Question 1; Problem 6.2",
+   "field": "Lipschitz-free spaces",
+   "used_at": "introduction.tex:6-10",
+   "status": "problem statement",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Countable complete discrete spaces with AP but not BAP",
+   "bib_key": "Smith26",
+   "locator": "Thm 1.3",
+   "field": "Lipschitz-free spaces / descriptive set theory",
+   "used_at": "introduction.tex:46-49",
+   "status": "background (closest prior result)",
+   "essential_for_headline": false
+  },
+  {
+   "name": "MAP for free spaces over countable proper spaces",
+   "bib_key": "Dalet15",
+   "locator": "Thm 2.6",
+   "field": "Lipschitz-free spaces",
+   "used_at": "introduction.tex:51-53",
+   "status": "background (explains why the example must be nonproper)",
+   "essential_for_headline": false
+  },
+  {
+   "name": "3-Schur property of uniformly discrete free spaces",
+   "bib_key": "CuthKalenda26",
+   "locator": "Thm 1.1",
+   "field": "Lipschitz-free spaces",
+   "used_at": "introduction.tex:54-58",
+   "status": "background",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Finite exact-extension lower bounds",
+   "bib_key": "BrudnyiBrudnyi07; GodefroyOzawa14",
+   "locator": "preprint Lemma 10.5; Prop 7",
+   "field": "Lipschitz extension",
+   "used_at": "introduction.tex:79-86",
+   "status": "background contrast",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Arens-Eells molecules; Godefroy-Kalton linearization",
+   "bib_key": "ArensEells56; GodefroyKalton03",
+   "locator": "§2; §2",
+   "field": "Lipschitz-free spaces",
+   "used_at": "introduction.tex:23-26; reduction.tex:147-148",
+   "status": "background; linearization re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Independent-permutation regular multigraph model",
+   "bib_key": "Friedman04",
+   "locator": "§1 p.2",
+   "field": "Random graphs",
+   "used_at": "blocks.tex:27-31",
+   "status": "model cited; local limit re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Empirical rooted-neighbourhood (local weak) convergence",
+   "bib_key": "BenjaminiSchramm01",
+   "locator": "§1.2",
+   "field": "Probability / random graphs",
+   "used_at": "blocks.tex:28-29",
+   "status": "viewpoint cited; needed facts re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Comparison of nonbacktracking continuation lengths; consistency lemma",
+   "bib_key": "BenDavidEtAl24",
+   "locator": "§6.1.2, Algorithm 6.1, Lemma 6.3",
+   "field": "Quantum query complexity / property testing",
+   "used_at": "introduction.tex:249-253; walks.tex:132-140",
+   "status": "named precedent; adapted and re-proved",
+   "essential_for_headline": false
+  },
+  {
+   "name": "McShane extension",
+   "bib_key": "McShane34",
+   "locator": null,
+   "field": "Real analysis / metric geometry",
+   "used_at": "tests.tex:47-60",
+   "status": "re-proved for finite data",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Signed vs probability representations in almost extension",
+   "bib_key": "Naor21",
+   "locator": "Prop 6, Remark 7",
+   "field": "Metric geometry / Lipschitz extension",
+   "used_at": "operators.tex:155-158",
+   "status": "background contrast",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Kalton's net characterization of approximable spaces",
+   "bib_key": "Kalton12",
+   "locator": "Thm 4.4 and p.1260",
+   "field": "Nonlinear geometry of Banach spaces",
+   "used_at": "reduction.tex:248-258",
+   "status": "cited, not re-proved",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Banach-valued linearization property of free spaces",
+   "bib_key": "Kalton04",
+   "locator": "Lemma 3.2",
+   "field": "Lipschitz-free spaces",
+   "used_at": "reduction.tex:262-265",
+   "status": "cited, not re-proved",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Mathlib: LipschitzOnWith.extend_real, lp spaces, FreeGroup, Equiv.Perm.exists_extending_pair",
+   "bib_key": null,
+   "locator": "Mathlib d13f23b",
+   "field": "Lean library",
+   "used_at": "SignedTests.lean:103; Coefficients.lean; FiniteQuotients.lean:48",
+   "status": "invoked in Lean",
+   "essential_for_headline": true
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Reduction: Prop coefficients (bounded 1-separated => F ~ ell_1, 2B-BAP). The metric wedge of blocks M_p, with contractive inclusion/retractions, inherits each block's obstruction (so no lambda-BAP) and has AP via finite-block projections R_N. Cor renorming transports F(M_p) to ell_1. The nonlinear corollary follows from Kalton's net theorem.",
+   "items": [
+    "I07",
+    "I08",
+    "I09",
+    "I10",
+    "I11",
+    "I12",
+    "I06",
+    "I13"
+   ],
+   "external": [
+    "Kalton12 Thm 4.4 (corollary only)"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Block construction: fix parameters; take a deterministic sequence of Delta-regular k-coloured multigraphs with iid-coloured-tree local statistics (paper: permutation model; Lean: large-girth Cayley quotients x all colourings). Label vertices by capped distances to colour classes; attach each vertex to the anchor of its label at distance R; join anchors by 2R + label distance. Get separation 1, diam <= B_p, 1-Lipschitz labels, small balls inside one graph, <= H uncapped coordinates.",
+   "items": [
+    "I14",
+    "I15",
+    "I16",
+    "I17",
+    "I18",
+    "I19",
+    "I20",
+    "I37",
+    "I38",
+    "I39"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "From operator to measures: a finite-rank T_0 with ||T_0||<=p and anchor error < 1/2 is perturbed to T with finite support S, ||T||<=2p, anchor error < 1. Affine signed measures mu_x on S have TV <= V and int b_x d mu_x >= 3L/4 (anchor at distance R, bump slope L/K).",
+   "items": [
+    "I21",
+    "I22",
+    "I23"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "Rare matched walks: with S fixed, compatibility forces colours into sets of size <= H, transitions have <= Q successors, so the fraction of roots starting a matched walk of length n is <= |S|(H/k)(Delta Q H/k)^n + o(1); pick n then a large graph with bad fraction < 1/(20V).",
+   "items": [
+    "I24",
+    "I25",
+    "I26",
+    "I28",
+    "I34",
+    "I38"
+   ]
+  },
+  {
+   "step": 5,
+   "claim": "Records: at good vertices define continuation records r_x(e,j) and exceptional incidences (strict argmax). Any compatible close pair across an edge has j in E_e or j' in E_{e-bar}.",
+   "items": [
+    "I29",
+    "I30",
+    "I31"
+   ],
+   "external": [
+    "BenDavidEtAl24 (precedent, re-proved)"
+   ]
+  },
+  {
+   "step": 6,
+   "claim": "Edge tests: f_e = b_x on S\\E_e, -b_y on S\\E_{e-bar}, extended by McShane and clipped. Pairing with mu_x - mu_y is >= 3L/2 - 2L(discarded variation) and <= 2p. Averaging over oriented incidences: discarded variation averages < 1/10 (one exceptional direction per state, degree > 20V; bad vertices rare). Contradiction 2p > 11p.",
+   "items": [
+    "I32",
+    "I33",
+    "I36"
+   ]
+  },
+  {
+   "step": 7,
+   "claim": "Assemble: Thm blocks for every p; then Thm main and Cor renorming (formalized), plus the unformalized nonlinear corollary.",
+   "items": [
+    "I05",
+    "I04",
+    "I06",
+    "I13",
+    "I35"
+   ]
+  }
+ ],
+ "eureka_candidates_ranked": [
+  "I32 (+I30,I33)",
+  "I18 (+I17,I22)",
+  "I31 (+I29,I30)",
+  "I25+I26",
+  "I07"
+ ],
+ "eureka_candidates": [
+  {
+   "rank": 1,
+   "item": "I32 (+I30, I33): opposing edge tests with exceptional discard sets and incidence averaging",
+   "provisional_N": "N3 (weak)",
+   "provisional_F": "F3",
+   "for": [
+    "Not a subterm of the goal or of L: the goal speaks of finite-rank operators and anchors; the proof manufactures, for every oriented edge, a 1-Lipschitz functional that is +bump(x) and -bump(y) on the operator's support minus a combinatorially chosen discard set.",
+    "It is where the finite-dimensionality of the range (finite S) is actually exploited against the infinite locally-tree-like structure; every other step is preparation.",
+    "No near-equivalent found in a quick search of Lipschitz-extension / free-space literature (Naor almost-extension, Naor-Rabani extension from finite subsets, Godefroy-Ozawa, Brudnyi-Brudnyi): those bound extension or projection constants, not arbitrary finite-rank operators via edge-by-edge opposing tests.",
+    "Lean confirms it is load-bearing: edge_test -> finite_support_impossible -> obstruction (dominated share 0.37-0.39 for the latter two)."
+   ],
+   "against": [
+    "The discard rule is an adaptation of a named precedent (Ben-David et al. 2024, continuation-length parent selection), so its hardest sub-step is transfer.",
+    "Once one decides to compare neighbouring measures by opposing bumps, the conflict on close cross pairs is forced, and discarding a sparse set of (state, direction) pairs is a natural repair; a judge may call the whole complex N2.",
+    "Averaging over edges against a degree-diluted error is a standard expander/Poincare pattern."
+   ],
+   "nearest_neighbour": "Ben-David, Childs, Gilyen, Kretschmer, Podder, Wang (SICOMP 2024; arXiv 2006.12760 Sec 6.1.2, Algorithm 1 FindParent + Lemma 58): parent direction = argmax of nonbacktracking continuation lengths; consistency by symmetric length inequalities. Uses: graph property testing, not Lipschitz tests.",
+   "literature_check": "WebSearch Oct 2026: no Lipschitz-free/BAP paper using records or edge-opposing tests found; Ben-David et al. text verified for the record argument."
+  },
+  {
+   "rank": 2,
+   "item": "I18 (+I17, I22): label-anchor block (capped colour-distance labels, one hub per label, bump peaking at the hub)",
+   "provisional_N": "N2 (leaning N3)",
+   "provisional_F": "F3 (F5 flavour)",
+   "for": [
+    "Simultaneously makes the block bounded (so F(M_p) ~ ell_1 with BAP, needed for AP and for the ell_1 renorming) and gives the anchor approximation a lever on every source vertex through the 1-Lipschitz label map.",
+    "The Lean label definitions are the only non-carrier items passing the 20% load-bearing proxy (PortGraph.label 0.23, originalLabel 0.21).",
+    "Not in the goal; nothing in L glues graphs through label-indexed hubs."
+   ],
+   "against": [
+    "Labels are truncated distances to random colour classes, i.e. a Frechet/Bourgain random-subset embedding into ell_infinity: N0/N1 transfer.",
+    "Coning a space to a finite hub set to bound its diameter is generic.",
+    "Each piece is simple; the novelty is the fit to the later test argument (chain depth: it pays off only after I23-I33)."
+   ],
+   "nearest_neighbour": "Bourgain-style embeddings via distances to random subsets; Kalton's interlaced graphs / graph metrics with added hubs in nonlinear Banach geometry.",
+   "literature_check": "No construction with label-indexed anchors found in quick search."
+  },
+  {
+   "rank": 3,
+   "item": "I31 (+I29, I30): continuation records and the at-most-one-exceptional-direction lemma",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Short, non-analytic and essential: it is what allows opposing prescriptions to coexist on a 1-Lipschitz function.",
+    "Transferring a property-testing lemma into Banach-space geometry is an unusual cross-field step."
+   ],
+   "against": [
+    "The paper names the precedent; the argument (prepend an edge to a longest continuation; symmetric strict inequalities) is the same as Ben-David et al. Lemma 58.",
+    "Cross-field transfer alone never yields D3."
+   ],
+   "nearest_neighbour": "Ben-David et al., arXiv 2006.12760 Lemma 58 (SICOMP Lemma 6.3).",
+   "literature_check": "Verified from the arXiv PDF: FindParent uses argmax of continuation lengths; Lemma 58 proof derives l_v > l_u and l_v < l_u."
+  },
+  {
+   "rank": 4,
+   "item": "I25 + I26 (+I20): matched walks and their rarity via colour restriction",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "The definition (a support-state sequence tracking a nonbacktracking walk with compatible labels) is invented for the proof, and dropping labels in favour of colours (I20) is a neat way to recover independence."
+   ],
+   "against": [
+    "The rarity proof is a first-moment union bound on an iid-coloured tree; Lean replaces it by an exact colouring count.",
+    "'A finite-state tracker cannot follow a random coloured tree' is folklore in automata/branching-process arguments."
+   ],
+   "nearest_neighbour": "First-moment bounds for tree-indexed Markov chains / finite automata on iid-labelled trees.",
+   "literature_check": "Not searched beyond general queries."
+  },
+  {
+   "rank": 5,
+   "item": "I07: per-operator finite anchor obstruction inside bounded blocks (vs projection/extension obstructions)",
+   "provisional_N": "N1-N2",
+   "provisional_F": null,
+   "for": [
+    "The paper stresses that earlier finite obstructions (Brudnyi-Brudnyi, Godefroy-Ozawa) only bound projections with prescribed range, while here a fixed finite set defeats every operator of norm <= p."
+   ],
+   "against": [
+    "The block/wedge reduction is a standard way to build a space failing BAP from a sequence of finite-level obstructions."
+   ],
+   "nearest_neighbour": "Godefroy-Ozawa 2014 Prop 7; Smith26 (non-constructive BAP failure for complete discrete spaces).",
+   "literature_check": "Kalton's question confirmed open before this release (emergentmind open-problem page; Smith26 v3 abstract)."
+  }
+ ],
+ "lean": {
+  "route_differences_lean_vs_paper": [
+   "Graph family: the paper uses random permutation-model multigraphs with iid colours and a local-limit lemma, then fixes a deterministic realization sequence. Lean uses Cayley graphs of finite permutation quotients of the free group on 20V+2 generators acting on word balls (girth > N), crossed with ALL colourings, so the bad-root bound is an exact count (ColorCounting.cardinal_identity) and the walk length n equals the component index N. No probability appears anywhere in Lean.",
+   "Degree and colours: Lean takes degree = 2(20V+2) > 20V and colors = 2*degree*Q*H + 1, concrete instances of the paper's 'choose Delta with V/Delta<1/20' and 'k > 2 Delta Q H'.",
+   "Metric: Lean uses a complete weighted graph with fallback weight 4R+cap on non-edges and its integer path closure; diameter <= 4R+D is then immediate. The paper uses the sparse weighted graph and bounds routes through anchors.",
+   "Finite-support reduction: Lean composes T_0 with a finite coordinate truncation (exploiting the ell_1 structure of the bounded block); the paper perturbs a basis of the range.",
+   "AP of the wedge: Lean collapses onto a retained finite union of blocks, which is itself bounded and separated, and applies its 2B-BAP; the paper sums per-block operators I_p T_p P_p.",
+   "Labels: Lean defines capped colour distances by Nat.find over walks in the port graph (PortGraph.label), equivalent to the paper's graph distances.",
+   "Dead code: BlockPaths.lean (SourcePath, source_shortest_path) is not on the proof DAG according to the extractor."
+  ],
+  "dag_summary": {
+   "n_files": 34,
+   "n_decls": 466,
+   "kind_counts": {
+    "theorem": 303,
+    "def": 120,
+    "instance": 30,
+    "abbrev": 11,
+    "inductive": 1,
+    "structure": 1
+   },
+   "proof_dag_decls": 380,
+   "proof_dag_theorems": 253,
+   "largest_dominated_shares": {
+    "BlockConstruction.obstruction": 0.3868,
+    "BlockConstruction.finite_support_impossible": 0.3711,
+    "main_proved": 0.1632,
+    "GraphProducer.exists_rare_component": 0.0868,
+    "GraphProducer.rare_matched_bound": 0.0763,
+    "MetricWedge.hasAP": 0.0737,
+    "MetricBlock.edge_test": 0.0342
+   },
+   "items_passing_20pct_frac_dag_dependents_proxy": [
+    "PortGraph (0.35)",
+    "Lip0/lipSubmodule (0.32)",
+    "Lip0.slope (0.30)",
+    "evaluation (0.28)",
+    "FreeSpace (0.26)",
+    "delta (0.25)",
+    "PortGraph.label (0.23)",
+    "BoxLabel (0.23)",
+    "MetricBlock.originalLabel (0.21)",
+    "MetricBlock.Point/Anchor (0.21)"
+   ],
+   "note": "As in 287, the 20% proxy is passed by carriers (free space, port graph) and by the label map; the record/exceptional machinery sits at 4-6% frac_dag_dependents, and edge_test dominates 3.4% of the DAG. The proxy does not see I31-I33 as load-bearing even though the contradiction cannot be formed without them."
+  },
+  "size": "34 files, ~4614 lines, 466 declarations (303 theorems, 120 defs)",
+  "imports": "Mathlib only (no external lake packages; no other OAI dirs)"
+ },
+ "correctness_audit": {
+  "verdict": "No gap found. The obstruction (sections 4-6) was checked line by line, and both comparator targets are formalized in Lean with no sorry/axiom and comparator-faithful statements. The one unformalized major claim is the nonlinear corollary (Kalton's Problem 1).",
+  "checked": [
+   "Parameters: B = 4R+D = 300p^2+150p+5; (2pR+1)/K = (60p^2+1)/(300p^2+10p) <= 1/5; K+2L+1 = D-4.",
+   "Lemma finite-support: eta < min{p, 1/(2B)} gives ||T|| < 2p and anchor error < 1/2 + eta B < 1.",
+   "Lemma measure-bounds: sign test has Lip <= 2 by 1-separation, so TV <= 2||T delta_x|| + 1 <= 1+4pB; bump mass L - (L/K)(2pR+1) >= 3L/4.",
+   "Lemma rare-walks: matched => colour of x_s in C_{j_s}; at most Delta^n nonbacktracking walks with distinct vertices on the tree, |S|Q^n state sequences, probability (H/k)^{n+1}.",
+   "Lemma exceptional-directions: A_x >= r_x(e,j) >= 1+A_y >= 1+r_y(e-bar,j') >= 2+A_x when neither is exceptional. The extended walk has length < n automatically because x is good.",
+   "Lemma edge-test: positive b_x(j) with d(j,j') < 2L forces both compatibilities (label triangle inequality < 1+K+2L), hence a discard; consistency on P∩Q via j=j'.",
+   "Final count: E|mu|(E_e) <= V/Delta + V beta < 1/10; 3L/2 - 4L/10 = 11p > 2p.",
+   "Wedge: triangle inequality case analysis; retractions 1-Lipschitz; R_N contractive projection; AP via R_N then block BAPs.",
+   "Lean: all of the above except Lemma local-limit (replaced by a deterministic construction) and the nonlinear corollary."
+  ],
+  "residual_concerns": [
+   "The nonlinear corollary (F(M) not approximable, answering Kalton's Problem 1) relies on the exact form of Kalton12 Thm 4.4 (a uniform Lipschitz bound for finite-range net maps approximating finite sets). It is not formalized and was not checked against Kalton's text. A literature source notes that a counterexample to Kalton's Problem 1 would give an ell_1 renorming without MAP; consistent with the paper, which proves the latter directly (formalized).",
+   "Three long-standing questions are claimed at once (Kalton's BAP question, MAP for equivalent norms on ell_1, Kalton's approximability problem). The first two are machine-checked modulo comparator definitions; the claims are extraordinary and unreviewed.",
+   "Comparator fidelity: FreeSpace is the closure of span of evaluations in the dual of Lip0 with the slope norm; HasAP/HasBAP use '∃ η < ε, errors <= η'. Both agree with the paper. BlockStatement asks only Countable (not infinite), harmless as argued.",
+   "The paper's Lemma local-limit is a standard but un-formalized probabilistic argument; Lean's independent deterministic route removes any dependence on it for the formal result.",
+   "No reasoning trace for this family; provenance of the record idea (TCS paper) is explicit in the text."
+  ]
+ },
+ "extraction_friction": [
+  "Catalog main_tex points to build/common.tex, which is only the preamble; the document root is build/main.tex (\\input{common}, then six sections). The catalog's bib field is empty because the bibliography is an inline thebibliography in sections/references.tex.",
+  "Key definitions are inline \\emph or display math: nonbacktracking, source vertices, anchor, compatible, matched, good/bad, exceptional; the record r_x(e,j), E_e, the label h and the bump b_x have no environment. A theorem-environment extractor sees only 9 environments (3 results, 1 proposition, 7 lemmas, 2 remarks).",
+  "The introduction (introduction.tex:147-239) restates the whole obstruction informally, so many items have two locations.",
+  "Comparator target name OAI.DiscreteFree.source_endpoints is uninformative and bundles Thm blocks with Thm main; the ell_1 corollary is a separate comparator.",
+  "Lean namespaces (DiscreteFree, GraphProducer, MetricBlock, BlockConstruction, MainConstruction) do not mention the family; HasBAP and blockBound are defined in RenormingModel.lean and re-declared in the challenge files.",
+  "The Lean graph construction differs from the paper's (deterministic Cayley quotients x all colourings vs random permutation model), so name/docstring joins fail for Lemma local-limit and Lemma rare-walks; the paper's Remark abstract-obstruction is the right join interface.",
+  "Extractor: the load-bearing proxy flags carriers (FreeSpace, PortGraph) and labels; the record/exceptional/edge-test machinery stays at 3-6% frac_dag_dependents. BlockPaths.lean (SourcePath, source_shortest_path) appears to be dead code.",
+  "No formalization.yaml entry for 330 (imports in OAI.lean:143-144 only)."
+ ],
+ "literature_checks": [
+  {
+   "query": "Kalton BAP uniformly discrete free spaces status",
+   "finding": "Listed as open before this release (emergentmind open-problem page; Cuth-Kalenda arXiv 2604.01875 records it); Smith arXiv 2509.00722 gives countable complete discrete (not uniformly discrete) counterexamples non-constructively.",
+   "urls": [
+    "https://www.emergentmind.com/open-problems/bap-for-lipschitz-free-spaces-over-uniformly-discrete-spaces",
+    "https://arxiv.org/abs/2509.00722v3",
+    "https://arxiv.org/pdf/2604.01875"
+   ]
+  },
+  {
+   "query": "Ben-David et al. continuation-length lemma",
+   "finding": "arXiv 2006.12760 Sec 6.1.2: FindParent takes argmax of nonbacktracking continuation lengths; Lemma 58 proves consistency of adjacent choices by symmetric strict inequalities. Very close to I31.",
+   "urls": [
+    "https://arxiv.org/abs/2006.12760"
+   ]
+  },
+  {
+   "query": "equivalent norm on ell_1 failing MAP",
+   "finding": "Described as a classical open problem tied to Kalton's Problem 1 (arXiv 2304.12042).",
+   "urls": [
+    "https://arxiv.org/pdf/2304.12042"
+   ]
+  },
+  {
+   "query": "Lipschitz extension lower bounds via expanders/high girth",
+   "finding": "Naor-Rabani (arXiv 1506.04398) and Naor almost-extension (arXiv 2009.11373) bound extension constants; no edge-opposing-test argument for finite-rank operators found.",
+   "urls": [
+    "https://arxiv.org/pdf/1506.04398",
+    "https://www.arxiv.org/pdf/2009.11373"
+   ]
+  }
+ ]
+}

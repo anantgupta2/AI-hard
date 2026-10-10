@@ -1,0 +1,696 @@
+{
+ "family": 221,
+ "title": "The Mézard–Parisi formula for diluted spin glasses",
+ "analyst_role": "novelty",
+ "date": "2026-10-09",
+ "inputs": [
+  "data/pilot/221/trace.json and trace.md (the only prior analysis; no family.json, paper.json, lean.json or f1_*.json exist)",
+  "preprints/The-Mezard-Parisi-formula-for-diluted-spin-glasses-September-23-2026/build/main.tex and sections/*.tex (read: introduction, overview, trees, perturbations, decorrelation; skimmed the others)",
+  "preprints/The-Mezard-Parisi-formula-for-diluted-spin-glasses-September-23-2026/build/references.bib (18 entries)",
+  "lean/OAI/Probability/DilutedSpin (405 files; file-level import DAG computed by this analyst)",
+  "lean/docs/221.md; lean/ComparatorChallenges/DilutedSpin.lean",
+  "web checks of arXiv 2410.15599, 2508.17049, 1406.4702 and 1307.2207, plus literature searches",
+  "data/pilot/287/novelty.json (template)"
+ ],
+ "base_library_L": "Mathlib d13f23b (no spin-glass content) + 221's references.bib: MP01, FL03, PT04, Pan13, Pan16, ASS03, Ruelle87, EfronStein, VB85, Guerra03, GG98, AC98, DeSanctis04, BarraDeSanctis07, BCS25, COP19, Concetti25, OpenAIThreeSAT2026. L- (for contamination control) drops OpenAIThreeSAT2026.",
+ "precedent_checks": [
+  {
+   "work": "BCS25: Biswas, Chen, Sen, 'On the Replica Symmetric Solution in General Diluted Spin Glasses', arXiv:2410.15599 (v1 2024-10-21; bib year 2025)",
+   "ai_disclosure": "none found in the abstract or metadata (WebFetch summary; not verified against the PDF)",
+   "relation": "RS formulas at high temperature and subcritical density; context only",
+   "contains_candidates": {
+    "C1": "absent",
+    "C2": "absent",
+    "C3": "absent",
+    "C4": "absent"
+   }
+  },
+  {
+   "work": "Concetti25: Concetti, 'Properties of the full replica symmetry breaking free energy functional of the Ising spin glass on random regular graph', arXiv:2508.17049 (v1 2025-08-23)",
+   "ai_disclosure": "none. The comments field states only an overlap with arXiv:1908.03820 (WebFetch summary)",
+   "relation": "a full-RSB bound no larger than the finite-RSB bounds on random regular graphs; equality is conjectural there; context only",
+   "contains_candidates": {
+    "C1": "absent",
+    "C2": "absent",
+    "C3": "absent",
+    "C4": "absent"
+   }
+  },
+  {
+   "work": "OpenAIThreeSAT2026: 'Computing the Random 3-SAT Threshold', openai/math preprint dated 2026-09-27 (in this release)",
+   "ai_disclosure": "model-produced (part of the OpenAI release; author 'OpenAI')",
+   "relation": "cited only in a remark (consequences.tex:131-138) as a companion for 3-SAT, with a different trial functional. Dated 4 days AFTER 221; not a dependency",
+   "contains_candidates": {
+    "C1": "absent (grep for fresh split / charging / canceled anchor / branching depth is negative; its 'delay' and 'shifted' hits concern hitting times and block boundaries)",
+    "C2": "not found",
+    "C3": "not found"
+   }
+  },
+  {
+   "work": "Panchenko 2016 (arXiv:1406.4702, in L): the nearest named precedent for the programme",
+   "ai_disclosure": "n/a (2014)",
+   "relation": "finite-RSB asymptotic Gibbs measures satisfy the MP ansatz after a small Hamiltonian modification. Abstract: 'what is still missing is a description of the general full-RSB asymptotic Gibbs measures' (WebFetch summary quote, unverified)",
+   "contains_candidates": {
+    "C1": "absent",
+    "C9": "close variant"
+   }
+  }
+ ],
+ "model_produced_prior_work_search": "WebSearch for 'Mézard–Parisi formula diluted spin glasses proof OpenAI GPT' and '\"Mezard-Parisi\" diluted ChatGPT / GPT-5 / AI-assisted' found only the openai/math release itself and secondary coverage (kingy.ai, unite.ai). It also found an unrelated AI-assisted spin-glass paper (arXiv:2608.13361, on aging, which discloses GPT-5.5) and the Parisi-Zamponi jamming work (arXiv:2606.03300). No model-produced prior work on this problem was found.",
+ "candidates": [
+  {
+   "id": "C1",
+   "name": "Shifted target tree S^+ with charging of fresh splits (relative absolute-cost bound)",
+   "paper_items": [
+    "Lemma tree:charging (trees.tex:393-456; eqs tree:charging-bound, tree:relative-charging)",
+    "'Shifted copies and their coefficients' (decorrelation.tex:291-363; Fig. decor:shift-figure; eqs decor:J-definition, decor:J-lower-bound, decor:relative-absolute-cost)",
+    "worked cancellation example (trees.tex:316-330: signed total -delta vs absolute sum 2+delta; a delayed split gives absolute sum delta)"
+   ],
+   "trace": "PV5 / E1 (L135-140, share 0.397; VERBATIM 'Great! Need carefully prove average error little with shifted depths not rare')",
+   "statement": "Move every internal branching depth of the target topology S one level later (S^+). For large L and eta-regular depths, the shifted target branching depths avoid all branching depths of the old two-copy tree, so each of the 2b target branching vertices must be created by a fresh split at a unary vertex, each with coefficient m_{e+1}-m_{e+2} = -delta. Hence sum_E |c_E| <= C_{q,k} delta^b for b charged vertices, and (1/|J|) sum_E |c_E| <= C_{k,eta} with J = kappa(S^+)^2 ~ delta^{2b}: errors survive division by the small normalizer.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Ghirlanda-Guerra 1998; Aizenman-Contucci 1998 (in L)",
+      "relation": "identities from perturbation/stochastic stability; signed combinations of replica moments; no division by small level-dependent normalizers, no tree-depth shift",
+      "verdict": "genuinely different"
+     },
+     {
+      "ref": "Barra-De Sanctis, J. Stat. Mech. 2007 (cond-mat/0612041, in L)",
+      "relation": "hierarchy of multioverlap stability relations for diluted models within RaMOSt; no finite-tree coefficient control",
+      "verdict": "genuinely different"
+     },
+     {
+      "ref": "Panchenko, Ann. Probab. 2013 'spin distributions' (1005.2720, in L); Panchenko 2015 hierarchical exchangeability (1307.2207); Panchenko 2016 finite-RSB structure (1406.4702, in L)",
+      "relation": "invariance/cavity identities and the finite-RSB MP ansatz. The missing step there is approximating full RSB by finite RSB, which 221 sidesteps with built-in hierarchies. No shift/charging device found",
+      "verdict": "genuinely different (nearest program)"
+     },
+     {
+      "ref": "Barbier-Panchenko CMP 2022 (2005.03115); Barbier-Panchenko-Saenz 2021 (2009.12939)",
+      "relation": "concentration of all multioverlaps by induction on the number of replicas from perturbation identities (Nishimori / Franz-de Sanctis); no hierarchical depths, no small normalizer",
+      "verdict": "genuinely different (nearest for the surrounding induction, not for the shift)"
+     },
+     {
+      "ref": "Generic 'general position' heuristic (perturb parameters to avoid coincidences); Gallavotti-Nicolo tree power counting in multiscale analysis (one small factor per scale-tree vertex)",
+      "relation": "same flavour (move to non-coinciding positions; charge one small factor per tree vertex); different objects and purpose",
+      "verdict": "genuinely different (conceptual cousins)"
+     }
+    ],
+    "verdict": "no near-equivalent found",
+    "searches": "WebSearch (standard/extended): 'Mezard-Parisi formula diluted spin glasses proof'; 'Mezard-Parisi diluted lower bound arXiv 2025 2026 Panchenko-Talagrand'; 'replica tree branching depth shifted one level fresh split coefficient small denominator stochastic stability'; 'Panchenko multi-overlaps Ghirlanda-Guerra diluted spin distributions'; 'Barbier Panchenko strong replica symmetry multioverlap induction'; 'random multi-overlap structures De Sanctis'; 'Coja-Oghlan Perkins variational formula pinning Aizenman-Sims-Starr'; 'Dominguez Mourrat Hamilton-Jacobi sparse graphs'. WebFetch of arXiv abstracts 1406.4702, 1307.2207, 2410.15599, 2508.17049. zbMATH, Google Scholar and MathOverflow were not queried directly; absence claims rest on these searches plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "The goal (main:theorem: lim F_N = inf_r inf_zeta Phi_r) contains no replica trees, extension histories or coefficient sums. S^+ is a one-symbol transform of S, but S occurs only in the paper's own intermediate theorem decor:overlap-concentration, not in the goal or in L. No statement in L (PT04, Pan13, Pan16, GG98, AC98, BarraDeSanctis07, MP01, Ruelle87, ASS03, DeSanctis04; Mathlib has no spin-glass content) bounds absolute extension-coefficient sums relative to a signed normalizer. Like Cook's extension variables, the item is syntactically tiny and occurs nowhere in the goal."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "paper": "Decorrelation is 3,384 of ~14,900 words (23%). Without the relative bound, division by J ~ delta^{2b} amplifies projection errors by delta^{-2b} and the induction in Prop. decor:conditional-concentration fails. Thm decor:overlap-concentration, Prop. comp:insertion-comparison, Cor. comp:bounded-lower and the lower half of main:theorem all depend on it. The upper bound (Prop. upper:bound, PT04) does not.",
+    "lean": "ShapeCharging.lean (prescribed_history_charging_bound) down=0.80 (0.68); ShiftedTree.lean (shiftedTwinDepths, shifted_twin_target_count) down=0.67 (0.55); SimultaneousShift 0.60; RegularScheduleShift 0.60; ProjectionShiftError 0.57; ScheduledRelativeCharge 0.49; TopologyChargeBound 0.48.",
+    "note": "Lean shares are from a file-level import DAG of lean/OAI/Probability/DilutedSpin (405 files, 56,285 lines; all 405 lie in the import cone of Main.lean). 'down' = share of cone files that transitively import the item's file (PLAN proxy, k=20%); line-weighted shares in parentheses where given. File imports partly reflect build ordering, so 'down' is inflated for early files; no declaration-level lean.json exists for 221. Load-bearing is therefore judged mainly by knockout on the paper's proof architecture.",
+    "compression": "Trace and paper both report that the alternatives (fresh subtrees with division by small gaps, coarse partitions, equal-exponent refinements) failed on exactly this error amplification (clause C10). This is a qualitative budget signature: an otherwise uncontrolled delta^{-2b} factor becomes a uniform constant. That is stronger than the additive-only signature found for 287. Not yet measured in Lean (no step-3b run for 221)."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1 from learned clause C10 (trace); >=2 from invoked literature",
+    "chain_depth": 2,
+    "protocol": "P-C1"
+   },
+   "final": {
+    "N": "N3 (provisional: tests 1-3 pass, test 4 pending)",
+    "F": "F3 (F5 flavour)",
+    "confidence": 0.4,
+    "justification": "No neighbour found for the shift-plus-charging device in the stochastic-stability, RPC, diluted-cavity, Bayesian strong-RS or sparse-graph (Coja-Oghlan et al.) literatures. The paper names no precedent for it, while naming antecedents for everything around it. It is non-analytic and knockout-essential, with a qualitative error-budget drop. Against: it sits one inference from clause C10, which the trace states three times, and 'move to general position' is a generic habit. Its value is local to the paper's own tree calculus (chain depth 2), so the downstream-speedup test may show a one-off device. The grade stands or falls with Test 4 arm B (C10 withheld)."
+   }
+  },
+  {
+   "id": "C2",
+   "name": "Finite-tree insertion calculus: tree density, canceled-anchor expansion, reference totals kappa(S)",
+   "paper_items": [
+    "Lemma tree:insertion (eq. tree:density, gamma_beta = m_d - n_beta m_{d+1})",
+    "Lemma tree:extension-expansion (canceled-anchor rule)",
+    "Lemma tree:reference-total (eq. tree:K, kappa(S))"
+   ],
+   "trace": "PV3 / E2 (L118-123, share 0.204)",
+   "statement": "For power-mean iterated kernels, inserting a path factor A changes the tree law by the density prod_a A^a prod_beta Y_beta^{gamma_beta}. Differentiating gives signed sums over extension histories (an old leaf with coefficient 1, or a fresh path at beta with coefficient gamma_beta). The total coefficient over extensions realizing a prescribed shape S is kappa(S) = prod_v prod_{j<a_v} (m_{d_v} - j m_{d_v+1}).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Mezard-Parisi 2001 App. A; Panchenko-Talagrand 2004 Sec. 5 (both in L; named by the paper, trees.tex:7-10)",
+      "relation": "power-mean computations for hierarchical trial laws with Ruelle cascade weights",
+      "verdict": "close variant (same recursion; 221 derives finite-kernel identities directly)"
+     },
+     {
+      "ref": "Ruelle 1987; Bolthausen-Sznitman 1998; Panchenko 2013 book Ch. 2 (RPC invariance; Gaussian integration by parts with coefficients built from zeta_d)",
+      "relation": "replica-tree laws and derivative formulas under cascades with level-dependent coefficients",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Aizenman-Contucci 1998; Barra-De Sanctis 2007 (in L)",
+      "relation": "stochastic-stability expansions over added replicas",
+      "verdict": "close variant (different bookkeeping)"
+     }
+    ],
+    "verdict": "close variants exist; the canceled-anchor bookkeeping and the closed form for kappa(S) were not found verbatim",
+    "searches": "WebSearch (standard/extended): 'Mezard-Parisi formula diluted spin glasses proof'; 'Mezard-Parisi diluted lower bound arXiv 2025 2026 Panchenko-Talagrand'; 'replica tree branching depth shifted one level fresh split coefficient small denominator stochastic stability'; 'Panchenko multi-overlaps Ghirlanda-Guerra diluted spin distributions'; 'Barbier Panchenko strong replica symmetry multioverlap induction'; 'random multi-overlap structures De Sanctis'; 'Coja-Oghlan Perkins variational formula pinning Aizenman-Sims-Starr'; 'Dominguez Mourrat Hamilton-Jacobi sparse graphs'. WebFetch of arXiv abstracts 1406.4702, 1307.2207, 2410.15599, 2508.17049. zbMATH, Google Scholar and MathOverflow were not queried directly; absence claims rest on these searches plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail (borderline)",
+    "evidence": "The Y-recursion is the trial functional's own power-mean recursion (model:power-means, inside the goal's Phi_r) and the MP01/PT04 recursion in L. The calculus is its derivative."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "paper": "Trees + perturbations = 6,105 words (41%). Every identity used in decorrelation and comparison is stated in this calculus.",
+    "lean": "TreeDerivatives down=0.96; AnchorExtension 0.89; ColoredAnchor 0.84.",
+    "note": "Lean shares are from a file-level import DAG of lean/OAI/Probability/DilutedSpin (405 files, 56,285 lines; all 405 lie in the import cone of Main.lean). 'down' = share of cone files that transitively import the item's file (PLAN proxy, k=20%); line-weighted shares in parentheses where given. File imports partly reflect build ordering, so 'down' is inflated for early files; no declaration-level lean.json exists for 221. Load-bearing is therefore judged mainly by knockout on the paper's proof architecture."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1 from C8 ('therefore'); 1-2 from MP01/PT04 in L",
+    "chain_depth": 1,
+    "protocol": "P-C2"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.65,
+    "justification": "A load-bearing new packaging of a known power-mean/cascade calculus, which the paper itself attributes to MP01/PT04/Ruelle. Near-analytic in the goal's own recursion."
+   }
+  },
+  {
+   "id": "C3",
+   "name": "Depth-selecting Rademacher marks and identities on prescribed colored trees",
+   "paper_items": [
+    "mark specification (perturbations.tex:28-38)",
+    "eq. pert:mark-selector",
+    "Lemma pert:palm; Lemma pert:analytic (u_nu smaller than every power of t_nu)",
+    "Thm pert:tree-identity (with polarization)"
+   ],
+   "trace": "PV3 + PV10 (L118-123; L149-152)",
+   "statement": "A countable family of bounded marked Poisson perturbations: signs sampled at assigned depths of auxiliary paths, rational test functions g and g_0, and a spin or marker anchor. Their concentrated scores give, via Palm insertion, Taylor-coefficient vanishing (u_nu in [j^{-j},2j^{-j}], t_nu = 1/j) and polarization, sum_E c_E E[f R_E] - E f sum_E c_E E[R_E] -> 0 for every prescribed colored shape. The sign products select split depths exactly.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Ghirlanda-Guerra 1998; Aizenman-Contucci 1998 (in L)",
+      "relation": "self-averaging of perturbation scores yields overlap identities",
+      "verdict": "close variant (named by the paper, perturbations.tex:15-24)"
+     },
+     {
+      "ref": "Barra-De Sanctis 2007 (in L)",
+      "relation": "stability relations for diluted multioverlaps",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Panchenko 2013 Ann. Probab. (in L)",
+      "relation": "novel perturbations giving invariance and self-consistency equations for spin distributions in diluted models",
+      "verdict": "close variant (cavity context)"
+     },
+     {
+      "ref": "Barbier-Panchenko 2022",
+      "relation": "perturbation by side observations giving Franz-de Sanctis identities for all multioverlaps (Bayesian)",
+      "verdict": "genuinely different setting; the trace's transfer attempt failed (C8)"
+     }
+    ],
+    "verdict": "close variants exist; depth-selecting sign marks not found",
+    "searches": "WebSearch (standard/extended): 'Mezard-Parisi formula diluted spin glasses proof'; 'Mezard-Parisi diluted lower bound arXiv 2025 2026 Panchenko-Talagrand'; 'replica tree branching depth shifted one level fresh split coefficient small denominator stochastic stability'; 'Panchenko multi-overlaps Ghirlanda-Guerra diluted spin distributions'; 'Barbier Panchenko strong replica symmetry multioverlap induction'; 'random multi-overlap structures De Sanctis'; 'Coja-Oghlan Perkins variational formula pinning Aizenman-Sims-Starr'; 'Dominguez Mourrat Hamilton-Jacobi sparse graphs'. WebFetch of arXiv abstracts 1406.4702, 1307.2207, 2410.15599, 2508.17049. zbMATH, Google Scholar and MathOverflow were not queried directly; absence claims rest on these searches plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "pass (weak)",
+    "evidence": "Marks indexed by hierarchy depth and the selector identity occur neither in the goal nor in L. The GG/AC identities in L belong to the same genre."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "paper": "Thm pert:tree-identity is the only source of identities for C1, C4 and C5.",
+    "lean": "MarkInsertion down=0.94; TreeMarkLaw 0.89; Polarization 0.83; HistorySelector 0.81; FullPalm 0.69; DictionaryPalm 0.66.",
+    "note": "Lean shares are from a file-level import DAG of lean/OAI/Probability/DilutedSpin (405 files, 56,285 lines; all 405 lie in the import cone of Main.lean). 'down' = share of cone files that transitively import the item's file (PLAN proxy, k=20%); line-weighted shares in parentheses where given. File imports partly reflect build ordering, so 'down' is inflated for early files; no declaration-level lean.json exists for 221. Load-bearing is therefore judged mainly by knockout on the paper's proof architecture."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1-2 from GG98/AC98/Pan13 (named in the paper, not in the trace)",
+    "chain_depth": 1,
+    "protocol": "P-C2 (sub-criterion b)"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "A clean new device inside a well-known genre whose precedents the paper names."
+   }
+  },
+  {
+   "id": "C4",
+   "name": "Conditional-decorrelation induction on squared conditional covariance v_N(S,d), with three-copy positivity",
+   "paper_items": [
+    "eq. decor:covariance-definition",
+    "Lemma decor:contractions",
+    "Prop. decor:conditional-concentration (induction on leaves)",
+    "one-leaf identity decor:singleton-identity"
+   ],
+   "trace": "PV4 / E3 (L124; L141-142)",
+   "statement": "Induct on the number of leaves, using the depth-averaged quantity v_N(S,d) = N^{-2} E sum_{ij} Cov(A_{S,i},A_{S,j} | F_d)^2. The three-copy inequality turns signed identities into a nonnegative bound.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Barbier-Panchenko CMP 2022; Barbier-Panchenko-Saenz 2021",
+      "relation": "concentration of all multioverlaps by induction on the number of replicas from perturbation identities",
+      "verdict": "close variant (same induction shape; no conditioning on hierarchy depth)"
+     },
+     {
+      "ref": "Talagrand Vol. I-II; Panchenko 2013 book: two- and three-replica variance arguments",
+      "relation": "standard replica-variance positivity",
+      "verdict": "ingredient"
+     }
+    ],
+    "verdict": "close variant",
+    "searches": "WebSearch (standard/extended): 'Mezard-Parisi formula diluted spin glasses proof'; 'Mezard-Parisi diluted lower bound arXiv 2025 2026 Panchenko-Talagrand'; 'replica tree branching depth shifted one level fresh split coefficient small denominator stochastic stability'; 'Panchenko multi-overlaps Ghirlanda-Guerra diluted spin distributions'; 'Barbier Panchenko strong replica symmetry multioverlap induction'; 'random multi-overlap structures De Sanctis'; 'Coja-Oghlan Perkins variational formula pinning Aizenman-Sims-Starr'; 'Dominguez Mourrat Hamilton-Jacobi sparse graphs'. WebFetch of arXiv abstracts 1406.4702, 1307.2207, 2410.15599, 2508.17049. zbMATH, Google Scholar and MathOverflow were not queried directly; absence claims rest on these searches plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "pass (weak)",
+    "evidence": "v_N(S,d) is not a subterm of the goal; multioverlaps are in L (Pan13, BarraDeSanctis07)."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "lean": "PairSquare down=0.76; MatrixTriple 0.68; ScheduledCovariance 0.54.",
+    "note": "Lean shares are from a file-level import DAG of lean/OAI/Probability/DilutedSpin (405 files, 56,285 lines; all 405 lie in the import cone of Main.lean). 'down' = share of cone files that transitively import the item's file (PLAN proxy, k=20%); line-weighted shares in parentheses where given. File imports partly reflect build ordering, so 'down' is inflated for early files; no declaration-level lean.json exists for 221. Load-bearing is therefore judged mainly by knockout on the paper's proof architecture."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 1,
+    "protocol": "one line: hide the inductive quantity of Prop. decor:conditional-concentration; a hit is any induction on replica count of a conditional-covariance / decorrelation functional"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "A templated strengthening (carry an extra tracked quantity + all substructures), so capped at N2. Barbier-Panchenko is a close neighbour for the induction shape."
+   }
+  },
+  {
+   "id": "C5",
+   "name": "Marker anchor variance identity",
+   "paper_items": [
+    "eq. decor:marker-coefficient C(S,e) = -delta kappa(S)",
+    "eq. decor:marker-variance-identity"
+   ],
+   "trace": "PV7 / E4 (L143-144)",
+   "statement": "With S_0 = 1 and a full copy of S added fresh at e-1, both sides of the prescribed-tree identity carry the same coefficient. This gives Var(E[R_S|F_{e-1}]) -> 0 at fixed L.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Thm pert:tree-identity with S_0=1 (the paper's own mark specification)",
+      "relation": "literal special case",
+      "verdict": "equivalent (internal)"
+     },
+     {
+      "ref": "GG identities with a trivial test function",
+      "relation": "same idea",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "special case of C3",
+    "searches": "WebSearch (standard/extended): 'Mezard-Parisi formula diluted spin glasses proof'; 'Mezard-Parisi diluted lower bound arXiv 2025 2026 Panchenko-Talagrand'; 'replica tree branching depth shifted one level fresh split coefficient small denominator stochastic stability'; 'Panchenko multi-overlaps Ghirlanda-Guerra diluted spin distributions'; 'Barbier Panchenko strong replica symmetry multioverlap induction'; 'random multi-overlap structures De Sanctis'; 'Coja-Oghlan Perkins variational formula pinning Aizenman-Sims-Starr'; 'Dominguez Mourrat Hamilton-Jacobi sparse graphs'. WebFetch of arXiv abstracts 1406.4702, 1307.2207, 2410.15599, 2508.17049. zbMATH, Google Scholar and MathOverflow were not queried directly; absence claims rest on these searches plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "The S_0=1 option is part of the mark specification; the identity is an instance of Thm pert:tree-identity."
+   },
+   "test3": {
+    "verdict": "pass (knockout, one step)",
+    "lean": "MarkerVariance down=0.43; MarkerScheduledIdentity 0.41.",
+    "note": "Lean shares are from a file-level import DAG of lean/OAI/Probability/DilutedSpin (405 files, 56,285 lines; all 405 lie in the import cone of Main.lean). 'down' = share of cone files that transitively import the item's file (PLAN proxy, k=20%); line-weighted shares in parentheses where given. File imports partly reflect build ordering, so 'down' is inflated for early files; no declaration-level lean.json exists for 221. Load-bearing is therefore judged mainly by knockout on the paper's proof architecture."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 2,
+    "protocol": "none needed (negative control)"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Overrides the trace's N2. It is an instance of the paper's own identity (C3) with the trivial anchor, with no independent content beyond C3."
+   }
+  },
+  {
+   "id": "C6",
+   "name": "Random-tree law Q_k for the logarithmic power-mean expansion",
+   "paper_items": [
+    "eq. tree:telescoping",
+    "eq. tree:Q-rule",
+    "Lemma tree:log-expansion"
+   ],
+   "trace": "PV8 / E5 (L147-148)",
+   "statement": "log Y_0 = sum_k (-1)^{k-1} t^k/k E_{Q_k} E_T prod D^a, where Q_k grows a tree by adding a fresh child at internal vertex beta with probability (n_beta m_{d+1} - m_d)/n.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Replica-tree sampling law of Ruelle probability cascades (nested Poisson-Dirichlet / Chinese-restaurant rule; Bolthausen-Sznitman 1998; Panchenko 2013 book Ch. 2)",
+      "relation": "Q_2 splits at depth d with probability m_{d+1}-m_d, matching P(R_12 = q_d) under RPC. The sequential rule appears to be the nested CRP",
+      "verdict": "likely equivalent (to be verified for k>=3)"
+     },
+     {
+      "ref": "MP01 App. A; PT04 Sec. 5 (in L)",
+      "relation": "power-mean Taylor expansions",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "likely equivalent",
+    "searches": "WebSearch (standard/extended): 'Mezard-Parisi formula diluted spin glasses proof'; 'Mezard-Parisi diluted lower bound arXiv 2025 2026 Panchenko-Talagrand'; 'replica tree branching depth shifted one level fresh split coefficient small denominator stochastic stability'; 'Panchenko multi-overlaps Ghirlanda-Guerra diluted spin distributions'; 'Barbier Panchenko strong replica symmetry multioverlap induction'; 'random multi-overlap structures De Sanctis'; 'Coja-Oghlan Perkins variational formula pinning Aizenman-Sims-Starr'; 'Dominguez Mourrat Hamilton-Jacobi sparse graphs'. WebFetch of arXiv abstracts 1406.4702, 1307.2207, 2410.15599, 2508.17049. zbMATH, Google Scholar and MathOverflow were not queried directly; absence claims rest on these searches plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "An expansion of the goal's own power-mean functional; the cascade replica law is in L via Ruelle87 and PT04."
+   },
+   "test3": {
+    "verdict": "pass (used in the upper-bound remainder and the comparison)",
+    "lean": "QTreeLaw down=0.39; FiniteLogExpansion 0.39.",
+    "note": "Lean shares are from a file-level import DAG of lean/OAI/Probability/DilutedSpin (405 files, 56,285 lines; all 405 lie in the import cone of Main.lean). 'down' = share of cone files that transitively import the item's file (PLAN proxy, k=20%); line-weighted shares in parentheses where given. File imports partly reflect build ordering, so 'down' is inflated for early files; no declaration-level lean.json exists for 221. Load-bearing is therefore judged mainly by knockout on the paper's proof architecture."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 1,
+    "protocol": "none (negative control)"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Overrides the trace's N1-N2. A reorganization of a known expansion whose tree law matches the standard RPC replica-sampling rule. N0 if the equivalence is confirmed for all k."
+   }
+  },
+  {
+   "id": "C7",
+   "name": "Concentration on average over separated branching depths, with martingale-energy depth continuity",
+   "paper_items": [
+    "eq. decor:average-definition (A_{L,eta})",
+    "Thm decor:overlap-concentration",
+    "Lemma decor:depth-continuity (eq. decor:martingale-energy)",
+    "Lemma tree:regular-shapes"
+   ],
+   "trace": "E6 + PV6 (L131, L140-142)",
+   "statement": "Prove multioverlap concentration only after averaging over eta-regular branching depths. Undo the one-level shift using sum_d E|mu_{d+1}-mu_d|^2 <= 1 (a bounded martingale), so the average one-step change is O(1/L). Exceptional trees have vanishing Q_k probability.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Pinning lemma (Montanari 2008; Raghavendra-Tan 2012; Coja-Oghlan-Krzakala-Perkins-Zdeborova 2018)",
+      "relation": "chain-rule / martingale energy pigeonhole: most levels have small increments",
+      "verdict": "equivalent (for the PV6 component)"
+     },
+     {
+      "ref": "GG98; Talagrand; Panchenko 2013 book: concentration on average over perturbation parameters",
+      "relation": "averaged rather than uniform concentration",
+      "verdict": "close variant (for the averaging notion)"
+     }
+    ],
+    "verdict": "close variants",
+    "searches": "WebSearch (standard/extended): 'Mezard-Parisi formula diluted spin glasses proof'; 'Mezard-Parisi diluted lower bound arXiv 2025 2026 Panchenko-Talagrand'; 'replica tree branching depth shifted one level fresh split coefficient small denominator stochastic stability'; 'Panchenko multi-overlaps Ghirlanda-Guerra diluted spin distributions'; 'Barbier Panchenko strong replica symmetry multioverlap induction'; 'random multi-overlap structures De Sanctis'; 'Coja-Oghlan Perkins variational formula pinning Aizenman-Sims-Starr'; 'Dominguez Mourrat Hamilton-Jacobi sparse graphs'. WebFetch of arXiv abstracts 1406.4702, 1307.2207, 2410.15599, 2508.17049. zbMATH, Google Scholar and MathOverflow were not queried directly; absence claims rest on these searches plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail (borderline)",
+    "evidence": "Parameter averaging is in L (GG98, Pan13). The depth parameter is new, but the move is the same."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "lean": "RegularDepth down=0.83; OverlapDepthAverage 0.41; RegularBadMass 0.38.",
+    "note": "Lean shares are from a file-level import DAG of lean/OAI/Probability/DilutedSpin (405 files, 56,285 lines; all 405 lie in the import cone of Main.lean). 'down' = share of cone files that transitively import the item's file (PLAN proxy, k=20%); line-weighted shares in parentheses where given. File imports partly reflect build ordering, so 'down' is inflated for early files; no declaration-level lean.json exists for 221. Load-bearing is therefore judged mainly by knockout on the paper's proof architecture."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 2,
+    "protocol": "one line: hide depth averaging; a hit is any weakening of the concentration target to an average over levels that the cavity expansion can absorb"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.55,
+    "justification": "The averaged target is the enabling choice for C1, but its mechanism (martingale energy, N0) and its genre (parameter averaging) are both known."
+   }
+  },
+  {
+   "id": "C8",
+   "name": "Perturbed cavity reservoir with a built-in finite auxiliary hierarchy (uniform mesh m_d = d/L)",
+   "paper_items": [
+    "Sec. cavity (Lemma cavity:increment, eq. cavity:grid)",
+    "tilted kernels eq. tree:original-tilt",
+    "Lemma pert:selection"
+   ],
+   "trace": "PV2 (L112-115, transfer) + b4.5",
+   "statement": "Compare sizes N and N+1 through a common reservoir whose Gibbs measure is iterated by L-1 auxiliary power-mean levels, with sublinear bounded perturbations, and select sizes and parameters with near-minimal increments.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Aizenman-Sims-Starr 2003 (in L); De Sanctis 2004 RaMOSt (in L)",
+      "relation": "cavity comparison with an auxiliary ROSt/RPC",
+      "verdict": "close variant (named, cavity.tex:4-6)"
+     },
+     {
+      "ref": "Panchenko 2013 Sec. 2.2 (in L)",
+      "relation": "spin-distribution cavity scheme",
+      "verdict": "close variant (named)"
+     },
+     {
+      "ref": "Mourrat-Panchenko 2020; Mourrat 2022 (SK enriched free energies; trace references, not in the paper)",
+      "relation": "cascade-enriched free energies",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "known route",
+    "searches": "WebSearch (standard/extended): 'Mezard-Parisi formula diluted spin glasses proof'; 'Mezard-Parisi diluted lower bound arXiv 2025 2026 Panchenko-Talagrand'; 'replica tree branching depth shifted one level fresh split coefficient small denominator stochastic stability'; 'Panchenko multi-overlaps Ghirlanda-Guerra diluted spin distributions'; 'Barbier Panchenko strong replica symmetry multioverlap induction'; 'random multi-overlap structures De Sanctis'; 'Coja-Oghlan Perkins variational formula pinning Aizenman-Sims-Starr'; 'Dominguez Mourrat Hamilton-Jacobi sparse graphs'. WebFetch of arXiv abstracts 1406.4702, 1307.2207, 2410.15599, 2508.17049. zbMATH, Google Scholar and MathOverflow were not queried directly; absence claims rest on these searches plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "ASS03 and PT04 are in L."
+   },
+   "test3": {
+    "verdict": "pass (frame)",
+    "lean": "Perturbations down=0.95; HierarchyBasic 0.40; CavityInsertionAlgebra 0.19.",
+    "note": "Lean shares are from a file-level import DAG of lean/OAI/Probability/DilutedSpin (405 files, 56,285 lines; all 405 lie in the import cone of Main.lean). 'down' = share of cone files that transitively import the item's file (PLAN proxy, k=20%); line-weighted shares in parentheses where given. File imports partly reflect build ordering, so 'down' is inflated for early files; no declaration-level lean.json exists for 221. Load-bearing is therefore judged mainly by knockout on the paper's proof architecture."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1 (retrieved)",
+    "chain_depth": 0,
+    "protocol": "none (transfer)"
+   },
+   "final": {
+    "N": "N0",
+    "F": null,
+    "confidence": 0.75,
+    "justification": "Transfer of the ASS/RPC cavity frame, which the paper attributes."
+   }
+  },
+  {
+   "id": "C9",
+   "name": "Recursive law encoding of a uniformly sampled reservoir site, and independent-message comparison",
+   "paper_items": [
+    "Lemma comp:encoding",
+    "Lemma comp:patterns",
+    "Prop. comp:insertion-comparison",
+    "Cor. comp:bounded-lower"
+   ],
+   "trace": "PV11 (arctanh encoding; L157-160)",
+   "statement": "Encode the site's whole finite hierarchy by successive conditional laws (a trial law in M_L). Multioverlap concentration then lets distinct site labels be replaced by independent copies in the cavity insertion.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Panchenko 2016 Thm 2 (1406.4702, in L)",
+      "relation": "hierarchical single-site representation for finite-RSB asymptotic Gibbs measures",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Austin-Panchenko 2014 hierarchical Aldous-Hoover; Coja-Oghlan-Perkins 2019 kernels (COP19 in L)",
+      "relation": "representation of spin arrays by hierarchical or kernel messages",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "close variants",
+    "searches": "WebSearch (standard/extended): 'Mezard-Parisi formula diluted spin glasses proof'; 'Mezard-Parisi diluted lower bound arXiv 2025 2026 Panchenko-Talagrand'; 'replica tree branching depth shifted one level fresh split coefficient small denominator stochastic stability'; 'Panchenko multi-overlaps Ghirlanda-Guerra diluted spin distributions'; 'Barbier Panchenko strong replica symmetry multioverlap induction'; 'random multi-overlap structures De Sanctis'; 'Coja-Oghlan Perkins variational formula pinning Aizenman-Sims-Starr'; 'Dominguez Mourrat Hamilton-Jacobi sparse graphs'. WebFetch of arXiv abstracts 1406.4702, 1307.2207, 2410.15599, 2508.17049. zbMATH, Google Scholar and MathOverflow were not queried directly; absence claims rest on these searches plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail (borderline)",
+    "evidence": "The trial messages are the goal's own objects, and Pan16 (in L) gives the analogous representation."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "lean": "PatternComparison down=0.78; FiniteEncoding 0.38; RootEncoding 0.33.",
+    "note": "Lean shares are from a file-level import DAG of lean/OAI/Probability/DilutedSpin (405 files, 56,285 lines; all 405 lie in the import cone of Main.lean). 'down' = share of cone files that transitively import the item's file (PLAN proxy, k=20%); line-weighted shares in parentheses where given. File imports partly reflect build ordering, so 'down' is inflated for early files; no declaration-level lean.json exists for 221. Load-bearing is therefore judged mainly by knockout on the paper's proof architecture."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 1,
+    "protocol": "none"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.55,
+    "justification": "Applies a known representation idea to the built-in finite hierarchy."
+   }
+  },
+  {
+   "id": "C10",
+   "name": "Upper bound with all-plus normalization and convexity remainder; reduction to first moments",
+   "paper_items": [
+    "Prop. upper:bound (normalization avoiding integrability of log a)",
+    "Lemma reduction:stability"
+   ],
+   "trace": "PV9, PV12 (from probe clause C3)",
+   "statement": "Reproduce the PT04 interpolation bound with a normalization by the all-plus configuration and the remainder A^p - pAB^{p-1} + (p-1)B^p >= 0; truncate to reduce to first moments.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Franz-Leone 2003; Panchenko-Talagrand 2004 (in L)",
+      "relation": "the same interpolation",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "known",
+    "searches": "WebSearch (standard/extended): 'Mezard-Parisi formula diluted spin glasses proof'; 'Mezard-Parisi diluted lower bound arXiv 2025 2026 Panchenko-Talagrand'; 'replica tree branching depth shifted one level fresh split coefficient small denominator stochastic stability'; 'Panchenko multi-overlaps Ghirlanda-Guerra diluted spin distributions'; 'Barbier Panchenko strong replica symmetry multioverlap induction'; 'random multi-overlap structures De Sanctis'; 'Coja-Oghlan Perkins variational formula pinning Aizenman-Sims-Starr'; 'Dominguez Mourrat Hamilton-Jacobi sparse graphs'. WebFetch of arXiv abstracts 1406.4702, 1307.2207, 2410.15599, 2508.17049. zbMATH, Google Scholar and MathOverflow were not queried directly; absence claims rest on these searches plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "PT04 is in L."
+   },
+   "test3": {
+    "verdict": "pass (upper half only)",
+    "lean": "UpperRegularized down=0.18; VariationalUpper 0.02.",
+    "note": "Lean shares are from a file-level import DAG of lean/OAI/Probability/DilutedSpin (405 files, 56,285 lines; all 405 lie in the import cone of Main.lean). 'down' = share of cone files that transitively import the item's file (PLAN proxy, k=20%); line-weighted shares in parentheses where given. File imports partly reflect build ordering, so 'down' is inflated for early files; no declaration-level lean.json exists for 221. Load-bearing is therefore judged mainly by knockout on the paper's proof architecture."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 0,
+    "protocol": "none"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "A minor technical variant of PT04."
+   }
+  }
+ ],
+ "excluded_from_candidates": [
+  {
+   "trace": "PV1: commit to PROVE; multioverlaps as target",
+   "reason": "strategic; a known route (Pan13 viewpoint)"
+  },
+  {
+   "trace": "b2 -> b3 insight backtrack (Poisson perturbations 'more direct')",
+   "reason": "retrieved from Barbier-Panchenko; N0 transfer"
+  },
+  {
+   "paper": "Efron-Stein score concentration (Lemma pert:concentration)",
+   "reason": "N0 standard tool"
+  },
+  {
+   "paper": "Cor. comp:bounded-lower (lower bound without factorization or positivity)",
+   "reason": "a result, not a device; noted as a by-product"
+  }
+ ],
+ "family_D": {
+  "label": "D3 (provisional)",
+  "confidence": 0.4,
+  "rests_on": "C1 alone (the shift S -> S^+ plus Lemma tree:charging). All other candidates are N0-N2.",
+  "falls_to": "D2 if Test 4 arm B (clause C10 withheld) exceeds the calibrated threshold; or if an expert identifies a known shift / general-position device for coefficient control in stochastic-stability or RPC arguments; or if a compression check shows that the division by a small normalizer can be avoided by another normalization.",
+  "not_transfer": "The frame (ASS cavity, RPC power means, GG-type perturbation identities, martingale pigeonhole) is attributed transfer. The candidate is a constructed device inside the paper's own calculus.",
+  "correctness_caveat": "Unrefereed. The Lean comparator OAI.DilutedSpinGlass.mezard_parisi exists (405 files) but was not compiled or checked for sorry or extra axioms in this pass.",
+  "comparison_with_287": "Both families rest on one F3 auxiliary item with chain depth 2. 221's item is conflict-specified (one step from C10), whereas 287's had no visible trigger, so 221's N3 is more exposed to a high arm-A hit rate. But 221 shows a qualitative error-budget drop, which 287 lacked."
+ },
+ "provenance_flag": {
+  "applies": "no",
+  "builds_on_prior_model_result_strict": false,
+  "model_produced_precedent": false,
+  "model_produced_citation": true,
+  "explanation": "The only model-produced work cited (OpenAIThreeSAT2026) is a companion from the same release. It is dated after 221, cited only in a remark, and does not contain C1-C3. The 2025 citations (BCS25, Concetti25) show no AI disclosure. The trace's references end in 2022. Web searches found no model-produced prior work on the MP formula."
+ },
+ "bridge_novelty": [
+  {
+   "bridge": "Aizenman-Sims-Starr cavity scheme (SK) -> diluted lower bound",
+   "status": "known route",
+   "evidence": "De Sanctis 2004 (RaMOSt), Panchenko 2013 and Coja-Oghlan-Perkins 2019 all run ASS-type comparisons for diluted models; the paper cites them (cavity.tex:4-6, introduction.tex:36-48)."
+  },
+  {
+   "bridge": "Ruelle cascades / power-mean trial hierarchies (an upper-bound device in PT04; enriched free energies for SK in Mourrat-Panchenko) -> built into the lower-bound reservoir",
+   "status": "known route (adapted)",
+   "evidence": "ASS03 ROSt and PT04 Sec. 5 are in L; the trace retrieved Mourrat-Panchenko and Mourrat (PV2)."
+  },
+  {
+   "bridge": "Stochastic stability / Ghirlanda-Guerra identities -> identities on prescribed finite colored trees",
+   "status": "known route, new devices",
+   "evidence": "GG98, AC98, Barra-De Sanctis 2007 (diluted multioverlaps) and Pan13 are named at perturbations.tex:15-24. Depth-selecting marks were not found elsewhere."
+  },
+  {
+   "bridge": "Bayesian strong replica symmetry (Barbier-Panchenko) -> non-Bayesian diluted multioverlap concentration",
+   "status": "attempted transfer failed (trace C8); the final induction is a variant",
+   "evidence": "Trace node b3. Barbier-Panchenko 2022's induction on replicas is the nearest neighbour for C4."
+  },
+  {
+   "bridge": "Pinning-lemma martingale pigeonhole (sparse inference: Montanari 2008; Coja-Oghlan et al. 2018) -> averaging over hierarchy depths",
+   "status": "known route",
+   "evidence": "The same chain-rule energy bound; the trace classes PV6 as a known technique."
+  }
+ ],
+ "discoverability_protocols": {
+  "common": {
+   "models": "Training cutoff strictly before 2026-09-23 (221's date; the release is 2026-10-06). No precedent for C1 predates this, so no earlier cutoff is required. Canary: the model must not know that the Mézard-Parisi formula for diluted even-arity models has been claimed proved, nor the phrase 'charging fresh splits'. No browsing or tools. Exclude the OpenAI model that produced 221 and its lineage (reference arm only). The judge must not be the proposer.",
+   "excluded_sources": "The openai/math release (all preprints, including 221 and OpenAIThreeSAT2026), its Lean library, reasoning_traces/mezard-parisi-formula.pdf, and any secondary coverage of the release (kingy.ai, unite.ai).",
+   "context_L_minus": "221's bibliography minus OpenAIThreeSAT2026, given as digests: the PT04 bound and recursion, the Pan13 cavity scheme, the Pan16 finite-RSB result, the GG98/AC98/Barra-De Sanctis identities, and Ruelle cascades. Mathlib adds nothing relevant.",
+   "sampling": "n = 256 per arm at T = 1, with a fixed reasoning budget. Report unbiased pass@k for k in {1,2,4,...,256}.",
+   "judging": "Two LLM judges, given the paper's precedent remarks (trees.tex:7-12, perturbations.tex:15-24) and this neighbour list. A human expert checks all hits and 10% of misses. Use Lean targets where available.",
+   "controls": "Positive: Cook-Reckhow ER variables for PHP. Negative: C6 (Q_k law), C5 (marker anchor), C10 (normalization)."
+  },
+  "P-C1": {
+   "item": "C1: shift S -> S^+ plus charging of fresh splits",
+   "hide": "Lemma tree:charging; the worked delayed-split example (trees.tex:316-330, which states the shift's one-vertex effect); the 'Shifted copies' paragraph and Fig. decor:shift-figure; eqs decor:J-definition through decor:projection-shift-error. Also everything downstream: the k>=2 step of Prop. decor:conditional-concentration, Thm decor:overlap-concentration, Sec. comp, Cor. comp:bounded-lower, and the lower half of main:theorem.",
+   "give": "The model section, overview steps 1-2, trees (minus the hidden parts), perturbations (including Thm pert:tree-identity), decor averages, the v_N definition, Lemma decor:contractions, Lemma decor:depth-continuity, the one-leaf case, and the target 'prove Prop. decor:conditional-concentration for k>=2'.",
+   "arm_A_clause": "Also state clause C10: 'the signed totals kappa(S)^2 ~ delta^{2b} are small, but the absolute coefficient sums are O(1), so errors after division blow up'. A high hit rate is expected (trace pivot distance 1).",
+   "arm_B_decisive": "Withhold C10, so the model must discover the amplification failure itself. This arm decides N3.",
+   "equivalence": "Hit: a modification of the target shape or extension constraints that forces each target branching vertex to be created by a fresh split at a unary vertex (coefficient O(delta)), with a relative absolute-cost bound uniform in L, plus a way back to the original depths (averaging or continuity). Accept any fixed nonzero shift, parity or sublattice depth choices disjoint from the old branching depths, or equivalent general-position schemes. Partial credit: a correct diagnosis without the construction. Lean: prescribed_history_charging_bound (ShapeCharging.lean), shifted_twin_target_count (ShiftedTree.lean).",
+   "k": "1..256 (powers of 2)",
+   "pivot_distance": "1 from C10 (trace); >=2 from L",
+   "chain_depth": 2
+  },
+  "P-C2": {
+   "item": "C2/C3: tree calculus and mark-selected identities",
+   "hide": "The trees and perturbations sections from Lemma tree:insertion on, and everything downstream.",
+   "give": "The model, the cavity reservoir and the L- digests. Target: 'derive identities among multioverlap moments on prescribed replica trees'.",
+   "equivalence": "(a) The density prod A^a prod Y_beta^{gamma_beta}, or an equivalent first-variation rule with fresh-path coefficients m_d - n m_{d+1}; (b) a perturbation whose expectation selects prescribed split depths.",
+   "k": "1..256",
+   "pivot_distance": "1-2",
+   "chain_depth": 1
+  }
+ },
+ "open_questions": [
+  "Expert query (Panchenko, Talagrand, Chen, Mourrat, De Sanctis): is shifting target branching depths to force fresh splits, with per-vertex charging, known or folklore in RPC / stochastic-stability computations? This is the main risk to C1's N3.",
+  "Verify for k>=3 that Q_k equals the RPC replica-tree (nested Poisson-Dirichlet) sampling law. If it does, C6 drops to N0.",
+  "Compile the Lean and check the comparator OAI.DilutedSpinGlass.mezard_parisi for sorry and extra axioms. Build a declaration-level DAG (no lean.json exists for 221) to replace the file-level shares.",
+  "Step-3b compression check: inline prescribed_history_charging_bound and measure the effect. Also try a proof variant without the shift, to test whether the delta^{-2b} amplification is genuinely unavoidable.",
+  "Spot-check the WebFetch-summarized abstracts (2410.15599, 2508.17049, 1406.4702) against the PDFs.",
+  "Run the absence searches on zbMATH, Google Scholar and MathOverflow (not queried here).",
+  "Ask OpenAI whether 221 and the 3-SAT companion were produced in the same run and share unpublished machinery."
+ ],
+ "sources": [
+  "https://arxiv.org/abs/2410.15599",
+  "https://arxiv.org/abs/2508.17049",
+  "https://arxiv.org/abs/1406.4702",
+  "https://arxiv.org/abs/1307.2207",
+  "https://arxiv.org/abs/1005.2720",
+  "https://arxiv.org/abs/2005.03115",
+  "https://arxiv.org/abs/2009.12939",
+  "https://arxiv.org/abs/cond-mat/0612041",
+  "https://arxiv.org/abs/cond-mat/0411727",
+  "https://arxiv.org/abs/1808.03440",
+  "https://arxiv.org/abs/1611.00814",
+  "https://arxiv.org/abs/2209.04516",
+  "https://github.com/openai/math",
+  "https://kingy.ai/blog/openai-math-722-manuscripts-results-proofs-compute-costs/",
+  "https://www.unite.ai/openai-releases-722-math-manuscripts-from-an-unreleased-ai-model/",
+  "https://arxiv.org/abs/2608.13361"
+ ]
+}

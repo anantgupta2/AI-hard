@@ -1,0 +1,2048 @@
+{
+ "family": 148,
+ "title": "The entropy-rate dimension formula for self-similar measures",
+ "manuscript_title": "The entropy-rate dimension formula for self-similar measures on the line (OpenAI, September 24, 2026)",
+ "manuscript_dir": "data/raw/openai-math/preprints/The-entropy-rate-dimension-formula-for-self-similar-measures-on-the-line-September-24-2026",
+ "source_root": "data/raw/openai-math/preprints/The-entropy-rate-dimension-formula-for-self-similar-measures-on-the-line-September-24-2026/build",
+ "tex_files": [
+  "build/main.tex",
+  "sections/introduction.tex",
+  "sections/entropy.tex",
+  "sections/pairs.tex",
+  "sections/types.tex",
+  "sections/windows.tex",
+  "sections/corollaries.tex"
+ ],
+ "commit": "fd4aeeb",
+ "analyst_role": "family analyst (paper + Lean, text level; Lean not compiled; no reasoning trace exists for this family)",
+ "base_library_L": "Mathlib d13f23b + references.bib of this manuscript (23 entries)",
+ "reasoning_trace": null,
+ "withdrawn_or_revised": "neither (catalog_manuscripts.csv: withdrawn=False, revised=False)",
+ "main_statement": {
+  "file_line": "sections/introduction.tex:78-88",
+  "latex": "\\begin{theorem}\\label{thm:main}\nFor every finite nonempty indexed family\n$\\varphi_i(x)=r_i x+t_i$ on $\\R$ with $0<|r_i|<1$, and every\nstrictly positive probability vector $p$, its self-similar measure satisfies\n\\[\n \\dim_H\\mu_{\\Phi,p}\n =\\min\\left\\{1,\\frac{h_{\\mathrm{RW}}(\\Phi,p)}{\\chi(\\Phi,p)}\\right\\}.\n\\]\nNo separation assumption is required; exact overlaps and repeated\ngenerators are allowed.\n\\end{theorem}",
+  "paraphrase": "For any finite system of contracting similarities of the line (signed, unequal ratios, repeated maps and exact overlaps allowed) and any positive weights, the Hausdorff dimension of the self-similar measure equals the minimum of 1 and the entropy rate of the random walk on composed affine maps divided by the Lyapunov exponent. This is Conjecture 3 of Varju's survey (arXiv 2509.22042), described there as 'wide open'; its no-exact-overlap case is the exact overlaps conjecture (Simon; Hochman) for measures, and Cor 6.3 gives the set version.",
+  "headline_corollaries": [
+   {
+    "file_line": "sections/corollaries.tex:27-40",
+    "paraphrase": "Exact overlaps conjecture for self-similar measures on R: no exact overlaps implies dim mu = min{1,H(p)/chi}."
+   },
+   {
+    "file_line": "sections/corollaries.tex:52-74",
+    "paraphrase": "Set version: no exact overlaps implies dim_H K = min{1, similarity dimension}."
+   },
+   {
+    "file_line": "sections/corollaries.tex:76-106",
+    "paraphrase": "Homogeneous systems and the Rapaport-Varju three-map family {lambda x, lambda x+1, lambda x+t}: full no-overlap formula for every lambda, t and weights."
+   }
+  ],
+  "relation_to_known_results": [
+   "Hochman 2014: formula under (weak) exponential separation; this paper needs no separation.",
+   "Rapaport 2022: exact overlaps conjecture for algebraic contraction ratios; this paper: arbitrary real ratios.",
+   "Breuillard-Varju 2019 + Varju 2019 (Annals): entropy-rate formula for all Bernoulli convolutions (Varju survey Thm 7); recovered as a special case.",
+   "Rapaport-Varju 2024 Thm A.1 (rational translations, common positive ratio, overlaps allowed), Feng-Feng 2025 (algebraic translations): special cases.",
+   "Baker 2021 / Barany-Kaenmaki 2021: super-exponential condensation without exact overlaps exists, so any proof must be separation-free; this proof never bounds the band endpoints B_n.",
+   "Does NOT use Hochman's inverse theorem; only external dimension theorem is Feng-Hu exact dimensionality (re-proved in Lean)."
+  ],
+  "lean": {
+   "comparators": [
+    {
+     "challenge": "lean/ComparatorChallenges/SelfSimilar.lean (+ .json)",
+     "target": "OAI.EntropyRateDimension.entropy_rate_dimension",
+     "solution_module": "OAI.MeasureTheory.SelfSimilar.Main",
+     "solution_decl": "lean/OAI/MeasureTheory/SelfSimilar/Main.lean:59",
+     "verbatim": "theorem entropy_rate_dimension {ι : Type uι} [Fintype ι] [Nonempty ι] (S : System ι) (μ : Measure ℝ) [IsProbabilityMeasure μ] (hμ : S.SelfSimilar μ) : lowerHausdorffDimension μ = ENNReal.ofReal (min 1 (S.entropyRate / S.lyapunov))",
+     "readable": "For every finite nonempty index type, signed ratios 0<|r_i|<1, positive weights summing to 1, and every probability measure mu on R with mu = sum_i p_i (phi_i)_* mu: inf{dimH E : E measurable, mu E>0} = min(1, h/chi), where h = inf_{n>=1} H_2(law of the complete affine map of n iid symbols)/n and chi = -sum p_i log_2|r_i|.",
+     "permitted_axioms": [
+      "propext",
+      "Quot.sound",
+      "Classical.choice"
+     ],
+     "enable_nanoda": false
+    },
+    {
+     "challenge": "lean/ComparatorChallenges/SelfSimilarCorollaries.lean (+ .json)",
+     "target": "OAI.EntropyRateDimension.Extensions.homogeneous_dimension_direct",
+     "solution_module": "OAI.MeasureTheory.SelfSimilar.DimensionCorollaries",
+     "solution_decl": "lean/OAI/MeasureTheory/SelfSimilar/HomogeneousDimension.lean:97",
+     "verbatim": "theorem homogeneous_dimension_direct {ι} [Fintype ι] [Nonempty ι] (S : System ι) {lam : ℝ} (hlam : 0 < lam) (hr : ∀ i, S.ratio i = lam) (μ : Measure ℝ) [IsProbabilityMeasure μ] (hμ : S.SelfSimilar μ) (h : NoExactOverlaps S) : lowerHausdorffDimension μ = ENNReal.ofReal (min 1 (symbolEntropy S / Real.log (1/lam)))",
+     "readable": "Common positive ratio lam, wordAffine injective on all lists: dim mu = min(1, H_e(p)/log(1/lam)) (natural logs; base-independent ratio). Covers Cor 6.4 and 6.5.",
+     "permitted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "enable_nanoda": false
+    },
+    {
+     "challenge": "lean/ComparatorChallenges/SelfSimilarCorollaries.lean",
+     "target": "OAI.CorSetReference.cor_set",
+     "solution_decl": "lean/OAI/MeasureTheory/SelfSimilar/AttractorFormula.lean:32",
+     "verbatim": "theorem cor_set (r t : ι → ℝ) (hr0 : ∀ i, 0 < |r i|) (hr1 : ∀ i, |r i| < 1) (hno : ∀ u v : List ι, u ≠ [] → v ≠ [] → word r t u = word r t v → u = v) : IsCompact (attractor r t) ∧ (attractor r t).Nonempty ∧ (∃! s : ℝ, 0 ≤ s ∧ ∑ i, |r i| ^ s = 1) ∧ (∀ s : ℝ, 0 ≤ s → (∑ i, |r i| ^ s = 1) → dimH (attractor r t) = ENNReal.ofReal (min 1 s))",
+     "readable": "Attractor = range of the coding map omega -> sum_n (prod_{j<n} r_{omega_j}) t_{omega_n}; no exact overlaps among nonempty words (any lengths) gives compact nonempty attractor, unique similarity dimension s>=0, and dimH = min(1,s). Cor 6.3."
+    }
+   ],
+   "match_check": {
+    "verdict": "Faithful. All three comparator targets match Thm 1.1, Cor 6.4 (and hence 6.5), and Cor 6.3. Challenge definitions are character-identical to Model.lean / NoOverlaps.lean / AttractorFormula.lean.",
+    "details": [
+     "wordAffine (i::w) = phi_i o phi_w computes the full signed affine map; completeMap uses List.ofFn, so G_n is the law of phi_{w_0}o...o phi_{w_{n-1}}, as in the paper.",
+     "entropyRate is the infimum over n>=1 (paper shows lim = inf); base-2 entropy and base-2 chi match the paper's convention; ratio is base-free anyway.",
+     "SelfSimilar is the fixed-point equation for an arbitrary probability measure; uniqueness is proved in Lean (selfSimilar_unique), so the theorem is not weakened by quantifying over solutions.",
+     "lowerHausdorffDimension = inf over measurable E with mu E>0 of Mathlib dimH: matches the paper's lower Hausdorff dimension (Borel sets).",
+     "Nonempty iota, positive weights, 0<|r_i|<1: exactly the paper's hypotheses. With one symbol the Lean statement still holds (h=0).",
+     "NoExactOverlaps in homogeneous_dimension_direct is injectivity of wordAffine on ALL lists (incl. different lengths and []); equivalent to the paper's same-length convention by Lemma 6.1 and slopes lam^n != 1.",
+     "cor_set compares nonempty words of arbitrary lengths; equivalent by Lemma 6.1. The tsum coding point is absolutely summable."
+    ],
+    "formalized_in_comparator": [
+     "Thm 1.1 (entropy_rate_dimension)",
+     "Cor 6.4 / 6.5 (homogeneous_dimension_direct)",
+     "Cor 6.3 (cor_set)"
+    ],
+    "formalized_in_library_but_not_compared": [
+     "Cor 6.2 general no-exact-overlap measure formula (Extensions.no_exact_overlaps_dimension, NoOverlaps.lean:200)",
+     "Lemma 6.1 (overlap_lengths)",
+     "Exact dimensionality of mu (selfSimilar_dimension, ExactDimension.lean:69)",
+     "three-map specialization (threeMapSystem, NoOverlaps.lean:240)"
+    ],
+    "not_formalized": [
+     "Nothing from the paper's proof is missing; Feng-Hu exact dimensionality, cited in the paper, is re-proved in Lean rather than assumed."
+    ],
+    "route_differences_lean_vs_paper": [
+     "Exact dimensionality proved in-house (Hopf maximal inequality, Birkhoff and Maker triangular averages, maximal ball ratio with integrable log envelope, information rate infoRate) rather than citing Feng-Hu Thm 2.8.",
+     "Pair bound proved with shifted 4-adic grids on AddCircle plus an existence-of-good-shift averaging and induction on depth (refinementCost 352k^4/R), rather than independently perturbed cuts; same final C_k = 60000k^4.",
+     "Types generalized to an arbitrary slope-fixing tag; the main theorem applies it to the b-block system S.blocks with tag = wordType.",
+     "Window count uses a common horizon H divisible by all n_i and T = 2DH (exists_common_horizon), instead of an even T with floor counts.",
+     "Homogeneous corollary has an independent 'direct' proof branch with the trivial tag."
+    ],
+    "extra_hypotheses": "None beyond the paper's.",
+    "formalization_yaml": "lean/formalization.yaml:1573-1575 lists entropy_rate_dimension with comparator SelfSimilar.json."
+   }
+  }
+ },
+ "trust_surface": {
+  "grep_scope": "lean/OAI/MeasureTheory/SelfSimilar/*.lean (64 files, 12,093 lines); only external import is `import Mathlib` (Model.lean); no other OAI dirs imported.",
+  "counts": {
+   "sorry": 0,
+   "axiom": 0,
+   "admit": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque": 0,
+   "partial def": 0,
+   "ofReduceBool/trustCompiler": 0,
+   "#eval/run_cmd/elab/macro/syntax": 0,
+   "set_option": 0,
+   "decide (kernel-checked)": 3,
+   "Classical.epsilon": 0,
+   "Classical.choice (explicit)": 2,
+   "propDecidable": 4,
+   "local instance": 23,
+   "local notation": 0,
+   "_root_": 0
+  },
+  "decide_uses": "3 occurrences, all Bool coercions inside definitions (FiniteEntropy.lean:1062-1063 TV via decide (q a <= p a); GridCoupling.lean:137 event flag) - no computation.",
+  "local_instances": "23 occurrences of `local instance : MeasurableSpace ι := ⊤` / MeasurableSingletonClass on the finite alphabet; harmless.",
+  "comparator_permitted_axioms": [
+   "propext",
+   "Quot.sound",
+   "Classical.choice"
+  ],
+  "comparator_flags": {
+   "definition_names": [],
+   "enable_nanoda": false
+  },
+  "computer_assisted": false,
+  "caveat": "Lean is not installed here; compilation and the comparator pass are asserted by the release, not re-checked. Text-level audit found no escape hatches."
+ },
+ "labels": {
+  "A": {
+   "label": "A3",
+   "secondary": {
+    "hard_direction_form": "lower bound dim >= min{1,h/chi}, proved as an impossibility (A5-like: no system with dimension loss d<1, d chi<h)",
+    "explicit_rate": false
+   },
+   "evidence": {
+    "quote": "\\dim_H\\mu_{\\Phi,p} =\\min\\left\\{1,\\frac{h_{\\mathrm{RW}}(\\Phi,p)}{\\chi(\\Phi,p)}\\right\\}.",
+    "file_line": "sections/introduction.tex:83-84"
+   },
+   "confidence": "medium-high",
+   "note": "Exact-value formula for every system (universal over systems, A1 outer). The upper bound is easy (Sec 1.3); all the content is the impossibility of dimension drop. No effective rates: 'the finite upper endpoints ... have no asserted effective bound' (corollaries.tex:108-111)."
+  },
+  "B": {
+   "label": "B1",
+   "flags": {
+    "full_only_with_prior_results": false,
+    "full_only_with_prior_results_detail": "Paper cites only Feng-Hu exact dimensionality as an external dimension theorem (introduction.tex:181-182); the Lean re-proves it, so the formal result is self-contained over Mathlib.",
+    "adds_corollaries_for_other_conjectures": true,
+    "adds_corollaries_detail": "Implies the exact overlaps conjecture on R for measures (Cor 6.2) and sets (Simon's question, Cor 6.3), the Rapaport-Varju three-map problem for all parameters (Cor 6.5), and re-derives the Hochman/Varju Bernoulli convolution formula and Rapaport's algebraic case."
+   },
+   "evidence": {
+    "quote": "This proves the entropy-rate dimension conjecture, formulated as Conjecture~3 in Varj\\'u's survey",
+    "file_line": "sections/introduction.tex:90-91"
+   },
+   "evidence_flag": {
+    "quote": "the only external dimension theorem used in the proof is exact dimensionality",
+    "file_line": "sections/introduction.tex:181-182"
+   },
+   "confidence": "high (as a claim); correctness see correctness_audit",
+   "note": "Varju's survey (arXiv 2509.22042v2, read for this report) states Conjecture 3 as 'folklore' and 'wide open'. Quick web search found no other claimed resolution."
+  },
+  "C": {
+   "primary": "C3",
+   "primary_evidence": {
+    "quote": "To prove equality in all other cases, it suffices to rule out d<1, d\\chi<h. These inequalities are the contradiction hypothesis",
+    "file_line": "sections/introduction.tex:254-260"
+   },
+   "secondaries": [
+    {
+     "label": "C4",
+     "evidence": {
+      "quote": "one may take $C_k=60000k^4$",
+      "file_line": "sections/pairs.tex:223"
+     },
+     "note": "Long chain of entropy inequalities with explicit constants (pair bound, nonsaturation loss C_*, 5/M boundary loss)."
+    },
+    {
+     "label": "C1",
+     "evidence": {
+      "quote": "Choose sufficiently large integers $n_1<\\cdots<n_q$ successively",
+      "file_line": "sections/windows.tex:131-132"
+     },
+     "note": "Auxiliary constructions (randomized nested partitions, separated bands, retained windows) - gadgets, not the witnessing object; C1 is secondary."
+    },
+    {
+     "label": "C5",
+     "evidence": {
+      "quote": "Feng--Hu's exact-dimensionality theorem \\cite[Theorem~2.8]{FengHu2009} applies",
+      "file_line": "sections/introduction.tex:54-55"
+     },
+     "note": "Only Feng-Hu exact dimensionality and the strong law/LLN are invoked without proof in the paper (Lean re-proves exact dimensionality)."
+    }
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "We prove the required entropy estimates here",
+    "file_line": "sections/introduction.tex:181"
+   },
+   "ih_strengthened": false,
+   "ih_template": null,
+   "ih_evidence": {
+    "quote": "We choose successive block lengths only after the preceding endpoints are known.",
+    "file_line": "sections/introduction.tex:211-212"
+   },
+   "ih_note": "No induction on statements. The only iteration is the successive (diagonal) choice of n_1<...<n_q and the inductive refinement of partitions in P15; no hypothesis is strengthened. Nonsaturation is a contradiction argument inside a contradiction argument.",
+   "confidence": "high"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "P15 finite-law pair bound (with P14 pair capacity and P17 sum-observation trick); second: P28 scale-free separated-band counting",
+   "evidence": {
+    "quote": "The estimate is independent of the smallest distance between support points.",
+    "file_line": "sections/introduction.tex:189-190"
+   },
+   "confidence": "low-medium",
+   "caveats": [
+    "The paper names Varju's Prop. 21 fair-pair decomposition as 'a predecessor of this approach' (pairs.tex:8-9); a strict reading of the N2 rule ('precedents the paper names itself') would cap P14/P15 at N2 and the family at D2. The judge must decide whether a separation-free deficit-to-capacity bound with a sumset term is a variant of Prop. 21 or a new statement.",
+    "P28's ingredients (telescoping of window entropy, diagonal choice of parameters) are individually standard; the novelty is the combination that removes all quantitative separation.",
+    "All other machinery is cited and re-proved (Varju entropy calculus, BV nonsaturation, GSSY block types, Feng-Hu)."
+   ],
+   "flag_builds_on_prior_model_produced_result": "no evidence: all 23 bibliography entries are human-authored published papers or arXiv preprints (Varju 2509.22042, Barany-Verma 2507.05835 verified to exist); no OpenAI/model-produced item is cited."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Dynamical systems and ergodic theory",
+    "msc2020": [
+     "28A80",
+     "37C45",
+     "28A78",
+     "11K55"
+    ],
+    "evidence": {
+     "quote": "\\cataloguesection{Dynamical systems and ergodic theory}{12}",
+     "file_line": "overview.tex:363"
+    },
+    "confidence": "high"
+   },
+   "lean_dir_field": {
+    "dir": "OAI/MeasureTheory/SelfSimilar",
+    "field": "MeasureTheory",
+    "confidence": "high"
+   },
+   "method_fields": [
+    {
+     "field": "Information theory (94A17): Shannon/conditional entropy, mutual information, chain rule, binary-entropy concavity",
+     "tag": "essential",
+     "what": "All of Secs 2-5; Lean FiniteEntropy library",
+     "evidence": {
+      "quote": "We use the entropy chain rule and nonnegativity of conditional mutual information",
+      "file_line": "sections/entropy.tex:14-15"
+     }
+    },
+    {
+     "field": "Fractal geometry / geometric measure theory (28A80, 28A78)",
+     "tag": "essential",
+     "what": "Hausdorff dimension of measures, covering upper bound, exact dimensionality",
+     "evidence": {
+      "quote": "We use the lower Hausdorff dimension of a measure",
+      "file_line": "sections/introduction.tex:50"
+     }
+    },
+    {
+     "field": "Ergodic theory / smooth IFS dimension theory (37C45, 37A30)",
+     "tag": "essential",
+     "what": "Feng-Hu exact dimensionality (cited in paper; Birkhoff/Hopf/Maker re-proved in Lean)",
+     "evidence": {
+      "quote": "Feng--Hu's exact-dimensionality theorem",
+      "file_line": "sections/introduction.tex:54"
+     }
+    },
+    {
+     "field": "Probability (60F15, 60G42): SLLN/LLN, conditional expectation, Jensen, independence of future environment",
+     "tag": "essential",
+     "what": "Upper bound, E_n, conditional pair gain",
+     "evidence": {
+      "quote": "The law of large numbers and $b\\chi<A'$ imply $\\P(E_n^c)\\to0$",
+      "file_line": "sections/types.tex:228"
+     }
+    },
+    {
+     "field": "Entropy methods for convolutions / Bernoulli convolutions (Varju, Breuillard-Varju; 28A80, 11K55)",
+     "tag": "essential",
+     "what": "Averaged entropy calculus, fair-pair gain, nonsaturation (all re-proved)",
+     "evidence": {
+      "quote": "the entropy calculus and fair-pair arguments of Varj\\'u",
+      "file_line": "sections/introduction.tex:176-178"
+     }
+    },
+    {
+     "field": "Random IFS / type-class disintegration (GSSY, SSS)",
+     "tag": "essential",
+     "what": "Block-type conditioning",
+     "evidence": {
+      "quote": "This is the block-type disintegration of Galicer--Saglietti--Shmerkin--Yavicoli",
+      "file_line": "sections/introduction.tex:193-194"
+     }
+    },
+    {
+     "field": "Additive combinatorics (11B13): k-fold sumset counting",
+     "tag": "essential",
+     "what": "|kD_b|<=(k+1)^{m^b} feeding the pair bound",
+     "evidence": {
+      "quote": "The same fixed contractions give a small sumset bound.",
+      "file_line": "sections/introduction.tex:203"
+     }
+    },
+    {
+     "field": "Combinatorial optimization (90C05/05C70): fractional matching LP",
+     "tag": "essential",
+     "what": "Definition of pair capacity c_ell",
+     "evidence": {
+      "quote": "Define $c_\\ell(\\nu)$ as the maximum of",
+      "file_line": "sections/pairs.tex:19"
+     }
+    },
+    {
+     "field": "Real analysis: differential entropy, uniform smoothing",
+     "tag": "essential",
+     "what": "calH_s = h(X+V_s) - log s",
+     "evidence": {
+      "quote": "\\mathcal H_s(X)=h(X+V_s)-\\log s",
+      "file_line": "sections/entropy.tex:35"
+     }
+    },
+    {
+     "field": "Homogeneous dynamics (Wang 2011 translation averaging)",
+     "tag": "background-cited",
+     "what": "Origin of translation averaging",
+     "evidence": {
+      "quote": "It uses translation averaging, developed by Wang",
+      "file_line": "sections/introduction.tex:175-176"
+     }
+    },
+    {
+     "field": "Additive combinatorics: Hochman's inverse theorem",
+     "tag": "background-cited",
+     "what": "Context only - NOT used",
+     "evidence": {
+      "quote": "using inverse theorems for entropy growth under convolution",
+      "file_line": "sections/introduction.tex:134"
+     }
+    },
+    {
+     "field": "Diophantine/number theory (Pisot, Garsia, Lehmer-type)",
+     "tag": "background-cited",
+     "what": "History of Bernoulli convolutions",
+     "evidence": {
+      "quote": "Erd\\H{o}s proved singularity for reciprocal Pisot parameters",
+      "file_line": "sections/introduction.tex:120-121"
+     }
+    }
+   ],
+   "cross_field_count_essential_nonDS": 5,
+   "share_invoked_cited_theorems_from_other_fields": "~2/9 invoked cited results are outside fractal geometry/ergodic theory (SLLN from probability; Wang-style translation averaging is technique-level). The heavy cross-field content is information theory and an LP notion, both used at definitional level.",
+   "confidence": "medium"
+  }
+ },
+ "items": [
+  {
+   "id": "P01",
+   "kind": "definition",
+   "name": "Indexed IFS Phi=(phi_i), phi_i(x)=r_i x+t_i, 0<|r_i|<1; self-similar measure mu_{Phi,p}",
+   "file_line": "sections/introduction.tex:3-19",
+   "statement": "mu = sum_i p_i (phi_i)_* mu; equivalently the law of lim phi_{I_1}...phi_{I_n}(0) with I_j iid ~ p. Repeated (indexed) maps allowed.",
+   "cited_or_new": {
+    "status": "classical, cited",
+    "bib_key": "Hutchinson1981",
+    "cue": "Hutchinson also established the invariant-measure construction used above"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Object of the theorem."
+   },
+   "analytic_check": {
+    "verdict": "analytic (occurs in goal)",
+    "detail": "Subterm of the main statement; Lean System/SelfSimilar are in the comparator signature."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Hutchinson 1981."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "OAI.EntropyRateDimension.System (Model.lean:13)",
+     "System.SelfSimilar (Model.lean:56)",
+     "Coding.law (Coding.lean:114)",
+     "System.selfSimilar_unique (InvariantLaw.lean:141)",
+     "Coding.law_selfSimilar (Coding.lean:129)"
+    ],
+    "note": "Lean quantifies over every probability measure satisfying the fixed-point equation and proves uniqueness in-house."
+   }
+  },
+  {
+   "id": "P02",
+   "kind": "definition",
+   "name": "Exact overlap (equality of complete affine maps for distinct same-length words)",
+   "file_line": "sections/introduction.tex:23-26",
+   "statement": "phi_u=phi_v for distinct words of equal positive length; equality includes signed slope and translation.",
+   "cited_or_new": {
+    "status": "classical, cited",
+    "bib_key": "Hochman2014",
+    "cue": "An \\emph{exact overlap} is an equality"
+   },
+   "uses_items": [
+    "P01"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Needed for the no-overlap corollaries; the main theorem allows all overlaps."
+   },
+   "analytic_check": {
+    "verdict": "analytic (occurs in corollary goals)",
+    "detail": "NoExactOverlaps is in the comparator signature of homogeneous_dimension_direct; cor_set states it inline."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard (Simon 1996, Hochman 2014)."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "Extensions.NoExactOverlaps (NoOverlaps.lean:15)",
+     "Extensions.SameLengthNoExactOverlaps (NoOverlaps.lean:21)"
+    ]
+   }
+  },
+  {
+   "id": "P03",
+   "kind": "definition",
+   "name": "Random affine map G_n and random-walk entropy rate h_RW = lim H(G_n)/n = inf H(G_n)/n",
+   "file_line": "sections/introduction.tex:28-48",
+   "statement": "P(G_n=g)=sum_{w: phi_w=g} p_w; h=lim H(G_n)/n=inf_n H(G_n)/n by subadditivity; 0<=h<=H(p).",
+   "cited_or_new": {
+    "status": "known, cited",
+    "bib_key": "VarjuSurvey2026; Garsia1963; BreuillardVarju2019",
+    "cue": "Garsia introduced the discrete entropy rate in this setting"
+   },
+   "uses_items": [
+    "P01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Appears in the theorem; drives the deficit lemma P22."
+   },
+   "analytic_check": {
+    "verdict": "analytic (occurs in goal)",
+    "detail": "walkEntropy/entropyRate are in the comparator signature."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Garsia entropy / Varju survey Conjecture 3 uses exactly this quantity."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "System.walkEntropy (Model.lean:47)",
+     "System.entropyRate (Model.lean:50)",
+     "System.mapMass, mapSupport, completeMap, wordAffine (Model.lean:27-45)"
+    ]
+   }
+  },
+  {
+   "id": "P04",
+   "kind": "definition",
+   "name": "Lyapunov exponent chi=-sum p_i log|r_i|",
+   "file_line": "sections/introduction.tex:36-43",
+   "statement": "Base-2 average log contraction.",
+   "cited_or_new": {
+    "status": "classical",
+    "bib_key": "",
+    "cue": "Define the random-walk entropy rate and the Lyapunov exponent"
+   },
+   "uses_items": [
+    "P01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "In the goal."
+   },
+   "analytic_check": {
+    "verdict": "analytic (occurs in goal)",
+    "detail": "System.lyapunov in comparator."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "System.lyapunov (Model.lean:53)"
+    ]
+   }
+  },
+  {
+   "id": "P05",
+   "kind": "definition",
+   "name": "Lower Hausdorff dimension of a measure",
+   "file_line": "sections/introduction.tex:50-52",
+   "statement": "dim_H nu = inf{dim_H E : E Borel, nu(E)>0}.",
+   "cited_or_new": {
+    "status": "classical",
+    "bib_key": "",
+    "cue": "We use the lower Hausdorff dimension of a measure"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "In the goal."
+   },
+   "analytic_check": {
+    "verdict": "analytic (occurs in goal)",
+    "detail": "lowerHausdorffDimension in comparator (Mathlib dimH)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "lowerHausdorffDimension (Model.lean:59)",
+     "LocalMass.lower_dim_eq_of_limit (MassDimension.lean:89)"
+    ]
+   }
+  },
+  {
+   "id": "P06",
+   "kind": "claim",
+   "name": "Exact dimensionality of mu (Feng-Hu Theorem 2.8) and equality of the two measure-dimension conventions",
+   "file_line": "sections/introduction.tex:54-76",
+   "statement": "lim log mu(B(x,s))/log s = d for mu-a.e. x; d = dim_H mu.",
+   "cited_or_new": {
+    "status": "cited, not re-proved in paper; RE-PROVED in Lean",
+    "bib_key": "FengHu2009",
+    "cue": "Feng--Hu's exact-dimensionality theorem \\cite[Theorem~2.8]{FengHu2009} applies"
+   },
+   "uses_items": [
+    "P01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Supplies d and the entropy bound P11 used by P12 and P22. Lean sub-DAG of selfSimilar_dimension = 24% of the main-theorem DAG."
+   },
+   "analytic_check": {
+    "verdict": "in L (cited)",
+    "detail": "Feng-Hu 2009 is in the bibliography; not in Mathlib."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Feng-Hu 2009. Lean re-derives it via Hopf maximal inequality, Birkhoff/Maker averages and a maximal ball-ratio bound."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "System.selfSimilar_dimension (ExactDimension.lean:69)",
+     "Coding.ae_radial_limit (ExactDimension.lean:47)",
+     "Coding.ae_radial_sequence (RadialLimit.lean:73)",
+     "Coding.exponent (RadiusGrowth.lean:62)",
+     "Coding.infoRate (BallLimits.lean:155)",
+     "ErgodicAux.hopf_finite (ErgodicAverages.lean:83)",
+     "ErgodicAux.ae_tendsto_average (ErgodicAverages.lean:258)",
+     "ErgodicAux.tailError_integral_tendsto (TriangularAverages.lean:76)",
+     "BallRatios.maximal / logEnvelope / ae_logRatio_limit (BallRatios.lean:59-223)"
+    ]
+   }
+  },
+  {
+   "id": "P07",
+   "kind": "theorem",
+   "name": "Theorem 1.1 (main): dim_H mu = min{1, h_RW/chi}",
+   "file_line": "sections/introduction.tex:78-88",
+   "statement": "See main_statement.",
+   "cited_or_new": {
+    "status": "new (claimed resolution of Varju survey Conjecture 3)",
+    "bib_key": "VarjuSurvey2026",
+    "cue": "This proves the entropy-rate dimension conjecture"
+   },
+   "uses_items": [
+    "P08",
+    "P30"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Headline."
+   },
+   "analytic_check": {
+    "verdict": "goal",
+    "detail": ""
+   },
+   "provisional_N": {
+    "grade": "n/a (goal)",
+    "justification": ""
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "OAI.EntropyRateDimension.entropy_rate_dimension (Main.lean:59)",
+     "System.exponent_lower_bound (Main.lean:25)"
+    ]
+   }
+  },
+  {
+   "id": "P08",
+   "kind": "claim",
+   "name": "Entropy-rate upper bound d <= min{1,h/chi}",
+   "file_line": "sections/introduction.tex:225-258",
+   "statement": "Regroup into n-blocks with alphabet = distinct maps of G_n (same mu), SLLN for prefix probability and contraction, covering argument.",
+   "cited_or_new": {
+    "status": "known, re-proved",
+    "bib_key": "",
+    "cue": "We prove the upper bound before turning to the contradiction argument"
+   },
+   "uses_items": [
+    "P01",
+    "P03",
+    "P04"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Easy direction."
+   },
+   "analytic_check": {
+    "verdict": "standard",
+    "detail": "Covering argument with map-alphabet compression."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Folklore (Feng-Hu, Hochman); merging coincident maps into a new alphabet is standard."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "System.exponent_le_rate (UpperBound.lean:215)",
+     "System.exponent_le_one (UpperBound.lean:222)",
+     "System.compressed (UpperBound.lean:98)",
+     "System.exponent_le_walkEntropy (UpperBound.lean:198)"
+    ]
+   }
+  },
+  {
+   "id": "P09",
+   "kind": "definition",
+   "name": "Fixed-grid entropy H_s^0, averaged entropy calH_s, window entropy G_{s,t}=calH_s-calH_t, one-bit deficit Delta_s=1-G_{s,2s}",
+   "file_line": "sections/entropy.tex:15-24",
+   "statement": "calH_s(X)=int_0^1 H(floor(X/s+u))du; Delta_s measures non-saturation between scales s and 2s.",
+   "cited_or_new": {
+    "status": "known, cited (Varju; Wang)",
+    "bib_key": "VarjuAbsolute2019; Wang2011",
+    "cue": "The smoothing and nested-grid identities are the averaged-entropy calculus of"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Language of every later lemma."
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "detail": "Varju 2019 Section 2.2 defines the averaged entropy; Delta is 1 minus a 2-scale window entropy."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Varju 2019 averaged entropy; Wang 2011 translation averaging."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "MeasureEntropy.averaged (MeasureEntropy.lean:87)",
+     "MeasureEntropy.deficit (MeasureEntropy.lean:1067)",
+     "MeasureEntropy.window (PairGain.lean:28)",
+     "MeasureEntropy.entropy/grid/label (MeasureEntropy.lean:13-85)"
+    ]
+   }
+  },
+  {
+   "id": "P10",
+   "kind": "lemma",
+   "name": "Lemma 2.1 Entropy calculus (smoothing identity, affine invariance, integer-ratio concavity and convolution monotonicity, scale and grid comparisons)",
+   "file_line": "sections/entropy.tex:32-96",
+   "statement": "calH_s(X)=h(X+V_s)-log s; calH_s(aX+b)=calH_{s/|a|}(X); for t/s integer, G_{s,t} concave, in [0,log N], and G_{s,t}(X+Y)>=G_{s,t}(X).",
+   "cited_or_new": {
+    "status": "known, re-proved",
+    "bib_key": "VarjuAbsolute2019",
+    "cue": "we include their proofs"
+   },
+   "uses_items": [
+    "P09"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Concavity under mixtures and convolution monotonicity are used in every gain step."
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "detail": "Varju 2019 Lemmas 5, 6, 10."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Re-proof of cited lemmas (signed scaling added)."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "MeasureEntropy.averaged_affine/averaged_reflect/averaged_scale/averaged_translate (MeasureEntropy.lean:291-415)",
+     "averaged_nested_bounds/averaged_nested_mixture/averaged_nested_translate_mixture (MeasureEntropy.lean:581-730)",
+     "averaged_le_averaged_add_log_ratio (MeasureEntropy.lean:537)"
+    ]
+   }
+  },
+  {
+   "id": "P11",
+   "kind": "lemma",
+   "name": "Lemma 2.2 Entropy and dimension: limsup max{calH_s,H_s^0}/log(1/s) <= d",
+   "file_line": "sections/entropy.tex:102-138",
+   "statement": "For exact-dimensional compactly supported nu.",
+   "cited_or_new": {
+    "status": "known, re-proved",
+    "bib_key": "",
+    "cue": "Exact dimensionality gives a measurable set"
+   },
+   "uses_items": [
+    "P06",
+    "P09"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Converts d into the entropy bound used in P12 and P22."
+   },
+   "analytic_check": {
+    "verdict": "standard",
+    "detail": "Folklore (Young / Fan-Lau-Rao)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "entropy_bound_of_radial_limit (EntropyDimension.lean:45)",
+     "System.selfSimilar_entropy_bound (ExactDimension.lean:75)"
+    ]
+   }
+  },
+  {
+   "id": "P12",
+   "kind": "lemma",
+   "name": "Lemma 2.3 Uniform nonsaturation: d<1 implies delta=inf_{v>0} Delta_v(mu)>0, for unequal signed ratios",
+   "file_line": "sections/entropy.tex:140-243",
+   "statement": "If Delta_{v_n}->0 then TV bound gives G_{v_n,Kv_n}->log K; stopped self-similarity transfers near-saturation to all smaller scales (loss C_*=log(1/a_*+2)+1), contradicting P11.",
+   "cited_or_new": {
+    "status": "adapted from cited precedent, re-proved",
+    "bib_key": "BreuillardVarju2019",
+    "cue": "For Bernoulli convolutions, the following nonsaturation property appears in Breuillard--Varj\\'u \\cite[Lemma~13]{BreuillardVarju2019}. The stopping-time argument below extends it"
+   },
+   "uses_items": [
+    "P09",
+    "P10",
+    "P11"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Supplies the per-pair gain delta at EVERY scale, which is what lets gains at arbitrarily fine (super-exponential) scales count. Lean sub-DAG 27%."
+   },
+   "analytic_check": {
+    "verdict": "not a subterm of the goal; near-equivalent in L",
+    "detail": "Breuillard-Varju Lemma 13 is the same statement for Bernoulli convolutions."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Named precedent (BV Lemma 13); the extension via a stopping time to unequal signed ratios is routine."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "System.uniform_nonsaturation_of_entropy_bound (EntropyBounds.lean:172)",
+     "MeasureEntropy.deficit_dyadic_tendsto_zero (MeasureEntropy.lean:1135)",
+     "FiniteEntropy.totalVariation, js (FiniteEntropy.lean:987-1054)"
+    ]
+   }
+  },
+  {
+   "id": "P13",
+   "kind": "lemma",
+   "name": "Lemma 2.4 Two-point gain: G_{s,t}(X+vJ)-G_{s,t}(X) >= Delta_v(X)-s/v-v/t",
+   "file_line": "sections/entropy.tex:245-297",
+   "statement": "Fair pair at distance v raises window entropy by Delta_v minus boundary losses; no integer-ratio needed.",
+   "cited_or_new": {
+    "status": "adapted from cited precedent, re-proved",
+    "bib_key": "VarjuAbsolute2019",
+    "cue": "The fair-pair comparison follows the method of \\cite[Proposition~20 and Lemma~22]{VarjuAbsolute2019}"
+   },
+   "uses_items": [
+    "P09",
+    "P10"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Every gain in Section 5 passes through it. Lean sub-DAG 22%."
+   },
+   "analytic_check": {
+    "verdict": "near-equivalent in L",
+    "detail": "Varju 2019 Prop. 20 / Lemma 22."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Restatement of Varju's fair-pair comparison in the averaged-entropy calculus."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "MeasureEntropy.two_point_gain (TranslationGain.lean:354)",
+     "averaged_fairShift_gain_le/compare (TranslationGain.lean:225-321)",
+     "MeasureEntropy.fairShift (MeasureEntropy.lean:775)"
+    ]
+   }
+  },
+  {
+   "id": "P14",
+   "kind": "definition",
+   "name": "Pair capacity c_ell(nu): max total weight of fair two-point laws with separation in [2^-ell,2^{1-ell}) forming a submeasure of nu (an LP / fractional matching)",
+   "file_line": "sections/pairs.tex:13-35",
+   "statement": "c_ell(nu)=max sum_e w_e s.t. w_e>=0, (1/2) sum_{e ni x} w_e <= nu({x}).",
+   "cited_or_new": {
+    "status": "new (formalized variant of named precedent)",
+    "bib_key": "VarjuAbsolute2019",
+    "cue": "Varj\\'u's scale-local decomposition into fair two-point submeasures \\cite[Proposition~21]{VarjuAbsolute2019} is a predecessor of this approach"
+   },
+   "uses_items": [
+    "P01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Appears in statements of P15, P24, P27 and in 5+ Lean files; the currency in which hidden entropy is paid."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "detail": "Not a subterm of the goal or of Mathlib. As an LP it is a fractional b-matching value on a distance-band graph (Mathlib has no such notion); Varju's Prop 21 decomposes into fair pairs at a scale but does not define an LP capacity per band."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Named predecessor (Varju Prop. 21); the LP/fractional-matching packaging is a natural formalization of 'mass in fair pairs at scale 2^-ell'. Candidate for N3 only jointly with P15."
+   },
+   "provisional_F": "F1",
+   "lean": {
+    "decls": [
+     "FairPairs.Law (FairPairs.lean:14)",
+     "FairPairs.Law.edges (FairPairs.lean:20)",
+     "FairPairs.incident (FairPairs.lean:25)",
+     "FairPairs.Feasible (FairPairs.lean:30)",
+     "FairPairs.capacity (FairPairs.lean:33)"
+    ]
+   }
+  },
+  {
+   "id": "P15",
+   "kind": "lemma",
+   "name": "Lemma 3.2 Finite-law pair bound: k(H(nu)-H^0_rho(nu)) <= log|kF| + C_k sum_{2^-ell<=2rho} c_ell(nu), C_k=60000k^4, independent of minimal separation",
+   "file_line": "sections/pairs.tex:37-227",
+   "statement": "Exact-minus-grid entropy of a finite law is bounded by the k-fold sumset growth plus pair capacity at all finer bands; separation-free.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "VarjuAbsolute2019 (predecessor only)",
+    "cue": "Here the sumset term controls the total capacity over all finer bands; we prove the needed estimate by randomized nested partitions"
+   },
+   "uses_items": [
+    "P14",
+    "P16",
+    "P17",
+    "P18"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The bridge from 'hidden entropy below scale rho' to 'fair-pair mass at finer scales' that makes the argument independent of quantitative separation. Lean sub-DAG 19-22% (pair_bound closure 140/749 decls)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "detail": "Neither the sumset-plus-capacity form nor any equivalent occurs in the goal, Mathlib, or the 23 bibliography items. Nearest: Varju Prop. 21 (fair-pair decomposition at one scale, used with separation), Hochman inverse theorem (structure of non-growing convolutions at a fixed scale range), entropic Plunnecke-Ruzsa (Tao), none of which bound the fine-scale entropy deficit by a sumset plus pair capacity."
+   },
+   "provisional_N": {
+    "grade": "N3 (candidate; borderline N2)",
+    "justification": "Quick check found no precedent for a separation-free deficit-to-pair-capacity bound with a sumset term; the paper names Varju Prop. 21 only as a predecessor. Key non-obvious device: conditioning on the k-fold sum Y makes the refinement cost linear (not t log 1/t) in exceptional probabilities, so costs sum geometrically over all finer scales."
+   },
+   "provisional_F": "F3",
+   "lean": {
+    "decls": [
+     "FairPairs.pair_bound (SumsetBound.lean:329)",
+     "FairPairs.pair_bound_natural (SumsetBound.lean:269)",
+     "FairPairs.exists_fine_partition (SumsetBound.lean:120)",
+     "FairPairs.sum_refinementCost_le (SumsetBound.lean:203)",
+     "FairPairs.mean_deviation_le_bandCost (SumsetBound.lean:49)",
+     "FairPairs.exists_capacity_refinement (SumsetBound.lean:81)",
+     "FairPairs.Law.sumset (SumsetBound.lean:265)"
+    ],
+    "route_difference": "Lean uses shifted 4-adic grids on AddCircle with an existence-of-good-shift averaging (GridCoupling.exists_shift_cost_le) and refinementCost 352k^4/R*bandCost, by induction on depth J, instead of independently perturbed cuts; final constant 60000k^4 kept."
+   }
+  },
+  {
+   "id": "P16",
+   "kind": "construction",
+   "name": "Randomized nested partitions rho_h=rho 4^-h with independently perturbed internal cuts (density <= 20/rho_h)",
+   "file_line": "sections/pairs.tex:61-107",
+   "statement": "Each parent of length in [rho_h/2,2rho_h] split into N in [2,8] pieces, cuts perturbed by +-rho_{h+1}/10; cuts independent of samples; separating depth J exists but is never bounded.",
+   "cited_or_new": {
+    "status": "new (standard technique)",
+    "bib_key": "Wang2011 (translation averaging, by analogy)",
+    "cue": "The refinement cuts are random, independent of the samples, to prevent atoms close to a fixed boundary from being charged too often"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Makes boundary-hitting probability linear in distance, which feeds the sum over scales."
+   },
+   "analytic_check": {
+    "verdict": "standard device",
+    "detail": "Random grid shifts/perturbations are a standard averaging trick (e.g. random dyadic grids)."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Randomized grids are standard; here an auxiliary gadget for P15."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "RandomGrid.hit/integral_hit (RandomGrid.lean:89-103)",
+     "RandomGrid.cell, shift (GridCoupling.lean:29-36)",
+     "GridCoupling.refinement_entropy_hit_bound (GridCoupling.lean:235)",
+     "GridCoupling.exists_shift_variation_bound (GridCoupling.lean:282)"
+    ]
+   }
+  },
+  {
+   "id": "P17",
+   "kind": "lemma",
+   "name": "One refinement after observing the sum: H(C_{h+1}|Y,C_h=(A_i)) <= 9k sum_i p_i (linear in exceptional probabilities)",
+   "file_line": "sections/pairs.tex:109-160",
+   "statement": "On the event that at most one coordinate deviates and the sum is near its mean, all child labels equal the mean's labels; the event B is Y-measurable so carries no binary-entropy cost; h_2(q)<=3sqrt q with q<=t^2.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "",
+    "cue": "This distinction is what makes \\eqref{eq:pair-flag} linear in the exceptional probabilities"
+   },
+   "uses_items": [
+    "P16"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The technical heart of P15; without it the costs would be t log(1/t) and would not sum over scales."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "detail": "Not in goal or L."
+   },
+   "provisional_N": {
+    "grade": "N3 (as part of P15)",
+    "justification": "Graded together with P15."
+   },
+   "provisional_F": "F3",
+   "lean": {
+    "decls": [
+     "GridCoupling.refinement_entropy_bound (GridCoupling.lean:123)",
+     "FiniteRefinement.fiber_entropy_hit_bound (FiniteRefinement.lean:72)",
+     "FiniteRefinement.cellMean (FiniteRefinement.lean:17)",
+     "RandomGrid.entropy_binary_extra (RandomGrid.lean:163)",
+     "GridCoupling.grid_alphabet_bound (GridCoupling.lean:91)"
+    ]
+   }
+  },
+  {
+   "id": "P18",
+   "kind": "claim",
+   "name": "Symmetric coupling pi_h=sum_A nu(A) nu(.|A)^{x2} gives feasible pair mixtures; sum over h of 2^-ell/rho_h <= 8/3",
+   "file_line": "sections/pairs.tex:182-226",
+   "statement": "Converts mean deviations into band capacities; geometric summation removes J.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": "",
+    "cue": "the corresponding portion of $\\pi_h$ supplies a feasible mixture"
+   },
+   "uses_items": [
+    "P14"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Bookkeeping inside P15."
+   },
+   "analytic_check": {
+    "verdict": "routine",
+    "detail": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine coupling/geometric series."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "FairPairs.conditionalCoupling (FairPairs.lean:257)",
+     "FairPairs.Law.bandCost (SumsetBound.lean:19)",
+     "FairPairs.band_scale_sum (SumsetBound.lean:167)"
+    ]
+   }
+  },
+  {
+   "id": "P19",
+   "kind": "definition",
+   "name": "Block types: words W_h in Lambda^b, type(w)=symbol counts, q_kappa, Q_kappa uniform on type class; type environment omega, signed products R_j, depths sigma_j",
+   "file_line": "sections/types.tex:62-103",
+   "statement": "Coding = iid types then independent uniform words within types; types fix the signed slope r(kappa).",
+   "cited_or_new": {
+    "status": "cited, re-proved",
+    "bib_key": "GalicerSagliettiShmerkinYavicoli2016; SagliettiShmerkinSolomyak2018; KaenmakiOrponen2023",
+    "cue": "The block-type disintegration is due to Galicer--Saglietti--Shmerkin--Yavicoli"
+   },
+   "uses_items": [
+    "P01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Makes the slope deterministic so that translation entropy equals map entropy (P22) and sumsets are small (P23)."
+   },
+   "analytic_check": {
+    "verdict": "in L (cited)",
+    "detail": "GSSY Section 6.4 / Lemma 6.6."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Known disintegration (GSSY; SSS; Kaenmaki-Orponen)."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "System.blocks (BlockWords.lean:32)",
+     "System.wordType (BlockWords.lean:114)",
+     "System.blockType (WordTypes.lean:38)",
+     "Typed.prob, tagWord (TypedLaw.lean:89-91)"
+    ],
+    "route_difference": "Lean generalizes to any tag : alpha -> beta with tag a = tag v -> ratio a = ratio v; the homogeneous corollary uses the trivial tag."
+   }
+  },
+  {
+   "id": "P20",
+   "kind": "definition",
+   "name": "Conditional laws nu_{omega,n} (law of sum_{h<n} R_h phi_{W_h}(0) given types) and mu_omega; E mu_omega = mu",
+   "file_line": "sections/types.tex:105-121",
+   "statement": "Finite random translation laws given the type environment.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": "",
+    "cue": "Given $\\omega$, use the independent conditional block draws above to define"
+   },
+   "uses_items": [
+    "P19"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The finite laws to which P15 is applied."
+   },
+   "analytic_check": {
+    "verdict": "routine",
+    "detail": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Conditional laws of the standard disintegration."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "Typed.law (TypedLaw.lean:125)",
+     "Typed.tail (TypedLaw.lean:129)",
+     "Typed.scaledTail (TailConvolution.lean:12)"
+    ]
+   }
+  },
+  {
+   "id": "P21",
+   "kind": "definition",
+   "name": "Parameters alpha, b, A=b alpha, A'=b(chi+alpha)/2, h_b=bh-m log(b+1), gamma=h_b-dA>0, rho_n=2^{-ceil(An)}, E_n={sigma_n<=A'n}, a_n=ceil(An)-1",
+   "file_line": "sections/types.tex:40-60, 126-132",
+   "statement": "Fixed constants.",
+   "cited_or_new": {
+    "status": "new (plumbing)",
+    "bib_key": "",
+    "cue": "These parameters remain fixed throughout the rest of the proof"
+   },
+   "uses_items": [
+    "P19"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Plumbing."
+   },
+   "analytic_check": {
+    "verdict": "plumbing",
+    "detail": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Parameter choices."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "Typed.fineScale, bandStart (RetainedLoss.lean:29-30)",
+     "exists_slightly_larger_depth (Main.lean:11)",
+     "exists_nat_log_small (PairBands.lean:11)"
+    ]
+   }
+  },
+  {
+   "id": "P22",
+   "kind": "lemma",
+   "name": "Lemma 4.1 Entropy retained by types: E H(nu_{omega,n}) = H(G_{bn}|Omega_n) >= n h_b; E H^0_s(nu_{omega,n}) <= H^0_s(mu)+1; E[1_{E_n}(H - H^0_{rho_n})(nu_{omega,n})] >= eps n",
+   "file_line": "sections/types.tex:134-235",
+   "statement": "Under the dimension-loss hypothesis, conditional translation laws carry linear entropy invisible at scale 2^{-An}.",
+   "cited_or_new": {
+    "status": "new (adaptation)",
+    "bib_key": "GalicerSagliettiShmerkinYavicoli2016; RapaportVarju2024 (Thm A.1); BaranyVerma2026",
+    "cue": "Conditioning costs only the entropy of the counts, so the map-entropy rate gives a lower bound for the remaining translation entropy even when addresses collide"
+   },
+   "uses_items": [
+    "P03",
+    "P11",
+    "P19",
+    "P20",
+    "P21"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Where h_RW (not H(p)) enters; source of the linear deficit. Lean sub-DAG 20%."
+   },
+   "analytic_check": {
+    "verdict": "not a subterm of goal",
+    "detail": "Combination of GSSY types with the map-entropy rate; RV Thm A.1 and Barany-Verma handle collisions under arithmetic/separation hypotheses."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Close neighbours: Hochman's entropy of the full affine map (Thm 1.4), RV Appendix A, Barany-Verma Thm 3.5. The observation that types fix slope so translation entropy = conditional map entropy is a short step."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "Typed.retained_loss_linear (RetainedLoss.lean:100)",
+     "Typed.expected_loss_linear (RetainedLoss.lean:43)",
+     "Typed.expected_entropy_lower (EntropyBudget.lean:12)",
+     "System.blocks_entropyRate_lower (BlockWords.lean:99)",
+     "Typed.entropyLoss (EntropyBudget.lean:36)"
+    ]
+   }
+  },
+  {
+   "id": "P23",
+   "kind": "claim",
+   "name": "Digit-count sumset bound: |k D_b| <= (k+1)^{m^b}, hence log|kS| <= n m^b log(k+1)",
+   "file_line": "sections/types.tex:260-276",
+   "statement": "A k-fold sum of block translations is determined by digit counts; fixed types make this uniform in omega and sign-independent.",
+   "cited_or_new": {
+    "status": "new (elementary)",
+    "bib_key": "",
+    "cue": "A sum of $k$ elements of $\\mathcal D_b$ is specified by the number of occurrences of each digit"
+   },
+   "uses_items": [
+    "P19",
+    "P20"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Makes the sumset term in P15 o(k) per block, so k large converts deficit into capacity."
+   },
+   "analytic_check": {
+    "verdict": "analytic-trivial",
+    "detail": "Standard multiset counting."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Trivial counting, but essential pairing with P15."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "DigitSumset.counts/sumset/card_sumset_le (DigitSumset.lean:13-41)",
+     "Typed.support_digit_representation (TypedSumset.lean:35)",
+     "Typed.sumset_log_bound (TypedSumset.lean:54)"
+    ]
+   }
+  },
+  {
+   "id": "P24",
+   "kind": "proposition",
+   "name": "Proposition 4.2 Pair mass in finite scale bands: E[1_{E_n} sum_{ell=a_n}^{B_n} c_ell(nu_{omega,n})] >= c n with deterministic finite B_n (no growth bound)",
+   "file_line": "sections/types.tex:244-312",
+   "statement": "P15 + P22 + P23 with k chosen after b, eps; B_n = max band index among finitely many laws.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "",
+    "cue": "no growth bound on $B_n$ is asserted"
+   },
+   "uses_items": [
+    "P15",
+    "P22",
+    "P23"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Output of Section 4; input to the window count."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "detail": ""
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Assembly of P15/P22/P23; the novelty lives in P15."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "Typed.pair_bands_of_retained_loss (PairBands.lean:83)",
+     "Typed.exists_band_pair_bound (PairBands.lean:46)",
+     "Typed.pairBudget (PairBands.lean:30)",
+     "Typed.fineScale_band_condition (PairBands.lean:36)"
+    ]
+   }
+  },
+  {
+   "id": "P25",
+   "kind": "definition",
+   "name": "Suffix laws tau_j = D_{R_j} mu_{theta^j omega} with tau_j = (D_{R_j} nu_{theta^j omega,n}) * tau_{j+n}",
+   "file_line": "sections/windows.tex:20-31",
+   "statement": "Pathwise convolution identity.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": "",
+    "cue": "Define the suffix laws, including their contraction from the initial scale"
+   },
+   "uses_items": [
+    "P20"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Allows telescoping."
+   },
+   "analytic_check": {
+    "verdict": "routine",
+    "detail": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "Typed.suffixLaw (SuffixLaw.lean:63)",
+     "Typed.suffixLaw_convolution (SuffixLaw.lean:74)",
+     "Typed.scaled_tail_convolution (TailConvolution.lean:39)"
+    ]
+   }
+  },
+  {
+   "id": "P26",
+   "kind": "definition",
+   "name": "Window entropy g_j = G_{r/M, Mr}(tau_j) at target depth L (r=2^-L), with 0<=g_j<=2 log M and g_j nonincreasing in j",
+   "file_line": "sections/windows.tex:33-47",
+   "statement": "A monotone sequence in the block index at each physical scale; its decrements are the per-window gains.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "",
+    "cue": "Here and below $g_j$ depends on $L$ and $\\omega$"
+   },
+   "uses_items": [
+    "P10",
+    "P25"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The monovariant whose total drop is <= 2 log M at each scale."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic but standard form",
+    "detail": "Multiscale entropy of partial convolutions (Hochman/BV/Varju style)."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Window entropy of partial convolution products is a standard object in this literature."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "MeasureEntropy.window (PairGain.lean:28)",
+     "Typed.retainedDrop (WindowGain.lean:17)"
+    ]
+   }
+  },
+  {
+   "id": "P27",
+   "kind": "lemma",
+   "name": "Lemma 5.1 Conditional pair gain: E[g_j - g_{j+n} | F_{j+n}] >= (delta/2) c_{L-ceil(sigma_j)}(nu_{theta^j omega,n})",
+   "file_line": "sections/windows.tex:57-127",
+   "statement": "Pairs from the window, rescaled to distance in [r,4r), each gain Delta_v(tau_{j+n})-5/M; averaging the unobserved future types restores D_{R_{j+n}}mu by Jensen (Delta convex), where nonsaturation gives delta.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "",
+    "cue": "The unobserved future types then average its tail law back to a scaled copy of $\\mu$"
+   },
+   "uses_items": [
+    "P12",
+    "P13",
+    "P14",
+    "P25",
+    "P26"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Converts capacity into entropy decrements; uses P12 at arbitrary scales. Lean sub-DAG 37%."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "detail": "Jensen over future randomness for a convex functional; nearest: averaging the environment in random/typed models (GSSY, SSS)."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Natural once P12 and P13 are in place; the Jensen-over-future step is a standard randomization move."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "Typed.conditional_gain (ScaleGain.lean:82)",
+     "Typed.expected_retained_gain (WindowGain.lean:67)",
+     "Typed.scaled_band_distance (ScaleGain.lean:11)",
+     "MeasureEntropy.deficit_mixture (PairGain.lean:99)"
+    ]
+   }
+  },
+  {
+   "id": "P28",
+   "kind": "construction",
+   "name": "Separated band selection: choose n_1<...<n_q successively with a_{n_i}-A'n_i-1 > B_{n_h} (h<i), candidate starts J_i (multiples of n_i), retention events A_{i,j,L}; then sum over targets L=1..T",
+   "file_line": "sections/windows.tex:129-163, 241-285",
+   "statement": "Adaptive choice of block lengths after earlier (uncontrolled) band endpoints are known; every band contributes delta c T/(4D) while each physical scale's total drop is <= 2 log M; so q <= 8D log M/(delta c), contradiction.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "",
+    "cue": "We choose successive block lengths only after the preceding endpoints are known"
+   },
+   "uses_items": [
+    "P24",
+    "P26",
+    "P27",
+    "P29"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The step that removes any need for quantitative separation (B_n arbitrary). Conceptually decisive though the Lean sub-DAG of select_separated_bands is only 3%; the full count (count_pair_budget_le) is 46%."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "detail": "Not in goal or L. Nearest: Hochman's multiscale entropy averaging over a fixed window of scales; Breuillard-Varju/Varju telescoping of entropy across scales."
+   },
+   "provisional_N": {
+    "grade": "N3 (candidate; borderline N2)",
+    "justification": "No precedent found for a scale-free counting that pits q adaptively separated relative-depth bands against a telescoping bound at each physical scale. Pieces (telescoping, diagonal selection) are standard."
+   },
+   "provisional_F": "F4",
+   "lean": {
+    "decls": [
+     "Typed.select_separated_bands (BandSelection.lean:34)",
+     "exists_large_band_start (BandSelection.lean:10)",
+     "exists_common_horizon (BandSelection.lean:80)",
+     "Windows.Retained (WindowCount.lean:8)",
+     "Windows.sum_target_shift (WindowCount.lean:52)",
+     "Typed.count_pair_budget_le (GlobalCount.lean:34)",
+     "Typed.no_strict_entropy_gap (EntropyGap.lean:12)"
+    ],
+    "route_difference": "Lean uses a common horizon H divisible by every n_i (K_i=H/n_i windows each) and T=2DH, instead of an even T with floor counts."
+   }
+  },
+  {
+   "id": "P29",
+   "kind": "lemma",
+   "name": "Lemma 5.2 Disjoint retained windows: at each target L, retained windows from all bands are pairwise disjoint, so total gain <= 2 log M",
+   "file_line": "sections/windows.tex:171-213",
+   "statement": "x_j=L-ceil(sigma_j) is nonincreasing; a finer-band window ends before any coarser-band window starts.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "",
+    "cue": "A retained window in a finer band cannot decrease this depth far enough to reach any coarser band"
+   },
+   "uses_items": [
+    "P26",
+    "P28"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Upper half of the contradiction."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic, elementary",
+    "detail": "Monotonicity argument."
+   },
+   "provisional_N": {
+    "grade": "N2 (part of P28)",
+    "justification": "Graded with P28."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "Windows.finer_window_before (Windows.lean:17)",
+     "Windows.multiples_disjoint (Windows.lean:31)",
+     "Windows.sum_disjoint_drops_le (Windows.lean:45)",
+     "Windows.retained_sum_le (WindowCount.lean:11)"
+    ]
+   }
+  },
+  {
+   "id": "P30",
+   "kind": "theorem",
+   "name": "Completion of proof: no dimension loss (d<1, d chi<h) is possible",
+   "file_line": "sections/windows.tex:287-296",
+   "statement": "Upper bound plus contradiction gives Theorem 1.1.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "",
+    "cue": "Completion of the proof of Theorem"
+   },
+   "uses_items": [
+    "P08",
+    "P24",
+    "P28",
+    "P29"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Top of the lower-bound branch (Lean sub-DAG 73%)."
+   },
+   "analytic_check": {
+    "verdict": "goal-level",
+    "detail": ""
+   },
+   "provisional_N": {
+    "grade": "n/a",
+    "justification": ""
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "Typed.no_strict_entropy_gap (EntropyGap.lean:12)",
+     "System.exponent_lower_bound (Main.lean:25)"
+    ]
+   }
+  },
+  {
+   "id": "P31",
+   "kind": "lemma",
+   "name": "Lemma 6.1 Overlap lengths: an exact overlap of arbitrary lengths yields one of equal lengths",
+   "file_line": "sections/corollaries.tex:9-25",
+   "statement": "phi_{uv}=phi_{vu}.",
+   "cited_or_new": {
+    "status": "known, re-proved",
+    "bib_key": "Hochman2014",
+    "cue": "The following observation also appears in \\cite[footnote~3]{Hochman2014}"
+   },
+   "uses_items": [
+    "P02"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Reconciles conventions for the corollaries."
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "detail": "Hochman 2014 fn 3."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Known."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "Extensions.overlap_lengths (NoOverlaps.lean:85)",
+     "Extensions.noExactOverlaps_sameLength (NoOverlaps.lean:106)",
+     "unweighted_overlap_lengths (UnweightedAttractor.lean:72)"
+    ]
+   }
+  },
+  {
+   "id": "P32",
+   "kind": "corollary",
+   "name": "Corollary 6.2 No exact overlaps: dim mu = min{1,H(p)/chi} (the exact overlaps conjecture for measures on R)",
+   "file_line": "sections/corollaries.tex:27-40",
+   "statement": "H(G_n)=nH(p) without exact overlaps.",
+   "cited_or_new": {
+    "status": "new consequence",
+    "bib_key": "",
+    "cue": "Apply Theorem~\\ref{thm:main}"
+   },
+   "uses_items": [
+    "P07",
+    "P31"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Headline consequence (Simon/Hochman exact overlaps conjecture)."
+   },
+   "analytic_check": {
+    "verdict": "goal-level",
+    "detail": ""
+   },
+   "provisional_N": {
+    "grade": "n/a",
+    "justification": ""
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "Extensions.no_exact_overlaps_dimension (NoOverlaps.lean:200)",
+     "Extensions.entropyRate_eq_symbolEntropy (NoOverlaps.lean:183)"
+    ]
+   }
+  },
+  {
+   "id": "P33",
+   "kind": "definition",
+   "name": "Attractor K_Phi (set of coding limits) and similarity dimension s_* (sum |r_i|^s=1)",
+   "file_line": "sections/corollaries.tex:42-50",
+   "statement": "",
+   "cited_or_new": {
+    "status": "classical",
+    "bib_key": "Hutchinson1981; Moran1946",
+    "cue": "Its similarity dimension $s_*$ is the unique number"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Corollary statement."
+   },
+   "analytic_check": {
+    "verdict": "analytic (occurs in cor_set goal)",
+    "detail": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "CorSetReference.codingPoint/attractor/word (AttractorFormula.lean:15-25)",
+     "Extensions.attractor (Attractor.lean:15)",
+     "Extensions.similarityDimension (AttractorDimension.lean:48)",
+     "Extensions.unweightedAttractor (UnweightedAttractor.lean:31)"
+    ]
+   }
+  },
+  {
+   "id": "P34",
+   "kind": "corollary",
+   "name": "Corollary 6.3 Attractor: no exact overlaps implies dim_H K = min{1,s_*}",
+   "file_line": "sections/corollaries.tex:52-74",
+   "statement": "Weights p_i=|r_i|^{s_*} and the cylinder covering bound.",
+   "cited_or_new": {
+    "status": "new consequence",
+    "bib_key": "Simon1996",
+    "cue": "absence of exact overlaps implies"
+   },
+   "uses_items": [
+    "P32",
+    "P33"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Set version of the exact overlaps conjecture (Simon)."
+   },
+   "analytic_check": {
+    "verdict": "goal-level",
+    "detail": ""
+   },
+   "provisional_N": {
+    "grade": "n/a",
+    "justification": ""
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "OAI.CorSetReference.cor_set (AttractorFormula.lean:32)",
+     "unweighted_no_exact_overlaps_attractor_dimension_of_root (UnweightedAttractor.lean:50)",
+     "no_exact_overlaps_attractor_dimension (AttractorDimension.lean:145)",
+     "Extensions.uniformSystem (UnweightedAttractor.lean:16)"
+    ]
+   }
+  },
+  {
+   "id": "P35",
+   "kind": "corollary",
+   "name": "Corollaries 6.4-6.5 Homogeneous systems and the three-map family {lambda x, lambda x+1, lambda x+t}",
+   "file_line": "sections/corollaries.tex:76-106",
+   "statement": "Specializations of P32.",
+   "cited_or_new": {
+    "status": "new consequence",
+    "bib_key": "RapaportVarju2024",
+    "cue": "Apply Corollary"
+   },
+   "uses_items": [
+    "P32"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Answers the Rapaport-Varju three-map problem in full."
+   },
+   "analytic_check": {
+    "verdict": "goal-level",
+    "detail": ""
+   },
+   "provisional_N": {
+    "grade": "n/a",
+    "justification": ""
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "Extensions.homogeneous_dimension_direct (HomogeneousDimension.lean:97)",
+     "Extensions.homogeneous_exponent_lower_direct (HomogeneousDimension.lean:75)",
+     "Extensions.threeMapSystem (NoOverlaps.lean:240)"
+    ],
+    "note": "homogeneous_dimension_direct re-runs the gap argument with a trivial tag (one type) instead of going through Cor 6.2."
+   }
+  },
+  {
+   "id": "L01",
+   "kind": "lean-only",
+   "name": "FiniteEntropy / FiniteDistribution / Conditioning / ProductLaw: finite Shannon entropy, conditional entropy, observable entropy, JS divergence, TV, product laws",
+   "file_line": "lean/OAI/MeasureTheory/SelfSimilar/FiniteEntropy.lean:13-1134 (+FiniteDistribution, Conditioning, ProductLaw)",
+   "statement": "In-house finite information theory (Mathlib at d13f23b has limited Shannon-entropy API).",
+   "cited_or_new": {
+    "status": "standard, re-built",
+    "bib_key": "",
+    "cue": ""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high (plumbing)",
+    "reason": "FiniteEntropy.mass is depended on by 37% of the DAG; pure infrastructure."
+   },
+   "analytic_check": {
+    "verdict": "in L up to renaming",
+    "detail": "Shannon entropy / chain rule; Mathlib has negMulLog and some entropy API."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Infrastructure."
+   },
+   "provisional_F": null,
+   "lean": null
+  },
+  {
+   "id": "L02",
+   "kind": "lean-only",
+   "name": "Typed tag abstraction (tag : alpha -> beta, equal tags => equal ratios)",
+   "file_line": "lean/OAI/MeasureTheory/SelfSimilar/EntropyGap.lean:12-19",
+   "statement": "Generalizes block types to any slope-fixing tag.",
+   "cited_or_new": {
+    "status": "new (formalization device)",
+    "bib_key": "",
+    "cue": ""
+   },
+   "uses_items": [
+    "P19"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Lets one proof serve the general theorem (word types of b-blocks) and the homogeneous corollary (trivial tag)."
+   },
+   "analytic_check": {
+    "verdict": "abbreviation",
+    "detail": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Formalization generalization."
+   },
+   "provisional_F": null,
+   "lean": null
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Exact dimensionality of self-similar (conformal) measures",
+   "bib_key": "FengHu2009",
+   "locator": "Theorem 2.8",
+   "field": "Ergodic theory / dimension theory",
+   "used_at": "introduction.tex:54-76; Lemma 2.2, 2.3, 4.1",
+   "status": "cited, not re-proved in paper; re-proved in Lean",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Averaged-entropy calculus (smoothing, nested grids)",
+   "bib_key": "VarjuAbsolute2019",
+   "locator": "Sec 2.2, Lemmas 5, 6, 10",
+   "field": "Entropy methods / Bernoulli convolutions",
+   "used_at": "entropy.tex:29-96",
+   "status": "cited, re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Fair-pair entropy comparison",
+   "bib_key": "VarjuAbsolute2019",
+   "locator": "Prop 20, Lemma 22",
+   "field": "Entropy methods",
+   "used_at": "entropy.tex:245-297",
+   "status": "adapted, re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Scale-local decomposition into fair two-point submeasures",
+   "bib_key": "VarjuAbsolute2019",
+   "locator": "Prop 21",
+   "field": "Entropy methods",
+   "used_at": "pairs.tex:8-11",
+   "status": "named predecessor, not used",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Nonsaturation of Bernoulli convolutions",
+   "bib_key": "BreuillardVarju2019",
+   "locator": "Lemma 13",
+   "field": "Bernoulli convolutions",
+   "used_at": "entropy.tex:140-243",
+   "status": "adapted (stopping time for unequal signed ratios), re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Block-type disintegration",
+   "bib_key": "GalicerSagliettiShmerkinYavicoli2016; SagliettiShmerkinSolomyak2018; KaenmakiOrponen2023",
+   "locator": "Sec 6.4 Lemma 6.6; Lemma 6.2; Sec 2.2 Prop 2.8",
+   "field": "Random fractals / self-similar measures",
+   "used_at": "types.tex:22-36",
+   "status": "cited, re-proved in the needed form",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Strong law / law of large numbers",
+   "bib_key": null,
+   "locator": "standard",
+   "field": "Probability",
+   "used_at": "introduction.tex:235-238; types.tex:228",
+   "status": "standard, invoked",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Existence/uniqueness of the invariant measure",
+   "bib_key": "Hutchinson1981",
+   "locator": "Theorem 4.4(1)",
+   "field": "Fractal geometry",
+   "used_at": "introduction.tex:9-13, 106-107",
+   "status": "cited; Lean re-proves uniqueness",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Overlap-length reconciliation",
+   "bib_key": "Hochman2014",
+   "locator": "footnote 3",
+   "field": "Fractal geometry",
+   "used_at": "corollaries.tex:4-25",
+   "status": "re-proved",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Translation averaging",
+   "bib_key": "Wang2011",
+   "locator": "Sec 4.1",
+   "field": "Homogeneous dynamics",
+   "used_at": "introduction.tex:175-176",
+   "status": "technique credit only",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Inverse theorem for entropy / exponential-separation formula",
+   "bib_key": "Hochman2014",
+   "locator": "Thm 1.1, 1.4",
+   "field": "Fractal geometry / additive combinatorics",
+   "used_at": "introduction.tex:132-140",
+   "status": "background only (not used)",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Super-exponential condensation examples",
+   "bib_key": "Baker2021; BaranyKaenmaki2021",
+   "locator": "Thm 1.3; Thm 2.1",
+   "field": "Fractal geometry",
+   "used_at": "introduction.tex:164-171",
+   "status": "background (motivates separation-free design)",
+   "essential_for_headline": false
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Setup and easy direction: h_RW subadditive; exact dimensionality gives d; regrouping into n-block map alphabets and a covering argument give d <= min{1,h/chi}. Remains: rule out d<1, d chi<h.",
+   "items": [
+    "P01",
+    "P03",
+    "P04",
+    "P05",
+    "P06",
+    "P08"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Entropy calculus between scales; entropy-dimension bound; uniform nonsaturation delta=inf_v Delta_v(mu)>0 (stopped self-similarity); two-point gain >= Delta_v - s/v - v/t.",
+   "items": [
+    "P09",
+    "P10",
+    "P11",
+    "P12",
+    "P13"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "Finite-law pair bound: for any finite law, k x (exact minus scale-rho entropy) <= log|kF| + C_k x (pair capacity at all finer bands), independent of minimal separation; proof by randomized nested partitions where revealing the k-fold sum makes refinement cost linear in mean deviations.",
+   "items": [
+    "P14",
+    "P15",
+    "P16",
+    "P17",
+    "P18"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "Block types fix signed slopes, so conditional translation entropy equals conditional map entropy >= n(bh - m log(b+1)); with dimension loss this exceeds scale-2^{-An} entropy by eps n. Digit-count sumsets are polynomial in k, so the pair bound yields expected pair capacity >= c n in a finite band [a_n, B_n] with B_n uncontrolled.",
+   "items": [
+    "P19",
+    "P20",
+    "P21",
+    "P22",
+    "P23",
+    "P24"
+   ]
+  },
+  {
+   "step": 5,
+   "claim": "Suffix laws and window entropy g_j at each target depth L; each fair pair of the window gains (delta/2) after averaging the unobserved future types (Jensen + nonsaturation).",
+   "items": [
+    "P25",
+    "P26",
+    "P27"
+   ]
+  },
+  {
+   "step": 6,
+   "claim": "Choose q bands with separated relative depths adaptively; at each physical scale retained windows are disjoint so gains telescope to <= 2 log M; summing over T targets each band contributes delta c T/(4D); q is bounded - contradiction.",
+   "items": [
+    "P28",
+    "P29",
+    "P30"
+   ]
+  },
+  {
+   "step": 7,
+   "claim": "Corollaries: overlap lengths, no exact overlaps (H(G_n)=nH(p)), attractor dimension via weights |r_i|^{s*}, homogeneous and three-map cases.",
+   "items": [
+    "P31",
+    "P32",
+    "P33",
+    "P34",
+    "P35"
+   ]
+  }
+ ],
+ "eureka_candidates_ranked": [
+  {
+   "rank": 1,
+   "item": "P15 (+P14 pair capacity, P17 sum-observation trick)",
+   "provisional_N": "N3 candidate (borderline N2)",
+   "provisional_F": "F3 (with P14 as F1)",
+   "for": [
+    "Separation-free: converts entropy hidden below scale rho into fair-pair mass at arbitrarily fine bands with a constant independent of the smallest gap - exactly what Baker/Barany-Kaenmaki examples showed was needed and what Hochman's fixed-scale inverse theorem cannot give.",
+    "Non-analytic: neither pair capacity nor the sumset-plus-capacity inequality is a subterm of the goal, of Mathlib, or of the bibliography.",
+    "Non-obvious device: conditioning on the k-fold sum Y makes the per-level refinement entropy linear in exceptional probabilities (no t log 1/t), so costs sum geometrically over all scales; the sumset term is then made negligible by the trivial digit-count bound P23.",
+    "Load-bearing: Lean sub-DAG of pair_bound is 19% of declarations / 22% of tokens of the main-theorem DAG; without it the argument needs quantitative separation."
+   ],
+   "against": [
+    "The paper names Varju 2019 Prop. 21 as a predecessor; fair-pair decompositions at a scale are established technique.",
+    "Entropy-sumset interplay (Plunnecke-type, Tao's entropic sumset inequalities) is classical; random grids are standard.",
+    "One could view it as a quantitative 'entropy of finite laws below a scale is witnessed by close pairs' lemma that an expert could formulate once the goal is separation-free."
+   ],
+   "literature_check": "Web search (Oct 2026) found no statement bounding fine-scale entropy deficit by a sumset term plus fair-pair capacity; nearest neighbours Varju JAMS 2019 Props 20-21 and Hochman 2014 inverse theorem. Varju's 2025/26 survey still lists the conjecture as wide open."
+  },
+  {
+   "rank": 2,
+   "item": "P28 (+P29) scale-free separated-band counting with adaptive block lengths",
+   "provisional_N": "N3 candidate (borderline N2)",
+   "provisional_F": "F4",
+   "for": [
+    "Removes the last need for effective separation: band endpoints B_n can be arbitrarily large because each n_i is chosen after the previous B_{n_h} are known, and a band's contribution delta c T/(4D) is independent of n_i.",
+    "Monovariant: at each physical scale g_j is nonincreasing and retained windows from different bands are disjoint, so all gains share a 2 log M budget; q bands force q <= 8 D log M/(delta c).",
+    "Not a subterm of the goal or L."
+   ],
+   "against": [
+    "Telescoping of multiscale entropy and diagonal parameter choice are standard in Hochman/BV/Varju arguments.",
+    "Small Lean footprint (select_separated_bands 3% sub-DAG; full count 46%).",
+    "Pivot distance from P24 is short once one asks 'how to use bands with no bound on their endpoints'."
+   ],
+   "literature_check": "No precedent found for this counting in the self-similar literature; nearest are Hochman's averaged multiscale entropy and Breuillard-Varju's scale-by-scale entropy increments."
+  },
+  {
+   "rank": 3,
+   "item": "P22 map-entropy retained by block types (types fix slope, so translation determines map)",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "This is where h_RW enters and exact overlaps are absorbed with no arithmetic assumption."
+   ],
+   "against": [
+    "GSSY types + Hochman's full-affine-map entropy (Thm 1.4) + RV Thm A.1 / Barany-Verma Thm 3.5 make it a short adaptation."
+   ],
+   "literature_check": "Named precedents in the paper."
+  },
+  {
+   "rank": 4,
+   "item": "P12 uniform nonsaturation for unequal signed ratios",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Makes every fine-scale pair worth delta, the reason super-exponentially fine pairs still count."
+   ],
+   "against": [
+    "Breuillard-Varju Lemma 13 is the same statement for Bernoulli convolutions; the stopping-time extension is routine."
+   ],
+   "literature_check": "Named precedent."
+  },
+  {
+   "rank": 5,
+   "item": "P27 conditional pair gain via Jensen over unobserved future types",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Lets a conditional tail (which need not be nonsaturated) inherit nonsaturation from mu by averaging."
+   ],
+   "against": [
+    "Convexity + averaging the environment is a standard randomization move."
+   ],
+   "literature_check": "Similar averaging over environments in GSSY/SSS random-measure arguments."
+  }
+ ],
+ "correctness_audit": {
+  "verdict": "No gap found on a line-by-line reading of all six sections (~1,500 lines of LaTeX), and the Lean formalization (64 files, 12,093 lines, 0 sorry/axiom/native_decide) proves exactly the comparator statements, which match the paper. This is an extraordinary claim (resolves a conjecture Varju's survey calls 'wide open', with a short proof avoiding inverse theorems); its strongest support is the Lean, which we could not compile.",
+  "checked": [
+   "Lemma 2.3: TV bound e_v <= sqrt(2 ln2 Delta_v) from binary-entropy concavity; common-density argument gives G_{v,Kv}->log K; stopped self-similarity plus integer-ratio concavity gives G_{s,Ks} >= G_{v,Kv}-C_* for all s<v; telescoping contradicts Lemma 2.2. Correct.",
+   "Lemma 2.4: D_a = I(J;Z_a|U_a); D_s >= D_v - s/v (boundary of v-grid in an s-cell with probability s/v); D_t <= v/t. Correct.",
+   "Lemma 3.2: chain H(X|C_0) <= log|kF| + sum_h H(C_{h+1}|C_h,Y); on E^c cap B^c children equal mean children; h2(q)<=3sqrt q<=3t; P(B)<=t; cut density 20/rho_h, union over <=7k cuts gives 1120k^2 u/rho_h; constants 9k*k*1120k^2=10080k^4, x2 for band bound, x8/3 geometric sum -> 53760k^4 <= 60000k^4. Child-length bounds [0.55,1.45]rho_{h+1} check. Correct.",
+   "Lemma 4.1: E H(nu) = H(G_{bn}|Omega_n) >= bnh - nm log(b+1); E H^0_s(nu) <= H^0_s(mu)+1 by concavity over translates and types. Correct.",
+   "Prop 4.2: log|kS| <= n m^b log(k+1); choosing k with m^b log(k+1) < k eps/2 gives c = k eps/(2C_k), independent of n. Correct.",
+   "Lemma 5.1: pairs scale to v in [r,4r); 5/M loss; E[tau_{j+n}|F_{j+n}] = D_{R_{j+n}} mu; Delta_v convex (G_{v,2v} concave, integer ratio); residual mass handled by convolution monotonicity (ratio M^2). Correct.",
+   "Lemma 5.2: x_j nonincreasing; x_{j+n_i} >= a_{n_i}-A'n_i-1 > B_{n_h} >= x_k forces k > j+n_i. Correct.",
+   "Final count: each j in J_i hits each ell in [a,B] for exactly one L because ceil(sigma_j) <= T/2 and B < T/2; stationarity under theta^j; |J_i| n_i >= T/(2D). Correct.",
+   "Lean: no_strict_entropy_gap (EntropyGap.lean:12) follows exactly this order (nonsaturation -> retained loss -> pair bands -> separated bands -> common horizon -> count_pair_budget_le -> bound on q)."
+  ],
+  "consistency_checks_passed": [
+   "Consistent with known dimension drops: Pisot Bernoulli convolutions have h_RW < log 2 (Garsia), so the formula predicts the known drop.",
+   "Does not overreach to R^d: the argument uses d<1 only through nonsaturation, which fails for measures saturating a subspace - matching the known need for irreducibility in Hochman's R^d theorem.",
+   "Consistent with Baker / Barany-Kaenmaki super-exponential condensation: no quantitative separation is used; band endpoints are never bounded.",
+   "Entropy bookkeeping: each block has entropy <= b log m, but the contradiction is about multiscale gains at a fixed physical scale (budget 2 log M), not about per-block entropy, so the q-fold accumulation is not a double count."
+  ],
+  "residual_concerns": [
+   "Extraordinary claim; unreviewed. Lean compilation and comparator pass were not re-run here.",
+   "enable_nanoda=false in both comparator configs (no second kernel check) - standard across the release.",
+   "The paper relies on Feng-Hu for exact dimensionality and Lemma 2.2's measurability construction is sketched; Lean supplies a full in-house proof, removing this dependency.",
+   "Ineffective: no rates or effective bounds; the result gives dimension only, not absolute continuity (as the paper states)."
+  ]
+ },
+ "lean_summary": {
+  "n_files": 64,
+  "n_lines": 12093,
+  "n_decls": 890,
+  "kind_counts": {
+   "theorem": 712,
+   "def": 141,
+   "instance": 31,
+   "abbrev": 3,
+   "structure": 3
+  },
+  "proof_dag_decls_main": 749,
+  "subDAG_shares_of_main_theorem (decls / tokens)": {
+   "Typed.no_strict_entropy_gap": "0.73 / 0.76",
+   "Typed.count_pair_budget_le": "0.46 / 0.41",
+   "Typed.expected_retained_gain": "0.41 / 0.35",
+   "Typed.conditional_gain": "0.37 / 0.33",
+   "System.exponent_le_rate (upper bound)": "0.28 / 0.22",
+   "System.uniform_nonsaturation_of_entropy_bound": "0.27 / 0.26",
+   "Typed.pair_bands_of_retained_loss": "0.24 / 0.25",
+   "System.selfSimilar_dimension (exact dim.)": "0.24 / 0.20",
+   "MeasureEntropy.two_point_gain": "0.22 / 0.22",
+   "Typed.retained_loss_linear": "0.20 / 0.17",
+   "FairPairs.pair_bound": "0.19 / 0.22",
+   "FairPairs.exists_fine_partition": "0.16 / 0.19",
+   "Typed.sumset_log_bound": "0.04 / 0.02",
+   "Typed.select_separated_bands": "0.03 / 0.02"
+  },
+  "extractor_note": "data/items/148_lean.json ranks FiniteEntropy.mass (0.37), System (0.34), FiniteEntropy.entropy (0.27) highest by dependents - infrastructure, as warned. Sub-DAG (closure) share is a better load-bearing proxy for lemmas here.",
+  "imports": "Only `import Mathlib`; no external packages or other OAI dirs."
+ },
+ "extraction_friction": [
+  "Load-bearing objects defined in display math, not environments: averaged entropy calH_s, G_{s,t}, Delta_s (entropy.tex:15-24), block types and environment (types.tex:62-103), conditional laws (types.tex:105-121), suffix laws tau_j and window entropy g_j (windows.tex:20-47), retention events (windows.tex:155-160). Only 'exact overlap' is an \\emph definition.",
+  "The key technical lemma inside Lemma 3.2 (one refinement after observing the sum) is an unnumbered \\paragraph; the band selection (windows.tex:129-163) and the final count (241-285) are unnumbered subsections.",
+  "Lean namespaces (EntropyRateDimension, Typed, FairPairs, CorSetReference, ErgodicAux) do not encode the family ID; three comparator targets across two challenge files, with corollaries in DimensionCorollaries.lean that only re-imports.",
+  "The extractor's dependents ranking puts infrastructure on top; closure (sub-DAG) share identifies the mathematical lemmas.",
+  "Lean re-proves the cited Feng-Hu theorem (~1,700 lines: ErgodicAverages, TriangularAverages, BallRatios, BallIntegrability, BallLimits, CodingIntegrals, RadiusGrowth, LocalMass, MassDimension, RadialLimit, ExactDimension) - 'cited' in the paper but 'formalized' in Lean; the field split must record both.",
+  "Lean route differs in the pair bound (shifted grids + good-shift existence vs perturbed cuts) and window count (common horizon), so name-based joins need docstring/statement matching."
+ ]
+}

@@ -1,0 +1,2201 @@
+{
+ "family": "047",
+ "title": "Zariski cancellation and affine fibrations over the complex numbers",
+ "manuscript_title": "An explicit failure of complex affine-space cancellation (OpenAI, September 23, 2026)",
+ "manuscript_dir": "data/raw/openai-math/preprints/An-explicit-failure-of-complex-affine-space-cancellation-September-23-2026",
+ "source_root": "data/raw/openai-math/preprints/An-explicit-failure-of-complex-affine-space-cancellation-September-23-2026/build",
+ "tex_files_read": [
+  "main.tex",
+  "preamble.tex",
+  "sections/01-introduction.tex",
+  "sections/02-construction.tex",
+  "sections/03-degeneration.tex",
+  "sections/04-bundle.tex",
+  "sections/05-reduction.tex",
+  "sections/06-rigidity.tex",
+  "sections/07-affine-fibrations.tex",
+  "references.tex"
+ ],
+ "commit": "fd4aeeb",
+ "analyst_role": "family analyst (paper + Lean, text level; Lean not built). Algebraic identities of the paper re-verified with sympy.",
+ "base_library_L": "Mathlib d13f23b + references.tex of this manuscript (26 bibitems, no references.bib; thebibliography inline)",
+ "main_statement": {
+  "file_line": "sections/01-introduction.tex:48-70",
+  "latex": "Let $p,s,u,F,J$ be algebraically independent over $\\kk$, and set $P=\\kk[p,s,u,F,J]$, $x=s^2+u^3+p^2F$, $H=x^2F-(1+2sx)J-p^2J^2-pu$, $A=P/(H)$. \\begin{theorem}\\label{thm:main} The algebra $A$ in \\eqref{eq:example} is an integral complex algebra of dimension four. For an independent variable $w$, \\[ A[w]\\simeq\\kk\\poly5, \\qquad A\\not\\simeq\\kk\\poly4. \\] Consequently the Zariski cancellation problem over the complex numbers has a negative answer in dimension four. \\end{theorem}",
+  "paraphrase": "An explicit hypersurface X=Spec A in A^5_C, cut out by one polynomial H in p,s,u,F,J, is a 4-dimensional integral affine variety with X x A^1 ≅ A^5 but X not ≅ A^4. So Zariski cancellation fails over C in dimension 4 (first characteristic-zero counterexample in any dimension >= 3).",
+  "headline_corollaries": [
+   {
+    "file_line": "01-introduction.tex:90-110",
+    "paraphrase": "Cor stable-coordinate: H is a coordinate of P[w] but not of P; the Stable Coordinate Conjecture fails over C in ambient dimension 5 after one stabilization."
+   },
+   {
+    "file_line": "07-affine-fibrations.tex:8-29",
+    "paraphrase": "Cor affine-fibrations: p: X -> A^1 and (p,H): A^5 -> A^2 are smooth surjective A^3-fibrations (every residue-field fiber is A^3) that are not Zariski-locally trivial; Dolgachev-Weisfeiler fails in relative dimension 3 over A^1 and A^2."
+   }
+  ],
+  "lean_comparator": {
+   "challenge_file": "lean/ComparatorChallenges/ComplexCancellation.lean",
+   "config": {
+    "challenge_module": "ComparatorChallenges.ComplexCancellation",
+    "solution_module": "OAI.Algebra.AffineCancellation.Main",
+    "theorem_names": [
+     "OAI.ComplexCancellation.main"
+    ],
+    "definition_names": [],
+    "permitted_axioms": [
+     "propext",
+     "Quot.sound",
+     "Classical.choice"
+    ],
+    "enable_nanoda": false
+   },
+   "verbatim": "abbrev P := MvPolynomial (Fin 5) ℂ\ndef p : P := MvPolynomial.X 0\ndef s : P := MvPolynomial.X 1\ndef u : P := MvPolynomial.X 2\ndef F : P := MvPolynomial.X 3\ndef J : P := MvPolynomial.X 4\ndef x : P := s ^ 2 + u ^ 3 + p ^ 2 * F\ndef H : P := x ^ 2 * F - (1 + 2 * s * x) * J - p ^ 2 * J ^ 2 - p * u\nabbrev A := P ⧸ Ideal.span {H}\ndef MainStatement : Prop :=\n  Algebra.FiniteType ℂ A ∧ IsDomain A ∧ ringKrullDim A = 4 ∧\n  Nonempty (Polynomial A ≃ₐ[ℂ] MvPolynomial (Fin 5) ℂ) ∧\n  ¬ Nonempty (A ≃ₐ[ℂ] MvPolynomial (Fin 4) ℂ)\ntheorem main : MainStatement := by\n  sorry",
+   "solution_decl": "lean/OAI/Algebra/AffineCancellation/Main.lean:32 (main := ⟨finiteType,domain,dimension,stabilization,nonpolynomiality⟩)",
+   "challenge_defs_identical_to_library": "Challenge lines 9-23 are textually identical to OAI/Algebra/AffineCancellation/Model.lean:9-23.",
+   "match_check": "EXACT. Same polynomial (variable order p,s,u,F,J = X0..X4), same quotient, ℂ-algebra isomorphisms (≃ₐ[ℂ] = 'isomorphisms fix the complex scalars', 01:14-15), Krull dimension 4, domain, finite type. Polynomial A is the one-variable cylinder A[w]. Nothing weaker than Thm main.",
+   "formalized": [
+    "Thm main in full (all five conjuncts)."
+   ],
+   "claimed_not_formalized": [
+    "Cor stable-coordinate (SCC failure)",
+    "Cor affine-fibrations (Dolgachev-Weisfeiler failure)",
+    "smoothness of G and of the fibrations",
+    "the explicit coordinates Phi^-1(...) beyond their use in the iso"
+   ],
+   "docs": "lean/docs/047.md: 'The separate stable-coordinate and general line-bundle lifting consequences are not included.'",
+   "formalization_yaml": "entry present (formalization.yaml:252-254, 1105-1107)"
+  }
+ },
+ "trust_surface": {
+  "grep_scope": "lean/OAI/Algebra/AffineCancellation/*.lean (55 files, ~5000 lines) + challenge file",
+  "counts": {
+   "sorry": 0,
+   "axiom": 0,
+   "admit": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque": 0,
+   "partial def": 0,
+   "set_option": 0,
+   "#eval/macro/elab": 0,
+   "decide (kernel-checked)": 4,
+   "Classical.choose/choice (explicit)": 17,
+   "attribute [local instance]": 4,
+   "linear_combination": 34,
+   "omega": 51
+  },
+  "decide_uses": "4 trivial Nat literal side-conditions: (by decide : 2 ≠ 0), (2 ≤ 3), (3 ≠ 0) in PositiveInvariant.lean:64 and Rigidity.lean:42,56,58. No search.",
+  "classical_uses": "Classical.choose to define FactorDerivation.value (division of a derivation by a common factor), PolynomialModel.model (slice model) and QuotientGrading.decomposeMap; all standard noncomputable definitions, within permitted axioms.",
+  "custom_axioms": "none",
+  "only_sorry": "the comparator challenge stub itself (ComparatorChallenges/ComplexCancellation.lean:26), as intended",
+  "external_packages": "none; single `import Mathlib` (Model.lean:1); no other OAI dirs imported",
+  "verdict": "Clean. If the comparator run passed (not re-run here: Lean not installed), Thm main is machine-checked against an exactly matching statement."
+ },
+ "labels": {
+  "A": {
+   "label": "A2",
+   "secondary": {
+    "hard_direction_form": "A5 (non-polynomiality: ¬∃ C-algebra iso A ≅ C^[4]) is the hard conjunct; the existence side A[w] ≅ C^[5] is an explicit construction",
+    "explicit_rate": false
+   },
+   "evidence": {
+    "quote": "Consequently the Zariski cancellation problem over the complex numbers has a negative answer in dimension four.",
+    "file_line": "01-introduction.tex:68-69"
+   },
+   "confidence": "high",
+   "note": "Existence of a counterexample to a universal implication; the witness A is explicit (constructive). The witness is fixed, so no family parameter."
+  },
+  "B": {
+   "label": "B2",
+   "flags": {
+    "full_only_with_prior_results": false,
+    "full_only_with_prior_results_detail": "Main theorem is self-contained: the stabilization theorem of El Kahoui-Ouali is cited but bypassed by explicit formulas; every other tool used for Thm main is re-proved (Mason-Stothers, Traverso/Brion linearization, Kaliman-Makar-Limanov degeneration). The corollaries need cited theorems (Dutta-Lahiri Thm 3.4 for Cor SCC; Bass-Connell-Wright and Suslin for Cor fibrations).",
+    "adds_corollaries_for_other_conjectures": true,
+    "adds_corollaries_detail": "Disproves the Stable Coordinate Conjecture (Makar-Limanov-van Rossum-Shpilrain-Yu, p.342) in ambient dim 5 and the Dolgachev-Weisfeiler affine-fibration conjecture in relative dim 3 over A^1 and A^2 (both residue-field and geometric versions)."
+   },
+   "evidence": {
+    "quote": "We give a negative answer to \\eqref{eq:cancellation-question} over $\\mathbb C$ for $n=4$.",
+    "file_line": "01-introduction.tex:42-43"
+   },
+   "confidence": "high",
+   "note": "The problem is posed as a question (implication), answered negatively; counts as refutation of the cancellation property for A^4 over C. Open in char 0 per GaifullinPetrov (July 2026) and Gupta's ICM survey."
+  },
+  "C": {
+   "primary": "C1",
+   "primary_evidence": {
+    "quote": "We retain the explicit formulas so that the resulting isomorphism is available without an existence argument.",
+    "file_line": "02-construction.tex:15-16"
+   },
+   "secondaries": [
+    {
+     "label": "C3",
+     "evidence": {
+      "quote": "Suppose that $A\\cong\\kk\\poly{4}$. ... This contradicts \\Cref{prop:rigidity}.",
+      "file_line": "06-rigidity.tex:322-335"
+     },
+     "note": "Non-polynomiality (most of the paper and 82% of the Lean DAG by dominated share) is a proof by contradiction: polynomiality -> LND on gr -> lifted LND -> constrained LND E on R~ -> impossible."
+    },
+    {
+     "label": "C5",
+     "evidence": {
+      "quote": "Bass--Connell--Wright's theorem ... therefore gives an $R_0$-algebra isomorphism",
+      "file_line": "07-affine-fibrations.tex:113-118"
+     },
+     "note": "Only for corollaries (BCW, Suslin, Dutta-Lahiri) - cited and not re-proved. For Thm main the cited tools are re-proved, so C5 is weak (corollary-only)."
+    },
+    {
+     "label": "C4",
+     "evidence": {
+      "quote": "Applying \\Cref{rig:abc} therefore yields \\[ 2D_d=2D_a+3D_u \\le D_d+D_a+D_u+\\deg_q N(q)-1 \\]",
+      "file_line": "06-rigidity.tex:216-221"
+     },
+     "note": "A short degree-counting chain (abc) inside rigidity; minor."
+    }
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "We include its polynomial inverse and the divisibility that makes it valid at $p=0$.",
+    "file_line": "01-introduction.tex:121-122"
+   },
+   "computer_assisted_note": "All identities are displayed with hand-checkable certificates; Lean closes them with ring/linear_combination (no search, 4 trivial decide). The polynomial H and identities were plausibly found with computer algebra, but the paper does not say so and the proof does not depend on any search.",
+   "ih_strengthened": false,
+   "ih_template": null,
+   "ih_note": "No induction on statements. Well-founded descents are local: weight reduction of representatives (03:226-228) and LND-order decrease (05:192-208). The extraction in I25 carries a sign condition (q<=0) through the reduction, which is a tracked extra quantity but not an induction hypothesis.",
+   "confidence": "high (C1/C3); medium (primary choice: C3 could be argued primary since the hard direction is indirect - precedence rule 'witness is built -> C1' applied)"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "I01 the witness polynomial H (N3, F3); runner-up I20 principalization by the SL2 -> quadric torus bundle (N2, F5)",
+   "evidence": {
+    "quote": "Let $p,s,u,F,J$ be algebraically independent over $\\kk$, and set ... $H=x^2F-(1+2sx)J-p^2J^2-pu$",
+    "file_line": "01-introduction.tex:48-52"
+   },
+   "confidence": "low-medium",
+   "caveats": [
+    "Test 2 is ill-posed for the witness of an A2 claim: H is a subterm of the formal goal (it is defined in the comparator) but not of the posed problem.",
+    "The construction may be partially templated: residual coordinate (El Kahoui-Ouali) + Asanuma/Danielewski-type twist p^3u=xy-z(z+1) over the SL2/T quadric. If a discoverability test finds that models propose such Asanuma-type twists of the quadric readily, I01 drops to N2 and the family to D2.",
+    "Every proof-side lemma (I13, I16, I20, I25, I29, I31, I33) is a variant of a named technique (Kaliman-Makar-Limanov, Gupta's Derksen-invariant strategy, Finston-Maubach abc rigidity, torsor pullback); none individually clears N3 without the example."
+   ],
+   "flag_builds_on_prior_model_produced_result": false,
+   "flag_detail": "No citation to model-produced work. The only 2026 citation is GaifullinPetrov (arXiv 2607.13593, human authors, cited only for the open status). The Lean route differs from the paper's (L04-L13), so the Lean was written independently of the paper's Picard argument; authorship of the Lean is not stated."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Algebraic and complex geometry",
+    "msc2020": [
+     "14R10",
+     "14R25",
+     "14R20",
+     "13B25"
+    ],
+    "evidence": {
+     "quote": "Algebraic and complex geometry (catalog_families.csv row 047)",
+     "file_line": "data/catalog_families.csv:47"
+    },
+    "confidence": "high"
+   },
+   "lean_dir_field": {
+    "dir": "OAI/Algebra/AffineCancellation",
+    "field": "Algebra",
+    "note": "Lean dir is Algebra while problem is algebraic geometry: the formalization is purely commutative-algebraic (MvPolynomial quotients, derivations, gradings)."
+   },
+   "method_fields": [
+    {
+     "field": "Commutative algebra: polynomial rings, residual/stable coordinates (13B25, 14R10)",
+     "tag": "essential",
+     "what": "Residual-coordinate stabilization (El Kahoui-Ouali method, re-done explicitly); UFD/primality arguments.",
+     "evidence": {
+      "quote": "This exponential-shift argument follows the method of El Kahoui--Ouali",
+      "file_line": "01-introduction.tex:118-119"
+     }
+    },
+    {
+     "field": "Affine algebraic geometry: locally nilpotent derivations / G_a-actions (14R20, 13N15)",
+     "tag": "essential",
+     "what": "LND theory, Derksen/Makar-Limanov-style degeneration, order function, highest components.",
+     "evidence": {
+      "quote": "the passage from filtered derivations to homogeneous derivations developed by Kaliman and Makar-Limanov",
+      "file_line": "01-introduction.tex:149-151"
+     }
+    },
+    {
+     "field": "Graded/filtered algebra, valuations, affine modifications (13A02, 13A18, 14E05)",
+     "tag": "essential",
+     "what": "ord_p valuation, associated graded, Kaliman-Zaidenberg affine modification R[tau,I/tau^2].",
+     "evidence": {
+      "quote": "This is an affine modification of $R[\\tau]$ in the sense of Kaliman--Zaidenberg",
+      "file_line": "01-introduction.tex:177-178"
+     }
+    },
+    {
+     "field": "Algebraic groups / homogeneous spaces (14L30, 14M17)",
+     "tag": "essential",
+     "what": "SL2 -> SL2/T torus bundle over the smooth quadric; fiber-scaling torus action.",
+     "evidence": {
+      "quote": "The bundle used here is the standard quotient of $\\mathrm{SL}_2$ by its diagonal torus",
+      "file_line": "04-bundle.tex:30-31"
+     }
+    },
+    {
+     "field": "Line bundles / Picard groups / linearization (14C22)",
+     "tag": "essential (paper) / not used (Lean)",
+     "what": "Pic(A^1 x X)=Pic(X) (Traverso), Brion's normalized linearization; re-proved in paper, bypassed in Lean by slice+Bezout.",
+     "evidence": {
+      "quote": "The Picard-group assertion is the regular-ring case of Traverso's theorem",
+      "file_line": "04-bundle.tex:202-203"
+     }
+    },
+    {
+     "field": "Arithmetic of function fields: polynomial abc / Mason-Stothers (11C08, 12E05)",
+     "tag": "essential",
+     "what": "Mason-Stothers on orbit polynomials; nonsquare of -u^3 via u-adic order.",
+     "evidence": {
+      "quote": "The Mason--Stothers polynomial $abc$ inequality and the nonsquareness of $-u^3$",
+      "file_line": "01-introduction.tex:233-234"
+     }
+    },
+    {
+     "field": "Lie theory: sl2 highest weight (17B10)",
+     "tag": "essential (Lean only)",
+     "what": "SL2.no_negative_highest replaces the paper's coefficient-intersection argument.",
+     "evidence": {
+      "quote": "A highest weight vector in a locally finite sl₂ representation has nonnegative weight.",
+      "file_line": "lean/OAI/Algebra/AffineCancellation/HighestWeight.lean:9-10"
+     }
+    },
+    {
+     "field": "Algebraic K-theory: projective modules over polynomial rings (13C10, 19A13)",
+     "tag": "corollary-only",
+     "what": "Quillen-Suslin; Bass-Connell-Wright locally polynomial algebras.",
+     "evidence": {
+      "quote": "the Quillen--Suslin theorem~\\cite[Theorem~2(b)]{Suslin}",
+      "file_line": "01-introduction.tex:141-142"
+     }
+    },
+    {
+     "field": "Polynomial automorphisms / coordinate theory (14R10, 13F20)",
+     "tag": "corollary-only",
+     "what": "Dutta-Lahiri Thm 3.4 (residual => one-stably coordinate), Edo-Venereau transfer, Maubach criterion.",
+     "evidence": {
+      "quote": "the theorem of Dutta--Lahiri~\\cite[Theorem~3.4]{DuttaLahiri}, applied with $R=\\kk[p]$",
+      "file_line": "01-introduction.tex:99-100"
+     }
+    },
+    {
+     "field": "Positive-characteristic cancellation (Asanuma, Gupta)",
+     "tag": "background-cited",
+     "what": "History; Gupta's Derksen-invariant strategy inspires I16 but 'Gupta's positive-characteristic theorem is not an input'.",
+     "evidence": {
+      "quote": "Gupta's positive-characteristic theorem is not an input to them.",
+      "file_line": "03-degeneration.tex:334-335"
+     }
+    }
+   ],
+   "cross_field_count_essential_non_problem_field": 3,
+   "cross_field_detail": "Essential fields outside affine algebraic geometry / commutative algebra: algebraic groups (SL2/T), line bundles/Picard (paper only), function-field abc; plus sl2 representation theory in Lean only.",
+   "share_invoked_cited_theorems_from_other_fields": "For Thm main: 2/6 invoked cited results are from other fields (Mason-Stothers: number theory/function fields; Traverso/Brion: Picard/linearization) and both are re-proved in the paper; Lean uses Mathlib Polynomial.abc. For the corollaries: Suslin (K-theory) and BCW.",
+   "confidence": "medium-high"
+  }
+ },
+ "items": [
+  {
+   "id": "I01",
+   "kind": "definition (display, eq:example) - the witness",
+   "name": "The hypersurface H and algebra A=P/(H)",
+   "file_line": "sections/01-introduction.tex:48-57; 02-construction.tex:18-24",
+   "statement": "P=C[p,s,u,F,J], x=s^2+u^3+p^2F, H=x^2F-(1+2sx)J-p^2J^2-pu, A=P/(H). In localized coordinates (x,y,z,u) over C[p,p^-1] it reads H=p^-2(xy-z(z+1))-pu (I02).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'We give a negative answer ... Let p,s,u,F,J be algebraically independent ... and set' (01:42-55). No precedent named for the polynomial itself; its design 'realizes the residual-coordinate method of El Kahoui--Ouali' (02:9-11)."
+   },
+   "uses_items": [
+    "I02",
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "It is the counterexample. Every later object (S,R,G,I,v) is computed from it, and its two properties pull in opposite directions: residual coordinate (cylinder trivial) yet degeneration whose center principalizes to v with a -u^3 nonsquare obstruction."
+   },
+   "analytic_check": {
+    "verdict": "occurs in formalized goal, not in posed problem",
+    "note": "H is literally defined in the comparator MainStatement (ComparatorChallenges/ComplexCancellation.lean:17), so test 2 is trivially 'analytic' w.r.t. the formal goal. Relative to the posed problem ('does A[w]=C^[n+1] imply A=C^[n]?') and to L it is not a subterm. Nearest L-objects: Asanuma/Gupta threefolds x^m y=F(x,z,t), Venereau-type residual coordinates, Russell cubic. None has the quadric-times-line center or the double twist (p^2 on F,J and p^3 on u)."
+   },
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Counterexample objects to a 70-year-old problem in char 0 do not exist in L (Gupta's char-p families do not lift; Dubouloz-Ghosh 2025 give only 'potential' counterexamples). The example is tiny (one quintic-ish polynomial in 5 variables) yet occurs nowhere in the goal-as-posed or L, matching the Cook-Reckhow profile. Risk: the design may be templated (El Kahoui-Ouali residual coordinate + Asanuma-type twist p^3u=xy-z(z+1) of a non-line), which would cap it at N2."
+   },
+   "provisional_F": {
+    "type": "F3",
+    "justification": "Auxiliary/witness construction: the object built to satisfy two competing constraints. Has an F1 flavour (new defined object)."
+   }
+  },
+  {
+   "id": "I02",
+   "kind": "key identity (display, con:identity)",
+   "name": "x,y,z and xy-z(z+1)=p^2(H+pu)",
+   "file_line": "02-construction.tex:21-41",
+   "statement": "y=s+x(x-u^3), z=sx+p^2J; identity xy-z(z+1)=p^2(H+pu). Over C[p,p^-1], (x,y,z,u) are coordinates with inverse s=y-x(x-u^3), F=p^-2(x-s^2-u^3), J=p^-2(z-sx).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'The definitions give the identity' (02:32)"
+   },
+   "uses_items": [
+    "I01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Explains the equation: A[p^-1]=C[p^±,x,y,z] and the Asanuma-type subring S. Used by I03, I04, I09, I13."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Verified with sympy (data/pilot/047/check047.py)."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Given H, a computation; conceptually it is the design key of I01, already credited there."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I03",
+   "kind": "lemma",
+   "name": "Lemma con:domain (A integral, dim 4, A[p^-1]=Laurent poly ring)",
+   "file_line": "02-construction.tex:43-88",
+   "statement": "A is a domain of dimension 4, p!=0 in A, A[p^-1]=C[p,p^-1,x,y,z].",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "Stacks",
+    "cue": "Tag 00P0 for dimension; UFD descent argument"
+   },
+   "uses_items": [
+    "I01",
+    "I02"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Part of the statement; routine."
+   },
+   "analytic_check": {
+    "verdict": "subterm of goal",
+    "note": "IsDomain A and ringKrullDim A=4 are conjuncts of MainStatement."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Routine UFD/transcendence-degree argument. Lean proves it differently (L03)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I04",
+   "kind": "key construction (display, con:derivation)",
+   "name": "Locally nilpotent derivation Delta=-p^2 d/du and exponential shift Phi=exp(w Delta)",
+   "file_line": "02-construction.tex:105-140",
+   "statement": "Delta fixes p,x,y,z, Delta u=-p^2; its values on s,F,J lie in P so Delta is an LND of P with Delta H=p^3, Delta^2H=0; Phi(H)=H+p^3w, A[w]=T:=P[w]/(H+p^3w).",
+   "cited_or_new": {
+    "status": "cited (method)",
+    "bib_key": "ElKahouiOuali",
+    "cue": "'This exponential-shift argument follows the method of El Kahoui--Ouali [Lemma 3.1 and proof of Theorem 1.1]' (01:118-119)"
+   },
+   "uses_items": [
+    "I02"
+   ],
+   "load_bearing_guess": {
+    "level": "high (stabilization branch)",
+    "reason": "Converts the cylinder problem to a hypersurface linear mod p^2."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Present in L via the cited El Kahoui-Ouali lemma."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Explicitly the El Kahoui-Ouali method."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I05",
+   "kind": "key construction (display, con:linear-coordinates)",
+   "name": "Determinant-one change (L,M) in (F,J) and B=C[p,s,u,M]",
+   "file_line": "02-construction.tex:143-169",
+   "statement": "L=x0^2F-(1+2sx0)J, M=(1-2sx0)F+4s^2J, det=1; H(L)=L-pu+p^2Q(L)+p^4F(L)^3.",
+   "cited_or_new": {
+    "status": "new (instance of cited method)",
+    "bib_key": "EdoVenereau",
+    "cue": "'the transfer theorem of Edo--Venereau also applies' (02:171-174)"
+   },
+   "uses_items": [
+    "I01"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Makes H residual at p=0 (H mod p is a coordinate L)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Instance of residual-coordinate criterion."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Explicit coordinate change; existence is guaranteed by the residual-coordinate property built into I01."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I06",
+   "kind": "key construction (display, con:root, con:e-polynomial, con:e-certificate)",
+   "name": "Root L*=pu-p^2C mod p^3 and fifth coordinate e0 with certificate p^3e0-(L-L*)=(p^2Q1(L)-1)(H(L)+p^3w)",
+   "file_line": "02-construction.tex:178-213",
+   "statement": "C=Q(0), Q1=(Q-C)/L, L*=pu-p^2C, h=u-pQ-p^3F^3-p^2w, e0=-w-pF^3-Q1h; then p^3 e=L-L* in T and T=B[e]=C[p,s,u,M,e].",
+   "cited_or_new": {
+    "status": "new (explicit instance)",
+    "bib_key": "EdoVenereau; Maubach",
+    "cue": "'The following calculation gives a polynomial inverse in this instance' (02:175)"
+   },
+   "uses_items": [
+    "I04",
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Yields the explicit cylinder isomorphism used by Lean (Cylinder.Frame.e, W)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "All identities verified with sympy."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Explicit inverse for a case covered by cited theorems (Edo-Venereau Thm 7, Maubach Thm 4.5, El Kahoui-Ouali Thm 1.1)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I07",
+   "kind": "proposition",
+   "name": "Prop stabilization: A[w] = C^[5]",
+   "file_line": "02-construction.tex:97-256",
+   "statement": "There is a C-algebra isomorphism A[w]=C^[5]; explicit generators Phi^-1(p,s,u,M,e0).",
+   "cited_or_new": {
+    "status": "cited result re-proved explicitly",
+    "bib_key": "ElKahouiOuali; DuttaLahiri",
+    "cue": "'Its one-stability therefore follows from the theorem of El Kahoui--Ouali [Theorem 1.1]' (01:80-82); 'We retain the explicit formulas so that the resulting isomorphism is available without an existence argument' (02:15-16)"
+   },
+   "uses_items": [
+    "I04",
+    "I05",
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "One of the two halves of the headline."
+   },
+   "analytic_check": {
+    "verdict": "subterm of goal",
+    "note": "Nonempty (Polynomial A ≃ₐ[ℂ] MvPolynomial (Fin 5) ℂ) is a conjunct."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Known theorem applied to I01; novelty lies in I01 being residual."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I08",
+   "kind": "corollary",
+   "name": "Cor stable-coordinate: H is a coordinate of P[w] but not of P (SCC fails in ambient dim 5)",
+   "file_line": "01-introduction.tex:90-110",
+   "statement": "Via Dutta-Lahiri Thm 3.4 and Thm main.",
+   "cited_or_new": {
+    "status": "new consequence",
+    "bib_key": "DuttaLahiri; MakarLimanovVanRossumShpilrainYu",
+    "cue": "'Failure of the Stable Coordinate Conjecture' (01:90)"
+   },
+   "uses_items": [
+    "I07",
+    "I34"
+   ],
+   "load_bearing_guess": {
+    "level": "low (corollary)",
+    "reason": "Not on the main path. Not formalized (docs/047.md: 'stable-coordinate ... consequences are not included')."
+   },
+   "analytic_check": {
+    "verdict": "n/a",
+    "note": "corollary"
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Immediate from main theorem + cited theorem."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I09",
+   "kind": "definition (display, deg:S-R)",
+   "name": "S=C[p,x,y,z,u]/(xy-z(z+1)-p^3u), R=S/pS=C[x,y,z,u]/(xy-z(z+1))",
+   "file_line": "03-degeneration.tex:12-18; 01-introduction.tex:153-164",
+   "statement": "Auxiliary subalgebra S of A with S[p^-1]=A[p^-1]; R is the smooth quadric threefold (SL2/T) times A^1_u.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'The construction ... identifies an auxiliary subalgebra of A' (01:153-155)"
+   },
+   "uses_items": [
+    "I02"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Defines the valuation ord_p used for the whole nonpolynomiality argument."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "S has Asanuma/Danielewski shape p^3 u = Q(x,y,z) (cf. Gupta x^m y=F(x,z,t)); R is the SL2/T quadric (Blanc-van Santen)."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "A Danielewski/Asanuma-type hypersurface over a known quadric; abbreviation once I01 is fixed."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I10",
+   "kind": "lemma",
+   "name": "Lemma deg:valuation (S->A injective, ord_p DVR valuation, divisibility)",
+   "file_line": "03-degeneration.tex:20-75",
+   "statement": "S embeds in A with same localization; R smooth domain; ord_p from S_{pS} with ord_p(b)>=i iff b in p^iS.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "Stacks",
+    "cue": "none"
+   },
+   "uses_items": [
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Supplies the valuation."
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": "Standard DVR facts."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I11",
+   "kind": "definition (inline \\emph)",
+   "name": "valuation degree deg h=-ord_p(h), filtration F_dA, gr A, initial form in(h), graded injection gr A -> R[tau,tau^-1]",
+   "file_line": "03-degeneration.tex:77-104; 01:166-167",
+   "statement": "deg is a degree function; gr A injects into R[tau^±] via [h]_d -> (p^d h mod p) tau^-d.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "KalimanMakarLimanov",
+    "cue": "'we call ... \\emph{valuation degree}' (03:77-78)"
+   },
+   "uses_items": [
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Carrier of the degeneration argument."
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": "Associated graded of a valuation filtration: standard (Derksen-Hadas-Makar-Limanov, Kaliman-Makar-Limanov)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard construction."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I12",
+   "kind": "definition (display, deg:center)",
+   "name": "s_R, f, g and center I=(f,g) in R",
+   "file_line": "03-degeneration.tex:114-119; 04:10-15",
+   "statement": "s_R=y-x(x-u^3), f=x-s_R^2-u^3, g=z-s_R x, I=(f,g).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "none"
+   },
+   "uses_items": [
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The center of the affine modification; principalized in I20."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Residues of p^2F and p^2J."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Defined by reduction of p^2F, p^2J; abbreviation."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I13",
+   "kind": "proposition",
+   "name": "Prop graded: gr A = G = R[tau, I/tau^2] = P/(H_top), smooth domain; exact-weight representatives",
+   "file_line": "03-degeneration.tex:121-247",
+   "statement": "With weights (p,s,u,F,J)=(-1,0,0,2,2), every h in A has a representative of max weight exactly deg h, G=P/(H_top), H_top=x^2F-(1+2sx)J-p^2J^2; G is an affine modification of R[tau] (Kaliman-Zaidenberg) and smooth.",
+   "cited_or_new": {
+    "status": "new (instance of known method)",
+    "bib_key": "KalimanZaidenberg",
+    "cue": "'The point requiring proof is that no cancellation among their leading terms produces an additional generator' (03:109-110)"
+   },
+   "uses_items": [
+    "I09",
+    "I11",
+    "I12"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Exactness of gr is what lets the bundle pullback act on G with known coefficient ring."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Computing gr of a hypersurface by its top-weight form is the standard 'admissible filtration' technique (Derksen-Hadas-Makar-Limanov; Gupta)."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "The technique is standard; the specific identification G=R[tau,I/tau^2] (an affine modification with smooth total space) is a nontrivial computation specific to this example."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I14",
+   "kind": "definition (inline \\emph)",
+   "name": "Locally nilpotent derivation (LND); homogeneous derivation of degree shift j",
+   "file_line": "01:112-114; 03-degeneration.tex:271-278",
+   "statement": "D is LND if every element is killed by some iterate; homogeneous of shift j if it maps degree d to d+j.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "none",
+    "cue": "'is \\emph{locally nilpotent} if' (03:273-275)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high (vocabulary)",
+    "reason": "Vocabulary."
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": "Mathlib has IsNilpotent / Derivation; Lean defines LND.LocallyNilpotent itself (Orbit.lean:14)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I15",
+   "kind": "lemma",
+   "name": "Lemma induced-lnd: LND of A induces nonzero homogeneous LND D_0 of G, invariants pass to initial forms",
+   "file_line": "03-degeneration.tex:280-328",
+   "statement": "j=max over generators of deg(Dh_i)-deg h_i; D_0([h]_d)=[Dh]_{d+j}.",
+   "cited_or_new": {
+    "status": "cited method re-proved",
+    "bib_key": "KalimanMakarLimanov",
+    "cue": "'This is the filtered-to-homogeneous derivation method developed by Kaliman--Makar-Limanov [Sections 3--5]' (03:266-267)"
+   },
+   "uses_items": [
+    "I11",
+    "I13",
+    "I14"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Gateway from A to G."
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": "Derksen-Hadas-Makar-Limanov theorem; Gupta Invent. 2014 uses same."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard (re-proved for Z-filtrations)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I16",
+   "kind": "proposition",
+   "name": "Prop positive-invariant: if A=C^[4], G has a nonzero homogeneous LND with a nonzero homogeneous invariant of positive degree",
+   "file_line": "03-degeneration.tex:337-356",
+   "statement": "Some coordinate q_r has positive degree (F_0A is proper since deg F=2); D=d/dq_i kills q_r.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "GuptaThreefold",
+    "cue": "'inspired by Gupta's Derksen-invariant strategy; see [Lemma 2.4 and the proof of Proposition 3.6]' (03:330-332)"
+   },
+   "uses_items": [
+    "I15"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Produces the object the rest of the paper excludes."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Close to Gupta's 'DK(A) proper' argument with the twist that only one positive-degree invariant is needed."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Paper names its own precedent (Gupta's Derksen-invariant strategy)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I17",
+   "kind": "remark",
+   "name": "Remark: Delta descends to G but moves R (u -> -tau^2)",
+   "file_line": "03-degeneration.tex:358-369",
+   "statement": "Coefficient preservation can fail; motivates lifting via line bundle rather than via R.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "none"
+   },
+   "uses_items": [
+    "I04",
+    "I13"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Explanatory."
+   },
+   "analytic_check": {
+    "verdict": "n/a",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Remark."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I18",
+   "kind": "definition (display, bun:determinant-ring)",
+   "name": "Determinant ring R~=C[a,d,b,c,u]/(ac-bd-1) with x=ab, y=dc, z=db",
+   "file_line": "04-bundle.tex:36-48; 01:189-202",
+   "statement": "SL2 (with u adjoined) mapping to the quadric R; the standard torus bundle SL2 -> SL2/T.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "BlancVanSanten",
+    "cue": "'The standard torus bundle from SL2 to the smooth affine quadric' (01:190); 'see Blanc--van Santen [p. 8431]' (04:32)"
+   },
+   "uses_items": [
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Ambient ring of the final rigidity argument."
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": "SL2/T quadric is classical."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard object; its use here is I20."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I19",
+   "kind": "definition (display, bun:v)",
+   "name": "v=a^2(x-u^3)-d^2=a^3b-a^2u^3-d^2",
+   "file_line": "04-bundle.tex:43-46",
+   "statement": "Single generator of I R~; fiber weight 2, valuation degree 0.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "none"
+   },
+   "uses_items": [
+    "I18",
+    "I12"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The constraint E^2(v)=0 is the final target; its split a^3b vs d^2+a^2u^3 under I29 and the -u^3 nonsquare drive the contradiction."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Computed from I12 by I20."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Determined by the example and the bundle; not a free choice."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I20",
+   "kind": "proposition",
+   "name": "Prop principalization: Spec R~ -> Spec R is a G_m-torsor (line bundle minus zero section), I R~=(v), G~=G⊗_R R~=R~[tau,V]/(tau^2V-v)",
+   "file_line": "04-bundle.tex:50-175",
+   "statement": "Charts D(z+1), D(z); certificate f=C1 v, g=b^2 v, v=alpha f+beta g with alpha C1+beta b^2=1; two commuting gradings (valuation degree, fiber weight).",
+   "cited_or_new": {
+    "status": "new (uses standard bundle)",
+    "bib_key": "BlancVanSanten",
+    "cue": "'The bundle algebra and the pullback of G are' (01:193-203); 'principalizes I after adjoining the unchanged variable u' (01:191)"
+   },
+   "uses_items": [
+    "I12",
+    "I13",
+    "I18",
+    "I19"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Replaces the two-generator center by one element v, turning G into a single-relation affine modification R~[tau,V]/(tau^2V-v) where degree pieces are explicit."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Certificate verified with sympy. Principalizing an ideal by passing to a torsor is a standard idea (blow-up / Cox-ring style), but for this center the torus bundle SL2->quadric is a specific and non-obvious choice."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Change-of-representation step: pull back along a known torsor so that the center becomes principal. Close neighbours: Cox-ring/torsor tricks, Danielewski-variety arguments on SL2. Could be N3 if discoverability is low; graded N2 provisionally."
+   },
+   "provisional_F": {
+    "type": "F5",
+    "justification": "Embedding into a larger structure (torus bundle over Spec G) to simplify the obstruction."
+   }
+  },
+  {
+   "id": "I21",
+   "kind": "proposition",
+   "name": "Prop linearization: Pic(A^1 x X)=Pic(X) for smooth affine X; unique normalized linear lift of any G_a-action to a line bundle",
+   "file_line": "04-bundle.tex:210-327",
+   "statement": "Picard invariance via Weil divisors; uniqueness via C[t]*=C*; cocycle; induced LND preserves fiber weights.",
+   "cited_or_new": {
+    "status": "cited, re-proved",
+    "bib_key": "Traverso; Brion",
+    "cue": "'The Picard-group assertion is the regular-ring case of Traverso's theorem'; 'we follow [Brion, Lemma 2.9]; we include the argument' (04:202-208)"
+   },
+   "uses_items": [
+    "I20"
+   ],
+   "load_bearing_guess": {
+    "level": "high (paper route)",
+    "reason": "Needed to lift D_0 to G~. Bypassed entirely in Lean (L12)."
+   },
+   "analytic_check": {
+    "verdict": "in L (cited)",
+    "note": "Traverso 1970, Brion 2015."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Known results re-proved."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I22",
+   "kind": "proposition",
+   "name": "Prop homogeneous-lift: D_0 lifts to an LND D~ of G~ of fiber weight 0 and the same valuation shift j",
+   "file_line": "04-bundle.tex:336-405",
+   "statement": "Conjugating by the degree-scaling sigma_lambda, uniqueness of normalized lifts forces homogeneity.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "Brion",
+    "cue": "'uniqueness of the normalized additive lift makes the two compatible' (04:333-334)"
+   },
+   "uses_items": [
+    "I13",
+    "I20",
+    "I21"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Transports the action to G~."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Uses uniqueness to get equivariance; standard style of argument."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Short consequence of I21 uniqueness."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I23",
+   "kind": "lemma",
+   "name": "Lemma lnd-order: nu_delta additive, kernel factorially closed, delta(h) not in hT",
+   "file_line": "05-reduction.tex:35-76",
+   "statement": "Order nu_delta(h)=max{n: delta^n h != 0}; nu(fg)=nu(f)+nu(g).",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "FinstonMaubach",
+    "cue": "'compare Finston--Maubach [Lemma 1.1]' (05:32-33)"
+   },
+   "uses_items": [
+    "I14"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Used in I25 twice."
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": "Freudenburg's book: degree function of an LND."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook (Freudenburg, Algebraic Theory of LNDs, Prop 1.9)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I24",
+   "kind": "lemma (unnumbered display, red:pieces)",
+   "name": "Homogeneous pieces of G~: G~_e = tau^-e R~ (e<0), V^l R~ (e=2l), tau V^{l+1} R~ (e=2l+1)",
+   "file_line": "05-reduction.tex:78-100",
+   "statement": "Exact description of each valuation-degree component.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'We will also use the exact homogeneous pieces' (05:78)"
+   },
+   "uses_items": [
+    "I20"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Gives V | positive-degree invariants and the factorization D~(r)=tau V^{l+1}E(r)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Direct computation."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine computation once I20 is in place. Lean: ModificationGrading.piece_negative/even/odd."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I25",
+   "kind": "proposition",
+   "name": "Prop extracted-lnd: if A=C^[4], R~ has a nonzero LND E of fiber-weight shift q<=0 with E^2(v)=0",
+   "file_line": "05-reduction.tex:102-226",
+   "statement": "Positive-degree invariant divisible by V forces D~V=0; Case 1 D~tau=0: E=tau^j D~|R~, E(v)=0, q=0. Case 2: j=2l+1 odd, D~(r)=tau V^{l+1}E(r), q=-2(l+1), LND order shows E LND and E^2(v)=0.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "FinstonMaubach",
+    "cue": "'We distinguish whether tau is also invariant' (05:128); no precedent named for the statement"
+   },
+   "uses_items": [
+    "I22",
+    "I23",
+    "I24",
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Converts the geometric hypothesis into a purely algebraic constraint on the explicit ring R~."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Statement 'E^2(v)=0 with nonpositive fiber weight' occurs nowhere in goal or L."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "New lemma, but assembled from standard LND-order and degree-piece bookkeeping; analytic once I20/I24 are given (pivot distance 1). Strengthening via a sign condition q<=0 is the key extra tracked quantity (Remark red:sign-essential)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I26",
+   "kind": "remark",
+   "name": "Remark red:sign-essential: E_+ (b->a, c->d) has shift +2, E_+(v)=a^4, E_+^2(v)=0",
+   "file_line": "05-reduction.tex:228-239",
+   "statement": "Shows the sign condition is necessary.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'The restriction to nonpositive fiber weight is essential' (05:229)"
+   },
+   "uses_items": [
+    "I25"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Sanity check."
+   },
+   "analytic_check": {
+    "verdict": "n/a",
+    "note": "Verified with sympy."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Example."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I27",
+   "kind": "lemma",
+   "name": "Lemma Mason-Stothers (abc for polynomials)",
+   "file_line": "06-rigidity.tex:28-76",
+   "statement": "max deg <= r(XYZ)-1 for coprime X+Y=Z not all constant.",
+   "cited_or_new": {
+    "status": "cited, re-proved",
+    "bib_key": "Mason; Stothers",
+    "cue": "'We include the Wronskian proof of the Mason--Stothers inequality' (06:24-25)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Engine of rigidity."
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": "Mathlib Polynomial.abc (used by Lean, Rigidity.lean:395)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical; in Mathlib."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I28",
+   "kind": "lemma",
+   "name": "Lemma rig:one-variable: LND of F[t] has delta(t) in F",
+   "file_line": "06-rigidity.tex:78-95",
+   "statement": "",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "none",
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Used for h in Q."
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": "Classical."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical. Lean: LND.polynomial_dX_constant."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I29",
+   "kind": "definition (inline \\emph, rig:auxiliary-grading)",
+   "name": "Auxiliary grading on R~: weights (a,d,b,c,u)=(0,3,-3,0,2)",
+   "file_line": "06-rigidity.tex:103-118",
+   "statement": "Z-grading commuting with fiber weight, under which N=d^2+a^2u^3 is homogeneous of degree 6 while a^3b has degree -3.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'We introduce an \\emph{auxiliary grading}, distinct from both the valuation degree and the fiber weight' (06:103-104)"
+   },
+   "uses_items": [
+    "I18",
+    "I19"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Separates the two parts of v so that the highest component E' satisfies (E')^2(N)=0, reducing to a two-term orbit identity where abc applies."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "A grading chosen ad hoc to isolate a sub-polynomial; standard 'highest-component' technique (Makar-Limanov, Derksen-Hadas-ML), but this weight vector is a specific find."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Choosing a grading making a target piece top-degree is a standard move in LND rigidity proofs; the specific vector is found by solving linear constraints (relation homogeneous, N homogeneous, a^3b lower). Low search cost once the strategy is fixed."
+   },
+   "provisional_F": {
+    "type": "F3",
+    "justification": "Auxiliary device built only to drive the proof (would be F4-like if seen as a weight function)."
+   }
+  },
+  {
+   "id": "I30",
+   "kind": "construction (inline)",
+   "name": "Highest auxiliary component E'=E_lambda",
+   "file_line": "06-rigidity.tex:120-145",
+   "statement": "E'=greatest nonzero shift component; still LND, same fiber shift.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "none",
+    "cue": "none"
+   },
+   "uses_items": [
+    "I29"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": "Standard."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard (Lean GradedLND.highest)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I31",
+   "kind": "construction (inline)",
+   "name": "Orbit polynomials a(q),d(q),u(q)=exp(qE')(.) and N(q)=N+qE'(N); nonsquare of -u^3 in K=C(a,d,b)(u)",
+   "file_line": "06-rigidity.tex:147-254",
+   "statement": "d(q)^2+a(q)^2u(q)^3=N(q) of degree <=1; pairwise coprime; abc gives D_u=0, D_d=D_a; leading coefficients give (delta/alpha)^2=-u^3 in K, impossible; hence E' fixes a,d,u.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "FinstonMaubach",
+    "cue": "'The use of polynomial abc for rigidity of additive actions has precedents in Finston--Maubach [Section 2]; here the nonsquare obstruction requires keeping the leading coefficients in the original fraction field' (01:237-240)"
+   },
+   "uses_items": [
+    "I27",
+    "I29",
+    "I30"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Core of rigidity."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Precedent named by paper."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Paper names Finston-Maubach precedent; the nonsquare twist is a small variant."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I32",
+   "kind": "construction (inline)",
+   "name": "h=cE'(b)-bE'(c); R~∩Q=C0=C[a,d,u]; fiber weight e-2<0 contradiction",
+   "file_line": "06-rigidity.tex:256-310",
+   "statement": "ah=E'(b), dh=E'(c); h in C0 has nonnegative weight but weight e-2<0.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "none"
+   },
+   "uses_items": [
+    "I28",
+    "I31"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Final contradiction. Lean replaces with an sl2 highest-weight argument (L16)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Short computation."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I33",
+   "kind": "proposition",
+   "name": "Prop rigidity: no nonzero LND E of R~ with fiber shift e<=0 and E^2(v)=0",
+   "file_line": "06-rigidity.tex:97-311",
+   "statement": "Combines I29-I32. (Argument actually works for e<=1.)",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "FinstonMaubach",
+    "cue": "none for statement; precedent for method"
+   },
+   "uses_items": [
+    "I29",
+    "I30",
+    "I31",
+    "I32"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Closes the contradiction."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Statement not in L."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "New rigidity statement for a specific ring, proved by a known method (highest component + abc)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I34",
+   "kind": "theorem",
+   "name": "Theorem main (A integral dim 4, A[w]=C^[5], A not C^[4])",
+   "file_line": "01-introduction.tex:59-70; proof 06-rigidity.tex:313-338",
+   "statement": "Assembly: I03, I07; contradiction chain I16 -> I22 -> I25 -> I33.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": ""
+   },
+   "uses_items": [
+    "I03",
+    "I07",
+    "I13",
+    "I16",
+    "I20",
+    "I22",
+    "I25",
+    "I33"
+   ],
+   "load_bearing_guess": {
+    "level": "target",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "n/a",
+    "justification": "Target."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I35",
+   "kind": "corollary",
+   "name": "Cor affine-fibrations: p:Spec A->A^1 and (p,H):A^5->A^2 are smooth A^3-fibrations, not Zariski-locally trivial (Dolgachev-Weisfeiler fails)",
+   "file_line": "07-affine-fibrations.tex:8-147",
+   "statement": "Residual coordinate gives fibers; Jacobian gives smoothness; local triviality + Bass-Connell-Wright + Suslin would give A=C^[4] or H a coordinate.",
+   "cited_or_new": {
+    "status": "new consequence",
+    "bib_key": "BassConnellWright; Suslin; DolgachevWeisfeiler; GuptaSurvey",
+    "cue": "'proves this consequence using the locally-polynomial-algebra theorem of Bass--Connell--Wright and the Quillen--Suslin theorem' (01:140-142)"
+   },
+   "uses_items": [
+    "I08",
+    "I34"
+   ],
+   "load_bearing_guess": {
+    "level": "low (corollary)",
+    "reason": "Not formalized."
+   },
+   "analytic_check": {
+    "verdict": "n/a",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Corollary via cited theorems."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I36",
+   "kind": "definitions (inline \\emph, prose)",
+   "name": "residual coordinate; one-stably a coordinate; A^3-fibration; Stable Coordinate Conjecture; fiber weight; normalization of a lift; Pic",
+   "file_line": "01:73-77; 01:84-88; 01:125-126; 04:52-56; 04:198-201",
+   "statement": "Background vocabulary.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "ElKahouiOuali; DuttaLahiri; MakarLimanovVanRossumShpilrainYu",
+    "cue": "'is a \\emph{residual coordinate} if' (01:74)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Vocabulary."
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Literature definitions."
+   },
+   "provisional_F": null
+  }
+ ],
+ "lean_items": [
+  {
+   "id": "L01",
+   "kind": "def+lemmas (Lean)",
+   "name": "Cylinder.Point, cubicDiff, Point.shift, shift_equation, shift_add",
+   "file_line": "lean/OAI/Algebra/AffineCancellation/CylinderShift.lean:12-104",
+   "statement": "Functor-of-points version of exp(w Delta): shift fixes p,x and sends equation to equation+p^3 w, with shift_add (group law).",
+   "cited_or_new": {
+    "status": "new (formal encoding of I04)",
+    "bib_key": "ElKahouiOuali",
+    "cue": "docstring 'A finite exponential shift fixing p, x, y, z and translating u by -p²w.'"
+   },
+   "uses_items": [
+    "I04"
+   ],
+   "load_bearing_guess": {
+    "level": "high (stabilization)",
+    "reason": "Basis of the explicit cylinder iso."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "dag frac 0.052"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Encoding of I04."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L02",
+   "kind": "defs+lemmas (Lean)",
+   "name": "Cylinder.Frame (x0,f,j,Q,c,Q1,root,h,e,L,W), encode/decode, e_certificate, Cylinder.equivalence",
+   "file_line": "lean/OAI/Algebra/AffineCancellation/CylinderShift.lean:112-189; CylinderMaps.lean:10-57; Cylinder.lean:114-184",
+   "statement": "Explicit mutually inverse algebra maps A[w] <-> C[p,s,u,M,e]; decode_encode uses only that p^3 is regular in A[w].",
+   "cited_or_new": {
+    "status": "new (formal encoding of I05-I06)",
+    "bib_key": "EdoVenereau",
+    "cue": ""
+   },
+   "uses_items": [
+    "L01",
+    "I05",
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Proves the stabilization conjunct."
+   },
+   "analytic_check": {
+    "verdict": "subterm of goal (stabilization)",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Encoding."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L03",
+   "kind": "theorems (Lean)",
+   "name": "finiteType, domain, dimension via the cylinder",
+   "file_line": "lean/OAI/Algebra/AffineCancellation/Dimension.lean:7-42",
+   "statement": "IsDomain A from A ↪ A[w] ≅ P; ringKrullDim A=4 from dim A[w]=dim A+1=5. Route differs from paper's UFD argument.",
+   "cited_or_new": {
+    "status": "new route",
+    "bib_key": "none",
+    "cue": ""
+   },
+   "uses_items": [
+    "L02"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "goal conjuncts",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Mathlib facts."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L04",
+   "kind": "defs+lemmas (Lean)",
+   "name": "Rees algebra B=C[q,p,s,u,F,J]/(H_top - q^3 p u) ⊂ A[T^±] (Rees.embedding), special fiber Special=B/qB ≅ G (red, backRed), maximum_q_factor, clear_order",
+   "file_line": "lean/OAI/Algebra/AffineCancellation/Rees.lean:10-121; ReesReduction.lean:10-75; ReesClearing.lean:8-77",
+   "statement": "Rees algebra of the valuation filtration, with q ↦ T, p ↦ pT^-1, F,J ↦ ·T^2; ker(red)=qB.",
+   "cited_or_new": {
+    "status": "standard technique",
+    "bib_key": "none",
+    "cue": ""
+   },
+   "uses_items": [
+    "I01",
+    "I13"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Lean replacement of I10, I11 and the exact-representative part of I13."
+   },
+   "analytic_check": {
+    "verdict": "in L (technique)",
+    "note": "Rees-algebra degeneration to the special fiber is textbook (deformation to the associated graded)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard Rees deformation; specific presentation is an instance."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L05",
+   "kind": "lemmas (Lean)",
+   "name": "Rees.scaled_restriction, LND.primitive_of_order, Rees.primitive_reduction, Rees.positive_invariant_of_polynomial",
+   "file_line": "lean/OAI/Algebra/AffineCancellation/ReesDerivation.lean:63-142; Primitive.lean:31-55; PositiveInvariant.lean:84-118",
+   "statement": "From A=C^[4]: a coordinate with c r not in B (positive degree), conjugated pderiv, extend to A[T^±], scale by T^n to preserve B, divide out powers of q until primitive, reduce mod q: a nonzero LND on G (NOT necessarily homogeneous) killing a nonzero homogeneous element of positive degree.",
+   "cited_or_new": {
+    "status": "new route",
+    "bib_key": "GuptaThreefold",
+    "cue": ""
+   },
+   "uses_items": [
+    "L04",
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Weaker than paper's I16 (no homogeneity of D), compensated later by taking highest component on G~ (main)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard Rees/degeneration technique (Derksen-Hadas-Makar-Limanov style)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L06",
+   "kind": "defs+lemmas (Lean)",
+   "name": "DifferentialSlice / RationalSlice / PolynomialModel: slice t=s/Ds; G ↪ F[t] with F=constants of D on Frac G; D ↦ d/dt",
+   "file_line": "lean/OAI/Algebra/AffineCancellation/DifferentialSlice.lean; RationalSlice.lean; PolynomialSlice.lean",
+   "statement": "Every LND of G becomes d/dt on a polynomial ring over the field of constants (rational slice theorem).",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "none",
+    "cue": ""
+   },
+   "uses_items": [
+    "L05"
+   ],
+   "load_bearing_guess": {
+    "level": "high (Lean route)",
+    "reason": "Lean replacement for I21's Picard argument."
+   },
+   "analytic_check": {
+    "verdict": "in L",
+    "note": "Slice theorem (Wright / Freudenburg Cor 1.26)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook slice theorem."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L07",
+   "kind": "theorem (Lean)",
+   "name": "BezoutFrame.exists_frame: over a Euclidean domain, xy=z(z+1) lifts to an SL2 point (a,d,b,c) with ab=x, dc=y, db=z, ac-db=1",
+   "file_line": "lean/OAI/Algebra/AffineCancellation/BezoutFrame.lean:9-44",
+   "statement": "Via gcd(x,z) and Bezout coefficients.",
+   "cited_or_new": {
+    "status": "new (elementary)",
+    "bib_key": "none",
+    "cue": "docstring 'Principalization of an SL₂/diagonal-torus point over a Euclidean domain.'"
+   },
+   "uses_items": [
+    "L06"
+   ],
+   "load_bearing_guess": {
+    "level": "high (Lean route)",
+    "reason": "Trivializes the torus bundle over the generic G_a-orbit."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Equivalent to: G_m-torsor over Spec of a PID is trivial."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Elementary; equivalent to triviality of Pic of a PID."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L08",
+   "kind": "defs+lemmas (Lean)",
+   "name": "Torsor.Frame, frameMap, forward : G~ -> F[t][T^±], backward, forward_injective, clear_laurent",
+   "file_line": "lean/OAI/Algebra/AffineCancellation/TorsorFrame.lean; TorsorInverse.lean; TorsorClearing.lean",
+   "statement": "Embeds G~ into Laurent polynomials over the slice ring using the Bezout frame; every Laurent polynomial is cleared by an invariant.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": ""
+   },
+   "uses_items": [
+    "L07",
+    "I20"
+   ],
+   "load_bearing_guess": {
+    "level": "high (Lean route)",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Explicit trivialization of the pulled-back torsor over the generic orbit; standard in spirit."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L09",
+   "kind": "theorem (Lean)",
+   "name": "PolynomialTorsor.exists_equivariant_lift: for any nonzero LND D of G there are c != 0 (D c=0) and nonzero LND E of G~ with E∘pullback = pullback∘(cD), commuting with fiber Euler",
+   "file_line": "lean/OAI/Algebra/AffineCancellation/EquivariantLift.lean:10-49; ReplicaLift.lean:175-184; InvariantRestriction.lean:19-33; TorsorEuler.lean:124-130",
+   "statement": "Lifts a replica cD rather than D; equivariance via LaurentEuler commuting with d/dt extension.",
+   "cited_or_new": {
+    "status": "new route (replaces I21-I22)",
+    "bib_key": "none",
+    "cue": ""
+   },
+   "uses_items": [
+    "L06",
+    "L07",
+    "L08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "dominated_share 0.202 of target DAG (largest single dominated subtree after nonpolynomiality)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Avoids Pic, smoothness of G, faithful flatness, and the sigma_lambda uniqueness argument."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Elementary replacement of the linearization step via slice + Bezout + replica; each piece standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L10",
+   "kind": "defs+lemmas (Lean)",
+   "name": "GradedLND.component, ShiftBound, highest, iterate_top, component_commute",
+   "file_line": "lean/OAI/Algebra/AffineCancellation/GradedLND.lean; GradedCommutation.lean",
+   "statement": "Highest homogeneous component of an LND on a finite-type Z-graded algebra is a nonzero LND.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "none",
+    "cue": "docstring 'Every nonzero locally nilpotent derivation of a finite type graded algebra has a nonzero highest component'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Used twice: valuation grading on G~ (Main) and auxiliary grading on R~ (rigidity)."
+   },
+   "analytic_check": {
+    "verdict": "in L (folklore)",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard (Makar-Limanov / Derksen-Hadas-ML)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L11",
+   "kind": "defs+lemmas (Lean)",
+   "name": "AffineModification.T R v = R[τ,V]/(τ^2V-v), pieces, euler, extract, fixed_V_of_positive_invariant, Bundle.no_positive_invariant",
+   "file_line": "lean/OAI/Algebra/AffineCancellation/Modification.lean; ModificationGrading.lean; Extraction.lean; HomogeneousExtraction.lean:56-164; PositiveObstruction.lean:22-35",
+   "statement": "Generic version of I24-I25 for any domain R with an Euler derivation H, H v=2v; no_positive_invariant assembles extraction + rigidity.",
+   "cited_or_new": {
+    "status": "new (generalization of I25)",
+    "bib_key": "none",
+    "cue": "docstring 'Extraction of a coefficient derivation without assuming invariance of the coefficient ring.'"
+   },
+   "uses_items": [
+    "I24",
+    "I25",
+    "L10",
+    "L13"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "dominated_share 0.127."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Formal version of I25."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L12",
+   "kind": "defs+lemmas (Lean)",
+   "name": "LND.orbit, orbitHom, order, kernel_factorially_closed, fixed_of_dvd, cancel_factor_locallyNilpotent, cancel_factor_square_zero, FactorDerivation.derivation",
+   "file_line": "lean/OAI/Algebra/AffineCancellation/Orbit.lean; Kernel.lean; Order.lean; FactorDerivation.lean",
+   "statement": "Exponential orbit polynomial and LND degree; dividing an LND by a common factor keeps it LND; E^2 v=0 from order count.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "FinstonMaubach",
+    "cue": ""
+   },
+   "uses_items": [
+    "I23"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "in L (textbook)",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook LND theory (Freudenburg ch.1)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L13",
+   "kind": "defs+theorems (Lean)",
+   "name": "Determinant.δ, η, Euler (sl2 triple on R~), FiberShift, SL2.no_negative_highest, fixed_coefficients_contradiction",
+   "file_line": "lean/OAI/Algebra/AffineCancellation/DeterminantRigidity.lean:12-127; HighestWeight.lean:12-61",
+   "statement": "Once E fixes a,d,u, E=h·δ with δh=0 and Euler h=(e-2)h; a δ-highest weight vector of negative weight with η locally nilpotent vanishes.",
+   "cited_or_new": {
+    "status": "new route (replaces I32)",
+    "bib_key": "none",
+    "cue": "docstring 'A highest weight vector in a locally finite sl₂ representation has nonnegative weight.'"
+   },
+   "uses_items": [
+    "I32"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": ""
+   },
+   "analytic_check": {
+    "verdict": "in L (rep theory)",
+    "note": "Standard sl2 representation theory."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard sl2 fact applied."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L14",
+   "kind": "defs+theorems (Lean)",
+   "name": "Determinant.auxWeight ![0,3,-3,0,2], aux grading, rigidity; Rigidity.orbit_constant (uses Mathlib Polynomial.abc), ratFunc_X_cube_nonsquare; LND.fixed_of_square_cube",
+   "file_line": "lean/OAI/Algebra/AffineCancellation/DeterminantRigidity.lean:131-271; Rigidity.lean; OrbitRigidity.lean",
+   "statement": "Formal I29-I33.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "Mason; Stothers; FinstonMaubach",
+    "cue": ""
+   },
+   "uses_items": [
+    "I29",
+    "I31",
+    "I33",
+    "L10",
+    "L12",
+    "L13"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "dominated_share of Determinant.rigidity 0.073."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Formal version of I33."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L15",
+   "kind": "theorem (Lean)",
+   "name": "ComplexCancellation.nonpolynomiality and main",
+   "file_line": "lean/OAI/Algebra/AffineCancellation/Main.lean:10-33",
+   "statement": "Assembly: positive_invariant_of_polynomial -> exists_equivariant_lift -> highest valuation component on G~ -> no_positive_invariant.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": ""
+   },
+   "uses_items": [
+    "L05",
+    "L09",
+    "L10",
+    "L11",
+    "L03",
+    "L02"
+   ],
+   "load_bearing_guess": {
+    "level": "target",
+    "reason": "dominated_share 0.816 for nonpolynomiality."
+   },
+   "analytic_check": {
+    "verdict": "goal",
+    "note": ""
+   },
+   "provisional_N": {
+    "grade": "n/a",
+    "justification": "Target."
+   },
+   "provisional_F": null
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "El Kahoui-Ouali: residual coordinates are one-stably coordinates (Lemma 3.1, Thm 1.1)",
+   "bib_key": "ElKahouiOuali",
+   "field": "Commutative algebra / polynomial automorphisms",
+   "used_at": "01:80-82, 118-119; 02:9-11",
+   "status": "cited; method re-done explicitly (not needed as a black box)",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Dutta-Lahiri Thm 3.4 (generalization)",
+   "bib_key": "DuttaLahiri",
+   "field": "Commutative algebra",
+   "used_at": "01:99-105 (Cor SCC)",
+   "status": "cited, not re-proved",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Edo-Venereau transfer Thm 7; Maubach coordinate criterion Thm 4.5",
+   "bib_key": "EdoVenereau; Maubach",
+   "field": "Polynomial automorphisms",
+   "used_at": "02:12-15, 171-175",
+   "status": "cited as alternative, not used",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Dimension formula for f.g. domains; Jacobian criterion; principal ideal theorem; Pic=Cl for regular",
+   "bib_key": "Stacks",
+   "field": "Commutative algebra",
+   "used_at": "02:87; 03:53; 04:238, 250",
+   "status": "cited, standard",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Kaliman-Makar-Limanov filtered-to-homogeneous LND method",
+   "bib_key": "KalimanMakarLimanov",
+   "field": "Affine algebraic geometry",
+   "used_at": "03:266-269",
+   "status": "cited, re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Kaliman-Zaidenberg affine modification (Def 1.1)",
+   "bib_key": "KalimanZaidenberg",
+   "field": "Affine algebraic geometry",
+   "used_at": "03:253-258",
+   "status": "definition only (descriptive)",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Gupta's Derksen-invariant strategy (Lemma 2.4, Prop 3.6)",
+   "bib_key": "GuptaThreefold",
+   "field": "Affine algebraic geometry (char p)",
+   "used_at": "03:330-335",
+   "status": "inspiration; not an input",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Traverso Thm 3.6 (Pic invariance, regular case)",
+   "bib_key": "Traverso",
+   "field": "Commutative algebra / Picard groups",
+   "used_at": "04:202-203",
+   "status": "cited, re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Brion Prop 2.10, Thm 2.14, Lemma 2.9 (linearization)",
+   "bib_key": "Brion",
+   "field": "Algebraic groups / line bundles",
+   "used_at": "04:204-208",
+   "status": "cited, re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Blanc-van Santen description of the affine quadric as SL2/T",
+   "bib_key": "BlancVanSanten",
+   "field": "Affine algebraic geometry",
+   "used_at": "04:30-33",
+   "status": "cited for description; charts given",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Finston-Maubach Lemma 1.1 (LND order) and Section 2 (abc rigidity)",
+   "bib_key": "FinstonMaubach",
+   "field": "Affine algebraic geometry",
+   "used_at": "05:32-33; 06:21-23",
+   "status": "precedent; re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Mason-Stothers abc for polynomials",
+   "bib_key": "Mason; Stothers",
+   "field": "Number theory (function fields)",
+   "used_at": "06:28-76",
+   "status": "re-proved (Wronskian); Lean uses Mathlib Polynomial.abc",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Bass-Connell-Wright: locally polynomial algebras are symmetric (Thm 3(a))",
+   "bib_key": "BassConnellWright; GuptaSurvey",
+   "field": "Commutative algebra / K-theory",
+   "used_at": "07:113-118",
+   "status": "cited, not re-proved",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Suslin Thm 2(b) (Quillen-Suslin)",
+   "bib_key": "Suslin",
+   "field": "Algebraic K-theory",
+   "used_at": "07:129-134",
+   "status": "cited, not re-proved",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Abhyankar-Eakin-Heinzer; Fujita; Miyanishi-Sugie; Asanuma; Gupta (x2); Makar-Limanov (Russell cubic); GaifullinPetrov; GuptaSurvey; Dolgachev-Weisfeiler; MLvRSY",
+   "bib_key": "AEH; Fujita; MiyanishiSugie; Asanuma; GuptaPositive; MakarLimanov; GaifullinPetrov; DolgachevWeisfeiler; MakarLimanovVanRossumShpilrainYu",
+   "field": "Affine algebraic geometry",
+   "used_at": "01 (history, problem statements)",
+   "status": "background-cited",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Lean-only Mathlib inputs: Polynomial.abc, radical, ringKrullDim of (Mv)Polynomial over Noetherian rings, WfDvdMonoid.max_power_factor', EuclideanDomain.gcd/gcdA/gcdB, IsFractionRing, LaurentPolynomial, weightedHomogeneousSubmodule grading, Derivation.liftOfSurjective",
+   "bib_key": "Mathlib d13f23b",
+   "field": "various",
+   "used_at": "Rigidity.lean:395; Dimension.lean:20-26; ReesReduction.lean:72; BezoutFrame.lean:15-24",
+   "status": "library",
+   "essential_for_headline": true
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Construction and integrality: A=P/(H) with xy-z(z+1)=p^2(H+pu); A[p^-1]=C[p^±,x,y,z]; A domain of dim 4.",
+   "items": [
+    "I01",
+    "I02",
+    "I03"
+   ],
+   "lean": [
+    "L03"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Stabilization: Delta=-p^2 d/du is an LND of P with Delta H=p^3; exp(w Delta) gives A[w]=P[w]/(H+p^3w); determinant-1 change (L,M), root L* mod p^3 and certificate e0 give T=C[p,s,u,M,e].",
+   "items": [
+    "I04",
+    "I05",
+    "I06",
+    "I07"
+   ],
+   "lean": [
+    "L01",
+    "L02"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "Degeneration: ord_p from S=C[p,x,y,z,u]/(xy-z(z+1)-p^3u); gr A = G = R[tau, I/tau^2] = P/(H_top) exactly, smooth.",
+   "items": [
+    "I09",
+    "I10",
+    "I11",
+    "I12",
+    "I13"
+   ],
+   "lean": [
+    "L04"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "If A=C^[4]: a coordinate of positive degree + d/dq_i gives a nonzero homogeneous LND D_0 of G with a positive-degree homogeneous invariant.",
+   "items": [
+    "I14",
+    "I15",
+    "I16"
+   ],
+   "lean": [
+    "L05 (D_0 not homogeneous in Lean)"
+   ]
+  },
+  {
+   "step": 5,
+   "claim": "Principalization: pull back along SL2 -> quadric torus bundle; I R~=(v), G~=R~[tau,V]/(tau^2V-v) with valuation and fiber gradings.",
+   "items": [
+    "I18",
+    "I19",
+    "I20"
+   ],
+   "lean": [
+    "Bundle.lean, Modification.lean"
+   ]
+  },
+  {
+   "step": 6,
+   "claim": "Lift: D_0 lifts uniquely to a fiber-weight-0 LND D~ on G~ with same degree shift (Picard invariance + normalized linearization).",
+   "items": [
+    "I21",
+    "I22"
+   ],
+   "lean": [
+    "L06",
+    "L07",
+    "L08",
+    "L09",
+    "L10 (lift c·D via slice+Bezout, then take highest valuation component)"
+   ]
+  },
+  {
+   "step": 7,
+   "claim": "Extraction: positive-degree invariant divisible by V forces D~V=0; case split on D~tau gives nonzero LND E on R~ of fiber shift q<=0 with E^2(v)=0.",
+   "items": [
+    "I23",
+    "I24",
+    "I25",
+    "I26"
+   ],
+   "lean": [
+    "L11",
+    "L12"
+   ]
+  },
+  {
+   "step": 8,
+   "claim": "Rigidity: auxiliary grading (0,3,-3,0,2) top component E' kills N twice; Mason-Stothers on orbit polynomials + nonsquare -u^3 force E' to fix a,d,u; then E'(b),E'(c) produce h of negative fiber weight in C[a,d,u], contradiction.",
+   "items": [
+    "I27",
+    "I28",
+    "I29",
+    "I30",
+    "I31",
+    "I32",
+    "I33"
+   ],
+   "lean": [
+    "L13",
+    "L14"
+   ]
+  },
+  {
+   "step": 9,
+   "claim": "Assembly of Thm main; corollaries SCC and Dolgachev-Weisfeiler via cited theorems.",
+   "items": [
+    "I34",
+    "I08",
+    "I35"
+   ],
+   "lean": [
+    "L15"
+   ]
+  }
+ ],
+ "lean_route_differences": [
+  "Domain and dimension: paper uses UFD irreducibility + transcendence degree; Lean derives both from the explicit cylinder iso (A ↪ A[w] ≅ C^[5]; dim A[w]=dim A+1).",
+  "Degeneration: paper uses ord_p from S_{pS} and computes gr A with exact representatives; Lean uses the Rees algebra B=C[q,...]/(H_top - q^3pu) ⊂ A[T^±] and proves B/qB ≅ G directly (Rees.backRed_red).",
+  "Positive invariant: Lean produces a possibly non-homogeneous LND on G (Rees scaling + primitive reduction), not the homogeneous D_0 of the paper.",
+  "Lifting: paper uses Pic(A^1 x X)=Pic(X) + Brion normalized linearization + uniqueness under sigma_lambda; Lean uses the rational slice theorem (G ↪ F[t], D -> d/dt), a Bezout SL2 frame over the Euclidean ring F[t], and a replica cD to clear denominators, then restores homogeneity by taking the highest valuation component on G~. No Picard groups, no smoothness of G, no faithful flatness.",
+  "Final step of rigidity: paper uses R~∩C(a,d,u)=C[a,d,u] and nonnegative weights; Lean writes E'=h·δ and uses sl2 highest-weight theory (SL2.no_negative_highest).",
+  "Mason-Stothers: paper re-proves; Lean uses Mathlib Polynomial.abc."
+ ],
+ "lean_dag_summary": {
+  "n_files": 55,
+  "n_decls": 783,
+  "kind_counts": {
+   "theorem": 499,
+   "def": 222,
+   "abbrev": 38,
+   "instance": 21,
+   "structure": 3
+  },
+  "proof_dag_decls": 668,
+  "proof_dag_theorems": 423,
+  "dominated_share_main_branches": {
+   "nonpolynomiality": 0.816,
+   "PolynomialTorsor.exists_equivariant_lift (lift)": 0.202,
+   "Rees.positive_invariant_of_polynomial": 0.133,
+   "Bundle.no_positive_invariant (extraction+rigidity)": 0.127,
+   "Determinant.rigidity": 0.073,
+   "Cylinder.equivalence (stabilization)": 0.055
+  },
+  "proxy_note": "Only carriers pass the 20% dag_share proxy (Degeneration.G 0.229, AffineModification.T 0.225, Determinant.v 0.163, LND.LocallyNilpotent 0.137, Torsor.Frame 0.125); the extractor's load-bearing ranking again over-weights carriers. The witness H itself is in the target signature closure (it is in the goal)."
+ },
+ "eureka_candidates_ranked": [
+  {
+   "rank": 1,
+   "item": "I01",
+   "name": "The witness polynomial H = x^2F-(1+2sx)J-p^2J^2-pu, x=s^2+u^3+p^2F",
+   "provisional_N": "N3",
+   "provisional_F": "F3",
+   "for": [
+    "Resolves a problem open since the 1940s-70s in char 0; none of the many candidate families (Koras-Russell, Asanuma-Gupta, Venereau, Dubouloz-Ghosh 2025 'potential counterexamples') worked.",
+    "Tiny object (one polynomial in 5 variables), not a subterm of the posed problem or L - the Cook-Reckhow profile.",
+    "Must satisfy two antagonistic constraints simultaneously: residual coordinate over C[p] (so the cylinder is trivial) and a degeneration whose principalized center v=a^3b-a^2u^3-d^2 carries the nonsquare -u^3 obstruction. The exponents (u^3, p^2 on F,J, p^3 on u) are tuned to both.",
+    "Every later step is downstream of it; once it is fixed, the remaining lemmas are variants of known techniques (pivot structure: one hard choice, then analytic work)."
+   ],
+   "against": [
+    "It is the witness of an existential claim, so it appears in the formalized goal; the eureka framework may need a separate treatment for witnesses vs lemmas.",
+    "Possibly templated: S has Asanuma/Danielewski shape p^3u=xy-z(z+1) with Q=xy-z(z+1) the SL2/T quadric; H is the residual-coordinate 'p^-2 twist' of that. A model primed with El Kahoui-Ouali + Gupta x^m y=F(x,z,t) might find this family.",
+    "Its novelty is unverified beyond a quick search; the paper names no precedent for the polynomial."
+   ],
+   "nearest_neighbour_quick_check": "Gupta's Asanuma threefolds x^m y=F(x,z,t) (char p only; char-0 analogues are A^3 when F(0,z,t) is a line); Venereau-type residual coordinates (Lewis: 1-stable coordinates; coordinate status open); Dubouloz-Ghosh 2025 (arXiv 2501.09613) A^1-contractible non-A^n families in dim >=4, called only potential counterexamples to ZCP; Gaifullin-Petrov 2026 (generalized cancellation only). None gives X x A^1 ≅ A^{n+1}."
+  },
+  {
+   "rank": 2,
+   "item": "I20 (+I19, I22)",
+   "name": "Principalizing the center by pulling back along the SL2 -> SL2/T torus bundle, giving G~=R~[tau,V]/(tau^2V-v)",
+   "provisional_N": "N2",
+   "provisional_F": "F5",
+   "for": [
+    "Converts the question 'does G carry a homogeneous LND with positive-degree invariant?' into an explicit single-relation ring where degree pieces are explicit (I24); non-analytic relative to the goal.",
+    "The lift must work even though D_0 does not preserve R (Remark I17) - the paper explicitly flags this obstacle.",
+    "Large drop in difficulty: after this step, extraction is bookkeeping."
+   ],
+   "against": [
+    "Torsor/Cox-ring pullbacks to principalize ideals and lifting G_a-actions via linearization (Brion) are known; SL2 -> quadric is classical (Blanc-van Santen cited).",
+    "Lean found an alternative elementary route (slice + Bezout), suggesting the step is reachable by several paths."
+   ],
+   "nearest_neighbour_quick_check": "Brion 'On linearization of line bundles' (2015) for the lift; Kaliman-Zaidenberg affine modifications; Danielewski-variety techniques on SL2. No source found combining principalization of an affine-modification center with an LND lift for a cancellation obstruction."
+  },
+  {
+   "rank": 3,
+   "item": "I25",
+   "name": "Extraction lemma: polynomiality => nonzero LND E of R~ with fiber shift q<=0 and E^2(v)=0",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "New statement; the sign constraint q<=0 is exactly what rigidity needs (Remark I26 shows it is essential).",
+    "Case 2 (tau moving) uses an LND-order count to get E^2(v)=0 and odd shift j - not obvious."
+   ],
+   "against": [
+    "Assembled from standard LND order/factorial-closure facts once I20/I24 are in place (pivot distance 1).",
+    "Tracking an extra sign is a 'carry an extra tracked quantity' template."
+   ],
+   "nearest_neighbour_quick_check": "Freudenburg's book (degree function of LNDs), Finston-Maubach Lemma 1.1."
+  },
+  {
+   "rank": 4,
+   "item": "I29+I31+I33",
+   "name": "Weighted rigidity: auxiliary grading (0,3,-3,0,2), orbit identity d(q)^2+a(q)^2u(q)^3=N(q) of degree <=1, Mason-Stothers + nonsquare -u^3",
+   "provisional_N": "N2",
+   "provisional_F": "F3",
+   "for": [
+    "The auxiliary weight vector isolating N=d^2+a^2u^3 from a^3b is a specific find; non-analytic.",
+    "Combining abc with a nonsquare argument in the original fraction field is a small new twist (paper's own remark)."
+   ],
+   "against": [
+    "Paper names the precedent (Finston-Maubach Section 2) for abc-based LND rigidity.",
+    "Highest-component projection is standard; the weight vector is determined by linear constraints."
+   ],
+   "nearest_neighbour_quick_check": "Finston-Maubach, 'Constructing (almost) rigid rings...' (Canad. Math. Bull. 2010; arXiv 0706.4184) uses a generalized Mason abc to prove rigidity; Crachiola-Maubach 'Rigid rings and Makar-Limanov techniques'."
+  },
+  {
+   "rank": 5,
+   "item": "I16",
+   "name": "Positive-degree invariant obstruction from polynomiality",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Neat replacement of the Derksen invariant by a single positive-degree coordinate."
+   ],
+   "against": [
+    "Paper cites Gupta's Derksen-invariant strategy as the inspiration; Derksen-Hadas-Makar-Limanov degeneration is standard."
+   ],
+   "nearest_neighbour_quick_check": "Gupta, Invent. Math. 2014 (arXiv 1208.0483): DK(A) proper => A not polynomial, via admissible filtration and gr(A)."
+  }
+ ],
+ "correctness_audit": {
+  "verdict": "No gap found. I read all seven sections line by line and re-checked every displayed polynomial identity with sympy: xy-z(z+1)=p^2(H+pu); Delta fixes x,y,z with Delta H=p^3, Delta^2H=0; the (L,M) inverse; H(L) expansion; C formula; root divisibility H(L*) in p^3B; H+p^3w=L-ph; the e0 certificate; p^3 | H(L*+p^3Z); xy=z(z+1) in R~; f=C1 v, g=b^2 v, v=alpha f+beta g, alpha C1+beta b^2=1 mod ac-bd-1; E_+ example; fiber weight of v=2; auxiliary degrees (relation 0, N 6, a^3b -3). The logical chain (positive invariant -> lift -> V invariant -> case split -> rigidity) is sound as written. More importantly, the Lean formalization proves the exact headline (all five conjuncts) with no sorry/axiom, by a partly different route; if the comparator check passed, the main theorem is machine-verified.",
+  "checked": [
+   "Lemma induced-lnd: deg is a valuation so each monomial in generators has degree equal to its weight; the shift bound and D_0 != 0 via a maximizing generator are correct.",
+   "Prop positive-invariant: F_0A is a subalgebra not containing F (deg 2), so some coordinate has positive degree; d/dq_i kills it.",
+   "Prop extracted-lnd Case 2: D~(v)=2 tau V D~(tau) (since D~V=0) and nu(v)=2m give nu(E v)=m-1 and nu(E^2 v) would be -2. Odd j forced since D~(tau) not in tau G~.",
+   "Prop rigidity: highest auxiliary component of E^2(v)=0 in degree 6+2lambda is (E')^2(N); coprimality of summands from deg N(q)<=1; abc yields D_u=0, D_d=D_a; leading-coefficient identity gives -u^3 a square in K=C(a,d,b)(u), impossible by u-adic order; ah=E'(b), dh=E'(c); h in C[a,d,u] has weight e-2<0. (Argument works for e<=1, stronger than needed.)",
+   "Prop principalization: charts and transition functions; tensoring the injection needs flatness (proved via Laurent charts).",
+   "Cor affine-fibrations: residue-field fibers via residual coordinate; Jacobian ideal is unit; local triviality -> locally polynomial -> Sym of projective (BCW) -> free (Suslin over C[p] or C[p,q])."
+  ],
+  "residual_concerns": [
+   "Extraordinary claim (first char-0 cancellation counterexample), unreviewed. The Lean proof is the strongest evidence; we did not run Lean/comparator (not installed), so trust rests on the published comparator pass.",
+   "Corollaries (SCC failure, Dolgachev-Weisfeiler failure) are NOT formalized and depend on cited theorems (Dutta-Lahiri Thm 3.4, BCW, Suslin) applied to the Lean-verified Thm main; their hypotheses look satisfied but are unchecked by machine.",
+   "Paper's Section 4 relies on Picard invariance and normalized linearization re-proved in a few lines (Weil divisor argument). These are correct for smooth affine X but are not needed by Lean, so any slip there would not affect the main theorem's truth.",
+   "The paper asserts 'Every additive action on the smooth affine base Spec G lifts uniquely' (01:210-213); uniqueness relies on C[t]^*=C^* for domains C, which holds; smoothness of G is proved but only used for regularity in the Pic step."
+  ],
+  "consistency_checks_passed": [
+   "sympy verification of all identities (data/pilot/047/check047.py, check047b.py)",
+   "Lean statement matches Thm main exactly",
+   "Lean defines the same H with variable order p,s,u,F,J",
+   "Lean's independent route agrees on every intermediate object (G, v, aux weights 0,3,-3,0,2, extraction cases)"
+  ]
+ },
+ "extraction_friction": [
+  "Most load-bearing objects are display-math definitions with no environment or \\emph: x,y,z, Delta, L,M, C,Q1,L*,h,e0,W, S,R, s_R,f,g,I, R~, v, h,C1,alpha,beta, G~,V, N, E', h. Inline \\emph definitions are only: residual coordinate, one-stably a coordinate, locally nilpotent, valuation degree, auxiliary grading.",
+  "Sub-lemmas inside proofs: the exact homogeneous pieces red:pieces (unnumbered), coefficient intersection R~∩Q=C0, pairwise coprimality of orbit polynomials.",
+  "The Lean route differs substantively from the paper in four places (degeneration via Rees algebra; positive invariant without homogeneity; lift via slice+Bezout+replica instead of Picard/linearization; sl2 highest weight at the end). A name/docstring join between paper and Lean items fails for these; joined manually here (L04-L13).",
+  "Lean namespace is OAI.ComplexCancellation (not a family id); one Lean dir, no OAI imports.",
+  "Extractor's candidate ranking and 20% dag_share proxy favour carriers (Degeneration.G, AffineModification.T, Determinant.v); dominated_share is more informative (lift 0.20, positive invariant 0.13, extraction+rigidity 0.13).",
+  "For an A2 family the main eureka candidate is the witness, which is in the comparator statement; analytic_check against the formal goal is trivially 'analytic' and must be judged against the posed problem instead.",
+  "No references.bib; bibliography is an inline thebibliography in references.tex (catalog bib column empty)."
+ ],
+ "sources_quick_lit_check": [
+  "https://arxiv.org/pdf/2501.09613",
+  "https://arxiv.org/pdf/1601.04625",
+  "https://arxiv.org/pdf/1903.07851",
+  "https://arxiv.org/pdf/1304.1765",
+  "https://ar5iv.labs.arxiv.org/html/1007.2230",
+  "https://ar5iv.arxiv.org/html/0706.4184",
+  "https://arxiv.org/pdf/1312.6267",
+  "https://arxiv.org/pdf/2607.13593",
+  "https://arxiv.org/pdf/1208.0483",
+  "https://arxiv.org/pdf/1309.1368"
+ ]
+}

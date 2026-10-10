@@ -1,0 +1,706 @@
+{
+ "family": 297,
+ "title": "A ZFC counterexample to Naimark's problem",
+ "analyst_role": "novelty",
+ "date": "2026-10-09",
+ "inputs": [
+  "docs/PLAN.md",
+  "docs/novelty_agent_prompt.md",
+  "data/pilot/287/novelty.json + novelty.md (worked example); data/pilot/242/novelty.json (key schema)",
+  "data/pilot/297/family.json + family.md (this analyst's Phase 1; no trace exists, no f1_* file)",
+  "preprint build/: main.tex + 6 sections + references.bib (14 entries), read in full",
+  "lean/OAI/Analysis/Naimark/*.lean (spot checks: Tracial, Stages, Peaking, HNN, Omission, Homogeneity, Operators, Recursion)",
+  "Full text extracted locally: Akemann-Weaver math/0312135; Calderon-Farah 2006.06886v3; Farah-Hirshberg 1612.01170v2 (Lemma 2.3); Akemann-Wassermann-Weaver 0705.1182",
+  "WebFetch (summariser): arxiv.org/abs/2609.26930, arxiv.org/html/2609.26930v1, exactmathematics.org/mathlibannex/projects/naimark-problem/"
+ ],
+ "base_library_L": "Mathlib d13f23b + references.bib of 297 (14 entries, including Tanaka2026 = arXiv:2609.26930, model-produced). L- = L minus Tanaka2026 (contamination control). CF22 (in L) contains Sec. 8 Questions 8.1-8.2 and Prop 8.3, which pose the bridge problem.",
+ "precedent_checks": [
+  {
+   "ref": "Tanaka, 'A separably representable counterexample to Naimark's problem in ZFC', arXiv:2609.26930v1 (submitted 2026-09-22 18:23 UTC), in L as Tanaka2026",
+   "access": "WebFetch of abs and html v1 (summariser; quotes unverified beyond short fragments)",
+   "relevance": "Earlier ZFC counterexample with a faithful trace (two days before 297). Also claims CH iff a counterexample of density aleph_1 exists (Cor 6.3) and a Lean formalization (MathlibAnnex v0.4.0).",
+   "ai_assistance": "Yes. AI-use statement: construction and proofs 'developed predominantly by OpenAI ChatGPT through an iterative process supervised and reviewed by the author'; ChatGPT and Codex-based tools developed the Lean source; the earlier Brief Report is 'an AI-assisted preliminary account' (summariser wording; verify against PDF).",
+   "method": "Single explicit algebra C*(Pi(CAR), {L_i}) in the reduced atomic representation; unitaries L_i built from shell sums of partial isometries plus rank-one defects; product state excised by projections q_n with tau(q_n)=2^-n; other pure states reached by transporting these projections with KOS automorphisms. 'Neither CH nor a prediction principle is used.' No crossed products, HNN extensions, free products, transfinite recursion, peaking-sequence terminology or dependency-closed sets.",
+   "contains_candidates": {
+    "C1 bridge": "absent",
+    "C2 closed-subiteration": "absent",
+    "C3 countable determination / c^+ schedule": "absent",
+    "C4 peaking expectation": "absent",
+    "C5 q_n = gamma(p_n), tau = 2^-n": "close variant (same transport of trace-2^-n CAR projections by KOS automorphisms)",
+    "C6 reordering": "absent"
+   }
+  },
+  {
+   "ref": "Exact Mathematics with AI, 'Naimark's problem' Brief Report, Draft R1 (2026-09-21) and MathlibAnnex companion project v0.4.0 (2026-09-20)",
+   "access": "Project page via WebFetch (first 100k chars); Brief Report PDF not fetched",
+   "relevance": "Model-produced antecedent of Tanaka2026; 'Publication responsibility: R. Tanaka; no mathematical author designated'.",
+   "ai_assistance": "Yes (site name and Tanaka2026's description of it as AI-assisted).",
+   "contains_candidates": {
+    "C1-C4, C6": "absent per page summary (CAR completions, homogeneity, shell families, GNS, direct sums; no HNN, crossed product, peaking or transfinite recursion)",
+    "C5": "close variant"
+   }
+  },
+  {
+   "ref": "Akemann-Weaver 2004, PNAS 101 (math/0312135), in L",
+   "access": "full text extracted locally",
+   "relevance": "Diamond construction. Thm 2: a pure state extends uniquely to A x_r G iff inequivalent to its translates. Cor 3: for separable simple A, a crossed product by a KOS-type automorphism makes two given states uniquely extending and equivalent. Lemma 1 = cross-excision (re-proved in 297). Lemma 4: club of stages where a pure state restricts purely. Prop 6: at least 2^aleph_0 generators.",
+   "ai_assistance": "n/a (2003)",
+   "contains_candidates": {
+    "C1": "genuinely different (global automorphism, separable base, only two states controlled)",
+    "C3": "club-restriction precursor"
+   }
+  },
+  {
+   "ref": "Calderon-Farah, JFA 285 (2023) (arXiv:2006.06886v3), in L",
+   "access": "full text extracted locally (Sec. 1, 7, 8)",
+   "relevance": "diamond_Cohen + CH suffice. Sec. 8 proposes the architecture: find a separable B whose restrictions uniquely determine the states, add an automorphism of B, and ask (Q8.1) for an 'amalgamation C of B x Z and A' preserving unique extension, 'a partial crossed product of sorts'. Q8.2: an automorphism moving every pure state off its class (open). Prop 8.3: a class of separable simple algebras closed under limits with extensions joining two states and giving (U) for every pure state yields a counterexample under CH.",
+   "ai_assistance": "n/a (2020-2022)",
+   "contains_candidates": {
+    "C1": "problem posed (Q8.1, Prop 8.3); construction absent",
+    "C3": "proposed ('separable C*-subalgebra B ... uniquely determine their extensions')"
+   }
+  },
+  {
+   "ref": "Farah-Hirshberg 2017, PNAS 114 (arXiv:1612.01170v2), in L",
+   "access": "full text extracted locally",
+   "relevance": "Lemma 2.3: separable simple A, countable families X, Y of inequivalent pure states, equivalence relation E on Y; crossed product A x_beta Z realises E with unique extensions for Y.",
+   "ai_assistance": "n/a",
+   "contains_candidates": {
+    "C1": "genuinely different (crossed product; countably many states; separable)"
+   }
+  },
+  {
+   "ref": "Akemann-Wassermann-Weaver 2010, Glasgow MJ 52 (arXiv:0705.1182), in L",
+   "access": "full text extracted locally",
+   "relevance": "Lemma 0.2: f0 o P_u is the unique extension to C*_r(F_R) (free-product word estimate). Prop 0.3 and Remark 1: a pure state restricts purely to a separable (simple) subalgebra containing any given separable one. Thm 0.6: every pure state of C*_r(F_S) extends uniquely to C*_r(F_R), via homogeneity plus automorphism extension.",
+   "ai_assistance": "n/a",
+   "contains_candidates": {
+    "C1": "technique neighbour (free-product unique extension), different statement",
+    "C2": "special case (independent adjunctions, different mechanism)",
+    "C3": "pure-restriction half equivalent"
+   }
+  },
+  {
+   "ref": "Ueda 2008 (IJM 52) and arXiv:math/0601706v4, in L",
+   "access": "not fetched; content as cited in 297 hnn.tex:11-16 and known to the analyst",
+   "relevance": "Reduced HNN extension as a corner of an amalgamated free product, with families of partial isomorphisms.",
+   "ai_assistance": "n/a",
+   "contains_candidates": {
+    "C1": "construction ingredient (N0); no pure-state analysis",
+    "C6": "multi-letter HNN symmetric in the letters, so the reordering is a corollary"
+   }
+  },
+  {
+   "ref": "Judah-Shelah (JuSh292); Horowitz-Shelah, 'Abstract corrected iterations', arXiv:2302.08581 (BUMI 2025)",
+   "access": "search snippets only",
+   "relevance": "Set theory: restricting an FS iteration of Suslin ccc forcings to a set of indices gives a complete subforcing; Horowitz-Shelah extend this to iterations along partial orders with 'adequate' index sets.",
+   "ai_assistance": "n/a",
+   "contains_candidates": {
+    "C2": "structural analogue in another field (complete sub-iteration over closed index sets)"
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "id": "C1",
+   "name": "Selective bridge: reduced HNN extension along matched peaking-projection algebras (T16 with I20, L09, L07)",
+   "paper_items": [
+    "T16 thm bridge (bridge.tex:11-357)",
+    "I20 peak transfer and endpoint criterion (bridge.tex:123-292)",
+    "L09 peaking expectation (states.tex:253-290)",
+    "L07 trace-null supports (states.tex:217-231)"
+   ],
+   "lean": [
+    "PeakingPairData (Peaking.lean:1046)",
+    "Endpoint.word_decay (Peaking.lean:1823)",
+    "PeakingPairData.hnn_unique / hnn_join (HNN.lean:1412-1416)",
+    "TracialStage.hnn (Stages.lean:129)"
+   ],
+   "trace": "no trace for 297",
+   "statement": "A faithfully tracial, no finite-dimensional irreps; (p_n^1),(p_n^2) peak to inequivalent f_1,f_2 with tau(p_n^1)=tau(p_n^2) strictly decreasing to 0. Adjoin v with v p_n^1 v* = p_n^2 as Ueda's reduced HNN extension over D_i = C*(p_n^i). Then every pure state of A has a unique state extension, and the extensions of h,k are equivalent iff h~k or {[h],[k]} = {[f_1],[f_2]}.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "AW04 Thm 2 / Cor 3 (in L)",
+      "relation": "joins two states by a crossed product by a KOS automorphism; needs A separable; unique extension only for the two states (and their orbits)",
+      "verdict": "genuinely different"
+     },
+     {
+      "ref": "FH17 Lemma 2.3 (in L)",
+      "relation": "crossed product realising a prescribed equivalence on a countable set Y with unique extensions; X states get non-unique extensions",
+      "verdict": "genuinely different"
+     },
+     {
+      "ref": "CF22 Sec. 8: Q8.1, Q8.2, Prop 8.3 (in L)",
+      "relation": "asks for an 'amalgamation' of B x Z with A ('a partial crossed product of sorts') preserving unique extension; Prop 8.3 shows a bridge with (U) for all pure states suffices under CH",
+      "verdict": "problem-level precedent (posed, unsolved); object absent"
+     },
+     {
+      "ref": "AWW10 Lemma 0.2 (in L)",
+      "relation": "unique extension through a free product via a word estimate on l^2(F_R)",
+      "verdict": "technique neighbour; different statement"
+     },
+     {
+      "ref": "Ueda 2008 (in L)",
+      "relation": "the reduced HNN construction itself",
+      "verdict": "ingredient (N0)"
+     },
+     {
+      "ref": "Tanaka2026 (in L; model-produced)",
+      "relation": "ZFC counterexample by shell sums and rank-one defects, no HNN",
+      "verdict": "absent"
+     }
+    ],
+    "verdict": "no near-equivalent found; the direction was posed by CF22 Sec. 8",
+    "searches": "WebSearch 2026-10-09: 'HNN extension C*-algebra pure states unique extension Naimark peaking projections'; 'Naimark problem counterexample amalgamated free product OR HNN OR partial crossed product unique pure state extension'; 'reduced free product C*-algebras pure state unique extension'; 'Naimark ZFC counterexample 2026'; 'Naimark ChatGPT/GPT-5/OpenAI'. Full texts: AW04, CF22, FH17, AWW10. zbMATH, MathOverflow and Google Scholar not queried directly."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "Judged against the problem as originally posed (does a C*-algebra with one irrep have to be K(H)?) and against the comparator goal: neither mentions HNN extensions, peaking projections or adjoined unitaries. L contains Ueda's HNN, AAP excision and CF22's questions, but no statement in L has an HNN/amalgamated extension with a unique-extension conclusion. CF22 Q8.1 is a question, not a statement, so it does not make the item analytic, but it shortens the pivot."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "dominated_share": {
+     "Endpoint.model_word_decay": 0.044,
+     "Endpoint.word_decay": 0.042,
+     "hnn_unique/hnn_join": 0.001
+    },
+    "lean": "The bridge is used twice: as every active successor step (TracialStage.hnn, exists_joining_successor_unconditional dominated 0.136) and inside T21 (omitted_endpoint_bridge 0.095). Removing it disconnects main. Supporting Lean branch (States+Amalgamation+Peaking+HNN) is about 10.8k of 25.9k lines.",
+    "note": "Domination fails because of double use; knockout is decisive, as in 287 and 242."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "estimated 1-2 from L: CF22 Q8.1 (in L) points to an amalgamation / partial crossed product; the further steps are (i) shrink B to the abelian algebra generated by peaking projections and use a partial isomorphism D_1->D_2 instead of an automorphism, and (ii) match traces so the HNN data exist (L09) and kill atoms by trace-null supports (L07).",
+    "chain_depth": 1,
+    "chain_note": "Pays off immediately (successor step); its full value (no-other-join for all states) is cashed by C2.",
+    "protocol": "P-C1"
+   },
+   "final": {
+    "N": "N3 (provisional: tests 1-3 pass, test 4 pending)",
+    "F": "F3 (auxiliary construction), with an F5 component (partial isomorphism of small abelian subalgebras replaces a global automorphism)",
+    "confidence": 0.45,
+    "justification": "No construction in any searched source gives an extension that preserves unique extension for all pure states and joins exactly one prescribed pair. The crossed-product precedents (AW04, FH17) need a global automorphism and separability, and the global version of the property is open as CF22 Q8.2. Downgrade pressure: CF22 Sec. 8, which is in L, explicitly suggests a 'partial crossed product' amalgamation for the same goal. The ingredients (Ueda HNN, AAP excision, AW cross-excision, AWW free-product estimates) are all in L. The eureka content is the choice of peaking-projection algebras with matched traces as the HNN data, together with the peak-transfer/trace-null endpoint analysis that makes it work for every old pure state."
+   }
+  },
+  {
+   "id": "C2",
+   "name": "Closed-subiteration theorem: (U) for A[S] in X_delta for every dependency-closed S (T21 with L20, I14)",
+   "paper_items": [
+    "T21 thm closed-extension (iteration.tex:172-279)",
+    "L20 inherited (iteration.tex:132-164)",
+    "I14 dependency sets (iteration.tex:122-130)",
+    "uses P14 reorder (hnn.tex:285-332)"
+   ],
+   "lean": [
+    "dependency_closed_pureUEP (Omission.lean:1596)",
+    "omitted_endpoint_bridge (Omission.lean:1528)",
+    "ChronologicalHistory (Recursion.lean:14)"
+   ],
+   "trace": "no trace",
+   "statement": "In a bridge iteration with countable dependency sets I_j, every dependency-closed S gives an inclusion A[S] in X_delta with property (U). Proof: postpone each omitted active step past the retained ones (reordering), keeping its pair inequivalent by the bridge's no-other-join clause, then apply the bridge.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "AWW10 Thm 0.6 (in L)",
+      "relation": "(U) from C*_r(F_S) to C*_r(F_R): independent adjunctions; proof via homogeneity plus automorphism extension",
+      "verdict": "close variant (special case, different mechanism)"
+     },
+     {
+      "ref": "Judah-Shelah; Horowitz-Shelah arXiv:2302.08581",
+      "relation": "sub-iterations over closed/adequate index sets are complete suborders (set theory)",
+      "verdict": "structural analogue in another field (close variant of the pattern)"
+     },
+     {
+      "ref": "CF22 Sec. 8",
+      "relation": "proposes separable subalgebras that determine states and an amalgamation preserving unique extension",
+      "verdict": "posed"
+     }
+    ],
+    "verdict": "close variants exist at the level of pattern; no C*-algebraic statement found",
+    "searches": "WebSearch 2026-10-09 (forcing sub-iteration complete subforcing; Naimark amalgamation); AWW10 read in full."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "Dependency sets and sub-iterations occur neither in the goal nor in L's C*-statements."
+   },
+   "test3": {
+    "verdict": "pass",
+    "dominated_share": {
+     "dependency_closed_pureUEP": 0.107,
+     "literal_dependency_closed_ambientUEP": 0.111,
+     "omitted_endpoint_bridge": 0.095
+    },
+    "lean": "Sole source of the uniqueness half of countable determination."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "2 (from C1 + reordering P14; reordering is one step from Ueda's multi-letter HNN)",
+    "chain_depth": 2,
+    "chain_note": "Needs C1's no-other-join clause and P14.",
+    "protocol": "P-C2"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.55,
+    "justification": "Templated strengthening: (U) is proved for every closed substructure ('strengthen to all subsets/substructures'), and the induction carries an extra tracked invariant, so it is capped at N2. Close variants exist: the AWW10 special case, and the set-theoretic complete-sub-iteration pattern. The C*-mechanism (postponing adjunctions by HNN reordering while no-other-join keeps the pair apart) is new and is the step that removes diamond, so N3 is plausible if the cap is waived."
+   }
+  },
+  {
+   "id": "C3",
+   "name": "Countable determination and the c^+ schedule replacing diamond (L22, C23, T25, I15)",
+   "paper_items": [
+    "L22 (iteration.tex:288-319)",
+    "C23 (iteration.tex:321-337)",
+    "T25 (construction.tex:22-139)",
+    "I15 schedule (construction.tex:29-39)"
+   ],
+   "lean": [
+    "literal_countable_determination (Omission.lean:1699)",
+    "exists_pair_schedule (Dependencies.lean:950)",
+    "fullTower_pure_reference_unconditional (Tracial.lean:206)"
+   ],
+   "trace": "no trace",
+   "statement": "Every pure state of X_delta is the unique extension of its pure restriction to a separable A[S] with S countable dependency-closed; hence at most c pure states when |delta| <= c, and a fixed injective schedule kappa x kappa -> kappa with kappa = c^+ treats every pure state.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "AWW10 Prop 0.3 + Remark 1",
+      "relation": "pure restriction to a separable subalgebra closed under a countable closure",
+      "verdict": "equivalent (pure-restriction half)"
+     },
+     {
+      "ref": "AW04 Lemma 4 + Thm 5",
+      "relation": "club of pure restrictions; diamond guesses states",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "CF22 Sec. 8, Prop 8.3",
+      "relation": "separable determining subalgebras; CH + L[X] replaces diamond",
+      "verdict": "close variant (architecture posed)"
+     },
+     {
+      "ref": "set-theoretic bookkeeping of length c^+",
+      "relation": "folklore",
+      "verdict": "equivalent (schedule)"
+     }
+    ],
+    "verdict": "close variants; uniqueness half reduces to C2",
+    "searches": "AW04, AWW10, CF22 read in full."
+   },
+   "test2": {
+    "verdict": "partial",
+    "evidence": "The pure-restriction half is in L (AWW10). The uniqueness half is C2."
+   },
+   "test3": {
+    "verdict": "pass",
+    "dominated_share": {
+     "ChronologicalData.countable_determination": 0.156,
+     "literal_countable_determination": 0.153
+    },
+    "lean": "Highest substantive dominated share."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1 from AWW10/CF22 given C2",
+    "chain_depth": 3,
+    "protocol": "P-C3 (low priority)"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.65,
+    "justification": "Assembly of AWW10's restriction argument, C2 and standard bookkeeping. The idea is posed in CF22 Sec. 8."
+   }
+  },
+  {
+   "id": "C4",
+   "name": "Peaking expectation E(a)(n)=tau(d_n a d_n)/tau(d_n), E(a)(infty)=h(a) (L09)",
+   "paper_items": [
+    "L09 (states.tex:253-290)"
+   ],
+   "lean": [
+    "peakingExpectation (States.lean:607)"
+   ],
+   "trace": "no trace",
+   "statement": "For a peaking sequence with traces strictly decreasing to 0, D=C*(p_n)=C(N u infty) and the displayed map is the trace-preserving conditional expectation onto D.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "diagonal expectations onto c_0-type / Cantor masas (e.g. the diagonal of the CAR algebra)",
+      "relation": "atomic averaging expectation",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "close variant",
+    "searches": "not searched separately"
+   },
+   "test2": {
+    "verdict": "pass (weak)",
+    "evidence": "Not in goal or L; elementary given L05."
+   },
+   "test3": {
+    "verdict": "pass (carrier)",
+    "dominated_share": {
+     "peakingExpectation": 0.004
+    },
+    "lean": "frac_dag_dependents 0.192 (carrier)."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 1,
+    "protocol": "folded into P-C1"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "New formula; the only novelty is the value h(a) at infinity, and continuity follows from excision."
+   }
+  },
+  {
+   "id": "C5",
+   "name": "Matched-trace peaking sequence q_n = gamma(p_n) by KOS on a separable determining subalgebra (I25)",
+   "paper_items": [
+    "I25 (construction.tex:61-86)"
+   ],
+   "lean": [
+    "homogeneousCARPeakPair (CAR.lean:445)",
+    "exists_supported_peak_pair_unconditional (Tracial.lean:22)"
+   ],
+   "trace": "no trace",
+   "statement": "gamma from KOS on A[S] carries g to the reference state on A[S]; q_n = gamma(p_n) peaks to g and tau(q_n) = 2^-n because gamma(M_{2^n}) is a unital matrix subalgebra.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Tanaka2026 (model-produced, 2026-09-22)",
+      "relation": "product state excised by q_n with tau(q_n)=2^-n; other pure states reached by transporting these projections with KOS automorphisms",
+      "verdict": "close variant, possibly equivalent (summariser report)"
+     },
+     {
+      "ref": "AW04 Cor 3, FH17 Lemma 2.3",
+      "relation": "KOS automorphisms transport states",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "close variant in model-produced precedent",
+    "searches": "WebFetch of arXiv html 2609.26930v1"
+   },
+   "test2": {
+    "verdict": "fail-ish",
+    "evidence": "KOS (in L) applied to the CAR peaks is a one-step use of L."
+   },
+   "test3": {
+    "verdict": "pass",
+    "dominated_share": {
+     "exists_supported_peak_pair_unconditional": 0.114
+    }
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 1,
+    "protocol": "none (fails test 2)"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.5,
+    "justification": "Close variant in Tanaka2026 (model-produced). It would be N0 if Tanaka's device is confirmed equivalent from the PDF."
+   }
+  },
+  {
+   "id": "C6",
+   "name": "Reordering of two HNN adjunctions over a common base (P14)",
+   "paper_items": [
+    "P14 (hnn.tex:285-332)"
+   ],
+   "lean": [
+    "reorderEquiv (Extension.lean:750)",
+    "hnn_reorder_via_equivs (Homogeneity.lean:841)"
+   ],
+   "trace": "no trace",
+   "statement": "H_k(H_j(O)) = H_j(H_k(O)) fixing O, v_j, v_k, when both data lie in O.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Ueda's HNN extension with a family of partial isomorphisms; associativity of amalgamated free products",
+      "relation": "simultaneous adjunction is symmetric",
+      "verdict": "close variant / corollary"
+     }
+    ],
+    "verdict": "close variant",
+    "searches": "none beyond Ueda citation"
+   },
+   "test2": {
+    "verdict": "fail (near-analytic)",
+    "evidence": "Follows from freeness over O, which is standard."
+   },
+   "test3": {
+    "verdict": "pass",
+    "dominated_share": {
+     "hnn_reorder_via_equivs": 0.042
+    }
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 1,
+    "protocol": "none"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Corollary of the multi-letter HNN or free-product associativity."
+   }
+  },
+  {
+   "id": "C7",
+   "name": "Trace-null supports: tau(r_h)=0 without finite-dimensional irreps (L07)",
+   "paper_items": [
+    "L07 (states.tex:217-231)"
+   ],
+   "lean": [
+    "excision_trace_null_of_small_projections (Representations.lean:1716)"
+   ],
+   "trace": "no trace",
+   "statement": "If B has no finite-dimensional irreps, every tracial state vanishes on the support projection of every pure state.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "folklore: a normal trace vanishes on minimal projections of an infinite type I factor summand of B**",
+      "relation": "same fact",
+      "verdict": "equivalent (folklore)"
+     }
+    ],
+    "verdict": "folklore",
+    "searches": "none"
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Immediate from orthogonal translates."
+   },
+   "test3": {
+    "verdict": "pass",
+    "dominated_share": {
+     "pureExcisionNet_trace_null": 0.003
+    }
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "0-1",
+    "chain_depth": 1,
+    "protocol": "none"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "Folklore; its role in C1 is what matters."
+   }
+  },
+  {
+   "id": "C8",
+   "name": "Lean-only re-proof of KOS homogeneity via near-central rows (I28)",
+   "paper_items": [],
+   "lean": [
+    "KOS.nearCentralRows (Operators.lean:898)",
+    "krylovChain (Operators.lean:403)",
+    "KOS.row_controlled_matching (Stages.lean:1529)"
+   ],
+   "trace": "no trace",
+   "statement": "Kishimoto-Ozawa-Sakai homogeneity, proved with Krylov projection chains and Cesaro-averaged quasicentral rows.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "KOS03 (in L); Arveson/Voiculescu quasicentral approximate units",
+      "relation": "same theorem; known technique",
+      "verdict": "equivalent"
+     }
+    ],
+    "verdict": "existing",
+    "searches": "none"
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Theorem in L."
+   },
+   "test3": {
+    "verdict": "pass",
+    "dominated_share": {
+     "KOS.homogeneity": 0.111
+    }
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "0",
+    "chain_depth": 0,
+    "protocol": "none"
+   },
+   "final": {
+    "N": "N0",
+    "F": null,
+    "confidence": 0.85,
+    "justification": "Re-proof of a cited theorem."
+   }
+  }
+ ],
+ "excluded_from_candidates": [
+  {
+   "paper": "P11/L12 Ueda reduced HNN and amalgamated free product",
+   "reason": "N0, cited and re-proved"
+  },
+  {
+   "paper": "L04/L05/L06 excision, projection excision, cross-excision",
+   "reason": "N0-N1 (AAP86, AW04 Lemma 1)"
+  },
+  {
+   "paper": "L02 Kadison transitivity consequences; L01, L17, L19",
+   "reason": "N0"
+  },
+  {
+   "paper": "I05 peaking sequence",
+   "reason": "N1 naming; folded into C1"
+  },
+  {
+   "paper": "I14 dependency sets; I15 schedule",
+   "reason": "N1 / N0; folded into C2 / C3"
+  },
+  {
+   "paper": "L10 simplicity from (U)+faithful expectation; L15 HNN limits; L18; L20",
+   "reason": "N1-N2 routine; L20 folded into C2"
+  },
+  {
+   "trace": "none",
+   "reason": "no reasoning trace exists for 297"
+  }
+ ],
+ "family_D": {
+  "label": "D3 (provisional)",
+  "confidence": 0.4,
+  "rests_on": "C1 alone (the selective bridge, with its analytic core: peak transfer + trace-null endpoints + peaking expectation). C2 is N2 by the templated cap, borderline N3.",
+  "falls_to": "D2 if (a) Test 4 arm L- for C1 exceeds the calibrated threshold, which is plausible because CF22 Q8.1 is in L and points to a partial-crossed-product amalgamation; (b) an expert (Farah, Vaccaro, Weaver, Ueda, Kishimoto) identifies an earlier HNN/amalgamated-free-product unique-extension result; or (c) the Tanaka/Exact-Mathematics materials (Brief Report PDF, MathlibAnnex source), or any other pre-2026-09-24 model output, contain an HNN bridge. They are absent from the page summaries, but the PDFs were not read.",
+  "not_transfer": "HNN extensions (group theory -> operator algebras, Ueda), KOS homogeneity and set-theoretic bookkeeping are transfer/N0. The candidate is the use of HNN extensions along peaking-projection algebras to obtain selective unique-extension control. No precedent for that use was found, so the transfer exclusion does not apply.",
+  "correctness_caveat": "Grades are conditional on correctness. The family analyst found no gap. The Lean proves the comparator verbatim (no sorry/axiom/native_decide, KOS re-proved) but was not compiled. The existence result is corroborated by an independent (model-produced, unrefereed) construction, Tanaka2026.",
+  "compression_note": "No step-3b run. The bridge is a two-use theorem (successor step and T21), not a definition that is unfolded many times, so no PHP-style blow-up is expected. A 'confirmed eureka' verdict would rest on the downstream test, e.g. reuse of the bridge for Glimm-dichotomy failures (exactly m irreps) or the trace-simplex variants (Vaccaro), which currently need diamond."
+ },
+ "provenance_flag": {
+  "applies": "partial",
+  "builds_on_prior_model_result_strict": false,
+  "model_produced_precedent": true,
+  "explanation": "297 cites Tanaka2026 (arXiv:2609.26930v1, 2026-09-22) as an earlier ZFC construction with a faithful trace. Tanaka2026's AI-use statement says the construction and proofs were developed predominantly by OpenAI ChatGPT, preceded by an AI-assisted Brief Report (2026-09-21) and a MathlibAnnex Lean release (2026-09-20). 297 uses no result from it, and its route (HNN bridge, closed sub-iterations, c^+ recursion) is absent from Tanaka. One device, transporting trace-2^-n CAR projections by KOS automorphisms (C5), is shared. So: model-produced precedent for the theorem and for C5, not builds-on. Both works come from OpenAI models within four days, so a shared lineage cannot be excluded. Web searches for Naimark with ChatGPT/GPT-5/OpenAI/AI-assisted found only Tanaka2026 and its companion pages. The pre-2026 neighbours (AW04, FH17, AWW10, CF22, Ueda) are human."
+ },
+ "bridge_novelty": [
+  {
+   "bridge": "Combinatorial group theory (HNN extensions) -> C*-algebras",
+   "status": "known route",
+   "evidence": "Ueda 2005/2008 reduced HNN extensions of operator algebras (in L)."
+  },
+  {
+   "bridge": "Free products -> unique extension of pure states",
+   "status": "known route (special case)",
+   "evidence": "AWW10 Lemma 0.2 for reduced free group algebras."
+  },
+  {
+   "bridge": "HNN / partial crossed products -> joining pure-state classes for Naimark",
+   "status": "posed, first execution",
+   "evidence": "CF22 Q8.1 asked for a 'partial crossed product of sorts' amalgamation; no construction found before 297."
+  },
+  {
+   "bridge": "Set theory (complete sub-iterations over closed index sets; bookkeeping over c^+) -> C*-algebra recursions",
+   "status": "known pattern, first C*-execution found",
+   "evidence": "Judah-Shelah, Horowitz-Shelah (forcing); AW04/CF22/Farah use diamond, forcing or L[X] instead; AWW10 has the independent-adjunction special case."
+  },
+  {
+   "bridge": "KOS homogeneity -> Naimark constructions",
+   "status": "known route",
+   "evidence": "AW04 Cor 3; FH17; CF22; Tanaka2026."
+  }
+ ],
+ "discoverability_protocols": {
+  "common": {
+   "models": "Training-data cutoff strictly before 2026-09-20 (MathlibAnnex v0.4.0 Naimark release, the earliest model-produced Naimark-in-ZFC artifact; then the Brief Report 2026-09-21 and arXiv:2609.26930 on 2026-09-22). Canary probe: ask whether Naimark's problem has a ZFC counterexample and what 'Tanaka 2026' or 'Exact Mathematics with AI' did; exclude any model that knows either. Exclude the OpenAI model(s) that produced the release and the ChatGPT/Codex lineage that produced Tanaka2026; run them only as an uncontrolled reference arm. No browsing or tools. Judge differs from proposer.",
+   "context_L_minus": "Digest of Mathlib d13f23b API (CStarAlgebra, GNS/PreGNS, states, CStarMatrix, lp, Ordinal/Cardinal) plus 297's bibliography minus Tanaka2026 (13 entries, as abstracts plus invoked statements: AAP86 Prop 2.2, AW04 Lemma 1/Thm 2/Cor 3/Lemma 4/Thm 5/Prop 6, KOS03 Thm 1.1, Ueda HNN Prop 2.2, Blanchard-Dykema, AWW10 Lemma 0.2/Prop 0.3/Thm 0.6, FH17 Lemma 2.3, CF22 Thm 5.4, Sec. 8 Q8.1-8.2, Prop 8.3).",
+   "arms": {
+    "L-": "main, contamination-controlled",
+    "L-minusCF8": "L- with CF22 Sec. 8 removed, to measure how much the posed question helps",
+    "L": "adds Tanaka2026 abstract and method summary",
+    "directed": "states the strategy: build an iteration in which each step joins one pure-state class to a reference class while every old pure state extends uniquely; asks for the successor step"
+   },
+   "sampling": "n = 256 samples per arm, temperature 1.0, fixed reasoning budget; unbiased pass@k for k in {1,2,4,8,16,32,64,128,256}; K = 256.",
+   "judging": "Two independent LLM judges, given 297's precedent paragraph (introduction.tex:113-130) and this file's neighbour lists. A human operator-algebraist checks all hits and 10% of misses. Lean equivalence is impractical (the Lean bridge spans about 10k lines), so judgments rely on the rubric.",
+   "controls": "Positive: Cook-Reckhow ER variables for PHP. Negative: C6 (reordering), C7 (trace-null supports), C8 (KOS), same format.",
+   "prompt_template": "Problem: Construct in ZFC (no diamond, no CH) a unital simple infinite-dimensional C*-algebra with a faithful tracial state and a unique irreducible representation up to equivalence. Library: [L- digest]. Established results you may use: [non-hidden items, verbatim]. [directed: Strategy: ...] Propose the single most useful new construction, lemma or definition, stated precisely, with a proof sketch."
+  },
+  "P-C1": {
+   "item": "C1 selective bridge",
+   "hide": "T16, I20, L09, L07, I05's role as HNN data, P11's use with abelian D_i, and everything downstream that names the bridge (T21, L22, T25, I25). Keep Ueda's HNN (in L) and AAP/AW excision.",
+   "equivalence_criterion": "HIT: an extension obtained by adjoining a unitary that implements a partial isomorphism between two small (abelian / peaking or excising) subalgebras attached to the two states, built as a reduced HNN or amalgamated free product with a trace or expectation killing reduced words, and claimed to give unique extension for ALL pure states with only the designated join. PARTIAL: CF22-style amalgamation A *_B (B x Z) with B separable, or an HNN extension without the all-states unique-extension claim. MISS: crossed product by a global automorphism (AW04/FH17), forcing, or diamond-type guessing.",
+   "k_values": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32,
+    64,
+    128,
+    256
+   ],
+   "pivot": "Report the hit rate separately for arms L- and L-minusCF8; the gap measures the contribution of CF22 Q8.1."
+  },
+  "P-C2": {
+   "item": "C2 closed-subiteration theorem",
+   "hide": "T21, L20, I14, L22's uniqueness half, C23, T25.",
+   "arm_A": "Give C1 (with no-other-join) and P14 (reordering) as established.",
+   "arm_B": "Give C1 only.",
+   "equivalence_criterion": "HIT: introduce countable supports/dependencies for each adjoined unitary and prove unique extension from the subalgebra generated by any support-closed set to the whole algebra, by commuting the omitted adjunctions past the retained ones while keeping their pairs inequivalent. PARTIAL: the statement without that mechanism, or the AWW10-style independent case.",
+   "k_values": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32,
+    64,
+    128,
+    256
+   ]
+  },
+  "P-C3": {
+   "item": "C3 countable determination + c^+ schedule (low priority)",
+   "hide": "L22, C23, T25, I15",
+   "equivalence_criterion": "HIT: every pure state is determined by a separable sub-iteration, so at most c pure states per stage, and bookkeeping of length c^+ replaces diamond.",
+   "k_values": [
+    1,
+    4,
+    16,
+    64,
+    256
+   ]
+  }
+ },
+ "open_questions": [
+  "Read the Tanaka2026 PDF and the Exact Mathematics Brief Report (2026-09-21) directly: verify the AI-use wording and confirm the absence of any HNN/amalgamation bridge or dependency-closed recursion (only summariser output was seen).",
+  "Did the OpenAI run that produced 297 see Tanaka's ChatGPT sessions or the MathlibAnnex release? Only OpenAI can answer; both are OpenAI-model outputs within four days.",
+  "Resolve the 'separably represented' tension: AW04 and the CF22 abstract say Rosenberg excludes separably acting or represented counterexamples, while Tanaka2026 claims a separably representable one. 297 reads Rosenberg as being about the irreducible representation (introduction.tex:27-31). This matters for the field's trust in the model-produced precedent.",
+  "Expert query (Farah, Vaccaro, Ueda, Kishimoto, Weaver): is an HNN or partial-crossed-product extension preserving unique extension of all pure states known or folklore since CF22 Q8.1? This is the main risk to C1's N3.",
+  "Does the bridge settle CF22 Q8.1 as stated (with B a separable subalgebra and a generic automorphism), or only a variant? Record for test-4 judging.",
+  "Downstream test candidates: Glimm-dichotomy failures with exactly m irreps, Vaccaro's prescribed trace simplices, and Farah-Hirshberg's algebras not isomorphic to their opposites, all currently under diamond. Can the bridge plus C2 make them ZFC?",
+  "Compile the Lean (25.9k lines) and confirm main under the permitted axioms; check that KOS.homogeneity is unconditional (it uses nearCentralRows, Operators.lean:898).",
+  "zbMATH, MathOverflow and Google Scholar were not queried directly; repeat the searches for 'HNN extension pure state', 'partial crossed product unique extension' and 'amalgamated free product excision'."
+ ],
+ "sources": [
+  "https://arxiv.org/abs/2609.26930 ; https://arxiv.org/html/2609.26930v1 (Tanaka 2026; WebFetch summariser)",
+  "https://exactmathematics.org/mathlibannex/projects/naimark-problem/ (WebFetch summariser)",
+  "https://arxiv.org/pdf/math/0312135 (Akemann-Weaver 2004; full text)",
+  "https://arxiv.org/pdf/2006.06886v3 (Calderon-Farah; full text)",
+  "https://arxiv.org/pdf/1612.01170v2 (Farah-Hirshberg; full text)",
+  "https://arxiv.org/pdf/0705.1182 (Akemann-Wassermann-Weaver; full text)",
+  "https://arxiv.org/abs/2302.08581 (Horowitz-Shelah; snippet)",
+  "https://en.wikipedia.org/wiki/Naimark%27s_problem (status check)",
+  "https://arxiv.org/abs/1708.04368 (Naimark's problem for graph C*-algebras; status check)"
+ ]
+}

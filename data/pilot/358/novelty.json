@@ -1,0 +1,754 @@
+{
+ "family": 358,
+ "title": "A three-manifold without conjugate points or nonpositive curvature",
+ "analyst_role": "novelty",
+ "date": "2026-10-09",
+ "inputs": [
+  "docs/PLAN.md",
+  "docs/novelty_agent_prompt.md",
+  "data/pilot/287/novelty.json + novelty.md (template)",
+  "data/pilot/358/family.json + family.md (no trace.json, no f1_*.json)",
+  "preprint build/ sections: introduction, cometric, variations (read); turning, global, topology (via family.json)",
+  "lean/docs/358.md; release README (author: OpenAI)",
+  "web: IK, BM, Leeb (PDF text-extracted), Tchuiaga, convexity sources"
+ ],
+ "base_library_L": "Mathlib d13f23b + references.bib of 358 (8 entries: BridsonHaefliger1999, BurnsMatveev2021, Gulliver1975, IvanovKapovitch2014, Leeb1995, KapovichLeeb1996, Milnor1963, Bonahon2009). L contains no convex-analysis / calculus-of-variations source. No model-produced entry, so no L- is needed.",
+ "precedent_checks": [
+  {
+   "ref": "Ivanov-Kapovitch, 'Manifolds without conjugate points and their fundamental groups', arXiv:1205.4455 (v1 2012-05-20), J. Differential Geom. 96 (2014) 223-240 [IvanovKapovitch2014 in L]",
+   "role": "problem source (Q1.1 = Q8.1); Thm 7.1 used for the no-focal-points corollary",
+   "access": "WebFetch of arxiv.org/abs/1205.4455 and ar5iv HTML (summarised by WebFetch; quotes unverified against the PDF)",
+   "ai_disclosure": "none (2012, pre-LLM)",
+   "content_check": {
+    "Q1.1/Q8.1": "'Does every closed Riemannian manifold without conjugate points admit a metric of nonpositive curvature?' (ar5iv, via summariser). The authors suspect a negative answer in general but think it might hold in dimension 3. 358 answers it negatively in dimension 3.",
+    "Q8.2": "Two copies of (punctured torus) x S^1 glued by A in SL(2,Z) with |tr A| > 2; asks whether this admits a metric without conjugate points. No construction proposed. 358's gluing [[1,1],[1,0]] has trace 1 in the (h,f) bases, so 358 does NOT settle Q8.2 as posed (agrees with family.md).",
+    "construction_methods": "IK contain no metric construction, no necks between flat tori, no positive-curvature regions and no convexity of the inverse metric (ar5iv summary). Section 7 rebuilds NPC metrics on geometric pieces from flat tori (O'Sullivan's flat torus theorem) for the no-focal-points case.",
+    "items_present": {
+     "C1": "absent",
+     "C2": "absent",
+     "C3": "absent",
+     "C4": "absent",
+     "C7": "absent (IK say Q8.2 manifolds 'clearly' admit no NPC metric, without proof)"
+    }
+   },
+   "verdict": "Problem source only. Contains none of the candidate items."
+  },
+  {
+   "ref": "Burns-Matveev, 'Open problems and questions about geodesics', arXiv:1308.5417 v3 (2019-09-03), ETDS 41 (2021) 641-684 [BurnsMatveev2021 in L]",
+   "role": "problem source (Question 4.1.2)",
+   "access": "WebFetch of /abs; PDF v3 saved by WebFetch and text-extracted locally with pypdf (bm.txt lines 392-401). Quote verified from extracted text.",
+   "ai_disclosure": "none ('This is the final version of the paper'; no AI statement)",
+   "content_check": {
+    "Q4.1.2": "'If (M,g) has no conjugate points, does M carry a metric with non-positive sectional curvature?' followed by: 'the problem is still open even in dimension 3', citing Croke-Schroeder 1986, Lebedeva 2002, Ivanov-Kapovitch 2014 for group-theoretic necessary conditions.",
+    "related": "Conjecture 7.3.1 (Burago-Kleiner): a no-conjugate-points metric on M^2 x S^1 (closed M of genus >= 2) lifts to a product on the Z-cover. Not contradicted by 358, whose pieces carry product metrics and have boundary.",
+    "items_present": {
+     "all": "absent"
+    }
+   },
+   "verdict": "Problem source only. Re-read here; it confirms the question was open in dimension 3 (family.md listed this as unchecked)."
+  },
+  {
+   "ref": "Leeb, '3-manifolds with(out) metrics of nonpositive curvature', arXiv:dg-ga/9410002 (1994-10-04), Invent. Math. 122 (1995) 277-289 [Leeb1995 in L]",
+   "role": "source of the topological obstruction (paper says 'This is an instance of Leeb's two-piece graph-manifold obstruction')",
+   "access": "WebFetch of /abs; PDF saved by WebFetch and text-extracted locally (leeb.txt lines 397-470). Statements verified from extracted text.",
+   "ai_disclosure": "none (1994)",
+   "content_check": {
+    "Example 4.1": "For two one-ended Seifert pieces (n=0), M admits an NPC metric iff the gluing map preserves the canonical bases, i.e. alpha_* {+-b0,+-f0} = {+-b1,+-f1}. Proof: the splittings <b0>+<f0> and <b1>+<f1> must both be orthogonal for the flat metric sigma_0, and then both pairs are the shortest lattice vectors, so they coincide.",
+    "applied_to_358": "358's gluing h2 = h1 + f1, f2 = h1 sends the basis {h1,f1} to a basis that is not {+-h2,+-f2}, so Example 4.1 gives 'no NPC metric' directly. 358's Thm no-cat0-action re-proves this group-theoretically (flat torus theorem, commutator axis shift zero, orthogonality) and strengthens it to proper cocompact CAT(0) actions.",
+    "neck_metrics": "Leeb's existence constructions (Thms 3.2, 3.3) glue NPC Seifert pieces along isometric flat boundary tori. There is no interpolating neck dt^2 + Q(t) and no conjugate-points discussion.",
+    "items_present": {
+     "C7": "same (Example 4.1 plus its orthogonality proof)",
+     "C5": "close variant (the same orthogonality mechanism; Lean's CN-space version avoids flats)",
+     "C3": "absent",
+     "C1": "absent",
+     "C2": "absent"
+    }
+   },
+   "verdict": "Topological half is N0 (equivalent). Leeb is also the nearest source for 'flat structures on the gluing torus', but contains no neck interpolation."
+  },
+  {
+   "ref": "Croke-Schroeder, 'The fundamental group of compact manifolds without conjugate points', Comment. Math. Helv. 61 (1986) 161-175 (NOT in 358's bibliography)",
+   "role": "classical necessary conditions on pi_1 for metrics without conjugate points",
+   "access": "Not fetched directly (Springer). Content taken from IK 2014 (ar5iv summary) and Dibble arXiv:1811.10095 (search snippets); unverified against the original.",
+   "ai_disclosure": "none (1986)",
+   "content_check": {
+    "results": "For analytic metrics without conjugate points: abelian subgroups of pi_1 are straight and solvable subgroups are virtually abelian (Bieberbach). Dibble (GGD 2021) notes a gap in the finite-generation claim and fills it for all no-conjugate-points metrics; Lebedeva (2002) proved straightness of finitely generated abelian subgroups for length spaces.",
+    "consistency_with_358": "Consistent. pi_1 of 358's graph manifold has Z^2 (gluing torus) and no non-virtually-abelian solvable subgroups (it is not Sol/Nil). IK centralizer splitting also holds (family.md correctness audit). These are necessary conditions only; they cannot certify or refute 358's metric.",
+    "items_present": {
+     "all": "absent (no constructions)"
+    }
+   },
+   "verdict": "No construction and no candidate item. It explains why Sol-type necks are excluded: Sol manifolds have no metric without conjugate points."
+  },
+  {
+   "ref": "Gulliver, 'On the variety of manifolds without conjugate points', TAMS 210 (1975) 185-201 [Gulliver1975 in L]",
+   "role": "background: local modifications creating positive curvature without conjugate points",
+   "access": "AMS PDF returned 403. Method taken from Dibble arXiv:1412.0341 search snippet: a ball is replaced by a constant positive curvature cap with radially symmetric interpolation, under an injectivity-radius condition. Unverified against the original.",
+   "ai_disclosure": "none (1975)",
+   "content_check": {
+    "method": "Radial (rotationally symmetric) comparison inside a ball, on a manifold that already carries a hyperbolic metric. No torus neck, no index-form estimate summed over passages, no convexity criterion.",
+    "items_present": {
+     "C1": "genuinely different (nearest for 'positive region without conjugate points')",
+     "C2": "absent",
+     "C3": "absent"
+    }
+   },
+   "verdict": "Nearest classical neighbour for 'insert positive curvature, keep no conjugate points'. A different mechanism."
+  },
+  {
+   "ref": "Joint-convexity / calculus-of-variations source of the concave-cometric trick: (a) Rockafellar, 'Generalized Hamiltonian equations for convex problems of Lagrange', Pacific J. Math. 33 (1970) 411-427, with Rockafellar, Convex Analysis (1970), Thm 33.1; (b) matrix-fractional joint convexity of (y,P) -> y^T P^{-1} y: Kiefer 1959 (Lemma 3.2, per Ruskai) and Lieb-Ruskai 1974; Boyd-Vandenberghe Sec. 3.1.7; (c) textbook sufficiency 'Euler-Lagrange solutions of a jointly convex problem are global minimisers' (Troutman, Variational Calculus and Optimal Control; Clarke). None of these is in 358's bibliography.",
+   "role": "uncited source of P19/P20's key observation",
+   "access": "WebSearch only (msp.org abstract of Rockafellar 1970; Ruskai/Tropp notes on Kiefer/Lieb-Ruskai). Textbooks not opened.",
+   "ai_disclosure": "none (1959-1974 and textbooks)",
+   "content_check": {
+    "equivalence_derivation": "L(t,tdot,xdot) = (tdot^2 + xdot^T Q(t) xdot)/2. Since y^T P^{-1} y = sup_p (2p^T y - p^T P p), concavity of P(t) makes y^T Q(t) y a supremum of functions convex in (t,y), hence jointly convex. Conversely, by Rockafellar Thm 33.1 the partial conjugate H(t,p) = p^T P(t) p / 2 of a jointly convex L is concave in t. So 'concave cometric' is exactly 'jointly convex geodesic Lagrangian' = 'Hamiltonian concave in position, convex in momentum' (Rockafellar's concave-convex class). 358's E_[a,c](V) is literally the second derivative of the coordinate energy along affine variations (t+rw, x+rz), so E >= 0 is the second-order form of joint convexity. 358 verifies it by direct computation and does not name convexity of the Lagrangian.",
+    "riemannian_use_found": "None. Searches for convex Lagrangian / concave Hamiltonian criteria for no conjugate points in Riemannian constructions found only Hamiltonian-dynamics work that assumes no conjugate points (Contreras-Iturriaga-G.Paternain-M.Paternain, ETDS 1999; Lee arXiv:1202.3836, reduced curvature). Neither gives a position-concavity criterion.",
+    "items_present": {
+     "C2": "core equivalent (nonnegativity of E); the boundary-term design is absent",
+     "C3": "absent"
+    }
+   },
+   "verdict": "C2's core is a known theorem from another field (N0 transfer). Its use to certify no conjugate points across a positively curved region of a closed Riemannian manifold has no precedent in our searches, so it is a new bridge, low-moderate confidence."
+  },
+  {
+   "ref": "Kapovich-Leeb, 'Actions of discrete groups on nonpositively curved spaces', Math. Ann. 306 (1996) 341-352 [KapovichLeeb1996 in L]",
+   "role": "background framework for the group-theoretic obstruction (Thm 2.4)",
+   "access": "Not accessed (no arXiv version found). Relies on family.json's reading of 358's citation.",
+   "ai_disclosure": "none (1996)",
+   "content_check": {
+    "items_present": {
+     "C5": "close variant (paper's own attribution)",
+     "C7": "contains it per 358"
+    }
+   },
+   "verdict": "Not independently verified. See open_questions."
+  },
+  {
+   "ref": "Tchuiaga, 'Isometric splitting of metrics without conjugate points on Sigma x S^1', arXiv:2504.07616 (v1 2025-04-10, v2 2025-12-29). NOT cited by 358.",
+   "role": "the only 2025-2026 work found on the topic. Checked for model provenance and overlap.",
+   "access": "WebFetch of /abs (summarised).",
+   "ai_disclosure": "none on the abstract page (no comments field)",
+   "content_check": {
+    "claim": "Any metric without conjugate points on Sigma x S^1 (closed Sigma, genus >= 2) is a Riemannian product (a Burago-Kleiner type rigidity). No construction, no graph manifolds.",
+    "items_present": {
+     "all": "absent"
+    }
+   },
+   "verdict": "Unrelated to the candidates. Not used. Its claimed rigidity concerns closed products and does not touch 358's pieces, which have boundary."
+  },
+  {
+   "ref": "Pardo-Guerra-Washburn, 'd'Alembert's functional equation and a globally convex free-action principle on positive paths', arXiv:2607.22594 (2026-06-10). Surfaced by the joint-convexity search; not cited.",
+   "role": "2026 preprint on jointly convex actions. Checked because it is recent.",
+   "access": "WebFetch of /abs (summarised).",
+   "ai_disclosure": "none on the abstract page",
+   "content_check": {
+    "items_present": {
+     "all": "absent (scalar positive paths; no matrices, inverse metrics or conjugate points)"
+    }
+   },
+   "verdict": "Unrelated."
+  }
+ ],
+ "candidates": [
+  {
+   "id": "C1",
+   "name": "Returning-passage free-endpoint index estimate",
+   "paper_items": [
+    "P29 prop turning-index (turning.tex)",
+    "P24 turning-gauge (variations.tex)",
+    "P25 turning-time / strict timing margin",
+    "P26 D=H_0^1, Phi_q, S(q,r)",
+    "P27 turning-duality (Cauchy-Schwarz + Schur complement)",
+    "P28 turning-S-bounds (|p1|-relative mixed bound)",
+    "P13 domination inequality |P'p|^2 <= C delta p^T(-P'')p",
+    "Lean: L08 DirectTurning, returning_arbitrary_field_nonnegative (Returning.lean:2265)"
+   ],
+   "trace": "no trace for this family",
+   "statement": "For all sufficiently small delta, every returning neck passage [0,L] and every smooth field V (no endpoint condition) satisfy I^perp_[0,L](V) >= 0, uniformly in the entry angle, turning height and duration L. Proof: a gauge makes w(0)=w(L)=0 and <V,T> affine. The boundary Christoffel term then gives mu(e^T Delta z)^2. Cauchy-Schwarz in L^2(Q)+H_0^1 and a Schur complement reduce the claim to S(p,p) - S(p,e)^2/(S(e,e)+1/mu) <= L, which is closed by three S-bounds and a strict timing margin beta < 1.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Gulliver 1975 (TAMS 210), Sec. 3",
+      "relation": "positive-curvature region with no conjugate points, via radial comparison in a ball",
+      "verdict": "genuinely different"
+     },
+     {
+      "ref": "Riccati / Green-bundle arguments (Hopf 1948; Green 1954; Eberlein; Ballmann-Brin-Burns, JDG 25 (1987))",
+      "relation": "standard tool for certifying no conjugate points; works with Jacobi/Riccati solutions, not with free-endpoint index estimates summed over passages",
+      "verdict": "genuinely different"
+     },
+     {
+      "ref": "Morse index theory with free / natural boundary conditions (Milnor 1963 Secs. 13-15; Ambrose 1961 index theorem for submanifold endpoints)",
+      "relation": "index forms with boundary terms. The general form is textbook; this specific uniform inequality is not",
+      "verdict": "genuinely different (framework only)"
+     },
+     {
+      "ref": "Eptaminitakis-Graham, arXiv:1912.04856 (asymptotically hyperbolic, no interior conjugate points)",
+      "relation": "a delicate construction with no interior conjugate points; method not inspected (abstract only)",
+      "verdict": "genuinely different as far as checked"
+     }
+    ],
+    "verdict": "no near-equivalent found",
+    "searches": "WebSearch (standard/extended) 2026-10-09: 'three-manifold without conjugate points no metric of nonpositive curvature graph manifold'; 'Riemannian metric no conjugate points concave inverse metric cometric torus bundle dt^2+g(t) positive curvature'; 'Gulliver 1975 variety of manifolds without conjugate points construction'; 'Ballmann Brin Burns surfaces with no conjugate points construction'; 'arXiv 2026 graph manifold metric without conjugate points Ivanov Kapovitch question answered'; MathOverflow-targeted query. zbMATH and MathSciNet were not queried, and Gulliver's full text returned 403."
+   },
+   "test2": {
+    "verdict": "fail (borderline): goal-shaped",
+    "evidence": "The statement is the goal's own predicate localised. Through the index criterion (P32, Milnor 1963 in L), 'no conjugate points' is 'I(V) >= 0 for fields vanishing at the ends'. C1 is that predicate on a sub-interval with the endpoint condition dropped, made uniform over a family of passages. It occurs in the goal up to restriction and strengthening, so it is not a new concept. Its proof devices (Hilbert-space Cauchy-Schwarz, Schur complement, convexity of v, strict margin) are standard analytic techniques. The non-analytic content is the choice of which three bounds to prove; that is proof-internal and not a statement-level item."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "down": null,
+    "cone": 0.131,
+    "lean": "returning_arbitrary_field_nonnegative has cone share 0.131 of the 1,753-decl target DAG (0.139 by tokens): below the 20% proxy. Knockout: the no-conjugate-points half (cone 0.765) has no other path for returning passages that leave an end collar, so removing C1 disconnects exists_uniform_compact_noConjugatePoints. The non-NPC half also depends on it in Lean, through L03 (cone 0.972).",
+    "note": "family.json does not give a 'down' share for this item. Cone shares are from the Lean analyst. Paper-side, it is the single non-routine estimate (introduction.tex:87-96)."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "about 3 from L: it needs C2 (coordinate energy and boundary sign), C3 (end germs with P'(0)=kappa e1e1^T) and the P24 gauge in place; 1 once those are given and the target inequality is stated",
+    "chain_depth": 3,
+    "protocol": "P-C1"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "No neighbour found (Test 1 passes), and it is load-bearing by knockout. But the statement is a localised, endpoint-free, uniform strengthening of the goal's own index-nonnegativity predicate. That is the 'uniform/quantitative version' and 'all substructures' strengthening templates by analogy (no induction is involved, and docs/templates.md does not exist), and family.md already noted this fit. Its proof is elementary once C2 and C3 are in place. The analyst's provisional 'N3 weak' is withdrawn. If it were N3 it would be F2."
+   }
+  },
+  {
+   "id": "C2",
+   "name": "Concave cometric => nonnegative coordinate second variation, with an engineered nonnegative boundary term",
+   "paper_items": [
+    "P19 coordinate energy E_[a,c](V) (variations.tex eq:linear-energy)",
+    "P20 lem:coordinate-index: I = E - [<T,Gamma(V,V)>], Gamma(V,V) = (kappa/2) z1^2 d_tau at the ends",
+    "P18 conservation p=Q xdot, F = p^T P p concave",
+    "P23 elementary passages (consequence)",
+    "Lean: Neck.coordinateEnergyDensity (Neck.lean:239), ReturningPassage.energy_nonnegative (Returning.lean:1399), Neck.boundaryTerm (Neck.lean:243)"
+   ],
+   "trace": "no trace",
+   "statement": "For g = dt^2 + dx^T Q(t) dx with P = Q^{-1} concave, the second derivative of energy along coordinate-affine variations equals E = int(wdot^2 + |zdot - P'p w|_Q^2 - F'' w^2/2), a sum of nonnegative terms. The intrinsic index is I = E - [<T,Gamma(V,V)>]. Because P'(0) = kappa e1 e1^T at both ends, the endpoint term is >= 0 at every entry and exit when w = 0 there.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Rockafellar, Pacific J. Math. 33 (1970) and Convex Analysis Thm 33.1: L jointly convex in (x,v) <=> H concave in x and convex in p",
+      "relation": "concave cometric <=> the geodesic Lagrangian (tdot^2 + xdot^T Q(t) xdot)/2 is jointly convex in (t,tdot,xdot), by partial Legendre duality",
+      "verdict": "equivalent (core)"
+     },
+     {
+      "ref": "Kiefer 1959 / Lieb-Ruskai 1974: (y,P) -> y^T P^{-1} y jointly convex and Loewner-decreasing in P",
+      "relation": "gives joint convexity of y^T Q(t) y directly from concavity of P(t)",
+      "verdict": "equivalent (core lemma)"
+     },
+     {
+      "ref": "Classical sufficiency theorem: solutions of the Euler-Lagrange equation of a jointly convex problem are global minimisers, so the second variation along affine variations is >= 0 (Troutman; Clarke; Gelfand-Fomin)",
+      "relation": "E >= 0 is exactly this second-order statement",
+      "verdict": "equivalent (core)"
+     },
+     {
+      "ref": "Second variation of a non-geodesic variation, boundary term <T, D_r W> (Milnor 1963; do Carmo)",
+      "relation": "the identity in P20",
+      "verdict": "equivalent (identity)"
+     },
+     {
+      "ref": "Sol geometry dt^2 + e^{2t}dx^2 + e^{-2t}dy^2 (cometric diag(e^{-2t}, e^{2t}) is CONVEX)",
+      "relation": "the standard torus-neck metric family, with the opposite convexity. Sol manifolds admit no metric without conjugate points (solvable subgroups must be virtually abelian: Croke-Schroeder strategy, completed by Lebedeva 2002 and Dibble 2021)",
+      "verdict": "genuinely different (contrast)"
+     }
+    ],
+    "verdict": "core exists in convex analysis / calculus of variations (transfer). The boundary-sign engineering is a problem-specific variant.",
+    "searches": "WebSearch 2026-10-09: 'jointly convex Lagrangian second variation nonnegative extremals minimizing no conjugate points'; 'Hamiltonian concave in position convex in momentum no conjugate points geodesic flow'; 'Riemannian metric energy convex in coordinates no conjugate points positive curvature'; 'matrix fractional function jointly convex Lieb Ruskai Kiefer'; 'Rockafellar 1970 Hamiltonian concave convex'. No Riemannian use of the criterion was found."
+   },
+   "test2": {
+    "verdict": "pass relative to L",
+    "evidence": "Not a subterm of the goal (which mentions curvature sign and Jacobi fields, never Q^{-1} or convexity). L = Mathlib d13f23b + 8 bib entries contains no convex-Lagrangian sufficiency theorem and no matrix-fractional convexity. Mathlib has ConvexOn, but not the variational statement. So it is non-analytic relative to L, though Test 1 shows it is N0 relative to the wider literature. Side observation (my derivation): in dimension 2, with g = dt^2 + f^2 dx^2, P = f^{-2} is concave iff f'' >= 3 f'^2/f, which forces K <= 0. The device creates positive curvature only through the 2x2 matrix shear. That is why it needs dimension >= 3."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "down": null,
+    "cone": null,
+    "lean": "Every passage estimate (P23, C1, P30) and hence the whole no-conjugate-points half (cone 0.765) uses E >= 0 and the boundary sign. Neck.boundaryTerm has dependents share 0.023. Cometric.P has dependents 0.097 and Cometric.a 0.215 (family.json lean_summary). No cone share is recorded for energy_nonnegative.",
+    "note": "This is the conceptual core of the metric half. Knockout clearly disconnects the main theorem."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "2 from L (the convexity fact is not in L); 1 from L plus Rockafellar/Kiefer",
+    "chain_depth": 1,
+    "protocol": "P-C2"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "The nonnegativity of E is the second-order form of a classical convex-analysis theorem (joint convexity <=> concave-convex Hamiltonian; matrix-fractional convexity). That is N0 transfer, uncited in 358. What is new is the bridge (using it to certify no conjugate points across a positively curved neck) and the design of the end germs so that the intrinsic-coordinate discrepancy has a sign. Transfer plus problem-specific engineering gives N2. The analyst's 'N2 leaning N3' resolves to N2. It could rise to N3 (F5) only as part of a C2+C3 cluster: see family_D."
+   }
+  },
+  {
+   "id": "C3",
+   "name": "Concave cometric neck path with delta/delta^2 scaling and the period trick B1 = delta^2 B2",
+   "paper_items": [
+    "P11 P(t) = d1 e1e1^T + d2 HH^T, H = e2 + eps chi e1, eps = delta^2 (cometric.tex eq:cometric-path)",
+    "P05 lattice B1 = eps B2 and end frames T1, T2 (cometric.tex eq:end-frames; topology.tex)",
+    "P10 cutoff a(u) = exp(-1/(2/3-u)) with a^2 <= -a'",
+    "P13 lem:cometric-bounds",
+    "Lean: Cometric.P/d1/d2/shear/H (Neck.lean:753-764), uniform_cometric_bounds (Neck.lean:1451), Coordinates3.shearD (Gluing.lean:1245)"
+   ],
+   "trace": "no trace",
+   "statement": "A smooth concave path of cometrics on [0,1] equals diag(1+delta A(tau), b) exactly near each end, with P'(0) = kappa e1e1^T. A shear of size delta^2 is introduced only on [5/12,7/12], where both diagonal second derivatives are strictly negative. Choosing the torus periods B1 = delta^2 B2 after delta turns the integral gluing [[1,1],[1,0]] into this coordinate swap plus a tiny shear.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Leeb 1995 (Thms 3.2, 3.3; Sec. 4.1)",
+      "relation": "flat structures on gluing tori, chosen in the hyperbolic plane of conformal classes; pieces glued isometrically, no neck",
+      "verdict": "genuinely different (no interpolation)"
+     },
+     {
+      "ref": "Torus-bundle / Sol-type metrics dt^2 + Q(t) (Thurston geometries; Bolsinov-Taimanov integrable flows on Sol manifolds)",
+      "relation": "a neck interpolating flat torus metrics; Sol's cometric is convex",
+      "verdict": "close variant in form, opposite in the key property"
+     },
+     {
+      "ref": "Buyalo-Svetlov / Buyalo-Kobelskii graph-manifold metric geometry (named by family.json; not opened)",
+      "relation": "realising gluings by choosing lattice periods and flat metrics",
+      "verdict": "close variant (period choice)"
+     },
+     {
+      "ref": "Gulliver 1975",
+      "relation": "interpolating region with positive curvature",
+      "verdict": "genuinely different (radial)"
+     }
+    ],
+    "verdict": "close variants exist for the ingredients (neck ansatz, period choice). The concavity-driven ordering (diagonal first, shear subordinated at delta^2) has no neighbour found.",
+    "searches": "As for C1 and C2, plus the Leeb PDF read directly (Sec. 4.1). Buyalo-Svetlov was not opened."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "No subterm of the goal or L mentions an interpolating cometric. The witness (the metric) does not appear in the comparator, which only asserts existence. Judged against the problem as posed (IK 2012 / BM 2013), it is not analytic. Caveat: once C2's criterion is chosen, a concave path is trivial (linear interpolation P0 + t(P1 - P0) is concave). The content is meeting the end constraints (exact product germs, P'(0) = kappa e1e1^T, NPC collars, the domination inequality), which is engineering in the sense of an F3 gadget."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "down": 0.215,
+    "cone": 0.068,
+    "lean": "Cometric.a dependents share 0.215, Cometric.A 0.192, Cometric.chi 0.143, Cometric.P 0.097. uniform_cometric_bounds has cone 0.068. It is the constructed object, so knockout is total.",
+    "note": "'down' here is the dependents share of the cutoff a (family.json). This is the only candidate that clears the 20% proxy on Lean numbers."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1 once C2 (the concavity criterion) and the end-sign requirement are given; 2-3 from the bare problem",
+    "chain_depth": 2,
+    "protocol": "P-C3"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.65,
+    "justification": "Neck metrics between flat tori and choosing periods to realise gluings are standard (close variants). The specific scaling and ordering is new but designed to meet hypotheses that C2 and C1 set. It is a bespoke F3-type gadget whose difficulty is downstream of choosing C2. Graded N2, as the analyst did."
+   }
+  },
+  {
+   "id": "C4",
+   "name": "Localisation of the index form to neck passages with independent per-passage gauges",
+   "paper_items": [
+    "P31 prop global-assembly (global.tex)",
+    "P17 lem tangential-invariance (pointwise)",
+    "Lean: GlobalAssembly.integral_nonneg_of_passages (Index.lean:1310), realCompactMetric_nonnegative_index (NoConjugatePoints.lean:1575)"
+   ],
+   "trace": "no trace",
+   "statement": "If K <= 0 off an open set U and I^perp_J(V) >= 0 on every component J of gamma^{-1}(U) for every field (no endpoint condition), then I_R(V) >= 0. Countable additivity is used; gauges need not match between passages.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Additivity of the index integral over a partition of the parameter line; tangential invariance of the normal index (textbook)",
+      "relation": "the whole proof",
+      "verdict": "equivalent (ingredients)"
+     },
+     {
+      "ref": "Gulliver-type 'bounded time in the positive region' arguments",
+      "relation": "the same strategic idea of handling a bad region visit by visit",
+      "verdict": "close variant (strategy)"
+     }
+    ],
+    "verdict": "the ingredients are textbook. As a stated principle it was not found, but it is one line once posed.",
+    "searches": "Covered by the C1 searches. No named 'passage localisation' principle was found."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "It is the integral-additivity of the goal's index form plus the pointwise identity P17, both in L (Milnor; Mathlib measure theory). It is a conjunction of L-facts."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "down": null,
+    "cone": null,
+    "lean": "It is the assembly step of the no-conjugate-points half. Lean replaces infinite passages with compact windows.",
+    "note": ""
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 1,
+    "protocol": "P-C4"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "It conjoins two L-facts. Its only content is the decision to ask for free-endpoint estimates, which is credited to C1. Downgraded from the analyst's N2."
+   }
+  },
+  {
+   "id": "C5",
+   "name": "(Lean only) Cyclic shear obstruction in CN-midpoint spaces",
+   "paper_items": [
+    "L05 CNMidpoint.cyclic_shear_obstruction (Convexity.lean:696)",
+    "paper counterpart: P07 Thm no-cat0-action (topology.tex)"
+   ],
+   "trace": "no trace",
+   "statement": "In a proper CN-midpoint space with linear geodesics, there are no isometries f, h with nonempty minsets satisfying [f,h] = 1, h = [a,b] with a,b in C(f), and hf = [c,d] with c,d in C(h). It uses only minsets, axes and axis shifts, with no flat torus theorem.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Leeb 1995 Example 4.1 (orthogonality of the splittings for the gluing torus)",
+      "relation": "the same incompatibility, in the Riemannian setting",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Kapovich-Leeb 1996 Thm 2.4; Bridson-Haefliger II.6.8, II.7.1",
+      "relation": "group-theoretic CAT(0) framework, with axis shifts of commutators in centralisers vanishing",
+      "verdict": "close variant (not opened; per 358's own attribution)"
+     }
+    ],
+    "verdict": "close variant exists",
+    "searches": "Leeb PDF read. KL 1996 search found no accessible copy."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "The relations are exactly those of the goal's manifold, and the method is the minset/axis half of the cited CAT(0) theory in L (BH, KL)."
+   },
+   "test3": {
+    "verdict": "weak (cone 0.035)",
+    "down": null,
+    "cone": 0.035,
+    "lean": "cyclic_shear_obstruction has cone 0.035 and npc_deck_shear_impossible 0.259. It is needed for the non-NPC half in Lean, but the paper route (flat torus theorem) replaces it.",
+    "note": "Route-dependent, so not load-bearing for the result."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 1,
+    "protocol": "P-C5"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "A leaner re-proof of a known obstruction in a weaker metric setting, produced as a Lean engineering choice. Close variant, not a new concept."
+   }
+  },
+  {
+   "id": "C6",
+   "name": "(Lean only) Fibre nontriviality via essential closed geodesics of the constructed metric",
+   "paper_items": [
+    "L03 fiberClass_ne_one (ThreeManifold.lean:36-70)",
+    "L02 closedGeodesic_essential + ncp_exponential_isCoveringMap",
+    "paper counterpart: P06 van Kampen / amalgam normal form"
+   ],
+   "trace": "no trace",
+   "statement": "The circle fibres are closed geodesics of the no-conjugate-points metric, hence not null-homotopic (exp is a covering map), so their classes in pi_1 are nontrivial.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Morse-Hedlund 1942 / Hadamard-Cartan for manifolds without conjugate points: exp_p is a covering map, so closed geodesics are essential",
+      "relation": "the whole content",
+      "verdict": "equivalent"
+     }
+    ],
+    "verdict": "equivalent exists",
+    "searches": "Classical; no search needed beyond confirming Morse-Hedlund (AMS TAMS 1942 surfaced in searches)."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "It applies a classical theorem to the paper's own metric."
+   },
+   "test3": {
+    "verdict": "pass in Lean only",
+    "down": null,
+    "cone": null,
+    "lean": "It couples the halves: realCompact_noNPC has cone 0.972 because of it.",
+    "note": "A route artefact of the formalisation (Mathlib lacks a usable van Kampen)."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 1,
+    "protocol": "none (N1; not worth a run)"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.65,
+    "justification": "A clever cross-use, but mathematically a corollary of a classical theorem. Downgraded from the analyst's N2."
+   }
+  },
+  {
+   "id": "C7",
+   "name": "Topological obstruction: the two-piece graph manifold with gluing h2 = h1 + f1, f2 = h1 has no NPC metric (and no proper cocompact CAT(0) action)",
+   "paper_items": [
+    "P04 the manifold",
+    "P07 Thm no-cat0-action",
+    "P08 Cor no-local-cat0",
+    "P09 Prop no-npc"
+   ],
+   "trace": "no trace",
+   "statement": "pi_1(M) admits no proper cocompact isometric action on a proper CAT(0) space, so M has no NPC metric.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Leeb 1995 Example 4.1 (read in full)",
+      "relation": "NPC iff the gluing preserves {+-b,+-f}; proof by orthogonality of the splittings",
+      "verdict": "equivalent"
+     },
+     {
+      "ref": "Kapovich-Leeb 1996 Thm 2.4",
+      "relation": "the group-theoretic (CAT(0) action) version",
+      "verdict": "equivalent per 358"
+     }
+    ],
+    "verdict": "equivalent exists (the paper says so)",
+    "searches": "Leeb PDF extracted and read."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "The non-NPC conjunct is in the goal. Its proof is in L (Leeb1995)."
+   },
+   "test3": {
+    "verdict": "pass",
+    "down": null,
+    "cone": 0.259,
+    "lean": "npc_deck_shear_impossible has cone 0.259",
+    "note": ""
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "0 (retrieval)",
+    "chain_depth": 0,
+    "protocol": "none"
+   },
+   "final": {
+    "N": "N0",
+    "F": null,
+    "confidence": 0.95,
+    "justification": "It is Leeb's Example 4.1, re-proved. The choice of the simplest non-base-preserving gluing is natural."
+   }
+  }
+ ],
+ "excluded_from_candidates": [
+  {
+   "item": "P01, P02, P16, P17, P32 (no conjugate/focal points, index form, tangential invariance, index criterion)",
+   "reason": "textbook N0, goal vocabulary"
+  },
+  {
+   "item": "P03 'cometric' name, P12 neck ansatz, P14 warped collars, P15/L06 hyperbolic punctured-torus cores (Bonahon 5.5)",
+   "reason": "N0/N1 standard constructions (P03's concavity requirement is graded in C2/C3)"
+  },
+  {
+   "item": "P22 passage classification",
+   "reason": "routine phase-plane analysis (N1)"
+  },
+  {
+   "item": "P30 passage-index, P33 main, P34 no focal points (IK Thm 7.1), L01 coordinate geometry, L04 smooth Cartan-Hadamard, L07, L09, L10",
+   "reason": "case assembly, headline, corollary, or formalisation of classical theorems"
+  }
+ ],
+ "family_D": {
+  "label": "D2",
+  "confidence": 0.6,
+  "rests_on": "C1 (returning-passage estimate), C2 (concave-cometric convexity bridge) and C3 (concave neck construction), all N2. No item passes all of Tests 1-3 cleanly. C1 fails Test 2 (goal-shaped strengthening). C2's core fails Test 1 (it is Rockafellar/Kiefer-Lieb-Ruskai convexity). C3 has close variants and is a hypothesis-driven gadget.",
+  "falls_to": "It would RISE to D3 (F5, cluster C2+C3) only if (i) an expert confirms that no prior Riemannian construction certifies no conjugate points through a jointly convex coordinate Lagrangian / concave cometric, AND (ii) Test 4 (P-C2 open arm and P-C3) gives a hit rate below the calibrated threshold. That is the same coupling argument used for 287's cluster. It would FALL to D1 only if a prior concave-inverse-metric neck construction is found AND C1 is judged a routine estimate (N1). Both seem unlikely.",
+  "not_transfer": "The central idea is transfer (convex analysis / calculus of variations -> Riemannian no-conjugate-points), so it cannot by itself give D3 (PLAN: cross-field transfer alone never yields D3). Any D3 claim must rest on the coupling with the bespoke neck (C3) and the uniform returning estimate (C1).",
+  "analyst_comparison": "family.json gave provisional D3 at low confidence on P29 'N3 weak'. This pass withdraws it: P29 is a localised strengthening of the goal predicate with an elementary proof. family.json itself flagged this risk ('drops to D2 if a judge calls that item N2').",
+  "result_vs_machinery_note": "This is a significant result: it answers IK Q1.1/8.1 and BM Q4.1.2, open since 2012-2013, negatively in dimension 3. The machinery is N2 throughout. The hardness appears to lie in choosing an architecture (neck + convexity certificate + free-endpoint passage estimates) rather than in one non-analytic item. Positive evidence that it was hard: the question stayed open for 13+ years despite expert attention (IK, BM, Tchuiaga 2025 worked nearby).",
+  "correctness_caveat": "The analyst re-derived the key identities and found no gap. Lean has 0 sorry/axiom and imports only Mathlib, but it was NOT built here. Unrefereed. All grades are conditional on correctness."
+ },
+ "provenance_flag": {
+  "applies": "no",
+  "builds_on_prior_model_result_strict": false,
+  "model_produced_precedent": false,
+  "explanation": "All 8 bibliography entries date from 1963-2021 (BurnsMatveev2021 is the ETDS version of arXiv:1308.5417, v1 2013) and predate LLM assistance. The arXiv abstract pages of IK (1205.4455), BM (1308.5417) and Leeb (dg-ga/9410002) carry no AI statement. The paper cites no 2025-2026 work. The only 2025-2026 items found on the topic (Tchuiaga arXiv:2504.07616; Pardo-Guerra-Washburn arXiv:2607.22594) disclose no AI use on their abstract pages, are not cited, and contain none of the candidates. WebSearch for the problem with 'ChatGPT', 'GPT-5', 'OpenAI' or 'AI-assisted' found no model-produced prior work and no prior resolution. The 358 preprint itself is authored 'OpenAI' (release README), so it is model-produced; that is the object under study, not a precedent."
+ },
+ "bridge_novelty": [
+  {
+   "import": "Convex analysis / calculus of variations: a jointly convex Lagrangian (equivalently a Hamiltonian concave in position) has nonnegative second variation; matrix-fractional joint convexity",
+   "into": "Riemannian no-conjugate-points construction (C2)",
+   "classification": "new bridge (no precedent found)",
+   "confidence": 0.5,
+   "evidence": "358 does not cite it. Searches for convex-Lagrangian or concave-Hamiltonian criteria for no conjugate points in Riemannian constructions returned only dynamics papers that assume no conjugate points (CIPP 1999, Lee 2012). Known constructions with positive curvature and no conjugate points (Gulliver 1975; Ballmann-Brin-Burns 1987; Eptaminitakis-Graham 2019) use radial/Riccati comparison. Caveat: the underlying implication is textbook, so an expert may know folklore uses (e.g. for Liouville/warped metrics). In 2D the criterion forces K <= 0, which may explain why it was not used before."
+  },
+  {
+   "import": "CAT(0) metric geometry: flat torus theorem, minsets and axis shifts (BH II.6-II.7)",
+   "into": "topological obstruction (C7)",
+   "classification": "known route",
+   "confidence": 0.95,
+   "evidence": "Leeb 1995 Example 4.1 and Kapovich-Leeb 1996 use exactly this route, and the paper says so."
+  },
+  {
+   "import": "Hyperbolic surfaces (punctured torus with cusp, Bonahon 5.5)",
+   "into": "product cores",
+   "classification": "known route",
+   "confidence": 0.9,
+   "evidence": "Standard in graph-manifold metric constructions (Leeb 1995 Thm 3.2 uses hyperbolic base orbifolds)."
+  },
+  {
+   "import": "Hilbert-space duality (H_0^1 dual norm, Riesz), Schur complement",
+   "into": "returning-passage estimate (C1)",
+   "classification": "known technique, new application",
+   "confidence": 0.7,
+   "evidence": "These are generic analytic tools, and Lean replaces them with a pointwise quadratic. Not a field-level bridge."
+  },
+  {
+   "import": "Matrix analysis (Loewner order, domination inequality)",
+   "into": "cometric bounds (C3)",
+   "classification": "known technique",
+   "confidence": 0.8,
+   "evidence": "Routine matrix calculus."
+  },
+  {
+   "import": "(Lean) Morse-Hedlund / Hadamard-Cartan for no conjugate points",
+   "into": "fibre nontriviality (C6)",
+   "classification": "known route",
+   "confidence": 0.85,
+   "evidence": "A classical consequence. The new element is only its use to bypass van Kampen."
+  }
+ ],
+ "discoverability_protocols": {
+  "common": {
+   "models": "Training-data cutoff strictly before 2026-09-24 (358 preprint date), with no exposure to the openai/math release (2026-10-06). No model-produced precedent exists, so this is the only date constraint. Canary probe: ask whether IK Q1.1/8.1 has been answered and what a 'concave cometric' neck is; exclude any model that recognises the 358 construction. No browsing, retrieval or tools. Run the OpenAI model(s) that produced 358 only as an uncontrolled upper-reference arm. The judge must differ from the proposer.",
+   "context_L": "Mathlib d13f23b (digest: Riemannian/inner-product API, ConvexOn, Loewner order Matrix.PosSemidef, intervalIntegral, ODE uniqueness) plus 358's 8 bibliography entries (abstracts plus the invoked statements: BH II.6.8/II.7.1/II.1A.6, Leeb Ex. 4.1, Milnor Secs. 13-15, IK Thm 7.1, Bonahon 5.5, Gulliver Sec. 3).",
+   "arms": {
+    "L": "main: problem + L, contamination-controlled",
+    "L+": "adds Rockafellar 1970 / Convex Analysis Thm 33.1 and the matrix-fractional lemma, to measure how much having the transfer source in context raises C2 hits",
+    "open": "problem statement only (IK Q8.1 in dimension 3), no direction",
+    "directed": "states the architecture: Leeb Example 4.1 manifold; NPC pieces; a neck dt^2 + dx^T Q(t) dx between the two flat structures; certify no conjugate points by index-form estimates"
+   },
+   "sampling": "n = 256 independent samples per arm, temperature 1.0, fixed reasoning budget (e.g. 32k tokens). Unbiased pass@k for k in {1,2,4,8,16,32,64,128,256}; K = 256.",
+   "judging": "Two independent LLM judges, given the neighbour lists from this file and the paper's own wording (introduction.tex:68-96). A differential geometer checks all hits and 10% of misses. Lean equivalence where possible (Neck.coordinateEnergyDensity, ReturningPassage.energy_nonnegative, returning_arbitrary_field_nonnegative). Partial credit is recorded, not counted.",
+   "controls": "Positive: Cook-Reckhow ER extension variables for PHP. Negative: C4 (passage localisation) and C7 (Leeb obstruction) in the same format.",
+   "prompt_template": "Problem: Is there a closed 3-manifold that admits a Riemannian metric without conjugate points but no metric of nonpositive sectional curvature? Library: [L digest]. [directed: Strategy: take the graph manifold of Leeb Example 4.1 with gluing h2=h1+f1, f2=h1; use NPC product pieces and insert a neck [0,1] x T^2 with metric dt^2 + dx^T Q(t) dx.] Established results you may use: [non-hidden upstream items]. Propose the single most useful new condition, lemma or construction, stated precisely, with a proof sketch."
+  },
+  "P-C2": {
+   "item": "C2 concave cometric => E >= 0, plus the boundary-term sign",
+   "hide": "P19, P20's sign clause, P18's concavity remark, the concavity requirement in P11/P13, and everything downstream (P23-P31)",
+   "arm_A": "directed + L: given the neck ansatz, ask for a pointwise condition on Q(t) that makes the second variation along every neck geodesic nonnegative up to boundary terms",
+   "arm_B": "open + L (decisive for the C2+C3 cluster)",
+   "equivalence": "Hit: any condition equivalent to concavity of Q(t)^{-1} in t (or to joint convexity of y^T Q(t) y in (t,y), or to a Hamiltonian concave in t), together with the coordinate-affine second variation. Partial: 'Lagrangian convex in (position, velocity)' stated with no condition on Q.",
+   "k": "1..256 (powers of 2)",
+   "pivot_distance": "2 from L; 1 in arm L+",
+   "chain_depth": 1
+  },
+  "P-C3": {
+   "item": "C3 concave cometric neck path",
+   "hide": "P05, P10, P11, P13 and downstream",
+   "give": "C2 (with the boundary-sign requirement P'(0) = kappa e1e1^T >= 0 at both ends), Leeb's manifold and the gluing",
+   "equivalence": "Hit: an explicit smooth path P on [0,1] with -P'' >= 0, exact product germs at both ends with end slope a positive multiple of e1e1^T in each end frame, realising the integral gluing (by a period choice or an equivalent normalisation). Lean check: Cometric.uniform_cometric_bounds-type statement. Linear interpolation alone is a miss (it violates the end germs).",
+   "k": "1..256",
+   "pivot_distance": "1 given C2",
+   "chain_depth": 2
+  },
+  "P-C1": {
+   "item": "C1 returning-passage estimate",
+   "hide": "P24-P29, P13's domination clause, L08",
+   "give": "C2, C3, the passage classification P22, the elementary passages P23, and the target statement 'I^perp >= 0 on every returning passage, uniformly'",
+   "equivalence": "Proof-completion task: the proposal is a hit if a judge (with Lean check against returning_arbitrary_field_nonnegative where formalisable) accepts a complete, uniform-in-L argument. Record separately whether it identifies (i) the boundary term controlling only e^T Delta z, (ii) a |p1|-relative mixed bound, (iii) a strict timing margin.",
+   "k": "1..256",
+   "pivot_distance": "about 3 from L; 1 given C2, C3 and the target",
+   "chain_depth": 3
+  },
+  "P-C4": {
+   "item": "C4 passage localisation",
+   "hide": "P31",
+   "equivalence": "Hit: reduce global index nonnegativity to free-endpoint estimates on each component of gamma^{-1}(neck).",
+   "k": "1..64",
+   "pivot_distance": 1,
+   "chain_depth": 1
+  },
+  "P-C5": {
+   "item": "C5 cyclic shear obstruction (Lean)",
+   "hide": "L05 and the flat torus theorem from context",
+   "equivalence": "Hit: an obstruction proof that uses only minsets, axes and axis shifts.",
+   "k": "1..64",
+   "pivot_distance": 1,
+   "chain_depth": 1
+  }
+ },
+ "open_questions": [
+  "Expert query (e.g. Kapovitch, Ivanov, Burns, Knieper, Ruggiero, Gulliver): is a convex-Lagrangian / concave-cometric certificate for no conjugate points known or folklore in Riemannian geometry, e.g. for Liouville or torus-bundle metrics? This decides whether C2's bridge is new and whether the C2+C3 cluster could reach N3.",
+  "Does a 358-style neck also handle IK Q8.2 (|tr A| > 2)? With periods chosen as for C3, a concave path may still exist. If it does, the device generalises and the downstream speedup test has a natural held-out target.",
+  "Run Lean: lean.md is text-only. Confirm that exists_uniform_compact_noConjugatePoints and realCompact_noNPC compile under the permitted axioms.",
+  "Kapovich-Leeb 1996 Thm 2.4 and Buyalo-Svetlov were not opened. Verify C5's 'close variant' grade and C3's period-choice precedent.",
+  "Gulliver 1975 full text returned 403; the method is taken from Dibble's description. Confirm that there is no coordinate-convexity argument there.",
+  "docs/templates.md (the strengthening template library referenced in PLAN) does not exist. C1's cap is applied by analogy to 'uniform/quantitative version' and 'strengthen to all substructures'. Ratify or reject.",
+  "zbMATH / MathSciNet / Google Scholar were not queried. Repeat searches for 'no conjugate points' + 'graph manifold' (2014-2026) and 'jointly convex' + 'conjugate points' + 'Riemannian'.",
+  "Quotes from IK (ar5iv) passed through WebFetch's summariser and are unverified. Leeb and Burns-Matveev quotes were checked against locally extracted PDF text."
+ ],
+ "sources": [
+  {
+   "ref": "Ivanov-Kapovitch arXiv:1205.4455",
+   "url": "https://arxiv.org/abs/1205.4455",
+   "also": "https://ar5iv.arxiv.org/html/1205.4455"
+  },
+  {
+   "ref": "Burns-Matveev arXiv:1308.5417v3",
+   "url": "https://arxiv.org/abs/1308.5417"
+  },
+  {
+   "ref": "Leeb arXiv:dg-ga/9410002",
+   "url": "https://arxiv.org/abs/dg-ga/9410002"
+  },
+  {
+   "ref": "Croke-Schroeder 1986 (Springer)",
+   "url": "https://link.springer.com/article/10.1007/BF02621908"
+  },
+  {
+   "ref": "Dibble arXiv:1811.10095 (abelian subgroups; Croke-Schroeder gap)",
+   "url": "https://arxiv.org/abs/1811.10095"
+  },
+  {
+   "ref": "Dibble arXiv:1412.0341 (describes Gulliver's construction)",
+   "url": "https://arxiv.org/abs/1412.0341"
+  },
+  {
+   "ref": "Gulliver 1975 TAMS",
+   "url": "https://www.ams.org/journals/tran/1975-210-00/S0002-9947-1975-0383294-0/"
+  },
+  {
+   "ref": "Rockafellar 1970 PJM 33",
+   "url": "https://msp.org/pjm/1970/33-2/p12.xhtml"
+  },
+  {
+   "ref": "Tropp note on joint convexity (Lieb-Ruskai / Kiefer attribution context)",
+   "url": "https://tropp.caltech.edu/papers/Tro12-Joint-Convexity.pdf"
+  },
+  {
+   "ref": "Contreras-Iturriaga-Paternain-Paternain, Convex Hamiltonians without conjugate points (ETDS 1999)",
+   "url": "https://www.cimat.mx/~gonzalo/papers/ham.pdf"
+  },
+  {
+   "ref": "Lee arXiv:1202.3836",
+   "url": "https://arxiv.org/abs/1202.3836"
+  },
+  {
+   "ref": "Tchuiaga arXiv:2504.07616",
+   "url": "https://arxiv.org/abs/2504.07616"
+  },
+  {
+   "ref": "Pardo-Guerra-Washburn arXiv:2607.22594",
+   "url": "https://arxiv.org/abs/2607.22594"
+  },
+  {
+   "ref": "Eptaminitakis-Graham arXiv:1912.04856",
+   "url": "https://arxiv.org/abs/1912.04856"
+  },
+  {
+   "ref": "Ballmann-Brin-Burns JDG 25 (1987)",
+   "url": "https://projecteuclid.org/journals/journal-of-differential-geometry/volume-25/issue-2/On-surfaces-with-no-conjugate-points/10.4310/jdg/1214440852.pdf"
+  }
+ ]
+}

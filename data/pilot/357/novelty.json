@@ -1,0 +1,584 @@
+{
+ "family": 357,
+ "title": "Bi-Lipschitz coordinates at every regular RCD point",
+ "analyst_role": "novelty",
+ "date": "2026-10-09",
+ "inputs": [
+  "docs/PLAN.md",
+  "data/pilot/287/novelty.json + novelty.md (template)",
+  "data/pilot/357/family.json + family.md (this agent, phase 1)",
+  "preprint build/source/*.tex + references.bib (read in full)",
+  "no trace.json, no f1_*.json, no Lean for 357"
+ ],
+ "base_library_L": "Mathlib d13f23b (no RCD/Ricci-limit content) + 357's references.bib (30 entries, incl. HZ26 = arXiv 2608.16021 and GV25). L- = L minus HZ26 for contamination control (HZ26 contains no candidate item but states the conjecture).",
+ "precedent_checks": [
+  {
+   "ref": "HZ26: Honda-Zhang, 'Regularity and structure of spaces with synthetic Ricci bounds and positive injectivity radius', arXiv:2608.16021v1 (17 Aug 2026)",
+   "why_checked": "2026 work; the paper's stated source of the conjecture and of 'noncommuting normalization matrices' (Thm 3.8).",
+   "access": "WebFetch abs page (ok); PDF downloaded via WebFetch and text-extracted with pypdf (ok).",
+   "ai_disclosure": "none. Acknowledgements (Sec 1.5) thank the Simons Center, the Bernoulli Center (EPFL), Man-Chun Lee and Tadashi Fujioka; no mention of AI, ChatGPT, OpenAI or language models (grep of full text).",
+   "conjecture_wording_verified": "'it is conjectured, for example in [CC97], that every regular point in the non-collapsed setting admits a bi-Lipschitz chart' (HZ26 Sec 1.2, from extracted PDF text). Also: 'None has a positive answer for general Ricci limit or RCD spaces.'",
+   "contains_candidates": {
+    "C1": "absent (HZ26 proves bi-Lipschitz charts under positive injectivity radius via Morrey-type estimates; no value-space iteration)",
+    "C2": "absent",
+    "C3": "close variant only in the weak sense of 'normalization matrices' (Thm 3.8), per the paper's own remark",
+    "others": "absent"
+   }
+  },
+  {
+   "ref": "GV25: Gigli-Violo, 'Notes on the Cheeger and Colding version of the Reifenberg theorem for metric spaces', arXiv:2406.13771 (June 2024; BUMI 2025)",
+   "why_checked": "2025 publication; the paper's precedent for summability-driven bi-Lipschitz parametrizations in metric spaces.",
+   "access": "WebFetch abs page (summarized).",
+   "ai_disclosure": "none on abs page.",
+   "contains_candidates": {
+    "C1": "absent; GV25 assumes summability of ordinary GH flatness errors (first-order), which regularity does not supply; architecture is the classical Reifenberg composition",
+    "C2": "absent"
+   }
+  },
+  {
+   "ref": "DPG18 v3: De Philippis-Gigli, arXiv:1708.02060v3 (revised 23 Jun 2025)",
+   "why_checked": "bib entry cites the 2025 revision.",
+   "access": "WebFetch abs page.",
+   "ai_disclosure": "none; v3 comment: 'Clarified the proof of Proposition 3.2, in particular step 2.2 (thank to Liming Yin for pointing this out)'.",
+   "contains_candidates": {
+    "all": "absent (supplies volume convergence/rigidity, regular set full measure)"
+   }
+  },
+  {
+   "ref": "Naber, 'Conjectures and open questions on the structure and regularity of spaces with lower Ricci curvature bounds', arXiv:2010.10031 (SIGMA 2020)",
+   "why_checked": "not cited by 357; checked for problem status.",
+   "access": "WebFetch abs + ar5iv (summarized; quotes unverified).",
+   "ai_disclosure": "n/a (2020).",
+   "finding": "Open Problem 2.2 asks whether noncollapsed limits are bi-Lipschitz to a manifold away from a codimension-two set; Example 2.3 (Colding-Naber) has every tangent R^n but harmonic or distance coordinates cannot be bi-Lipschitz. 357's Cor 1.2 would answer OP 2.2 in local-chart form; the paper does not mention it.",
+   "contains_candidates": {
+    "all": "absent"
+   }
+  },
+  {
+   "ref": "Model-produced prior work search",
+   "why_checked": "brief Task 2",
+   "access": "WebSearch: 'bi-Lipschitz regular points Ricci limit RCD ChatGPT OR GPT-5 OR OpenAI OR AI-assisted'; extended search for 2026 proofs of the regular-point statement.",
+   "finding": "No model-assisted or prior human proof of the regular-point bi-Lipschitz statement found. Only hit with AI content was an unrelated news item."
+  }
+ ],
+ "candidates": [
+  {
+   "id": "C1",
+   "name": "Value-space renormalization iteration with l^2 diagonal second-derivative recurrence",
+   "paper_items": [
+    "I43 iteration h_{i+1}=h_i+(Dh_i)^{-T}v_i + metric-step identity (renormalization.tex:308-337)",
+    "I47 Prop re:metric-iteration (renormalization.tex:507-685)",
+    "I41 field v_i (renormalization.tex:198-203)"
+   ],
+   "trace": "no trace exists",
+   "statement": "Build smooth maps h_i on the value domain Omega=u(B_1(p)) by h_{i+1}=h_i+J_i^{-T}v_i, v_i=sum_y phi_{i,y}D_{i,y}(P-c_{i,y}). The inverse transpose makes |J_{i+1}xi|^2-|J_ixi|^2 = 2 xi^T Dv_i xi - 2<D^2h_i(xi,xi), J_i^{-T}v_i> + |DW xi|^2; with b_i=r_i|D^2h_i(xi,xi)|/q_i obeying b_{i+1}<=b_i/2+C(sqrt(Z_i[xi])+sqrt(E_i)q_i), all errors are summed using sum E_i only, giving J_k^TJ_k ~ H_k (possibly unbounded) and a bi-Lipschitz limit F=lim h_i o u.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Toro, 'Geometric conditions and existence of bi-Lipschitz parameterizations', Duke Math. J. 77 (1995); David-Toro, Mem. AMS 215 (2012) [DT12, cited; Prop 8.34]",
+      "relation": "Reifenberg-type maps f_{k+1}=sigma_k o f_k with sigma_k = Id + sum_j psi_j (pi_j - Id) (partition-of-unity patch corrections); square-summable flatness suffices because distortion is second order (Pythagoras).",
+      "verdict": "close variant in architecture (patch-wise corrections summed over scales, square-summability), genuinely different in mechanism: in 357 the needed metric change is FIRST order and accumulates without bound (H_k unbounded), the target is intrinsic, and the error is controlled by the J^{-T} identity plus the diagonal recurrence, not by Pythagoras."
+     },
+     {
+      "ref": "Gigli-Violo 2025 [GV25, cited], Cheeger-Colding Reifenberg for metric spaces",
+      "relation": "bi-Lipschitz parametrization of metric spaces under summable GH errors.",
+      "verdict": "genuinely different (needs first-order summability; 357 explicitly avoids it)."
+     },
+     {
+      "ref": "Nash 1954/1956 C^1 and C^infty isometric embeddings; Nash-Kuiper; Nash-Moser",
+      "relation": "iteratively add positive-definite metric increments (sums of primitive metrics), controlling errors and derivative loss across stages.",
+      "verdict": "genuinely different (codimension, oscillatory corrugations, mollification) but the closest conceptual template for 'realize an accumulated positive metric increment stagewise'. Not cited by 357."
+     },
+     {
+      "ref": "Cheeger-Naber 2015 Thm 1.32 [CN15]; Cheeger-Jiang-Naber 2021 Sec 7 transformation theorem [CJN21]; Huang-Huang 2024 [HH24]; Honda-Zhang 2026 Thm 3.8 [HZ26]",
+      "relation": "scale-dependent matrices T_{x,r} normalizing harmonic splitting maps; noncommuting normalization matrices.",
+      "verdict": "genuinely different: they normalize u separately at each (x,r) and never produce one map; the paper notes 'those freedoms alone do not remove the Holder loss' (introduction.tex:186-188)."
+     },
+     {
+      "ref": "Bonk-Lang, 'Bi-Lipschitz parameterization of surfaces' (Math. Ann. 2003); 2D Alexandrov/Reshetnyak theory",
+      "relation": "bi-Lipschitz charts for 2D surfaces under curvature-measure smallness.",
+      "verdict": "genuinely different (2D uniformization methods)."
+     }
+    ],
+    "verdict": "no equivalent found; nearest structural neighbour is the Toro/David-Toro patch-correction construction (close in architecture, different in mechanism)",
+    "searches": "WebSearch (standard + extended): 'bi-Lipschitz chart regular point noncollapsed RCD space conjecture'; 'bi-Lipschitz regular point noncollapsed Ricci limit 2026 arXiv'; 'Ricci limit bi-Lipschitz Dini volume ratio summable harmonic coordinates'; 'Toro 1995 bi-Lipschitz parameterizations square summable'; 'metric space Reifenberg bi-Lipschitz square summable/Dini'; 'Nash iteration metric increment primitive metrics'; 'iterative composition positive definite pullback increments bi-Lipschitz'; 'Cheeger Jiang Naber sharp splitting Hessian estimate volume pinching'. WebFetch: arXiv abs 2608.16021 (+PDF text), 2406.13771, 1708.02060v3, 2010.10031 (abs + ar5iv). zbMATH / MathOverflow / Google Scholar not queried directly; absence claims rest on WebSearch plus analyst knowledge."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "The goal only asks for some bi-Lipschitz homeomorphism; no statement in L (bib or Mathlib) contains a map on coordinate-value space whose pullback accumulates mass forms, nor the diagonal recurrence. Judged against the problem as posed (CC97/HZ26): the natural candidates were harmonic or distance coordinates, which are known to fail (Naber Ex. 2.3), so the iteration is not a subterm of the posed problem either."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "down": 0.13,
+    "cone": 0.913,
+    "note": "Paper DAG (46 items on path): I43 down 0.13, I47 down 0.065 (below the 20% proxy because the chain is linear and these sit at the end), cone of I47 = 0.91. Knockout: Sections 2-3 alone give only bi-Holder/Reifenberg control; removing the iteration disconnects Thm 1.1 with no alternative route in the paper. As in 287, judged by knockout and both shares reported."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "about 2 from L (Reifenberg patch corrections + choosing J^{-T} so the leading term is a metric increment); about 1 once I22 and I34 are supplied and the strategy 'compensate in value space' is stated",
+    "chain_depth": 2,
+    "protocol": "P-C1"
+   },
+   "final": {
+    "N": "N3 (provisional: tests 1-3 pass, test 4 pending)",
+    "F": "F5 (F3 secondary)",
+    "confidence": 0.4,
+    "justification": "No equivalent found in GMT (Toro/David-Toro), metric Reifenberg (GV25), Ricci-limit transformation theory (CN15, CJN21, HH24, HZ26) or Nash-type iterations. The decisive content is the pairing of (i) a value-space representation in which a non-summable first-order Gram drift becomes a positive metric increment and (ii) the l^2 diagonal recurrence that lets errors be summed with sum E_i instead of sum sqrt E_i. Risks: a judge may treat it as the David-Toro sigma_k construction plus a Newton-type step (N2); and Test 4 given I22+I34 may show a low pivot. The Gevrey jet layer is templated and excluded (C7)."
+   }
+  },
+  {
+   "id": "C2",
+   "name": "Summable directional pinching (two-centre commutator + radial transport + sharp projection)",
+   "paper_items": [
+    "I34 Prop pi:directional-pinching (pinching.tex:1034-1132)",
+    "I31 commutator (701-798)",
+    "I33 sharp projection (909-1032)"
+   ],
+   "trace": "no trace exists",
+   "statement": "D_{i,y}[u(x)-u(z)] <= C r_i^2 (E_i(x)+E_i(z)) for x,z,y within C_sep r_i, with sup_x sum_i E_i(x) -> 0: the normalized Bochner mass in the direction of actual coordinate differences is controlled by summable volume-pinching defects at the two points.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Cheeger-Jiang-Naber, Annals 2021 [CJN21, cited], Thm 6.1 / Prop 6.4 (sharp splitting)",
+      "relation": "existence of splitting maps whose L^2 Hessian (and Ricci term) is bounded LINEARLY by the volume/entropy pinching at k+1 effectively spanning points; Poisson replacement of d^2.",
+      "verdict": "close variant (357's estimate is the one-direction, two-point version, transported to value space)"
+     },
+     {
+      "ref": "Breiner-Park, arXiv:2506.08317 (2025)",
+      "relation": "points-version of CJN sharp splitting via Green-function monotonicity.",
+      "verdict": "close variant (not cited by 357)"
+     },
+     {
+      "ref": "Cheeger-Colding 1996 [CC96, cited]",
+      "relation": "Poisson replacement of squared distance, almost rigidity.",
+      "verdict": "component"
+     }
+    ],
+    "verdict": "close variant exists (CJN21 Thm 6.1); the paper names CC96 and CJN21 as antecedents (introduction.tex:176-181; pinching.tex:87-91)",
+    "searches": "WebSearch (standard + extended): 'bi-Lipschitz chart regular point noncollapsed RCD space conjecture'; 'bi-Lipschitz regular point noncollapsed Ricci limit 2026 arXiv'; 'Ricci limit bi-Lipschitz Dini volume ratio summable harmonic coordinates'; 'Toro 1995 bi-Lipschitz parameterizations square summable'; 'metric space Reifenberg bi-Lipschitz square summable/Dini'; 'Nash iteration metric increment primitive metrics'; 'iterative composition positive definite pullback increments bi-Lipschitz'; 'Cheeger Jiang Naber sharp splitting Hessian estimate volume pinching'. WebFetch: arXiv abs 2608.16021 (+PDF text), 2406.13771, 1708.02060v3, 2010.10031 (abs + ar5iv). zbMATH / MathOverflow / Google Scholar not queried directly; absence claims rest on WebSearch plus analyst knowledge."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "Not a subterm of the goal. CJN21's statement is in L but in a different form (Hessian of a constructed splitting map at spanning points), so the item is not literally in L; up to equivalence it is near-analytic relative to CJN21."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "down": 0.174,
+    "cone": 0.609,
+    "note": "Needed for the field-value bound |v_i|_Q <= C sqrt(eps E) r and the diagonal error bound; without it the per-scale error is eps_i, which need not be summable."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1 from CJN21 Thm 6.1 once the direction u(x)-u(z) is singled out",
+    "chain_depth": 1,
+    "protocol": "P-C2"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.65,
+    "justification": "Close variant of CJN21 sharp splitting (named by the paper). The radial transport and the linear-rate sharp projection are careful new technique but not a new concept."
+   }
+  },
+  {
+   "id": "C3",
+   "name": "Mass forms D_{i,y} on coordinate-value space and their two-sided cumulative comparison with H_k",
+   "paper_items": [
+    "I22 Lemma co:cumulative-comparison and def co:D-definition (coordinates.tex:1093-1166)"
+   ],
+   "trace": "no trace exists",
+   "statement": "D_{i,y}=R_i(y)^{-1}[r_i^{2-n}M(B_{Lr_i}(y))]R_i(y)^{-1}; for bounded weighted families of nearby centres, Id+sum Z_i <= C_* H_k and H_k <= C_*(Id+sum S_i).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "CJN21 Sec 8.1-8.2 heat Gram normalization and quadratic telescoping",
+      "relation": "same telescoping of heat-averaged Gram matrices",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "CN15 Thm 1.32; HH24 Thm 4.1; HZ26 Thm 3.8",
+      "relation": "normalized Hessian/Bochner energies of transformed harmonic maps",
+      "verdict": "close variant (D_{i,y} = R^{-1/2} M(U_{i,y}) R^{-1/2}, the same data read on value space)"
+     }
+    ],
+    "verdict": "close variant",
+    "searches": "WebSearch (standard + extended): 'bi-Lipschitz chart regular point noncollapsed RCD space conjecture'; 'bi-Lipschitz regular point noncollapsed Ricci limit 2026 arXiv'; 'Ricci limit bi-Lipschitz Dini volume ratio summable harmonic coordinates'; 'Toro 1995 bi-Lipschitz parameterizations square summable'; 'metric space Reifenberg bi-Lipschitz square summable/Dini'; 'Nash iteration metric increment primitive metrics'; 'iterative composition positive definite pullback increments bi-Lipschitz'; 'Cheeger Jiang Naber sharp splitting Hessian estimate volume pinching'. WebFetch: arXiv abs 2608.16021 (+PDF text), 2406.13771, 1708.02060v3, 2010.10031 (abs + ar5iv). zbMATH / MathOverflow / Google Scholar not queried directly; absence claims rest on WebSearch plus analyst knowledge."
+   },
+   "test2": {
+    "verdict": "borderline",
+    "evidence": "Up to the conjugation identity co:M-scaling (coordinates.tex:375-376) D_{i,y} is the normalized Bochner mass of the normalized coordinates, an object present in L (CJN21-type energies). The value-space reading is new; the object is not."
+   },
+   "test3": {
+    "verdict": "pass",
+    "down": 0.304,
+    "cone": 0.37,
+    "note": "down share 0.30 >= 20%; supplies the leading term of the metric bootstrap."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 1,
+    "protocol": "P-C3"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Re-expression of known normalized energies plus a non-commutative telescoping that follows CJN21 Sec 8."
+   }
+  },
+  {
+   "id": "C4",
+   "name": "Non-commutative weighted inverse increments",
+   "paper_items": [
+    "I20 Lemma co:inverse-increments (coordinates.tex:946-1039)",
+    "I21 co:normalization-error"
+   ],
+   "trace": "no trace exists",
+   "statement": "C^{-1}H_k <= Id+sum_{i<k} H_iN_iH_i <= C H_k and sum F_i[H_i xi] <= C H_k[xi], without commutativity and without bounded H_k.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "CJN21 Sec 8.1-8.2",
+      "relation": "quadratic telescoping of heat Gram matrices",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "standard operator-monotonicity of inversion; discrete convolution (Young) bounds",
+      "relation": "proof technique",
+      "verdict": "component"
+     }
+    ],
+    "verdict": "close variant",
+    "searches": "WebSearch (standard + extended): 'bi-Lipschitz chart regular point noncollapsed RCD space conjecture'; 'bi-Lipschitz regular point noncollapsed Ricci limit 2026 arXiv'; 'Ricci limit bi-Lipschitz Dini volume ratio summable harmonic coordinates'; 'Toro 1995 bi-Lipschitz parameterizations square summable'; 'metric space Reifenberg bi-Lipschitz square summable/Dini'; 'Nash iteration metric increment primitive metrics'; 'iterative composition positive definite pullback increments bi-Lipschitz'; 'Cheeger Jiang Naber sharp splitting Hessian estimate volume pinching'. WebFetch: arXiv abs 2608.16021 (+PDF text), 2406.13771, 1708.02060v3, 2010.10031 (abs + ar5iv). zbMATH / MathOverflow / Google Scholar not queried directly; absence claims rest on WebSearch plus analyst knowledge."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "Not a subterm of goal or L."
+   },
+   "test3": {
+    "verdict": "pass",
+    "down": 0.348,
+    "cone": 0.326,
+    "note": "down share 0.35."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 1,
+    "protocol": "common (arm directed only)"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Careful non-commutative extension of a named precedent."
+   }
+  },
+  {
+   "id": "C5",
+   "name": "Radial transport of an unnormalized residual",
+   "paper_items": [
+    "I32 Lemma pi:radial-transport (pinching.tex:804-907)"
+   ],
+   "trace": "no trace exists",
+   "statement": "For L_z w = w + l.U + k + e_w with bounded w, the L^2 norm on B_{2R} is controlled by the norm on B_R plus s, keeping the defect quadratic.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "exponentially weighted radial energy / transport estimates for the Euler operator X.grad - 1 (generic technique; Carleman-type weights)",
+      "relation": "same technique",
+      "verdict": "close variant (technique)"
+     }
+    ],
+    "verdict": "technique precedent; statement new",
+    "searches": "no targeted search beyond generic; analyst knowledge"
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "Not in goal or L."
+   },
+   "test3": {
+    "verdict": "pass",
+    "down": 0.217,
+    "cone": 0.174,
+    "note": "down 0.22; needed by the sharp projection."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 2,
+    "protocol": "not prioritized"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.5,
+    "justification": "Technical device with a generic technique precedent; could be judged N1."
+   }
+  },
+  {
+   "id": "C6",
+   "name": "Summable radial invariance and smoothed defects E_i",
+   "paper_items": [
+    "I30 Lemma pi:radial-invariance (pinching.tex:446-654)"
+   ],
+   "trace": "no trace exists",
+   "statement": "Radial derivatives of normalized coordinates are W^{1,2}-close to A(U-U(a)) with error sqrt(E_i(a)), E_i a geometric smoothing of the Poisson defects with sum E_i = o(1).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "CJN21 Sec 6 (cone/radial estimates for splitting maps)",
+      "relation": "same estimate type",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Campanato-type affine-fit decay iteration",
+      "relation": "technique",
+      "verdict": "component"
+     }
+    ],
+    "verdict": "close variant",
+    "searches": "WebSearch (standard + extended): 'bi-Lipschitz chart regular point noncollapsed RCD space conjecture'; 'bi-Lipschitz regular point noncollapsed Ricci limit 2026 arXiv'; 'Ricci limit bi-Lipschitz Dini volume ratio summable harmonic coordinates'; 'Toro 1995 bi-Lipschitz parameterizations square summable'; 'metric space Reifenberg bi-Lipschitz square summable/Dini'; 'Nash iteration metric increment primitive metrics'; 'iterative composition positive definite pullback increments bi-Lipschitz'; 'Cheeger Jiang Naber sharp splitting Hessian estimate volume pinching'. WebFetch: arXiv abs 2608.16021 (+PDF text), 2406.13771, 1708.02060v3, 2010.10031 (abs + ar5iv). zbMATH / MathOverflow / Google Scholar not queried directly; absence claims rest on WebSearch plus analyst knowledge."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "Not a subterm."
+   },
+   "test3": {
+    "verdict": "pass",
+    "down": 0.326,
+    "cone": 0.283,
+    "note": "down 0.33."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 1,
+    "protocol": "not prioritized"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Variant of CJN21-type radial estimates; the smoothing that keeps only sum E_i is bookkeeping."
+   }
+  },
+  {
+   "id": "C7",
+   "name": "Gevrey all-order jet bootstrap (strengthened IH)",
+   "paper_items": [
+    "I44 bootstrap hypotheses",
+    "I45 re:inverse-majorant",
+    "I46 re:jet-step"
+   ],
+   "trace": "no trace exists",
+   "statement": "Carry r_i^{m-1}||D^m h_i|| <= B^{m-1}(m!)^{1+sigma} in all orders to absorb the loss of one derivative per update.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Gevrey-class algebra and majorant method (Cauchy-Kovalevskaya; Gevrey classes closed under inversion/composition)",
+      "relation": "same technique",
+      "verdict": "equivalent (technique)"
+     }
+    ],
+    "verdict": "known technique",
+    "searches": "analyst knowledge"
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Templated IH strengthening (carry an extra tracked quantity / all-orders uniform version)."
+   },
+   "test3": {
+    "verdict": "pass",
+    "down": 0.109,
+    "cone": 0.674,
+    "note": "necessary to close the induction."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "0-1",
+    "chain_depth": 1,
+    "protocol": "not needed"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "Templated strengthening (capped at N2 anyway); a standard majorant device."
+   }
+  },
+  {
+   "id": "C8",
+   "name": "Near-minimizing fixed patch centres",
+   "paper_items": [
+    "I40 (renormalization.tex:178-196)"
+   ],
+   "trace": "no trace exists",
+   "statement": "Choose z_{i,y} in each patch with E_i(z) < 2 inf E_i (positive floor guarantees existence) so the directional bound at any active point costs only E_i(x).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "generic near-minimizer selection",
+      "relation": "same trick",
+      "verdict": "equivalent (trick)"
+     }
+    ],
+    "verdict": "known trick",
+    "searches": "analyst knowledge"
+   },
+   "test2": {
+    "verdict": "borderline",
+    "evidence": "One-line selection; analytic once the floor exists."
+   },
+   "test3": {
+    "verdict": "pass",
+    "down": 0.196,
+    "cone": 0.587,
+    "note": "used in every field estimate."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "0",
+    "chain_depth": 2,
+    "protocol": "not needed"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Small selection device; part of the C1 cluster's plumbing."
+   }
+  }
+ ],
+ "excluded_from_candidates": [
+  {
+   "paper": "I26 summable Poisson defects (volume telescoping)",
+   "reason": "N0: classical (CC96; summability of volume pinching across scales underlies Cheeger-Naber/CJN quantitative stratification)"
+  },
+  {
+   "paper": "I24 linear gradient bound for positive source",
+   "reason": "N0: Boccardo-Gallouet-type measure-data estimate"
+  },
+  {
+   "paper": "I11 uniform harmonic normalization; I16 heat Gram matrices; I18 heat comparison",
+   "reason": "N1: special cases/variants of named transformation and heat-normalization precedents (CN15, CJN21, HH24, BNS20)"
+  },
+  {
+   "paper": "I13 open coordinates; I48 limiting chart; I49 assembly",
+   "reason": "N1: routine"
+  },
+  {
+   "trace": "none",
+   "reason": "family has no reasoning trace"
+  }
+ ],
+ "family_D": {
+  "label": "D3 (provisional)",
+  "confidence": 0.35,
+  "rests_on": "C1 alone (I43+I47 with I41): the value-space renormalization with the l^2 diagonal recurrence. All other candidates are N0-N2.",
+  "falls_to": "D2 if (a) Test 4 arm A (I22 and I34 given, strategy 'compensate degeneration in coordinate-value space' stated) exceeds the calibrated threshold; (b) a judge or expert classifies the iteration as the David-Toro sigma_k construction plus a Newton-type correction; or (c) an expert identifies a prior value-space renormalization producing a bi-Lipschitz map from first-order non-summable drift. Falls further if the proof has a gap.",
+  "not_transfer": "The imports (CJN21 sharp splitting, heat-kernel bounds, Gevrey majorants, invariance of domain) are N0/N2 transfer; the candidate is the new value-space mechanism, so the cross-field-transfer exclusion does not apply.",
+  "correctness_caveat": "All grades are conditional on correctness. The claim is extraordinary (resolves the CC97/HZ26 conjecture and, unclaimed, Naber's Open Problem 2.2 in local-chart form), unrefereed, without Lean or trace. Phase-1 audit found no gap in the traced steps, but RCD technicalities and compactness uniformity are delegated or sketched.",
+  "compression_note": "Not measured (no Lean). The step-3b intuition: without C1, the paper's Sections 2-3 yield only bi-Holder charts (a qualitative, not size, gap), so the item buys feasibility rather than a measurable proof-length drop."
+ },
+ "provenance_flag": {
+  "applies": "no",
+  "builds_on_prior_model_result_strict": false,
+  "model_produced_precedent": false,
+  "explanation": "Cited 2025-2026 works (HZ26 arXiv 2608.16021; GV25; DPG18 v3) contain no AI disclosure (HZ26 acknowledgements checked in full text). No candidate item appears in them. Web searches for model-assisted or prior proofs of the regular-point bi-Lipschitz statement found nothing."
+ },
+ "bridge_novelty": [
+  {
+   "import": "Square-summability-suffices (GMT: Toro 1995, David-Toro DT12) -> intrinsic RCD charts",
+   "status": "partly known route, new bridge in substance",
+   "evidence": "Metric-space Reifenberg with bi-Lipschitz output exists (GV25, Cheeger-Colding) but needs first-order summability. Using summable volume pinching (the squared quantity) through Bochner mass in coordinate-value space has no precedent found."
+  },
+  {
+   "import": "Nash-type stagewise positive metric increments (isometric embedding / convex integration) -> RCD chart construction",
+   "status": "new bridge (if counted as an import; not cited by the paper)",
+   "evidence": "No precedent found for realizing an accumulated positive metric increment in Ricci-limit/RCD regularity."
+  },
+  {
+   "import": "Gevrey/majorant methods (analytic PDE, Nash-Moser derivative loss)",
+   "status": "known route",
+   "evidence": "Standard way to absorb derivative loss; re-proved inline."
+  },
+  {
+   "import": "Heat-kernel Gram normalization and sharp splitting (CJN21) within Ricci-limit theory",
+   "status": "known route (same field)",
+   "evidence": "Paper names CJN21 Sec 6-8, CN15, HH24, BNS20."
+  },
+  {
+   "import": "Invariance of domain (topology)",
+   "status": "known route",
+   "evidence": "Standard for openness of chart images."
+  },
+  {
+   "import": "PSD matrix analysis (non-commuting inverse increments)",
+   "status": "known route",
+   "evidence": "Elementary; re-proved."
+  }
+ ],
+ "discoverability_protocols": {
+  "common": {
+   "models": "Training cutoff strictly before 2026-09-25 (357 preprint date); HZ26 (2026-08-17) contains no candidate item, so it is not an exclusion bound, but use L- (without HZ26) in the main arm. Canary probe: ask whether the regular-point bi-Lipschitz conjecture for noncollapsed RCD spaces has been resolved and about 'value-space renormalization'; exclude models that recognise either. No browsing/tools. Exclude the OpenAI model(s) that produced the release (run only as an uncontrolled upper-reference arm). Judge must differ from proposer.",
+   "context_L_minus": "Digest of 357's bibliography minus HZ26 (statements of DPG18, AH18, JLZ16, Gigli15, Jiang14, CJN21 Thm 6.1 and Sec 8, CN15, DT12 Prop 8.34, GV25, CC96, CC97 Rem 5.15). Mathlib contributes nothing relevant.",
+   "arms": {
+    "L-": "main, contamination-controlled",
+    "open": "problem only",
+    "directed": "problem + all non-hidden upstream items + the strategy sentence 'the Gram matrices of harmonic coordinates may degenerate; compensate in the space of coordinate values'"
+   },
+   "sampling": "n=256 per arm, temperature 1.0, fixed reasoning budget (e.g. 32k tokens); unbiased pass@k for k in {1,2,4,...,256}; K=256.",
+   "judging": "Two independent LLM judges whose prompt includes the paper's precedent remarks (introduction.tex:176-189, 219-228) and this file's neighbour lists; a human geometric analyst reviews all hits and 10% of misses. No Lean equivalence possible.",
+   "controls": "Positive: Cook-Reckhow ER variables for PHP. Negative: C7 (Gevrey bootstrap) and I26 (volume telescoping) in the same format.",
+   "prompt_template": "Problem: Let X be a noncollapsed RCD(K,n) space and p a point at which every tangent is R^n. Construct a bi-Lipschitz chart near p. Library: [L- digest]. Established results you may use: [non-hidden upstream items verbatim]. [directed: strategy sentence]. Propose the single most useful new construction or lemma, stated precisely, with a proof sketch."
+  },
+  "P-C1": {
+   "item": "C1 value-space renormalization (I41, I43, I47)",
+   "hide": "I41-I49 (everything in Section 4 from the field definition on) and the introduction paragraphs 191-217",
+   "arm_A": "Give I01-I40 including I22 (cumulative comparison) and I34 (directional pinching). Expect moderate-to-high hit rate; decides whether C1 is a 1-step pivot.",
+   "arm_B_decisive": "Also hide I34 and I31-I33 (keep I22 and summable E_i). Decides N3 for the C1+C2 cluster.",
+   "equivalence": "Hit: a construction of a single map on the coordinate-value space (or an equivalent composition of correction maps) whose pullback metric increases scale by scale by the localized mass forms (or any equivalent positive increments matched to H_k), WITH an error mechanism that sums the defects E_i rather than their square roots (e.g. a recurrence on the diagonal second derivative or an equivalent l^2 argument). Partial: correct iteration without the l^2 error mechanism, or an appeal to a Reifenberg/Toro-type construction that needs sum sqrt E_i.",
+   "k": "1..256 (powers of 2)",
+   "pivot_distance": "~1 in arm A; ~2 in arm B",
+   "chain_depth": 2
+  },
+  "P-C2": {
+   "item": "C2 directional pinching (I34 with I31-I33)",
+   "hide": "I31-I34 and everything downstream (I35-I49)",
+   "give": "I01-I30 (incl. summable E_i and radial invariance)",
+   "equivalence": "Hit: an estimate bounding the (normalized) Bochner mass of the harmonic coordinates in the direction u(x)-u(z) by C r^2 times a summable defect at x and z (any equivalent form, e.g. L^2 Hessian of the coordinate in that direction). Partial: CJN-type bound with k+1 spanning points without the directional/two-point form.",
+   "k": "1..256",
+   "pivot_distance": "1 from CJN21 Thm 6.1",
+   "chain_depth": 1
+  },
+  "P-C3": {
+   "item": "C3 mass forms D_{i,y} + cumulative comparison",
+   "hide": "I20-I22 and downstream",
+   "equivalence": "a two-sided comparison of the inverse heat Gram H_k with Id plus accumulated conjugated Bochner masses",
+   "k": "1..64",
+   "pivot_distance": "1",
+   "chain_depth": 1
+  }
+ },
+ "open_questions": [
+  "Expert review of correctness: especially the uniformity of compactness thresholds across infinitely many scales, the capacity/singular-measure pairings, and the claim that L_n depends only on n (the catalogue says 'point-dependent').",
+  "Does an expert regard the h_i iteration as a known variant of David-Toro sigma_k or of any bi-Lipschitz parametrization scheme (e.g. Semmes, Bonk-Lang, Bishop)? This is the main risk to C1's N3.",
+  "Does Cor 1.2 indeed settle Naber's Open Problem 2.2 for noncollapsed Ricci limits in local form, and does the Colding-Naber Example 2.3 provide a sanity test (it predicts a non-harmonic bi-Lipschitz chart at the special point)?",
+  "zbMATH, MathOverflow and Google Scholar were not queried directly; repeat searches for 'bi-Lipschitz chart regular point Ricci limit', 'value space renormalization', 'inverse transpose iteration metric increment'.",
+  "Breiner-Park 2506.08317 was found via search only; confirm its relation to C2 and check it for AI disclosure if it is used as a neighbour.",
+  "No trace exists; Test 4 pivot distances are paper-based estimates only."
+ ],
+ "sources": [
+  "https://arxiv.org/abs/2608.16021 (HZ26 abs; PDF text extracted locally)",
+  "https://arxiv.org/abs/2406.13771 (GV25)",
+  "https://arxiv.org/abs/1708.02060v3 (DPG18 v3)",
+  "https://arxiv.org/abs/2010.10031 and https://ar5iv.arxiv.org/html/2010.10031 (Naber survey; summarized)",
+  "https://arxiv.org/pdf/1805.07988 (CJN21; via search snippet)",
+  "https://arxiv.org/pdf/2506.08317 (Breiner-Park; via search snippet)",
+  "https://ar5iv.labs.arxiv.org/html/0910.4869 (David-Toro, Reifenberg parameterizations for sets with holes)",
+  "https://arxiv.org/pdf/1612.08052 (Quantitative Reifenberg theorem for measures; Toro 1995 discussion)",
+  "https://arxiv.org/pdf/2306.12879, https://arxiv.org/pdf/1606.02551 (Nash iteration background)"
+ ]
+}

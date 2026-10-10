@@ -1,0 +1,822 @@
+{
+ "family": 102,
+ "title": "The Unique Games Conjecture and optimal approximation thresholds",
+ "manuscript": "The-Unique-Games-Theorem-September-23-2026 (the only manuscript the trace leads to)",
+ "analyst_role": "novelty",
+ "date": "2026-10-09",
+ "inputs": [
+  "docs/PLAN.md",
+  "docs/novelty_agent_prompt.md",
+  "data/pilot/287/novelty.json + novelty.md (template)",
+  "data/pilot/102/trace.json + trace.md (only prior analysis; no family.json, no f1_*.json)",
+  "preprint build/ main.tex + sections + references.bib (read: 00, 01, 02 in full; 03-07 key statements)",
+  "Perfect-completeness-for-2-to-1-games companion (sibling check)",
+  "lean/OAI/Computability/UniqueGames (sizes, spot checks)"
+ ],
+ "base_library_L": "Mathlib d13f23b + references.bib of the UG manuscript (42 entries, incl. 3 OpenAI companion preprints). L- removes the 3 OpenAI entries for contamination control. Khot-Moshkovitz 2016, Croot-Lev-Pach and Lovett are in the trace's reference list but NOT in L.",
+ "precedent_checks": [
+  {
+   "ref": "Minzer-Zheng, 'Near Optimal Alphabet-Soundness Tradeoff PCPs', arXiv:2404.07441v4 (bib MZ26)",
+   "dates": "v1 2024-04-11; v2 2025-09-23; v3 2025-12-19; v4 2026-05-13",
+   "comments_field": "STOC 2024, 106 pages",
+   "ai_disclosure": "none on the abstract page (full text not checked)",
+   "role_in_102": "framework for correlated advice (cited with KMS17)",
+   "contains_candidates": {
+    "C1": "absent",
+    "C2": "absent",
+    "C7": "close variant (framework)"
+   }
+  },
+  {
+   "ref": "Ellis-Kindler-Lifshitz, 'An analogue of Bonami's Lemma for functions on spaces of linear maps, and 2-2 Games', arXiv:2209.04243v2 (bib EKL26)",
+   "dates": "v1 2022-09-09; v2 2026-01-22",
+   "comments_field": "46 pages",
+   "ai_disclosure": "none on the abstract page",
+   "role_in_102": "context only ('our external input remains the KMS theorem')",
+   "contains_candidates": {
+    "C1": "absent",
+    "C2": "absent"
+   }
+  },
+  {
+   "ref": "KMS17 and DKKMS25 (Theory of Computing 21, 2025; STOC 2017/2018 versions)",
+   "ai_disclosure": "not applicable (human, pre-2020 originals)",
+   "contains_candidates": {
+    "C1": "absent (uniform rank-one noise, completeness ~1/2)",
+    "C2": "absent",
+    "C7": "close variant",
+    "C8": "close variant"
+   }
+  },
+  {
+   "ref": "Khot-Safra 2013, 'A two-prover one-round game with strong soundness' (bib KS13)",
+   "ai_disclosure": "not applicable",
+   "contains_candidates": {
+    "C6": "close variant (virtual tables)",
+    "C7": "close variant (sparse projection, Fourier list decoding)",
+    "C1": "absent",
+    "C2": "absent"
+   }
+  },
+  {
+   "ref": "Barak-Kothari-Steurer ITCS 2019, arXiv:1804.08662 (bib BKS18)",
+   "ai_disclosure": "not applicable",
+   "contains_candidates": {
+    "C1": "related programme (Sec. 1.6 higher-degree tests; degree-3 rank-one tensor test has completeness 3/4)",
+    "C2": "absent",
+    "C10": "equivalent (matrix chart)"
+   }
+  },
+  {
+   "ref": "OpenAI, 'Perfect completeness for 2-to-1 games' (bib OpenAIPerfectTwoToOne2026; same release, dated 2026-09-23)",
+   "ai_disclosure": "model-produced (OpenAI release; author 'OpenAI')",
+   "role_in_102": "footnote: 'It is not an input to this proof.'",
+   "contains_candidates": {
+    "C1": "absent",
+    "C2": "close variant of architecture only (recursive tree with products of pairs of child functions, random root-to-leaf path, fresh randomness); different object and purpose",
+    "C7": "close variant",
+    "C8": "close variant"
+   }
+  },
+  {
+   "ref": "OpenAI, 'Constant-factor hardness of uniform sparsest cut' and 'The Gaussian propeller bound in every dimension' (same release)",
+   "ai_disclosure": "model-produced",
+   "role_in_102": "cited in Sec. 7 as separate companion applications; not inputs",
+   "contains_candidates": {
+    "all": "absent"
+   }
+  },
+  {
+   "ref": "Fei-Minzer-Wang, 'On the Hardness of 4-to-1 Games with Perfect Completeness', ECCC TR26-179 (2026-09-14; cited by the 2-to-1 companion, not by 102)",
+   "ai_disclosure": "none on the ECCC page; Quanta reports it was written by the authors and posted early after rumours of the OpenAI result reached Minzer on 2026-09-11",
+   "contains_candidates": {
+    "C1": "absent",
+    "C2": "absent (quadratic equations in the outer PCP only)"
+   }
+  },
+  {
+   "ref": "ProofAtlas 'Unique Games Conjecture' collaboration page (proofatlas.ai; 'AI-first mathematical research'; status checked 2026-08-06)",
+   "ai_disclosure": "platform describes itself as AI-first; content not explicitly attributed to a model",
+   "contains_candidates": {
+    "C1": "absent (tensor-rank-one verifier programme, unfinished; 'The conjecture is unresolved' [WebFetch paraphrase, unverified])",
+    "C2": "absent"
+   }
+  },
+  {
+   "ref": "Web search: 'Unique Games Conjecture' + ChatGPT / GPT-5 / OpenAI / AI-assisted",
+   "result": "Only coverage of the 2026-10-06 release (Quanta 2026-10-07; Aaronson 'The Mathocalypse'; Fortnow TCS selection; news). No earlier model-produced UGC proof or latent-gadget construction found. The model is described as an unreleased internal model."
+  }
+ ],
+ "candidates": [
+  {
+   "id": "C1",
+   "name": "Latent alphabet gadget: the separation concept (nonlinear K-equivariant observable stable under a noise law that every high-restriction-rank linear family detects), and its use as the noise of the rank-one matrix test",
+   "paper_items": [
+    "lem:latent (02-latent.tex:8-31)",
+    "matrix test eq:matrix-test with a~mu (03-game.tex)",
+    "lem:outer-completeness (03-game.tex:319)",
+    "intro 00-introduction.tex:'changes the noise using a nonlinear map'"
+   ],
+   "trace": "PV4 / EC1 / IE3: seed L166 ('abstract equivariant-decoder proposal'), adopted L251, target h(r)/p specified L265-271",
+   "statement": "For every p*>0 there is r* such that for all large l there are V >= K=F_2^l, C:V->K and a law mu with C(x+k)=C(x)+k, Pr[C(x+a)!=C(x)]<=p*, and every G<=V* with dim(G|_K)>=r* detects a~mu with probability >=1/8. Plugged into the BKS/KMS rank-one test P -> P + a l^T, it gives completeness 1-eps while high-rank Fourier mass is damped by >=1/8.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Khot-Moshkovitz, 'Candidate hard unique game' STOC 2016 (ECCC TR14-142); KM STOC 2011 Robust-3LIN(R)",
+      "relation": "Earlier attempt to get UG completeness near 1 by changing the code and its noise test ('real code': unique local test + sub-code covering). The trace invokes 'Khot-Moshkovitz's Boolean noise test' at L250, one sentence before PV4 is adopted. Real-valued encoding, soundness only in a special setting; no nonlinear equivariant decoder over F_2 and no rank-detection statement.",
+      "verdict": "close variant at the level of strategy; genuinely different object"
+     },
+     {
+      "ref": "Barak-Kothari-Steurer ITCS 2019 (arXiv:1804.08662) Sec. 1.6 (in L)",
+      "relation": "Suggests higher-degree shortcode tests to raise the 1/2 completeness; degree-3 rank-one tensor test reaches 3/4. Same goal, different route (raise degree of the code vs. change the noise via a nonlinear map). The trace tries it first (POS1 c3) and it fails.",
+      "verdict": "related programme; genuinely different"
+     },
+     {
+      "ref": "KMS 2018/2023 Grassmann expansion; DKKMS 2-to-2 (in L)",
+      "relation": "Supply the rank-one test with uniform noise, completeness ~1/2 for UG. The gadget is designed to keep their soundness analysis while changing only the noise.",
+      "verdict": "genuinely different (target of the plug-in)"
+     },
+     {
+      "ref": "Folding / equivariance (BGS98, in L)",
+      "relation": "C(x+k)=C(x)+k is ordinary folding-style equivariance.",
+      "verdict": "ingredient (N0)"
+     },
+     {
+      "ref": "Eldan-Moshkovitz, 'Reduction from non-unique games to Boolean unique games' ITCS 2022 (arXiv:2006.13073)",
+      "relation": "Boolean UG with 1-delta vs 1-C delta via Gaussian-space concentration; small-completeness-loss regime, not a fixed-alphabet separation gadget.",
+      "verdict": "genuinely different"
+     },
+     {
+      "ref": "ProofAtlas 'Unique Games Conjecture' collaboration page (AI-first platform, status checked 2026-08-06)",
+      "relation": "Unfinished 'tensor-rank-one local verifier program' for UGC; no nonlinear map, no change of noise distribution (WebFetch paraphrase).",
+      "verdict": "absent"
+     }
+    ],
+    "verdict": "close variant at strategy level (KM 2016 + BKS Sec. 1.6); no near-equivalent of the separation statement found",
+    "searches": "WebSearch (standard/extended) and WebFetch on arXiv/ECCC/Quanta/ProofAtlas/Fortnow pages; zbMATH, Google Scholar and MathOverflow were not queried directly. Bash had no network. Absence claims rest on WebSearch plus analyst domain knowledge and are phrased as 'no neighbour found'."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "The goal (thm:ugc) speaks of permutation constraints, 3SAT and values; no stability/rank-detection separation occurs in it or in any statement of L (Mathlib has no PCP/shortcode library; the bibliography's shortcode theorems use uniform noise). Not a subterm."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "evidence": "Sole source of completeness 1-eps: without it the uniform rank-one test keeps an evaluation with probability (1+2^-l)/2 (00-introduction.tex). Its detection clause is the only input to lem:matrix-spectral, the bridge to the KMS inverse theorem. No paper.json/lean.json DAG exists for 102; Lean line-share proxy: Quadratic/ + Gadgets/ = 9,106 of ~186.5k lines in lean/OAI/Computability/UniqueGames (4.9%), top theorem Gadgets/Final.lean:19 exists_actual_gadget. The share proxy is depressed by Machines/ (polytime, 55.7k lines) and Inverse/ (KMS re-proved, 18.7k)."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "about 1 from the trace state (prepared by lessons C9, C10, C12, C19, C22 and the KM analogy at L250); >=2 from L alone",
+    "chain_depth": 1,
+    "protocol": "P-C1"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.55,
+    "justification": "The concept is non-analytic and load-bearing, but its strategy has a named-in-trace neighbour (Khot-Moshkovitz real-code noise test, invoked at L250 just before adoption) and an explicit programme in L (BKS Sec. 1.6). The trace analyst's 'no retrieval' for PV4 is overridden: L250-251 shows a retrieval trigger. The statement is close to a specification of what the KMS machinery needs; the hard content is its realisability (C2). Upgrade to N3 only if Test 4 shows the concept itself is rarely proposed at Arm B."
+   }
+  },
+  {
+   "id": "C2",
+   "name": "Explicit quadratic latent gadget: char-2 block C_blk(x,y)=y+Q(x), Q=(x2x3,x1x3,x1x2) on F_{2^d}^3, update spaces U_A on F-lines, all-isomorphism concatenation with random-leaf noise, quotient by zero shifts, enlargement through all injections B->K",
+   "paper_items": [
+    "eq:latent-quadratic, lem:latent-block, lem:latent-block-noise, lem:latent-block-kernel (02-latent.tex:56-212)",
+    "recursion eq:latent-recursive-output/shifts, lem:latent-noise (369-468)",
+    "lem:latent-lift-factorization (486-513)",
+    "quotients and enlargement, proof of lem:latent (614-760)"
+   ],
+   "trace": "PV5 / EC2 / IE4: L306-313, one sentence after k3 (Croot-Lev-Pach/Lovett rejected as too weak); answers C21/C22/C24",
+   "statement": "Block: U_A={(a,Q(a)+w): a in A, w in D_A} makes the quadratic term cancel, so a uniform nonzero update changes the output with probability exactly 1-theta, theta=1/(q^2+q+1); a lifted character dies on U_A iff A=Fz and z.g(z)=sqrt(z1z2z3). Concatenating through every (A,J) gives p_t=(1-q^-3)(1-theta)^t while a full lift survives to a leaf with probability >=1/2.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Standard quadratic Cremona transformation [x:y:z]->[yz:xz:xy] (classical algebraic geometry)",
+      "relation": "Q is the affine form of this classical map; nothing about char-2 update spaces, kernels or noise.",
+      "verdict": "ingredient (N0 object); genuinely different use"
+     },
+     {
+      "ref": "Khot-Saket quadratic code (FOCS 2014; ECCC 2017) and low-degree long / short codes (Dinur-Guruswami FOCS 2013, BGHMRS 2015 in L)",
+      "relation": "Quadratic encodings in PCPs: honest tables are evaluations of x (x)x or low-degree polynomials, linear in the table. Here the honest answer C(Pz) is nonlinear in the table and Q is a vector-valued map over F_{2^d}.",
+      "verdict": "genuinely different (nearest PCP neighbour)"
+     },
+     {
+      "ref": "Recursive majority / iterated composition noise decay (Ben-Or-Linial 1985; noise-sensitivity literature)",
+      "relation": "A single-leaf perturbation reaches the root of a recursive function with probability decaying geometrically in depth; same 'absorb per level' principle as lem:latent-noise.",
+      "verdict": "related principle, genuinely different statement (no linear-rank preservation)"
+     },
+     {
+      "ref": "OpenAI 'Perfect completeness for 2-to-1 games' (same release, dated 2026-09-23; cited, 'not an input')",
+      "relation": "Recursive tree whose internal spaces are spanned by products of pairs of child functions, random root-to-leaf path with fresh randomness (02-construction.tex:436-440 'recursive-product redesign'). Same architecture family (recursive quadratic composition + random path), different object (function spaces/arrays, 2-to-1 partitions) and purpose.",
+      "verdict": "model-produced sibling; close variant of architecture only"
+     },
+     {
+      "ref": "Fei-Minzer-Wang, ECCC TR26-179 (2026-09-14)",
+      "relation": "4-to-1 games with perfect completeness; quadratic equations in the outer PCP, tensor of Grassmann encodings inner; no nonlinear equivariant decoder or noise-absorbing gadget (abstract, WebFetch paraphrase).",
+      "verdict": "genuinely different"
+     },
+     {
+      "ref": "Croot-Lev-Pach 2017 / Lovett analytic rank 2019 (in trace, not in paper)",
+      "relation": "Tried in the trace and found too weak (C25).",
+      "verdict": "genuinely different"
+     },
+     {
+      "ref": "Quadratic APN / vectorial Boolean function derivatives (cryptography)",
+      "relation": "Derivatives of quadratic maps over F_{2^n}; Q here has differential uniformity 2^n (far from APN); no comparable use.",
+      "verdict": "genuinely different"
+     }
+    ],
+    "verdict": "no near-equivalent found",
+    "searches": "WebSearch (standard/extended) and WebFetch on arXiv/ECCC/Quanta/ProofAtlas/Fortnow pages; zbMATH, Google Scholar and MathOverflow were not queried directly. Bash had no network. Absence claims rest on WebSearch plus analyst domain knowledge and are phrased as 'no neighbour found'."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "Neither Q, U_A, the recursion, nor any separation statement of this kind is a subterm of thm:ugc or of statements in L. Syntactically small (one quadratic map), in the Cook sense."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "evidence": "It is the only construction proving C1; every other route to completeness 1-eps in the trace failed (POS1 tensor 3/4, KM Gaussian analogue, winding numbers, rare gates). Lean: Gadgets/ (10 files, 4,960 lines) + Quadratic/ (18 files, 4,146 lines). No DAG share computed; no compression (step 3b) estimate exists for 102."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": ">=2 from L; about 1 given the h(r)/p specification and C21/C24 (trace states them before L307)",
+    "chain_depth": 2,
+    "protocol": "P-C2"
+   },
+   "final": {
+    "N": "N3 (provisional: tests 1-3 pass, test 4 pending)",
+    "F": "F3",
+    "confidence": 0.45,
+    "justification": "No neighbour in searches for nonlinear decoders, quadratic codes, Cremona/APN maps or the 2-to-2 literature. In the trace it appears in one sentence without retrieval, right after a failed retrieval, as in 287. Its requirements were specified in advance by the model's own lessons, so a directed Arm A may hit often; the decisive arm is B. A same-day model-produced sibling (2-to-1 paper) shares the recursive-quadratic-tree architecture, so the architecture may be a house style of the producing model rather than a one-off. The summary may compress search (Kasami-Tokura at L164-165 hints at a structured search over biased multilinear forms)."
+   }
+  },
+  {
+   "id": "C3",
+   "name": "Generic character spaces: <=3r alignments z.g(z)=sqrt(z1z2z3) for every binary-linear g, proved by independence of square-root monomials and specialization; abundance of generic spaces",
+   "paper_items": [
+    "Def. generic (02-latent.tex:222-230)",
+    "lem:latent-generic (256-354)"
+   ],
+   "trace": "inside PV5 ('cubic monomials and finite-field specialization bound exceptional cancellations by 3r', L309-311)",
+   "statement": "For fixed r, a uniform binary r-subspace of F^3 is generic with probability ->1 as d->inf.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Schwartz-Zippel (in L), Zippel 1979 (in L)",
+      "relation": "Used verbatim for specialization.",
+      "verdict": "ingredient (N0)"
+     },
+     {
+      "ref": "Linear independence of square roots of monomials over F_2(x) (purely inseparable extensions; textbook)",
+      "relation": "The parity-vector argument is standard.",
+      "verdict": "ingredient (N0)"
+     },
+     {
+      "ref": "Generic-position / random-subspace arguments in pseudorandomness (folklore)",
+      "relation": "Random r-subspaces avoid a fixed algebraic condition with high probability.",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "close variant (routine instance of 'random specialization avoids a nonzero polynomial')",
+    "searches": "WebSearch (standard/extended) and WebFetch on arXiv/ECCC/Quanta/ProofAtlas/Fortnow pages; zbMATH, Google Scholar and MathOverflow were not queried directly. Bash had no network. Absence claims rest on WebSearch plus analyst domain knowledge and are phrased as 'no neighbour found'."
+   },
+   "test2": {
+    "verdict": "pass (weak)",
+    "evidence": "The definition is new and absent from the goal and L, but its proof is a direct application of L's Schwartz-Zippel."
+   },
+   "test3": {
+    "verdict": "pass (inside C2)",
+    "evidence": "Needed so that rank loss per level is <=1 with probability <=3r*theta; Lean Quadratic/GenericSubspaceProbability.lean, GenericFieldChoice.lean."
+   },
+   "test4": {
+    "status": "not run (scored as a sub-criterion of P-C2)",
+    "pivot_distance": 1,
+    "chain_depth": 3
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.55,
+    "justification": "A tailored definition with a textbook proof; its value is entirely inherited from C2."
+   }
+  },
+  {
+   "id": "C4",
+   "name": "Harmonic rank potential with fresh orientations: E[H_{r_j}-H_{r_{j+1}}] <= 4 theta per level, made valid under adaptivity by uniform isomorphisms J",
+   "paper_items": [
+    "prop:latent-full-lift-detection (02-latent.tex:534-612)",
+    "eq:latent-fresh-orientation"
+   ],
+   "trace": "PV5 ('harmonic-potential estimate kept h>=1/4', L311-312) + IE8 ('fresh outgoing randomness', L538-541)",
+   "statement": "Rank loss probability <= 3r theta per level, so H_r drops by <= 3theta in expectation; depth s = H_{r0}/(8theta) keeps extinction probability <=1/2.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Harmonic-number potentials for processes whose loss rate is proportional to the current size (coupon-collector style; folklore in randomized algorithms)",
+      "relation": "Same device.",
+      "verdict": "equivalent device"
+     },
+     {
+      "ref": "Random change of basis to restore genericity under adaptivity (standard)",
+      "relation": "Same device.",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "equivalent device exists",
+    "searches": "WebSearch (standard/extended) and WebFetch on arXiv/ECCC/Quanta/ProofAtlas/Fortnow pages; zbMATH, Google Scholar and MathOverflow were not queried directly. Bash had no network. Absence claims rest on WebSearch plus analyst domain knowledge and are phrased as 'no neighbour found'."
+   },
+   "test2": {
+    "verdict": "fail (borderline)",
+    "evidence": "The potential is the standard one for a rate-proportional-to-r loss; given eq. latent-generic-rank-loss it is forced."
+   },
+   "test3": {
+    "verdict": "pass (inside C2)",
+    "evidence": "Lean Quadratic/HarmonicLoss.lean, Gadgets/AdaptivePathsLemmas.lean."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 3
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.65,
+    "justification": "An F4-type potential, but a standard one; not graded N3."
+   }
+  },
+  {
+   "id": "C5",
+   "name": "Spectral comparison: latent-noise eigenvalue Lambda_g <= 7/8 on restriction rank >= r*, forcing low-rank Fourier mass and hence positive acceptance of the ordinary uniform rank-one test",
+   "paper_items": [
+    "lem:matrix-spectral (04-matrix.tex:244-300)"
+   ],
+   "trace": "IE7 'Aha! average-scalar-cost' neighbourhood; trace CHK nodes",
+   "statement": "Matrix-test acceptance >= 0.99 implies E_{U,T} Pr[F_U(M,T)=F_U(M+al^T,T)] >= 0.9*2^{-r*} for uniform a in K.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "KMS 2018/2023 Lemma 2.10 (rank-indexed spectrum of the rank-one walk, in L)",
+      "relation": "Same Fourier computation for uniform noise.",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Hastad 2001 noise-operator Fourier arguments (in L)",
+      "relation": "Standard eigenvalue comparison.",
+      "verdict": "ingredient"
+     }
+    ],
+    "verdict": "close variant",
+    "searches": "WebSearch (standard/extended) and WebFetch on arXiv/ECCC/Quanta/ProofAtlas/Fortnow pages; zbMATH, Google Scholar and MathOverflow were not queried directly. Bash had no network. Absence claims rest on WebSearch plus analyst domain knowledge and are phrased as 'no neighbour found'."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "A two-line Fourier comparison of eigenvalues once C1's detection clause is given."
+   },
+   "test3": {
+    "verdict": "pass (knockout bridge)",
+    "evidence": "Only link from C1 to thm:shortcode."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 2
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "Routine bridge."
+   }
+  },
+  {
+   "id": "C6",
+   "name": "Exact reduced keys + translation-orbit folding (projected table and pullback share a key)",
+   "paper_items": [
+    "03-game.tex:165-300 (keys, eq:reduced-table-intercept, eq:key-sharing, eq:table-folding)"
+   ],
+   "trace": "PV6 / EC4 / IE5 (L319-335)",
+   "statement": "Tables are identified by support plus induced affine map; constant K-translates fold.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Khot-Safra 2013 virtual tables, Sec. 1.1 (in L; paper: 'adapts')",
+      "relation": "Named precedent.",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "BGS98 folding Sec. 3.3 (in L; paper: 'adapt')",
+      "relation": "Named precedent.",
+      "verdict": "equivalent"
+     }
+    ],
+    "verdict": "close variant (named by the paper)",
+    "searches": "WebSearch (standard/extended) and WebFetch on arXiv/ECCC/Quanta/ProofAtlas/Fortnow pages; zbMATH, Google Scholar and MathOverflow were not queried directly. Bash had no network. Absence claims rest on WebSearch plus analyst domain knowledge and are phrased as 'no neighbour found'."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Folding/sharing identities of L, re-instantiated."
+   },
+   "test3": {
+    "verdict": "pass",
+    "evidence": "Needed for completeness and for the hypotheses of prop:matrix-decoding."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 1
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.75,
+    "justification": "Paper's own precedent remarks."
+   }
+  },
+  {
+   "id": "C7",
+   "name": "Row-fibre advice: abundance of good row advice by erasure; short answer sets; transfer of a chosen witness to sparse projections",
+   "paper_items": [
+    "lem:good-row-advice (04-matrix.tex:325)",
+    "lem:projected-tv (468)",
+    "lem:projected-witness (543)",
+    "Fourier decoder (621-)"
+   ],
+   "trace": "PV7 / EC3 (L336-341, L408-416; two VERBATIM repairs)",
+   "statement": "A fixed positive fraction of (U,A,T,AM) admit column equations and a target certifying agreement; the certificate transfers to O.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Khot-Minzer-Safra 2017 Secs. 3.3-3.4 (in L; paper: 'follow')",
+      "relation": "Correlated advice, vanishing coordinates.",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Minzer-Zheng arXiv:2404.07441v4 Sec. 3 (in L)",
+      "relation": "Later use of the framework.",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Khot-Safra 2013 Sec. 3, Lemma 3.1 (in L)",
+      "relation": "Smooth outer game, sparse projection.",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "close variant (named)",
+    "searches": "WebSearch (standard/extended) and WebFetch on arXiv/ECCC/Quanta/ProofAtlas/Fortnow pages; zbMATH, Google Scholar and MathOverflow were not queried directly. Bash had no network. Absence claims rest on WebSearch plus analyst domain knowledge and are phrased as 'no neighbour found'."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Framework of L adapted to the occurrence-indexed questions."
+   },
+   "test3": {
+    "verdict": "pass",
+    "evidence": "Needed for soundness."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 2
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.65,
+    "justification": "Self-detected repair in the trace, but the machinery is KMS17/KS13; at most N2 for the erasure step."
+   }
+  },
+  {
+   "id": "C8",
+   "name": "Parameter architecture: beta=k^{-2/3}, clean singleton coordinates, Dinur-Steurer repetition fixed before the latent alphabet",
+   "paper_items": [
+    "lem:clean (05-clean.tex:88)",
+    "prop:matrix-gap (243)",
+    "06-finish.tex"
+   ],
+   "trace": "PV8 / EC5 (L341-343, L383-393, L549-552)",
+   "statement": "k beta^2 -> 0 and k beta -> inf; agreement <= exp(-c k^{1/3}).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "KMS17 smooth outer game (in L)",
+      "relation": "Same vanishing-advice device.",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Dinur-Steurer 2014, Rao 2011 (in L)",
+      "relation": "Alphabet-independent projection repetition.",
+      "verdict": "equivalent"
+     }
+    ],
+    "verdict": "close variant",
+    "searches": "WebSearch (standard/extended) and WebFetch on arXiv/ECCC/Quanta/ProofAtlas/Fortnow pages; zbMATH, Google Scholar and MathOverflow were not queried directly. Bash had no network. Absence claims rest on WebSearch plus analyst domain knowledge and are phrased as 'no neighbour found'."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Parameter choice in a known framework."
+   },
+   "test3": {
+    "verdict": "pass",
+    "evidence": "Quantifier order is essential."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 1
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.75,
+    "justification": "Known technique."
+   }
+  },
+  {
+   "id": "C9",
+   "name": "Converse: NP-hardness at the BasicSDP threshold for all CSPs => UGC (dummy labels + KV gap + Rao repetition)",
+   "paper_items": [
+    "not in the paper (dropped)"
+   ],
+   "trace": "PV1 / EC6 / IE1 'Wait insight' (L97-115)",
+   "statement": "A (1-eps, 1-eta) UG gap with fixed eta and eps->0 yields UGC by projection-game repetition.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Rao 2011 / Khot survey 2010 (in L)",
+      "relation": "UG gap amplification by repetition with alphabet independence is the known route.",
+      "verdict": "equivalent"
+     }
+    ],
+    "verdict": "equivalent (known route)",
+    "searches": "WebSearch (standard/extended) and WebFetch on arXiv/ECCC/Quanta/ProofAtlas/Fortnow pages; zbMATH, Google Scholar and MathOverflow were not queried directly. Bash had no network. Absence claims rest on WebSearch plus analyst domain knowledge and are phrased as 'no neighbour found'."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Follows from L directly."
+   },
+   "test3": {
+    "verdict": "fail (strategic only; not in proof)",
+    "evidence": "Architecture only."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 0
+   },
+   "final": {
+    "N": "N0",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "Known route."
+   }
+  },
+  {
+   "id": "C10",
+   "name": "Inverse shortcode theorem (equality soundness for degree-two shortcode) derived from Grassmann expansion",
+   "paper_items": [
+    "thm:shortcode (04-matrix.tex:33-)"
+   ],
+   "trace": "PV2 (L123-136)",
+   "statement": "Retention eta => agreement with Mz+u on a bounded slice.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "KMS 2018/2023 Thm 1.12 + BKS18 Def. 3.2, Lemmas 3.3-3.7 (in L)",
+      "relation": "Derived consequence.",
+      "verdict": "equivalent"
+     }
+    ],
+    "verdict": "equivalent",
+    "searches": "WebSearch (standard/extended) and WebFetch on arXiv/ECCC/Quanta/ProofAtlas/Fortnow pages; zbMATH, Google Scholar and MathOverflow were not queried directly. Bash had no network. Absence claims rest on WebSearch plus analyst domain knowledge and are phrased as 'no neighbour found'."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Statement of L."
+   },
+   "test3": {
+    "verdict": "pass (imported)",
+    "evidence": "Lean Inverse/ re-proves it (18.7k lines)."
+   },
+   "test4": {
+    "status": "not applicable"
+   },
+   "final": {
+    "N": "N0",
+    "F": null,
+    "confidence": 0.9,
+    "justification": "Imported."
+   }
+  },
+  {
+   "id": "C11",
+   "name": "Raghavendra transfer to the BasicSDP threshold (the posed problem)",
+   "paper_items": [
+    "cor:raghavendra-consequence (07-consequences.tex:64)"
+   ],
+   "trace": "PV9 (L168-173, L555-557)",
+   "statement": "UGC => NP-hardness beyond alpha_Gamma for every finite Max-CSP.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Raghavendra STOC 2008 (in L)",
+      "relation": "Invoked.",
+      "verdict": "equivalent"
+     }
+    ],
+    "verdict": "equivalent",
+    "searches": "WebSearch (standard/extended) and WebFetch on arXiv/ECCC/Quanta/ProofAtlas/Fortnow pages; zbMATH, Google Scholar and MathOverflow were not queried directly. Bash had no network. Absence claims rest on WebSearch plus analyst domain knowledge and are phrased as 'no neighbour found'."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Statement of L."
+   },
+   "test3": {
+    "verdict": "corollary-only",
+    "evidence": "Not a comparator target."
+   },
+   "test4": {
+    "status": "not applicable"
+   },
+   "final": {
+    "N": "N0",
+    "F": null,
+    "confidence": 0.9,
+    "justification": "Imported."
+   }
+  },
+  {
+   "id": "C12",
+   "name": "Amplification / stability-gap target: honest loss -> 0 while dishonest loss stays constant under repeated noise; rank-one (not Gaussian) linearity",
+   "paper_items": [
+    "implicit in Sec. 2 introduction text"
+   ],
+   "trace": "PV3 / IE2 / C10, C12, C14 (L137-166)",
+   "statement": "Specification of the needed test.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "BKS18 Sec. 1.6 (in L)",
+      "relation": "Higher-completeness variants of the shortcode test.",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Khot-Moshkovitz 2016",
+      "relation": "Noise-test design for near-1 completeness.",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "close variant",
+    "searches": "WebSearch (standard/extended) and WebFetch on arXiv/ECCC/Quanta/ProofAtlas/Fortnow pages; zbMATH, Google Scholar and MathOverflow were not queried directly. Bash had no network. Absence claims rest on WebSearch plus analyst domain knowledge and are phrased as 'no neighbour found'."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Restates the completeness requirement of the goal."
+   },
+   "test3": {
+    "verdict": "fail (strategic)",
+    "evidence": "Specification, not a proof item."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 0
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Sharpened target."
+   }
+  }
+ ],
+ "excluded_from_candidates": [
+  {
+   "item": "Direct Max-Cut / Vertex Cover / Min-UnCut / DFVS manuscripts",
+   "reason": "not led to by the trace; separate families of items; out of scope for this pass"
+  },
+  {
+   "item": "lem:rounding-subdivision, Appendix strong-left formulation and ordering reduction",
+   "reason": "plumbing / known reductions"
+  },
+  {
+   "item": "IE6 Lindeberg comparison",
+   "reason": "dropped from the paper; N0"
+  }
+ ],
+ "family_D": {
+  "label": "D3 (provisional)",
+  "confidence": 0.45,
+  "rests_on": "C2 alone (the explicit quadratic latent gadget). C1 is graded N2 because the strategy had a retrieval trigger (Khot-Moshkovitz noise test, L250) and a programme in L (BKS Sec. 1.6).",
+  "falls_to": "D2 if Test 4 Arm B (concept hidden) or Arm A (concept given) exceeds the calibrated threshold for C2; if an expert identifies a known nonlinear translation-equivariant gadget separating stability from linear-rank detection (e.g. in unpublished Khot-Moshkovitz/Minzer-group notes or the 2-to-2 -> UG folklore); or if the recursive-quadratic-tree architecture turns out to be lifted from an earlier model-produced source.",
+  "not_transfer": "The ingredients (Cremona-type quadratic map, char-2 trace duality, Schwartz-Zippel, harmonic potential, KMS expansion, KS13/KMS17 outer machinery) are N0/N1. The candidate is their combination into a gadget with a new separation property.",
+  "correctness_caveat": "Unrefereed, extraordinary claim. The comparator OAI.UniqueGamesTheorem.theorem11 exists, and Lean contains the gadget (Gadgets/Final.lean:19 exists_actual_gadget) and a re-proof of KMS expansion (Inverse/), with no 'axiom' or 'sorry' found by grep; Lean was not compiled here and no Lean-analyst file exists for 102.",
+  "compression_note": "No step-3b compression estimate exists. Structurally C2 is a single-use bottleneck lemma (one statement consumed once, by lem:matrix-spectral and lem:outer-completeness), so a PHP-style multiplicative signature is not expected; 'confirmed eureka' would rest on the downstream-speedup test."
+ },
+ "provenance_flag": {
+  "applies": "partial",
+  "builds_on_prior_model_result_strict": false,
+  "model_produced_precedent": "sibling only",
+  "explanation": "No 2025-2026 human preprint in the bibliography discloses AI assistance (MZ26, EKL26 abstract pages checked). The three cited OpenAI preprints are same-release model output and are context or corollary-only: the 2-to-1 companion is 'not an input to this proof', and the sparsest-cut and Gaussian-propeller companions are separate applications. The 2-to-1 companion (same date) shares C2's recursive-quadratic-tree-with-random-path architecture, so C2 has a model-produced sibling of unknown relative order. An earlier AI-first platform page (ProofAtlas, Aug 2026) pursued an unfinished tensor-rank-one route without the gadget. No external model-produced precedent for C1/C2 found."
+ },
+ "bridge_novelty": [
+  {
+   "import": "Characteristic-2 finite-field algebra (vector-valued quadratic map on F_{2^d}^3, trace duality, Frobenius square roots, Schwartz-Zippel specialization) -> PCP test design, as a noise-absorbing nonlinear decoder",
+   "verdict": "new bridge (as used)",
+   "evidence": "Algebra in PCPs is a known route (Hadamard/Reed-Muller/low-degree and quadratic codes: ALMSS, BGHMRS, Khot-Saket, Dinur-Guruswami), but there the honest table is linear in the code coordinates. No precedent found for a nonlinear equivariant decoder whose noise is invisible to it but detected by all high-rank linear families."
+  },
+  {
+   "import": "Grassmann expansion / degree-two shortcode inverse theorem (KMS, BKS) -> UG soundness",
+   "verdict": "known route",
+   "evidence": "BKS18 and DKKMS used it for 2-to-2 and UG at completeness 1/2; BKS Sec. 1.6 proposes it for higher completeness."
+  },
+  {
+   "import": "Smooth outer games, virtual tables, correlated advice (KS13, KMS17, MZ)",
+   "verdict": "known route",
+   "evidence": "Paper names these precedents ('adapts', 'follow')."
+  },
+  {
+   "import": "Alphabet-independent projection-game parallel repetition (Rao, Dinur-Steurer)",
+   "verdict": "known route",
+   "evidence": "Standard in UG/Label Cover hardness."
+  },
+  {
+   "import": "Potential-function / martingale bookkeeping (harmonic numbers) for rank loss",
+   "verdict": "known technique",
+   "evidence": "Coupon-collector style potentials; folklore."
+  },
+  {
+   "import": "Raghavendra's SDP-optimality transfer",
+   "verdict": "known route",
+   "evidence": "Raghavendra 2008 invoked as stated."
+  },
+  {
+   "import": "Additive combinatorics (Croot-Lev-Pach, Lovett analytic rank)",
+   "verdict": "not used in the final proof",
+   "evidence": "Considered at trace L304-305 and rejected as too weak (C25)."
+  }
+ ],
+ "discoverability_protocols": {
+  "common": {
+   "models": "Training-data cutoff strictly before 2026-09-11 (first public rumour of the OpenAI result, per Quanta); stricter run before 2026-09-14 (FMW TR26-179) is implied. Canary probe: the model must not know 'latent alphabet gadget', the map (x2x3,x1x3,x1x2) in a Unique Games context, or that UGC has been claimed proved; exclude any model that does. No browsing/tools. Exclude the unreleased OpenAI model that produced the release and its lineage; run it only as an uncontrolled reference arm. The judge must not be the proposer.",
+   "excluded_sources": [
+    "openai/math release (fd4aeeb) incl. all five family-102 manuscripts and the 2-to-1, uniform-sparsest-cut and Gaussian-propeller companions",
+    "Quanta 2026-10-07 and later coverage",
+    "ProofAtlas UGC page (kept out of context; contains no gadget)"
+   ],
+   "context_L_minus": "Mathlib d13f23b digest (finite fields, GaloisField, trace form, FiniteDimensional, Fourier on ZMod 2-spaces) plus 102's bibliography minus the three OpenAI entries (39 entries; abstracts plus invoked statements: KMS Thm 1.12, BKS chart + Sec. 1.6, KS13 Sec. 1.1/3, KMS17 Secs. 3.3-3.4, Hastad parity, Dinur-Steurer Cor. 1.2, Raghavendra). Variant L+: add Khot-Moshkovitz 2016 (the trace's retrieval trigger) to measure its effect.",
+   "sampling": "n=256 per arm, temperature 1.0, fixed reasoning budget; unbiased pass@k for k in {1,2,4,...,256}; K=256.",
+   "judging": "Two independent LLM judges with the paper's precedent remarks (00-introduction.tex 'changes the noise using a nonlinear map'; KS13/BGS/KMS17 'adapt/follow') and this neighbour list; a PCP expert checks all hits and 10% of misses; Lean equivalence against OAI.UniqueGamesTheorem gadget statements where feasible.",
+   "controls": "Positive: Cook-Reckhow ER variables for PHP. Negative: C6 (folding), C8 (beta=k^{-2/3}), C10 (inverse shortcode) in the same format."
+  },
+  "P-C1": {
+   "item": "C1 latent separation concept",
+   "hide": "lem:latent and everything downstream (Sec. 2, matrix test with mu, lem:outer-completeness, lem:matrix-spectral, prop:matrix-gap, Sec. 6) plus C12's specification; keep thm:shortcode, KS13/KMS17 machinery, C6-C8 statements.",
+   "prompt": "Problem: give a reduction from 3SAT to Unique Games with completeness 1-eps and soundness delta. Known: the degree-two shortcode rank-one test has completeness ~1/2 and the KMS inverse theorem [statement]. Propose a modification of the test, stated as a precise lemma, that would give completeness near 1 while keeping the inverse theorem usable.",
+   "hit_criterion": "Proposes a fixed-alphabet object with (i) a nonlinear map equivariant under the label translations, (ii) a noise law changing it with probability <=p, (iii) a uniform lower bound on detection of that noise by every linear family of restriction rank >= r(p) independent of the alphabet. Proposals that only raise the code degree (BKS 1.6) or use real/Gaussian noise without (iii) are misses.",
+   "arms": [
+    "L-, open",
+    "L-, directed (states: keep the rank-one test, change the noise)",
+    "L+ (adds Khot-Moshkovitz 2016)"
+   ]
+  },
+  "P-C2": {
+   "item": "C2 explicit quadratic gadget",
+   "hide": "All of Sec. 2 (02-latent.tex) and its Lean dirs Quadratic/, Gadgets/; downstream as in P-C1.",
+   "arm_A_pivot": "Give the statement of lem:latent (C1) and the trace's specification (target h(r)/p -> inf; avoid split scalar lifts; avoid rank collapse under fixed branching). Ask for a construction with proof sketch. High hit rate would downgrade C2 to N2.",
+   "arm_B_cluster_decisive": "Hide C1 too; prompt as P-C1 open/directed. Hit requires both the separation statement and a construction meeting the hit criterion below.",
+   "hit_criterion": "A finite explicit construction achieving lem:latent's three properties with r* independent of l, by any mechanism (not necessarily Q); scored sub-criteria: (a) a nonlinear block whose update spaces cancel the nonlinear term, (b) recursive composition with per-level absorption and controlled linear-rank loss, (c) an alphabet-enlargement step. Full hit = valid construction (checked by expert or Lean).",
+   "trace_distances": {
+    "pivot_distance": ">=2 from L; ~1 given the C21/C22/C24 specification",
+    "chain_depth": 2
+   }
+  },
+  "P-C3_C4": {
+   "item": "C3 genericity, C4 harmonic potential",
+   "protocol": "Scored as sub-criteria of P-C2 Arm A; additionally a one-shot arm giving Q, U_A and the kernel criterion and asking for a rank-loss bound: any proof of <=O(r theta) loss per level plus a potential argument counts as a hit."
+  }
+ },
+ "open_questions": [
+  "Spot-check every WebFetch-derived quote (Quanta, ProofAtlas, ECCC, arXiv pages) against the originals; all are summariser paraphrases.",
+  "Ask OpenAI for the run order of the UG and 2-to-1 searches: does the recursive-product tree in the 2-to-1 paper predate or derive from the latent gadget (or vice versa)?",
+  "Expert query (Khot, Minzer, Moshkovitz, Steurer, Kothari): is a nonlinear translation-equivariant noise-absorbing gadget with linear-rank detection known or folklore in the 2-to-2 -> UG programme? This is the main risk to C2's N3.",
+  "Read Khot-Moshkovitz 2016 in full to fix how close the real-code noise test is to C1 (honest answers nonlinear in the table?).",
+  "Run a Lean analyst pass for 102: DAG share and step-3b compression for Gadgets/ and Quadratic/; compile and run the comparator theorem11.",
+  "Re-run absence searches on zbMATH, Google Scholar and MathOverflow (not reachable here).",
+  "Check whether Kasami-Tokura structured search (trace L164-165) is a hidden antecedent of Q."
+ ],
+ "sources": [
+  "data/raw/openai-math/preprints/The-Unique-Games-Theorem-September-23-2026/build/main.tex, sections/00-07, appendices, references.bib",
+  "data/raw/openai-math/preprints/Perfect-completeness-for-2-to-1-games-September-23-2026/build/00-introduction.tex, 02-construction.tex:436-440, 03-sampling.tex",
+  "data/raw/openai-math/lean/OAI/Computability/UniqueGames/ (directory sizes, Gadgets/Final.lean), lean/docs/102.md",
+  "data/pilot/102/trace.md, trace.json; data/traces/102.txt L146-166, L248-275, L300-315",
+  "https://arxiv.org/abs/2404.07441v4",
+  "https://arxiv.org/abs/2209.04243v2",
+  "https://eccc.weizmann.ac.il/report/2026/179/",
+  "https://eccc.weizmann.ac.il/report/2014/142/",
+  "https://www.quantamagazine.org/as-ai-closed-in-on-unique-games-proof-researchers-raced-to-beat-the-machines-20261007/",
+  "https://www.proofatlas.ai/collaboration/unique-games-conjecture/",
+  "https://lance.fortnow.com/openai-math-tcs.htm",
+  "https://arxiv.org/abs/1804.08662 (BKS18; via search snippets)",
+  "https://scottaaronson.blog/?p=10169 (via search snippets)",
+  "Khot-Saket FOCS 2014 quadratic code (via search snippets: arXiv 1408.0262, 1504.03923)"
+ ]
+}

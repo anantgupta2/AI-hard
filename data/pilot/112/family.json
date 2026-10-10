@@ -1,0 +1,2660 @@
+{
+ "family": 112,
+ "title": "Beyond the square-root exponent for depth-three circuits",
+ "manuscript_dir": "data/raw/openai-math/preprints/Beyond-the-Square-Root-Exponent-for-Depth-Three-Boolean-Circuits-September-23-2026",
+ "source_root": "data/raw/openai-math/preprints/Beyond-the-Square-Root-Exponent-for-Depth-Three-Boolean-Circuits-September-23-2026/build/latex",
+ "commit": "fd4aeeb",
+ "analyst_role": "family analyst (paper + Lean, text level; Lean not built); no reasoning trace exists for 112",
+ "base_library_L": "Mathlib d13f23b + the 12 entries of the inline thebibliography (references.tex): ABI86, DHMTW14, ER60, GKPRT26, GPPST24, H89, HJP95, IPZ01, Krawczyk94, PPSZ05, PPZ99, PSZ00",
+ "main_statement": {
+  "file_line": "sections/00_introduction.tex:52-66",
+  "latex": "\\label{thm:main}\nThere is a language \\(L\\subseteq\\bits^*\\), a deterministic Turing machine\ndeciding \\(L\\), and fixed positive integers \\(C,a\\) such that the machine\nruns in time at most \\(C(n+1)^a\\) on every input of length \\(n\\).\nIf \\(f_n\\) is the membership function of \\(L\\) on \\(\\bits^n\\), then\n\\[\n \\lim_{n\\to\\infty}\\frac{\\log_2 S_3(f_n)}{\\sqrt n}=\\infty.\n\\]\nEquivalently, for every real \\(A>0\\), there is an integer \\(N_A\\)\nsuch that\n\\[\n S_3(f_n)>2^{A\\sqrt n}\\qquad\\text{for every }n\\ge N_A.\n\\]\nNo uniformity or bottom fan-in restriction is imposed on the circuits.",
+  "paraphrase": "There is one language L in deterministic polynomial time whose n-bit membership function needs more than 2^{A sqrt n} gates (all gates counted) in any unbounded fan-in OR-AND-OR circuit, for every constant A > 0 and all large n. The language and machine are fixed before A.",
+  "constructive_core": {
+   "file_line": "sections/02_restriction.tex:14-34; sections/04_construction.tex:118-137",
+   "paraphrase": "Two structural statements: (1) Lemma restriction lifts correlation bounds from width-b CNFs to width-k CNFs under p-restrictions with constant pk, at expected cost 1/(1-theta) independent of clause count; (2) Prop good-slices gives a slice whose random restrictions have corr_b <= 2^{-|T|/8} with failure probability 4 2^{-m0/16}."
+  },
+  "headline_corollaries": [],
+  "lean_comparator": [
+   {
+    "name": "DepthThree",
+    "challenge_file": "lean/ComparatorChallenges/DepthThree.lean",
+    "config": "lean/ComparatorChallenges/DepthThree.json",
+    "target": "OAI.DepthThreeLowerBound.exists_polynomial_time_language_depth_three_lower_bound",
+    "solution_module": "OAI.Computability.DepthThree.Main",
+    "solution_decl": "lean/OAI/Computability/DepthThree/Main.lean:8-16 (term: language_polynomial_time + language_depth_three_gate_lower_bound)",
+    "verbatim": "exists (L : List Bool -> Bool) (M : FiniteMultiTapeMachine) (C a : N), 0 < C /\\ 0 < a /\\ (forall w, MultiTapeHaltsIn M w (L w) (C * (w.length + 1) ^ a)) /\\ forall A : R, 0 < A -> exists N, forall n >= N, forall D : Circuit3 (Fin n), D.Computes (fun x => L (List.ofFn x)) -> 2 ^ (A * sqrt n) < D.gateCount",
+    "permitted_axioms": [
+     "propext",
+     "Quot.sound",
+     "Classical.choice"
+    ],
+    "definitions_unfolded": {
+     "Circuit3": "bottom : Fin bottomCount -> RawClause V (list of literals or Boolean constants), middle : Fin middleCount -> Finset (Fin bottomCount), top : Finset (Fin middleCount); strictly layered OR-AND-OR",
+     "gateCount": "bottomCount + middleCount + 1 (all gates incl. output; matches S_3 total count)",
+     "Computes": "forall x, C.eval x = f x (exact)",
+     "FiniteMultiTapeMachine": "finite tape set K, finite alphabet with blank, finite states, partial transition code, accept : Q -> Bool; built on Mathlib Turing.Tape",
+     "MultiTapeHaltsIn M w out time": "exists k <= time and config c reached in k steps from init w with step c = none and accept c.q = out"
+    },
+    "readable": "Thm main, with \"deterministic Turing machine\" rendered as a finite multi-tape machine.",
+    "match_check": {
+     "verdict": "exact",
+     "details": [
+      "Quantifier order matches: L, M, C, a chosen before A (paper 00:41-42 \"the language and its membership algorithm must be fixed before A is chosen\").",
+      "Gate count matches the paper's total count incl. bottom and output gates (00:44-50).",
+      "Constants allowed as gate inputs; negations free via Literal = V x Bool (00:46-49).",
+      "Paper says \"deterministic Turing machine\"; Lean uses multi-tape, which is the standard equivalent for polynomial time.",
+      "Shared bottom gates allowed (Finset indices), as in paper 05:100-101."
+     ],
+     "gaps": "None found. The lim log S/sqrt n = infinity form is replaced by the equivalent forall A formulation, which the paper also states."
+    }
+   }
+  ],
+  "match_summary": "The single comparator matches Thm main exactly.",
+  "formalized_vs_claimed": {
+   "formalized": [
+    "Thm main in full (polynomial-time machine + gate lower bound), end to end",
+    "Lemma restriction (Restriction.lean:59 cnf_restriction_bound)",
+    "Lemma sparse-partition (SparsePartition.lean:59)",
+    "Prop good-slices (HardSliceEventual.lean:15, HardSliceExistence.lean)",
+    "Prop polytime as an explicit multi-tape machine with C = 24000*3^8, a = 8 (MachineLanguage.lean:119-131)"
+   ],
+   "claimed_not_formalized": [
+    "Appendix field-existence proof (Lean uses Mathlib GaloisField + primitive element instead)",
+    "Erdos-Rado is re-proved in Lean (Sunflower.lean) rather than cited; no gap",
+    "Expository remarks on HJP95/PPSZ05 scale; none are claims"
+   ]
+  }
+ },
+ "trust_surface": {
+  "grep_scope": "lean/OAI/Computability/DepthThree/*.lean (179 files per dump, ~25,000 lines, 2652 declarations) and lean/ComparatorChallenges/DepthThree.{lean,json}",
+  "counts": {
+   "sorry": 0,
+   "axiom": 0,
+   "admit": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque": 0,
+   "partial def": 0,
+   "decide": "169 lines / 55 files (Bool case splits, numeral side goals)",
+   "set_option": 0,
+   "#eval/run_cmd": 0
+  },
+  "notes": [
+   "The only sorry is in the comparator challenge file (by design: ComparatorChallenges/DepthThree.lean:140).",
+   "Permitted axioms: propext, Quot.sound, Classical.choice (DepthThree.json).",
+   "Imports: Mathlib only (incl. Mathlib.Computability.TuringMachine.Tape, Mathlib.LinearAlgebra.Lagrange, Mathlib.FieldTheory.Finite.GaloisField). Three files import \"Mathlib.Basic.Real.Basic\", an unusual module path, but 71 files across the release use it, so it presumably exists at the pinned Mathlib.",
+   "Lean was not built in this pass (not installed); all checks are text-level."
+  ],
+  "computer_assisted": "No."
+ },
+ "labels": {
+  "A": {
+   "label": "A5",
+   "secondary": {
+    "outer_form": "A2 (one explicit language L in P is exhibited: exists L, M, C, a)",
+    "quantitative": "A3 flag: the bound is a rate (log2 S_3 / sqrt n -> infinity); no explicit growth function is given (b(A) and M(b, 1/8) are tower-like and only implicitly bounded)",
+    "explicit_rate": false
+   },
+   "evidence": {
+    "quote": "S_3(f_n)>2^{A\\sqrt n}\\qquad\\text{for every }n\\ge N_A",
+    "file_line": "sections/00_introduction.tex:52-66"
+   },
+   "confidence": "medium-high",
+   "note": "Innermost conclusion: every OR-AND-OR circuit computing f_n has > 2^{A sqrt n} gates, i.e. no small circuit exists (impossibility). The outer quantifier is a single witness language (not indexed), hence A2 as secondary. Lean: forall D, D.Computes ... -> 2^{A sqrt n} < gateCount (ComparatorChallenges/DepthThree.lean:133-139)."
+  },
+  "B": {
+   "label": "B1",
+   "flags": {
+    "full_only_with_prior_results": false,
+    "adds_corollaries_for_other_conjectures": false,
+    "weaker_than_related_open_questions": "Does not give 2^{n^{1/2+eps}} (HJP95 Sec 5 Problem 2) and does not address Majority (GPPST24, HJP95); explicitly acknowledged (00:89-92).",
+    "explicitness": "explicit = decided in deterministic polynomial time; the hard slice inside the language is selected non-constructively (probabilistic method) but the language is fixed"
+   },
+   "evidence": {
+    "quote": "This is the depth-three lower-bound problem discussed by Gurumukhani, Paturi, Pudlak, Saks, and Talebanfard [GPPST24, Section 1.1] and still identified as open in [GKPRT26, Section 1].",
+    "file_line": "sections/00_introduction.tex:85-91"
+   },
+   "confidence": "medium-high",
+   "note": "B1 relative to the 2^{omega(sqrt n)} explicit-function question (open as of lacker.io page verified 2026-08-10; Talebanfard 2026 talk says depth-3 state of the art unchanged). B3 relative to HJP95 Problem 2 (n^{1/2+eps}) or to the Majority question."
+  },
+  "C": {
+   "primary": "C1",
+   "primary_evidence": {
+    "quote": "We construct a language with a data block and parameter blocks.",
+    "file_line": "sections/00_introduction.tex:130"
+   },
+   "secondaries": [
+    "C3 (probabilistic method to select the hard slice, 04:139-299; proof of Thm main by contradiction, 05:91-136)",
+    "C4 (estimation chain: restriction cost theta^j, moment bound, union bound, tails, final exponent arithmetic)",
+    "C2 (sparsification branching tree with insertion budgets; Erdos-Rado induction; induction F_s(R) <= theta^s)"
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "cases a <;> cases b <;> decide",
+    "file_line": "lean/OAI/Computability/DepthThree/AlgebraBits.lean:41",
+    "note": "169 decide lines in 55 files, all Bool case splits / numeral side conditions; no native_decide, no #eval, no search. (GKPRT26, a cited paper, used computer search; this paper does not.)"
+   },
+   "ih_strengthened": true,
+   "ih_template": "strengthen to all subsets/substructures (F_s(R) <= theta^s proved for EVERY starting state R, 02:318-320); secondary: carry an extra tracked quantity (sparsification invariant on added clauses, 03:138-152, inherited from IPZ01)",
+   "ih_evidence": {
+    "quote": "Induction in \\eqref{eq:restriction-reverse-recurrence} now yields $F_s(R)\\leq\\theta^s$ for every $R$ and every fixed $y$.",
+    "file_line": "sections/02_restriction.tex:318-320"
+   },
+   "ih_note": "Mild and templated. The real work in I07 is the representation (I11, I12) and the backward encoding (I15), not the IH. The C5 label does not apply: every cited ingredient (Erdos-Rado, sparsification, hashing, interpolation, field existence) is re-proved.",
+   "confidence": "medium (C1 vs C3 primary is a precedence call: the language is built, the hard slice is chosen non-constructively)"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "I07 Lemma restriction (cluster I11 expansion + I12 marker mixture + I15 backward averaging counting)",
+   "evidence": {
+    "quote": "Counting the resulting paths backwards cancels the number of eligible clauses against a reciprocal violation count. This is the source of the clause-count independence.",
+    "file_line": "sections/00_introduction.tex:126-128"
+   },
+   "confidence": "low-medium",
+   "caveats": [
+    "Switching-lemma family (Hastad, Razborov, SBI, Rossman, Lovett-Wu-Zhang) is a dense neighbourhood; an expert may know a CNF-to-CNF L1 expansion for constant pk.",
+    "If the restriction lemma is new, the remainder (sparsification, k-wise independence, PSZ00 slices, top-down counting) is N0-N2, so D3 rests on a single cluster.",
+    "Correctness assumed; the claim is extraordinary (see correctness_audit), though Lean-formalized end to end."
+   ],
+   "flag_builds_on_prior_model_produced_result": "no (all cited works are human-authored; GKPRT26 arXiv 2601.04446 shows no AI disclosure; no prior model-produced attack found)"
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Theoretical computer science",
+    "msc2020": [
+     "68Q06 (networks and circuits as models of computation; circuit complexity)",
+     "68Q17 (computational difficulty of problems: lower bounds)",
+     "94C11 (switching theory, Boolean functions)"
+    ],
+    "subfield": "Boolean circuit complexity: depth-3 (Sigma_3) lower bounds",
+    "evidence": "catalog_families.csv subject; 00_introduction.tex:34-104"
+   },
+   "lean_dir_field": {
+    "dir": "OAI/Computability/DepthThree",
+    "lean_field": "Computability",
+    "imports": "Mathlib only (no external lake packages; no other OAI dirs; lean_dirs_imported empty)"
+   },
+   "method_fields": [
+    {
+     "field": "Circuit complexity / random restrictions (TCS)",
+     "items": "I05, I07, I35",
+     "tag": "essential",
+     "home": true
+    },
+    {
+     "field": "Exact algorithms / SAT (sparsification lemma, IPZ01; DHMTW14)",
+     "items": "I17, I20-I22",
+     "tag": "essential",
+     "home": true
+    },
+    {
+     "field": "Pseudorandomness: universal hashing and k-wise independence (Krawczyk94, ABI86)",
+     "items": "I24, I27, I28, I30",
+     "tag": "essential",
+     "home": true
+    },
+    {
+     "field": "Extremal set theory (Erdos-Rado sunflower lemma, ER60)",
+     "items": "I19",
+     "tag": "essential (re-proved)",
+     "home": false
+    },
+    {
+     "field": "Finite fields / commutative algebra (GF(2^r), irreducible polynomials, Lagrange interpolation)",
+     "items": "I23, I28, I36",
+     "tag": "essential (re-proved; Lean uses Mathlib GaloisField/Lagrange)",
+     "home": false
+    },
+    {
+     "field": "Elementary probability (moments, Markov, binomial tails, random orderings)",
+     "items": "I12, I30, I31",
+     "tag": "essential",
+     "home": false
+    },
+    {
+     "field": "Information theory (binary entropy counting)",
+     "items": "I22",
+     "tag": "essential (elementary)",
+     "home": false
+    },
+    {
+     "field": "Computability (Turing machines, polynomial time)",
+     "items": "I25, I39",
+     "tag": "essential for the headline statement",
+     "home": true
+    },
+    {
+     "field": "SAT algorithms vs lower bounds (PPZ99, PPSZ05 satisfiability coding / isolation)",
+     "items": "intro context",
+     "tag": "background-cited",
+     "home": true
+    },
+    {
+     "field": "Hastad switching lemma (H89)",
+     "items": "contrast in 02:9-12",
+     "tag": "background-cited (contrasted, not invoked)",
+     "home": true
+    }
+   ],
+   "cross_field_count_essential_nonTCS": 4,
+   "share_invoked_cited_theorems_from_other_fields": "2/6 (ER60 combinatorics; field existence/GF(2^r) algebra, uncited textbook). The other invoked citations (IPZ01, DHMTW14, Krawczyk94, ABI86) are TCS. All six are re-proved, none invoked as a black box.",
+   "confidence": "medium-high"
+  }
+ },
+ "items": [
+  {
+   "id": "I01",
+   "origin": "paper",
+   "kind": "definition (inline \\emph, intro)",
+   "name": "OR-AND-OR circuit and total gate count S_3(f)",
+   "file_line": "sections/00_introduction.tex:34-50",
+   "statement": "Depth-3 OR-AND-OR circuit, unbounded fan-in/fan-out, free input negations and constants, strictly layered; S_3(f) = minimum TOTAL number of AND and OR gates (bottom gates and output counted).",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "H89; HJP95; PSZ00",
+    "cue": "standard model; total-gate emphasis is the paper's"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Ambient object of the headline."
+   },
+   "analytic_check": "Analytic: occurs verbatim in the goal.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook depth-3 circuit model; total-gate count is the standard size measure."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.Circuit3",
+     "kind": "structure",
+     "file_line": "lean/OAI/Computability/DepthThree/Model.lean:39",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0178,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.Circuit3.gateCount",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/Model.lean:48",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.008,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.Circuit3.Computes",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/Model.lean:59",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0045,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I02",
+   "origin": "paper",
+   "kind": "definition (inline, intro + prelim)",
+   "name": "sign g of a predicate; correlation |E gH| with a CNF indicator H",
+   "file_line": "sections/00_introduction.tex:107-110; sections/01_preliminaries.tex:183-184",
+   "statement": "g = +1 on accepted inputs, -1 otherwise; correlation of g with H is |E_x g(x)H(x)| under uniform x.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Every estimate is phrased in this quantity."
+   },
+   "analytic_check": "Analytic: standard Boolean-function-analysis vocabulary in L (correlation bounds literature).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.sign",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/Core.lean:151",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0276,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.finiteAvg",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/FiniteProbability.lean:33",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0963,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I03",
+   "origin": "paper",
+   "kind": "definition (inline \\emph)",
+   "name": "clause, CNF, scope, width, normalized clause",
+   "file_line": "sections/01_preliminaries.tex:186-192",
+   "statement": "Clause = OR of literals; CNF = AND of clauses; after removing tautologies a nonconstant clause has distinct variables; scope = its variable set, width = |scope|; violated on exactly one assignment to its scope; false clause has empty scope.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Basic carrier."
+   },
+   "analytic_check": "Analytic (subterm of goal).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.Clause",
+     "kind": "abbrev",
+     "file_line": "lean/OAI/Computability/DepthThree/Core.lean:9",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.3512,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.CNF",
+     "kind": "abbrev",
+     "file_line": "lean/OAI/Computability/DepthThree/Core.lean:10",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.1034,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I04",
+   "origin": "paper",
+   "kind": "definition (displayed equation)",
+   "name": "C_b(V) and corr_b(G) = max over width-<=b CNF indicators J of |E GJ|",
+   "file_line": "sections/01_preliminaries.tex:194-204",
+   "statement": "C_b(V) = CNF indicators on {0,1}^V with clause widths <= b (no bound on clause count); corr_b(G) = max_{J in C_b(V)} |E_z G(z)J(z)|.",
+   "cited_or_new": {
+    "status": "new-notation",
+    "bib_key": null,
+    "cue": "none; implicitly standard (correlation with a class)"
+   },
+   "uses_items": [
+    "I02",
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The interface quantity between the restriction lemma and the hard-slice proposition."
+   },
+   "analytic_check": "Analytic: \"max correlation with class C\" is a standard pattern in L (correlation bounds vs AC0 / k-CNF); special case with C = width-b CNFs.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Abbreviation: correlation with a fixed function class."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.corr",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionCorrelation.lean:50",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.025,
+     "dominated_share": 0.001
+    }
+   ]
+  },
+  {
+   "id": "I05",
+   "origin": "paper",
+   "kind": "definition (prelim)",
+   "name": "p-random restriction (T, rho), restricted function G_{T,rho}, and the averaging identity E_x GH = E_{T,rho} E_z G_{T,rho}H_{T,rho}",
+   "file_line": "sections/01_preliminaries.tex:206-216",
+   "statement": "T keeps each coordinate independently w.p. p; rho uniform outside T; filling T uniformly gives a uniform point, eq. (restriction-expectation).",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "H89",
+    "cue": "standard random restriction"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Used in sec 2, 4, 5."
+   },
+   "analytic_check": "Analytic: in L (Hastad).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Hastad random restrictions."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.Restriction",
+     "kind": "abbrev",
+     "file_line": "lean/OAI/Computability/DepthThree/FiniteProbability.lean:19",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.1132,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.Live",
+     "kind": "abbrev",
+     "file_line": "lean/OAI/Computability/DepthThree/FiniteProbability.lean:20",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0989,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.fill",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/FiniteProbability.lean:22",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0891,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.TapeStoreRuns.fill",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/TapeStoreRepresentation.lean:88",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0169,
+     "dominated_share": 0.001
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.restrictionAvg",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/FiniteProbability.lean:142",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0303,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.liveSet",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionProbability.lean:16",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0668,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I06",
+   "origin": "paper",
+   "kind": "definition (inline \\emph)",
+   "name": "cylinder (subcube) on the live set",
+   "file_line": "sections/01_preliminaries.tex:218-221",
+   "statement": "Prescribe a pattern on U subset T; indicator is a conjunction of unit clauses; measure 2^{-|U|}.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Used for J_P and the reweighting step."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Subcube."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.cylinderCNF",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionCylinders.lean:109",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0143,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I07",
+   "origin": "paper",
+   "kind": "lemma",
+   "name": "Lemma restriction (Restriction bound): clause-count-independent signed CNF expansion under p-restriction",
+   "file_line": "sections/02_restriction.tex:14-34 (proof 36-342)",
+   "statement": "For H a width-<=k CNF on [d], 0<p<1, b>=1, theta = sum_{l=b+1}^k C(k,l)(2p/(1-p))^l < 1: there are W(H,T,rho) >= 0 with E W <= 1/(1-theta) and |E_z G(z)H_{T,rho}(z)| <= W corr_b(G) simultaneously for all real G on {0,1}^T. No dependence on the number of clauses.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"This is a different conclusion from the classical switching estimate ... Here the tests remain CNFs\" (02:9-12); intro: \"Our main ingredient\" (00:116)"
+   },
+   "uses_items": [
+    "I03",
+    "I04",
+    "I05",
+    "I08",
+    "I09",
+    "I10",
+    "I11",
+    "I12",
+    "I13",
+    "I14",
+    "I15",
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "Sole route from width k = Theta(sqrt d) to constant width b; without it the method is Hastad-limited to pk < const and gives only 2^{O(sqrt n)}. Lean closure 346/2046 decls (16.9% of whole DAG; ~38% of the 906-decl lower-bound half)."
+   },
+   "analytic_check": "Non-analytic: neither the goal (a depth-3 size bound) nor L states a signed-CNF L1-mass expansion of restricted CNFs; nearest L statement is Hastad's switching lemma (H89 Main Lemma), which has a different conclusion (DNF/decision tree) and requires pk < const.",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Candidate. Quick lit check (Oct 2026): no statement found that expands a restricted width-k CNF into width-b CNF tests with expected coefficient mass <= 1/(1-theta) for ARBITRARY constant pk (b depending on pk). Neighbours: Hastad switching lemma (pk<1/5, DT depth), Razborov encoding proof, Segerlind-Buss-Impagliazzo small-restriction switching, Lovett-Wu-Zhang mild restrictions (first moment of useful terms), Gopalan-Meka-Reingold DNF sparsification. None gives this conclusion."
+   },
+   "provisional_F": "F3 (auxiliary construction: the path expansion + marker mixtures is a device built only to drive the proof), with F5 flavour (change of representation of H_{T,rho} as a signed mixture of CNFs)",
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.cnf_restriction_bound",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/Restriction.lean:59",
+     "in_proof_dag": false,
+     "frac_dag_dependents": 0.0,
+     "dominated_share": 0.0
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.cnf_restricted_correlation_le_cost",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/Restriction.lean:37",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0036,
+     "dominated_share": 0.0748
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.restrictionAvg_cnfRestrictionCost_le",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/Restriction.lean:46",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0045,
+     "dominated_share": 0.0298
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.restrictionAvg_cnfRestrictionCost_le_two",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/Restriction.lean:71",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0036,
+     "dominated_share": 0.0303
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.restrictionTheta",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/Restriction.lean:17",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0062,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.cnfRestrictionCost",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/Restriction.lean:30",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0071,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I08",
+   "origin": "paper",
+   "kind": "definition (inline \\emph, in proof)",
+   "name": "easy/hard at U; counts a_U (violated easy clauses) and c_U (violated fully-revealed clauses); q",
+   "file_line": "sections/02_restriction.tex:46-56",
+   "statement": "Index i easy at U iff |E_i cap (T minus U)| <= b; a_U = sum of v_i over easy i; c_U = sum over i with E_i cap (T minus U) empty; q = total violated count.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I03",
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Denominators of the expansion."
+   },
+   "analytic_check": "Non-analytic relative to goal; resembles the \"first surviving clause\" bookkeeping of switching-lemma proofs.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Part of I07; counting-of-violated-clauses normalisations have neighbours (PPZ isolation counting; Razborov encodings), but this specific easy/hard split is internal to I07."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.hardIndices",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionPaths.lean:86",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0437,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.coveredCount",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionExpansion.lean:34",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.041,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.easyCount_eq_covered_add_intermediate",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionCountSplit.lean:30",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0098,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I09",
+   "origin": "paper",
+   "kind": "definition (in proof)",
+   "name": "K = conjunction of initially easy clauses after rho (width <= b CNF)",
+   "file_line": "sections/02_restriction.tex:57-62",
+   "statement": "K = 1[a_empty = 0]; K >= H_{T,rho}; first-order approximation of H.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Leading term of the expansion."
+   },
+   "analytic_check": "Analytic-ish: truncation of a CNF to its narrow clauses is a common move (cf. I30).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Sub-conjunction of H."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.easyBaseCNF",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionEasyBase.lean:80",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0098,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.easyBaseClause",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionEasyBase.lean:62",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0107,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.easyBaseIndices",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionEasyBase.lean:59",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0098,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I10",
+   "origin": "paper",
+   "kind": "definition (in proof)",
+   "name": "violation paths P_j(T): sequences of successively hard clause indices with revealed sets U_h",
+   "file_line": "sections/02_restriction.tex:74-91",
+   "statement": "P = (i_1..i_j) with i_h hard at U_{h-1}, U_h = U_{h-1} cup (E_{i_h} cap T); each step reveals > b coords, so length <= |T|/(b+1); indices distinct; a_{U_h} >= c_{U_h} >= h on support.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Index set of the expansion and of W."
+   },
+   "analytic_check": "Non-analytic vs goal. Close in shape to the canonical decision tree / \"successive first unsatisfied clause\" paths in switching-lemma proofs (H89, Razborov).",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Variant of canonical-decision-tree paths, but selection is \"any hard violated clause\" (all of them, summed), not the first one."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.revealed",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionPaths.lean:18",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0758,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.residual",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionPaths.lean:21",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0758,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.pathWeight",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionPathData.lean:61",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0223,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I11",
+   "origin": "paper",
+   "kind": "key construction (identity)",
+   "name": "Telescoping partition-of-unity expansion: 1 = sum_i v_i/q, r_P = t_P - sum_i r_{Pi}, giving H_{T,rho} = K + K sum_j (-1)^j sum_{P in P_j} prod v / prod a_{U_h} (pointwise, finite)",
+   "file_line": "sections/02_restriction.tex:63-131 (eq. restriction-expansion at 124-130)",
+   "statement": "Distribute the unit excess K - H among violated hard clauses with weights v_i/q, replace q by the count a_{U_j} of easy violated clauses, and push the remainder to longer paths; finite alternating expansion.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"The next step replaces the common denominator q by counts of easy clauses\" (02:70)"
+   },
+   "uses_items": [
+    "I08",
+    "I09",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "The representational core of I07."
+   },
+   "analytic_check": "Non-analytic: no subterm of goal or L. Generic neighbours: inclusion-exclusion / cluster (polymer) expansions; partitions of unity over violated constraints (e.g. Moser-Tardos-style witness trees use similar path bookkeeping).",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Part of the I07 cluster; no neighbour found that writes a CNF as an alternating sum over violation paths with violated-count denominators."
+   },
+   "provisional_F": "F5 (change of representation)",
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.finite_violation_expansion",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionExpansion.lean:293",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0062,
+     "dominated_share": 0.0098
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.pathTerm",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionExpansion.lean:46",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0143,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.indexedCNF_restriction_expansion",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionCostCorrelation.lean:124",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0054,
+     "dominated_share": 0.0132
+    }
+   ]
+  },
+  {
+   "id": "I12",
+   "origin": "paper",
+   "kind": "key construction (lemma-like, in proof)",
+   "name": "Marker mixture: random order of a clauses and c markers; conjunction of clauses before first marker has expectation c/(c+w)",
+   "file_line": "sections/02_restriction.tex:168-193",
+   "statement": "Represents the rational weight c/(c+w) (w = # violated clauses in an indexed family) as a convex mixture of conjunctions of those clauses, so every term K prod v / prod a equals omega(P) E[J_P] with J_P in C_b(T).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"We use the following elementary finite mixture\" (02:168)"
+   },
+   "uses_items": [
+    "I08",
+    "I11"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Keeps the tests inside C_b, which is what lets the bound be in terms of corr_b. Lean closure of pathMixture_scaled_average: 156 decls (7.6%)."
+   },
+   "analytic_check": "Non-analytic vs goal; the probability that the first of w+c random objects is a marker is a classical symmetry fact (random-order / \"first arrival\" arguments).",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Elementary random-ordering identity (classical), used here in a new role: realizing reciprocal-count weights as convex combinations of CNFs. The use is new, the identity is N0."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.marker_mixture_ratio",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/MarkerMixture.lean:114",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0125,
+     "dominated_share": 0.0083
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.marker_product_mixture_ratio",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/MarkerMixture.lean:147",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0116,
+     "dominated_share": 0.0088
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.markerSelected",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/MarkerMixture.lean:23",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0223,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.markerSample",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/MarkerMixture.lean:36",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.016,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.pathMixtureCNF",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionPathMixture.lean:127",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0098,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.pathMixture_scaled_average",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionPathMixture.lean:139",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.008,
+     "dominated_share": 0.0205
+    }
+   ]
+  },
+  {
+   "id": "I13",
+   "origin": "paper",
+   "kind": "definition (in proof)",
+   "name": "path weight omega(P) = prod 1/c_h; W_j, W(H,T,rho) = sum over compatible paths",
+   "file_line": "sections/02_restriction.tex:134-211",
+   "statement": "Compatible paths (all selected clauses simultaneously violable with rho) prescribe a pattern sigma_P on U_j; c_{U_h} is constant on the cylinder; omega(P) = prod 1/c_h; W = sum_j W_j.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I10",
+    "I11",
+    "I12"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The cost W of I07."
+   },
+   "analytic_check": "Non-analytic.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Part of I07 cluster (bookkeeping)."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.restrictionCost",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionPathData.lean:68",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0116,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.pathWeight",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionPathData.lean:61",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0223,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I14",
+   "origin": "paper",
+   "kind": "proof step",
+   "name": "Reweighting by a full assignment y (E W_j = E_{T,y}[sum over paths violated at y of 2^{|U_j|} prod 1/c_{U_h}(y)])",
+   "file_line": "sections/02_restriction.tex:213-233",
+   "statement": "Sample y uniform, set rho = y outside T; conditional on (T,rho) multiply by 2^{|U_j|} to undo the cylinder probability.",
+   "cited_or_new": {
+    "status": "new-application",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I13"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Step to make counting y-wise."
+   },
+   "analytic_check": "Analytic: standard \"sample the full assignment first\" trick (Razborov / Beame proofs of the switching lemma).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard reweighting."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.pathWeight_eq_finiteAvg_supported",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionExpectedCost.lean:52",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0098,
+     "dominated_share": 0.0034
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.restrictionAvg_pathCost_le",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionExpectedCost.lean:132",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0071,
+     "dominated_share": 0.0274
+    }
+   ]
+  },
+  {
+   "id": "I15",
+   "origin": "paper",
+   "kind": "key construction + lemma (in proof)",
+   "name": "Backward (reverse) path counting: injective reverse encoding from terminal set R_j, recursion F_s(R) = (1/|V_R|) sum_{i in V_R} sum_{D subset E_i,|D|>b} alpha^{|D|} F_{s-1}(R cup D) <= theta^s; the reciprocal count 1/|V_R| AVERAGES over clause indices, cancelling clause count",
+   "file_line": "sections/02_restriction.tex:235-342 (figure 256-266; recursion 296-323)",
+   "statement": "With alpha = 2p/(1-p), pi(T) 2^{|U_j|} prod 1/c = pi(R_j) prod alpha^{|D_h|}/|V_{R_h}|; one-step weight <= theta; hence E W_j <= theta^j and E W <= 1/(1-theta).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"Counting the resulting paths backwards cancels the number of eligible clauses against a reciprocal violation count. This is the source of the clause-count independence.\" (00:126-128)"
+   },
+   "uses_items": [
+    "I13",
+    "I14",
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "The quantitative heart of I07. Lean: weighted_supported_paths_le closure 79 decls; ReversePath* 64 decls, 648 lines."
+   },
+   "analytic_check": "Non-analytic. Shape-neighbour: Razborov's injective encoding of bad restrictions (aux info d log w), Rossman entropy proof; here the encoding runs backward from the terminal live set and the per-step factor is an average (1/|V_R| sum), not a log w bit cost.",
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Part of I07 cluster; the averaging-instead-of-multiplying device is what removes the clause count and permits arbitrary constant pk."
+   },
+   "provisional_F": "F3",
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.weighted_supported_paths_le",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/ReversePathEncoding.lean:373",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.008,
+     "dominated_share": 0.021
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.reverseTheta",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/ReversePathRecurrence.lean:85",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.016,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.reverseEncode",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/ReversePathEncoding.lean:126",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0152,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.reverseEligible",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/ReversePathRecurrence.lean:21",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0205,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.reverseBlocks",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/ReversePathRecurrence.lean:37",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0187,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.bernoulliWeight",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/ReversePathWeights.lean:15",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0294,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I16",
+   "origin": "paper",
+   "kind": "definition (displayed)",
+   "name": "theta = sum_{l=b+1}^k C(k,l)(2p/(1-p))^l",
+   "file_line": "sections/02_restriction.tex:19-22",
+   "statement": "Poisson-like tail; <= sum_{l>b} Q^l/l! with Q = 2pk/(1-p).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Controls E W."
+   },
+   "analytic_check": "Analytic (a binomial tail).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Tail sum."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.restrictionTheta",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/Restriction.lean:17",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0062,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.reverseTheta",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/ReversePathRecurrence.lean:85",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.016,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I17",
+   "origin": "paper",
+   "kind": "lemma",
+   "name": "Lemma sparse-partition: every width-b CNF on m vars is a DISJOINT sum of <= 2^{eta m} width-b CNFs with <= M(b,eta) m clauses each",
+   "file_line": "sections/03_sparse_partition.tex:14-25 (proof 56-264)",
+   "statement": "For every b>=1, eta>0 there is M(b,eta) such that H = sum_{a<=q} H_a pointwise, q <= 2^{eta m}, H_a width <= b with <= Mm clauses, satisfying sets pairwise disjoint.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "IPZ01; DHMTW14",
+    "cue": "\"The proof adapts the sparsification method of Impagliazzo, Paturi, and Zane ... A disjoint refinement is described by Dell, Husfeldt, Marx, Taslaman, and Wahlen ... Here we prove a version with the bookkeeping needed\" (03:5-10)"
+   },
+   "uses_items": [
+    "I18",
+    "I19",
+    "I20",
+    "I21",
+    "I22"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Needed so a union bound over 2^{O(m log m)} sparse tests controls all width-b CNFs. Lean closure 196 decls (9.6%); Sparse* defs have frac_dag_dependents ~0.21-0.23."
+   },
+   "analytic_check": "Analytic vs L: the sparsification lemma (IPZ01) and its disjoint/counting version (DHMTW14, Calabro-Impagliazzo-Paturi 2006) are in L.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Re-proof of the disjoint sparsification lemma (known, cited); restated with clause count Mm instead of variable-occurrence bounds."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.exists_sparse_partition_constant",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/SparsePartition.lean:59",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0116,
+     "dominated_share": 0.0758
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.SparsePartition",
+     "kind": "structure",
+     "file_line": "lean/OAI/Computability/DepthThree/SparsePartition.lean:46",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0143,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.SparseState",
+     "kind": "structure",
+     "file_line": "lean/OAI/Computability/DepthThree/SparseBranch.lean:67",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.2264,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I18",
+   "origin": "paper",
+   "kind": "definition (inline \\emph)",
+   "name": "sunflower, core, petals",
+   "file_line": "sections/03_sparse_partition.tex:29-32",
+   "statement": "Distinct sets with common pairwise intersection C (core); petals = sets minus C.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "ER60",
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Branching device."
+   },
+   "analytic_check": "Analytic (in L).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Erdos-Rado."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.Sunflower",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/Sunflower.lean:18",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.2193,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I19",
+   "origin": "paper",
+   "kind": "lemma (re-proved)",
+   "name": "Lemma sunflower-bound (Erdos-Rado): > s!(r-1)^s distinct s-sets contain an r-sunflower",
+   "file_line": "sections/03_sparse_partition.tex:33-54",
+   "statement": "Classical, with proof by induction on s.",
+   "cited_or_new": {
+    "status": "cited and re-proved",
+    "bib_key": "ER60",
+    "cue": "\"We use the classical sunflower bound of Erdos and Rado ... and include its short proof\" (03:27-28)"
+   },
+   "uses_items": [
+    "I18"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Occurrence bound in I21."
+   },
+   "analytic_check": "Analytic (in L).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Erdos-Rado 1960."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.finite_uniform_sunflower",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/Sunflower.lean:146",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0259,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.lift_erased_sunflower",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/Sunflower.lean:122",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0268,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.no_nonempty_core_sunflower_occurrence_le",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/Sunflower.lean:253",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.025,
+     "dominated_share": 0.0029
+    }
+   ]
+  },
+  {
+   "id": "I20",
+   "origin": "paper",
+   "kind": "definition (in proof)",
+   "name": "eligible sunflower at size i (r_i members, nonempty core); branching state = active antichain + separate unit-clause side condition; branch 0 inserts core C, branch 1 inserts petals and adds \"C false\" side condition",
+   "file_line": "sections/03_sparse_partition.tex:63-120",
+   "statement": "F = F_0 + 1[C false] F_1 with disjoint supports.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "IPZ01; DHMTW14",
+    "cue": "\"The extra requirement on branch 1 is the disjointness device of [DHMTW14, App. A]\" (03:94-95)"
+   },
+   "uses_items": [
+    "I18"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Defines the partition tree."
+   },
+   "analytic_check": "Analytic vs L (IPZ01 branching, DHMTW14 disjointness).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "IPZ branching with DHMTW side condition; keeping the side condition separate from the active family is a bookkeeping refinement."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.SparseState",
+     "kind": "structure",
+     "file_line": "lean/OAI/Computability/DepthThree/SparseBranch.lean:67",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.2264,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.SignedSunflower",
+     "kind": "structure",
+     "file_line": "lean/OAI/Computability/DepthThree/SparseBranch.lean:276",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.2166,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.sparseBatchUpdate",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/SparseBranch.lean:14",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.2121,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.SparseState.batchUpdate",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/SparseBranch.lean:110",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.2094,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.InsertionBatch",
+     "kind": "structure",
+     "file_line": "lean/OAI/Computability/DepthThree/SparseBranch.lean:139",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.2112,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I21",
+   "origin": "paper",
+   "kind": "proof step / invariant",
+   "name": "occurrence bounds e_i, added-clause invariant (<= e_u + 1 per literal), insertion charging N_u <= (e_u+1)(2m + sum_{v<u} N_v), budgets D_i",
+   "file_line": "sections/03_sparse_partition.tex:122-195",
+   "statement": "Bounds the number of steps per path linearly in m.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "IPZ01",
+    "cue": "\"including its occurrence bounds, insertion accounting\" (03:6)"
+   },
+   "uses_items": [
+    "I19",
+    "I20"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Termination and leaf counting."
+   },
+   "analytic_check": "Analytic vs IPZ01.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "IPZ accounting."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.sparse_occurrence_le_of_no_sunflower",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/SparsePrefix.lean:26",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0241,
+     "dominated_share": 0.0044
+    }
+   ]
+  },
+  {
+   "id": "I22",
+   "origin": "paper",
+   "kind": "proof step",
+   "name": "leaf counting via per-size decision streams with few ones + binary entropy bound; threshold choice r_i = 2^{q_i}",
+   "file_line": "sections/03_sparse_partition.tex:197-240",
+   "statement": "#leaves <= prod 2^{m F_i h_2(1/r_i)} <= 2^{eta m}.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "IPZ01",
+    "cue": "\"entropy count of branches\" (03:7)"
+   },
+   "uses_items": [
+    "I21"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Gives q <= 2^{eta m}."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard entropy counting as in IPZ01."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.sparse_entropy_bound",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/SparseThresholds.lean:115",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0134,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.sparse_entropy_sum_budget",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/SparsePartition.lean:18",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0125,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.exists_integer_entropy_threshold",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/EntropyThreshold.lean:43",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0268,
+     "dominated_share": 0.0015
+    }
+   ]
+  },
+  {
+   "id": "I23",
+   "origin": "paper",
+   "kind": "definition",
+   "name": "Definition language: data x (d bits), Hankel/Toeplitz hash seed u, monic modulus P of degree r = ceil(d^{2/3}), t ~ d^{1/6} coefficients beta_j in F_2[Z]/(P); accept iff lambda(sum_j beta_j h(x)^j) = 0",
+   "file_line": "sections/04_construction.tex:15-47",
+   "statement": "d = floor(n/5); r = ceil(d^{2/3}); t = largest even j with j^6 <= d; parameter bits are part of the input; evaluator never tests irreducibility.",
+   "cited_or_new": {
+    "status": "new (assembly of standard parts)",
+    "bib_key": "PSZ00; Krawczyk94; ABI86",
+    "cue": "\"The input-index construction in [PSZ00, Section 5] supplies an earlier instance of this evaluator-and-hard-subfunction method\" (04:10-11)"
+   },
+   "uses_items": [
+    "I24",
+    "I27",
+    "I28"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The witness language."
+   },
+   "analytic_check": "Non-analytic in the trivial sense (the goal is existential in L); the design is a standard pattern: k-wise independent function = polynomial of degree < t over GF(2^r) evaluated at a hash, with seed/coefficients as input bits (PSZ00 style).",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Close variant of PSZ00 input-index construction + ABI86/IPZ01 polynomial families; parameters r, t tuned to the sqrt(d) live sets."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.language",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/Language.lean:55",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0152,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.ParsedInput",
+     "kind": "structure",
+     "file_line": "lean/OAI/Computability/DepthThree/LanguageParser.lean:8",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0463,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.BinaryHash.hashBool",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/Hash.lean:66",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0348,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.dataDimension",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/LanguageParameters.lean:9",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0731,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.hashDimension",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/LanguageParameters.lean:28",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0945,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.independenceOrder",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/LanguageParameters.lean:80",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0909,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I24",
+   "origin": "paper",
+   "kind": "definition",
+   "name": "Hankel (Toeplitz) linear hash h_i(x) = sum_s u_{i+s-1} x_s",
+   "file_line": "sections/04_construction.tex:36-40, 49-52",
+   "statement": "Universal linear hash; only uniformity of h(w) for nonzero w is used.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "Krawczyk94",
+    "cue": "\"Fully random Toeplitz matrices give a standard universal linear hash family\" (04:51-52)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Injectivity on restricted cube."
+   },
+   "analytic_check": "Analytic (in L).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Toeplitz hashing."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.BinaryHash.hashBool",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/Hash.lean:66",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0348,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I25",
+   "origin": "paper",
+   "kind": "proposition",
+   "name": "Prop polytime: L decided by one deterministic TM in time C(n+1)^a",
+   "file_line": "sections/04_construction.tex:72-106",
+   "statement": "Integer parameter search, O(rd + t r^2) bit operations; no irreducibility test.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I23"
+   ],
+   "load_bearing_guess": {
+    "level": "high (for statement), low (mathematically)",
+    "reason": "Needed for \"polynomial-time language\"; in Lean it is 60% of the proof DAG (TM compilation)."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Routine algorithmics."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.language_polynomial_time",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/MachineLanguage.lean:126",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0009,
+     "dominated_share": 0.5513
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.MachineLanguage.polynomial_time",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/MachineLanguage.lean:119",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0018,
+     "dominated_share": 0.5503
+    }
+   ]
+  },
+  {
+   "id": "I26",
+   "origin": "paper",
+   "kind": "proposition",
+   "name": "Prop good-slices: for fixed b, B and large n there is a setting of non-data bits whose slice g satisfies Pr_{T,rho}[|T| not in [m0/2, 2m0] or corr_b(g_{T,rho}) > 2^{-|T|/8}] <= 4 2^{-m0/16}, p = B/sqrt d, m0 = B sqrt d",
+   "file_line": "sections/04_construction.tex:118-299",
+   "statement": "Probabilistic method over (u, beta): hash injective on the restricted cube w.p. >= 1 - 2^{m-r}; then signs t-wise independent; t-th moment + union over (C_m+1)^{Mm} sparse tests + sparse partition gives corr_b <= 2^{-m/8}; average over parameter choices.",
+   "cited_or_new": {
+    "status": "new (combination)",
+    "bib_key": "IPZ01; ABI86; Krawczyk94; PSZ00",
+    "cue": "\"Sparse normal forms and random polynomial families also occur in [IPZ01, Section 1.2]\" (00:154-155)"
+   },
+   "uses_items": [
+    "I04",
+    "I05",
+    "I17",
+    "I23",
+    "I24",
+    "I27",
+    "I28",
+    "I29",
+    "I30",
+    "I31"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "Supplies the b-independent correlation exponent 1/8 on random restrictions. Lean closure of exists_good_language_slice_eventually: 552 decls (27%)."
+   },
+   "analytic_check": "Partly analytic: \"random degree-2 polynomials / limited-independence functions have small correlation with sparse k-CNFs, via sparsification + union bound\" is IPZ01 Sec 1.2 (in L). New: applying it on every random restriction with live-set size ~ B sqrt d and an exponent independent of b.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Close variant of IPZ01's random-polynomial depth-3 (bounded bottom fan-in) argument, transplanted to restricted cubes."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.exists_good_language_slice_eventually",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/HardSliceEventual.lean:15",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0027,
+     "dominated_share": 0.195
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.exists_good_hash_coefficients",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/HardSliceExistence.lean:37",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0036,
+     "dominated_share": 0.0665
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.goodRestriction",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/HardSliceSelection.lean:63",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0071,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.actual_hash_coefficient_failure_le",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/HardSliceProbability.lean:122",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0054,
+     "dominated_share": 0.0557
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.exists_sparse_correlation_transfer",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/SparseCorrelation.lean:47",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0107,
+     "dominated_share": 0.0787
+    }
+   ]
+  },
+  {
+   "id": "I27",
+   "origin": "paper",
+   "kind": "proof step",
+   "name": "h(w) uniform for every nonzero w (successive pivots), hence injectivity on a restricted m-cube except w.p. <= 2^{m-r}",
+   "file_line": "sections/04_construction.tex:148-169",
+   "statement": "Union bound over 2^m - 1 differences.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "Krawczyk94",
+    "cue": "none"
+   },
+   "uses_items": [
+    "I24"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": ""
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Universal hashing."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.BinaryHash.hashBool_restriction_failure_le",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/HashProbability.lean:170",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0071,
+     "dominated_share": 0.0288
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.BinaryHash.hashBool_restriction_failure_le_pow",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/HashProbability.lean:189",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0062,
+     "dominated_share": 0.0293
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.BinaryHash.hashBool_badSeed_probability_le",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/HashProbability.lean:72",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.008,
+     "dominated_share": 0.0249
+    }
+   ]
+  },
+  {
+   "id": "I28",
+   "origin": "paper",
+   "kind": "proof step",
+   "name": "limited independence from Lagrange interpolation: uniform beta in F^t gives t-wise independent unbiased signs on distinct hash values",
+   "file_line": "sections/04_construction.tex:171-188",
+   "statement": "Evaluation map surjective for q <= t distinct nodes; lambda balanced.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "ABI86",
+    "cue": "\"as in [ABI86, Section 6, proof of Proposition 6.3]\" (04:55-56)"
+   },
+   "uses_items": [
+    "I27"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": ""
+   },
+   "analytic_check": "Analytic (Mathlib Lagrange in L).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard k-wise independence construction."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.Interpolation.coeffEval_surjective",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/InterpolationEvaluation.lean:32",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0143,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.Interpolation.bitEval_surjective",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/InterpolationSigns.lean:40",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0134,
+     "dominated_share": 0.001
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.Interpolation.finiteAvg_acceptEval_finset",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/InterpolationSigns.lean:147",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0098,
+     "dominated_share": 0.0044
+    }
+   ]
+  },
+  {
+   "id": "I29",
+   "origin": "paper",
+   "kind": "proof step",
+   "name": "count of sparse tests <= 2^{Mm[1 + b log2(2m+1)]}",
+   "file_line": "sections/04_construction.tex:190-208",
+   "statement": "Encoding of normalized clauses and lists of <= Mm clauses.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I17"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": ""
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Counting."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.sparse_moment_union_le",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/SparseTailBounds.lean:60",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0062,
+     "dominated_share": 0.0024
+    }
+   ]
+  },
+  {
+   "id": "I30",
+   "origin": "paper",
+   "kind": "proof step",
+   "name": "t-th moment bound E Y^t <= t^t 2^{mt/2}, Markov, union bound",
+   "file_line": "sections/04_construction.tex:210-257",
+   "statement": "Terms with a singleton point vanish; at most 2^{mt/2}(t/2)^t surviving descriptions.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I28",
+    "I29"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": ""
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard moment method for k-wise independent sums."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.even_moment_le",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/MomentBounds.lean:103",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0125,
+     "dominated_share": 0.0054
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.even_moment_le_manuscript",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/MomentBounds.lean:145",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0116,
+     "dominated_share": 0.0059
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.tuple_product_avg_zero",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/MomentBounds.lean:75",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0134,
+     "dominated_share": 0.002
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.card_noSingleton_tuples_le",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/TupleCounting.lean:76",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0134,
+     "dominated_share": 0.0015
+    }
+   ]
+  },
+  {
+   "id": "I31",
+   "origin": "paper",
+   "kind": "proof step",
+   "name": "binomial tails of |T| and averaging to fix one parameter setting",
+   "file_line": "sections/04_construction.tex:259-299",
+   "statement": "Pr[m<m0/2], Pr[m>2m0] <= 2^{-m0/16} each; averaging argument.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": ""
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Chernoff-type."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.lower_tail_exponent",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/RestrictionTails.lean:67",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0071,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I32",
+   "origin": "paper",
+   "kind": "proof step (key parameter choice)",
+   "name": "Order of quantifiers and parameters: fix A, s = 3A, B = 64(s+1), p = B/sqrt d, k = ceil(3(s+1) sqrt d), Q = 4B[3(s+1)+1], then choose b = b(A) with sum_{l>b} Q^l/l! <= 1/2 so theta <= 1/2",
+   "file_line": "sections/05_lower_bound.tex:9-46",
+   "statement": "pk is a (large) constant depending on A; b is chosen after A so the restriction lemma applies; the slice is chosen after (b, B). \"This is the only place where the desired circuit exponent affects the target width.\"",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I07",
+    "I16",
+    "I26"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "This is where the omega(sqrt n) comes from: arbitrary constant pk is allowed because b may grow with A while the slice's correlation exponent (1/8) does not depend on b."
+   },
+   "analytic_check": "Partly analytic: once I07 and I26 are stated, the parameter choice is forced by arithmetic.",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Strategic insight but arithmetically forced given I07 + I26; in Lean exists_final_parameter_width / exists_factorial_tail_width."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.exists_final_parameter_width",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/FinalParameterBounds.lean:124",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0027,
+     "dominated_share": 0.0029
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.exists_factorial_tail_width",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/AsymptoticBounds.lean:19",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0036,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.reverseTheta_le_factorial_tail",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/FinalParameterBounds.lean:99",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0036,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I33",
+   "origin": "paper",
+   "kind": "proof step (lemma-like)",
+   "name": "Correlation transfer to width k: |E g H| <= 2^{-m0/16} E[W_H 1_good] + Pr[not good] <= 6 2^{-m0/16} for every width-k CNF H, no independence needed",
+   "file_line": "sections/05_lower_bound.tex:48-79",
+   "statement": "Combine I07 (per H) with I26 (good event, uniform over all width-b tests).",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I07",
+    "I26"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Lean wide_correlation_of_good_restrictions dominated share 0.131."
+   },
+   "analytic_check": "Analytic given I07, I26.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Direct combination."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.wide_correlation_of_good_restrictions",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/WideCorrelation.lean:17",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0027,
+     "dominated_share": 0.131
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.restriction_correlation_transfer_six",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/CorrelationTransfer.lean:99",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0036,
+     "dominated_share": 0.0029
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.exists_language_slice_small_correlations",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/HardSlice.lean:12",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0018,
+     "dominated_share": 0.3509
+    }
+   ]
+  },
+  {
+   "id": "I34",
+   "origin": "paper",
+   "kind": "proof step",
+   "name": "near-balance: constant-true CNF gives |E g| <= 6 2^{-m0/16}, so Pr[g=1] >= 1/4",
+   "file_line": "sections/05_lower_bound.tex:81-88",
+   "statement": "",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I33"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": ""
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Trivial instance of I33."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.acceptance_density_lower_of_width_correlation",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/CircuitDensity.lean:33",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0027,
+     "dominated_share": 0.0024
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.acceptance_density_lower_of_sign_bound",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/CircuitDensity.lean:26",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0036,
+     "dominated_share": 0.002
+    }
+   ]
+  },
+  {
+   "id": "I35",
+   "origin": "paper",
+   "kind": "proof step",
+   "name": "Circuit counting: <= S middle CNFs with <= S clauses; delete clauses wider than k (error S 2^{-k} each); gH = H for middle gates of an exact OR; sum over middle gates contradicts density 1/4",
+   "file_line": "sections/05_lower_bound.tex:90-141",
+   "statement": "Pr[g=1] <= 6S 2^{-m0/16} + S^2 2^{-k} -> 0.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "HJP95; PSZ00",
+    "cue": "none (standard depth-3 top-down counting)"
+   },
+   "uses_items": [
+    "I01",
+    "I33",
+    "I34"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Final step. Lean circuit_lower_bound_of_small_cnf_correlations closure 88 decls."
+   },
+   "analytic_check": "Analytic: wide-clause truncation and \"each middle CNF accepts few inputs\" are standard in depth-3 lower bounds (HJP95 top-down, PPZ).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.circuit_lower_bound_of_small_cnf_correlations",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/CircuitQuantitative.lean:10",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0018,
+     "dominated_share": 0.02
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.Circuit3.acceptance_density_le",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/CircuitLowerBound.lean:68",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0027,
+     "dominated_share": 0.0156
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.CNF.deleteWide",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/CircuitDeletion.lean:44",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0098,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.Circuit3.middleCNF",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/CircuitNormalization.lean:88",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0107,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I36",
+   "origin": "paper",
+   "kind": "lemma (appendix, re-proved)",
+   "name": "Lemma field-existence: monic irreducible polynomial of every degree r over F_2",
+   "file_line": "appendices/finite_fields.tex:145-196",
+   "statement": "Elementary construction of GF(2^r) and counting of lower-degree elements.",
+   "cited_or_new": {
+    "status": "standard (re-proved)",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Only to identify R_P with a field in the analysis."
+   },
+   "analytic_check": "Analytic (Mathlib GaloisField).",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook; Lean uses Mathlib GaloisField + primitive element instead (route difference)."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.exists_monic_irreducible_natDegree_two",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/IrreduciblePolynomial.lean:7",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0045,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.exists_irreducible_inputPolynomialBits",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/IrreducibleEncoding.lean:30",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0036,
+     "dominated_share": 0.002
+    }
+   ]
+  },
+  {
+   "id": "I37",
+   "origin": "paper",
+   "kind": "definition (inline \\emph)",
+   "name": "slice: function of the data bits obtained by fixing the parameter bits",
+   "file_line": "sections/00_introduction.tex:131-134; sections/04_construction.tex:108-110",
+   "statement": "",
+   "cited_or_new": {
+    "status": "new-name",
+    "bib_key": "PSZ00",
+    "cue": "\"which we call a \\emph{slice}\" (00:133)"
+   },
+   "uses_items": [
+    "I23"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": ""
+   },
+   "analytic_check": "Analytic (restriction / subfunction).",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Subfunction under a restriction of non-data inputs."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.GateInput.assignment",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/Circuit.lean:19",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0134,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I38",
+   "origin": "lean",
+   "kind": "definition (comparator)",
+   "name": "Comparator definitions: Circuit3, gateCount = bottomCount + middleCount + 1, FiniteMultiTapeMachine, MultiTapeHaltsIn, runSteps",
+   "file_line": "lean/ComparatorChallenges/DepthThree.lean:9-131",
+   "statement": "Self-contained model of depth-3 circuits and multi-tape TMs on top of Mathlib Turing.Tape.",
+   "cited_or_new": {
+    "status": "new (formal modelling)",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Statement carriers."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Formal renderings of standard models."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.Circuit3",
+     "kind": "structure",
+     "file_line": "lean/OAI/Computability/DepthThree/Model.lean:39",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0178,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.FiniteMultiTapeMachine",
+     "kind": "structure",
+     "file_line": "lean/OAI/Computability/DepthThree/Model.lean:92",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0045,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.MultiTapeHaltsIn",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/Model.lean:127",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0045,
+     "dominated_share": 0.0005
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.runSteps",
+     "kind": "def",
+     "file_line": "lean/OAI/Computability/DepthThree/Model.lean:63",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.1373,
+     "dominated_share": 0.0005
+    }
+   ]
+  },
+  {
+   "id": "I39",
+   "origin": "lean",
+   "kind": "construction (Lean only)",
+   "name": "Multi-tape TM implementation of the evaluator (Tape*.lean, Machine*.lean, LanguageBit*.lean): ~1224 decls, ~7900 lines; machine constants C = 24000*3^8, a = 8",
+   "file_line": "lean/OAI/Computability/DepthThree/MachineLanguage.lean:119-131 (and Tape*.lean)",
+   "statement": "Explicit compilation of hash, polynomial multiply/reduce, Horner loop, parser into a finite multi-tape machine with time bound.",
+   "cited_or_new": {
+    "status": "new (plumbing)",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I23",
+    "I25"
+   ],
+   "load_bearing_guess": {
+    "level": "high for DAG share (polytime closure 1227/2046 = 60%), low mathematically",
+    "reason": "Plumbing; dominates the Lean DAG."
+   },
+   "analytic_check": "Analytic.",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Routine implementation (negative control for the load-bearing proxy)."
+   },
+   "provisional_F": null,
+   "lean_counterpart": [
+    {
+     "decl": "OAI.DepthThreeLowerBound.language_polynomial_time",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/MachineLanguage.lean:126",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0009,
+     "dominated_share": 0.5513
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.MachineLanguage.polynomial_time",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/MachineLanguage.lean:119",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0018,
+     "dominated_share": 0.5503
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.MachineLanguage.halts",
+     "kind": "theorem",
+     "file_line": "lean/OAI/Computability/DepthThree/MachineLanguage.lean:78",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.0027,
+     "dominated_share": 0.3358
+    },
+    {
+     "decl": "OAI.DepthThreeLowerBound.TapeRegister",
+     "kind": "abbrev",
+     "file_line": "lean/OAI/Computability/DepthThree/TapeEncoding.lean:12",
+     "in_proof_dag": true,
+     "frac_dag_dependents": 0.2683,
+     "dominated_share": 0.0005
+    }
+   ]
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Erdos-Rado sunflower lemma",
+   "bib_key": "ER60",
+   "locator": "classical bound s!(r-1)^s",
+   "field": "Extremal set theory",
+   "used_at": "03_sparse_partition.tex:33-54, 130-136",
+   "status": "cited and re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Sparsification lemma (sunflower branching, occurrence bounds, insertion accounting, entropy count)",
+   "bib_key": "IPZ01",
+   "locator": "Section 2",
+   "field": "TCS (exact algorithms / SAT)",
+   "used_at": "03_sparse_partition.tex:5-10, whole section",
+   "status": "adapted and re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Disjoint refinement of sparsification (side condition \"C false\")",
+   "bib_key": "DHMTW14",
+   "locator": "Appendix A of arXiv 1206.1775v1",
+   "field": "TCS (fine-grained counting complexity)",
+   "used_at": "03_sparse_partition.tex:94-95",
+   "status": "adapted and re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Toeplitz matrices as universal linear hash family",
+   "bib_key": "Krawczyk94",
+   "locator": "pp. 136-137",
+   "field": "Cryptography / pseudorandomness",
+   "used_at": "04_construction.tex:49-53, 148-169",
+   "status": "cited; the needed property (uniform image of nonzero differences) re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Polynomial evaluation gives t-wise independence",
+   "bib_key": "ABI86",
+   "locator": "Section 6, proof of Prop. 6.3",
+   "field": "Pseudorandomness / algebra",
+   "used_at": "04_construction.tex:54-56, 171-188",
+   "status": "cited and re-proved (Lagrange interpolation)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Existence of irreducible polynomials of every degree over F_2",
+   "bib_key": null,
+   "locator": "Appendix Lemma field-existence",
+   "field": "Finite fields",
+   "used_at": "04_construction.tex:111-114, 141",
+   "status": "re-proved (Lean: Mathlib GaloisField)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Input-index construction / evaluator-and-hard-subfunction idea",
+   "bib_key": "PSZ00",
+   "locator": "Section 5",
+   "field": "TCS (depth-3 lower bounds)",
+   "used_at": "00_introduction.tex:138-140; 04_construction.tex:10-13",
+   "status": "idea reused, no theorem invoked",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Hastad switching lemma; parity depth-3 bound",
+   "bib_key": "H89",
+   "locator": "Section 3 Main Lemma; Theorem 1",
+   "field": "TCS",
+   "used_at": "00_introduction.tex:69-71, 121-124; 02_restriction.tex:9-12",
+   "status": "background-cited (contrast); not invoked",
+   "essential_for_headline": false
+  },
+  {
+   "name": "HJP95 top-down bounds; PPZ99 parity tight bound; PPSZ05 code-membership bound; PSZ00 bottom fan-in 2; GPPST24; GKPRT26",
+   "bib_key": "HJP95; PPZ99; PPSZ05; PSZ00; GPPST24; GKPRT26",
+   "locator": "various",
+   "field": "TCS",
+   "used_at": "00_introduction.tex:68-104",
+   "status": "background-cited (context, open-problem statement)",
+   "essential_for_headline": false
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Define the language: data block, Hankel hash seed, monic modulus, t coefficients; accept iff lambda(sum beta_j h(x)^j) = 0. It runs in polynomial time and never searches.",
+   "items": [
+    "I23",
+    "I24",
+    "I25",
+    "I37",
+    "I39"
+   ],
+   "external": [
+    "PSZ00 (idea of parameter bits as input)",
+    "Krawczyk94"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Sparse partition: each width-b CNF on m vars is a disjoint sum of <= 2^{eta m} width-b CNFs with <= Mm clauses.",
+   "items": [
+    "I17",
+    "I18",
+    "I19",
+    "I20",
+    "I21",
+    "I22"
+   ],
+   "external": [
+    "IPZ01",
+    "DHMTW14",
+    "ER60"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "Good slices: for fixed (b, B) a parameter setting exists such that on most p-restrictions (p = B/sqrt d) the restricted slice has corr_b <= 2^{-|T|/8}, via hash injectivity, t-wise independence, t-th moment, union bound over sparse tests.",
+   "items": [
+    "I26",
+    "I27",
+    "I28",
+    "I29",
+    "I30",
+    "I31",
+    "I36"
+   ],
+   "external": [
+    "ABI86",
+    "IPZ01 Sec 1.2 (analogue)"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "Restriction lemma: any width-k CNF restricted by (T, rho) correlates with G at most W corr_b(G), E W <= 1/(1-theta), clause-count independent; built from the path expansion, marker mixtures and backward averaging count.",
+   "items": [
+    "I07",
+    "I08",
+    "I09",
+    "I10",
+    "I11",
+    "I12",
+    "I13",
+    "I14",
+    "I15",
+    "I16"
+   ],
+   "external": []
+  },
+  {
+   "step": 5,
+   "claim": "Parameters: fix A, then B, k = Theta(sqrt d), Q = O(pk), b = b(A) with Poisson tail <= 1/2; transfer correlation to all width-k CNFs: |E gH| <= 6 2^{-m0/16}.",
+   "items": [
+    "I32",
+    "I33",
+    "I34"
+   ],
+   "external": []
+  },
+  {
+   "step": 6,
+   "claim": "Circuit counting: truncate middle CNFs at width k, each accepts <= 6 2^{-m0/16} + S 2^{-k}; S <= 2^{A sqrt n} contradicts acceptance density >= 1/4.",
+   "items": [
+    "I35",
+    "I01"
+   ],
+   "external": [
+    "standard depth-3 top-down counting (HJP95)"
+   ]
+  }
+ ],
+ "eureka_candidates_ranked": [
+  "I07 Lemma restriction, as the cluster I11 (telescoping violation-path expansion) + I12 (marker mixture keeping tests in C_b) + I15 (backward averaging count: 1/|V_R| averages over clause indices)",
+  "Strategy insight I32 + I26: choose b AFTER A so pk may be any constant, and make the slice pseudorandom so its correlation exponent (1/8) does not depend on b",
+  "I26 Prop good-slices (k-wise independent slices with small corr_b on almost every restriction)",
+  "I12 marker mixture (c/(c+w) realised as a convex mixture of conjunctions)",
+  "I17 disjoint sparse partition with linear clause count"
+ ],
+ "eureka_candidates": [
+  {
+   "rank": 1,
+   "item": "I07 Lemma restriction, as the cluster I11 (telescoping violation-path expansion) + I12 (marker mixture keeping tests in C_b) + I15 (backward averaging count: 1/|V_R| averages over clause indices)",
+   "provisional_N": "N3",
+   "provisional_F": "F3 (with F5 flavour)",
+   "for": [
+    "It is the step that breaks the sqrt n barrier: it allows any constant pk (b chosen after A), while every switching-lemma statement in L needs pk below an absolute constant.",
+    "Conclusion type (signed CNF mixture with L1 cost, clause-count free, tests stay CNFs) is not a subterm of the goal or of L; the paper itself contrasts it with Hastad.",
+    "Load-bearing: 346/2046 Lean decls (16.9% of whole DAG, ~38% of the lower-bound half); nothing else lifts width.",
+    "Pieces are tiny identities (1 = sum v_i/q; c/(c+w) as marker mixture) that do not appear in the goal, in the Cook-PHP sense."
+   ],
+   "against": [
+    "Dense neighbourhood: Razborov encoding proofs, SBI small-restriction switching lemma, Lovett-Wu-Zhang mild-restriction lemma (bounds first moment of useful terms for width-w DNFs at any constant restriction rate), Rossman entropy proof, GMR DNF sparsification. An expert may recognise I07 as a variant.",
+    "Backward encoding with reweighting by a full assignment is a known technique family.",
+    "The lemma alone is not the lower bound; it needs the b-independent pseudorandom slice (I26)."
+   ],
+   "nearest_neighbour": "Lovett, Wu, Zhang, \"Decision list compression by mild random restrictions\" (STOC 2020, arXiv 1909.10658): under a mild restriction, width-w DNFs have 2^{O(w)} useful terms in expectation (first moment). Also Hastad H89 Main Lemma; Segerlind-Buss-Impagliazzo 2004.",
+   "literature_check": "WebSearch Oct 2026 (3 queries: signed combination of small-width CNFs with bounded mass; Lovett-Wu-Zhang; switching lemma any constant pk / Razborov encoding): no statement of a clause-count-free CNF-to-CNF L1 expansion found."
+  },
+  {
+   "rank": 2,
+   "item": "Strategy insight I32 + I26: choose b AFTER A so pk may be any constant, and make the slice pseudorandom so its correlation exponent (1/8) does not depend on b",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Explains why parity/majority cannot work (their corr_b decays like 2^{-m/b}) and why a pseudorandom slice can.",
+    "The quantifier order is the conceptual crux of omega(sqrt n)."
+   ],
+   "against": [
+    "Once I07 is stated, the parameter arithmetic is forced.",
+    "Pseudorandom-against-bounded-width-CNFs is IPZ01 Sec 1.2 (random polynomials need 2^{Omega(n)} for Sigma_3^k)."
+   ],
+   "nearest_neighbour": "IPZ01 Section 1.2 (random degree-2 GF(2) polynomials require strongly exponential Sigma_3^k circuits for k = o(log log n)); PSZ00 Section 5.",
+   "literature_check": "WebSearch: IPZ01 abstract confirms the random-polynomial bounded-bottom-fan-in result."
+  },
+  {
+   "rank": 3,
+   "item": "I26 Prop good-slices (k-wise independent slices with small corr_b on almost every restriction)",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Needed with exponent independent of b and simultaneously over all width-b tests; uses sparse partition on the restricted cube."
+   ],
+   "against": [
+    "Every component is standard (Toeplitz hash, Lagrange k-wise independence, moment bound, sparsification + union bound)."
+   ],
+   "nearest_neighbour": "IPZ01 Sec 1.2; PSZ00 Sec 5; ABI86.",
+   "literature_check": "as above"
+  },
+  {
+   "rank": 4,
+   "item": "I12 marker mixture (c/(c+w) realised as a convex mixture of conjunctions)",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Keeps every test a width-b CNF, which is what makes corr_b the right currency."
+   ],
+   "against": [
+    "The identity is a classical random-ordering fact; sub-step of the rank-1 cluster."
+   ],
+   "nearest_neighbour": "Random-order \"first arrival\" arguments (e.g. in probabilistic combinatorics); no CNF-specific precedent found.",
+   "literature_check": "not separately searched"
+  },
+  {
+   "rank": 5,
+   "item": "I17 disjoint sparse partition with linear clause count",
+   "provisional_N": "N1",
+   "provisional_F": null,
+   "for": [
+    "Large Lean share (Sparse* defs ~22% frac_dag_dependents)."
+   ],
+   "against": [
+    "Paper explicitly adapts IPZ01 + DHMTW14; DHMTW14 \"transfer the sparsification lemma ... to the counting setting\" (arXiv 1206.1775 abstract) is the disjoint version."
+   ],
+   "nearest_neighbour": "IPZ01; Calabro-Impagliazzo-Paturi 2006; DHMTW14 App. A.",
+   "literature_check": "WebFetch arXiv 1206.1775 abstract."
+  }
+ ],
+ "lean": {
+  "route_differences_lean_vs_paper": [
+   "Lean route differences: appendix field existence replaced by Mathlib GaloisField; Lagrange from Mathlib; Erdos-Rado re-proved; the TM is an explicit compiled multi-tape program, much more detailed than Prop polytime."
+  ],
+  "dag_summary": {
+   "n_files": 180,
+   "n_decls": 2652,
+   "kind_counts": {
+    "theorem": 1655,
+    "def": 757,
+    "abbrev": 184,
+    "instance": 19,
+    "structure": 19,
+    "inductive": 18
+   },
+   "proof_dag_decls": 2046,
+   "proof_dag_theorems": 1122,
+   "closure_shares": {
+    "language_polynomial_time (TM)": "1227/2046 = 0.600",
+    "language_depth_three_gate_lower_bound": "906/2046 = 0.443",
+    "exists_good_language_slice_eventually (I26 incl. sparse)": "552/2046 = 0.270",
+    "restriction lemma (I07)": "346/2046 = 0.169",
+    "exists_sparse_partition_constant (I17)": "196/2046 = 0.096",
+    "circuit counting (I35)": "88/2046 = 0.043",
+    "pathMixture_scaled_average (I12)": "156/2046 = 0.076",
+    "weighted_supported_paths_le (I15)": "79/2046 = 0.039"
+   },
+   "largest_dominated_shares": {
+    "language_polynomial_time": 0.551,
+    "language_depth_three_gate_lower_bound": 0.396,
+    "exists_language_slice_small_correlations": 0.351,
+    "exists_good_language_slice_eventually": 0.195,
+    "wide_correlation_of_good_restrictions": 0.131,
+    "exists_sparse_partition_constant": 0.076,
+    "cnf_restricted_correlation_le_cost": 0.075
+   },
+   "note": "Closure share = number of proof-DAG decls in the dependency closure of the named theorem. Dominated shares come from the dump. As in 287/330, the 20% frac_dag_dependents proxy is passed by carriers (Clause, Literal, TapeRegister, SparseState) and misses the restriction lemma; closure share on the lower-bound subDAG is the better proxy."
+  },
+  "size": "179 files, ~25,000 lines, 2652 declarations (1655 theorems, 757 defs)",
+  "imports": "Mathlib only (no external lake packages; no other OAI dirs)"
+ },
+ "correctness_audit": {
+  "verdict": "No gap found on a line-by-line reading of sections 2-5. The claim is extraordinary: it resolves the 2^{omega(sqrt n)} explicit depth-3 lower bound question that the cited literature (GPPST24, GKPRT26) and a community problem list (verified 2026-08-10) treat as open. The Lean development proves the comparator statement end to end with no sorry/axiom, which (if it builds) removes most correctness risk, leaving only definitional faithfulness, which checks out.",
+  "checked": [
+   "Restriction lemma, expansion identity: verified the cases K=0, q=0, and K=1/q>0; residual identity r_P = t_P - sum r_{Pi} uses q = a_{U_j} + sum_{hard} v_i (02:105-112).",
+   "Restriction lemma, marker mixture: K prod v/prod a = omega(P) E[J_P] on and off the cylinder; J_P has width <= b (needs b >= 1 for unit clauses).",
+   "Restriction lemma, expected cost: reverse encoding injective; pi(T)2^{|U_j|} = pi(R_j) alpha^{|U_j|}; one-step weight <= theta by monotonicity in |E_i| <= k (02:309-316).",
+   "Sanity examples worked by hand: single width-k clause (E W = 1 + Pr[unsatisfied by rho and > b live]) and parity-as-CNF (W = 1 + 2^{l-1}, paid by alpha^l); both consistent with E W <= 1 + theta-ish.",
+   "Good slices: union-bound condition M[1+b log(2m+1)]/t + log t/m <= 1/8 holds since t ~ d^{1/6} >> log d and m ~ sqrt d (04:239-246); hash failure 2^{m-r} with r ~ d^{2/3} >> m.",
+   "Final arithmetic: m0/16 = 4(s+1) sqrt d > s sqrt d + O(1); k >= 3(s+1) sqrt d > 2 s sqrt d; Q constant so b = b(A) exists (05:26-44, 127-136).",
+   "Why parity is not a counterexample to the method: corr_b(parity_m) ~ 2^{-Theta(m/b)}, so the bound degrades as b grows with A; consistent with PPZ99 tightness.",
+   "Comparator definitions faithful (gate count includes bottom + middle + output; exact computation; machine time bound C(n+1)^a)."
+  ],
+  "residual_concerns": [
+   "Lean not compiled here; the end-to-end guarantee is conditional on the release CI build.",
+   "Rate is ineffective: b(A) and M(b, 1/8) grow extremely fast (M is tower-like in b via e_i = (i-1)!(r_i-1)^{i-1} with r_i chosen after F_i), so the omega in 2^{omega(sqrt n)} is astronomically slow; the paper does not claim any rate.",
+   "The hard slice is chosen by the probabilistic method; the language is explicit (in P) only because the parameter bits are inputs (PSZ00-style). This is a standard but weaker notion of explicitness than a fixed natural function like Majority.",
+   "The function depends on only r = d^{2/3} linear forms of the data (g = G(Mx)); the proof never needs more, but this is worth noting for anyone looking for a structural attack.",
+   "No independent expert verification; the result is unreviewed."
+  ]
+ },
+ "extraction_friction": [
+  "Single comparator; matches the headline exactly (no sibling headline).",
+  "The extractor's load-bearing ranking is dominated by Turing-machine plumbing: polytime closure is 1227/2046 (60%) of the proof DAG, while the mathematical heart (restriction lemma) is 17%. The 20% proxy would wrongly favour TapeRegister/TapeAtom (frac 0.21-0.27) over I07. Measure load-bearing on the lower-bound subDAG (906 decls) instead.",
+  "Sparse* structures have frac_dag_dependents ~0.22 (SparseState, Sunflower) because the hard-slice proof routes through them; this over-ranks an N1 re-proof of IPZ/DHMTW.",
+  "Many key constructions are in-proof (no theorem environments): paths, marker mixture, reverse encoding, parameter choice. Extraction needs proof-body segmentation.",
+  "The paper uses \\emph only sparsely; \"slice\", \"easy/hard\", \"compatible\", \"cylinder\", \"sunflower\", \"eligible\" are the inline definitions.",
+  "Lean namespace OAI.DepthThreeLowerBound; files 179 (dump) / Computability field; no imported OAI dirs (lean_dirs_imported empty).",
+  "Lean route differences: appendix field existence replaced by Mathlib GaloisField; Lagrange from Mathlib; Erdos-Rado re-proved; the TM is an explicit compiled multi-tape program, much more detailed than Prop polytime."
+ ],
+ "literature_checks": [
+  {
+   "query": "depth-three circuit lower bound 2^{omega(sqrt n)} explicit function open problem",
+   "finding": "Open before this release: best explicit 2^{1.282 sqrt n} (PPSZ05); parity tight (PPZ99); lacker.io problem page verified 2026-08-10 lists it as open.",
+   "urls": [
+    "https://lacker.io/complexity/problems/depth3-circuits-past-sqrt-n.html",
+    "https://arxiv.org/abs/2601.04446"
+   ]
+  },
+  {
+   "query": "random restriction CNF signed combination small width CNFs bounded coefficient mass independent of number of clauses",
+   "finding": "No match.",
+   "urls": []
+  },
+  {
+   "query": "Lovett Wu Zhang decision list compression by mild random restrictions",
+   "finding": "Nearest neighbour for I07: mild restriction lemma bounding expected number of useful terms (4/alpha)^w for width-w DNFs; different conclusion (term count, not a correlation-preserving CNF expansion).",
+   "urls": [
+    "https://arxiv.org/abs/1909.10658"
+   ]
+  },
+  {
+   "query": "switching lemma any constant pk / Razborov encoding / SBI",
+   "finding": "Switching lemmas need pk below a constant ((13pk)^s for SBI with p <= 1/13).",
+   "urls": [
+    "https://mathweb.ucsd.edu/~sbuss/ResearchWeb/resK/focs02.pdf"
+   ]
+  },
+  {
+   "query": "IPZ01 random polynomial depth-3 bounded bottom fan-in",
+   "finding": "IPZ01: random degree-2 polynomials need strongly exponential Sigma_3^k circuits for k = o(log log n), via sparsification. Precedent for I26.",
+   "urls": [
+    "https://khoury.northeastern.edu/~viola/classes/papers/ImpagliazzoPaturiZane01Which.pdf"
+   ]
+  },
+  {
+   "query": "Beyond the square-root exponent depth-three OpenAI; depth-3 + ChatGPT/GPT-5/AI-assisted",
+   "finding": "No prior model-produced work found.",
+   "urls": []
+  }
+ ]
+}

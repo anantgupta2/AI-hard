@@ -1,0 +1,836 @@
+{
+ "family": 362,
+ "title": "Global smoothness for relativistic Vlasov–Maxwell",
+ "analyst_role": "novelty",
+ "date": "2026-10-09",
+ "inputs": [
+  "data/pilot/362/trace.json, trace.md (the only prior analysis; no family.json/paper.json/lean.json and no f1_* file exist for 362)",
+  "data/raw/openai-math/preprints/Global-classical-solutions-of-the-three-dimensional-relativistic-Vlasov-Maxwell-system-September-23-2026/build/sections/*.tex (all 10 sections; key items read in full: setup, cancellation, direction, selection, closure, continuation tail, occupation head)",
+  "data/raw/openai-math/preprints/.../build/references.bib (29 entries)",
+  "data/raw/openai-math/lean/OAI/Analysis/VlasovMaxwell (207 files, ~90k lines; grep for sorry/axiom: none found; file-level import-DAG shares computed by this analyst; not compiled)",
+  "data/raw/openai-math/lean/docs/362.md and ComparatorChallenges/VlasovMaxwell.lean",
+  "Web checks listed under precedent_checks and sources"
+ ],
+ "base_library_L": "Mathlib d13f23b plus the paper's 29-entry bibliography. L therefore INCLUDES Klainerman–Staffilani 2002, Bouchut–Golse–Pallard 2003, Pfaffelmoser 1992, Glassey–Strauss 1986/1987, Luk–Strain 2014/2016, Pallard 2005/2015, Lazarovici 2016, and Wang 2026 I (arXiv:2203.01199v2) and II (arXiv:2607.14685). L does NOT include Wang's 2020 radial preprint (arXiv:2003.14192), Cheverry–Ibrahim (arXiv:2306.11812; RMI 2025; consulted in the trace only), Patel (arXiv:1607.07416), or any classical-electrodynamics text (Heaviside 1902, Feynman Lectures II ch. 21, Jefimenko). L⁻ (contamination control) = L minus Wang 2026 I/II.",
+ "precedent_checks": [
+  {
+   "work": "Wang, X., Large data global solution of the 3D RVM system with cylindrical symmetry I: Iterative smoothing scheme",
+   "arxiv_id": "2203.01199 (v1 2022-03-02; v2 2026-07-16, 263 KB)",
+   "in_bib": "Wang2026I (bib note: 'to appear in Annals of Mathematics'; the arXiv page lists no journal ref)",
+   "ai_assistance_declared": false,
+   "ai_evidence": "No AI/LLM statement on the abstract page or in the first ~200k of ~238k characters of the v2 HTML. Acknowledgment (Section 2 preamble, relayed by WebFetch, wording unverified): thanks to Yu Deng, Pin Yu and Fan Zheng; NSFC and MOST grants. Comments: v1 reformatted after referee reports; Part II uploaded separately.",
+   "comparison": [
+    {
+     "item": "C1 signed-increment bootstrap",
+     "verdict": "close variant (role)",
+     "detail": "Bootstraps the dyadic sizes of |V|, |V_⊥|, |X_⊥| along characteristics. Increments are controlled by integrating K against unit-direction vectors such as (V_⊥/|V|,0) and V/|V| (signed, projected integrals). The bootstrap is on magnitudes, not on the vector impulse with a √I + I·P²L/w profile."
+    },
+    {
+     "item": "C2 signed force identity",
+     "verdict": "close variant (Fourier-side analogue)",
+     "detail": "§1.6.2 'Result of integration by parts in characteristics time': ∫U(t,X(t))dt is integrated by parts in the receiver time t using e^{iX(t)·ξ+iμ(t−s)|ξ|} = ∂_t(…)/(iμ|ξ|+iV̂(t)·ξ). The Type I term (∂_t on V(t)) 'creates an independent electromagnetic field', i.e. the receiver-acceleration residual (362's 𝒜). The nonresonance denominator is the Fourier counterpart of 362's D = 1−n·a. Wang contrasts this with Glassey–Strauss integrating in s at fixed t. Absent: the physical-space retarded form, the exact transport/acceleration-kernel cancellation, and the w^{-1/2} coefficient analysis."
+    },
+    {
+     "item": "C3 direction-change count",
+     "verdict": "absent",
+     "detail": "Direction enters only relative to the fixed symmetry axis (V_⊥, X_⊥); there is no count of δ-changes of V/|V|."
+    },
+    {
+     "item": "C4 direction-based improved occupation",
+     "verdict": "absent",
+     "detail": "There is a residence-time heuristic in dyadic shells around the z-axis, but no monotone-crossing occupation bound."
+    },
+    {
+     "item": "C5 selection + exponent contradiction",
+     "verdict": "absent",
+     "detail": "Symmetry (large |v| nearly aligned with the axis) is used where 362 uses selection."
+    }
+   ],
+   "access": "WebFetch of /abs and /html v2 (offsets 0 and 100000); the last ~38k characters were not read. Summarizer paraphrase; quotes unverified."
+  },
+  {
+   "work": "Wang, X., Large data global solution of the 3D RVM system with cylindrical symmetry II: Pointwise estimates",
+   "arxiv_id": "2607.14685 (v1 only, 2026-07-16 07:45 UTC, 98 KB)",
+   "in_bib": "Wang2026II",
+   "ai_assistance_declared": false,
+   "ai_evidence": "No AI statement on the abstract page or in the first 100k of ~190k characters of the HTML. Acknowledgment relayed: thanks to Yu Deng, Pin Yu and Fan Zheng (wording unverified). arXiv admin note: substantial text overlap with 2203.01199.",
+   "comparison": [
+    {
+     "item": "C1/C2",
+     "verdict": "close variant (ingredient level)",
+     "detail": "A localized Glassey–Strauss decomposition; a normal form (integration by parts in time on an oscillatory phase along the profile g(s,x,v)=f(s,x+sv̂,v)); a dyadic angle decomposition exposing a 'double null structure'. Not described as a transport + acceleration kernel combination."
+    },
+    {
+     "item": "C3, C4, C5",
+     "verdict": "absent",
+     "detail": "No direction counting, no Pfaffelmoser occupation, no selection rule."
+    }
+   ],
+   "access": "WebFetch of /abs and /html v1 (first 100k characters). Quotes unverified."
+  },
+  {
+   "work": "Wang, X., Global solution of the 3D relativistic Vlasov–Maxwell system for the large radial data",
+   "arxiv_id": "2003.14192 (v1 2020-03-31; v2 2022-03-03, metadata only; comments: 'This preprint is not for publication')",
+   "in_bib": "no (not cited by 362)",
+   "ai_assistance_declared": false,
+   "ai_evidence": "None on the abstract page or in the first 100k characters of the HTML.",
+   "comparison": [
+    {
+     "item": "C1+C2",
+     "verdict": "close variant (architecture)",
+     "detail": "Prop. 3.1 uses 'a standard bootstrap argument' on the size of every velocity characteristic. It cites Klainerman–Staffilani for the observation that the integral of the field along the characteristic is smoother, integrates by parts in time (normal form), and notes that the loss 'can be very large' because differentiating the velocity characteristic brings in another electromagnetic field, at an angle-dependent cost. This is the 2020 template of 362's signed impulse plus receiver-acceleration residual, closed there by spherical symmetry."
+    }
+   ],
+   "access": "WebFetch of /abs and /html (first 100k characters); paraphrase."
+  },
+  {
+   "work": "Bigorgne, L., Global existence and modified scattering for the solutions to the Vlasov–Maxwell system with a small distribution function",
+   "arxiv_id": "2208.08360 (v1 2022-08-17, v2 2023-08-31); Anal. PDE 18 (2025) 629–714",
+   "in_bib": "Bigorgne2025SmallDistribution",
+   "ai_assistance_declared": false,
+   "ai_evidence": "No statement on the abstract page.",
+   "comparison": [
+    {
+     "item": "all candidates",
+     "verdict": "absent",
+     "detail": "A vector-field small-data method, cited only as historical context."
+    }
+   ],
+   "access": "WebFetch /abs."
+  },
+  {
+   "work": "Cheverry, C. and Ibrahim, S., The relativistic Vlasov–Maxwell system: local smooth solvability for weak topologies",
+   "arxiv_id": "2306.11812 (v1 2023-06-20); Rev. Mat. Iberoam. 41 (2025) 551–602",
+   "in_bib": "no (trace only: branches a2 and a5.7; the trace's latest-dated reference)",
+   "ai_assistance_declared": false,
+   "ai_evidence": "Full PDF text extracted and read around the acknowledgments: NSERC grant and IRMAR thanks only; no AI statement.",
+   "comparison": [
+    {
+     "item": "C1 signed increment",
+     "verdict": "close variant (concept)",
+     "detail": "Definition 6 'momentum increment' D(t,y,η)=⟨Ξ(t)⟩−⟨η⟩ and Proposition 7, a representation formula D = D0+Dh+Dl+Dn via a Radon transform and non-stationary phase, integrating by parts in the source variables r and x and converting ∂_r+ν·∇_x into ξ-derivatives through the Vlasov equation. It is a scalar energy increment, used for local theory."
+    },
+    {
+     "item": "C3 direction count",
+     "verdict": "absent (explicitly avoided)",
+     "detail": "§2.4.1: the authors work with |Ξ| because the directions Ξ/|Ξ| 'may be strongly oscillating' and impractical to control. That is exactly the quantity 362 counts."
+    }
+   ],
+   "access": "WebFetch /abs; the PDF saved by WebFetch was text-extracted with pypdf (python -I) in the scratchpad."
+  },
+  {
+   "work": "Patel, N., Three new results on continuation criteria for the 3D relativistic Vlasov–Maxwell system",
+   "arxiv_id": "1607.07416 (2016)",
+   "in_bib": "no",
+   "ai_assistance_declared": false,
+   "ai_evidence": "None seen (pre-LLM).",
+   "comparison": [
+    {
+     "item": "C1–C5",
+     "verdict": "absent",
+     "detail": "The momentum bound is written with absolute values, P(t) ≲ 1 + sup∫(|E|+|B|)ds. Tools: Strichartz and averaging operators, a Pallard-type cone change of variables, the angle factor (1+p̂·ω)⁻¹, and projection onto a fixed plane Q (Luk–Strain style). There is no signed impulse, no time integration by parts and no direction counting. The only bootstrap is the self-improving P(T) ≲ 1 + P(T)^γ ln^λ P."
+    }
+   ],
+   "access": "ar5iv (first 100k characters); paraphrase."
+  },
+  {
+   "work": "Hernandez, Patel, Salguero, Bounds on the aspect ratio of the momentum support of a 2D collisionless plasma",
+   "arxiv_id": "2411.18610 (2024)",
+   "in_bib": "no",
+   "ai_assistance_declared": false,
+   "ai_evidence": "None in the visible text.",
+   "comparison": [
+    {
+     "item": "C3",
+     "verdict": "genuinely different",
+     "detail": "2D direction control comes from the geometry of the support rectangle (|p| ≤ P₂/sinθ) and angular thresholds. There is no count of direction changes along a characteristic."
+    }
+   ],
+   "access": "arXiv html (first 100k characters)."
+  },
+  {
+   "work": "Klainerman, S. and Staffilani, G., A new approach to study the Vlasov–Maxwell system, CPAA 1 (2002) 103–125",
+   "arxiv_id": "n/a",
+   "in_bib": "KlainermanStaffilani2002",
+   "ai_assistance_declared": false,
+   "ai_evidence": "2002, pre-LLM.",
+   "comparison": [
+    {
+     "item": "C1+C2",
+     "verdict": "close variant (key observation)",
+     "detail": "A Fourier proof of Glassey–Strauss. As relayed by later papers (Wang 2003.14192; secondary summaries), its key observation is that the integral of the field along a particle characteristic is smoother than the field. The gain comes from the speed gap between waves and particles and is realized by integrating by parts along the characteristic at an angle-dependent cost. Full text not accessed; the abstract only points to 'Facts 1–3'."
+    }
+   ],
+   "access": "Abstract page only; content via secondary sources (unverified)."
+  },
+  {
+   "work": "Heaviside (1902) / Feynman Lectures on Physics II, ch. 21: the field of a point charge in arbitrary motion",
+   "arxiv_id": "n/a",
+   "in_bib": "no",
+   "ai_assistance_declared": false,
+   "ai_evidence": "classical",
+   "comparison": [
+    {
+     "item": "C2 signed force identity",
+     "verdict": "equivalent in the stationary-receiver case; close variant overall",
+     "detail": "Heaviside–Feynman form (c=1, unit charge): E = n/(κr²) + ∂_t[(n−u)/(κr)], with κ = 1−n·u (= 362's d) and derivatives in observer time. Integrating in t with ds = dt/d gives ∫E dt = ∫(n/r²)ds − [k0/(rd)], where k0 = u−n. Analyst hand check: setting a ≡ 0 (receiver at rest, q_X = 1, D = e = 1, H = Id) in Lemma can:identity gives 𝒦 = −(k0/(rd))′ + n/r². The transport part of 𝒦, −g/(r²q²d), equals the Liénard–Wiechert velocity field (n−u)/(γ²d³r²) times dt/ds = d. So for a stationary receiver the lemma is the time-integrated Heaviside–Feynman formula, summed over sources. The moving receiver adds the Lorentz matrix Q = D·Id + n⊗a (since B = n×E for retarded fields) and the chain-rule term n(a_t·k0)/(rD²). The paper does not cite this. The trace offers only a 'physical' (Liénard–Wiechert) reading at L165–167."
+    }
+   ],
+   "access": "WebSearch summaries of the formula (Wikipedia Jefimenko page; USP problem set; ar5iv 0704.1574). The algebra was checked by hand, not symbolically."
+  },
+  {
+   "work": "Ilin, V., Semi-Autonomous Formalization of the Vlasov–Maxwell–Landau Equilibrium",
+   "arxiv_id": "2603.15929 (v1 2026-03-16, v2 2026-03-31), cs.AI",
+   "in_bib": "no",
+   "ai_assistance_declared": true,
+   "ai_evidence": "Abstract (relayed): a reasoning model (Gemini DeepThink) generated the proof, Claude Code translated it to Lean, and Aristotle closed 111 lemmas. Quote: 'A single mathematician supervised the process over 10 days at a cost of $200, writing zero lines of code.'",
+   "comparison": [
+    {
+     "item": "all candidates",
+     "verdict": "absent",
+     "detail": "An equilibrium characterization for Vlasov–Maxwell–Landau, not the Cauchy problem; no overlap with any 362 item. Recorded only as the one model-produced work found in the neighbourhood."
+    }
+   ],
+   "access": "WebFetch /abs."
+  },
+  {
+   "work": "Constantin, P. and Grayer II, H., Radiative Vlasov–Maxwell equations",
+   "arxiv_id": "2504.01687 (2025)",
+   "in_bib": "no",
+   "ai_assistance_declared": false,
+   "ai_evidence": "No statement on the abstract page.",
+   "comparison": [
+    {
+     "item": "all",
+     "verdict": "genuinely different",
+     "detail": "Global regularity for a radiation-reaction-modified system. The mechanism is radiation damping of particle energy, which the standard RVM lacks."
+    }
+   ],
+   "access": "WebFetch /abs."
+  }
+ ],
+ "candidates": [
+  {
+   "id": "C1",
+   "name": "Signed-increment bootstrap with a two-term profile and the doubling argument",
+   "paper_items": [
+    "Prop. prop:increment (setup.tex:35–49, eq. eq:bootstrap)",
+    "Proof of Thm thm:global from the Props (setup.tex:69–101): doubling times ≥ c/log P, divergent sum",
+    "Section closure (closure.tex), which closes it"
+   ],
+   "trace": "PV4(a), E1 (L83–85, L98–100; share 0.13/0.22)",
+   "statement": "There are M,A,P₀ such that for every dyadic P ≥ P₀ above 1024·(max momentum), every supported receiver, every dyad w and every interval with w/8 ≤ q_X ≤ 8w: |V_X(t₂)−V_X(t₁)| ≤ MP√(t₂−t₁) + A(t₂−t₁)P²log(2+P)/w. Doubling the maximal energy then takes time ≥ c/log P, and Σ1/log(2^n) diverges.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Wang, arXiv:2003.14192 (2020), Prop. 3.1; Wang 2026 I (arXiv:2203.01199v2, in L), §1.4",
+      "relation": "a bootstrap on the size of every velocity characteristic, closed by integrating the force along the characteristic (the KS trick) before taking norms",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Cheverry–Ibrahim, arXiv:2306.11812, Def. 6 / Prop. 7",
+      "relation": "a signed (scalar energy) momentum increment along characteristics, with a representation formula",
+      "verdict": "close variant (concept)"
+     },
+     {
+      "ref": "Glassey–Strauss 1986; Pfaffelmoser 1992; Schaeffer 1991 (the Pfaffelmoser–Schaeffer short-interval bound on ∫_{t−Δ}^t|E|ds)",
+      "relation": "the standard momentum-support bootstrap on short intervals, with absolute field bounds",
+      "verdict": "close variant (the templated parent)"
+     },
+     {
+      "ref": "Osgood-type divergence / doubling-time arguments",
+      "relation": "the deduction of T_max = ∞",
+      "verdict": "equivalent (N0 for that sub-step)"
+     }
+    ],
+    "verdict": "close neighbours exist",
+    "searches": "WebSearch (standard/extended): 'relativistic Vlasov-Maxwell global classical solutions OpenAI GPT-5'; 'Vlasov-Maxwell ChatGPT/AI-assisted/language model'; 'Patel relativistic Vlasov-Maxwell a priori estimates'; 'Pfaffelmoser method relativistic Vlasov-Maxwell residence time'; 'Klainerman Staffilani along the characteristic smoother integration by parts normal form'; 'Heaviside-Feynman formula Lienard-Wiechert'; 'Cheverry Ibrahim momentum spreading'. WebFetch: arXiv abs/html of 2203.01199v2, 2607.14685, 2003.14192, 2208.08360, 2306.11812 (full PDF text extracted), 1607.07416 (ar5iv), 2411.18610, 2504.01687, 2603.15929, KS 2002 abstract page. zbMATH, MathSciNet and Google Scholar were not queried directly; absence claims rest on these searches plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "weak pass",
+    "evidence": "The goal (global smoothness; via Prop. continuation, bounded momentum support) does not contain an interval-uniform bound on the vector impulse. But a bootstrap on characteristic velocities, closed through time-integrated forces, is a statement form already in L (Wang 2026 I). The PLAN's 'uniform/quantitative version' and 'carry an extra tracked quantity' templates both apply, with the receiver energy scale w as the tracked parameter."
+   },
+   "test3": {
+    "verdict": "pass",
+    "lean": "Continuation/IncrementBootstrap.lean: file-level downstream share 0.75 of the 207-file import DAG (0.79 by lines). Main.lean's last step applies global_classical_of_uniform_physical_increment to population_increment. Every occupation, direction and selection estimate assumes it.",
+    "down": 0.75,
+    "cone": 0.02,
+    "note": "Shares are file-level import-DAG proxies computed by this analyst, since no lean.json exists for 362. 'cone' = the share of lines the file itself transitively imports."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1–2 (trace PV4: from the Glassey–Strauss representation; the bootstrap target 'evolved' at L83)",
+    "chain_depth": 2,
+    "protocol": "P-C1"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.75,
+    "justification": "Capped at N2 as a templated strengthening: a uniform/quantitative momentum bootstrap carrying the receiver-energy scale. Independently downgraded by Wang's 2020/2026 velocity-characteristic bootstrap closed by signed time integration (in L via Wang 2026 I), and by Cheverry–Ibrahim's signed momentum increment. What is specific to 362 is the profile: a √I diffusive term plus I·P²L/w, tuned so that the doubling time is ≳ 1/log P and so buys exactly a divergent harmonic-log series. That is design, not a new concept."
+   }
+  },
+  {
+   "id": "C2",
+   "name": "Signed force identity (transport + source-acceleration kernels = total derivative + residuals 𝓡 and 𝓐) and the weighted signed formula",
+   "paper_items": [
+    "Lemma can:identity (cancellation.tex:49–106)",
+    "Prop. can:weighted-formula (cancellation.tex:278–363)",
+    "the receiver-coefficient bound can:receiver-coefficient"
+   ],
+   "trace": "PV4(b), E2 (L76–77; share 0.075; no visible trigger)",
+   "statement": "Along a retarded branch t = s + r of a source label, with d = 1−n·u, D = 1−n·a, e = 1−a·u and k0 = u−(e/D)n, the interior Lorentz-force kernel 𝒦 = −(H/r)∂_s^{(u)}g − Hg/(r²q²d) equals −(k0/(rd))′ + (e/(r²D²))(n/(q_X²D) − a) + n(a_t·k0)/(rD²). The residuals contain neither the source acceleration nor inverse powers of d. Integrated against Lipschitz endpoint-vanishing weights and a bounded C¹ matrix Π, this gives the weighted signed formula with an initial-cone boundary term.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Heaviside 1902 / Feynman Lectures II §21-1 (the Heaviside–Feynman formula E = n/(κr²) + ∂_t[(n−u)/(κr)])",
+      "relation": "Analyst hand check: for a stationary receiver (a ≡ 0), Lemma can:identity is exactly this formula integrated in observer time (ds = dt/d), summed over sources. The 362 primitive −k0/(rd) is Heaviside–Feynman's (n−u)/(κr).",
+      "verdict": "equivalent for a = 0; close variant in general (the moving receiver adds the Lorentz matrix Q = D·Id + n⊗a and a chain-rule term in a_t)"
+     },
+     {
+      "ref": "Klainerman–Staffilani 2002 (in L); Wang 2020 radial; Wang 2026 I §1.6.2 (in L)",
+      "relation": "Integrate the field along the receiver characteristic by parts in receiver time. The derivative falling on V(t) produces a second-field (receiver-acceleration) term, and the cost is the nonresonance factor |ξ|+V̂·ξ, the counterpart of D.",
+      "verdict": "close variant (Fourier-side analogue of the same move)"
+     },
+     {
+      "ref": "Glassey–Strauss 1986 T/S decomposition (in L); Pallard 2015 Lemma 2.1 (in L); Luk–Strain 2014 Prop. 2.2 (in L)",
+      "relation": "the kernels being recombined; Pallard: the acceleration kernel is orthogonal to the cone normal",
+      "verdict": "ingredients"
+     },
+     {
+      "ref": "Cheverry–Ibrahim 2306.11812 Prop. 7",
+      "relation": "integration by parts in the source variables r,x, converting ∂_r+ν·∇_x into ξ-derivatives, inside a momentum-increment representation",
+      "verdict": "close variant (technique)"
+     }
+    ],
+    "verdict": "close neighbours exist; the stationary-receiver case is classical physics",
+    "searches": "WebSearch (standard/extended): 'relativistic Vlasov-Maxwell global classical solutions OpenAI GPT-5'; 'Vlasov-Maxwell ChatGPT/AI-assisted/language model'; 'Patel relativistic Vlasov-Maxwell a priori estimates'; 'Pfaffelmoser method relativistic Vlasov-Maxwell residence time'; 'Klainerman Staffilani along the characteristic smoother integration by parts normal form'; 'Heaviside-Feynman formula Lienard-Wiechert'; 'Cheverry Ibrahim momentum spreading'. WebFetch: arXiv abs/html of 2203.01199v2, 2607.14685, 2003.14192, 2208.08360, 2306.11812 (full PDF text extracted), 1607.07416 (ar5iv), 2411.18610, 2504.01687, 2603.15929, KS 2002 abstract page. zbMATH, MathSciNet and Google Scholar were not queried directly; absence claims rest on these searches plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "borderline fail",
+    "evidence": "Not a subterm of the goal. In L, Wang 2026 I contains the receiver-time integration by parts with a receiver-acceleration ('Type I') term. The identity follows from the Glassey–Strauss kernels (in L) by the product rule plus three algebraic identities (cancellation.tex:74–103). Outside L, its a = 0 case is a textbook formula. Under the PLAN's equivalence-up-to-unfolding reading it is close to analytic."
+   },
+   "test3": {
+    "verdict": "pass",
+    "lean": "Population/SignedRemainder.lean (signedRemainder, weighted_signed_identity_on_branch, ac_weighted_signed_ibp): downstream file share 0.45 (0.54 by lines). The paper uses it twice: for the direction count and for the selected impulse.",
+    "down": 0.45,
+    "cone": 0.01,
+    "note": "file-level import-DAG proxy"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1 in the trace: derived in the sentence after committing to the residence-time strategy, with a physical reading at L165–167. From L it is also about 1: the KS/Wang receiver-time integration by parts transcribed to physical space.",
+    "chain_depth": 0,
+    "protocol": "P-C2"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.75,
+    "justification": "Downgraded from the trace's N2–N3. For a stationary receiver the identity is the Heaviside–Feynman formula integrated in time (checked by hand). For a moving receiver it is that formula under the Lorentz force, plus a product-rule term. Its PDE role, signed time integration along the receiver with a receiver-acceleration residual at angle cost D⁻¹, is the Klainerman–Staffilani/Wang move, which is in L. New here: the physical-space retarded form, the exact absence of source acceleration and of inverse powers of d in the residuals, and the cutoff and initial-cone bookkeeping. That makes it a strong N2 'bridge execution', not N3. It could be argued down to N1 if the moving-receiver case is regarded as a Lorentz-covariant restatement."
+   }
+  },
+  {
+   "id": "C3",
+   "name": "Direction-change count: the number of δ-exits of V/|V| on a stable window is ≤ C(M,A)L⁶/δ",
+   "paper_items": [
+    "Lemma ang:direction (direction.tex:22–201)"
+   ],
+   "trace": "PV5, E3 first half (L81–83; conflict-driven from clause C4: no uniform directional modulus)",
+   "statement": "Assume the signed bootstrap. Take w ≥ P^{3/5}, an interval of length ≤ (w/P)² with q_X ∈ [w/8,8w], and w^{-3/5} ≤ δ ≤ w^{-1/10}. Then the greedy first-exit partition of the direction ξ = V_X/|V_X| at chordal scale δ has at most C(M,A)L⁶/δ pieces. Proof: on each complete piece a ramped weight ψ gives |∫ψ w ξ_t dt| ≥ wδ/2, and w ξ_t = ΠK with Π = wP_X/|V_X|. Apply the weighted signed formula with the fixed selection θ < κφ, pθ√h ≤ 1. Because the weights sum to ≤ 1, every bulk term over the union of pieces is ≤ C(M,A)wL⁶, while only the weight-derivative terms scale with the count (CL²N_c). Hence N_c·wδ/2 ≤ C·wL⁶ + CL²N_c. The argument never bounds the absolute direction variation.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Greedy stopping-time partitions with counts controlled by a control function (Friz–Victoir rough paths, p-variation); λ-jump counting inequalities (Lépingle 1976; Jones–Seeger–Wright 2008)",
+      "relation": "the counting device itself (the number of δ-exits of a path), bounded by a variation-type quantity",
+      "verdict": "genuinely different statement; same generic device (N0 for the device)"
+     },
+     {
+      "ref": "Pfaffelmoser 1992 / Schaeffer 1991 (in L)",
+      "relation": "short-time cells on which the velocity is nearly frozen, from absolute field bounds (362's own baseline occ:stability)",
+      "verdict": "genuinely different (velocity freezing from absolute bounds, not a count of direction exits from signed bounds)"
+     },
+     {
+      "ref": "Wang 2026 I (in L)",
+      "relation": "signed, projected integrals of K against V_⊥/|V|, relative to a fixed symmetry axis",
+      "verdict": "genuinely different (fixed axis, no counting)"
+     },
+     {
+      "ref": "Cheverry–Ibrahim 2306.11812 §2.4.1",
+      "relation": "explicitly avoid controlling Ξ/|Ξ| because it may oscillate strongly",
+      "verdict": "genuinely different (and evidence that direction control was regarded as impractical)"
+     },
+     {
+      "ref": "Hernandez–Patel–Salguero 2411.18610",
+      "relation": "2D direction (aspect-ratio) control of the momentum support",
+      "verdict": "genuinely different"
+     }
+    ],
+    "verdict": "no near-equivalent found",
+    "searches": "WebSearch (standard/extended): 'relativistic Vlasov-Maxwell global classical solutions OpenAI GPT-5'; 'Vlasov-Maxwell ChatGPT/AI-assisted/language model'; 'Patel relativistic Vlasov-Maxwell a priori estimates'; 'Pfaffelmoser method relativistic Vlasov-Maxwell residence time'; 'Klainerman Staffilani along the characteristic smoother integration by parts normal form'; 'Heaviside-Feynman formula Lienard-Wiechert'; 'Cheverry Ibrahim momentum spreading'. WebFetch: arXiv abs/html of 2203.01199v2, 2607.14685, 2003.14192, 2208.08360, 2306.11812 (full PDF text extracted), 1607.07416 (ar5iv), 2411.18610, 2504.01687, 2603.15929, KS 2002 abstract page. zbMATH, MathSciNet and Google Scholar were not queried directly; absence claims rest on these searches plus analyst domain knowledge. Specific queries: 'number of direction changes characteristic Vlasov', 'momentum direction oscillation count kinetic', 'stopping time count direction Lorentz force' (no hits)."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "Neither the goal nor any statement in L counts direction exits of particle momenta. L contains direction-projected signed integrals (Wang) and frozen-velocity cells (Pfaffelmoser), not a count bounded through signed weighted integrals."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "lean": "Population/DirectionCounts.lean (WeightedDirectionPartition, IncrementBootstrap.weighted_direction_partition, direction_complete_count_cost_bound, eventually_direction_absorption): downstream file share 0.15 (0.19 by lines); upstream cone 0.69 of lines. It sits high in the chain, with only the improved occupation (C4), the selection lemma and the final assembly downstream. The PLAN's 20% downstream proxy therefore fails mechanically, as it did for 287's top-of-chain items. Knockout: without C3 there is no improved occupation, and the contradiction in Lemma sel:exponents (the third table entry of sel:pure) has no window bound.",
+    "down": 0.15,
+    "cone": 0.69,
+    "note": "file-level proxy; knockout judged from the paper's dependency figure"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1 (trace: one propagation step from learned clause C4, 'no uniform directional modulus', explicit at L82–83)",
+    "chain_depth": 1,
+    "protocol": "P-C3"
+   },
+   "final": {
+    "N": "N3 (provisional: tests 1–3 pass, test 4 pending)",
+    "F": "F3",
+    "confidence": 0.3,
+    "justification": "The only item with no neighbour found. It replaces an unattainable uniform directional modulus with a count of direction exits, bounded through the projected signed identity. That count is why the improved occupation, and hence the selection contradiction, works without symmetry. A Vlasov–Maxwell neighbour (Cheverry–Ibrahim) explicitly deemed direction control impractical. Against: the counting device is generic (greedy partitions, jump counting), and the trace reaches it in one propagation step from a learned clause, by the natural move 'if you cannot freeze it, count it'. Test 4 is therefore likely to show high hit rates in a directed arm. Confidence is lower than for 287's C2 (0.40) for that reason. F3 = an auxiliary stopping-time partition plus its count; F2 (a tracked quantity) is a secondary reading."
+   }
+  },
+  {
+   "id": "C4",
+   "name": "Direction-based occupation at intermediate angles (monotone crossing within combined direction cells)",
+   "paper_items": [
+    "Lemma ang:improved-hit (direction.tex:222–end)"
+   ],
+   "trace": "PV5 second half, E3 (L140–141, L169–170, L200–202)",
+   "statement": "In small-sector bins with p,w ≥ P^{7/10} and j^{-49/100} ≤ φ ≤ j^{-4/25}, the hit measure satisfies 𝖬 ≤ C(h/p)φ^{-29/25}·max(1, I/I⁰_m, h/I⁰_m), with C independent of M,A. Proof: refine the source and receiver direction partitions (C3, with δ = c₂φ), discard hits that straddle a receiver boundary, and use a monotone crossing of e_F·(Y−X) at rate ≥ cφ inside each combined cell.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Pfaffelmoser 1992; Schaeffer 1991 (in L)",
+      "relation": "relative velocity bounded below ⇒ short residence time near the receiver (monotone crossing)",
+      "verdict": "close variant (same mechanism, with cells defined by direction rather than full velocity stability)"
+     },
+     {
+      "ref": "362's own baseline occ:cell-lemma",
+      "relation": "the same argument on velocity-stable cells of length λ",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "close neighbours exist",
+    "searches": "WebSearch (standard/extended): 'relativistic Vlasov-Maxwell global classical solutions OpenAI GPT-5'; 'Vlasov-Maxwell ChatGPT/AI-assisted/language model'; 'Patel relativistic Vlasov-Maxwell a priori estimates'; 'Pfaffelmoser method relativistic Vlasov-Maxwell residence time'; 'Klainerman Staffilani along the characteristic smoother integration by parts normal form'; 'Heaviside-Feynman formula Lienard-Wiechert'; 'Cheverry Ibrahim momentum spreading'. WebFetch: arXiv abs/html of 2203.01199v2, 2607.14685, 2003.14192, 2208.08360, 2306.11812 (full PDF text extracted), 1607.07416 (ar5iv), 2411.18610, 2504.01687, 2603.15929, KS 2002 abstract page. zbMATH, MathSciNet and Google Scholar were not queried directly; absence claims rest on these searches plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail (borderline)",
+    "evidence": "A residence-time occupation bound is a statement form in L (Pfaffelmoser). The new content lies in the cell definition, which comes from C3."
+   },
+   "test3": {
+    "verdict": "pass",
+    "lean": "Population/GoodCrossings.lean: downstream 0.08; SelectedDirection.lean: 0.15 (file-level). Knockout-essential for sel:exponents.",
+    "down": 0.15,
+    "cone": 0.67,
+    "note": "file-level proxy"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1 given C3",
+    "chain_depth": 2,
+    "protocol": "scored inside P-C3 as sub-criterion (b)"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.65,
+    "justification": "Pfaffelmoser's monotone crossing (in L), run on cells supplied by C3. Its novelty is inherited from C3, and it is scored with C3 as a cluster."
+   }
+  },
+  {
+   "id": "C5",
+   "name": "Summable selection rule and exponent contradiction for the receiver coefficient",
+   "paper_items": [
+    "eqs. sel:pure, sel:weight W=(Pθ)^{-ε}φ^ε h^ε, sel:selection (selection.tex:45–84)",
+    "Lemma sel:weight-sum",
+    "Lemma sel:exponents (selection.tex:122–), with H < 0.41z vs H > 0.496z"
+   ],
+   "trace": "PV6, E4 (L87, L108–111, L171–174)",
+   "statement": "Select only those narrow-sector dyadic bins whose near/far direct bounds exceed P√I·W; the unselected bins sum to CP√I. On selected bins the receiver coefficient satisfies U ≤ w^{-1/2}W. The proof is by contradiction: an unsafe selected bin is forced into the actual regime and then into the improved-occupation window, where its exponent inequalities are incompatible. Summing exactly cancels the √w loss in ∫|K|.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Good/bad dyadic-bin decompositions with summable weights (standard harmonic-analysis bookkeeping). Wang 2026 I/II (in L) close the same receiver-acceleration loss by cylindrical symmetry instead.",
+      "relation": "same role (absorbing the receiver-acceleration residual), different mechanism",
+      "verdict": "close variant (device); different (mechanism)"
+     }
+    ],
+    "verdict": "no exact neighbour; generic device",
+    "searches": "WebSearch (standard/extended): 'relativistic Vlasov-Maxwell global classical solutions OpenAI GPT-5'; 'Vlasov-Maxwell ChatGPT/AI-assisted/language model'; 'Patel relativistic Vlasov-Maxwell a priori estimates'; 'Pfaffelmoser method relativistic Vlasov-Maxwell residence time'; 'Klainerman Staffilani along the characteristic smoother integration by parts normal form'; 'Heaviside-Feynman formula Lienard-Wiechert'; 'Cheverry Ibrahim momentum spreading'. WebFetch: arXiv abs/html of 2203.01199v2, 2607.14685, 2003.14192, 2208.08360, 2306.11812 (full PDF text extracted), 1607.07416 (ar5iv), 2411.18610, 2504.01687, 2603.15929, KS 2002 abstract page. zbMATH, MathSciNet and Google Scholar were not queried directly; absence claims rest on these searches plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail (weak)",
+    "evidence": "Exponent feasibility over dyadic parameters is a finite linear-inequality check (Lean: SelectionWeight.lean, selected_coefficient_power_table). The selection threshold is defined from bounds already proved."
+   },
+   "test3": {
+    "verdict": "pass",
+    "lean": "Population/SelectionWeight.lean: downstream 0.28 (0.36 by lines); SelectionCounts.lean: 0.13.",
+    "down": 0.28,
+    "cone": 0.01,
+    "note": "file-level proxy"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 2,
+    "protocol": "P-C5"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.55,
+    "justification": "The design insight is economical: improved occupation is needed only in a window, because selection forces every obstruction into it. But it follows from routine exponent bookkeeping once C2–C4 are in hand, so it is borderline N1. This is where the KS/Wang receiver-acceleration loss is closed without symmetry, the paper's real advance over Wang; that advance, however, rests on C3."
+   }
+  },
+  {
+   "id": "C6",
+   "name": "Cutoff-derivative cancellation for selected sums of a partition of unity",
+   "paper_items": [
+    "Lemma can:cutoff-cancellation (cancellation.tex:138–168)"
+   ],
+   "trace": "a5.8.3",
+   "statement": "∂(Σ_{j∈S}β_j) = −Σ_{j∉S}∂β_j, supported where selected and unselected supports meet.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "partition-of-unity calculus (any textbook)",
+      "relation": "identity",
+      "verdict": "equivalent"
+     }
+    ],
+    "verdict": "equivalent exists",
+    "searches": "domain knowledge"
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Immediate from Σβ_j = 1."
+   },
+   "test3": {
+    "verdict": "pass (minor)",
+    "lean": "Population/DirectionCutoffs.lean et al.",
+    "down": null,
+    "cone": null,
+    "note": "plumbing"
+   },
+   "test4": {
+    "status": "not applicable (negative control)",
+    "pivot_distance": "0",
+    "chain_depth": 0,
+    "protocol": "negative control"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.9,
+    "justification": "Plumbing; a negative control."
+   }
+  },
+  {
+   "id": "C7",
+   "name": "Endpoint-ramp closure of the bootstrap",
+   "paper_items": [
+    "closure.tex:20–82 (eq. eq:closure-improvement)"
+   ],
+   "trace": "PV8 (L88)",
+   "statement": "Weight with an endpoint-vanishing ramp ψ and bound the bulk by the selected estimate. Restore the edges by ∫χK = −∫χ′F, using the signed bootstrap on intervals of length ηI. Then choose η, M and A in that order and conclude by continuity.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "standard continuity/bootstrap closure; summation by parts",
+      "relation": "same",
+      "verdict": "equivalent (pattern)"
+     }
+    ],
+    "verdict": "equivalent pattern",
+    "searches": "domain knowledge"
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Routine."
+   },
+   "test3": {
+    "verdict": "pass",
+    "lean": "Continuation/Bootstrap.lean",
+    "down": null,
+    "cone": null,
+    "note": ""
+   },
+   "test4": {
+    "status": "not applicable",
+    "pivot_distance": "1",
+    "chain_depth": 1,
+    "protocol": "none"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.8,
+    "justification": "A standard bootstrap closure. The edge restoration by signed anchoring is a small, natural trick."
+   }
+  },
+  {
+   "id": "C8",
+   "name": "Pfaffelmoser-type residence-time occupation on retarded bins, with a joint time-averaged energy budget",
+   "paper_items": [
+    "occ:stability; Lemma occ:cell-lemma (occupation.tex:254)",
+    "Prop. occ:refined-proposition (occupation.tex:353)"
+   ],
+   "trace": "PV3 (L75)",
+   "statement": "Under the bootstrap, short cells of length λ keep source and receiver velocities stable, giving 𝖬 ≤ C(hk₁/p)·max(1, I/λ, h/λ). A time-averaged energy budget ℰ_{pφ} with Σℰ_{pφ} ≤ C makes the small sector summable.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Pfaffelmoser 1992; Schaeffer 1991 (in L)",
+      "relation": "the paper calls it 'methodological inspiration, not a theorem input'",
+      "verdict": "close variant (transfer + adaptation)"
+     }
+    ],
+    "verdict": "transfer",
+    "searches": "WebSearch (standard/extended): 'relativistic Vlasov-Maxwell global classical solutions OpenAI GPT-5'; 'Vlasov-Maxwell ChatGPT/AI-assisted/language model'; 'Patel relativistic Vlasov-Maxwell a priori estimates'; 'Pfaffelmoser method relativistic Vlasov-Maxwell residence time'; 'Klainerman Staffilani along the characteristic smoother integration by parts normal form'; 'Heaviside-Feynman formula Lienard-Wiechert'; 'Cheverry Ibrahim momentum spreading'. WebFetch: arXiv abs/html of 2203.01199v2, 2607.14685, 2003.14192, 2208.08360, 2306.11812 (full PDF text extracted), 1607.07416 (ar5iv), 2411.18610, 2504.01687, 2603.15929, KS 2002 abstract page. zbMATH, MathSciNet and Google Scholar were not queried directly; absence claims rest on these searches plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "The method is in L. The retarded adaptation is substantial but follows its template."
+   },
+   "test3": {
+    "verdict": "pass",
+    "lean": "Population/LabelOccupation.lean: downstream 0.74; BinHits.lean: 0.40",
+    "down": 0.74,
+    "cone": 0.07,
+    "note": "file-level proxy"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1 (retrieved)",
+    "chain_depth": 0,
+    "protocol": "none (transfer)"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.55,
+    "justification": "Cross-field transfer (Vlasov–Poisson to retarded Vlasov–Maxwell) with substantial adaptation. The joint energy budget is borderline N2. Transfer never yields D3."
+   }
+  },
+  {
+   "id": "C9",
+   "name": "Finite-horizon field modification for the continuation criterion",
+   "paper_items": [
+    "Lemma cont:vacuum (continuation.tex:305)",
+    "eq. cont:modified-data (continuation.tex:367)",
+    "cont:normalization"
+   ],
+   "trace": "PV2, E5 (negative control)",
+   "statement": "Keep the Coulomb field, cut off the vector potentials of the divergence-free remainders, and evolve the removed part as a vacuum Maxwell field that vanishes on the particle region up to the horizon (finite propagation). This puts C_b^∞∩L² data into the H⁵ class of the Luk–Strain form of Glassey–Strauss.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "finite speed of propagation + Helmholtz/Coulomb split (standard)",
+      "relation": "same",
+      "verdict": "equivalent (technique)"
+     }
+    ],
+    "verdict": "known technique",
+    "searches": "domain knowledge"
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Standard localization."
+   },
+   "test3": {
+    "verdict": "pass",
+    "lean": "Maxwell/ExtendedField.lean: downstream 0.79; DifferenceFieldEnergy.lean: 0.64",
+    "down": 0.79,
+    "cone": 0.03,
+    "note": "The high share reflects a foundational position, not novelty."
+   },
+   "test4": {
+    "status": "not applicable (negative control)",
+    "pivot_distance": "1",
+    "chain_depth": 0,
+    "protocol": "negative control"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.85,
+    "justification": "A routine repair of a hypothesis gap."
+   }
+  },
+  {
+   "id": "C10",
+   "name": "Retarded label change and moving-cone change of variables",
+   "paper_items": [
+    "Lemma ret:phase-change (retarded.tex:103)",
+    "occupation.tex:147, Jacobian table"
+   ],
+   "trace": "a5.8.2 (labels held fixed)",
+   "statement": "dz = d·dy·dv from retarded phase points to initial labels; dy = r²D dt dn; dt/ds = d/D.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Lazarovici 2016 Lemma 9.2 (in L); Pallard 2005 Lemma 2.1 (in L); Luk–Strain 2014 Prop. 5.2 (in L)",
+      "relation": "credited by the paper",
+      "verdict": "equivalent"
+     }
+    ],
+    "verdict": "equivalent",
+    "searches": "the paper's own attributions"
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "In L."
+   },
+   "test3": {
+    "verdict": "pass",
+    "lean": "Retarded/RetardedPhaseDomain.lean et al.",
+    "down": null,
+    "cone": null,
+    "note": ""
+   },
+   "test4": {
+    "status": "not applicable",
+    "pivot_distance": "0",
+    "chain_depth": 0,
+    "protocol": "none"
+   },
+   "final": {
+    "N": "N0",
+    "F": null,
+    "confidence": 0.9,
+    "justification": "Credited prior results."
+   }
+  }
+ ],
+ "excluded_from_candidates": [
+  {
+   "trace": "PV1",
+   "reason": "A strategic choice (the affirmative answer via the Glassey–Strauss continuation route); a known route."
+  },
+  {
+   "trace": "PV7",
+   "reason": "Parameter retuning (shortening the windows by M²+A log P); absorbed into C3."
+  },
+  {
+   "trace": "a2/a5.7 Cheverry–Ibrahim retarded work kernel; a3 Wang beyond symmetry; a4 Serre; a6 Pallard comparison",
+   "reason": "Not in the final proof (abandoned or light branches)."
+  }
+ ],
+ "family_D": {
+  "label": "D3 (provisional), more likely D2",
+  "confidence": 0.3,
+  "rests_on": "C3 (the direction-change count) alone, with C4 as its payoff. C1, C2 and C5 are N2.",
+  "falls_to": "D2 if (a) the directed arm of P-C3 exceeds the calibrated threshold, as the trace's pivot distance of 1 predicts, or (b) an expert identifies a prior direction-exit count in kinetic theory or plasma physics (the Vlasov–Poisson, guiding-center and magnetized literature was not searched exhaustively).",
+  "not_transfer": "Pfaffelmoser (C8), Lazarovici/Pallard (C10), finite propagation (C9) and the Heaviside–Feynman / Klainerman–Staffilani content of C2 are transfer or N0/N1/N2, and do not support D3.",
+  "correctness_caveat": "An extraordinary, unrefereed claim: resolution of the 3D large-data global classical problem for RVM. The Lean side has 207 files and about 90k lines under OAI/Analysis/VlasovMaxwell. grep finds no 'sorry' or 'axiom', and the comparator imports only Mathlib. Main.lean proves global_classical_solution without importing the Luk–Strain criterion; local theory and continuation are re-proved in LocalPDE/ and Continuation/. This analyst did not compile it. If it checks, correctness is unusually well supported. All grades are conditional on correctness.",
+  "compression_note": "No compression check was run. The paper's main gain over Wang (no symmetry) is concentrated in C3→C4→C5, not in the identity C2, which is the KS/Wang/Heaviside–Feynman move transcribed to physical space."
+ },
+ "provenance_flag": {
+  "applies": "no",
+  "builds_on_prior_model_result_strict": false,
+  "model_produced_precedent": false,
+  "explanation": "None of the cited 2025–2026 works discloses AI or model assistance: Wang 2026 I (2203.01199v2), Wang 2026 II (2607.14685) and Bigorgne 2025 (2208.08360). Neither does the trace-cited Cheverry–Ibrahim (2306.11812, RMI 2025), whose acknowledgments were read in the full text. The only model-produced work found nearby is Ilin 2603.15929 (Gemini DeepThink; a Lean formalization of a Vlasov–Maxwell–Landau equilibrium result), and it shares no item with 362. Web searches for the problem together with ChatGPT, GPT-5, OpenAI or AI-assisted surfaced only the 362 release itself. Caveats: WebFetch left the last ~38k (Wang I) and ~90k (Wang II) characters of the HTML unread, though both acknowledgments were seen. The closest precedents (Wang 2020/2026; Klainerman–Staffilani 2002) are human-authored. The trace never cites Wang 2026, only the 2022 v1, so the model's route plausibly did not use the July 2026 versions."
+ },
+ "bridge_novelty": [
+  {
+   "import": "Pfaffelmoser residence-time method (Vlasov–Poisson) → retarded relativistic Vlasov–Maxwell (C8, C4)",
+   "status": "new bridge in execution; known as a direction",
+   "evidence": "No published Pfaffelmoser-based momentum bound for 3D RVM was found in the searches above. Prior RVM momentum work (Glassey–Strauss, Pallard, Luk–Strain, Patel) uses absolute field integrals along characteristics, and Wang 2026 I uses only a residence-time heuristic around the symmetry axis. The VP→VM analogy is folklore, so this is a first full transfer, not a first connection."
+  },
+  {
+   "import": "Classical electrodynamics (the Heaviside–Feynman / Liénard–Wiechert total-time-derivative form) → kinetic-PDE signed identity (C2)",
+   "status": "known route",
+   "evidence": "The PDE counterpart, signed time integration of the field along the receiver characteristic with a receiver-acceleration cost, is Klainerman–Staffilani 2002 and Wang 2020/2022/2026 (two of these in L). The physics identity is textbook. 362 writes it in physical space on the retarded cone, without citing either."
+  },
+  {
+   "import": "Stopping-time / jump-counting device (probability, rough paths, harmonic analysis) → counting direction changes of particle momenta (C3)",
+   "status": "new bridge (application) of a generic device",
+   "evidence": "No kinetic-theory precedent was found, and Cheverry–Ibrahim explicitly avoid direction control. The device itself is standard, so the novelty lies in what is counted and how the count is bounded (by signed weighted integrals), not in the counting."
+  },
+  {
+   "import": "Finite propagation + Coulomb/Helmholtz split → continuation for C_b^∞∩L² data (C9)",
+   "status": "known route",
+   "evidence": "Standard localization technique."
+  }
+ ],
+ "discoverability_protocols": {
+  "common": {
+   "models": "Training cutoff strictly before 2026-07-16 (Wang 2026 I v2 / II); this also covers the release-level exclusions (the 362 manuscript date 2026-09-23 and the 2026-10-06 release). Canary probe: the model must not know the 362 manuscript, that global RVM regularity has been claimed, or the contents of 2607.14685. No browsing or tools. Exclude the OpenAI model lineage that produced 362, and run it only as an uncontrolled reference arm. The judge must not be the proposer. Klainerman–Staffilani 2002, Wang 2020 radial (2003.14192) and 2022 v1, Cheverry–Ibrahim 2023 and Heaviside–Feynman are old and cannot be excluded. They are background every model has seen, which is the point of grading against them.",
+   "context_L_minus": "Mathlib d13f23b digest (not substantive here) plus 362's bibliography minus Wang2026I/II: 27 entries, given as abstracts plus the invoked statements (GS continuation in Luk–Strain form, the GS representation, the Pallard 2005/2015 lemmas, Lazarovici Lemma 9.2, an outline of Pfaffelmoser's argument).",
+   "arms": {
+    "L-": "main, contamination-controlled",
+    "L": "adds Wang 2026 I/II, to measure their effect",
+    "open": "problem statement only",
+    "directed": "states the momentum-bound strategy and gives all non-hidden upstream items"
+   },
+   "sampling": "n = 256 per arm at T = 1.0, with a fixed reasoning budget. Report unbiased pass@k for k ∈ {1,2,4,…,256}; K = 256.",
+   "judging": "Two independent LLM judges, given the paper's precedent remarks (introduction.tex, 'The formulas used below have several classical antecedents'; occupation.tex:9–12) and this neighbour list. A human kinetic-theory expert checks all hits and 10% of misses. Lean statements are used where they exist (DirectionCounts.lean, SignedRemainder.lean).",
+   "controls": "Positive: Cook–Reckhow ER variables. Negative: C6 (cutoff cancellation), C9 (field localization) and C10 (label change), in the same format.",
+   "prompt_template": "Problem: Prove global classical existence for 3D one-species RVM with C_c^∞ particle data and C_b^∞∩L² fields. Library: [L⁻ digest]. Established results you may use: [non-hidden upstream items]. [directed arm only: Strategy: bound signed momentum increments along characteristics on short intervals; the absolute force bound loses √w near the cone.] Propose the single most useful new lemma, definition or construction, stated precisely, with a proof sketch."
+  },
+  "P-C3": {
+   "item": "C3, the direction-change count (with C4 as sub-criterion b)",
+   "hide": "Lemma ang:direction and everything downstream: ang:improved-hit, the third entry of sel:pure, sel:exponents, closure.",
+   "arm_A_pivot": "Give C1, C2, C8 and the direct bounds, plus the failed alternative 'a uniform modulus of continuity for V/|V| on stable windows is unavailable (moving-cutoff derivatives)', i.e. the trace's clause C4. A high hit rate is expected here (trace pivot distance 1).",
+   "arm_B_decisive": "Do not state clause C4. Give only C1, C2, C8 and the goal 'improve occupation at intermediate angles for high-momentum pairs'.",
+   "equivalence": "(a) Hit: a bound on the number of δ-direction-exits of a characteristic's momentum (or an equivalent stopping-time count of direction changes), of size polylog(P)/δ or any bound ≪ w/δ, derived from signed or projected force integrals and not from absolute variation. (b) Sub-credit: using it to define direction-stable cells with a monotone relative crossing. Lean target: OAI.RVM.Admissible.direction_complete_count_cost_bound.",
+   "k": "1…256",
+   "pivot_distance": "1 (trace)",
+   "chain_depth": 1
+  },
+  "P-C2": {
+   "item": "C2, the signed force identity",
+   "hide": "Lemma can:identity, Prop. can:weighted-formula and everything downstream (C3–C5, closure).",
+   "arm_A": "directed, with the GS kernels written out",
+   "arm_B": "open",
+   "equivalence": "Any exact identity that writes the transport + source-acceleration retarded force kernel as a total source-time (or receiver-time) derivative plus residuals free of source acceleration and of inverse powers of d. A physical-space Heaviside–Feynman-type rewriting counts; a Fourier normal-form version gets partial credit.",
+   "k": "1…256",
+   "pivot_distance": "1",
+   "chain_depth": 0
+  },
+  "P-C1": {
+   "item": "C1, the signed bootstrap",
+   "hide": "Prop. prop:increment, its deduction and the closure.",
+   "equivalence": "An interval-uniform bound on the vector impulse whose short-time scale makes the sum of doubling times diverge (any profile giving gaps ≳ 1/log P).",
+   "k": "1…256",
+   "pivot_distance": "1–2",
+   "chain_depth": 2
+  },
+  "P-C5": {
+   "item": "C5, selection + exponent contradiction",
+   "hide": "sel:selection, sel:weight, sel:exponents",
+   "equivalence": "Any summable bin selection under which the receiver coefficient on selected bins is ≤ w^{-1/2}·(a summable weight).",
+   "k": "1…64",
+   "pivot_distance": "1",
+   "chain_depth": 2
+  }
+ },
+ "open_questions": [
+  "Compile the Lean library and run the comparator OAI.RVM.global_classical_solution (Main.lean). If it checks without extra axioms, record the correctness caveat as discharged.",
+  "Check symbolically the C2 ↔ Heaviside–Feynman reduction for a ≡ 0 (done by hand here), and whether the moving-receiver case equals exactly the Lorentz force of the HF field plus the product-rule term.",
+  "Read Klainerman–Staffilani 2002, Facts 1–3, in full to confirm the receiver-time integration-by-parts reading; only secondary sources were used.",
+  "Expert query (e.g., Glassey, Schaeffer, Pallard, Strain, Luk, Wang, Rein): is a count of direction exits of particle momenta, bounded via signed force integrals, known in Vlasov–Poisson, guiding-center or magnetized-plasma work? This is the main risk to C3's N3.",
+  "Finish reading Wang 2026 I/II (the unread HTML tails) for any direction-counting device or AI statement.",
+  "Compute a proper declaration-level Lean DAG (as in 287's lean.json) to replace the file-level shares used here.",
+  "Ask OpenAI whether earlier attempts preceded the summarized run (trace L81: 'The present attempt')."
+ ],
+ "sources": [
+  "https://arxiv.org/abs/2203.01199v2 ; https://arxiv.org/html/2203.01199v2",
+  "https://arxiv.org/abs/2607.14685 ; https://arxiv.org/html/2607.14685v1",
+  "https://arxiv.org/abs/2003.14192 ; https://arxiv.org/html/2003.14192",
+  "https://arxiv.org/abs/2208.08360",
+  "https://arxiv.org/abs/2306.11812 (PDF text extracted)",
+  "https://ar5iv.labs.arxiv.org/html/1607.07416",
+  "https://arxiv.org/html/2411.18610v1",
+  "https://arxiv.org/abs/2504.01687",
+  "https://arxiv.org/abs/2603.15929",
+  "https://www.aimsciences.org//article/doi/10.3934/cpaa.2002.1.103",
+  "https://en.wikipedia.org/wiki/Jefimenko%27s_equations ; https://ar5iv.arxiv.org/html/0704.1574 (Heaviside–Feynman formula)",
+  "https://github.com/openai/math/tree/main/preprints/Global-classical-solutions-of-the-three-dimensional-relativistic-Vlasov-Maxwell-system-September-23-2026",
+  "Local: data/raw/openai-math (fd4aeeb) preprint sections and lean/OAI/Analysis/VlasovMaxwell; data/pilot/362/trace.json"
+ ]
+}

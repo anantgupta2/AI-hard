@@ -1,0 +1,363 @@
+{
+ "fid": "148",
+ "item": "Finite-law pair bound (Lemma lem:pair-bound): k(H(ν) − H⁰_ρ(ν)) ≤ log|kF| + C_k Σ_{2^{-ℓ} ≤ 2ρ} c_ℓ(ν), log-free and independent of the minimal separation of F = supp ν",
+ "item_type": "F3",
+ "lean_status": "as in paper",
+ "lean_status_why": "pair_bound_natural states Lemma 3.2 with the paper's constant C_k = 60000 k^4 (natural-log form) and is on the proof DAG of all three comparator theorems; pair_bound (SumsetBound.lean:329) is the base-2 restatement.",
+ "lean_gaps": [
+  "Checked at text level only; the Lean was not compiled.",
+  "The shortlist's pointer pair_bound (SumsetBound.lean:329) is a base-2 wrapper and is NOT on any comparator DAG (0 dependents). The load-bearing declaration is pair_bound_natural (:269), which states the same inequality in natural log, with the factor Real.log 2 moved onto the capacity term.",
+  "Law is a finitely supported real law with strictly positive weights (prob_pos), as in the paper.",
+  "The paper's C_k is existential, with the remark that one may take 60000 k^4; Lean hard-codes 60000 k^4.",
+  "Downstream, exists_band_pair_bound replaces log|kF| by n·|α|·log(k+1) (a type-counting bound) for block laws; this is the paper's use, not a weakening of the lemma.",
+  "Dominated share in the comparator DAG: pair_bound_natural 0.10, exists_fine_partition 0.076 (extract_lean.py)."
+ ],
+ "comparator": "ComparatorChallenges/SelfSimilar.json (entropy_rate_dimension); SelfSimilarCorollaries.json (homogeneous_dimension_direct, cor_set)",
+ "comparator_chain": [
+  "OAI.EntropyRateDimension.entropy_rate_dimension (Main.lean:59)",
+  "OAI.EntropyRateDimension.System.exponent_lower_bound",
+  "OAI.EntropyRateDimension.Typed.no_strict_entropy_gap",
+  "OAI.EntropyRateDimension.Typed.pair_bands_of_retained_loss",
+  "OAI.EntropyRateDimension.Typed.exists_band_pair_bound (PairBands.lean:46)",
+  "OAI.EntropyRateDimension.FairPairs.pair_bound_natural (SumsetBound.lean:269)",
+  "OAI.EntropyRateDimension.FairPairs.exists_fine_partition (SumsetBound.lean:120)"
+ ],
+ "comparator_chains_all": {
+  "SelfSimilar (OAI.EntropyRateDimension.entropy_rate_dimension)": [
+   "OAI.EntropyRateDimension.entropy_rate_dimension (Main.lean:59)",
+   "OAI.EntropyRateDimension.System.exponent_lower_bound",
+   "OAI.EntropyRateDimension.Typed.no_strict_entropy_gap",
+   "OAI.EntropyRateDimension.Typed.pair_bands_of_retained_loss",
+   "OAI.EntropyRateDimension.Typed.exists_band_pair_bound (PairBands.lean:46)",
+   "OAI.EntropyRateDimension.FairPairs.pair_bound_natural (SumsetBound.lean:269)",
+   "OAI.EntropyRateDimension.FairPairs.exists_fine_partition (SumsetBound.lean:120)"
+  ],
+  "SelfSimilarCorollaries (homogeneous_dimension_direct)": [
+   "OAI.EntropyRateDimension.Extensions.homogeneous_dimension_direct",
+   "OAI.EntropyRateDimension.Extensions.homogeneous_exponent_lower_direct",
+   "OAI.EntropyRateDimension.Typed.no_strict_entropy_gap",
+   "... (as above) ... OAI.EntropyRateDimension.FairPairs.pair_bound_natural"
+  ],
+  "SelfSimilarCorollaries (OAI.CorSetReference.cor_set)": [
+   "OAI.CorSetReference.cor_set",
+   "OAI.EntropyRateDimension.Extensions.unweighted_no_exact_overlaps_attractor_dimension_of_root",
+   "OAI.EntropyRateDimension.Extensions.no_exact_overlaps_attractor_dimension_of_root",
+   "OAI.EntropyRateDimension.Extensions.no_exact_overlaps_dimension",
+   "OAI.EntropyRateDimension.System.exponent_lower_bound",
+   "... (as above) ... OAI.EntropyRateDimension.FairPairs.pair_bound_natural"
+  ]
+ },
+ "lean_source": [
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.Law",
+   "kind": "structure",
+   "file": "OAI/MeasureTheory/SelfSimilar/FairPairs.lean",
+   "line": 14,
+   "text": "structure Law where\n  support : Finset ℝ\n  prob : ℝ → ℝ\n  prob_pos : ∀ x ∈ support, 0 < prob x\n  prob_sum : ∑ x ∈ support, prob x = 1"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.capacity",
+   "kind": "def",
+   "file": "OAI/MeasureTheory/SelfSimilar/FairPairs.lean",
+   "line": 33,
+   "text": "noncomputable def capacity (ν : Law) (ℓ : ℤ) : ℝ :=\n  sSup {t : ℝ | ∃ w : ν.edges ℓ → ℝ, Feasible w ∧ ∑ e, w e = t}"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.Law.bandSupport",
+   "kind": "def",
+   "file": "OAI/MeasureTheory/SelfSimilar/SumsetBound.lean",
+   "line": 15,
+   "text": "noncomputable def Law.bandSupport (ν : Law) : Finset ℤ := by\n  classical\n  exact (ν.support ×ˢ ν.support).image (fun e => bandIndex |e.2-e.1|)"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.Law.sumset",
+   "kind": "def",
+   "file": "OAI/MeasureTheory/SelfSimilar/SumsetBound.lean",
+   "line": 265,
+   "text": "noncomputable def Law.sumset (ν : Law) (k : ℕ) : Finset ℝ := by\n  classical\n  exact Finset.univ.image (fun x : Fin k → ν.support => ∑ i, (x i : ℝ))"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.Law.refinementCost",
+   "kind": "def",
+   "file": "OAI/MeasureTheory/SelfSimilar/SumsetBound.lean",
+   "line": 117,
+   "text": "noncomputable def Law.refinementCost (ν : Law) (k : ℕ) (R : ℝ) : ℝ :=\n  (352*k^4/R)*ν.bandCost R*Real.log 2"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.exists_fine_partition",
+   "kind": "theorem",
+   "file": "OAI/MeasureTheory/SelfSimilar/SumsetBound.lean",
+   "line": 120,
+   "text": "theorem exists_fine_partition (ν : Law) (k : ℕ) (hk : 1 ≤ k)\n    (ρ : ℝ) (hρ : 0 < ρ) (J : ℕ) :\n    ∃ g : ℝ → List ℤ,\n      (∀ a ∈ ν.support, ∀ b ∈ ν.support, g a = g b → |a-b| ≤ ρ/4^J) ∧\n      ν.partitionEntropy k g ≤ ν.partitionEntropy k (fun x => [⌊x/ρ⌋]) +\n        ∑ h ∈ Finset.range J, ν.refinementCost k (ρ/4^h)"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.pair_bound_natural",
+   "kind": "theorem",
+   "file": "OAI/MeasureTheory/SelfSimilar/SumsetBound.lean",
+   "line": 269,
+   "text": "theorem pair_bound_natural (ν : Law) (k : ℕ) (hk : 1 ≤ k) (ρ : ℝ) (hρ : 0 < ρ) :\n    k * (entropy ν.support ν.prob - observableEntropy ν.support ν.prob (fun x => ⌊x/ρ⌋)) ≤\n      Real.log (ν.sumset k).card + 60000*k^4*Real.log 2 *\n        ∑ ℓ ∈ ν.bandSupport.filter (fun ℓ => (2 : ℝ)^(-ℓ) ≤ 2*ρ), capacity ν ℓ"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.pair_bound",
+   "kind": "theorem",
+   "file": "OAI/MeasureTheory/SelfSimilar/SumsetBound.lean",
+   "line": 329,
+   "text": "theorem pair_bound (ν : Law) (k : ℕ) (hk : 1 ≤ k) (ρ : ℝ) (hρ : 0 < ρ) :\n    k*(ν.shannonEntropy-ν.gridEntropy ρ) ≤ Real.log (ν.sumset k).card / Real.log 2 +\n      60000*k^4 * ∑ ℓ ∈ ν.bandSupport.filter (fun ℓ => (2 : ℝ)^(-ℓ) ≤ 2*ρ), capacity ν ℓ"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.FairPairs.coupling_band_le_capacity",
+   "kind": "theorem",
+   "file": "OAI/MeasureTheory/SelfSimilar/FairPairs.lean",
+   "line": 189,
+   "text": "theorem coupling_band_le_capacity {ν : Law} (ℓ : ℤ) (π : ℝ → ℝ → ℝ)\n    (hπ : ∀ x ∈ ν.support, ∀ y ∈ ν.support, 0 ≤ π x y)\n    (hsym : ∀ x ∈ ν.support, ∀ y ∈ ν.support, π x y = π y x)\n    (hrow : ∀ x ∈ ν.support, ∑ y ∈ ν.support, π x y ≤ ν.prob x) :\n    (∑ x ∈ ν.support, ∑ y ∈ ν.support,\n      if (2 : ℝ) ^ (-ℓ) ≤ |y - x| ∧ |y - x| < (2 : ℝ) ^ (1 - ℓ)\n      then π x y else 0) ≤ capacity ν ℓ"
+  },
+  {
+   "name": "OAI.EntropyRateDimension.Typed.exists_band_pair_bound",
+   "kind": "theorem",
+   "file": "OAI/MeasureTheory/SelfSimilar/PairBands.lean",
+   "line": 46,
+   "text": "theorem exists_band_pair_bound (S : System α) (tag : α → β)\n    (hr : ∀ a v, tag a=tag v → S.ratio a=S.ratio v)\n    (A : ℝ) (n k : ℕ) (hk : 1 ≤ k) :\n    ∃ B : ℤ, bandStart A n ≤ B ∧ ∀ w : Fin n → α,\n      (k : ℝ)*entropyLoss S tag w (fineScale A n) ≤\n        (n : ℝ)*Fintype.card α*Real.log (k+1)+60000*k^4*Real.log 2*\n          ∑ ℓ ∈ Finset.Icc (bandStart A n) B, capacity (law S tag w) ℓ"
+  }
+ ],
+ "speedup_targets": [
+  {
+   "id": "S1",
+   "title": "Single-scale entropy-to-pair-mass bounds (Varjú JAMS 2019, Prop. 21 with Lemma 27)",
+   "statement": "If a finitely supported law has entropy that is not visible at scale r, then a definite mass of it decomposes into fair two-point laws at distances in [r/2, 2r] (single scale, doubling hypothesis, log loss).",
+   "reference": "P. Varjú, On the dimension of Bernoulli convolutions for all transcendental parameters, Annals 189 (2019); and JAMS 2019 (arXiv:1602.00261), §4.2.3, Prop. 21.",
+   "status": "known",
+   "current_proof_size": "about 5 pages; no formalization",
+   "how_item_helps": "A one-band specialization of the pair bound with k = 1 or 2 (the pair bound is log-free and multiscale, so it implies the single-scale version up to constants).",
+   "expected_speedup": "high but uninformative: the target is weaker than the item",
+   "confidence": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI FairPairs.Law, capacity, entropy, observableEntropy",
+    "missing": "none (Bernoulli-convolution framing would add ~50 lines)",
+    "formal_proof_to_compare": "none outside OAI"
+   }
+  },
+  {
+   "id": "S2",
+   "title": "Kittle–Kogler entropy loss under addition, d = 1 (variance-energy form)",
+   "statement": "For finitely supported laws, the entropy lost when passing to k-fold sums is at most C·k·(multiscale variance energy); KK 2026 Thm 1.3 with C_m = 120 m².",
+   "reference": "S. Kittle, C. Kogler, arXiv:2610.10511 (7 Oct 2026), Thm 1.3; the proof is credited to GPT-6 Astra.",
+   "status": "known (post-release, independent)",
+   "current_proof_size": "a few pages in KK 2026",
+   "how_item_helps": "The pair bound gives the same shape with capacities and C_k = 60000 k^4. Proving KK's form needs only a capacity-versus-variance-energy comparison. Measures whether the library's version transfers to the competitor currency.",
+   "expected_speedup": "med",
+   "confidence": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI FairPairs, entropy, sumset",
+    "missing": "variance energy V_rho(r) and its integral over dyadic scales (~80–150 lines)",
+    "formal_proof_to_compare": "KK reportedly have their own Lean (about 47k lines; relayed in novelty.md, unverified); not in this repo"
+   }
+  },
+  {
+   "id": "S3",
+   "title": "Dimension of contracting-on-average self-similar measures under weak separation (Kittle–Kogler 2025)",
+   "statement": "For contracting-on-average random affine IFS on ℝ satisfying weak separation, dim μ = min(1, h_RW/χ).",
+   "reference": "Kittle–Kogler, arXiv:2501.17795.",
+   "status": "known with separation; open without",
+   "current_proof_size": "long paper (~60 pp)",
+   "how_item_helps": "The pair bound is stated for finite laws and is independent of the IFS. Applying it to stopping-time blocks would remove the use of separation on the entropy-increase side.",
+   "expected_speedup": "med",
+   "confidence": "medium-low",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI System (needs ratio_lt_one dropped), lowerHausdorffDimension, entropyRate, lyapunov",
+    "missing": "System variant allowing some |r_i| >= 1 with negative Lyapunov exponent (~100–200 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "open_problems": [
+  {
+   "id": "O1",
+   "title": "Separation-free dimension formula for contracting-on-average self-similar measures on ℝ",
+   "statement": "dim μ = min(1, h_RW/χ) without any separation.",
+   "reference": "Kittle–Kogler, arXiv:2501.17795",
+   "url": "https://arxiv.org/abs/2501.17795",
+   "status": "open without weak separation",
+   "obstruction_match": "Exact: 1-D, commuting slopes, entropy hidden at unknown fine scales.",
+   "adaptation_sketch": "Stopping-time blocks; apply the pair bound verbatim to block laws.",
+   "payoff": "new theorem",
+   "confidence": "medium",
+   "difficulty": "medium-high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI System, lowerHausdorffDimension",
+    "missing": "System variant without ratio_lt_one (~100–200 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O2",
+   "title": "Countably infinite self-similar IFS on ℝ",
+   "statement": "Separation-free dimension formula for countable IFS with finite entropy and finite Lyapunov exponent.",
+   "reference": "f1 analysis, C9",
+   "url": "",
+   "status": "open (believed routine)",
+   "obstruction_match": "Same; truncation keeps the laws finite.",
+   "adaptation_sketch": "Truncate the IFS, choose k after truncation, and apply the pair bound.",
+   "payoff": "new theorem (routine)",
+   "confidence": "medium",
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI System (Fintype ι)",
+    "missing": "countable-index System with summability conditions (~150 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O3",
+   "title": "Random / non-autonomous self-similar measures (quenched dimension)",
+   "statement": "Quenched dimension formula without separation or transversality.",
+   "reference": "Saglietti–Shmerkin–Solomyak, arXiv:1709.05092; GSSY",
+   "url": "https://arxiv.org/abs/1709.05092",
+   "status": "open",
+   "obstruction_match": "Same; the types machinery is native.",
+   "adaptation_sketch": "Pair bound per block law; Jensen over the future environment.",
+   "payoff": "new quenched formulas",
+   "confidence": "medium-low",
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI System, Mathlib ergodic theory",
+    "missing": "sequence-of-systems model and the quenched measure (~200–300 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O4",
+   "title": "Separation-free Hochman trichotomy in ℝ^d with commuting linear parts",
+   "statement": "Dimension formula or saturation alternative without exponential separation.",
+   "reference": "Hochman, arXiv:1503.09043; KK 2610.10511 claims the virtually solvable case",
+   "url": "https://arxiv.org/abs/1503.09043",
+   "status": "open / claimed post-release by KK",
+   "obstruction_match": "Pair side matches; directional saturation is new.",
+   "adaptation_sketch": "Capacities over annulus bands × direction sectors.",
+   "payoff": "independent proof",
+   "confidence": "low-medium",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "Mathlib EuclideanSpace, Hausdorff dimension",
+    "missing": "ℝ^d IFS, projections and saturation notions (>300 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O5",
+   "title": "Real-analytic self-conformal IFS on ℝ",
+   "statement": "Separation-free dimension formula.",
+   "reference": "Rapaport, arXiv:2412.16753; Käenmäki, arXiv:2609.23743",
+   "url": "https://arxiv.org/abs/2412.16753",
+   "status": "open without ESC",
+   "obstruction_match": "Half: the pair bound transfers, but 'types identify maps' fails.",
+   "adaptation_sketch": "Linearize at fine scales; pair bound on block laws.",
+   "payoff": "partial",
+   "confidence": "low-medium",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "Mathlib AnalyticOn",
+    "missing": "conformal IFS and its invariant measure (>300 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "Hochman 2014 Thm 1.3 (exponential separation implies dim = min(1, h/χ)): a corollary of the 148 main theorem, not reuse of the pair bound.",
+  "Varjú 2019: dimension 1 for transcendental Bernoulli-convolution parameters.",
+  "Rapaport 2022 (algebraic contraction ratios); Rapaport–Varjú 2024 (three-map family; Lean homogeneous_dimension_direct); Feng–Feng 2025 (algebraic translations).",
+  "Attractor formula dim_H K = min(1, s) without exact overlaps (Lean cor_set)."
+ ],
+ "release_reuse": [
+  {
+   "where": "Release-wide grep (f1 analysis)",
+   "use": "No other family uses fair pairs, pair capacity or the pair bound.",
+   "counts_as_device_reuse": "no"
+  },
+  {
+   "where": "Family 153 (Bernoulli convolution arithmetic)",
+   "use": "a different device (common submeasure plus single-scale word-pair counts)",
+   "counts_as_device_reuse": "no"
+  }
+ ],
+ "negative_controls": [
+  {
+   "id": "N1",
+   "setting": "L^q dimensions of self-similar measures without separation (Shmerkin)",
+   "expected": "fails",
+   "why": "The pair bound rests on the Shannon chain rule; Rényi entropies have no chain rule."
+  },
+  {
+   "id": "N2",
+   "setting": "Absolute continuity of Bernoulli convolutions (Varjú, Kittle)",
+   "expected": "no help",
+   "why": "The argument is ineffective: the scale B_n is uncontrolled, so it gives no quantitative smoothness."
+  },
+  {
+   "id": "N3",
+   "setting": "Furstenberg measures on SL2(ℝ) / planar self-affine measures without ESC",
+   "expected": "likely fails",
+   "why": "Non-commutativity breaks type conditioning (P22); KK name the same obstruction."
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "id": "S2",
+   "title": "KK 2026 entropy-loss bound (variance energy)",
+   "argument": "This is the only external theorem that is literally a restatement of the device. It is statable with ~100 lines (variance energy) on top of OAI FairPairs. It tests whether a prover that has pair_bound_natural in its library reaches KK's form faster. KK reached it independently, which is the decisive discoverability datapoint."
+  },
+  {
+   "rank": 2,
+   "id": "O1",
+   "title": "Contracting-on-average, no separation",
+   "argument": "The best new-theorem target. The pair bound applies verbatim to block laws; statable once System drops ratio_lt_one (<300 lines). KK's variance energy is a ready-made competitor."
+  },
+  {
+   "rank": 3,
+   "id": "O2",
+   "title": "Countable IFS",
+   "argument": "A cheap transfer test (truncation), statable in <300 lines; weak evidence of eureka value."
+  },
+  {
+   "rank": 4,
+   "id": "S3",
+   "title": "KK 2025 with separation (known)",
+   "argument": "A known theorem whose separation-based step the pair bound could replace."
+  },
+  {
+   "rank": 5,
+   "id": "S1",
+   "title": "Varjú Prop. 21 (control)",
+   "argument": "Statable now. A specialization that should be near-free with the item; use it as a sanity check of the harness."
+  }
+ ],
+ "precedent_check": {
+  "earlier_equivalent": "no (Varjú Prop. 21 is a single-scale, log-lossy relative)",
+  "summary": "Varjú (JAMS 2019, Prop. 21) converts entropy into fair-pair mass at a single scale, with a doubling hypothesis and log loss; the pair capacity is equivalent to his extremal decomposition (N1 for the definition). The log-free, separation-free, all-finer-scales pair bound has no earlier equivalent found. AFTER Oct 6: Kittle–Kogler, arXiv:2610.10511 (7 Oct 2026), proved the same mechanism with a variance-energy currency and C_m = 120 m², crediting GPT-6 Astra (first proof dated 27 Sep 2026), and called their Thm 1.3 a quantitative version of 148's Lemma 3.2. That is an independent, near-simultaneous rediscovery by another model: strong evidence the device is discoverable (Test 4 adverse)."
+ },
+ "sources": [
+  "https://arxiv.org/abs/2610.10511 (Kittle–Kogler, 7 Oct 2026)",
+  "https://arxiv.org/abs/1602.00261 (Varjú JAMS 2019)",
+  "https://arxiv.org/abs/2501.17795",
+  "https://arxiv.org/abs/1503.09043",
+  "https://arxiv.org/abs/1709.05092",
+  "https://arxiv.org/abs/2412.16753",
+  "https://arxiv.org/abs/2609.23743",
+  "data/pilot/148/f1_pair_capacity.json and novelty.json (reused)"
+ ],
+ "search_log": [
+  "Read the brief, the shortlist entry, novelty.md (C1 = pair bound) and f1_pair_capacity.md.",
+  "Read SumsetBound.lean (statements), PairBands.lean:40–60, Model.lean System, Main.lean target.",
+  "Ran scripts/extract_lean.py 148 (to the scratchpad); BFS from the three comparator theorems: pair_bound unreachable, pair_bound_natural and exists_fine_partition reachable.",
+  "Compared with the paper's pairs.tex L37–50 and L215–225 (C_k = 60000k^4).",
+  "No new web search: the f1 and novelty agents already verified KK 2610.10511 and the Varjú precedent (kept brief per instructions)."
+ ]
+}

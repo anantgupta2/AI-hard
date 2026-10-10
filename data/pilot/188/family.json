@@ -1,0 +1,2406 @@
+{
+ "family": 188,
+ "title": "The sharp terminal leave in random triangle removal",
+ "manuscript_dir": "data/raw/openai-math/preprints/The-Sharp-Terminal-Leave-in-Random-Triangle-Removal-September-25-2026",
+ "source_root": "data/raw/openai-math/preprints/The-Sharp-Terminal-Leave-in-Random-Triangle-Removal-September-25-2026/build",
+ "commit": "fd4aeeb",
+ "analyst_role": "family analyst (paper + Lean); no reasoning trace exists for this family",
+ "base_library_L": "Mathlib d13f23b + references.bib of this manuscript (10 entries: BohmanFriezeLubetzky2015, Spencer1995, RodlThoma1996, Grable1997, BohmanFriezeLubetzky2010, PenroseSudbury2005, BalBennett2023, ChungGraham2002, EngelNagel2000, joosKuehn2025 [arXiv 2412.15039v2])",
+ "subject": "Combinatorics",
+ "main_statement": {
+  "file_line": "introduction.tex:36-48",
+  "latex": "\\begin{theorem}\\label{thm:main} For the uniform triangle-removal process starting from $K_n$, \\[ \\E\\left[\\left(\\frac{F_n}{n^{3/2}}- \\frac1{2\\sqrt2}\\right)^2\\right]\\longrightarrow0. \\] In particular, \\[ \\frac{F_n}{n^{3/2}}\\xrightarrow{\\Prb}\\frac1{2\\sqrt2}, \\qquad \\frac{\\E F_n}{n^{3/2}}\\longrightarrow\\frac1{2\\sqrt2}. \\] \\end{theorem}",
+  "paraphrase": "Delete uniformly random triangles from K_n until none remain. The number F_n of surviving edges satisfies F_n/n^{3/2} -> 1/(2 sqrt 2) ~ 0.3536 in L^2, hence in probability and in mean. This is the triangle case of Joos-Kuhn Conjecture 16.2 (which asks for convergence in probability).",
+  "scope_note": "introduction.tex:52-54: no claim for other starting graphs, general hypergraph removal, or fluctuations.",
+  "lean_comparator": {
+   "challenge_file": "lean/ComparatorChallenges/TriangleRemoval.lean",
+   "config": {
+    "challenge_module": "ComparatorChallenges.TriangleRemoval",
+    "solution_module": "OAI.Combinatorics.TriangleRemoval.Main",
+    "theorem_names": [
+     "OAI.SharpTerminalLeave.sharp_terminal_leave"
+    ],
+    "definition_names": [],
+    "permitted_axioms": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "enable_nanoda": false
+   },
+   "target": "OAI.SharpTerminalLeave.sharp_terminal_leave",
+   "solution_decl": "lean/OAI/Combinatorics/TriangleRemoval/Main.lean:79 (conjunction of sharp_terminal_leave_l2 :36, _probability :52, _expectation :64)",
+   "verbatim": "theorem sharp_terminal_leave : Tendsto (fun n => expectation n (fun G => (normalizedLeave n G - sharpConstant) ^ 2)) atTop (nhds 0) /\\ (forall eps : R, 0 < eps -> Tendsto (fun n => probability n (fun G => eps < |normalizedLeave n G - sharpConstant|)) atTop (nhds 0)) /\\ Tendsto (fun n => expectation n (fun G => (G.card : R)) / normalization n) atTop (nhds sharpConstant)",
+   "definitions_unfolded": [
+    "Graph n := Finset (Finset (Fin n)); completeGraph n := all 2-subsets",
+    "triangles G := 3-subsets all of whose 2-subsets lie in G",
+    "step G := uniform triangle t of G, map to G \\ (2-subsets of t); PMF.pure G if no triangle",
+    "evolve G k := k-fold bind of step; terminalLaw n := evolve (completeGraph n) (n.choose 2)",
+    "expectation, probability: finite sums against terminalLaw; normalization n := n^(3/2:R); sharpConstant := 1/(2*sqrt 2)"
+   ],
+   "challenge_defs_identical_to_library": "ComparatorChallenges/TriangleRemoval.lean lines 13-44 are textually identical to OAI/Combinatorics/TriangleRemoval/Model.lean lines 13-44.",
+   "match_check": "Exact match with Thm main: all three conclusions (L2, in probability for every eps>0, normalized mean) are formalized. Running C(n,2) steps is enough because each removal deletes 3 edges and step is absorbing when triangle-free (Lean: Process/TerminalLaw.lean). Vertices are Fin n and graphs are Finsets of 2-sets rather than SimpleGraph, which is harmless.",
+   "formalized_vs_claimed": {
+    "formalized_in_comparator": [
+     "Thm main (all three parts)"
+    ],
+    "formalized_in_library_but_not_compared": [
+     "GoodPrefixGraph event with failure <= exp(-(log n)^{4/3}) (Prop prefix analogue, own constants c=1/80000, C=3*8001+2)",
+     "goodPrefix_survival_moments (first and second moments uniformly on good prefixes)",
+     "goodPrefix_uniform_semigroup (Prop semigroup)",
+     "canonical_collision_sum (Prop collision analogue)",
+     "graph_star_semigroup_bound (||exp(-sP)|| <= 1+2s)"
+    ],
+    "not_formalized": [
+     "Nothing in the headline. The paper's JK specialisation itself is not formalized; it is replaced by a different self-contained proof."
+    ],
+    "extra_hypotheses": "none",
+    "formalization_yaml": "NOT listed in lean/formalization.yaml main_results (no TriangleRemoval entry; catalog in_formalization_yaml=False), although OAI.lean:314 imports OAI.Combinatorics.TriangleRemoval.Main and lean/docs/188.md links the comparator."
+   },
+   "verdict": "The comparator states exactly the paper's headline theorem; the library proves it with no sorry/axiom and, unlike the paper, without any cited black box (the JK prefix is re-proved for triangles inside Lean)."
+  }
+ },
+ "trust_surface": {
+  "grep_scope": "lean/OAI/Combinatorics/TriangleRemoval/**/*.lean (287 files, 33,800 lines) + ComparatorChallenges/TriangleRemoval.{json,lean}",
+  "counts": {
+   "sorry": 0,
+   "axiom": 0,
+   "admit": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque": 0,
+   "partial def": 0,
+   "set_option": 0,
+   "#eval/run_cmd/macro/elab": 0,
+   "maxHeartbeats": 0,
+   "by decide": 15,
+   "decide (tactic line)": 4,
+   "decide (Bool coercion in terms/simp lemmas)": "~104",
+   "Classical (mentions)": 276,
+   "noncomputable (mentions)": 270
+  },
+  "decide_uses": "All tactic decides are on literals: card of powersetCard 2 of a 3-set = 3 (TerminalLaw.lean:33, TriangleLiftCount.lean:133, ActiveCavityFactorProduct.lean:109), 2 != 0, 8000 even / small Nat bounds (DensityGlobalSpectral.lean:44,58), the 2-vertex degree template is simple, independent and balanced (DegreeTemplate.lean:16-21), 64 = 64 (IndexedWitnessCode.lean:62).",
+  "comparator_permitted_axioms": [
+   "propext",
+   "Classical.choice",
+   "Quot.sound"
+  ],
+  "comparator_flags": {
+   "definition_names": [],
+   "enable_nanoda": false
+  },
+  "imports": "Mathlib only (no other OAI dir; catalog lean_dirs_imported is empty).",
+  "other_risks": "Lean was not built here (text-level reading). The family is absent from formalization.yaml, so it may not be in the release's checked comparator list; its build status is inferred only from OAI.lean importing Main.",
+  "verdict": "Clean: no escape hatches; computer-assisted flag not warranted."
+ },
+ "labels": {
+  "A": {
+   "label": "A3",
+   "secondary": {
+    "hard_direction_form": null,
+    "explicit_rate": false,
+    "note_secondary": "Asymptotic equality with sharp constant; no rate of convergence is given (the error terms are o(1) via n^{-a}, D^{-34}, D/n)."
+   },
+   "evidence": {
+    "quote": "\\E\\left[\\left(\\frac{F_n}{n^{3/2}}- \\frac1{2\\sqrt2}\\right)^2\\right]\\longrightarrow0",
+    "file_line": "introduction.tex:39-40"
+   },
+   "confidence": "high",
+   "note": "Innermost conclusion is a limit with a specified constant: quantitative/sharp."
+  },
+  "B": {
+   "label": "B1",
+   "flags": {
+    "full_only_with_prior_results": true,
+    "full_only_with_prior_results_detail": "Paper: the prefix (Prop prefix) is a specialization of Joos-Kuhn Lemmas 7.15 and 10.1, not re-proved (\"The only external proof input\"). Lean: NOT needed; the prefix is re-proved for triangles.",
+    "adds_corollaries_for_other_conjectures": false,
+    "adds_corollaries_detail": "Strengthens the conjectured convergence in probability to L2; gives the constant in Bollobas-Erdos/Spencer order-of-magnitude question. No other conjecture."
+   },
+   "evidence": {
+    "quote": "This proves the triangle case of the sharp-constant conjecture of Joos and K\\\"uhn.",
+    "file_line": "introduction.tex:12-13 (abstract), 31-33"
+   },
+   "confidence": "high (as a claim)",
+   "note": "Relative to the full JK Conjecture 16.2 (all strictly k-balanced F) this is B3 (special case); the family's posed problem is the triangle case, so B1."
+  },
+  "C": {
+   "primary": "C4",
+   "primary_evidence": {
+    "quote": "Their combination gives an absolute error $o(1/D)$",
+    "file_line": "introduction.tex:116-117"
+   },
+   "secondaries": [
+    {
+     "label": "C5",
+     "evidence": {
+      "quote": "The only external proof input is the early-prefix control from Joos and K\\\"uhn",
+      "file_line": "introduction.tex:50-51"
+     },
+     "note": "JK Lemmas 7.15, 10.1 invoked without re-proof (paper only)."
+    },
+    {
+     "label": "C1",
+     "evidence": {
+      "quote": "constructs an auxiliary tree in which each occurrence of a candidate receives an independent priority",
+      "file_line": "introduction.tex:88-89"
+     },
+     "note": "Auxiliary-object construction (unfolding, formal witness graph), not a witness of the goal; so not primary."
+    },
+    {
+     "label": "C2",
+     "evidence": {
+      "quote": "We prove correctness by induction on the number of triangle priorities strictly below the call's threshold.",
+      "file_line": "queries.tex:95-96"
+     },
+     "note": "Plus the continuity/bootstrap in Prop unfolding (stability.tex:337-378)."
+    }
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "All unspecified constants below are independent of $n$ and of the realized good prefix graph.",
+    "file_line": "introduction.tex:141-143"
+   },
+   "computer_assisted_note": "No computation in the paper; Lean decides are literal side conditions.",
+   "ih_strengthened": true,
+   "ih_template": "strengthen to all subsets/substructures",
+   "ih_evidence": {
+    "quote": "A call with focus $\\{f,g\\}\\subset T$ and threshold $U_T$ returns true exactly when both $f$ and $g$ are untouched before $U_T$.",
+    "file_line": "queries.tex:85-86"
+   },
+   "ih_note": "The root-call statement alone is not inductive; Lemma exact-paired-test proves it jointly for all call types (pair calls with omitted parent). The bootstrap in Prop unfolding additionally carries I_{e,T} <= 1/2 alongside ||z|| <= n^{-a} (\"carry an extra tracked quantity\"). Both templated; low stakes.",
+   "confidence": "medium (primary C4 vs C5: the paper's own continuation is an estimation chain; C5 applies only to the prefix)"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "E1 = I26 cluster (I23-I26: max-norm semigroup via star averaging); E2 = I40 cluster (I32-I40: o(1/D) collision bound); Lean-only L06 (self-contained prefix via moving-star stability) is the downstream use of E1.",
+   "evidence": {
+    "quote": "The continuation estimates developed here are the maximum-norm stability of the unfolding and the smaller than $D^{-1}$ error for adaptive paired queries.",
+    "file_line": "introduction.tex:130-132"
+   },
+   "confidence": "low-medium",
+   "caveats": [
+    "Every ingredient of E1 (trace method, line-graph incidence identity, Dyson expansion) is individually classical; the N3 claim rests on the combination.",
+    "E2 is an elaborate estimate whose pieces (decreasing-path 1/l!, cycle-in-exploration certificates, template counts) have close precedents; it may fall to N2.",
+    "The constant itself is N0 (JK Conj 16.2; Spencer's branching law)."
+   ],
+   "flag_builds_on_prior_model_produced_result": false,
+   "flag_note": "All cited works are human-authored (1995-2025). The only 2025 item, joosKuehn2025 (arXiv 2412.15039v1 Dec 2024, v2 Aug 2025), shows no AI disclosure on its abstract page or in its text (grep of the PDF for ChatGPT/language model/acknowledg found none)."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Combinatorics",
+    "msc2020": [
+     "05C80 random graphs (graph-theoretic aspects)",
+     "05C70 edge subsets with special properties (packings)",
+     "05B07 triple systems",
+     "60C05 combinatorial probability"
+    ],
+    "evidence": {
+     "quote": "The accepted triangles form a partial Steiner triple system, and $F_n$ measures its uncovered pairs.",
+     "file_line": "introduction.tex:11-12"
+    },
+    "confidence": "high"
+   },
+   "lean_dir_field": {
+    "dir": "OAI/Combinatorics/TriangleRemoval",
+    "field": "Combinatorics",
+    "note": "Matches problem field. Mathlib namespaces used heavily: Finset, Real, PMF, Matrix, NormedSpace (exp), EuclideanSpace, SimpleGraph, intervalIntegral, BoundedContinuousFunction."
+   },
+   "method_fields": [
+    {
+     "field": "Probabilistic combinatorics: random greedy packing / removal processes",
+     "role": "essential",
+     "source": "JK prefix (cited), priority representation, extension counts",
+     "cross_field": false
+    },
+    {
+     "field": "Probability: branching processes / local tree approximation (Spencer)",
+     "role": "essential",
+     "source": "independent unfolding, scalar law q(t)",
+     "cross_field": true
+    },
+    {
+     "field": "Probability: couplings and second-moment method",
+     "role": "essential",
+     "source": "Lemma coupling, moment identities",
+     "cross_field": true
+    },
+    {
+     "field": "Spectral graph theory / quasirandomness (trace method)",
+     "role": "essential",
+     "source": "link trace estimate, star approximation (ChungGraham2002 as comparison)",
+     "cross_field": true
+    },
+    {
+     "field": "Functional analysis: operator semigroups, bounded-perturbation (Dyson-Phillips) expansion",
+     "role": "essential",
+     "source": "EngelNagel2000 Thm III.1.10 (form re-proved)",
+     "cross_field": true
+    },
+    {
+     "field": "ODE: comparison/bootstrap for a nonlinear system",
+     "role": "essential",
+     "source": "Prop unfolding",
+     "cross_field": true
+    },
+    {
+     "field": "Interacting particle systems: random sequential adsorption",
+     "role": "background-cited",
+     "source": "PenroseSudbury2005 (argument re-given)",
+     "cross_field": true
+    },
+    {
+     "field": "Random regular hypergraph matching processes",
+     "role": "background-cited",
+     "source": "BalBennett2023",
+     "cross_field": false
+    },
+    {
+     "field": "Probability: martingale concentration (Freedman)",
+     "role": "essential (Lean only)",
+     "source": "Process/HistoryAdditive.lean",
+     "cross_field": true
+    },
+    {
+     "field": "Statistical physics: cavity method (naming only)",
+     "role": "essential (Lean only, as the analytic solution of the product identities)",
+     "source": "Coupling/UnitTime.lean",
+     "cross_field": true
+    }
+   ],
+   "cross_field_count_essential_nonCO": 5,
+   "share_invoked_cited_theorems_from_other_fields": "1/2 of the theorems invoked without proof in the paper: JK Lemma 7.15/10.1 (combinatorics) and none other; Spencer1995 eq (9) is used only as a closed form re-verified by the ODE q'=-Dq^3, EngelNagel and ChungGraham are re-proved in finite form. Counting re-proved imports, 4 of 6 method sources are non-combinatorial (probability, spectral, functional analysis, ODE).",
+   "lean_imports": "Mathlib only.",
+   "confidence": "medium-high"
+  }
+ },
+ "items": [
+  {
+   "id": "I01",
+   "kind": "definition (inline \\emph)",
+   "name": "leave / terminal edge count F_n",
+   "source": "paper",
+   "file_line": "introduction.tex:4-9",
+   "lean_decls": [
+    "Model.lean:13-44 (Graph, triangles, step, evolve, terminalLaw, normalizedLeave)"
+   ],
+   "statement": "Run uniform triangle removal from K_n until triangle-free; the leave is the set of uncovered edges, F_n its size.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Object of the goal."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Occurs in the goal (comparator: terminalLaw, normalizedLeave)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Design-theory term (leave of a partial triple system); process from BFL2015."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I02",
+   "kind": "theorem",
+   "name": "Main theorem: L2 convergence of F_n/n^{3/2} to 1/(2 sqrt 2)",
+   "source": "paper",
+   "file_line": "introduction.tex:36-48",
+   "lean_decls": [
+    "Main.lean:79 sharp_terminal_leave",
+    "Main.lean:36 sharp_terminal_leave_l2"
+   ],
+   "statement": "E[(F_n/n^{3/2} - 1/(2sqrt2))^2] -> 0; hence convergence in probability and of E F_n / n^{3/2}.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"This proves the triangle case of the sharp-constant conjecture of Joos and Kuhn\""
+   },
+   "uses_items": [
+    "I07",
+    "I31",
+    "I46",
+    "I47",
+    "I48"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Headline."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Is the goal."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "The statement (constant) was conjectured: joosKuehn2025 Conj 16.2; the theorem is new, the concept is not."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I03",
+   "kind": "definition (constants)",
+   "name": "Fixed parameters eps=1/2000, r0=8000, L=100, B=50, H0=8001",
+   "source": "paper",
+   "file_line": "prefix.tex:9-17",
+   "lean_decls": [
+    "Tracking/PrefixEpsilon.lean:14-18 prefixEpsilon, prefixCycleCap, prefixSuffixLength, prefixSuppression, prefixTemplateCap"
+   ],
+   "statement": "Numerical constants fixing the stopping density, link-cycle length, suffix length and suppression exponent.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Plumbing; values only need inequalities (e.g. L-B>0, 2B+1 < 1/(2eps)... )."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Plumbing."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Parameter choice."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I04",
+   "kind": "definition",
+   "name": "Prefix trajectory p_i, stopping step i0, p, D=np^2, m=n^2p/2",
+   "source": "paper",
+   "file_line": "prefix.tex:18-32",
+   "lean_decls": [
+    "Tracking/PrefixEpsilon.lean:20-32 prefixTargetDensity, prefixTime, prefixDensity, prefixD, prefixM"
+   ],
+   "statement": "p_i = 1 - 1/n - 6i/n^2; i0 chosen so p = n^{-1/2+eps}+O(n^{-2}); D ~ n^{2eps} common neighbours per edge.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "joosKuehn2025",
+    "cue": "\"Their density trajectory is therefore exactly p_i\" (prefix.tex:105-106)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Fixes the scale of the continuation."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Deterministic trajectory of the process (JK normalization)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "JK/BFL trajectory."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I05",
+   "kind": "definition (environment)",
+   "name": "Rooted template (H,I), extension count X_{H,I,psi}, scaling S(H,I), same-root subtemplate, rooted density, balanced",
+   "source": "paper",
+   "file_line": "prefix.tex:34-50",
+   "lean_decls": [
+    "Embeddings/RootedTemplates.lean:13 RootedTemplate",
+    "Embeddings/RootedTemplates.lean:37 rootedCount",
+    "Embeddings/RootedTemplates.lean:41 rootedScaling"
+   ],
+   "statement": "Rooted extension counts with scaling n^{v-|I|} p^{e}; balanced = every same-root subtemplate has rooted density <= that of (H,I).",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "joosKuehn2025",
+    "cue": "\"specialization of Joos--Kuhn's stopping estimates, including the parameters and rooted conventions\" (prefix.tex:87-88)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Vocabulary for prefix bounds and the witness embedding bound."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Standard extension-count vocabulary in L (JK Sec. 7, BFL)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard (Spencer counting extensions; JK templates)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I06",
+   "kind": "proposition",
+   "name": "Good prefix (degrees, codegrees, link-cycle counts up to length 8000, two rooted-extension upper bounds) with failure prob <= exp(-(log n)^{4/3})",
+   "source": "paper",
+   "file_line": "prefix.tex:52-201",
+   "lean_decls": [
+    "Tracking/PrefixEpsilon.lean:63 GoodPrefixGraph",
+    "Tracking/PrefixEpsilon.lean:83 UniformPrefixObligation",
+    "Tracking/NormalizedTrackingAbsolute.lean:84 uniform_prefix_obligation"
+   ],
+   "statement": "There is a prefix-measurable event G_n of probability 1-n^{-omega(1)} on which G_{i0} has (1+-n^{-c}) degrees and codegrees, (1+-n^{-c})D^j labelled j-cycles in every vertex link (3<=j<=8000), and polylog-factor extension upper bounds for all templates on <= 8001 vertices.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "joosKuehn2025",
+    "cue": "\"The only external proof input is the early-prefix control from Joos and Kuhn\" (introduction.tex:50-51); proof is a specialization of JK Sects 5-7, Lemma 7.15, Lemma 10.1"
+   },
+   "uses_items": [
+    "I04",
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Everything downstream is conditioned on it."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Specialization of statements in L (JK2025 Thm/Lemmas)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Cited black box in the paper (C5 invocation). Lean re-proves it by a different route (see L10-L14)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I07",
+   "kind": "definition (inline)",
+   "name": "Triangle degree d_e and the linear triangle hypergraph T on E(G)",
+   "source": "paper",
+   "file_line": "prefix.tex:203-214",
+   "lean_decls": [
+    "Process/TriangleHypergraph.lean:17 triangleHypergraph",
+    "Process/ActiveHypergraph.lean:14 activeHypergraph"
+   ],
+   "statement": "Fix a good G; E=E(G), T=triangles as 3-subsets of E; d_e=(1+-n^{-c})D.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Setup."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Standard."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I08",
+   "kind": "definition (inline \\emph)",
+   "name": "Priority scan; edge \"untouched before t\"",
+   "source": "paper",
+   "file_line": "queries.tex:19-25",
+   "lean_decls": [],
+   "statement": "Independent uniform priorities U_T; scan in increasing order, accept a triangle iff all its edges remain.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "Spencer1995; Grable1997; BohmanFriezeLubetzky2015; joosKuehn2025",
+    "cue": "\"standard random greedy packing representation; see Spencer..., Grable..., and the triangle-removal accounts\" (queries.tex:13-17)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Representation used for all queries."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "In L: Spencer1995 Sec 1, Grable1997 Sec 1, BFL2015 Sec 6 (uniform permutation formulation), JK Sec 14.1."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I09",
+   "kind": "lemma",
+   "name": "Priority representation",
+   "source": "paper",
+   "file_line": "queries.tex:26-47",
+   "lean_decls": [
+    "Process/TriangleHypergraph.lean:48 graph_gridQuery_eq_scan",
+    "Coupling/HyperScanAction.lean",
+    "Coupling/ClockOrder.lean:81 clock_order_error"
+   ],
+   "statement": "The accepted-triangle sequence of the scan has the law of uniform sequential triangle removal from G.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": null,
+    "cue": "\"standard random greedy packing representation\""
+   },
+   "uses_items": [
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Links process and scan."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Statement in L (BFL2015 Sec 6, JK 14.1)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Re-proved, standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I10",
+   "kind": "definition (inline \\emph)",
+   "name": "Call (focus of one or two edges, threshold, parent); root/non-root calls; candidates; child call",
+   "source": "paper",
+   "file_line": "queries.tex:49-61",
+   "lean_decls": [
+    "Process/MapOutput.lean:92 QueryCall",
+    "Queries/TreeBind.lean:184 gridCandidates",
+    "Queries/Separated.lean:19 QueryCall.Separated"
+   ],
+   "statement": "Root call: focus {e}, candidates all triangles at e. Non-root call: focus {f,g} subset T, threshold U_T, candidates all triangles meeting the focus except T; each candidate S has a unique focus edge e(S) and child call on S\\{e(S)} at threshold U_S.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"A child test asks whether the other two edges of a candidate triangle survive before its priority\" (introduction.tex:83-85)"
+   },
+   "uses_items": [
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Defines the recursion on which every later estimate runs."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal; the recursive greedy-MIS oracle (Nguyen-Onak 2008) is not in L."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Close variant of the recursive random-rank oracle for greedy MIS/matching (Nguyen-Onak 2008; Yoshida-Yamamoto-Ito 2009) and of Spencer/Grable backward exploration, specialised to edge-pair foci."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I11",
+   "kind": "definition (procedure)",
+   "name": "Finite paired test with one jointly ordered candidate list and expose-all rule",
+   "source": "paper",
+   "file_line": "queries.tex:63-79",
+   "lean_decls": [
+    "Queries/TreeBind.lean:188 gridQueryDepth (discrete-grid version)",
+    "Probability/ProductPMF.lean:61 ExposureTree"
+   ],
+   "statement": "At a call: expose priorities of all candidates in fixed type order; scan those below threshold in priority order (one joint order across both focus edges); stop false at first true child, else true.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"We test the two edges with one jointly ordered list of candidates, which is essential to the later visitation estimate\" (introduction.tex:85-86)"
+   },
+   "uses_items": [
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Joint order and full exposure are what make the collision event checkable (I36) and the visitation bound (I44) work."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal or L."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Engineering variant of the standard oracle; the paper flags joint ordering as essential."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I12",
+   "kind": "lemma",
+   "name": "Exact paired test",
+   "source": "paper",
+   "file_line": "queries.tex:81-119",
+   "lean_decls": [
+    "Process/TriangleHypergraph.lean:48 graph_gridQuery_eq_scan"
+   ],
+   "statement": "The finite test terminates; a root call at (e,t) returns true iff e is untouched before t; a pair call returns true iff both focus edges are untouched before U_T.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none (proved by induction on the number of priorities below threshold)"
+   },
+   "uses_items": [
+    "I10",
+    "I11",
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Correctness of the query representation."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Correctness of a greedy oracle; same induction as Nguyen-Onak style simulations."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I13",
+   "kind": "definition (inline \\emph)",
+   "name": "Independent unfolding (fresh uniform priority at every occurrence in the tree of all possible calls); omitted-parent root variants",
+   "source": "paper",
+   "file_line": "queries.tex:121-146",
+   "lean_decls": [
+    "Probability/ProductPMF.lean:72 ExposureTree.fresh",
+    "Queries/TreeBind.lean:203 gridPriorities"
+   ],
+   "statement": "Deterministic tree of all possible calls; an independent uniform variable per child occurrence serves as priority and threshold; distinct roots use disjoint trees.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "Spencer1995",
+    "cue": "\"Backward exploration and comparison with independent branching occur in Spencer's analysis\" (queries.tex:123-124)"
+   },
+   "uses_items": [
+    "I10",
+    "I11"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The auxiliary model whose probabilities have exact product formulas."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in the goal; Spencer1995 (in L) has the branching-process analogue."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Spencer's branching process realised on the graph's computation tree (cf. belief-propagation computation trees). Lean calls the resulting equations \"cavity\" equations."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I14",
+   "kind": "lemma",
+   "name": "Finite evaluation of unfoldings (factorial decay of decreasing paths)",
+   "source": "paper",
+   "file_line": "queries.tex:148-192",
+   "lean_decls": [
+    "Coupling/UnitTime.lean:73 cavityDepth",
+    "Coupling/UnitTime.lean:307 cavityLimit (Lean replaces the a.s. construction by Picard iteration in a Banach space)"
+   ],
+   "statement": "Almost surely every call at every threshold has a finite evaluation; P(decreasing path of length j) <= M^j/j!.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "PenroseSudbury2005",
+    "cue": "\"as in the local construction of graph adsorption processes by Penrose and Sudbury\" (queries.tex:148-151)"
+   },
+   "uses_items": [
+    "I13"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Well-definedness."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Penrose-Sudbury Prop 1 in L."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Penrose-Sudbury 2005 argument re-given."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I15",
+   "kind": "definition",
+   "name": "q_e(t), q_{e,T}(t) (omitted-parent survival), I_{e,T}(t) = int_0^t q_{f,T} q_{g,T}",
+   "source": "paper",
+   "file_line": "queries.tex:194-204",
+   "lean_decls": [
+    "Coupling/UnitTime.lean:65 messageIntegral",
+    "Coupling/UnitTime.lean:69 cavityOperator",
+    "Coupling/UnitTime.lean:464 cavityMessage"
+   ],
+   "statement": "Survival probabilities in the independent unfolding and the message integral.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I13"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "State variables of the stability analysis."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Cavity/message quantities; Spencer f(c) analogue per edge type."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I16",
+   "kind": "proposition",
+   "name": "Product identities",
+   "source": "paper",
+   "file_line": "queries.tex:206-261",
+   "lean_decls": [
+    "Queries/TreeBind.lean:210 gridAnswerProbability_step",
+    "Queries/TreeBind.lean:352 gridMessage_exact"
+   ],
+   "statement": "P(pair true at t) = q_{f,T} q_{g,T}; q_e = prod_{S ni e}(1 - I_{e,S}); q_{e,T} = prod_{S ni e, S != T}(1 - I_{e,S}); all C^1.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"These identities describe the auxiliary independent model\" (queries.tex:256)"
+   },
+   "uses_items": [
+    "I13",
+    "I15"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Exact equations analysed in Sec 4."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Exact cavity / belief-propagation recursion on a tree; Spencer1995 eq. for scalar case."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I17",
+   "kind": "definition",
+   "name": "Scalar comparison q(t) = (1+2Dt)^{-1/2} (solves q' = -D q^3)",
+   "source": "paper",
+   "file_line": "stability.tex:6-16",
+   "lean_decls": [
+    "Stability/CavityReference.lean:73 cavityReference"
+   ],
+   "statement": "Spencer's branching survival law (1+Qc)^{-1/Q} with Q=2, c=Dt.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "Spencer1995",
+    "cue": "\"This is Spencer's scalar branching law after the time change c=Dt\" (introduction.tex:96-97)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Gives the constant: m q(1) ~ n^{3/2}/(2sqrt2)."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "In L (Spencer1995 eq. (9)); also gives JK Conj 16.2 constant."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Cited formula."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I18",
+   "kind": "definition",
+   "name": "Log time s = (1/2)log(1+2Dt); z_e(s) = log(q_e/q)",
+   "source": "paper",
+   "file_line": "stability.tex:18-34",
+   "lean_decls": [
+    "Coupling/UnitTime.lean:459 cavityTime",
+    "Coupling/UnitTime.lean:461 cavityLog",
+    "Stability/CavityReference.lean:74 cavityClock"
+   ],
+   "statement": "Change of variables making q = e^{-s}; z(0)=0.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I15",
+    "I17"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Coordinates for the linearization."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard ODE normalization."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I19",
+   "kind": "definition",
+   "name": "Edge-adjacency matrix A (A_ef=1 iff e!=f in a common triangle)",
+   "source": "paper",
+   "file_line": "stability.tex:37-41",
+   "lean_decls": [
+    "Spectral/LinkStarMatrix.lean:52 globalLinkAdjacency",
+    "Stability/CavityGenerator.lean:24 cavityGenerator"
+   ],
+   "statement": "Real symmetric matrix on E(G) with row sums 2d_e.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Generator of the linearized dynamics."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Adjacency matrix of the triangle-hypergraph 2-shadow on edges (standard construction)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I20",
+   "kind": "lemma (display)",
+   "name": "Exact z-equation and linearized error ||z' + (A/D)z||_inf <= C(n^{-2a}+n^{-c}+log n/D) under bootstrap assumptions",
+   "source": "paper",
+   "file_line": "stability.tex:43-106",
+   "lean_decls": [
+    "Stability/CavityGenerator.lean:35-128 cavityVelocity, cavityResidual, cavityResidual_bound"
+   ],
+   "statement": "Differentiating the product identities; bootstrap ||z||_inf <= n^{-a}, I_{e,T} <= 1/2.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I16",
+    "I18",
+    "I19"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Reduces stability to a semigroup bound."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine linearization/bootstrap."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I21",
+   "kind": "lemma (paragraph)",
+   "name": "Link trace estimate tr((M_u/D)^r) = 1 + O(n^{-c*}) from link-cycle counts",
+   "source": "paper",
+   "file_line": "stability.tex:133-173",
+   "lean_decls": [
+    "Spectral/RealTraceAdjMatrix.lean:35 normalized_link_trace_bound",
+    "Spectral/ClosedWords.lean:72 nonsimpleWords_card_le",
+    "Spectral/ClosedWalkPattern.lean:73 noninjective_pattern_count"
+   ],
+   "statement": "Closed walks of even length r=8000 in the vertex link: injective walks are labelled cycles; tree-supported and cycle-supported non-injective patterns are lower order.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "ChungGraham2002",
+    "cue": "\"follows the sparse quasirandom trace method; compare Chung and Graham\" (stability.tex:110-113)"
+   },
+   "uses_items": [
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Spectral input."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Chung-Graham 2002 (in L) trace method."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Quantitative re-proof of a known method."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I22",
+   "kind": "lemma (display)",
+   "name": "Star approximation ||M_u/D - 11^T/N_u||_2 = O(n^{-gamma})",
+   "source": "paper",
+   "file_line": "stability.tex:175-202",
+   "lean_decls": [
+    "Spectral/GraphStarApproximation.lean:26 graph_star_approximation",
+    "Spectral/NormalizedOnes.lean:103 star_approximation_from_trace"
+   ],
+   "statement": "Leading eigenvalue ~1 and simple; other eigenvalues O(n^{-gamma}); eigenvector close to normalized all-ones.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I21"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Each link is spectrally close to its averaging projection."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal; consequence of standard quasirandomness."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard eigenvalue perturbation."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I23",
+   "kind": "definition + lemma",
+   "name": "Star-average decomposition: P = sum_u 11^T/N_u (extended to E), R = A/D - P with ||R||_2 = O(n^{-gamma}), ||R||_inf = O(1)",
+   "source": "paper",
+   "file_line": "stability.tex:204-230",
+   "lean_decls": [
+    "Spectral/LinkStarMatrix.lean:55 globalStarAverage",
+    "Spectral/EdgeStar.lean edgeStar"
+   ],
+   "statement": "A is the sum of the extended link matrices M_u (two edges in a common triangle share a unique vertex); each edge lies in exactly two stars, so the l2 error does not grow with n.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"Each edge lies in exactly two stars, which explains the last equality and prevents a loss proportional to the number of vertices\" (stability.tex:221-222)"
+   },
+   "uses_items": [
+    "I19",
+    "I22"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Splits the generator into a structured part with controllable max-norm semigroup and an l2-small remainder."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Neither P nor the splitting occurs in goal or L."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Novel use; P = B^T N^{-1} B for the unsigned vertex-edge incidence B is classical (line-graph identity B^T B = 2I + A_line)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I24",
+   "kind": "lemma (display)",
+   "name": "Vertex-space factorization P = UV, VU = Id + W and max-norm bound ||e^{-sP}||_inf <= 1+2s, ||e^{-sP}||_2 <= 1",
+   "source": "paper",
+   "file_line": "stability.tex:232-268",
+   "lean_decls": [
+    "Process/EdgeIncidence.lean:62 graph_star_semigroup_bound"
+   ],
+   "statement": "(Uy)_{uv} = y_u+y_v, (Vx)_u = average over star; e^{-sP} = Id - U int_0^s e^{-v(Id+W)} dv V; ||e^{-v(Id+W)}||_inf <= 1.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"The special form of P supplies this stronger control\" (stability.tex:233-234)"
+   },
+   "uses_items": [
+    "I23"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The only source of max-norm control."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal or L."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Push-through identity (UV)^j = U(VU)^{j-1}V is standard; its use to control an edge-space semigroup by a vertex random walk is the new move. Part of candidate E1."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I25",
+   "kind": "lemma (paragraph)",
+   "name": "Finite bounded-perturbation (Dyson) expansion with mixed norms: K terms in max norm, remainder in l2 and converted by sqrt(m)",
+   "source": "paper",
+   "file_line": "stability.tex:270-315",
+   "lean_decls": [
+    "Stability/MovingPerturbationFiniteExpansion.lean:11-81 moving_perturbation_finite_expansion, moving_perturbation_mixed_norm_absorb",
+    "Spectral/MatrixExpL2Bound.lean"
+   ],
+   "statement": "Iterate E(s) = E0(s) - int E0(s-v) R E(v) dv K times, K gamma > 2; terms are polylog in max norm; remainder <= n (Cn^{-gamma})^K (log n)^K/K! = o(1).",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "EngelNagel2000",
+    "cue": "\"We use a finite form of the bounded-perturbation expansion for semigroups [EngelNagel2000 Thm III.1.10], estimating its initial terms and remainder in different norms\" (stability.tex:272-274)"
+   },
+   "uses_items": [
+    "I23",
+    "I24"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Transfers max-norm control from P to A/D."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Dyson-Phillips expansion is in L (EngelNagel2000)."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Cited expansion; mixed-norm remainder trick is standard in analysis (e.g. resolvent expansions in random-matrix local laws)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I26",
+   "kind": "proposition",
+   "name": "Uniform max-norm semigroup bound sup_{s<=log n} ||e^{-sA/D}||_inf <= C1 (1+log n)^J",
+   "source": "paper",
+   "file_line": "stability.tex:116-316",
+   "lean_decls": [
+    "Process/GraphCardSqrt.lean:38 goodPrefix_uniform_semigroup",
+    "Spectral/GlobalLinkAdjacencyHermitian.lean:26 goodPrefix_semigroup_quantitative"
+   ],
+   "statement": "For every graph satisfying the degree, codegree and link-cycle conditions.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"The continuation estimates developed here are the maximum-norm stability of the unfolding and the smaller than D^{-1} error for adaptive paired queries\" (introduction.tex:130-133); trivial bound \"gives a loss of order D ... too large\" (stability.tex:100-103)"
+   },
+   "uses_items": [
+    "I21",
+    "I22",
+    "I23",
+    "I24",
+    "I25"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Turns the linearized error into a strict bootstrap improvement; without it the naive bound loses e^{O(D)}."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal or L."
+   },
+   "provisional_N": {
+    "grade": "N3 (provisional)",
+    "justification": "No neighbour found that controls a max-norm heat semigroup of a quasirandom edge-adjacency operator via star averaging; ingredients (trace method, line-graph identity, Dyson expansion) are individually known. Candidate E1."
+   },
+   "provisional_F": "F5 (change of representation: edge space -> vertex space via P=UV) with F2 flavour"
+  },
+  {
+   "id": "I27",
+   "kind": "proposition",
+   "name": "Unfolded probabilities q_e, q_{e,T} = (1+o(1))q(t), I_{e,T} = O(log n / D) uniformly",
+   "source": "paper",
+   "file_line": "stability.tex:318-378",
+   "lean_decls": [
+    "Stability/CavityReference.lean:102 goodPrefix_cavity_relative",
+    "Stability/CavityReference.lean:40 goodPrefix_cavity_continuation",
+    "Stability/CavityGenerator.lean:304 cavity_closed_continuation"
+   ],
+   "statement": "Bootstrap/continuity argument using I20 and I26.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I20",
+    "I26"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Gives first moment and constant."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard bootstrap once I26 is available."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I28",
+   "kind": "lemma (display)",
+   "name": "Off-pattern product bound q_{f,T}q_{g,T}/(1-J_n)^2 <= 2q(t)^2",
+   "source": "paper",
+   "file_line": "stability.tex:380-394",
+   "lean_decls": [],
+   "statement": "Deleting at most two no-success factors from a pair call increases the product by at most (1-J_n)^{-2}.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I27"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Input to visitation bound."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Direct corollary."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I29",
+   "kind": "definition (inline \\emph)",
+   "name": "Triangle type vs occurrence",
+   "source": "paper",
+   "file_line": "coupling.tex:9-10",
+   "lean_decls": [],
+   "statement": "A member of T as opposed to its occurrences in an unfolding.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I13"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Vocabulary."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Plumbing."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Plumbing."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I30",
+   "kind": "definition (experiment)",
+   "name": "k in {1,2} uniformly sampled oriented root edges, all roots executed at threshold 1; collision event C_k = some type exposed twice among all exposed lists",
+   "source": "paper",
+   "file_line": "coupling.tex:12-28",
+   "lean_decls": [
+    "Queries/LegalCollisionPairs.lean:29 tracedCollisionProbability"
+   ],
+   "statement": "Compares the finite tests (shared priorities) to independent unfoldings (disjoint trees).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"At each visited call, expose the priorities of all candidates\" (coupling.tex:21)"
+   },
+   "uses_items": [
+    "I11",
+    "I13"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Defines the error event."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard sampled-root second-moment experiment."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I31",
+   "kind": "lemma",
+   "name": "Coupling by exposed triangle types: |P(X^fin in H) - P(X^ind in H)| <= P_ind(C_k)",
+   "source": "paper",
+   "file_line": "coupling.tex:30-68",
+   "lean_decls": [
+    "Process/TriangleHypergraph.lean:63 graph_grid_exposure_error",
+    "Queries/GridCollision.lean:61 graph_cavity_error"
+   ],
+   "statement": "Use U_T at the first exposure of each type and fresh variables afterwards; executions agree until a repeat.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I30"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Reduces finite process to the unfolding."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "First-repetition coupling, standard in local-limit arguments."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I32",
+   "kind": "definition (inline \\emph)",
+   "name": "Formal graph Gamma of visited calls with label map lambda, formal vertices, birth calls, properties (i)-(iv)",
+   "source": "paper",
+   "file_line": "coupling.tex:70-106",
+   "lean_decls": [
+    "Embeddings/BirthGraph.lean:16 BirthGraph",
+    "Embeddings/TriangleGrowth.lean:17 TriangleGrowth",
+    "Queries/RecordedCallForest.lean:18 RecordedCallForest"
+   ],
+   "statement": "Each root adds a formal edge; each visited child glues a new vertex to its attachment edge; the only triangles of Gamma are gluing triangles.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I10",
+    "I30"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Geometric encoding of explorations."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Exploration-graph encodings are standard in local analyses (Spencer, Bohman triangle-free), but this gluing graph is tailored."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I33",
+   "kind": "definition (inline \\emph)",
+   "name": "Ancestral call path; Gamma_{a,b}; extra-edge witness",
+   "source": "paper",
+   "file_line": "coupling.tex:153-160",
+   "lean_decls": [
+    "Embeddings/BirthGraph.lean:73 ExposedAt",
+    "Tracking/RootedExposedCollisionWitness.lean"
+   ],
+   "statement": "(a,b) distinct, nonadjacent in Gamma, labels adjacent in G, lambda injective on Gamma_{a,b}.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I32"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Object counted in Sec 6."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "\"Cycle in the explored neighbourhood\" certificate; tailored form new."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I34",
+   "kind": "lemma",
+   "name": "Geometric witness for a collision: C_k produces an extra-edge witness; P(C_k) <= O(1/n) + P(witness exists)",
+   "source": "paper",
+   "file_line": "coupling.tex:162-232",
+   "lean_decls": [
+    "Queries/CallPathCollisionWitness.lean:53 traced_graph_path_collision_witness",
+    "Tracking/RootedCountedTracedRepeat.lean:18 rooted_counted_traced_repeat_cover"
+   ],
+   "statement": "Case analysis on injectivity of lambda and on the latest vertex of a formal triangle.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I32",
+    "I33"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Converts a probabilistic event into a counting problem."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Tree-likeness certificate; close in spirit to standard \"explored ball is a tree unless a cycle is found\" arguments."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I35",
+   "kind": "definition (inline \\emph)",
+   "name": "Call forest paths, pattern (h, l1, l2, marks, focus choices), formal graph J, J^+ = J+ab; pattern count C 2^l",
+   "source": "paper",
+   "file_line": "witnesses.tex:17-57",
+   "lean_decls": [
+    "Process/PathPattern.lean",
+    "Queries/MarkedIndexedAttachmentPattern.lean:20 marked_indexed_attachment_pattern_count"
+   ],
+   "statement": "v(J) = 2r+l, e(J) = r+2l.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I33"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Indexing for union bound."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Bookkeeping."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I36",
+   "kind": "lemma",
+   "name": "Embedding an extra edge: #emb(J^+ -> G) <= (2m)^r (2D)^l D^{-B}, via a last-L-births suffix template for long patterns",
+   "source": "paper",
+   "file_line": "witnesses.tex:59-219",
+   "lean_decls": [
+    "Embeddings/SuffixTemplate.lean:22 suffixTemplate",
+    "Embeddings/SuffixTemplate.lean:53 suffixTemplate_count",
+    "Process/BackEdgesCardSplit.lean:88 actual_long_witness_count",
+    "Process/WitnessCountEventually.lean:20 actual_witness_count_eventually"
+   ],
+   "statement": "Short patterns: whole J^+ is a template with all subtemplate scalings >=1, gain p. Long: template on the last L=100 born vertices with backward edges and ab has scaling D^L p < 1 and all completion scalings <= 1, so polylog many extensions; gain D^{-B} independent of path length.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I05",
+    "I06",
+    "I35"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Supplies the D^{-B} factor uniformly in l."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal; uses JK Lemma 7.15-type bounds (in L)."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Template counting is standard (JK, BFL); the suffix trick to get a length-independent gain is new but routine for experts."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I37",
+   "kind": "definition",
+   "name": "Visitation weights b(t) = q(t)^2, C_D = 1+2D, mu = log(1+2D)/(2D)",
+   "source": "paper",
+   "file_line": "witnesses.tex:240-245",
+   "lean_decls": [
+    "Tracking/PrefixWeight.lean:16 prefixWeight",
+    "Process/WitnessMu.lean"
+   ],
+   "statement": "b is the off-pattern survival factor; mu its integral.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I17",
+    "I28"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Weights in visitation bound."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Definition."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I38",
+   "kind": "definition (prospective event)",
+   "name": "Off-pattern event O_x: every off-pattern candidate at a required call below t_x has a false child, evaluated hypothetically",
+   "source": "paper",
+   "file_line": "witnesses.tex:262-284",
+   "lean_decls": [
+    "Process/ProspectiveFailure.lean",
+    "Queries/MarkedChildKernelProspective.lean"
+   ],
+   "statement": "Necessary for visiting all required calls; O_x independent across x given selected priorities.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"Define O_x prospectively\" (witnesses.tex:265)"
+   },
+   "uses_items": [
+    "I13",
+    "I14"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Source of the b-weights."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "New device; hypothetical evaluation of subtrees follows Lemma finite-evaluation."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I39",
+   "kind": "lemma",
+   "name": "Visiting an embedded pattern: P(all required calls visited) <= C_D^3 (2mu)^l / (h! l1! l2!)",
+   "source": "paper",
+   "file_line": "witnesses.tex:247-340",
+   "lean_decls": [
+    "Process/DivergentArms.lean:60 actualPairVisitProbability_pattern_factorial",
+    "Queries/SplitQueryPaths.lean:87 actualPairVisitProbability_weight",
+    "Probability/RootPairVisitProbability2.lean:20 rootPairVisitProbability_spine"
+   ],
+   "statement": "Decreasing priorities along each segment give 1/j!; each selected priority carries a factor 2b(u) from O_x; integrating gives mu^j/j!.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I28",
+    "I37",
+    "I38"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Turns a D^l path count into (8 D mu)^l/l! ~ poly(D) in total."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N2 (provisional N3 as part of E2)",
+    "justification": "Decreasing-path 1/l! bounds are standard (Nguyen-Onak 2008; Penrose-Sudbury); weighting by off-pattern failure is the new twist."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I40",
+   "kind": "proposition",
+   "name": "Uniform collision bound P_ind(C_k) = O(D^{15-B} + n^{-1}) = o(D^{-1})",
+   "source": "paper",
+   "file_line": "witnesses.tex:342-396",
+   "lean_decls": [
+    "Queries/CanonicalCollisionSum.lean:18 canonical_collision_sum"
+   ],
+   "statement": "Pattern count x embedding bound x root probability x visitation bound, summed: D^{-B} C_D^3 exp(24 D mu) = O(D^{15-B}).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"This precision matters because the two-root survival probability is itself of order 1/D\" (introduction.tex:117-118)"
+   },
+   "uses_items": [
+    "I31",
+    "I34",
+    "I35",
+    "I36",
+    "I39"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Required precision for the second moment."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N3 (provisional)",
+    "justification": "Cluster I32-I40 delivers o(1/D) coupling error for adaptive paired queries with growing D; no neighbour found achieving sub-1/D local-approximation error in this setting. Candidate E2."
+   },
+   "provisional_F": "F3 (auxiliary construction: formal witness graph + suffix template) with F4-like weighting"
+  },
+  {
+   "id": "I41",
+   "kind": "lemma (display)",
+   "name": "Moment identities: P(all k finite roots true | prefix) = E[(F_n/m)^k | prefix]; unfolded = ((1/m) sum_e q_e(1))^k",
+   "source": "paper",
+   "file_line": "moments.tex:8-30",
+   "lean_decls": [
+    "Tracking/GoodPrefixSurvivalMoments.lean:19 goodPrefix_survival_moments",
+    "Process/TriangleHypergraph.lean:60 focusSurvival"
+   ],
+   "statement": "Sampling roots with replacement turns survival probabilities into moments.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I12",
+    "I27"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Bridge to moments."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Standard second-moment set-up."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I42",
+   "kind": "lemma (display)",
+   "name": "Conditional L2: E[(Y_n-1)^2 | prefix] = o(1) uniformly on G_n; normalization a_n = mq(1)/n^{3/2} -> 1/(2sqrt2); removal of bad prefixes",
+   "source": "paper",
+   "file_line": "moments.tex:44-85",
+   "lean_decls": [
+    "Probability/PmfMeanAffineSq.lean:27 goodPrefix_normalized_l2",
+    "Process/EvolveBindFinish.lean:55 main_l2_prefix_failure_bound",
+    "Tracking/PrefixFailureEnvelopeSuperpolynomial.lean:51 prefix_failure_l2_envelope_tendsto"
+   ],
+   "statement": "Y_n = F_n/(m q(1)); bad prefix contribution <= Cn P(G_n^c) = o(1).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I06",
+    "I40",
+    "I41"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Final assembly."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Routine."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I43",
+   "kind": "remark (scope)",
+   "name": "Scope remark: no claim for arbitrary starting graphs, general hypergraph removal, or fluctuations",
+   "source": "paper",
+   "file_line": "introduction.tex:52-54",
+   "lean_decls": [],
+   "statement": "Scope limitation.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Scope."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "n/a"
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Not a mathematical item."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L01",
+   "kind": "definition (Lean)",
+   "name": "ExposureTree: a free monad of priority exposures with \"fresh\" (independent) and shared interpretations",
+   "source": "lean",
+   "file_line": "n/a (Lean only)",
+   "lean_decls": [
+    "Probability/ProductPMF.lean:61 ExposureTree",
+    "Probability/ProductPMF.lean:72 ExposureTree.fresh",
+    "Queries/TreeBind.lean:18 bind",
+    "Probability/ProductPMF.lean:14 productPMF"
+   ],
+   "statement": "Inductive tree of exposure queries over keys K with values V; fresh interprets every exposure with an independent copy; product PMF gives the shared one.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "n/a"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Formal carrier of both the finite test and the unfolding (frac_dag_dependents 0.132)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Formalization device (free monad / decision tree); corresponds to Grable's adaptive exposure decision trees."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L02",
+   "kind": "definition (Lean)",
+   "name": "Discrete-grid priorities: priorities in Fin N, depth-bounded grid queries, grid->continuum error",
+   "source": "lean",
+   "file_line": "n/a (Lean only)",
+   "lean_decls": [
+    "Queries/TreeBind.lean:188 gridQueryDepth",
+    "Queries/TreeBind.lean:206 gridAnswerProbability",
+    "Coupling/ClockOrder.lean:81 clock_order_error",
+    "Coupling/GridUniformError.lean",
+    "Stability/GridCavityError.lean"
+   ],
+   "statement": "All probabilities are finite PMFs on Fin N; errors from ties and grid are shown to vanish as N -> infinity.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "n/a"
+   },
+   "uses_items": [
+    "L01"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Lets the whole argument live in PMF (no measure theory on [0,1]^T)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Formalization device."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L03",
+   "kind": "definition (Lean)",
+   "name": "Cavity operator, cavityDepth (Picard iteration) and cavityLimit in a space of bounded continuous functions",
+   "source": "lean",
+   "file_line": "n/a (Lean only)",
+   "lean_decls": [
+    "Coupling/UnitTime.lean:62-73 messageCandidates, messageIntegral, cavityOperator, cavityDepth",
+    "Coupling/UnitTime.lean:300-307 cavityLimitBCF, cavityLimit"
+   ],
+   "statement": "cavityOperator H q e parent t = prod_{T in candidates}(1 - int_0^t prod q); cavityDepth k = k-fold iterate; Cauchy in BCF; limit = solution of the product identities.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "n/a (naming: \"cavity\", \"message\")"
+   },
+   "uses_items": [
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Lean solves the product identities analytically rather than via the a.s.-finite unfolding."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Cavity method / belief propagation (statistical physics) plus Picard iteration: transfer. The Lean naming makes the import explicit."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L04",
+   "kind": "definition (Lean)",
+   "name": "Moving star average: movingStarMean/movingStarLift on a shrinking active edge set; movingResidualForcing; trajectorySeminorm; activeLinf/activeL2",
+   "source": "lean",
+   "file_line": "n/a (Lean only)",
+   "lean_decls": [
+    "Spectral/MovingStarDegree.lean:20 movingStarMean",
+    "Spectral/MovingStarDegree.lean:25 movingStarLift",
+    "Stability/MovingResidualForcing.lean:25 movingResidualForcing",
+    "Asymptotics/ActiveL2Map.lean:13-19 activeL2Map, activeL2"
+   ],
+   "statement": "Time-dependent version of P = UV for a nested family of active edge sets, with seminorms along trajectories.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "n/a"
+   },
+   "uses_items": [
+    "I23",
+    "I24"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Used for the Lean-only prefix codegree stability (L06)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Moving (discrete-time, shrinking-support) variant of the paper's star-averaging device I23-I24."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L05",
+   "kind": "lemma (Lean)",
+   "name": "movingStar_mixed_stability and moving_perturbation_mixed_norm_absorb",
+   "source": "lean",
+   "file_line": "n/a (Lean only)",
+   "lean_decls": [
+    "Stability/MovingResidualForcing.lean:115 movingStar_mixed_stability",
+    "Stability/MovingPerturbationFiniteExpansion.lean:63 moving_perturbation_mixed_norm_absorb"
+   ],
+   "statement": "Mixed l2/l_inf stability of x_{k+1} = x_k - a_k(P_k x_k + R_k x_k) + forcing on a nested active set.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "n/a"
+   },
+   "uses_items": [
+    "L04",
+    "I25"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Engine of L06."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Discrete-time analogue of I25-I26."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L06",
+   "kind": "lemma cluster (Lean)",
+   "name": "Self-contained prefix: centred codegree vector recurrence with star drift; edge-barrier improvement; degree/wheel/balanced-template tracking; rooted upper bounds by moments from intact-survival; UniformPrefixObligation",
+   "source": "lean",
+   "file_line": "n/a (Lean only)",
+   "lean_decls": [
+    "Process/CompleteEdgePair.lean:66 centered_edge_operator_drift",
+    "Process/CompleteEdgePair.lean:124 prefix_centered_edge_recurrence",
+    "Process/CenteredEdgeVectorTriangle.lean:19 prefix_edge_barrier_improvement",
+    "Process/CenteredEdgeVectorTriangle.lean:103 prefix_present_edge_closure",
+    "Spectral/DensityGlobalSpectral.lean:84 prefix_degree_wheel_tracking",
+    "Tracking/PrefixBalancedNoise.lean:121 prefix_balanced_tracking",
+    "Tracking/RootedCompletionMax.lean:242 prefix_rooted_upper_failure",
+    "Tracking/NormalizedTrackingAbsolute.lean:19 prefix_good_history",
+    "Tracking/NormalizedTrackingAbsolute.lean:84 uniform_prefix_obligation"
+   ],
+   "statement": "For triangle removal from K_n up to density n^{-1/2+1/2000}: codegrees (1+-n^{-c}), degrees, link-cycle counts (via wheels as 2-balanced templates), polylog^{3*8001+2} rooted upper bounds, with failure <= exp(-(log n)^{4/3}). Proved from Freedman (re-proved) and the moving-star stability, without Joos-Kuhn.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "n/a (the paper cites JK instead)"
+   },
+   "uses_items": [
+    "L04",
+    "L05",
+    "L07",
+    "I21",
+    "I22"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "uniform_prefix_obligation dominated_share 0.269; prefix cone 623 decls / 8,837 lines (452 decls / 6,991 lines exclusive)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal; JK proves a stronger general statement by different means."
+   },
+   "provisional_N": {
+    "grade": "N3 (provisional) / N2 relative to I26",
+    "justification": "Replaces the paper's only black box (JK, 87 pp.) with a triangle-specific proof in which codegree self-correction is a linear max-norm stability statement for the same star-averaged operator; no human neighbour found (BFL2015 needed triangular extensions; JK chains/branching families). Lean-only, no prose exposition; see novelty pass."
+   },
+   "provisional_F": "F2 (strengthened invariant: whole codegree vector controlled in max norm) / downstream reuse of E1"
+  },
+  {
+   "id": "L07",
+   "kind": "lemma (Lean)",
+   "name": "Freedman inequality for finite Markov histories (two-sided and maximal forms)",
+   "source": "lean",
+   "file_line": "n/a (Lean only)",
+   "lean_decls": [
+    "Process/HistoryAdditive.lean:44 history_additive_freedman",
+    "Process/HistoryAdditive.lean:114 history_additive_freedman_maximal",
+    "Probability/PmfMeanNeg.lean:26 history_additive_freedman_two_sided",
+    "Process/History.lean:17-31 History, historyLaw"
+   ],
+   "statement": "P(sum of bounded martingale increments >= r and predictable variance <= V) <= exp(-r^2/(4(V+cr))).",
+   "cited_or_new": {
+    "status": "cited (implicitly)",
+    "bib_key": null,
+    "cue": "n/a"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "All prefix concentration."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Freedman 1975; not in Mathlib d13f23b as far as the extractor shows (re-proved locally)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Freedman 1975 (transfer from probability)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L08",
+   "kind": "lemma (Lean)",
+   "name": "Rooted-count moment bound from intact-survival: E[X^q] <= U((2((q+1)k)+1)^k M)^q if P(F intact) <= U p^{|F|}",
+   "source": "lean",
+   "file_line": "n/a (Lean only)",
+   "lean_decls": [
+    "Process/OverlapVertices.lean:270 rooted_count_moment_from_survival",
+    "Tracking/RootedCompletionMax.lean:55 rooted_tail_from_survival"
+   ],
+   "statement": "Spencer-type extension-count moment bound transferred to the removal process.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "n/a"
+   },
+   "uses_items": [
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Gives the rooted upper bounds (template-small/large) in the Lean prefix."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Close to moment method for extension counts in G(n,p) (Spencer 1990, Janson-Rucinski)."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard moment method."
+   },
+   "provisional_F": null
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "JK stopping estimates: trajectories/stopping times (Secs 5-7), Lemma 7.15 (two general rooted-extension bounds, exponent alpha=2^{v-|I|+1}-2), Lemma 10.1 (failure prob exp(-(log n)^{4/3}))",
+   "bib_key": "joosKuehn2025",
+   "locator": "v2 pp. 9-11, 16-17, 50",
+   "field": "Combinatorics (hypergraph removal process)",
+   "used_at": "prefix.tex:86-201",
+   "status": "cited, not re-proved (paper); a different triangle-specific proof is formalized in Lean",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Spencer branching survival law (1+Qc)^{-1/Q}",
+   "bib_key": "Spencer1995",
+   "locator": "Sec 3, eq (9)",
+   "field": "Probability (branching processes)",
+   "used_at": "stability.tex:6-12",
+   "status": "cited as motivation; the needed fact q'=-Dq^3 is verified directly",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Priority (random permutation) representation of random greedy packing",
+   "bib_key": "Spencer1995; Grable1997; BohmanFriezeLubetzky2015; joosKuehn2025",
+   "locator": "Sec 1; Sec 1; Sec 1.2; Sec 14.1",
+   "field": "Probabilistic combinatorics",
+   "used_at": "queries.tex:11-47",
+   "status": "re-proved (Lemma priority)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Factorial decay of decreasing-priority paths",
+   "bib_key": "PenroseSudbury2005",
+   "locator": "Prop 1 and proof",
+   "field": "Probability (deposition/adsorption processes)",
+   "used_at": "queries.tex:148-184",
+   "status": "re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Sparse quasirandom trace method (closed walks -> spectrum)",
+   "bib_key": "ChungGraham2002",
+   "locator": "Thm 1, Facts 7-8",
+   "field": "Spectral graph theory",
+   "used_at": "stability.tex:110-202",
+   "status": "re-proved in the needed quantitative form",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Bounded-perturbation (Dyson-Phillips) expansion for semigroups",
+   "bib_key": "EngelNagel2000",
+   "locator": "Thm III.1.10",
+   "field": "Functional analysis (operator semigroups)",
+   "used_at": "stability.tex:270-315",
+   "status": "finite form re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Matching estimates for fixed-degree random regular hypergraphs / growing girth",
+   "bib_key": "BalBennett2023",
+   "locator": "Cor 3-4",
+   "field": "Probabilistic combinatorics",
+   "used_at": "introduction.tex:97-101",
+   "status": "background only",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Spectral theorem for real symmetric matrices; Rayleigh quotient; Cauchy-Schwarz ||H||_inf <= sqrt(m)||H||_2; Markov inequality",
+   "bib_key": null,
+   "locator": "textbook",
+   "field": "Linear algebra / probability",
+   "used_at": "stability.tex:175-305; moments.tex:83-85",
+   "status": "standard",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Freedman inequality (Lean only)",
+   "bib_key": null,
+   "locator": "Freedman 1975",
+   "field": "Probability (martingales)",
+   "used_at": "Lean Process/HistoryAdditive.lean:44-114",
+   "status": "re-proved in Lean",
+   "essential_for_headline": true
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Prefix: run the process to density p = n^{-1/2+eps} (eps=1/2000); with prob 1-n^{-omega(1)} the graph has accurate degrees, codegrees, link-cycle counts (lengths <= 8000) and rooted-extension upper bounds. Paper: cite JK. Lean: own proof via Freedman + moving-star codegree stability + moment bounds (L06).",
+   "items": [
+    "I03",
+    "I04",
+    "I05",
+    "I06",
+    "L06",
+    "L07",
+    "L08"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Continuation as a priority scan; edge survival decided by an exact recursive paired test with joint candidate ordering and full exposure.",
+   "items": [
+    "I08",
+    "I09",
+    "I10",
+    "I11",
+    "I12"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "Independent unfolding: fresh priorities per occurrence give exact product (cavity) identities for q_e, q_{e,T}, I_{e,T}.",
+   "items": [
+    "I13",
+    "I14",
+    "I15",
+    "I16",
+    "L01",
+    "L02",
+    "L03"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "Stability: in log-time s, z = log(q_e/q) satisfies z' = -(A/D)z + small; max-norm semigroup bound for e^{-sA/D} (link traces -> star approximation -> P = UV with VU = I+W -> mixed-norm Dyson expansion) closes a bootstrap: q_e = (1+o(1))(1+2Dt)^{-1/2} uniformly.",
+   "items": [
+    "I17",
+    "I18",
+    "I19",
+    "I20",
+    "I21",
+    "I22",
+    "I23",
+    "I24",
+    "I25",
+    "I26",
+    "I27"
+   ]
+  },
+  {
+   "step": 5,
+   "claim": "Coupling: finite vs independent root queries differ by at most P(some triangle type exposed twice); a repetition forces an extra-edge witness in the union of two visited ancestral call paths.",
+   "items": [
+    "I29",
+    "I30",
+    "I31",
+    "I32",
+    "I33",
+    "I34"
+   ]
+  },
+  {
+   "step": 6,
+   "claim": "Witness count: embeddings of path unions with an extra edge carry D^{-B} (suffix template); visiting a prescribed pattern costs C_D^3 (2mu)^l/(h! l1! l2!) via off-pattern failures; summing gives O(D^{15-B}) = o(1/D).",
+   "items": [
+    "I28",
+    "I35",
+    "I36",
+    "I37",
+    "I38",
+    "I39",
+    "I40"
+   ]
+  },
+  {
+   "step": 7,
+   "claim": "Moments: one- and two-root probabilities give E[Y], E[Y^2] = 1+o(1) uniformly on good prefixes; m q(1)/n^{3/2} -> 1/(2sqrt2); bad prefixes cost Cn P(G^c) = o(1); L2, then Markov and Cauchy-Schwarz.",
+   "items": [
+    "I41",
+    "I42",
+    "I02"
+   ]
+  }
+ ],
+ "lean_route_differences": [
+  "Prefix: the paper cites JK; Lean proves a triangle-specific prefix (UniformPrefixObligation, c=1/80000, polylog exponent 3*8001+2 instead of 2^{8002}-2) by Freedman-based tracking with the moving-star codegree stability (L04-L06). This is ~7k exclusive lines of the 21.9k-line target DAG.",
+  "Randomness: Lean uses discrete priorities in Fin N (grid) with explicit grid->continuum error lemmas instead of continuous uniforms (L02).",
+  "Unfolding: Lean defines the product-identity solution analytically by Picard iteration of a \"cavity operator\" in a BCF space (L03) instead of via an a.s.-finite random tree; the unfolding itself is an ExposureTree interpreted \"fresh\" (L01).",
+  "Collision bound: Lean's canonical_collision_sum has the form C^3 (3*prefixWeight)^l / l! (single factorial, constant 3) rather than the paper's (2mu)^l/(h! l1! l2!); the conclusion is the same o(1/D).",
+  "Semigroup: Lean reproduces ||exp(-sP)|| <= 1+2s exactly (graph_star_semigroup_bound) and the mixed-norm expansion abstractly over seminorms (MovingPerturbationFiniteExpansion.lean), reused for both continuation and prefix."
+ ],
+ "dag_summary": {
+  "extractor": "scripts/extract_lean.py -> data/items/188_lean.json",
+  "n_files": 287,
+  "n_lines": 33800,
+  "n_decls": 1892,
+  "kind_counts": {
+   "theorem": 1473,
+   "def": 386,
+   "abbrev": 13,
+   "instance": 11,
+   "structure": 7,
+   "inductive": 2
+  },
+  "proof_dag_decls": 1671,
+  "proof_dag_theorems": 1294,
+  "target_dag_lines": 21948,
+  "dominated_share_of_main_branches": {
+   "sharp_terminal_leave_l2": 0.984,
+   "main_l2_prefix_failure_bound": 0.618,
+   "goodPrefix_normalized_l2": 0.604,
+   "goodPrefix_survival_moments": 0.588,
+   "canonical_collision_sum (E2)": 0.317,
+   "uniform_prefix_obligation (L06)": 0.269,
+   "rooted_counted_traced_repeat_cover": 0.205,
+   "prefix_good_history": 0.145,
+   "actualPairVisitProbability_* (I39)": 0.084,
+   "goodPrefix_cavity_relative (I27)": 0.077,
+   "prefix_present_edge_closure (L06 codegree)": 0.074,
+   "goodPrefix_cavity_semigroup": 0.041,
+   "goodPrefix_uniform_semigroup (E1)": 0.035,
+   "movingStar_mixed_stability (L05)": 0.032,
+   "graph_star_approximation (I22)": 0.031,
+   "graph_star_semigroup_bound (I24)": 0.014
+  },
+  "cones": {
+   "prefix (uniform_prefix_obligation)": "623 decls / 8,837 lines; 452 / 6,991 exclusive of continuation",
+   "continuation (goodPrefix_normalized_l2)": "1,203 decls / 14,771 lines; 1,032 / 12,925 exclusive of prefix",
+   "collision (canonical_collision_sum)": "666 decls / 7,635 lines",
+   "stability (goodPrefix_cavity_relative)": "323 decls / 3,979 lines",
+   "semigroup (goodPrefix_uniform_semigroup)": "190 decls / 2,350 lines",
+   "shared prefix & continuation": "171 decls / 1,846 lines (spectral/star machinery and templates)"
+  },
+  "note": "dominated_share = fraction of target DAG reachable only through the item. Definitions all have tiny dominated shares (<0.01); the extractor's candidate_defs ranking is not informative here. The 20% proxy is met only by the big assembly lemmas, the collision sum (0.317) and the prefix (0.269)."
+ },
+ "eureka_candidates_ranked": [
+  {
+   "rank": 1,
+   "id": "E1",
+   "items": [
+    "I23",
+    "I24",
+    "I25",
+    "I26"
+   ],
+   "name": "Max-norm semigroup stability via star averaging (A/D = P + R, P = UV, VU = I + W, mixed-norm Dyson expansion)",
+   "provisional_N": "N3",
+   "provisional_F": "F5 (edge space -> vertex space) with F2 flavour",
+   "for": [
+    "Named by the paper as one of the two new continuation estimates (introduction.tex:130-133).",
+    "The naive bound loses e^{O(D)} (stability.tex:100-103); this device is what makes the D -> infinity regime work.",
+    "Not a subterm of the goal or of L; the decisive object P = sum of star averages appears nowhere in BFL/JK/Spencer.",
+    "Reused in Lean (moving-star version) to give a self-contained prefix proof replacing JK: evidence of payoff beyond its own theorem."
+   ],
+   "against": [
+    "Each ingredient is classical: trace method (ChungGraham2002), line-graph identity B^T B = 2I + A_line, push-through identity, Dyson-Phillips expansion (EngelNagel2000), mixed-norm remainder trick (random-matrix local laws).",
+    "Pivot distance from L is plausibly 2-3 steps for a strong model that knows it needs l_inf stability.",
+    "Lean dominated share only 0.035 (well below 20%)."
+   ],
+   "nearest_neighbours": [
+    "ChungGraham2002 (trace method; cited)",
+    "EngelNagel2000 Thm III.1.10 (cited)",
+    "BFL2015 / BFL2010 codegree self-correction (scalar critical intervals)",
+    "JK2025 chains and branching families (scalar error hierarchies)"
+   ],
+   "literature_check": "WebSearch (2026-10-09, extended): \"random greedy packing codegree self-correcting linearized operator spectral link cycle counts maximum norm semigroup stability triangle removal\" returned only BFL2010/2011/2015 and unrelated Tuza/Latin-box work; no linear-algebraic max-norm stability device found."
+  },
+  {
+   "rank": 2,
+   "id": "E2",
+   "items": [
+    "I32",
+    "I33",
+    "I34",
+    "I36",
+    "I38",
+    "I39",
+    "I40"
+   ],
+   "name": "o(1/D) collision bound: extra-edge witness + suffix-template D^{-B} gain + off-pattern-weighted visitation (2mu)^l/l!",
+   "provisional_N": "N3",
+   "provisional_F": "F3",
+   "for": [
+    "Paper flags the sub-1/D precision as new and necessary for the second moment (introduction.tex:116-118; witnesses.tex:4-7).",
+    "Lean canonical_collision_sum dominated share 0.317 (passes 20% proxy).",
+    "Weighting each step of a visited path by the off-pattern failure factor b(t)=q(t)^2 converts D^l path counts into poly(D) total, a non-obvious quantitative move."
+   ],
+   "against": [
+    "Decreasing-path 1/l! bounds are standard (Nguyen-Onak 2008 random-rank oracle; PenroseSudbury2005).",
+    "Cycle-in-explored-neighbourhood certificates are the standard way to prove local tree-likeness (Spencer 1995; local-limit papers e.g. Krivelevich-Meszaros-Michaeli-Shikhelman 2019).",
+    "Template extension bounds come from JK Lemma 7.15.",
+    "It is an estimation chain rather than a new concept."
+   ],
+   "nearest_neighbours": [
+    "Nguyen-Onak 2008 / Yoshida-Yamamoto-Ito 2009 (query-tree size via random ranks)",
+    "PenroseSudbury2005",
+    "Spencer1995",
+    "arXiv:1907.07216 Greedy maximal independent sets via local limits"
+   ],
+   "literature_check": "WebSearch (2026-10-09): local computation of greedy MIS (Nguyen-Onak, Yoshida et al.) and local-limit greedy MIS found; none treats growing degree with sub-1/D error."
+  },
+  {
+   "rank": 3,
+   "id": "E3",
+   "items": [
+    "L04",
+    "L05",
+    "L06"
+   ],
+   "name": "Lean-only self-contained prefix via moving-star codegree stability",
+   "provisional_N": "N3 (or N2 as a variant of E1)",
+   "provisional_F": "F2",
+   "for": [
+    "Removes the paper's only black box (JK, 87 pp.) with ~7k lines of a triangle-specific proof; dominated share 0.269.",
+    "BFL2015 needed carefully designed triangular extensions to pass the n^{7/4} barrier; the Lean route controls the whole codegree vector by a linear max-norm stability statement plus link spectral control from wheel counts."
+   ],
+   "against": [
+    "Lean-only: no prose, so its mathematical content is reconstructed from declaration names and signatures; graded with low confidence.",
+    "It is the same device as E1 applied in discrete time; within the family it is a variant (N2) of E1."
+   ],
+   "nearest_neighbours": [
+    "BFL2015 (self-correcting martingales, triangular extensions)",
+    "BFL2010 note (codegrees to 7/4)",
+    "JK2025 (chains/branching families)"
+   ],
+   "literature_check": "Same search as E1; no linear-algebraic codegree-vector stability for removal processes found."
+  },
+  {
+   "rank": 4,
+   "id": "E4",
+   "items": [
+    "I10",
+    "I11",
+    "I12"
+   ],
+   "name": "Paired-focus finite test with one jointly ordered list and expose-all rule",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Paper says joint ordering is \"essential to the later visitation estimate\"; full exposure makes collisions detectable."
+   ],
+   "against": [
+    "Recursive random-rank oracle for greedy MIS/matching is known (Nguyen-Onak 2008); Spencer/Grable backward exploration and adaptive exposure trees are cited."
+   ],
+   "nearest_neighbours": [
+    "Nguyen-Onak 2008",
+    "Grable1997 Secs 1, 4",
+    "Spencer1995 Secs 2-4"
+   ],
+   "literature_check": "WebSearch (2026-10-09) on local computation of greedy MIS: same recursion on the conflict graph."
+  },
+  {
+   "rank": 5,
+   "id": "E5",
+   "items": [
+    "I13",
+    "I15",
+    "I16",
+    "L03"
+   ],
+   "name": "Independent unfolding and exact product (cavity) identities",
+   "provisional_N": "N1",
+   "provisional_F": null,
+   "for": [
+    "Load-bearing: all continuation probabilities live here."
+   ],
+   "against": [
+    "Spencer1995 branching process; belief-propagation computation trees; Lean itself names it the cavity method: transfer."
+   ],
+   "nearest_neighbours": [
+    "Spencer1995",
+    "cavity method / BP computation tree (Weitz 2006-type constructions)"
+   ],
+   "literature_check": "Spencer 1995 abstract page and NYU manuscript listing confirm the continuous-time branching model for random greedy packing."
+  }
+ ],
+ "literature_check_sources": [
+  "https://arxiv.org/abs/1203.4223 (BFL2015 abstract) and full text of arXiv:1203.4223v3 (pdftotext): no constant conjectured; final phase handled only in the lower bound via a uniform permutation and local events (Sec 6).",
+  "https://arxiv.org/abs/2412.15039 and full text v2: Sec 16 heuristic (Poisson degrees, ODE for copy count) gives Conjecture 16.2; for triangles it yields R = n^{3/2}/(2sqrt2).",
+  "https://www.combinatorics.org/ojs/index.php/eljc/article/view/v4i2r19 (Spencer, Real Time Asymptotic Packing, 1996/97): modified greedy, growing D, leave O(N D^{-1/k} ln^c D); not cited by the paper.",
+  "https://arxiv.org/pdf/1907.07216 (greedy MIS via local limits).",
+  "WebSearch results on Nguyen-Onak / Yoshida-Yamamoto-Ito random-rank oracles."
+ ],
+ "correctness_audit": {
+  "verdict": "No gap found on a line-by-line reading of all seven sections. Independently, the Lean library proves the comparator (identical to Thm main) from Mathlib alone, without the JK black box, with no sorry/axiom; this is strong (if the build is confirmed) evidence of correctness.",
+  "checked": [
+   "Exact paired test (queries.tex:89-113): the iff claim and induction on priorities below threshold are correct; parent omission justified by strict threshold.",
+   "Product identities: candidate sets at f and g are disjoint after omitting T, and occurrence variables independent.",
+   "Exact z-equation: (dt/ds) q_e'/q_e + 1 with q_{f,T} = q_f/(1-I_{f,T}) reproduces eq. (exact-z); the constant term is 1 - d_e/D = O(n^{-c}).",
+   "E_0 formula: e^{-sUV} = Id - U int_0^s e^{-vVU} dv V verified by power series; ||e^{-v(I+W)}||_inf <= e^{-v}e^{v} = 1, so ||E_0||_inf <= 1+2s.",
+   "Dyson remainder: n (Cn^{-gamma})^K (log n)^K -> 0 needs K gamma > 1; paper takes > 2.",
+   "Bootstrap closure: needs a < c and a < 2 eps; stated (stability.tex:66-67, 356-358).",
+   "Short-pattern embedding: induced subgraphs of J have <= 2v-2 edges (root vertex orderings), so scaling >= D^v >= 1; count <= kappa (2m)^r D^l p.",
+   "Long-pattern suffix template: S(H,I) = D^L p = n^{-799/2000+o(1)} < 1 with all completion scalings <= 1; kappa <= (2D)^L D^{-B} since L > B.",
+   "Visitation bound: O_x necessary and conditionally independent; fork factor b(max)/(b(u)b(v)) = 1/b(min) <= C_D; at most two root steps; integrates to mu^j/j!.",
+   "Collision sum: 2 (patterns) x 2 (b-factor) x 2D (embedding) = 8D per step; sum of three exponentials = exp(24 D mu) = C_D^{12}; total C_D^{15} D^{-B}.",
+   "Moments: a_n = sqrt(D)/(2 sqrt(1+2D)) -> 1/(2sqrt2); (Y_n-1)^2 <= Cn and P(G^c) superpolynomially small.",
+   "Constant cross-check: JK Sec 16 heuristic with k=2, e(F)=v(F)=3, aut=6 gives p = (6/12)^{1/2} n^{-1/2} and R = n^2 p/2 = n^{3/2}/(2sqrt2)."
+  ],
+  "consistency_checks_passed": [
+   "Paper constants (eps, r0, L, B, H0) match Lean (prefixEpsilon, prefixCycleCap, prefixSuffixLength, prefixSuppression, prefixTemplateCap).",
+   "Lean graph_star_semigroup_bound states exactly ||exp(-sP)|| <= 1+2s.",
+   "Lean goodPrefix_survival_moments has error 8192(1+2D)^48/D^50 = O(D^{-2}) for the first moment, consistent with O(D^{15-B}).",
+   "Lean uniform_prefix_obligation has failure <= exp(-(log n)^{4/3}) exactly as Prop prefix."
+  ],
+  "residual_concerns": [
+   "The paper's specialization of JK conventions (rooted vs independent-root templates, alpha_{H,I}, horizon, pseudorandomness conditions (P1)-(P4) of K_n) was not checked against JK in detail; the Lean bypasses it, so the headline does not depend on it if Lean builds.",
+   "formalization.yaml has no entry for this comparator; whether it is in the release's CI-checked set is unknown.",
+   "Lean-only prefix route (L06) has no prose; its human readability and generality (other F, other starting graphs) are unknown.",
+   "Unreviewed claim; but the result is a sharp constant for a famous process and fits the predicted value exactly."
+  ]
+ },
+ "extraction_friction": [
+  "The paper's only cited black box (JK prefix) is re-proved in Lean by a different method; paper items and Lean items diverge for ~1/3 of the DAG.",
+  "Lean uses statistical-physics naming (cavity, message) absent from the paper; joins by name fail, joins by statement succeed.",
+  "Lean discretizes priorities (Fin N grid), so paper lemmas about continuous priorities map to grid lemmas plus N -> infinity limits.",
+  "Many paper \"lemmas\" are displayed equations or paragraphs inside proofs (link trace, star approximation, E_0 formula, Dyson expansion); environment-based extraction misses them.",
+  "Extractor candidate_defs ranking is dominated by plumbing; no definition exceeds 0.01 dominated share.",
+  "The family is missing from lean/formalization.yaml; catalog fields any_ms_formalized/in_formalization_yaml are False even though a comparator and full proof exist.",
+  "Inline \\emph definitions (call, independent unfolding, extra-edge witness, birth call, ancestral call path, pattern) carry most of the new vocabulary."
+ ]
+}

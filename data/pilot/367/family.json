@@ -1,0 +1,2062 @@
+{
+ "family": 367,
+ "title": "The critical dimension for the one-phase Bernoulli problem",
+ "manuscript_title": "The critical dimension for one-phase Bernoulli minimizers",
+ "manuscript_dir": "preprints/The-critical-dimension-for-one-phase-Bernoulli-minimizers-September-24-2026",
+ "source_root": "data/raw/openai-math",
+ "tex_files": [
+  "build/paper.tex",
+  "sections/history.tex",
+  "sections/reductions.tex",
+  "sections/geometry.tex",
+  "sections/certificate.tex",
+  "sections/flux.tex",
+  "sections/certificate-proof.tex",
+  "sections/cutoffs.tex",
+  "sections/consequences.tex",
+  "appendices/tables.tex",
+  "figures/suspension-cutoff.tex",
+  "references.tex (thebibliography, 20 entries; no .bib)"
+ ],
+ "commit": "fd4aeeb",
+ "analyst_role": "family analyst (paper + Lean, text level; Lean not compiled; Python verification not executed; no reasoning trace for this family)",
+ "base_library_L": "Mathlib d13f23b + the 20-entry thebibliography in build/references.tex",
+ "reasoning_trace": null,
+ "withdrawn_or_revised": "neither (catalog_manuscripts.csv: withdrawn=False, revised=False; in_formalization_yaml=False)",
+ "main_statement": {
+  "file_line": "build/paper.tex:73-80",
+  "latex": "\\begin{theorem}\\label{thm:main}\nEvery nonzero one-homogeneous global minimizer of \\eqref{eq:energy}\nin \\(\\R^d\\), \\(1\\leq d\\leq6\\), is flat. There is a nonflat\none-homogeneous global minimizer in \\(\\R^7\\). Consequently,\n\\[\n  d_*=7.\n\\]\n\\end{theorem}",
+  "paraphrase": "For the Alt-Caffarelli one-phase energy int |grad v|^2 + 1_{v>0} with arbitrary nonnegative Sobolev competitors on balls, there is no singular minimizing cone in dimensions 5 or 6; together with Jerison-Savin (none in d<=4) and De Silva-Jerison (one exists in d=7), the critical dimension is exactly 7. The new content is the exclusion of d=5,6 (Thm 7.4 = cutoffs.tex:315-351). It is exactly the claim that d_* is the top value of the known range {5,6,7}.",
+  "headline_corollaries": [
+   {
+    "file_line": "build/paper.tex:90-99",
+    "paraphrase": "Local minimizers: free boundary smooth outside Sing(u); Sing empty for n<=6, locally finite for n=7, dim_H Sing <= n-7 for n>=7, sharp (DJ cone x R^{n-7})."
+   }
+  ],
+  "relation_to_known_results": [
+   "Caffarelli-Jerison-Kenig 2004: d_*>=4 (no stable smooth-link cones in R^3); conjectured flatness of stable cones for n<=6.",
+   "Jerison-Savin 2015: stable smooth-link cones flat for n<=4 => d_*>=5; their Sec 3.2 explains why Hessian-power tests fail in 4<=n<=6.",
+   "De Silva-Jerison 2009: nonflat minimizing cone in R^7 => d_*<=7.",
+   "Firester-Tsiamis-Wang 2026 (arXiv 2601.16966): symmetric (cohomogeneity-one) cones unstable n<=6, stable n>=7 - symmetric case only.",
+   "Fernandez-Real-Serra 2026 (arXiv 2609.05669): stable classical solutions in R^4 are 1D (removes homogeneity in d=4).",
+   "Mazzoleni-Tortone-Velichkov 2023 (arXiv 2310.06591): states d* in {5,6,7} as the open range.",
+   "Quick web search found no other claimed resolution of d_*=7."
+  ],
+  "lean": {
+   "challenge": "lean/ComparatorChallenges/BernoulliNonflatInSeven.lean (+ .json)",
+   "target": "OAI.Bernoulli.nonflat_in_seven",
+   "solution_module": "OAI.Analysis.BernoulliCone.Main",
+   "solution_decl": "lean/OAI/Analysis/BernoulliCone/Main.lean:10-12 (:= DeSilvaJerison.exists_nonflat_dimension_seven, GlobalMinimizer.lean:76-78)",
+   "verbatim": "theorem nonflat_in_seven : ∃ u : Space 7 → ℝ, GlobalMinimizer u ∧ Nonzero u ∧ OneHomogeneous u ∧ ¬ Flat u",
+   "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+   ],
+   "definition_names": [],
+   "enable_nanoda": false,
+   "match_check": "Matches the second sentence of Thm 1.1 (existence in R^7), i.e. De Silva-Jerison 2009 Thm 1.1, with the paper's exact competitor class (arbitrary nonnegative H^1 competitors on every ball, zero-trace difference as H^1-closure of C_c^infty, volume term included). Flat is a.e. equality with (x.e)_+; nonzero is not a.e. zero. Model.lean is character-identical to the challenge preamble. It does NOT formalize the new direction (flatness for d<=6), d_*=7, or Corollary 1.2."
+  },
+  "formalized_vs_claimed": "Formalized: only the existence of a nonflat 1-homogeneous global minimizer in R^7 (De Silva-Jerison 2009, known). Claimed but not formalized: flatness for d<=6 (the paper's new contribution), d_*=7, regularity and singular-set corollary."
+ },
+ "trust_surface": {
+  "grep_scope": "lean/OAI/Analysis/BernoulliCone/*.lean (91 files, 13,545 lines) + ComparatorChallenges/BernoulliNonflatInSeven.lean",
+  "counts": {
+   "sorry": 0,
+   "axiom": 0,
+   "admit": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque": 0,
+   "partial def": 0,
+   "set_option": 0,
+   "decide": 0,
+   "local instance": 0,
+   "Classical.choice (explicit)": 0,
+   "Classical.epsilon": 0,
+   "#eval": 0,
+   "_root_": 32,
+   "nlinarith": 151,
+   "norm_num": 270
+  },
+  "notes": "The one textual hit for 'admit' is prose in a docstring (HarmonicReplacement.lean:467 'Actual Bernoulli minimizers admit harmonic replacements'). The 32 '_root_' hits are `open scoped _root_.Bernoulli`. The challenge file contains the expected `sorry` placeholder (BernoulliNonflatInSeven.lean:80).",
+  "comparator_permitted_axioms": [
+   "propext",
+   "Quot.sound",
+   "Classical.choice"
+  ],
+  "comparator_flags": {
+   "definition_names": [],
+   "enable_nanoda": false
+  },
+  "computer_assisted": true,
+  "computer_assisted_scope": "The paper's NEW half is computer-assisted (exact rational Python verification of Prop 4.1; verification/ directory with two engines, hashes, independent re-implementation of the interior expansion). The Lean half (known DJ existence) is not computer-assisted beyond tactic automation (nlinarith/norm_num).",
+  "caveat": "Lean not installed; compilation and comparator pass asserted by the release. Python verification not executed here."
+ },
+ "labels": {
+  "A": {
+   "label": "A3",
+   "secondary": {
+    "hard_direction_form": "A5/A1: nonexistence of nonflat one-homogeneous global minimizers in d=5,6 (equivalently: every such minimizer is flat), proved by contradiction with stability",
+    "explicit_rate": false,
+    "alternative_reading": "A1 (universal rigidity 'every nonzero 1-homogeneous global minimizer in R^d, d<=6, is flat') if the existence half (De Silva-Jerison, cited) is treated as context."
+   },
+   "evidence": {
+    "quote": "Every nonzero one-homogeneous global minimizer of \\eqref{eq:energy} in \\(\\R^d\\), \\(1\\leq d\\leq6\\), is flat. There is a nonflat one-homogeneous global minimizer in \\(\\R^7\\). Consequently, \\[ d_*=7. \\]",
+    "file_line": "build/paper.tex:73-80"
+   },
+   "confidence": "medium",
+   "note": "Headline is a sharp threshold (exact value of a critical dimension). The new content is entirely the impossibility half; the existence half is De Silva-Jerison 2009 (and is the only part formalized in Lean)."
+  },
+  "B": {
+   "label": "B1",
+   "flags": {
+    "full_only_with_prior_results": true,
+    "full_only_with_prior_results_detail": "d_*=7 needs Jerison-Savin 2015 (d_*>=5, cited) and De Silva-Jerison 2009 (d_*<=7, cited; formalized in Lean). The paper's own contribution excludes d_* in {5,6}.",
+    "adds_corollaries_for_other_conjectures": true,
+    "adds_corollaries_detail": "Sharp singular-set bound (empty for n<=6, locally finite n=7, dim <= n-7, sharp). Implicitly (not stated by the paper): after the reductions only stability and a smooth link are used, so the argument would also give the Caffarelli-Jerison-Kenig stability conjecture for cones with smooth cross-section in R^6 (and, via suspension, R^5) - flagged as an unclaimed consequence to check."
+   },
+   "evidence": {
+    "quote": "Our main result answers positively the critical-dimension question whether $d_*=7$.",
+    "file_line": "build/sections/history.tex:9-10"
+   },
+   "confidence": "high (as a claim); correctness see correctness_audit",
+   "note": "The posed problem is 'is d_*=7?' (open between 5 and 7 since JS 2015 and DJ 2009). CJK conjectured flatness of stable cones up to n<=6 (JS 2015 p.1); MTV 2023 (arXiv 2310.06591) state d* in {5,6,7}."
+  },
+  "C": {
+   "primary": "C3",
+   "primary_evidence": {
+    "quote": "For the exclusion argument, suppose from now on that \\begin{equation}\\label{red:first-dimension} d=d_*\\in\\{5,6\\},",
+    "file_line": "build/sections/reductions.tex:229-233"
+   },
+   "secondaries": [
+    {
+     "label": "C1",
+     "evidence": {
+      "quote": "we construct a positive scalar $h$ from $w$, the normalized tensor $T/w$, $g$, and $\\nabla g$, and a vector field $Z$",
+      "file_line": "build/sections/history.tex:96-99"
+     },
+     "note": "Auxiliary construction (test h and flux Z) that refutes stability; it is a gadget, not the witnessing object, so C1 is secondary."
+    },
+    {
+     "label": "C4",
+     "evidence": {
+      "quote": "We prove them by weighted sums of tensor squares and exact rational remainder bounds",
+      "file_line": "build/sections/history.tex:119-121"
+     },
+     "note": "Long estimation chain: graph bounds, 4x4 quadratic-form domination, rational slacks, dominated convergence."
+    },
+    {
+     "label": "C5",
+     "evidence": {
+      "quote": "The lower-dimensional classification of Jerison--Savin ... and the dimension-seven minimizing example of De Silva--Jerison ... give $5\\leq d_*\\leq7$.",
+      "file_line": "build/sections/reductions.tex:224-227"
+     },
+     "note": "Invoked without re-proof: Velichkov regularity theory, DFS 2019 higher regularity, Hunter boundary regularity, JS 2015 (d_*>=5), DJ 2009 (d_*<=7), Weiss dimension reduction (corollary)."
+    }
+   ],
+   "computer_assisted": true,
+   "computer_assisted_evidence": {
+    "quote": "The accompanying program \\texttt{verification/checks/reproduce.py} implements the specified calculation and records the individual coefficients as well as these sums.",
+    "file_line": "build/sections/certificate-proof.tex:524-526"
+   },
+   "computer_assisted_note": "Genuine, essential computer assistance: (i) the coefficient polynomials (231 Table-I rows) and Gram blocks (557 Table-II rows) are evidently the output of a numerical SOS/SDP search (Parrilo-style), not stated how found; (ii) verification of the interior inequality expands to 1714 nonzero scalar-graph keys and is done by exact rational arithmetic in Python (two engines; independent engine matched 1714/1714 keys, verification/independent-certificate/output/oracle-comparison.json). The README states the checks 'do not certify equivalence between mathematical formulas and code, or the analytic proof'. Not Lean.",
+   "ih_strengthened": false,
+   "ih_template": null,
+   "ih_evidence": {
+    "quote": "Since its dimension is $d-1<d_*$, it is flat.",
+    "file_line": "build/sections/reductions.tex:258"
+   },
+   "ih_note": "Only a minimal-dimension (first critical dimension) argument: off-origin blowups live in dimension d-1<d_* and are flat by minimality of d_*. No induction hypothesis is strengthened; no descent beyond one step, so C2 is not listed (codebook: minimal counterexample is C3).",
+   "confidence": "high"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "P21+P22 (universal algebraic certificate and the flux pair (h,Z)); supporting: P23 (fourth-derivative elimination), P25 (boundary reflection parity)",
+   "evidence": {
+    "quote": "Our proof uses the normalized shape of the Hessian to construct both a scalar test and a separate vector field whose divergence controls the test's energy.",
+    "file_line": "build/sections/history.tex:78-80"
+   },
+   "confidence": "low-medium",
+   "caveats": [
+    "The paper itself names Jerison-Savin's 'functions of the Hessian satisfying inequalities for the linearized free-boundary problem' (history.tex:33-34) and Simons 1968 as precedents, and Parrilo 2003 for Gram certificates. A strict reading of the N2 rule ('precedents the paper names itself') could cap P22 at N2 and the family at D2; the judge must decide whether a non-gradient flux plus a machine-found universal polynomial certificate is a 'variant' of JS's w^alpha subsolution.",
+    "The certificate's content is a large machine-found object; whether its discovery counts as a eureka step or as search (SDP) is a framing question for test 4.",
+    "Everything else (reductions, stability, Bochner, cutoffs) is standard N0-N1."
+   ],
+   "flag_builds_on_prior_model_result": "no (provisional; see provenance)"
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Partial differential equations",
+    "msc2020": [
+     "35R35",
+     "49Q10",
+     "35B65",
+     "35J25"
+    ],
+    "evidence": {
+     "quote": "\\cataloguesection{Partial differential equations}{9}",
+     "file_line": "overview.tex:822 (entry overview.tex:834)"
+    },
+    "confidence": "high"
+   },
+   "lean_dir_field": {
+    "dir": "OAI/Analysis/BernoulliCone",
+    "field": "Analysis",
+    "confidence": "high",
+    "note": "Imports only Mathlib (catalog lean_dirs_imported is empty; extractor imported_oai_dirs=[])."
+   },
+   "method_fields": [
+    {
+     "field": "Free-boundary regularity theory (35R35): Alt-Caffarelli/Weiss/De Silva/Velichkov",
+     "tag": "essential",
+     "what": "Lipschitz, nondegeneracy, blowup compactness and homogeneity, flatness => C^{1,alpha}, higher regularity (DFS 2019), JS d_*>=5, DJ d_*<=7",
+     "evidence": {
+      "quote": "We use the constant-coefficient theory with $\\Lambda=1$ in \\cite{Velichkov2023}",
+      "file_line": "build/sections/reductions.tex:60-61"
+     }
+    },
+    {
+     "field": "Riemannian/spherical tensor calculus and Bochner-Simons identities (53C21, 58J05)",
+     "tag": "essential",
+     "what": "Codazzi tensor T, Delta T=mT, Ricci commutator, Bochner, warped-product suspension",
+     "evidence": {
+      "quote": "Thus $T$ is Codazzi",
+      "file_line": "build/sections/geometry.tex:80"
+     }
+    },
+    {
+     "field": "Calculus of variations: second variation / stability, sharp Hardy constant (49K20, 26D10)",
+     "tag": "essential",
+     "what": "Stability inequality with constant 4 on S^5",
+     "evidence": {
+      "quote": "The angular constant comes from the sharp radial Hardy threshold",
+      "file_line": "build/sections/geometry.tex:482"
+     }
+    },
+    {
+     "field": "Real algebraic geometry / polynomial optimization: SOS Gram-matrix certificates (14P10, 90C22)",
+     "tag": "essential",
+     "what": "Interior and boundary polynomial inequalities certified by Gram blocks + rational remainder bounds",
+     "evidence": {
+      "quote": "The positive tensor squares below have the form of Gram-matrix certificates for polynomial positivity; compare \\cite[Section~3.2]{Parrilo2003}.",
+      "file_line": "build/sections/certificate-proof.tex:66-68"
+     }
+    },
+    {
+     "field": "Invariant theory / representation theory of O(5) and S_r on tensors (15A72, 20C30)",
+     "tag": "essential",
+     "what": "Equivariant tensor polynomials as graphs; symmetric trace-free and hook projections",
+     "evidence": {
+      "quote": "the hook operator is $48Q_0P_0$",
+      "file_line": "build/sections/certificate-proof.tex:194"
+     }
+    },
+    {
+     "field": "Elliptic PDE: maximum principle, Hopf lemma, boundary regularity (35J05, 35B50)",
+     "tag": "essential",
+     "what": "s^2<1, H>0; smoothness up to boundary",
+     "evidence": {
+      "quote": "The Hopf boundary lemma therefore gives",
+      "file_line": "build/sections/geometry.tex:132"
+     }
+    },
+    {
+     "field": "Computer-assisted exact arithmetic (65G20 / 68V05)",
+     "tag": "essential",
+     "what": "Exact rational verification of 1714-key interior expansion and 11-coefficient boundary expansion",
+     "evidence": {
+      "quote": "These finite sums use only integer and rational operations and comparisons",
+      "file_line": "build/sections/certificate-proof.tex:523-524"
+     }
+    },
+    {
+     "field": "Geometric measure theory: dimension reduction (49Q20, 28A78)",
+     "tag": "corollary-only",
+     "what": "Singular-set bound",
+     "evidence": {
+      "quote": "This step uses the dimension-reduction theorem of Weiss",
+      "file_line": "build/sections/consequences.tex:5-6"
+     }
+    },
+    {
+     "field": "Minimal surfaces (Simons cone theory, 53A10)",
+     "tag": "background-cited",
+     "what": "Analogy for Hessian test functions",
+     "evidence": {
+      "quote": "The use of the harmonic Hessian has a geometric precedent in Simons's second-fundamental-form argument",
+      "file_line": "build/sections/history.tex:66-67"
+     }
+    }
+   ],
+   "cross_field_count": 6,
+   "share_of_invoked_theorems_from_other_fields": "about 0.2 (of ~10 invoked external results, only Parrilo's Gram method and the Hardy/Hopf classical tools come from outside free-boundary theory; most cross-field content is technique, not invoked theorems)"
+  }
+ },
+ "items": [
+  {
+   "id": "P01",
+   "kind": "definition",
+   "name": "One-phase Bernoulli energy J(v;B) and global minimizer (ballwise, arbitrary nonnegative H^1 competitors with v-u in H^1_0(B))",
+   "file_line": "build/paper.tex:54-63",
+   "statement": "J(v;B)=int_B |grad v|^2 + 1_{v>0}; u>=0 in H^1_loc(R^d) is a global minimizer if J(u;B)<=J(v;B) for every ball B and nonnegative v with v-u in H^1_0(B).",
+   "cited_or_new": {
+    "status": "classical, cited",
+    "bib_key": "AltCaffarelli1981",
+    "cue": "For a nonnegative function ... the one-phase Bernoulli energy is"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Object of the theorem."
+   },
+   "analytic_check": {
+    "verdict": "analytic (occurs in goal)",
+    "detail": "Subterm of the main statement; Lean Model.lean GlobalMinimizer/LocalMinimizer/energy are the comparator signature."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Alt-Caffarelli 1981."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "OAI.Bernoulli.energy (Model.lean)",
+     "OAI.Bernoulli.LocalMinimizer",
+     "OAI.Bernoulli.GlobalMinimizer",
+     "H1, H10, H1Loc, WeakGradient, Test"
+    ],
+    "note": "Mathlib has no Sobolev spaces at d13f23b; H1/H10 are defined ad hoc (weak gradient tested against C_c^infty, H10 as H1-closure of tests)."
+   }
+  },
+  {
+   "id": "P02",
+   "kind": "definition",
+   "name": "One-homogeneous; flat solutions (x.e)_+; critical dimension d_* (least dimension with a nonzero nonflat one-homogeneous global minimizer)",
+   "file_line": "build/paper.tex:64-71",
+   "statement": "u(rx)=r u(x) a.e.; flat = (x.e)_+, |e|=1; d_* = least d admitting a nonzero, nonflat, one-homogeneous global minimizer.",
+   "cited_or_new": {
+    "status": "classical, cited",
+    "bib_key": "Weiss1999; Velichkov2023; JerisonSavin2015",
+    "cue": "Let \\(d_*\\) be the least dimension containing a nonzero, nonflat"
+   },
+   "uses_items": [
+    "P01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Headline quantity."
+   },
+   "analytic_check": {
+    "verdict": "analytic (occurs in goal)",
+    "detail": "Goal statement; Lean OneHomogeneous, Flat, Nonzero."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard critical-dimension notion (Weiss 1999; CJK 2004; Velichkov 2023 Ch. 10)."
+   },
+   "provisional_F": null,
+   "lean": {
+    "decls": [
+     "OAI.Bernoulli.OneHomogeneous",
+     "OAI.Bernoulli.Flat",
+     "OAI.Bernoulli.Nonzero"
+    ]
+   }
+  },
+  {
+   "id": "P03",
+   "kind": "definition",
+   "name": "Local minimizer, blowup at a free-boundary point, regular vs singular points, Sing(u)",
+   "file_line": "build/paper.tex:82-88",
+   "statement": "Local minimizer in open D: same comparison on balls compactly in D; blowup = locally uniform limit of u(x0+rx)/r; regular if some blowup is flat.",
+   "cited_or_new": {
+    "status": "classical, cited",
+    "bib_key": "Velichkov2023",
+    "cue": "A point is regular if one such limit is a flat solution"
+   },
+   "uses_items": [
+    "P01",
+    "P02"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Needed for reductions and Corollary 1.2."
+   },
+   "analytic_check": {
+    "verdict": "analytic (occurs in corollary goal)",
+    "detail": "Sing(u) occurs in Corollary 1.2."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Velichkov 2023 Ch. 6-10."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P04",
+   "kind": "proposition",
+   "name": "Regularity and blowups of minimizers (Lipschitz, nondegeneracy, compactness, homogeneous blowups, flat blowup => smooth free boundary with grad u = N_E)",
+   "file_line": "build/sections/reductions.tex:31-120",
+   "statement": "(i) locally Lipschitz, harmonic in {u>0}; (ii) blowup sequences subconverge to nonzero one-homogeneous global minimizers; (iii) a flat blowup gives a smooth one-sided free boundary with u=0, grad u=N_E.",
+   "cited_or_new": {
+    "status": "cited (assembled from literature)",
+    "bib_key": "Velichkov2023; DeSilvaFerrariSalsa2019; DeSilvaFerrariSalsa2014; Hunter2014",
+    "cue": "We use the constant-coefficient theory with $\\Lambda=1$ in \\cite{Velichkov2023}"
+   },
+   "uses_items": [
+    "P01",
+    "P03"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Gives the smooth link and boundary conditions on which all tensor calculus rests."
+   },
+   "analytic_check": {
+    "verdict": "analytic (in L)",
+    "detail": "Each part is a cited theorem in L (Velichkov Thm 3.1, Prop 4.1, 6.2, 9.12, Thm 8.1, Cor 8.2, Prop 7.1; DFS2019 Thm 1.1/Cor 1.2)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Pure citation; the paper only checks hypotheses (one-phase as a two-phase viscosity solution with G(b)=1+b)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P05",
+   "kind": "lemma",
+   "name": "Translation invariance of an off-origin blowup of a one-homogeneous minimizer",
+   "file_line": "build/sections/reductions.tex:136-165",
+   "statement": "If u is one-homogeneous and 0!=x0 in free boundary, any blowup U satisfies U(y+t x0)=U(y).",
+   "cited_or_new": {
+    "status": "classical, re-proved",
+    "bib_key": "Velichkov2023",
+    "cue": "compare \\cite[Lemmas~10.9--10.10]{Velichkov2023}"
+   },
+   "uses_items": [
+    "P04"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Dimension-reduction step."
+   },
+   "analytic_check": {
+    "verdict": "analytic (in L)",
+    "detail": "Velichkov Lemma 10.9."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard dimension-reduction lemma (Federer/Weiss; Velichkov 10.9)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P06",
+   "kind": "lemma",
+   "name": "Minimality of a translation-invariant factor",
+   "file_line": "build/sections/reductions.tex:167-207",
+   "statement": "If U(y,s)=v(y) is a global minimizer in R^k x R then v is a global minimizer in R^k (cutoff eta_L in s; energy gain 2L delta beats bounded transition cost).",
+   "cited_or_new": {
+    "status": "classical, re-proved",
+    "bib_key": "Velichkov2023",
+    "cue": "compare \\cite[Lemmas~10.9--10.10]{Velichkov2023}"
+   },
+   "uses_items": [
+    "P01"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Dimension-reduction step."
+   },
+   "analytic_check": {
+    "verdict": "analytic (in L)",
+    "detail": "Velichkov Lemma 10.10."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P07",
+   "kind": "lemma (inline)",
+   "name": "Flatness in dimension one",
+   "file_line": "build/sections/reductions.tex:209-222",
+   "statement": "Nonnegative 1-homogeneous minimizers on R are b x_+ with b=1 (two slopes ruled out by a bump; b=1 from a translation family).",
+   "cited_or_new": {
+    "status": "classical, re-proved",
+    "bib_key": null,
+    "cue": "This proves flatness in dimension one directly."
+   },
+   "uses_items": [
+    "P01"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Base case for d_*>=2; superseded by JS d_*>=5."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "detail": "Elementary."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Folklore (Alt-Caffarelli)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P08",
+   "kind": "proposition",
+   "name": "Smooth original link: on a first nonflat cone in d in {5,6}, every nonzero free-boundary point is regular; link components are smooth domains with Delta g=-m g, g=0, grad g=N",
+   "file_line": "build/sections/reductions.tex:224-292",
+   "statement": "Assume d=d_* in {5,6}; fix a nonzero nonflat 1-homogeneous minimizer u; off-origin blowups are (d-1)-dimensional minimizers times R, hence flat; so the spherical positive set has finitely many smooth components with the overdetermined Bernoulli boundary conditions.",
+   "cited_or_new": {
+    "status": "standard argument, re-assembled",
+    "bib_key": "JerisonSavin2015; DeSilvaJerison2009; Velichkov2023",
+    "cue": "The lower-dimensional classification of Jerison--Savin ... give $5\\leq d_*\\leq7$"
+   },
+   "uses_items": [
+    "P04",
+    "P05",
+    "P06"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Puts the problem on a smooth spherical domain; uses minimality of d_* (first-dimension argument)."
+   },
+   "analytic_check": {
+    "verdict": "analytic (in L)",
+    "detail": "Smooth-link reduction is the standard first step (CJK 2004; JS 2015 assume smooth cross-section)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard minimal-dimension/dimension-reduction argument."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P09",
+   "kind": "lemma",
+   "name": "Selection of a nonflat component (T_o = Hess g_o + g_o Id not identically zero on some component)",
+   "file_line": "build/sections/reductions.tex:294-335",
+   "statement": "If T_o vanished on every component, each positive cone is a half-space with |b|=1, and disjoint closures force a single half-space, contradicting nonflatness.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "There is a component $\\Omega_o$ ... such that"
+   },
+   "uses_items": [
+    "P08"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Supplies the positive mass I_o in the final contradiction."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "detail": "Elementary."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P10",
+   "kind": "proposition",
+   "name": "Suspension preserves global minimality; suspended link on S^5 with two singular tips p_+-; g~(Phi(t,y))=sin t g_o(y)",
+   "file_line": "build/sections/reductions.tex:339-413",
+   "statement": "u minimizer in R^k => u(x,s)=u(x) minimizer in R^{k+1}; for the d=5 cone, the singular set of the product is the axis, meeting S^5 only at two tips; the link component is the spherical suspension of Omega_o.",
+   "cited_or_new": {
+    "status": "classical (minimality of cylinders), new use",
+    "bib_key": null,
+    "cue": "If $u\\geq0$ is a global minimizer in $\\R^k$, then"
+   },
+   "uses_items": [
+    "P08",
+    "P09"
+   ],
+   "load_bearing_guess": {
+    "level": "medium-high",
+    "reason": "Lets the d=5 case be handled on the same S^5 working domain with the same certificate (m=5, Hardy constant 4) as d=6, at the price of two tips."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic as a device (suspension does not occur in goal); minimality of products is in L-adjacent literature (Velichkov Ch. 10; used for sharpness in Weiss/DJ)",
+    "detail": "Product minimality is classical; using the suspension to unify d=5 and d=6 into one tensor certificate in dimension 5 is the device."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Minimality of cylinders is classical (also used in Cor 1.2 sharpness and in dimension-reduction literature); the unification is a convenience, not a large budget drop (alternative: a second certificate on S^4 with constant 9/4)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P11",
+   "kind": "definition",
+   "name": "Working domain: Omega in S^5 = Omega_o (m_o=5) or its suspension (m_o=4); Sigma = tips; regular boundary",
+   "file_line": "build/sections/reductions.tex:415-435",
+   "statement": "Fix Omega subset S^5 connected, from a nonnegative 1-homogeneous global minimizer in R^6; tests supported away from Sigma.",
+   "cited_or_new": {
+    "status": "new (notation)",
+    "bib_key": null,
+    "cue": "Notation for the remaining argument."
+   },
+   "uses_items": [
+    "P10"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Notation."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "detail": "Notation."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Notation."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P12",
+   "kind": "definition",
+   "name": "Spherical jet data p=grad g, T=Hess g+g Id, B=grad T, w=|T|, s^2=g^2+|p|^2",
+   "file_line": "build/sections/geometry.tex:26-43",
+   "statement": "T is the tangential block of r D^2u; s^2=|D u|^2 on the sphere.",
+   "cited_or_new": {
+    "status": "classical",
+    "bib_key": null,
+    "cue": "For a smooth solution of $\\Delta g=-mg$ on a domain in $S^m$, set"
+   },
+   "uses_items": [
+    "P11"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "All later objects are built from these."
+   },
+   "analytic_check": {
+    "verdict": "analytic (in L)",
+    "detail": "T is (r times) the ambient Hessian D^2u restricted to the sphere; JS 2015 use w=||D^2u|| (Sec 3)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "JS 2015 Sec. 3 (w=||D^2u||); CJK."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P13",
+   "kind": "proposition",
+   "name": "Interior identities: T symmetric trace-free Codazzi; B fully symmetric trace-free; Ricci commutator for B; Delta T=mT; Delta w^2=2m w^2+2|B|^2; Delta s^2=2w^2; |grad w|<=|B|",
+   "file_line": "build/sections/geometry.tex:45-106",
+   "statement": "Spherical Simons/Bochner-type identities for g with Delta g=-mg.",
+   "cited_or_new": {
+    "status": "classical, re-proved",
+    "bib_key": null,
+    "cue": "The following identities hold:"
+   },
+   "uses_items": [
+    "P12"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Bochner identity drives the weighted integrability (P35); commutator and Delta T=mT drive the 4th-derivative elimination (P23)."
+   },
+   "analytic_check": {
+    "verdict": "analytic (in L)",
+    "detail": "Standard Bochner/Simons computations; JS (3.1) equivalent in Euclidean form."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Simons 1968 / JS 2015 Prop 3.1 style identities."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P14",
+   "kind": "lemma",
+   "name": "Strict gradient bound s_o^2<1 inside; H_o>0, T_o p_o=-H_o p_o, w_o>0 on the boundary",
+   "file_line": "build/sections/geometry.tex:108-141",
+   "statement": "Subharmonicity of s^2 and Hopf lemma.",
+   "cited_or_new": {
+    "status": "classical, re-proved",
+    "bib_key": null,
+    "cue": "The Hopf boundary lemma therefore gives"
+   },
+   "uses_items": [
+    "P13"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "H>0 and w>0 on boundary are needed for the boundary certificate and the cutoffs; s^2<=1 is the constraint chi>=0 of the certificate."
+   },
+   "analytic_check": {
+    "verdict": "analytic (in L)",
+    "detail": "JS 2015 Sec 2.2: |grad u|^2/2 subharmonic, Hopf gives H>0."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Same argument as JS 2015 Sec 2.2."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P15",
+   "kind": "proposition",
+   "name": "Boundary jets: T_{N alpha}=0, T_{alpha beta}=second fundamental form, H=tr h; odd-normal components of B determined pointwise (B_{N alpha beta}=T_NN T_ab-(T^2)_ab, B_NNN=w^2); normalized A, lambda=-H/w, S_0=lambda A-A^2, model tensor V; d_N w = w^2(2 lambda - tr A^3)",
+   "file_line": "build/sections/geometry.tex:147-242",
+   "statement": "Odd-normal part of B/w^2 equals V built from (A,p).",
+   "cited_or_new": {
+    "status": "classical computation; V normalization new",
+    "bib_key": null,
+    "cue": "The components with an odd number of normal slots are thus determined"
+   },
+   "uses_items": [
+    "P12",
+    "P13",
+    "P14"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Feeds the boundary certificate (P25/P26)."
+   },
+   "analytic_check": {
+    "verdict": "analytic (in L)",
+    "detail": "JS 2015 (2.2): u_iin=u_nn u_ii-u_ii^2, u_nnn=sum u_kk^2 are exactly these identities; V is their tensorial normalization."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "JS 2015 eq. (2.2) contains the odd-normal jet identities; V is a coordinate-free repackaging."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P16",
+   "kind": "proposition",
+   "name": "Suspended data: T~=rho^{-1}T_o, B~ components, w~=rho^{-1}w_o, |B~|^2=rho^{-4}(|B_o|^2+3c^2 w_o^2), H~=rho^{-1}H_o, measures rho^4 dt dV_o",
+   "file_line": "build/sections/geometry.tex:246-332",
+   "statement": "Warped-product computation for the suspension.",
+   "cited_or_new": {
+    "status": "new (routine computation)",
+    "bib_key": null,
+    "cue": "the data satisfy"
+   },
+   "uses_items": [
+    "P10",
+    "P13",
+    "P15"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Needed for the tip cutoff integrability."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "detail": "Routine warped-product calculus."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P17",
+   "kind": "proposition",
+   "name": "Euclidean stability on a component: int_D |grad phi|^2 >= int_{dD} H_E phi^2 for smooth phi compactly supported away from vertex/singular points, arbitrary trace",
+   "file_line": "build/sections/geometry.tex:348-480",
+   "statement": "Second variation of J under (F+eps phi)_+ competitor.",
+   "cited_or_new": {
+    "status": "classical, re-proved",
+    "bib_key": "CaffarelliJerisonKenig2004 (main lemma, not cited at this point)",
+    "cue": "We derive stability directly from the minimizing property"
+   },
+   "uses_items": [
+    "P04",
+    "P11"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Stability is the only property of the cone used after the reductions."
+   },
+   "analytic_check": {
+    "verdict": "analytic (in L)",
+    "detail": "CJK 2004 main lemma = JS 2015 (2.4)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "CJK 2004; JS 2015 eq. (2.4)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P18",
+   "kind": "corollary",
+   "name": "Spherical stability on S^5: int_{dOmega} H v^2 <= int_Omega |grad v|^2 + 4 v^2",
+   "file_line": "build/sections/geometry.tex:487-556",
+   "statement": "Separation of variables plus sharp radial Hardy constant beta^2=((m-1)/2)^2=4 for m=5.",
+   "cited_or_new": {
+    "status": "classical, re-proved",
+    "bib_key": "JerisonSavin2015",
+    "cue": "The angular constant comes from the sharp radial Hardy threshold, which also enters the cone instability criteria in \\cite[Propositions~2.1--2.2]{JerisonSavin2015}"
+   },
+   "uses_items": [
+    "P17"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The inequality to be contradicted."
+   },
+   "analytic_check": {
+    "verdict": "analytic (in L)",
+    "detail": "JS 2015 Prop 2.1-2.2 (lambda >= (n-2)^2/4)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "JS 2015 Prop 2.1."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P19",
+   "kind": "definition",
+   "name": "Constants a=29/50, Q=250000, eps_*=438907/12000000, delta_*=6984137359/31250000000; STF^r(R^5)",
+   "file_line": "build/sections/certificate.tex:5-15",
+   "statement": "Fixed rational parameters of the certificate; a in (1/2,1).",
+   "cited_or_new": {
+    "status": "new (parameters)",
+    "bib_key": null,
+    "cue": "Fix"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Parameters; a in (1/2,1) is needed for both the certificate and the weighted Bochner estimate."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "detail": "Numbers."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Parameter choice."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P20",
+   "kind": "definition",
+   "name": "Formal normalized derivation D_l on tensor polynomials in (A,p,g,delta): D_l A=X_l - q_l A, D_l p=wA - g z delta, D_l g=z p, with free STF three-tensor X and free scalars w,z (z homogenizing)",
+   "file_line": "build/sections/certificate.tex:17-31; build/sections/flux.tex:38-73",
+   "statement": "Jet-space encoding of covariant differentiation of functions of the normalized Hessian shape A=T/w, with q_l=X_lij A_ij = grad log w.",
+   "cited_or_new": {
+    "status": "new (encoding)",
+    "bib_key": null,
+    "cue": "On tensor polynomials in $A,p,g,\\delta$, define $D_l$ by the product rule"
+   },
+   "uses_items": [
+    "P12",
+    "P13"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Turns the geometric differential inequalities into a finite-dimensional polynomial inequality in free variables (change of representation)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic (not a subterm of goal or L)",
+    "detail": "Formal jet variables are standard in SOS/PDE (e.g. 'jet space' relaxations), but this specific normalized encoding (A on unit sphere of STF^2, q=X:A) is not in L."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Jet-space/Lie-derivative encodings of differential inequalities for SOS are known (Valmorbida-Ahmadi-Papachristodoulou; Chernyshenko et al. auxiliary-function SOS); normalization by w is new to this problem."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P21",
+   "kind": "proposition",
+   "name": "Universal algebraic certificate: there are rational equivariant tensor polynomials f,U,K,M,P (Table I, 231 rows) such that the interior polynomial I >= eps_*(z^2+|ell|^2) whenever g^2+|p|^2<=1, and the boundary polynomial S >= delta_* for unit STF A with Ap=lambda p, lambda<0, |p|=1, g=0; U,K even in p, P=0 at g=0",
+   "file_line": "build/sections/certificate.tex:33-71 (proof: build/sections/certificate-proof.tex:1-674; data: build/appendices/tables.tex)",
+   "statement": "I = z^2[5 U:A + C(delta A+delta A) - 4f] + [D G + (2a-1) q G]:X + w[D M + (2a+1) q M] + z[D P + 2a q P] + f|ell|^2 - (D f + 2a q f).ell >= eps_*(z^2+|ell|^2); S = -lambda f + U:(S_0+p p) + C p V + p.M >= delta_*.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "There are rational tensor polynomials $f,U_{jk},K_{lijk},M_l,P_l$"
+   },
+   "uses_items": [
+    "P19",
+    "P20",
+    "P22",
+    "P23",
+    "P25",
+    "P28",
+    "P29",
+    "P31",
+    "P32"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "Without it there is no contradiction; it replaces the JS power test w^alpha whose interior and boundary windows are incompatible for n=5,6 (JS Sec 3.2)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "detail": "f,U,K,M,P are not subterms of the goal or of any statement in L; the existence of such polynomials is the whole content."
+   },
+   "provisional_N": {
+    "grade": "N3 candidate",
+    "justification": "No neighbour found in quick searches (JS 2015 uses w^alpha and w^2=sum lambda_+^2 + a sum lambda_-^2, subsolution form; FR-Serra 2026 is dim 4 stable solutions; SOS-Lyapunov PDE literature is control-theoretic). Paper names JS as precedent for 'functions of the Hessian' and Parrilo for Gram certificates."
+   },
+   "provisional_F": "F3 (auxiliary construction), with F5 (change of representation via P20) and F4 flavour (Z is a flux/potential-type field)"
+  },
+  {
+   "id": "P22",
+   "kind": "definition / key construction",
+   "name": "Flux pair: h = w^a sqrt(f(A,p,g)), Z_l = w^{2a}(G_lijk X_ijk + w M_l + P_l), G_lijk = delta_li U_jk + C_lijk, C_lijk = K_lijk - K_iljk",
+   "file_line": "build/sections/flux.tex:16-23,119-126",
+   "statement": "Scalar test h and vector field Z built from the normalized Hessian shape, g, grad g and grad T/w; target inequalities div Z >= |grad h|^2+4h^2+eps w^{2a} in Omega_+, N.Z + H h^2 >= 0 on the regular boundary.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "JerisonSavin2015 (precedent: functions of the Hessian); Simons1968",
+    "cue": "Our proof uses the normalized shape of the Hessian to construct both a scalar test and a separate vector field whose divergence controls the test's energy"
+   },
+   "uses_items": [
+    "P12",
+    "P20",
+    "P21"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "Core of the contradiction; Z is the device that decouples interior and boundary (JS's obstruction)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "detail": "Neither h (beyond the w^a factor) nor Z occurs in the goal or in L; the subsolution approach of JS corresponds to Z = h grad h, which this generalizes with non-gradient, curvature-skew terms."
+   },
+   "provisional_N": {
+    "grade": "N3 candidate",
+    "justification": "Closest: JS 2015 Sec 3-4 (v=w^alpha; w^2 = sum lambda_+^2 + a sum lambda_-^2), a strict subsolution criterion (Prop 2.1-2.2). New: (i) a non-gradient flux Z, (ii) dependence on g and grad g (not only Hessian eigenvalues), (iii) free coefficient polynomials found by certificate."
+   },
+   "provisional_F": "F3"
+  },
+  {
+   "id": "P23",
+   "kind": "lemma",
+   "name": "Normalized differentiation and fourth-derivative elimination: (1/w) G_lijk grad_l B_ijk = 5 U:A + C_lijk(delta_lj A_ik + delta_lk A_ij)",
+   "file_line": "build/sections/flux.tex:38-103",
+   "statement": "Choosing G = delta U + (skew in l,i) makes every undetermined fourth derivative of g drop out, via Delta T = 5T and the Ricci commutator of B.",
+   "cited_or_new": {
+    "status": "new (design constraint)",
+    "bib_key": null,
+    "cue": "This calculation eliminates every undetermined fourth derivative of $g$."
+   },
+   "uses_items": [
+    "P13",
+    "P20"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "Without it div Z contains uncontrolled 4th derivatives; this is what makes the certificate finite-dimensional."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic (as a design principle); the identities used are analytic",
+    "detail": "The two contractions (trace and commutator) are standard Bochner/Weitzenbock identities; restricting the flux ansatz to exactly these contractions is the idea."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Null-Lagrangian / divergence-structure ideas are classical (Weitzenbock, Codazzi, Simons); the restriction of the ansatz is a careful but natural engineering step once one seeks a flux of B."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P24",
+   "kind": "proposition",
+   "name": "Interior comparison div Z >= 4h^2 + |grad h|^2 + eps_* w^{2a}, via the exact divergence identity and completing the square in the free vector ell",
+   "file_line": "build/sections/flux.tex:128-192",
+   "statement": "I|_{z=1} = w^{-2a}(div Z - 4h^2 - |grad h|^2) + f|ell-ell_*|^2, ell_* = F/(2f).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "Differentiating $h$ and completing the square give"
+   },
+   "uses_items": [
+    "P21",
+    "P22",
+    "P23"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "Interior half of the contradiction."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "detail": "Follows from P21-P23."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Mechanical given P21/P22 (square completion is the standard way |grad sqrt f|^2 is linearized)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P25",
+   "kind": "lemma",
+   "name": "Boundary reflection parity: F=p_l G_lijk changes sign under reflection in p^perp, so it kills all even-normal (undetermined) components of B; p.G.B/w^2 = U:(S_0+pp) + C p V",
+   "file_line": "build/sections/flux.tex:208-262",
+   "statement": "Orthogonal equivariance + evenness of U,K in p => F has only odd-normal components; those of B/w^2 equal V.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "At the boundary, reflection in the normal direction removes the derivative components not determined by the boundary conditions."
+   },
+   "uses_items": [
+    "P15",
+    "P21",
+    "P22"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Makes the boundary inequality a pointwise algebraic statement in (A,p)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "detail": "Parity/equivariance arguments are standard; the design (U,K even in p) to exploit them is part of the ansatz."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Standard symmetry argument used as a design constraint."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P26",
+   "kind": "proposition",
+   "name": "Boundary comparison: N.Z + H h^2 = w^{2a+1} S >= delta_* w^{2a+1} > 0",
+   "file_line": "build/sections/flux.tex:264-295",
+   "statement": "Uses P=0 at g=0, P25, and the boundary certificate.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "On the regular side boundary,"
+   },
+   "uses_items": [
+    "P21",
+    "P25"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "Boundary half of the contradiction (replaces JS's boundary inequality 1/H (log v)_nu >= -1)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "detail": "Follows from P21, P25."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Mechanical given P21/P25."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P27",
+   "kind": "lemma",
+   "name": "Uniform field bounds |h|<=Cw^a, |grad h|, |Z| <= C w^a (resp. w^{2a})(1+w+|X|)",
+   "file_line": "build/sections/flux.tex:299-328",
+   "statement": "Compactness of the coefficient domain.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "There is a finite constant $C$"
+   },
+   "uses_items": [
+    "P21",
+    "P22"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Needed for the cutoff argument."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "detail": "Routine."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P28",
+   "kind": "definition",
+   "name": "Tensor-monomial graph encoding (digit triples: g^h (tr A^3)^b w/z; edges carrying A^k between slots/p/ell/X) and Tables I/II",
+   "file_line": "build/sections/certificate-proof.tex:16-62; build/appendices/tables.tex",
+   "statement": "Finite specification of f,U,K,M,P (231 rows) and of 21 Gram blocks (557 rows).",
+   "cited_or_new": {
+    "status": "new (data format)",
+    "bib_key": null,
+    "cue": "a rank-$r$ tensor monomial is encoded by a word of decimal digits"
+   },
+   "uses_items": [
+    "P19"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Plumbing/data format."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "detail": "Encoding."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Plumbing."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P29",
+   "kind": "lemma",
+   "name": "Gram-block comparison forms with scaled projections (sym2, sym3, hook, anti) are PSD; Gamma >= 0 when chi >= 0",
+   "file_line": "build/sections/certificate-proof.tex:64-202",
+   "statement": "Gram-matrix (SOS) certificate in tensor variables; hook projection onto trace-free (2,1)-Young component.",
+   "cited_or_new": {
+    "status": "cited method, new instance",
+    "bib_key": "Parrilo2003",
+    "cue": "compare \\cite[Section~3.2]{Parrilo2003}"
+   },
+   "uses_items": [
+    "P28"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Supplies the nonnegative part of the decomposition."
+   },
+   "analytic_check": {
+    "verdict": "analytic (in L)",
+    "detail": "Gram/SOS certificates are in L (Parrilo 2003); projections are standard representation theory of O(5)/S_r."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Parrilo 2003 Gram-matrix method; Young-symmetrizer projections."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P30",
+   "kind": "lemma",
+   "name": "Closure of the graph calculation (finite, degree two in (w,z,ell,X), at most two copies of X)",
+   "file_line": "build/sections/certificate-proof.tex:204-289",
+   "statement": "Contraction/differentiation rules on graph keys are exact and terminate.",
+   "cited_or_new": {
+    "status": "new (plumbing)",
+    "bib_key": null,
+    "cue": "The preceding rules evaluate all terms"
+   },
+   "uses_items": [
+    "P20",
+    "P28"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Bookkeeping."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "detail": "Bookkeeping."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Plumbing."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P31",
+   "kind": "lemma",
+   "name": "Tensor bounds: ||A||_op^2<=4/5, |A^k|^2<=theta^{k-1}, |tr A^3|^2<=9/20, |X:A|^2<=(5/7)|X|^2, mixed g/p bound",
+   "file_line": "build/sections/certificate-proof.tex:310-379",
+   "statement": "Elementary eigenvalue/Lagrange-multiplier bounds for unit STF A in R^5 and STF projection bound.",
+   "cited_or_new": {
+    "status": "classical (re-proved)",
+    "bib_key": null,
+    "cue": "For the constrained matrix $A$"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Bounds the remainder monomials."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "detail": "Elementary."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Folklore (e.g. Okumura-type trace inequality |tr A^3| <= (n-2)/sqrt(n(n-1)) |A|^3)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P32",
+   "kind": "lemma",
+   "name": "Complete graph bound |M(t)| <= L_t y_i y_j for every retained scalar graph",
+   "file_line": "build/sections/certificate-proof.tex:381-454",
+   "statement": "Classification of graph components with at most two cubic vertices; Cauchy-Schwarz with operator norms.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "Every scalar graph retained"
+   },
+   "uses_items": [
+    "P30",
+    "P31"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Turns 1714 remainder monomials into a 4x4 quadratic form bound."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "detail": "Routine."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P33",
+   "kind": "computation",
+   "name": "Interior remainder and coercive margin: E = Gamma + sum d_i y_i^2 - I has 1714 nonzero keys; |E| <= y^T D0 y <= y^T Dbar y; slacks with nu=(2484,1440,996,304) give coefficients >= eps_* (exact table (5.x))",
+   "file_line": "build/sections/certificate-proof.tex:461-561",
+   "statement": "Exact rational arithmetic; this report re-checked the ten D0<=Dbar comparisons, the four slacks and delta_* from the printed integers.",
+   "cited_or_new": {
+    "status": "new (computer-assisted)",
+    "bib_key": null,
+    "cue": "The accompanying program \\texttt{verification/checks/reproduce.py} implements the specified calculation"
+   },
+   "uses_items": [
+    "P21",
+    "P29",
+    "P32"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "This is where the inequality is actually verified."
+   },
+   "analytic_check": {
+    "verdict": "analytic (computation)",
+    "detail": "Computation."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Verification step of P21."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P34",
+   "kind": "computation",
+   "name": "Boundary reduction to four tangential eigenvalues; E_b has eleven symmetric-monomial coefficients; S >= 1/4 - 1656725282/Q^2 = delta_*",
+   "file_line": "build/sections/certificate-proof.tex:563-674",
+   "statement": "p=e_5, A=diag(x_1..x_4,lambda), lambda=-sum x_i; Lambda >= 0 when sum x_i >= 0.",
+   "cited_or_new": {
+    "status": "new (computer-assisted)",
+    "bib_key": null,
+    "cue": "with exactly the following eleven nonzero coefficients"
+   },
+   "uses_items": [
+    "P21",
+    "P29"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "Boundary verification."
+   },
+   "analytic_check": {
+    "verdict": "analytic (computation)",
+    "detail": "Computation."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Verification step of P21."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P35",
+   "kind": "lemma",
+   "name": "Weighted Bochner estimate: int w_o^{2a-2}|B_o|^2 < infinity for a in (1/2,1), via W_delta = w_o^2 + delta and absorption (4a-2 = 8/25)",
+   "file_line": "build/sections/cutoffs.tex:33-108",
+   "statement": "Regularized Bochner identity integrated against a cutoff controls derivatives near Hessian zeros without any structure of the zero set.",
+   "cited_or_new": {
+    "status": "new (standard technique)",
+    "bib_key": null,
+    "cue": "A regularized Bochner identity gives an integrable weight"
+   },
+   "uses_items": [
+    "P13",
+    "P14"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Lets the normalized fields be cut off near {w=0}; domination for all three error terms."
+   },
+   "analytic_check": {
+    "verdict": "analytic (in L)",
+    "detail": "Same mechanism as Kato/Simons-type integrability arguments (e.g. Schoen-Simon-Yau 1975 use of |A|^{p} with Simons' inequality)."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard regularization (delta-regularized Bochner, absorption with exponent > 1/2)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P36",
+   "kind": "definition",
+   "name": "Product cutoffs xi_j = theta(j w_o) [times theta(j sin t) in the suspension]",
+   "file_line": "build/sections/cutoffs.tex:110-140",
+   "statement": "Smooth cutoffs vanishing near Hessian zeros and near tips.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "Smooth product cutoffs therefore remove both obstructions"
+   },
+   "uses_items": [
+    "P35",
+    "P16"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Needed for rigour."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "detail": "Routine."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P37",
+   "kind": "lemma",
+   "name": "Integrated comparison: eps_* int xi^2 w^{2a} <= int (h^2|grad xi|^2 + 2 xi h grad h.grad xi - 2 xi Z.grad xi)",
+   "file_line": "build/sections/cutoffs.tex:169-208",
+   "statement": "Combine P24, divergence theorem, P26 and P18 applied to v=xi h.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "For each fixed $j\\geq3$"
+   },
+   "uses_items": [
+    "P18",
+    "P24",
+    "P26",
+    "P36"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Assembles the contradiction."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "detail": "Algebra."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine assembly."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P38",
+   "kind": "lemma (inline)",
+   "name": "Vanishing of all three cutoff errors by dominated convergence (dominator C D_o, resp. s_t^{2-2a} D_o in the suspension; 21/25 > -1)",
+   "file_line": "build/sections/cutoffs.tex:222-313",
+   "statement": "Explicit suspension scaling makes the tip errors integrable.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "Dominated convergence therefore makes the right side"
+   },
+   "uses_items": [
+    "P35",
+    "P36",
+    "P37",
+    "P16"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Rigour."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "detail": "Routine."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P39",
+   "kind": "theorem",
+   "name": "Exclusion: the first dimension admitting a nonflat one-homogeneous global minimizer is not 5 or 6",
+   "file_line": "build/sections/cutoffs.tex:315-351",
+   "statement": "Positive mass I_o = int w_o^{2a} > 0 (resp. times int sin^{71/25}) contradicts P37 after j -> infinity.",
+   "cited_or_new": {
+    "status": "new (headline step)",
+    "bib_key": null,
+    "cue": "The first dimension admitting a nonflat one-homogeneous global minimizer cannot be $5$ or $6$."
+   },
+   "uses_items": [
+    "P08",
+    "P09",
+    "P10",
+    "P37",
+    "P38"
+   ],
+   "load_bearing_guess": {
+    "level": "target",
+    "reason": "The new half of the theorem."
+   },
+   "analytic_check": {
+    "verdict": "analytic (is the goal)",
+    "detail": "Goal."
+   },
+   "provisional_N": {
+    "grade": "n/a",
+    "justification": "Target."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P40",
+   "kind": "corollary",
+   "name": "Sharp singular-set bound: Sing empty for n<=6, locally finite for n=7, dim_H <= n-7, attained by DJ cone x R^{n-7}",
+   "file_line": "build/paper.tex:90-99; build/sections/consequences.tex:9-32",
+   "statement": "Weiss dimension reduction with d_*=7; sharpness by products with the De Silva-Jerison cone.",
+   "cited_or_new": {
+    "status": "classical consequence",
+    "bib_key": "Weiss1999; Velichkov2023; DeSilvaJerison2009",
+    "cue": "The upper bound is the standard dimension-reduction consequence of the critical dimension"
+   },
+   "uses_items": [
+    "P41",
+    "P04",
+    "P10"
+   ],
+   "load_bearing_guess": {
+    "level": "low (for headline)",
+    "reason": "Corollary."
+   },
+   "analytic_check": {
+    "verdict": "analytic (in L)",
+    "detail": "Velichkov Thm 1.4/Prop 10.13 with d_*."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P41",
+   "kind": "theorem",
+   "name": "Main theorem: every nonzero 1-homogeneous global minimizer in R^d, d<=6, is flat; there is a nonflat one in R^7; d_*=7",
+   "file_line": "build/paper.tex:73-80",
+   "statement": "Combine JS (d_*>=5), DJ (d_*<=7) and P39.",
+   "cited_or_new": {
+    "status": "new (headline)",
+    "bib_key": "JerisonSavin2015; DeSilvaJerison2009",
+    "cue": "Consequently,"
+   },
+   "uses_items": [
+    "P39"
+   ],
+   "load_bearing_guess": {
+    "level": "target",
+    "reason": "Headline."
+   },
+   "analytic_check": {
+    "verdict": "analytic (is the goal)",
+    "detail": "Goal."
+   },
+   "provisional_N": {
+    "grade": "n/a",
+    "justification": "Target."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L01",
+   "kind": "definition (Lean)",
+   "name": "Model: Test, WeakGradient, H1, H10, H1Loc, energy, LocalMinimizer, GlobalMinimizer, OneHomogeneous, Nonzero, Flat",
+   "file_line": "lean/OAI/Analysis/BernoulliCone/Model.lean:13-77 (character-identical to ComparatorChallenges/BernoulliNonflatInSeven.lean:13-76)",
+   "statement": "Ad hoc Sobolev model on EuclideanSpace R (Fin d).",
+   "cited_or_new": {
+    "status": "new (formalization)",
+    "bib_key": null,
+    "cue": "Full ballwise local comparison. Competitor and gradient are arbitrary Sobolev representatives on the ball"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Comparator signature."
+   },
+   "analytic_check": {
+    "verdict": "analytic (is the goal)",
+    "detail": "Comparator signature closure (12 decls)."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Faithful encodings of standard notions; Mathlib lacks H^1."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L02",
+   "kind": "definition (Lean)",
+   "name": "De Silva-Jerison profile: f(t) = (8-25t^2+15t^4)/(8(1-t^2)^2) - (15/8) t artanh t solving (1-t^2)f''-6tf'+6f=0, root t7, c7, kappa, p, Z(x)=|x| p(x_7/|x|), U=kappa Z (axisymmetric double cone in R^7)",
+   "file_line": "lean/OAI/Analysis/BernoulliCone/LowerSupport.lean:18-300",
+   "statement": "The DJ cone.",
+   "cited_or_new": {
+    "status": "classical, cited",
+    "bib_key": "DeSilvaJerison2009",
+    "cue": "The concrete seven-dimensional cone belonging to the De Silva-Jerison profile"
+   },
+   "uses_items": [
+    "L01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Witness of the formalized statement."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic w.r.t. the comparator goal (witness), but in L (DJ 2009)",
+    "detail": "The witness is the DJ cone from the cited bibliography."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "De Silva-Jerison 2009."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L03",
+   "kind": "theorem (Lean)",
+   "name": "U_global_minimizer: split any competitor v into max(v,U) and min(v,U) (Sobolev lattice identity) and apply upper and lower comparisons",
+   "file_line": "lean/OAI/Analysis/BernoulliCone/GlobalMinimizer.lean:14-74",
+   "statement": "energy(m)+energy(p)=energy(U)+energy(v) with p=U+(v-U)_+, m=U-(U-v)_+.",
+   "cited_or_new": {
+    "status": "classical technique",
+    "bib_key": null,
+    "cue": "Upper and lower comparisons are joined by the exact Sobolev lattice identity"
+   },
+   "uses_items": [
+    "L04",
+    "L05",
+    "L06"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Top of the DAG."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "detail": "Standard lattice/sub-super decomposition."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L04",
+   "kind": "theorem (Lean)",
+   "name": "U_upper_comparison via a calibrated foliation by homothetic upper barriers (upperFamily, upperParameter, upperCalibration) with an explicit glued cap/exterior barrier (capAmplitude=-(10/17) f(3/5), smoothCap, rational tau=-2 Legendre solution gSup, GSup<=c7 on [t7,3/5])",
+   "file_line": "lean/OAI/Analysis/BernoulliCone/UpperComparison.lean:30; UpperSupport.lean:102-330; CapCalculus.lean:151; UpperCalibration.lean; SeamCalibration.lean",
+   "statement": "Calibration (divergence of the foliation's gradient field with nonpositive seam flux) proves U <= any upper competitor in energy.",
+   "cited_or_new": {
+    "status": "cited method (DJ 2009 foliation), explicit barriers new to the formalization",
+    "bib_key": "DeSilvaJerison2009",
+    "cue": "The actual upper foliation comparison, transferred through H1-zero trace closure"
+   },
+   "uses_items": [
+    "L02",
+    "L06",
+    "L07"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "Sub-DAG share 0.86 decls / 0.84 tokens of the main theorem."
+   },
+   "analytic_check": {
+    "verdict": "analytic w.r.t. L (DJ 2009 proves minimality by a foliation argument)",
+    "detail": "Explicit rational barrier constants (10/17, 3/5, 27/50, tau=-2) are formalization-specific proxies; not checked against DJ's original barriers."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Formalization of DJ 2009's minimality proof; barrier details possibly re-engineered (N1-N2), but the result is known and the method is DJ's."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L05",
+   "kind": "theorem (Lean)",
+   "name": "U_lower_comparison via Picone ground-state inequality (picone_test, picone_h10_eLpNorm) on the positive cone",
+   "file_line": "lean/OAI/Analysis/BernoulliCone/LowerComparison.lean:207; ConePicone.lean; GroundState.lean",
+   "statement": "Competitors below U cannot lower energy: ground-state square completion with the positive superharmonic barrier.",
+   "cited_or_new": {
+    "status": "classical technique",
+    "bib_key": null,
+    "cue": "Ground-state square completion for arbitrary compact smooth tests"
+   },
+   "uses_items": [
+    "L02",
+    "L06"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Sub-DAG share 0.34 / 0.33."
+   },
+   "analytic_check": {
+    "verdict": "analytic (in L)",
+    "detail": "Picone identity classical."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Picone (1910) / ground-state transform."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L06",
+   "kind": "lemmas (Lean)",
+   "name": "SobolevCalculus: positive part preserves H10, gradient zero a.e. on level sets, lattice operations (2,035 lines)",
+   "file_line": "lean/OAI/Analysis/BernoulliCone/SobolevCalculus.lean (e.g. h10_positivePart :1724, gradient_zero_on_zero_set)",
+   "statement": "Standard Sobolev facts built from scratch.",
+   "cited_or_new": {
+    "status": "classical (re-proved, Mathlib gap)",
+    "bib_key": null,
+    "cue": "h10_positivePart"
+   },
+   "uses_items": [
+    "L01"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Infrastructure."
+   },
+   "analytic_check": {
+    "verdict": "analytic (textbook)",
+    "detail": "Textbook (Gilbarg-Trudinger Lemma 7.6/7.7)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook Sobolev facts absent from Mathlib."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L07",
+   "kind": "theorem (Lean)",
+   "name": "ThresholdRecovery.upper_variation_of_threshold_tests: comparison against smooth threshold tests extends to all H10 competitors",
+   "file_line": "lean/OAI/Analysis/BernoulliCone/ThresholdRecovery.lean:180",
+   "statement": "Approximation step from smooth tests to Sobolev competitors.",
+   "cited_or_new": {
+    "status": "new (formalization)",
+    "bib_key": null,
+    "cue": "upper_variation_of_threshold_tests"
+   },
+   "uses_items": [
+    "L06"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Sub-DAG share 0.14/0.15."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "detail": "Density argument."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine density."
+   },
+   "provisional_F": null
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Regularity theory for one-phase minimizers (Lipschitz Thm 3.1, nondegeneracy Prop 4.1, compactness Prop 6.2, homogeneity of blowups Prop 9.12, flatness=>C^{1,alpha} Def 6.10/Thm 8.1/Cor 8.2, viscosity condition Prop 7.1, Defs 2.11-2.12)",
+   "bib_key": "Velichkov2023",
+   "locator": "as listed",
+   "field": "Free-boundary regularity (PDE)",
+   "used_at": "reductions.tex:59-84 (Prop 2.1)",
+   "status": "cited, not re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Higher regularity of two-phase free boundaries (C^{2,gamma} and smooth) for Lipschitz viscosity solutions",
+   "bib_key": "DeSilvaFerrariSalsa2019 (+ Def 7.1 of DeSilvaFerrariSalsa2014)",
+   "locator": "Thm 1.1, Cor 1.2",
+   "field": "Free-boundary regularity (PDE)",
+   "used_at": "reductions.tex:86-114",
+   "status": "cited, not re-proved; hypotheses checked",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Boundary regularity for harmonic functions with zero Dirichlet data",
+   "bib_key": "Hunter2014",
+   "locator": "Thms 4.30-4.31, Cor 4.32",
+   "field": "Elliptic PDE",
+   "used_at": "reductions.tex:114-118",
+   "status": "cited",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Stable homogeneous solutions with smooth cross-section are flat for n<=4; minimizers regular => d_*>=5",
+   "bib_key": "JerisonSavin2015",
+   "locator": "Thm 1.1, Cor 1.2",
+   "field": "Free-boundary (PDE)",
+   "used_at": "reductions.tex:224-227; cutoffs.tex:347",
+   "status": "cited, not re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Nonflat singular energy-minimizing cone in R^7 (d_*<=7)",
+   "bib_key": "DeSilvaJerison2009",
+   "locator": "Thm 1.1",
+   "field": "Free-boundary (PDE)",
+   "used_at": "reductions.tex:226; consequences.tex:22-31",
+   "status": "cited in paper; formalized (re-proved) in Lean as the comparator target",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Dimension reduction for one-phase minimizers",
+   "bib_key": "Weiss1999; Velichkov2023",
+   "locator": "Velichkov Thm 1.4, Prop 10.13, Lemmas 10.9-10.10 (compared)",
+   "field": "Free-boundary / GMT",
+   "used_at": "consequences.tex:5-20; reductions.tex:133-134",
+   "status": "cited (corollary); Lemmas 10.9-10.10 re-proved",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Hopf boundary lemma, strong maximum principle",
+   "bib_key": null,
+   "locator": "classical, uncited",
+   "field": "Elliptic PDE",
+   "used_at": "geometry.tex:124-135",
+   "status": "invoked",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Gram-matrix (SOS) certificates for polynomial positivity",
+   "bib_key": "Parrilo2003",
+   "locator": "Sec 3.2",
+   "field": "Real algebraic geometry / optimization",
+   "used_at": "certificate-proof.tex:66-70",
+   "status": "method cited; certificate verified directly (no theorem invoked)",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Simons' Hessian/second-fundamental-form argument",
+   "bib_key": "Simons1968",
+   "locator": "Sec 6.1",
+   "field": "Minimal surfaces",
+   "used_at": "history.tex:66-68",
+   "status": "background-cited",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Cohomogeneity-one cones unstable n<=6, stable n>=7; capillary cones; stability conjecture in R^4; generic regularity",
+   "bib_key": "FiresterTsiamisWang2026; FiresterTsiamisWang2026Capillary; FernandezRealSerra2026; FernandezRealYu2025",
+   "locator": "various",
+   "field": "Free-boundary (PDE)",
+   "used_at": "history.tex:39-62",
+   "status": "background-cited",
+   "essential_for_headline": false
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Known bounds 5<=d_*<=7 (JS 2015; DJ 2009). Suppose d=d_* in {5,6}; fix a nonflat 1-homogeneous minimizer.",
+   "items": [
+    "P02",
+    "P41"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Minimal-dimension reduction: off-origin blowups are (d-1)-dimensional minimizers times R, hence flat; link components are smooth with Delta g=-mg, g=0, grad g=N; some component has T_o != 0.",
+   "items": [
+    "P04",
+    "P05",
+    "P06",
+    "P08",
+    "P09"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "If d=5, suspend to R^6 (minimality preserved), so in both cases the working link is Omega in S^5 (with two tips if suspended).",
+   "items": [
+    "P10",
+    "P11",
+    "P16"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "Spherical tensor identities, s^2<1, H>0, boundary jets; second variation gives stability int H v^2 <= int |grad v|^2+4v^2 on S^5.",
+   "items": [
+    "P12",
+    "P13",
+    "P14",
+    "P15",
+    "P17",
+    "P18"
+   ]
+  },
+  {
+   "step": 5,
+   "claim": "Universal algebraic certificate (Prop 4.1) for free normalized jet data (A,p,g,X,w,z,ell).",
+   "items": [
+    "P19",
+    "P20",
+    "P21",
+    "P28"
+   ]
+  },
+  {
+   "step": 6,
+   "claim": "Build h=w^a sqrt f and flux Z; fourth derivatives cancel; div Z >= 4h^2+|grad h|^2+eps w^{2a}; reflection parity gives N.Z+Hh^2 >= delta w^{2a+1}.",
+   "items": [
+    "P22",
+    "P23",
+    "P24",
+    "P25",
+    "P26",
+    "P27"
+   ]
+  },
+  {
+   "step": 7,
+   "claim": "Exact verification of the certificate: Gram blocks PSD, graph calculus, graph bounds, 1714-key remainder dominated by 4x4 matrix with positive slacks; boundary reduces to 11 symmetric coefficients.",
+   "items": [
+    "P29",
+    "P30",
+    "P31",
+    "P32",
+    "P33",
+    "P34"
+   ]
+  },
+  {
+   "step": 8,
+   "claim": "Cutoffs near Hessian zeros and tips: weighted Bochner integrability (a>1/2), integrated comparison, dominated convergence; positive mass int w^{2a} contradicts stability. Hence d_* not in {5,6}, so d_*=7.",
+   "items": [
+    "P35",
+    "P36",
+    "P37",
+    "P38",
+    "P39",
+    "P41"
+   ]
+  },
+  {
+   "step": 9,
+   "claim": "Corollary: Weiss dimension reduction gives Sing empty n<=6, locally finite n=7, dim<=n-7, sharp via DJ x R^{n-7}.",
+   "items": [
+    "P40"
+   ]
+  }
+ ],
+ "eureka_candidates_ranked": [
+  {
+   "rank": 1,
+   "item": "P22 + P21 (flux pair (h,Z) with a universal SOS-type tensor certificate)",
+   "provisional_N": "N3 candidate (borderline N2)",
+   "provisional_F": "F3 (with F5: normalized jet representation P20)",
+   "for": [
+    "Directly overcomes the obstruction JS 2015 Sec 3.2 identified for 4<=n<=6: the interior and boundary constraints on a single Hessian-power test are optimized by different configurations. Here a non-gradient flux Z decouples the two (interior: div Z; boundary: N.Z), so the same tensor data serve both.",
+    "Non-analytic: neither f,U,K,M,P nor Z occurs in the goal, in Mathlib, or in the bibliography; JS's tests are scalar functions of Hessian eigenvalues with the subsolution form (equivalent to Z = h grad h).",
+    "Load-bearing: the entire new half of the theorem (exclusion of d=5,6) rests on it; everything else is standard N0-N1.",
+    "Huge budget drop if it is right: a 40+-year-old style open problem (CJK conjecture n<=6 for minimizers) settled by a pointwise certificate plus routine cutoffs."
+   ],
+   "against": [
+    "Paper names JS ('functions of the Hessian satisfying inequalities for the linearized free-boundary problem') and Simons as precedents; the vector-field form of a stability-violation certificate is the classical integration-by-parts / calibration idea.",
+    "The certificate is machine-found (SDP-style search over an ansatz); the human-level idea may be 'make the JS test function a general polynomial in (A,p,g), allow a flux, and let an SDP find it' - which is a natural move for an SOS-literate analyst.",
+    "SOS/auxiliary-function certificates for PDE inequalities exist in control theory (Valmorbida-Ahmadi-Papachristodoulou, arXiv 1703.06371; Chernyshenko et al.), so the method is transfer (N0 bridge) even if the specific certificate is new."
+   ],
+   "literature_check": "Quick searches (Oct 2026): 'one-phase Bernoulli critical dimension stable cones 5 6' (found FTW 2601.16966, FR-Serra 2609.05669, MTV 2310.06591; none claims dims 5-6 for general cones); 'SOS certificate stability inequality minimal cones Simons' (only control-theory SOS-Lyapunov and fractional Simons-cone numerics); 'Mazet stable minimal hypersurfaces R^6' (bi-Ricci method, scalar quadratic-form positivity, not tensor SOS). Read JS 2015 Secs 2-4 (arXiv 1410.7463): test v=w^alpha, w^2=sum lambda_+^2 + a sum lambda_-^2, subsolution criteria Prop 2.1-2.3. No neighbour with a non-gradient flux or tensor-polynomial certificate found."
+  },
+  {
+   "rank": 2,
+   "item": "P23 (fourth-derivative elimination: G = delta U + skew C)",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Key enabling design constraint: only the Laplacian contraction and the (l,i)-skew contraction of grad B are controlled by identities, so restricting the flux to these makes div Z a function of the 3-jet.",
+    "Not a subterm of the goal."
+   ],
+   "against": [
+    "Uses only classical identities (Delta T = mT, Ricci commutator); null-Lagrangian/Weitzenbock design is standard in Bochner methods.",
+    "Part of rank-1 construction, not separately load-bearing."
+   ],
+   "literature_check": "No separate search; subsumed under rank 1."
+  },
+  {
+   "rank": 3,
+   "item": "P25 (boundary reflection parity killing undetermined even-normal jets)",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Makes the boundary inequality pointwise in (A,p) without knowing tangential derivatives of curvature (which JS handle only via the specific scalar w)."
+   ],
+   "against": [
+    "Equivariance/parity arguments are standard; it is a consequence of choosing U,K even in p."
+   ],
+   "literature_check": "Subsumed under rank 1."
+  },
+  {
+   "rank": 4,
+   "item": "P10/P11 (suspension unifying d=5 and d=6 on S^5 with two tips)",
+   "provisional_N": "N1",
+   "provisional_F": null,
+   "for": [
+    "Allows one certificate (m=5, Hardy constant 4) for both dimensions; tips handled by an integrable power sin^{21/25}."
+   ],
+   "against": [
+    "Minimality of cylinders is classical (DJ, Weiss, Velichkov); a second certificate on S^4 would also do; modest budget effect."
+   ],
+   "literature_check": "Cylindrical products of minimizing cones are standard in dimension reduction (e.g. the paper's own sharpness argument)."
+  },
+  {
+   "rank": 5,
+   "item": "P35 (weighted Bochner integrability, a in (1/2,1))",
+   "provisional_N": "N1",
+   "provisional_F": null,
+   "for": [
+    "Removes all regularity assumptions on the Hessian zero set."
+   ],
+   "against": [
+    "Standard delta-regularization + absorption (Schoen-Simon-Yau / Simons-type integrability)."
+   ],
+   "literature_check": "Standard technique; no search."
+  }
+ ],
+ "correctness_audit": {
+  "verdict": "No gap found on a full reading of the ~2,700 lines of LaTeX (excluding tables). The analytic skeleton (reductions, stability with Hardy constant 4, flux identity, boundary parity, cutoffs) checks line by line. The weight of the proof sits in Proposition 4.1, a large computer-verified certificate (231 + 557 table rows, 1714 interior keys) that we did not recompute. This is an extraordinary claim: it settles the open question d_* in {5,6,7} and, implicitly, the CJK stability conjecture for smooth-link cones in R^5, R^6. The Lean formalization does NOT cover any of the new mathematics.",
+  "checked": [
+   "Suspension: tilde g = sin t g_o, tilde T = rho^{-1} T_o, |tilde B|^2 = rho^{-4}(|B_o|^2+3c^2 w_o^2), measures rho^4, rho^3 (geometry.tex:246-332): consistent with warped connection.",
+   "Stability: second variation with layer cancellation of normal-derivative terms gives int|grad phi|^2 >= int H phi^2 (geometry.tex:392-479), matches CJK/JS (2.4); Hardy constant ((m-1)/2)^2 = 4 for m=5.",
+   "Divergence identity: d/dl of w^{2a} G X gives (2a-1) q G X after X=B/w (flux.tex:137-158); U part: delta_li U_jk grad_l B_ijk = U:Delta T = 5 U:A w; skew part via commutator gives C(delta A + delta A) (flux.tex:75-95). Correct.",
+   "Square completion: f|l|^2 - F.l = f|l - F/2f|^2 - |F|^2/4f and |grad h|^2 = w^{2a}|F|^2/(4f) (flux.tex:160-191). Correct.",
+   "f >= eps_*: at X=w=z=0, |l|=1, all D-terms vanish and I=f (certificate-proof.tex:559-561). Correct.",
+   "Boundary: N.Z + H h^2 = w^{2a+1} S with P=0 at g=0 and Hh^2 = -lambda w^{2a+1} f (flux.tex:276-289). Correct.",
+   "Arithmetic re-checked here from printed integers: all ten D0 entries <= 2Q^2 Dbar (ratios 0.9992-0.99992, tight); slacks (673/18400, 438907/12000000, 2844869/24900000, 3479389/7600000) reproduce exactly; sum of the eleven boundary coefficients = 1656725282 and 1/4 - 1656725282/Q^2 = delta_* exactly.",
+   "Weighted Bochner: 2I <= (1/a) int Delta eta W^a + 4(1-a) I, 2-4(1-a) = 4a-2 = 8/25 > 0 needs a > 1/2 (cutoffs.tex:71-88). Correct.",
+   "Tip integrability: errors * s^4 <= C s^{2-2a} D_o, exponent 21/25 > -1; positive mass I_o int sin^{71/25} > 0 (cutoffs.tex:290-339). Correct.",
+   "Tensor bounds: ||A||_op^2 <= 4/5 and (tr A^3)^2 <= 9/20 for unit trace-free 5x5 A (Okumura-type) correct."
+  ],
+  "consistency_checks_passed": true,
+  "residual_concerns": [
+   "Formula-to-code correspondence is not certified: the README says the finite checks 'do not certify equivalence between mathematical formulas and code, or the analytic proof'. An independent interior engine reproduced 1714/1714 keys (oracle-comparison.json), but both engines implement the same written decoding; a shared misreading of a contraction convention would propagate. Boundary verified by a separate script (boundary-independent.py). We did not execute repository code (untrusted-code policy) and did not recompute the expansion.",
+   "The margins are tight (D0/Dbar ratios up to 0.99992 after rounding to 1e-5), so any coefficient transcription error in Tables I/II could flip the conclusion.",
+   "Implied strength: the argument after Section 2 uses only stability and a smooth link (plus suspension), so it would prove the CJK stability conjecture for smooth-link cones in dims 5 and 6, which JS 2015 indicated their method could not reach. The paper does not state this; reviewers should check whether minimality is used anywhere beyond the reductions (we found no such use).",
+   "Suspension case: stability on the suspended cone is derived from minimality of the product (Prop 2.8) and tests supported away from the axis; the certificate needs s^2<1, H>0, w>0 which transfer from Omega_o. Fine as written; the axis is handled only by cutoffs, never by regularity.",
+   "Lean covers only the known De Silva-Jerison existence (comparator nonflat_in_seven, 13,545 lines), not the new exclusion; lean/docs/367.md says the flatness classification 'and the resulting regularity and singular-set bounds are outside this selected statement'.",
+   "How the certificate was found is not disclosed (no SDP solver, seeds or numerical precursor files are released)."
+  ]
+ },
+ "lean_summary": {
+  "n_files": 91,
+  "n_lines": 13545,
+  "n_decls": 1055,
+  "kind_counts": {
+   "theorem": 880,
+   "def": 171,
+   "abbrev": 4
+  },
+  "proof_dag_decls_main": 836,
+  "comparator": {
+   "challenge": "lean/ComparatorChallenges/BernoulliNonflatInSeven.lean (+ .json)",
+   "target": "OAI.Bernoulli.nonflat_in_seven",
+   "solution_module": "OAI.Analysis.BernoulliCone.Main",
+   "solution_decl": "lean/OAI/Analysis/BernoulliCone/Main.lean:10-12 (:= DeSilvaJerison.exists_nonflat_dimension_seven, GlobalMinimizer.lean:76-78)",
+   "verbatim": "theorem nonflat_in_seven : ∃ u : Space 7 → ℝ, GlobalMinimizer u ∧ Nonzero u ∧ OneHomogeneous u ∧ ¬ Flat u",
+   "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+   ],
+   "definition_names": [],
+   "enable_nanoda": false,
+   "match_check": "Matches the second sentence of Thm 1.1 (existence in R^7), i.e. De Silva-Jerison 2009 Thm 1.1, with the paper's exact competitor class (arbitrary nonnegative H^1 competitors on every ball, zero-trace difference as H^1-closure of C_c^infty, volume term included). Flat is a.e. equality with (x.e)_+; nonzero is not a.e. zero. Model.lean is character-identical to the challenge preamble. It does NOT formalize the new direction (flatness for d<=6), d_*=7, or Corollary 1.2."
+  },
+  "subDAG_shares_of_main_theorem (decls / tokens)": {
+   "DeSilvaJerison.U_upper_comparison (foliation calibration)": "0.86 / 0.84",
+   "DeSilvaJerison.comparisonR_integral_nonneg": "0.63 / 0.58",
+   "DeSilvaJerison.upperFlux_primitive_bound": "0.57 / 0.51",
+   "DeSilvaJerison.upperCalibration_bulk": "0.40 / 0.31",
+   "DeSilvaJerison.U_lower_comparison (Picone ground state)": "0.34 / 0.33",
+   "DeSilvaJerison.upperCalibration_seam": "0.22 / 0.12",
+   "DeSilvaJerison.smoothCap_laplacian_nonpos": "0.22 / 0.15",
+   "ThresholdRecovery.upper_variation_of_threshold_tests": "0.14 / 0.15",
+   "DeSilvaJerison.lower_groundstate_slope": "0.14 / 0.10",
+   "SobolevCalculus.h10_positivePart": "0.09 / 0.09",
+   "DeSilvaJerison.CapAlgebra.coeff_bounds": "0.09 / 0.05",
+   "DeSilvaJerison.GSup_le_c7": "0.05 / 0.04"
+  },
+  "largest_files_in_main_DAG_by_tokens": [
+   [
+    "LowerSupport.lean",
+    17277
+   ],
+   [
+    "SobolevCalculus.lean",
+    15053
+   ],
+   [
+    "UpperSupport.lean",
+    14190
+   ],
+   [
+    "CapCalculus.lean",
+    3688
+   ],
+   [
+    "GroundState.lean",
+    3456
+   ]
+  ],
+  "extractor_note": "data/items/367_lean.json lists candidate defs led by Cylindrical.radiusSq, DeSilvaJerison.f, upperFlux - geometry/plumbing of the DJ construction. Closure share computed here (scratch script) identifies the upper calibration as the load-bearing Lean component. None of the Lean is about the paper's new mathematics.",
+  "imports": "Only `import Mathlib`; no other OAI dirs (catalog lean_dirs_imported empty). Namespace OAI.Bernoulli.DeSilvaJerison; formalization.yaml does not list this dir under 367 (its 367 entry, line 1242, is OAI.Problem367.free_ising_factor_iff_threshold, an unrelated namespace collision)."
+ },
+ "extraction_friction": [
+  "The headline's new half is not formalized: the comparator targets the known DJ existence. Any Lean-DAG load-bearing measure therefore says nothing about the paper's eureka candidates; the Lean DAG is a formalization of De Silva-Jerison 2009 (with formalization-specific explicit barriers).",
+  "The key objects f,U,K,M,P exist only as coefficient tables (appendices/tables.tex, 936 lines of digit codes) with a bespoke graph encoding; they are not stated in closed form anywhere. Extracting 'the definition' of the eureka item means extracting a data table.",
+  "Load-bearing definitions are inline in displays (h, Z, G, C, A, X, q, V, S_0) rather than in definition environments; only global minimizer, one-homogeneous and blowup are \\emph-defined.",
+  "No .bib: references are a hand-written thebibliography (references.tex); catalog bib column is empty.",
+  "Lean namespace OAI.Bernoulli.DeSilvaJerison; formalization.yaml's 'Problem367' namespace belongs to an unrelated result (namespace collision), and the BernoulliCone dir is not in formalization.yaml.",
+  "Verification directory contains internal-process artifacts ('algebra-debate-graphs', 'submitted engine', 'peer reports', 'first-freeze') that reveal a multi-pass internal verification process but not how the certificate was found."
+ ]
+}

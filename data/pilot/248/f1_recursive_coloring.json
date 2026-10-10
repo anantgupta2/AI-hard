@@ -1,0 +1,415 @@
+{
+ "item": {
+  "family": 248,
+  "family_title": "Thompson's group F is nonamenable",
+  "slug": "recursive_coloring",
+  "item_ids": [
+   "I19 (recursive coloring p(T))",
+   "I23 (pullback X_I^(n)(g))"
+  ],
+  "paper_location": "preprints/Thompsons-group-F-is-nonamenable-September-23-2026/build/sections/finite-proof.tex:110-170 (eq. color:recursion at 124-138; color:global at 157-165)",
+  "lean_location": "lean/OAI/GroupTheory/Thompson/RecursiveColoring.lean:23 (partitionColor); PartitionColorFamily.lean:29; GlobalColors.lean:37",
+  "analyst_grade": "provisional N3, F1 (F3 flavour)",
+  "verdict_of_this_report": "N3 stands (no earlier equivalent found). Downstream transfer as a definition is real but narrow: within group theory every group whose structure the device needs seems to contain F, so its new open-problem payoff comes almost entirely through the THEOREM (corollaries), not through re-use of the DEFINITION. Device-level reuse is strongest for (i) explicit quantitative isoperimetric/spectral bounds for F, (ii) uniform elementary nonamenability proofs for Thompson-like and piecewise-projective groups, (iii) explicit finite witnesses (Moore's convex Ramsey statement; an explicit fixed-point-free convex compact F-space). Not a confirmed eureka step yet; the speedup test is still to run."
+ },
+ "definition": {
+  "setting": "H a real Hilbert space, B its closed unit ball, f:B->B L-Lipschitz with ||f(x)-x|| >= delta > 0 for all x (Benyamini-Sternfeld; the paper builds one on L^2([0,1];R^2) with delta = 1/2). D >= 2 with D > 4L^2/delta^2. Internal basic dyadic intervals I_1 < ... < I_D (paper: I_j = [(2j-1)2^-r, 2j 2^-r] with 2^r > 2D; Lean: depth 2D, index 2i+1). For a basic dyadic partition T that respects I, T_I = { s_I^{-1}(K) : K in T, K subset I } is its normalized restriction (s_I : [0,1] -> I the increasing affine chart).",
+  "recursion": "p(T) = f( (1/D) * sum_{j=1..D} p(T_{I_j}) ) if T respects every I_j; p(T) = 0 otherwise. Well founded on the number of cells, since each I_j is internal, so T_{I_j} has fewer cells. p(T) is in B.",
+  "pullback": "Family I = {I_i} union {I_i . I_j} (parents and descendants, I.J = s_I(J)). (n,g) is admissible if gT^(n) is basic and respects every member of I. X_I^(n)(g) = p((gT^(n))_I) if admissible, else 0. Scalar correlations phi_{I,J}(g) = <X_I(g), X_J(g)> lie in [-1,1].",
+  "key_identities": [
+   "(T_I)_J = T_{I.J} (restriction composes)",
+   "exact covariance: if h maps I affinely onto I', then ((hg)T^(n))_{I'} = (gT^(n))_I",
+   "recursive identity on admissible g: X_{I_i}(g) = f(z_i(g)), z_i = (1/D) sum_j X_{I_i.I_j}(g), m = (1/D) sum_k X_{I_k}(g) = (1/D) sum_i f(z_i)"
+  ],
+  "worked_example": "p(T^(0)) = 0, p(T^(r)) = f(0), p(T^(2r)) = f(f(0)): on uniform partitions the coloring iterates f, so it behaves like a bounded 'depth counter' that never stabilises."
+ },
+ "obstruction_dissolved": "Approximate invariance (Folner) gives control only over AVERAGES of BOUNDED functions, with error eta*||phi||_inf. The natural invariant that should rule out Folner sets in F is unbounded and well-founded: depth or cell count strictly decreases under restriction to a parent (T_{I_1.I_1} has fewer cells than T_{I_1}), while transports equate the laws of restrictions at different scales. With a bounded scalar surrogate the averaging works, but every bounded scalar or finite-dimensional recursion has a fixed point (Brouwer), so it can stabilise and give no contradiction. That is why Moore's scalar tree colourings and Akhmedov's integer height function did not close the problem, and why Moore's Folner-function recursion only yields tower-type size bounds. A second obstruction is that the recursion is nonlinear: E f(z) != f(E z), so first-moment invariance is useless. The device removes both at once. (1) Bounded but non-stabilising: p takes values in the unit ball, yet the recursion goes through a Lipschitz f with no approximate fixed point, which exists only in infinite dimension. It is a bounded, Lipschitz replacement for 'height + 1'. (2) The nonlinearity is handled by second moments only. Approximate invariance under a FIXED finite set S of pair transports makes all separated-pair correlations approximately equal (alpha +- eta). Averaging D exchangeable vectors then concentrates z_i near m (variance <= 4/D + 4eta). Lipschitz continuity gives f(z_i) ~ f(m), so m = mean f(z_i) ~ f(m), an approximate fixed point, which is a contradiction. The F-specific input is that transports change scale (descendants map onto parents) and place two separated intervals INDEPENDENTLY. Translation-only, level-preserving or affine groups lack this.",
+ "abstract_mechanism": "Setting: a group acts on 'configurations' that can be refined to be fine at every scale, and that carry a self-similar restriction operator (sub-configuration on a cell, renormalised to the whole). Colour each configuration recursively by a vector in an infinite-dimensional Hilbert ball: a configuration's colour is a fixed Lipschitz self-map f, with no approximate fixed point, applied to the mean of the colours of its restrictions to D fixed separated cells. The colour is bounded, unlike depth, and cannot settle at a fixed point, unlike any finite-dimensional colour. If the group has a fixed finite set of elements that carry any separated pair of cells, at any scales, onto one reference pair, then an approximately invariant finite average makes all pair correlations nearly equal. Pair-exchangeability concentrates the child-means near the parent-mean, so the recursion forces an approximate fixed point of f, a contradiction. In short: 'recursively aggregate a vector-valued colouring through a map with no approximate fixed points, so approximate invariance forces a contradiction'. Abstract applicability conditions: (a) self-similar restriction with (T_I)_J = T_{I.J}; (b) a well-founded measure decreasing under restriction; (c) configurations that can be made simultaneously fine on any finite cell family for any finite set of group elements, i.e. the orbit map g -> gT^(n) at a level n chosen after A; (d) a FIXED finite set of scale-changing transports for every separated pair, with exact covariance. (c) and (d) are where it fails for amenable groups: translation-only groups such as IET or polygon exchanges fail (d); level-preserving tree-automorphism groups fail (d); and actions on finite point configurations, such as F acting on k-subsets of dyadics, whose finite-set stabilisers are co-amenable, fail (c).",
+ "candidates": [
+  {
+   "id": "C1",
+   "problem": "Explicit isoperimetric and spectral constants for Thompson's group F with its standard generators {x0,x1}: an explicit lower bound for the Folner (Cheeger) constant; an explicit upper bound < 4 for the Kesten norm ||x0+x0^-1+x1+x1^-1|| in C*_r(F) (equivalently, spectral radius < 1); cogrowth rate < 16 (Elvey Price-Guttmann); supremum of Guba's subgraph density < 4.",
+   "reference": "Haagerup-Haagerup-Ramirez-Solano, 'A computational approach to the Thompson group F', IJAC 25 (2015), arXiv:1409.1486 (numerics suggest the norm is about 3.87, but they have no rigorous upper bound); Elvey Price-Guttmann, 'Numerical studies of Thompson's group F and related groups', arXiv:1706.07571; Guba, 'Cayley graphs of R. Thompson's group F: new estimates for the density', J. Comb. Algebra (2025), arXiv:2210.12304 (density > 3.5); Guba, 'Amenability problem for Thompson's group F: state of the art', arXiv:2305.07113.",
+   "status": "open: no rigorous upper bound < 4 / < 16 is known. Only numerical estimates and rigorous LOWER bounds exist. The release proves nonamenability qualitatively plus a constant for one specific large S (Main.lean thompson_F_boundary_with_exact_constant).",
+   "obstruction_match": "Exact. These are quantitative versions of the very Folner failure the device produces. The open part is turning 'some constant for some S' into numbers for the standard generators.",
+   "adaptation_sketch": "Take the explicit constant c0 = (delta^2/L^2 - 4/D)/(4(1-1/D)) for S = {h_{I,J}}. Bound the word length of each transport in {x0,x1}: tree-pair diagrams with O(D) carets, since the intervals have depth <= 4D, and word length is comparable to the caret count (Burillo-Cleary-Stein / Fordham). This gives a Folner constant for {x0,x1} of at least c0/max|h| ~ delta^4/(C L^4), which is polynomial in 1/L and not tower-type. Then apply Cheeger/Dodziuk-Mohar to get ||x0+x0^-1+x1+x1^-1|| <= 4 - c*(Folner)^2, and Kesten/Grigorchuk to get a cogrowth bound. L comes from Lean's Analytic.displacementLipschitzConstant. The bound improves directly if one can construct B-S maps with a better L/delta ratio (optimal Lipschitz-retraction constants on Hilbert space, known only roughly: 4.5 < k0 < ~29).",
+   "expected_payoff": "new bound: the first rigorous separation of the Kesten norm from 4 and of the cogrowth from 16; very weak numerically but explicit.",
+   "confidence": "high (the reduction is mechanical once the theorem is right)",
+   "difficulty": "medium (word-length bookkeeping for O(D^4) transports; bounding the B-S Lipschitz constant explicitly)",
+   "kind": "device transfer (quantitative)"
+  },
+  {
+   "id": "C2",
+   "problem": "Uniform elementary nonamenability proofs, with explicit constants, for Thompson-like PL and piecewise-projective groups: Brown-Higman F_{n} (n-adic), Stein groups F_{n1,...,nk}, Cleary's golden-ratio group F_tau, Lodha-Moore group G_0, Monod's H(A) and Gamma_S = H(Z[1/S]), Belk-Forrest rearrangement groups, Witzel-Zaremsky cloning-system groups F_d(G_*), Brothier's forest-skein groups.",
+   "reference": "Monod, 'Groups of piecewise projective homeomorphisms', PNAS 110 (2013); Monod, 'Some comments on piecewise-projective groups of the line', arXiv:2305.00796 (2023); Lodha-Moore, GGD 10 (2016); Burillo-Nucinkis-Reeves, 'An irrational-slope Thompson's group', arXiv:1806.00108; Brothier, 'Forest-skein groups I-III', arXiv:2207.03100, 2212.01993, 2406.09718.",
+   "status": "Amenability of F_n, the Stein groups and F_tau was open only because F was open: they contain F (BNR for F_tau; Burillo-Cleary-Stein for F_n), so they are now nonamenable by containment. H(A) and G_0 were already known nonamenable through Carriere-Ghys (Monod 2013) or Monod's explicit affine fixed-point argument (2023), which by Monod's own remark 'fails precisely for F'.",
+   "obstruction_match": "Strong structural match. Each of these groups has self-similar cell structures (n-adic, tau-adic, Farey/Stern-Brocot via Thurston's H_Q(Z) = F, replacement systems, forests) and scale-changing transports of separated cell pairs.",
+   "adaptation_sketch": "Replace BasicInterval and BasicPartition by the family's cells: n-adic intervals; tau-subdivisions, with two cell shapes, where normalised restriction still returns a partition of [0,1]; Farey intervals with projective charts for H(A). Re-prove the restriction-composition law, the eventual-fineness lemma and pair transitivity. The generic Lean core boundaryConstant_le_of_correlations (stated for an arbitrary type G) and the whole B-S construction are reused verbatim.",
+   "expected_payoff": "simplifies known proofs (H(A), G_0: no Carriere-Ghys or ergodic theory) and gives explicit uniform Folner constants. For F_n, F_tau and Stein groups it duplicates what containment of F already gives, but with intrinsic constants. Does NOT give Monod's stronger 'amenability gap' / co-amenability results.",
+   "confidence": "high",
+   "difficulty": "low-medium (combinatorial plumbing; about 30% of the Lean DAG is dyadic plumbing that must be redone)",
+   "kind": "device transfer (re-derivation); best speedup-test source"
+  },
+  {
+   "id": "C3",
+   "problem": "Moore's convex structural Ramsey statement for finite rooted ordered binary trees, shown equivalent to amenability of F (Moore 2013, Thm 3.1), and its relatives in Kechris-Pestov-Todorcevic / Moore 'Amenability and Ramsey theory' (convex Ramsey property <-> amenability of automorphism groups).",
+   "reference": "Moore, 'Hindman's theorem, Ellis's lemma, and Thompson's group F', arXiv:1106.4735 (Zb. Rad. 2013); Moore, 'Amenability and Ramsey theory', Fund. Math. 220 (2013); Kechris-Sokic-Todorcevic survey arXiv:1502.04429; Kechris-Sokic, Fund. Math. 218 (2012).",
+   "status": "Now false (if the theorem holds), via Moore's equivalence. No explicit counterexample is known.",
+   "obstruction_match": "Direct. Moore's statement asks for convex combinations that make every 2-colouring of trees nearly balanced, which is a Folner-type statement. The device's scalar correlations phi_{I,J}(T) = <X_I(T), X_J(T)> are exactly bounded functions of finite trees that refute it.",
+   "adaptation_sketch": "Translate S, the level n and the colourings phi_{I,J} into Moore's tree language: tree-pair diagrams are basic partitions, and the transports act by caret moves. Quantise the [-1,1]-valued phi to 2-colourings by thresholding (randomised rounding), losing a constant. The explicit c0 then gives explicit m, n and colourings for which no convex combination works.",
+   "expected_payoff": "an explicit finite combinatorial counterexample (a new, concrete statement), and a template for refuting convex Ramsey properties of other self-similar Fraisse-type classes",
+   "confidence": "medium",
+   "difficulty": "medium (Moore's quantifiers must be matched carefully)",
+   "kind": "device transfer (explicit witness), relying on a theorem-level equivalence"
+  },
+  {
+   "id": "C4",
+   "problem": "Construct an EXPLICIT convex compact F-space without a fixed point, or more generally give nonlinear (Lipschitz) fixed-point characterisations of amenability. Monod (2023) gives explicit fixed-point-free convex compact spaces for H(A) and Gamma_S, but his criterion 'fails precisely for F'. Day/Gheysens-Monod/Barroso-Mbombo-Pestov characterisations are affine. Lau's 1976 problem concerns nonexpansive actions.",
+   "reference": "Monod arXiv:2305.00796; Gheysens-Monod, 'Fixed points for bounded orbits in Hilbert spaces' (Ann. Sci. ENS 2017); Barroso-Mbombo-Pestov arXiv:1410.8370; Wisnicki arXiv:1612.06270, 1909.09723 (Lau's problem); Day 1961.",
+   "status": "Open as an explicit construction for F; Day's theorem gives only abstract existence once F is nonamenable. Lau's problem is largely resolved (Salame; Wisnicki; TMNA 2022) and is not a target.",
+   "obstruction_match": "Partial. The device is a NONLINEAR fixed-point argument: approximate invariance forces an approximate fixed point of a Lipschitz f. It is not an affine action of F, but the recursion can be linearised by taking laws.",
+   "adaptation_sketch": "Let K be the weak*-closed convex set of 'approximately admissible' laws of the colour family (X_I)_{I in calI} (probability measures on B^calI, or their correlation matrices), with F acting by the transports through exact covariance. The proof shows that no F-invariant point satisfies the recursive constraint. Upgrade this to an affine F-action on a compact convex set of means on the space of partitions with the recursion built in (an 'inverse-limit of colour laws'), mirroring Monod's measures-on-P^1 spaces. A cleaner but harder variant asks for a nonlinear Day theorem: G is nonamenable iff G admits such a self-similar Lipschitz recursive system.",
+   "expected_payoff": "explicit Day witness for F (a new construction); possibly a new nonlinear characterisation of amenability for groups acting on self-similar structures",
+   "confidence": "low-medium",
+   "difficulty": "high (compactness and the weak* topology interact badly with the infinite-dimensional ball and the nonlinear f)",
+   "kind": "device transfer (structural)"
+  },
+  {
+   "id": "C5",
+   "problem": "Co-amenability and amenability of actions (Schreier graphs) for F, T, V: e.g. is F_{[a,b]^c} (elements trivial on [a,b]) co-amenable in F? Relative co-amenability of F in T and V (Caprace-Monod; Scarparo). Monod's 'spectrum' of co-amenability classes.",
+   "reference": "Savchuk et al., 'Some graphs related to Thompson's group F', arXiv:0803.0043 (stabilisers of finite sets of dyadics are co-amenable in F); 'Relatively amenable actions of Thompson's groups', arXiv:2109.01111 (S^1 is (T,F)-amenable); Caprace-Monod, 'Relative amenability', GGD 8 (2014); Monod arXiv:2305.00796, Thm 5.1.",
+   "status": "partially solved / scattered; no general criterion for non-co-amenability inside Thompson groups",
+   "obstruction_match": "Weak to partial. The device works on a coset space only if the orbit map descends to G/H with configurations that remain FINE on all of calI for most points of a Folner set. That is condition (c). For finite point configurations it fails, which is consistent with Savchuk's co-amenability. For partial-support subgroups the image region g([a,b]) can shrink, so the device only yields 'Folner sets of F/H concentrate on cosets whose image region misses the parent family'.",
+   "adaptation_sketch": "Define colours on cosets gH by p((g T^(n)|_[a,b])_I) for I inside g([a,b]); run the proof on the subset of a Folner set where calI is contained in g([a,b]); then show that this subset carries positive mass, or quantify how it must vanish.",
+   "expected_payoff": "partial structural information (which cosets Folner sets must avoid); possibly non-co-amenability results for subgroups whose cosets carry fine configurations near a fixed interval",
+   "confidence": "low",
+   "difficulty": "high",
+   "kind": "device transfer (speculative)"
+  },
+  {
+   "id": "C6",
+   "problem": "Uniform non-amenability of F (Arzhantseva-Burillo-Lustig-Reeves-Short-Ventura): is inf over finite generating sets X of the Folner constant positive? Uniform non-amenability would imply uniform exponential growth of F, which also appears to be unsettled.",
+   "reference": "Arzhantseva et al., 'Uniform non-amenability', Adv. Math. 197 (2005); Chaudhari, 'Confined subgroups of F...' arXiv:1809.05146 (uniform growth of orbital graphs only).",
+   "status": "open (no source found settling it)",
+   "obstruction_match": "Weak. The device constant is tied to one fixed S. Uniformity would need transports of bounded length in EVERY generating set, and generating sets such as {x0, x_N} with x_N of tiny support plausibly make all transports long.",
+   "adaptation_sketch": "Choose the cell family calI adapted to the generating set (put parents inside the support region of the 'small' generator) and look for a scale-free choice of D-families with transports of bounded length. This is probably impossible. An ABLRSV-style argument for ascending-HNN-like structure (F = HNN of a copy of itself by x0) may instead show that F is NOT uniformly nonamenable.",
+   "expected_payoff": "either a resolution (unlikely via the device) or a clarified negative",
+   "confidence": "low",
+   "difficulty": "high",
+   "kind": "device transfer (speculative)"
+  },
+  {
+   "id": "C7",
+   "problem": "Brin-Sapir conjecture: every subgroup of PL_+(I) is elementary amenable or contains F. Equivalently, one now asks whether amenable subgroups of PL_+(I) are exactly the F-less ones, and whether F-less ones are elementary amenable.",
+   "reference": "Brin, 'The ubiquity of Thompson's group F...', J. LMS 1999 (arXiv:math/9705205); Bleak-Brin-Moore, 'Complexity among the finitely generated subgroups of Thompson's group', arXiv:1711.10998; arXiv:2103.14911.",
+   "status": "open. The theorem gives one new fact: every amenable subgroup of PL_+(I) is F-less.",
+   "obstruction_match": "Negative. Brin's ubiquity criterion (an element approaching one end of an orbital but not the other) is already met by any group with scale-changing pair transports, so every group the device applies to contains F. The device cannot reach F-less groups.",
+   "adaptation_sketch": "None. This is a boundary: the device's domain inside PL_+(I) coincides with the F-containing groups.",
+   "expected_payoff": "none from the device (theorem corollary only)",
+   "confidence": "high that the device does not help",
+   "difficulty": "n/a",
+   "kind": "delineation (negative)"
+  },
+  {
+   "id": "C8",
+   "problem": "Amenability of the interval exchange group IET (Katok's question about free subgroups; Juschenko-Matte Bon-Monod-de la Salle settled rational rank <= 2), plus the release's own F_m polygon-exchange groups (family 253) and polynomial-activity automaton groups (Sidki; Amir-Angel-Virag linear activity amenable; quadratic open).",
+   "reference": "Juschenko-Matte Bon-Monod-de la Salle, ETDS 38 (2018); Garban, arXiv:1804.01981; Guelman-Liousse arXiv:2601.23054; Amir-Angel-Virag (2013).",
+   "status": "IET amenability open; polynomial activity >= 2 open",
+   "obstruction_match": "Only superficial. These are the right 'kind' of open amenability problem, but their transports preserve scale: IETs and polygon exchanges are measure-preserving translations, and tree automorphisms preserve levels. So descendants can never be carried onto parents, the parent and child correlations need not agree, and the alpha-cancellation fails.",
+   "adaptation_sketch": "Using Rauzy-Veech renormalisation as an EXTERNAL self-similarity is conceivable, but renormalisation is not induced by group elements, so exact covariance (dyad:covariance) is lost. Not viable as stated.",
+   "expected_payoff": "none (but it is a useful 'proves-too-much' control: the device must fail here, and it does)",
+   "confidence": "high that it does not apply",
+   "difficulty": "n/a",
+   "kind": "delineation (negative control)"
+  },
+  {
+   "id": "C9",
+   "problem": "Jones-technology / Brothier programme: build actions and representations of Thompson-like groups from functors on categories of forests (Pythagorean representations; forest-skein groups) and use them to decide analytic properties (amenability, exactness, weak amenability, Haagerup).",
+   "reference": "Brothier-Jones, 'Pythagorean representations of Thompson's groups', arXiv:1807.06215; Brothier-Jones, 'On the approximation properties for Thompson's groups', CMP 2019; Brothier-Wijesena arXiv:2211.08555, 2306.01256; Brothier forest-skein I-III.",
+   "status": "open questions remain: exactness and weak amenability of F (unknown); analytic properties of forest-skein groups",
+   "obstruction_match": "Structural neighbour. Jones actions assign Hilbert vectors recursively along trees through a fixed map (an isometry R: H -> H (+) H). The recursive colouring assigns ball vectors recursively through a fixed NONLINEAR, fixed-point-free f with D-ary averaging. It is a nonlinear Jones-type 'functor' that yields a contradiction rather than a representation.",
+   "adaptation_sketch": "Formulate 'Lipschitz Jones actions' (functors from forests to Lip(B)), and test whether their averaged correlation kernels give positive-definite or approximation-property obstructions (exactness, weak amenability) for forest-skein groups that do not obviously contain F.",
+   "expected_payoff": "speculative; conceptual unification",
+   "confidence": "low",
+   "difficulty": "high",
+   "kind": "device transfer (speculative)"
+  },
+  {
+   "id": "C10",
+   "problem": "Theorem-level corollaries (these use the THEOREM, not the definition): T is C*-simple (Haagerup-Olesen plus Le Boudec-Matte Bon: T is C*-simple iff F is nonamenable); F has nontrivial Poisson boundary for every nondegenerate measure (Kaimanovich proved it for some measures, arXiv:1602.02971); p_c < p_u on all Cayley graphs of F (release family 214); non-unitarisable uniformly bounded representations of F (release family 251); Moore's Ramsey statement fails; Guba's density is < 4; every group containing F (T, V, nV, F_tau, Stein, H(A), Lodha-Moore) is nonamenable; amenable subgroups of PL_+(I) are F-less.",
+   "reference": "Le Boudec-Matte Bon, Ann. Sci. ENS 51 (2018), arXiv:1605.01651; Haagerup-Olesen 2017; Kaimanovich arXiv:1602.02971; release families 214, 251.",
+   "status": "resolved conditionally on the theorem",
+   "obstruction_match": "n/a (not a transfer of the device)",
+   "adaptation_sketch": "none needed",
+   "expected_payoff": "resolves several open problems, but this is credit for the THEOREM. It is not evidence that the DEFINITION speeds up other proofs.",
+   "confidence": "high (conditional on correctness)",
+   "difficulty": "trivial",
+   "kind": "theorem corollary (excluded from eureka-transfer scoring)"
+  },
+  {
+   "id": "C11",
+   "problem": "Generic nonamenability criterion for future groups with self-similar, scale-changing pair transports (e.g. new Thompson-like groups built from operads, cloning systems or forest-skein presentations whose F-containment is unclear).",
+   "reference": "Thumann, 'Operad groups and their finiteness properties' arXiv:1409.1085; Witzel-Zaremsky cloning systems; Brothier forest-skein.",
+   "status": "a template, not a specific open problem",
+   "obstruction_match": "Exactly the device's conditions (a)-(d).",
+   "adaptation_sketch": "State and prove an abstract theorem: if G acts on a set of finite configurations with restriction maps satisfying (a)-(d), then G is nonamenable with an explicit constant. The Lean generic core (boundaryConstant_le_of_correlations over arbitrary G) already covers the analytic half.",
+   "expected_payoff": "reusable criterion; it only matters if some group satisfying (a)-(d) does not contain F, and none is known (see C7).",
+   "confidence": "medium (criterion), low (that it yields new examples)",
+   "difficulty": "medium",
+   "kind": "device abstraction"
+  }
+ ],
+ "release_reuse": {
+  "uses_of_device_in_release": "None found. Searched all preprint .tex sources for Benyamini/Sternfeld (hits only in family 248 itself), 'approximate fixed point', 'fixed-point-free' (hits in families with unrelated graph involutions), and 'recursive colo(u)r'. CONTENTS.md was searched for amenability, Thompson, fixed point, Folner, piecewise linear/projective, Dixmier, Ramsey and uniformly bounded.",
+  "families_that_consume_the_theorem": [
+   "214 (Benjamini-Schramm p_c<p_u for all nonamenable quasi-transitive graphs): gives Cor. cor:percolation for F. Theorem-level reuse only.",
+   "251 (Dixmier unitarizability and strong Ulam stability characterise amenability): gives Cor. cor:nonunitarizable for F. Theorem-level reuse only; its mechanism is boundary theory and weights, not the device."
+  ],
+  "families_that_could_use_it": [
+   "253 (an infinite finitely presented simple amenable group F_m of polygon exchanges): the mirror image. It builds random finite polygonal partitions whose law is almost invariant, which works because its exchanges are translations (no scale change). The device explains why the same strategy must fail for F: scale-changing transports plus a recursive colouring rule out almost-invariant partition laws. A natural joint 'dichotomy' statement for the two families, and a proves-too-much control: the device cannot apply to F_m.",
+   "328 (Kirk's problem: every nonexpansive self-map of a bounded closed convex subset of a reflexive space has a fixed point): complementary. B-S maps are Lipschitz but not nonexpansive, so they are consistent with 328. The device needs L > 1, and the paper's D > 4L^2/delta^2 shows the cost of L. No reuse."
+  ]
+ },
+ "speedup_targets": [
+  {
+   "id": "S1",
+   "theorem": "Monod's piecewise-projective groups H(A) (A != Z) and Gamma_S = H(Z[1/S]) are nonamenable.",
+   "reference": "Monod PNAS 110 (2013) 4524-4527; Monod arXiv:2305.00796 Sect. 3 (elementary fixed-point proof).",
+   "current_proof_size": "PNAS paper: about 4 pp., but it invokes Carriere-Ghys (C. R. 1985), which rests on Connes-Feldman-Weiss / Zimmer amenable equivalence relations, so it is heavy. Monod 2023 elementary route: about 8 pp. Not in Mathlib.",
+   "how_device_shortens": "Given the device in L: F = H_Q(Z) is contained in Gamma_S (Thurston; Monod Lemma 2.1), so the result follows in a few lines. Alternatively, run the device directly with Farey/Stern-Brocot cells.",
+   "formalizable": "yes, but it needs a Lean model of piecewise-SL2 homeomorphisms (absent from Mathlib)"
+  },
+  {
+   "id": "S2",
+   "theorem": "The Lodha-Moore group G_0 is nonamenable.",
+   "reference": "Lodha-Moore, GGD 10 (2016) 177-200 (nonamenability part about 2 pp., via Monod/Carriere-Ghys).",
+   "current_proof_size": "about 2 pp. plus Monod plus Carriere-Ghys",
+   "how_device_shortens": "F is contained in G_0, or the device runs directly on its tree structure",
+   "formalizable": "yes (needs the model)"
+  },
+  {
+   "id": "S3",
+   "theorem": "n-adic Thompson groups F_n, Stein groups F_{2,3} and Cleary's F_tau are nonamenable (new, but immediate given F).",
+   "reference": "Burillo-Cleary-Stein (embeddings of F_m into F_n, TAMS 2001); Burillo-Nucinkis-Reeves arXiv:1806.00108.",
+   "current_proof_size": "embedding proofs of a few pp. plus the F proof (paper about 12 pp. including the appendix; Lean 9457 lines)",
+   "how_device_shortens": "Lean speedup test: port the 68-file development to n-adic cells. Expect the generic core (21% of the DAG) and the B-S map (34%) to transfer verbatim, so only the plumbing (30%) is redone. Compare the prover's success with and without partitionColor plus the generic core in L.",
+   "formalizable": "yes: the best Lean target, since the existing infrastructure is reused"
+  },
+  {
+   "id": "S4",
+   "theorem": "An explicit Folner constant for F with respect to {x0, x1}, giving ||x0+x0^-1+x1+x1^-1|| < 4 explicitly.",
+   "reference": "new; it builds on Main.lean thompson_F_uniform_boundary plus a word-length bound for transports (Fordham / Burillo-Cleary-Stein caret metrics).",
+   "current_proof_size": "no existing proof",
+   "how_device_shortens": "n/a (new). Measures whether the device yields quantitative results cheaply.",
+   "formalizable": "yes (word-length bounds need a normal-form library)"
+  },
+  {
+   "id": "S5",
+   "theorem": "NEGATIVE CONTROLS: (i) the rational-rank-<=2 IET subgroups are amenable (Juschenko-Matte Bon-Monod-de la Salle 2018); (ii) the release's polygon-exchange group F_m is amenable (family 253); (iii) stabilisers of finite dyadic sets are co-amenable in F (arXiv:0803.0043).",
+   "reference": "as cited",
+   "current_proof_size": "10-40 pp. each",
+   "how_device_shortens": "It must NOT: the device's hypotheses (scale-changing pair transports; fine configurations) fail in each case. Use these to check that a prover equipped with the device does not 'prove' false nonamenability.",
+   "formalizable": "the hypothesis-failure checks are cheap to formalise"
+  },
+  {
+   "id": "S6",
+   "theorem": "T and V are nonamenable (they contain free subgroups).",
+   "reference": "classical (ping-pong in T; ~1 p.)",
+   "current_proof_size": "about 1 p.",
+   "how_device_shortens": "It does not; this is a control that the device gives no spurious speedup where a trivial proof exists.",
+   "formalizable": "yes"
+  }
+ ],
+ "precedent_check": {
+  "earlier_equivalent_found": false,
+  "verdict": "No earlier equivalent found, so the N3 grade is not downgraded. The combination (recursive tree/partition colouring) + (vector values in an infinite-dimensional ball) + (Lipschitz map with no approximate fixed point) + (pair-exchangeability concentration) does not appear in the literature I could reach.",
+  "nearest_neighbours": [
+   "Moore 2013, Ramsey characterisation: finite SCALAR colourings of finite binary trees with a convex Ramsey property. Neither recursive nor vector-valued; it is a reformulation, not a contradiction mechanism.",
+   "Moore, 'Fast growth in the Folner function for Thompson's group F' (arXiv:0905.1118): recursion over restrictions giving tower lower bounds on Folner sets. Scalar and unbounded, so it yields size bounds and no contradiction. This is the closest in spirit: the device is the bounded, non-stabilising upgrade of this recursion.",
+   "Akhmedov, height-function criteria (arXiv:0902.4755, 1310.4395): unbounded integer-valued heights. The device replaces 'height' by a bounded Lipschitz Hilbert-valued counter.",
+   "Monod 2013/2023: explicit fixed-point-free AFFINE convex compact spaces for H(A); by Monod's own statement the criterion fails precisely for F.",
+   "Day 1961, Gheysens-Monod 2017, Barroso-Mbombo-Pestov (arXiv:1410.8370): affine fixed-point characterisations. No nonlinear map, no recursion.",
+   "Benyamini-Sternfeld 1983 and Lin-Sternfeld 1985: the map itself, with no group-theoretic use.",
+   "Jones / Brothier-Jones Pythagorean representations: recursive assignment of Hilbert vectors along trees through a fixed LINEAR isometry. These are representations, not contradictions, and they have no averaging or fixed-point-free map. A structural cousin only.",
+   "Diaconis-Freedman finite de Finetti: the concentration step (EC2), not the definition."
+  ],
+  "post_release_use": "None found as of 2026-10-09. Sources checked: VibeMathed problem page (lists the result as 'Candidate (review pending)'); Gil Kalai's blog of 2026-10-07 (mentions the claim, no assessment); press coverage of the release; arXiv searches for Benyamini-Sternfeld plus amenability; 'A Human Audit of OpenAI's AI-Generated Mathematical Proofs' arXiv:2608.14673 (covers the August release, not this item); arXiv:2609.25931 (Lipschitz group actions, unrelated).",
+  "caveats": "The underlying theorem is unreviewed. Its history includes withdrawn claims (Shavgulidze 2009, Moore 2012, Akhmedov versions), and the release has had withdrawals (3 manuscripts on Oct 7). Every downstream item depends on its correctness. My own 'proves too much' checks are consistent with the device: it fails exactly where amenable examples live (translation-only IET and polygon exchanges, level-preserving automaton groups, finite-point configuration spaces with co-amenable stabilisers)."
+ },
+ "top5": [
+  {
+   "rank": 1,
+   "candidate": "C1",
+   "title": "Explicit isoperimetric/spectral constants for F (Kesten norm < 4, cogrowth < 16, Guba density < 4)",
+   "argument": "This is the most direct and most certain reuse of the definition itself. The device already outputs a uniform Folner constant c0 for a fixed S, and the transports have O(D) carets, so the Folner constant for {x0,x1} is polynomial in delta/L (roughly delta^4/L^4), not tower-type. That turns a decades-old numerical programme (Haagerup-Haagerup-Ramirez-Solano, Elvey Price-Guttmann, Guba's density estimates) into rigorous inequalities. The bound will be numerically tiny, but no rigorous separation from 4 or 16 exists at all. It is cleanly formalisable on top of Main.lean, so it doubles as a speedup target (S4)."
+  },
+  {
+   "rank": 2,
+   "candidate": "C2",
+   "title": "Uniform elementary nonamenability for Thompson-like and piecewise-projective groups",
+   "argument": "This is the best held-out family for a measurable speedup test. Monod's H(A) and Lodha-Moore's G_0 currently need Carriere-Ghys or Monod's affine fixed-point spaces. With the device in L they follow either by embedding F or by rerunning the argument on Farey/n-adic/tau-adic cells. The generic Lean core is already stated for an arbitrary type G, so the porting cost can be measured directly (S1-S3). Caveat: novelty is modest, because containment of F gives the qualitative results anyway, and Monod's co-amenability gaps are out of reach."
+  },
+  {
+   "rank": 3,
+   "candidate": "C3",
+   "title": "Explicit counterexample to Moore's convex Ramsey statement for finite binary trees",
+   "argument": "Moore's equivalence means the statement is now false, but only abstractly. The device's correlation functions phi_{I,J} are bounded functions of finite trees, built from an explicit B-S map, that witness the failure, so a thresholded version should give explicit (m, n, colouring) counterexamples. This is a genuinely new combinatorial object produced by the definition. It also suggests a template for refuting convex Ramsey properties of other self-similar classes (KPT-Moore), though I found no specific open class where the template clearly applies."
+  },
+  {
+   "rank": 4,
+   "candidate": "C4",
+   "title": "Explicit fixed-point-free convex compact F-space / nonlinear fixed-point characterisation",
+   "argument": "Monod's 2023 note explicitly frames the gap: his explicit fixed-point-free affine spaces work for every piecewise-projective group except F. The device supplies a nonlinear obstruction, and lifting it to an affine action on laws of colour families would give the first explicit Day witness for F. It might also suggest a 'nonlinear Day theorem' for groups acting on self-similar structures. Conceptually this is the most interesting target, but the compactness issues make it uncertain."
+  },
+  {
+   "rank": 5,
+   "candidate": "C5",
+   "title": "Co-amenability / Schreier-graph amenability inside Thompson groups",
+   "argument": "The device sharpens to a statement about coset spaces: Folner sets of G/H must concentrate on cosets whose configurations are not fine on the parent family. That is consistent with the known co-amenability of finite-set stabilisers, and it might yield non-co-amenability for subgroups whose cosets carry fine configurations near a fixed interval. Low confidence. It is listed because it is the only direction in which the device, rather than the theorem, could reach new group-theoretic open problems. Otherwise, inside PL_+(I) the device's domain coincides with groups containing F (C7)."
+  }
+ ],
+ "lean_source": [
+  {
+   "name": "UnitBall",
+   "kind": "abbrev (support)",
+   "file": "data/raw/openai-math/lean/OAI/GroupTheory/Thompson/UnitBall.lean",
+   "line": 9,
+   "text": "abbrev UnitBall (E : Type uE) [SeminormedAddCommGroup E] := {x : E // ‖x‖ ≤ 1}",
+   "note": "Carrier of the coloring: closed unit ball as a subtype."
+  },
+  {
+   "name": "ballMean",
+   "kind": "def (support)",
+   "file": "data/raw/openai-math/lean/OAI/GroupTheory/Thompson/HilbertAverage.lean",
+   "line": 79,
+   "text": "/-- The equally weighted mean, bundled with its unit-ball bound. -/\ndef ballMean (hD : 0 < D) (x : Fin D → UnitBall E) : UnitBall E :=\n  ⟨finMean (fun i => (x i : E)), finMean_mem_unitBall hD x⟩",
+   "note": "Equal-weight mean bundled with its unit-ball proof; the argument of f in the recursion."
+  },
+  {
+   "name": "partitionColor",
+   "kind": "def (THE item: recursive Hilbert-ball coloring p(T))",
+   "file": "data/raw/openai-math/lean/OAI/GroupTheory/Thompson/RecursiveColoring.lean",
+   "line": 23,
+   "text": "def partitionColor (I : Fin D → BasicInterval) (hI : ∀ i, (I i).Internal)\n    (hD : 0 < D) (f : UnitBall E → UnitBall E) (T : BasicPartition) :\n    UnitBall E := by\n  classical\n  exact if h : ∀ i, T.Respects (I i) then\n    f (ballMean hD (fun i =>\n      partitionColor I hI hD f (T.restrict (I i) (h i))))\n  else unitBallZero E\ntermination_by T.cellCount\ndecreasing_by\n  exact T.restrict_cellCount_lt _ _ (hI _)",
+   "note": "No declaration docstring; the module docstring (RecursiveColoring.lean:6-11) reads: 'Recursive unit-ball colors of actual basic dyadic partitions. The recursion uses the number of actual cells. Restriction to any selected internal interval strictly decreases that number. The mean is bundled with its genuine unit-ball proof before it is supplied to the map.'"
+  },
+  {
+   "name": "partitionFamilyColor",
+   "kind": "def (coloring restricted to parent/child family, zero off admissibility)",
+   "file": "data/raw/openai-math/lean/OAI/GroupTheory/Thompson/PartitionColorFamily.lean",
+   "line": 29,
+   "text": "/-- The family color is zero whenever the actual partition is inadmissible. -/\ndef partitionFamilyColor (hD : 0 < D) (f : UnitBall E → UnitBall E)\n    (T : BasicPartition) (q : IntervalIndex D) : UnitBall E := by\n  classical\n  exact if h : PartitionAdmissible D T then\n    partitionColor (selectedInterval D) (selectedInterval_internal D) hD f\n      (T.restrict (familyInterval D q) (h q))\n  else unitBallZero E",
+   "note": "Paper's X_I before pullback (finite-proof.tex:157-165)."
+  },
+  {
+   "name": "globalColor",
+   "kind": "def (pullback of the coloring to F: X_I^{(n)}(g))",
+   "file": "data/raw/openai-math/lean/OAI/GroupTheory/Thompson/GlobalColors.lean",
+   "line": 37,
+   "text": "def globalColor (hD : 0 < D) (f : UnitBall E → UnitBall E)\n    (n : ℕ) (q : IntervalIndex D) (g : F) : UnitBall E :=\n  optionFamilyColor hD f (imagePartitionOption g n) q",
+   "note": "No declaration docstring. Paper I23 (color:global)."
+  },
+  {
+   "name": "partitionColor_restrict",
+   "kind": "theorem (defining recursive identity at a parent)",
+   "file": "data/raw/openai-math/lean/OAI/GroupTheory/Thompson/RecursiveColoring.lean",
+   "line": 62,
+   "text": "/-- Applying the recursion to a parent restriction gives the actual child mean.\nThe normalized two-step restriction is replaced by the proved composite one. -/\ntheorem partitionColor_restrict (I : Fin D → BasicInterval)\n    (hI : ∀ i, (I i).Internal) (hD : 0 < D)\n    (f : UnitBall E → UnitBall E) (T : BasicPartition) (i : Fin D)\n    (hparent : T.Respects (I i))\n    (hchild : ∀ j, T.Respects ((I i).comp (I j))) :\n    partitionColor I hI hD f (T.restrict (I i) hparent) =\n      f (ballMean hD (fun j => partitionColor I hI hD f\n        (T.restrict ((I i).comp (I j)) (hchild j)))) := ...",
+   "note": "Paper eq. (avg:recursive-identity) X_{I_i}=f(z_i), via (T_I)_J = T_{I.J}."
+  },
+  {
+   "name": "partitionFamilyColor_parent",
+   "kind": "theorem (recursive identity on the family)",
+   "file": "data/raw/openai-math/lean/OAI/GroupTheory/Thompson/PartitionColorFamily.lean",
+   "line": 57,
+   "text": "/-- A parent's color is the map applied to its actual child-color mean. -/\ntheorem partitionFamilyColor_parent (hD : 0 < D)\n    (f : UnitBall E → UnitBall E) (T : BasicPartition)\n    (h : PartitionAdmissible D T) (i : Fin D) :\n    partitionFamilyColor hD f T (.inl i) =\n      f (ballMean hD (fun j => partitionFamilyColor hD f T (.inr (i, j)))) := ...",
+   "note": ""
+  },
+  {
+   "name": "globalColor_covariance",
+   "kind": "theorem (exact covariance under transports)",
+   "file": "data/raw/openai-math/lean/OAI/GroupTheory/Thompson/GlobalColors.lean",
+   "line": 96,
+   "text": "/-- Source and target admissibility suffice; the transport need not preserve\nany other selected interval. -/\ntheorem globalColor_covariance (hD : 0 < D) (f : UnitBall E → UnitBall E)\n    (n : ℕ) (h g : F) (q r : IntervalIndex D)\n    (hc : CarriesAffinely h (familyInterval D q) (familyInterval D r))\n    (hg : GlobalAdmissible D n g) (hhg : GlobalAdmissible D n (h * g)) :\n    globalColor hD f n q g = globalColor hD f n r (h * g) := ...",
+   "note": "Paper eq. (dyad:covariance)."
+  },
+  {
+   "name": "displacement_le_mean_energy",
+   "kind": "theorem (no-approximate-fixed-point => spread)",
+   "file": "data/raw/openai-math/lean/OAI/GroupTheory/Thompson/DisplacementEstimate.lean",
+   "line": 23,
+   "text": "/-- The pointwise inequality obtained from the actual recursive colors. -/\ntheorem displacement_le_mean_energy {D : ℕ} (hD : 0 < D)\n    (f : UnitBall E → UnitBall E) (L δ : ℝ)\n    (_hL : 0 < L) (hδ : 0 < δ)\n    (hLip : ∀ u v, ‖(f u : E) - f v‖ ≤ L * ‖(u : E) - v‖)\n    (hDisp : ∀ u, δ ≤ ‖(f u : E) - u‖)\n    (x z : Fin D → UnitBall E) (hrec : ∀ i, x i = f (z i)) :\n    δ ^ 2 ≤ L ^ 2 * (D : ℝ)⁻¹ *\n      ∑ i, ‖(z i : E) - (ballMean hD x : E)‖ ^ 2 := ...",
+   "note": "Paper eq. (avg:displacement)."
+  },
+  {
+   "name": "boundaryConstant_le_of_correlations",
+   "kind": "theorem (generic core: recursion + approximate pair-exchangeability => boundary bound; G is an arbitrary type)",
+   "file": "data/raw/openai-math/lean/OAI/GroupTheory/Thompson/FiniteCorrelationBoundary.lean",
+   "line": 56,
+   "text": "theorem boundaryConstant_le_of_correlations (A : Finset G) (hA : A.Nonempty)\n    (hD : 2 ≤ D) (f : UnitBall E → UnitBall E) (L δ α η : ℝ)\n    (hL : 0 < L) (hδ : 0 < δ)\n    (hLip : ∀ u v, ‖(f u : E) - f v‖ ≤ L * ‖(u : E) - v‖)\n    (hDisp : ∀ u, δ ≤ ‖(f u : E) - u‖)\n    (x : G → Fin D → UnitBall E) (y : G → Fin D → Fin D → UnitBall E)\n    (hrec : ∀ g ∈ A, ∀ i,\n      x g i = f (ballMean (lt_of_lt_of_le (by decide : 0 < 2) hD) (y g i)))\n    (hparent : ∀ j k, j ≠ k →\n      |corr A (fun g => (x g j : E)) (fun g => (x g k : E)) - α| ≤ η)\n    (hchild : ∀ i j k, j ≠ k →\n      |corr A (fun g => (y g i j : E)) (fun g => (y g i k : E)) - α| ≤ η)\n    (hmixed : ∀ i j k, k ≠ i →\n      |corr A (fun g => (y g i j : E)) (fun g => (x g k : E)) - α| ≤ η) :\n    boundaryConstant L δ D ≤ η := ...",
+   "note": "Generic over any index type G -- the reusable abstract criterion."
+  },
+  {
+   "name": "exists_fixed_boundary",
+   "kind": "theorem (uniform Folner failure for F, any Hilbert space E and any displacement map f)",
+   "file": "data/raw/openai-math/lean/OAI/GroupTheory/Thompson/FiniteBoundary.lean",
+   "line": 16,
+   "text": "theorem exists_fixed_boundary (f : UnitBall E → UnitBall E) (L δ : ℝ)\n    (hL : 0 < L) (hδ : 0 < δ)\n    (hLip : ∀ x y, ‖(f x : E) - f y‖ ≤ L * ‖(x : E) - y‖)\n    (hDisp : ∀ x, δ ≤ ‖(f x : E) - x‖)\n    (D : ℕ) (hD : 2 ≤ D) (hlarge : 4 * L ^ 2 / δ ^ 2 < (D : ℝ)) :\n    ∃ S : Finset F, S.Nonempty ∧ 0 < boundaryConstant L δ D ∧\n      ∀ A : Finset F, A.Nonempty →\n        ∃ h ∈ S, boundaryConstant L δ D ≤ boundaryRatio A h := ...",
+   "note": "Proof assembles the coloring, transports and the generic core."
+  }
+ ],
+ "sources": [
+  "data/pilot/248/family.json, family.md (analyst items I16, I19, I23, I25, I28, I31, I33, I34)",
+  "data/raw/openai-math/preprints/Thompsons-group-F-is-nonamenable-September-23-2026/build/sections/{introduction,finite-proof,consequences}.tex",
+  "data/raw/openai-math/lean/OAI/GroupTheory/Thompson/{RecursiveColoring,PartitionColorFamily,GlobalColors,DisplacementEstimate,FiniteCorrelationBoundary,FiniteBoundary,Main,UnitBall,HilbertAverage,IntervalFamily,AnalyticConstruction,BoundaryAlgebra,TransportFamily}.lean",
+  "data/raw/openai-math/lean/docs/248.md",
+  "data/raw/openai-math/CONTENTS.md (families 214, 251, 253, 259, 328)",
+  "data/raw/openai-math/preprints/An-Infinite-Finitely-Presented-Simple-Amenable-Group-September-23-2026/build/sections/amenability.tex",
+  "https://arxiv.org/abs/2305.00796 (Monod 2023, piecewise-projective groups; read in full)",
+  "https://arxiv.org/abs/1409.1486 (Haagerup-Haagerup-Ramirez-Solano)",
+  "https://arxiv.org/abs/1706.07571 (Elvey Price-Guttmann)",
+  "https://arxiv.org/abs/2210.12304 (Guba, density)",
+  "https://arxiv.org/abs/2305.07113 (Guba, state of the art)",
+  "https://arxiv.org/abs/1106.4735 (Moore, Hindman/Ellis/F)",
+  "https://arxiv.org/abs/1502.04429 (Kechris-Sokic-Todorcevic survey)",
+  "https://arxiv.org/abs/0905.1118 (Moore, Folner function)",
+  "https://arxiv.org/abs/1310.4395 and https://arxiv.org/abs/0902.4755 (Akhmedov)",
+  "https://arxiv.org/abs/1605.01651 (Le Boudec-Matte Bon)",
+  "https://arxiv.org/abs/1602.02971 (Kaimanovich, F not Liouville)",
+  "https://arxiv.org/abs/math/9705205 (Brin ubiquity); https://arxiv.org/abs/1711.10998; https://arxiv.org/abs/2103.14911",
+  "https://arxiv.org/abs/1806.00108 (Burillo-Nucinkis-Reeves, F_tau)",
+  "https://arxiv.org/abs/2207.03100, 2212.01993, 2406.09718 (Brothier forest-skein)",
+  "https://arxiv.org/abs/1807.06215 (Brothier-Jones Pythagorean)",
+  "https://arxiv.org/abs/1804.01981 (Garban, IET); Juschenko-Matte Bon-Monod-de la Salle ETDS 2018; https://arxiv.org/abs/2601.23054",
+  "https://arxiv.org/abs/0803.0043 (graphs related to F; co-amenable stabilisers)",
+  "https://arxiv.org/abs/2109.01111 (relatively amenable actions of Thompson's groups)",
+  "https://arxiv.org/abs/1410.8370 (Barroso-Mbombo-Pestov AFP)",
+  "https://arxiv.org/abs/1612.06270, https://arxiv.org/abs/1909.09723 (Wisnicki, Lau's problem)",
+  "Arzhantseva-Burillo-Lustig-Reeves-Short-Ventura, Uniform non-amenability, Adv. Math. 2005 (web.mat.upc.edu/pep.burillo/Papers/folner.pdf)",
+  "https://vibemathed.com/problem/thompson-group-f-amenability",
+  "https://gilkalai.wordpress.com/2026/10/07/updates-sharing-ai-progress-on-mathematics-amazing-and-my-lecture-plans/",
+  "https://arxiv.org/abs/2608.14673, https://arxiv.org/abs/2609.25931, https://arxiv.org/abs/2607.17388 (contamination checks; none relevant)"
+ ],
+ "search_log": [
+  "Local: read the brief, PLAN.md (novelty/speedup sections), family.md, family.json items, introduction/finite-proof/consequences .tex, Lean RecursiveColoring/PartitionColorFamily/GlobalColors/FiniteBoundary/FiniteCorrelationBoundary/DisplacementEstimate/Main/HilbertAverage/UnitBall/IntervalFamily/AnalyticConstruction, and lean/docs/248.md.",
+  "Local release search: grep CONTENTS.md for amenab|thompson|benyamini|fixed point|lner|piecewise|homeomorphism|Dixmier|Ramsey|uniformly bounded. Found 214, 251, 253, 328, 259 (unrelated) and others irrelevant. grep all preprint .tex for Benyamini|Sternfeld (only 248), Thompson (253, 250, Ulam-stability etc.; no device use), approximate fixed point / fixed-point-free (unrelated involutions). Read 253 amenability.tex intro (translation-only random polygonal partitions) and 251 section list.",
+  "Web: 'Thompson's group F nonamenable 2026 recursive coloring Hilbert ball' -> VibeMathed candidate page; no other confirmation.",
+  "Web: Brin ubiquity / Brin-Sapir dichotomy -> conjecture open; Brin's criterion shows the device's domain contains F.",
+  "Web: Le Boudec-Matte Bon -> T C*-simple iff F nonamenable (theorem corollary).",
+  "Web: forest-skein groups and F -> no amenability statements found.",
+  "Web: uniform exponential growth / uniform non-amenability of F -> not settled in the sources; ABLRSV 2005 read (no F statement extracted).",
+  "Web: Guba density 2025; Haagerup-Haagerup-Ramirez-Solano; Elvey Price-Guttmann -> only numerical or lower bounds, no rigorous < 4 / < 16.",
+  "Web: Lau / Lau-Zhang nonexpansive fixed point problem -> largely resolved (Salame, Wisnicki, TMNA 2022); not a target.",
+  "Web: IET amenability (JMMdlS, Garban, Guelman-Liousse 2026) -> open; device inapplicable (no scale change).",
+  "Web: Moore Ramsey characterisation (1106.4735; KST survey) -> statement equivalent to amenability; Moore's 1.3/1.4 conjectures already refuted by Moore.",
+  "Web: piecewise-projective open problems -> Monod 2023 (read the PDF text): explicit affine fixed-point method fails precisely for F; amenability-gap and co-amenability theorems.",
+  "Web: Akhmedov height function / TSP -> unbounded integer heights; Guba disproved TSP for F.",
+  "Web: Benyamini-Sternfeld + amenability -> no prior group-theoretic use; Barroso-Mbombo-Pestov AFP is affine only.",
+  "Web: 2609.25931, 2607.17388, 2608.14673 abstracts -> no contamination.",
+  "Web: co-amenability in Thompson groups -> finite-set stabilisers co-amenable in F (0803.0043); S^1 is (T,F)-amenable (2109.01111).",
+  "Web: KPT/Kechris-Sokic random poset and distributive lattice -> already nonamenable by other methods; no matching open class found.",
+  "Web: Brothier-Jones Pythagorean representations -> linear recursive vector assignment; structural cousin.",
+  "Web: Cleary F_tau -> contains F (BNR), so nonamenable by containment.",
+  "Web: expert reaction to the release -> Kalai blog (no assessment), press; no named expert verdict on 248."
+ ]
+}

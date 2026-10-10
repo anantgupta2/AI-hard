@@ -1,0 +1,400 @@
+{
+ "fid": "221",
+ "item": "Shifted target tree S+ with charging of fresh splits (Mézard-Parisi lower bound): delay every internal branching depth of the target shape by one, so each target branching vertex must be created by a fresh unary split (coefficient -delta), giving sum |c| <= C delta^b and, after division by J = kappa(S+)^2 ~ delta^{2b}, a relative absolute cost bounded uniformly in L",
+ "item_type": "lemma (F3; device inside the conditional-decorrelation induction)",
+ "lean_status": "as in paper",
+ "lean_status_why": "Located: the shift is OAI/Probability/DilutedSpin/ShiftedTree.lean (bottomUnary, doubled, shiftedTwinDepths, shifted_twin_old_count/target_count), the charging lemma is ShapeCharging.lean:30 prescribed_history_charging_bound (via HistorySelector.lean:155 labeledHistory_charging_bound and ActualCharging.lean chargeBound), and the relative bound after division is RootMatrixTriple.lean:110 shiftedCharge_relative_bound; all lie on the proof path of the comparator target OAI.DilutedSpinGlass.mezard_parisi.",
+ "lean_gaps": [
+  "Text-level only: the Lean was NOT compiled (no local toolchain). The DAG was regenerated with scripts/extract_lean.py into the scratchpad because data/items/221_lean.json is an older v1 extraction without dominated_share; data/items was not modified.",
+  "Encoding of the shift: the Lean works with two aligned copies, doubled S = node 2 (fun _ => S), compared with doubled (bottomUnary S) (old tree: depths unchanged) and doubled (unary S) (target: every branching depth delayed). Because doubled adds a root level, the charged depth set is shiftedTwinDepths S = branchingDepths S + 2, and with a retained prefix shiftedPrefixDepths S d = (+2) + d. This is the paper's S+ (shift by one) seen from inside the doubled tree.",
+  "The general-position premise is made explicit as NoAdjacentBranchDepths S (no two branching depths differ by 1), derived from regularity once eta L > 1; the paper says 'for large L, regularity ensures that each shifted depth differs from every branching depth of the old tree'.",
+  "Charging constant: the paper bounds the sum by k!/(k-b)! (q+k)^b (2(q+k))^{k-b} delta^b; the Lean uses a recursively defined chargeBound C D k b (chargeBound_scale pulls out delta^b with delta = 1/L). Equivalent role, different constant bookkeeping.",
+  "Normalizer: the paper divides by J = kappa(S+)^2; the Lean divides by |partialKappa T grid univ / partialKappa T grid {b,a}| (a full-to-protected-pair kappa ratio, protectedKappa_grid_lower gives D*E <= J) and states the cancellation of powers of L exactly, including distinct vertices at equal depths (docstring of shiftedCharge_relative_bound).",
+  "The Lean's lower bound (symmetric_trial_lower, SymmetricTrialLower.lean:13) is stated for Model (q+1) of ANY arity with a permutation-symmetric bounded-first-moment disorder; the paper fixes even p in model.tex:3 (the even-arity/positivity class is needed only for the upper bound). So the Lean lower bound containing the device is more general than the paper's stated scope, and the SATComputability formalization (docs/235) (SATComputability) uses it at arity 3.",
+  "The charging count (without the shift) is used a second time inside the family: qExpect_grid_branching (QTreeLaw.lean:112) bounds the Q_k random-tree mass of prescribed branching vertices by chargeBound * L^{-b}; it matches the paper's separate Lemma tree:regular-shapes (trees.tex:468), whose proof is the probabilistic version of the same count. This reuses the fresh-split count, not the S+ shift.",
+  "Comparator is the full headline (pressure -> variationalValue for admissible models); the device is invisible in statements. Declaration-level dominated shares are small (prescribed_history_charging_bound 0.0014, shiftedCharge_relative_bound 0.0032, node_frame_charge_uniform 0.0115); the novelty pass's 0.80/0.67 were file-import shares and are inflated.",
+  "Family 221 is absent from lean/formalization.yaml (comparator present in ComparatorChallenges/DilutedSpin.json and docs/221.md)."
+ ],
+ "comparator_chain": [
+  "OAI.DilutedSpinGlass.mezard_parisi (Main.lean:12; comparator target)",
+  "variationalValue_le_liminf_pressure",
+  "admissible_trial_lower",
+  "symmetric_trial_lower (SymmetricTrialLower.lean:13)",
+  "bounded_symmetric_trial_lower",
+  "full_regular_covariance_selection",
+  "physicalShapeLimsup_tendsto",
+  "physicalShapeLimsup_node",
+  "regular_node_average",
+  "regular_node_pointwise (RegularNodeProducer.lean:19)",
+  "physical_grid_scheduled_step",
+  "physical_grid_root_multileaf",
+  "canonical_regular_root_multileaf",
+  "physical_scheduled_root_multileaf_moments",
+  "physical_scheduled_root_multileaf",
+  "scheduled_root_multileaf",
+  "root_multileaf_matrix",
+  "root_matrix_three_copy (RootMatrixTriple.lean:17)",
+  "matrix_three_copy_pointwise",
+  "projection_history_difference",
+  "projection_history_cost",
+  "prescribed_history_charging_bound (ShapeCharging.lean:30)",
+  "labeledHistory_charging_bound (HistorySelector.lean:155)",
+  "charging_final_shape (ActualCharging.lean:814) -> chargeBound (ActualCharging.lean:709)",
+  "[shift branch] regular_node_pointwise -> node_frame_charge_uniform (RegularNodeGeometry.lean:64) -> scheduled_frame_target_total -> shifted_prefix_total_count -> shifted_twin_total_count -> shifted_twin_target_count (ShiftedTree.lean:173)",
+  "[shift branch] canonical_regular_root_multileaf -> scheduled_regular_old_count -> scheduled_frame_old_count -> shifted_prefix_old_count -> shifted_twin_old_count (ShiftedTree.lean:160) [uses NoAdjacentBranchDepths, bottomUnary]",
+  "[relative bound] root_matrix_three_copy / node_frame_charge_uniform -> shiftedCharge (MatrixRoot.lean:30), shiftedCharge_relative_bound (RootMatrixTriple.lean:110) -> protectedKappa_grid_lower",
+  "[second in-family use of charging, no shift] ... cavityProxy_comparison_tendsto -> ... -> qSubtree_limsup_tendsto -> qExpect_subtree_eta_bound -> ... -> qEmbed_realize_le -> qExpect_grid_branching (QTreeLaw.lean:112)"
+ ],
+ "lean_source": [
+  {
+   "name": "bottomUnary",
+   "kind": "def",
+   "file": "lean/OAI/Probability/DilutedSpin/ShiftedTree.lean",
+   "line": 16,
+   "text": "/-- Extending the final unary edge keeps every internal branching depth.\nIn contrast, `unary S` delays all of them by exactly one. -/\ndef bottomUnary : {n : ℕ} → PrescribedTree n → PrescribedTree (n+1)\n  | 0, .leaf => unary .leaf\n  | _+1, .node k C => .node k (fun i => bottomUnary (C i))"
+  },
+  {
+   "name": "doubled",
+   "kind": "def",
+   "file": "lean/OAI/Probability/DilutedSpin/ShiftedTree.lean",
+   "line": 145,
+   "text": "/-- Both copies are aligned, but the two occurrences are different vertices. -/\ndef doubled {n : ℕ} (S : PrescribedTree n) : PrescribedTree (n+1) := .node 2 (fun _ => S)"
+  },
+  {
+   "name": "shiftedTwinDepths",
+   "kind": "def",
+   "file": "lean/OAI/Probability/DilutedSpin/ShiftedTree.lean",
+   "line": 147,
+   "text": "noncomputable def shiftedTwinDepths {n : ℕ} (S : PrescribedTree n) : Finset ℕ :=\n  (branchingDepths S).image (fun d => d+2)"
+  },
+  {
+   "name": "NoAdjacentBranchDepths",
+   "kind": "def",
+   "file": "lean/OAI/Probability/DilutedSpin/ShiftedTree.lean",
+   "line": 157,
+   "text": "/-- Regular depth assignments imply this no-adjacent-depth condition once\neta L > 1. It is precisely the geometric premise of shifted charging. -/\ndef NoAdjacentBranchDepths {n : ℕ} (S : PrescribedTree n) : Prop :=\n  ∀ a ∈ branchingDepths S, ∀ b ∈ branchingDepths S, a+1 ≠ b"
+  },
+  {
+   "name": "shifted_twin_old_count",
+   "kind": "lemma",
+   "file": "lean/OAI/Probability/DilutedSpin/ShiftedTree.lean",
+   "line": 160,
+   "text": "lemma shifted_twin_old_count {n : ℕ} (S : PrescribedTree n) (hs : NoAdjacentBranchDepths S) :\n    branchingCount (doubled (bottomUnary S)) (· ∈ shiftedTwinDepths S) = 0"
+  },
+  {
+   "name": "shifted_twin_target_count",
+   "kind": "lemma",
+   "file": "lean/OAI/Probability/DilutedSpin/ShiftedTree.lean",
+   "line": 173,
+   "text": "lemma shifted_twin_target_count {n : ℕ} (S : PrescribedTree n) :\n    branchingCount (doubled (unary S)) (· ∈ shiftedTwinDepths S) =\n      2*branchingCount S (fun _ => True)"
+  },
+  {
+   "name": "chargeBound",
+   "kind": "def",
+   "file": "lean/OAI/Probability/DilutedSpin/ActualCharging.lean",
+   "line": 709,
+   "text": "noncomputable def chargeBound (C D : ℝ) : ℕ → ℕ → ℝ\n  | 0, b => if b = 0 then 1 else 0\n  | k+1, 0 => C * chargeBound C D k 0\n  | k+1, b+1 => C * chargeBound C D k (b+1) + D * chargeBound C D k b"
+  },
+  {
+   "name": "labeledHistory_charging_bound",
+   "kind": "theorem",
+   "file": "lean/OAI/Probability/DilutedSpin/HistorySelector.lean",
+   "line": 155,
+   "text": "/-- Charging estimate for an actual labeled terminal observable. Restricting\nthe allowed splitting matrices and inserting a uniformly bounded projection\nerror are both handled in this single estimate. -/\ntheorem labeledHistory_charging_bound (hL : 0 < L) (Q : Finset ℕ) (b : ℕ)\n    (V : (S : PrescribedTree L) → (C → S.Leaf) → (Sample Ω S → ℝ) → ℝ)\n    (E : ℝ) (hE : 0 ≤ E) (cs : List C) (S : PrescribedTree L)\n    (U : Finset ι) (loc : ι → S.Leaf) (pos : C → S.Leaf)\n    (f : Sample Ω S → ℝ) (hf : ∀ x, |f x| ≤ 1) (hU : U.card ≤ leaves S)\n    (hV : ∀ T pos g, (∀ x, |g x| ≤ 1) → |V T pos g| ≤ E *\n      (if branchingCount S (· ∈ Q)+b ≤ branchingCount T (· ∈ Q) then 1 else 0)) :\n    |labeledHistory (grid L 0 L) V cs S U loc pos f| ≤\n      E * (chargeBound (2*(leaves S+cs.length:ℕ)) ((Q.card:ℝ)*(leaves S+cs.length:ℕ))\n        cs.length b * (L:ℝ)⁻¹^b)"
+  },
+  {
+   "name": "prescribed_history_charging_bound",
+   "kind": "theorem",
+   "file": "lean/OAI/Probability/DilutedSpin/ShapeCharging.lean",
+   "line": 30,
+   "text": "/-- Absolute projection-error cost for the ACTUAL exact-matrix history. This\nis the charging step in the shifted-two-copy argument: take Q to be shifted\ndepths, so the old tree has no branching in Q. The exponent counts vertices,\nnot distinct depths, hence aligned copies are charged separately. -/\ntheorem prescribed_history_charging_bound (hL : 0 < L) (Q : Finset ℕ)\n    (T S : PrescribedTree L) (q : C → T.Leaf) (hq : Function.Surjective q)\n    (hS : branchingCount S (· ∈ Q) = 0)\n    (W : (R : PrescribedTree L) → (C → R.Leaf) → (Sample Ω R → ℝ) → ℝ)\n    (E : ℝ) (hE : 0 ≤ E)\n    (hW : ∀ R pos g, (∀ x, |g x| ≤ 1) →\n      (∀ a b, splitDepth R (pos a) (pos b) = splitDepth T (q a) (q b)) → |W R pos g| ≤ E)\n    (cs : List C) (U : Finset ι) (loc : ι → S.Leaf) (pos : C → S.Leaf)\n    (f : Sample Ω S → ℝ) (hf : ∀ x, |f x| ≤ 1) (hU : U.card ≤ leaves S) :\n    |labeledHistory (grid L 0 L)\n      (fun R pos g => if ∀ a b, splitDepth R (pos a) (pos b) = splitDepth T (q a) (q b)\n        then W R pos g else 0) cs S U loc pos f| ≤\n      E * (chargeBound (2*(leaves S+cs.length:ℕ)) ((Q.card:ℝ)*(leaves S+cs.length:ℕ))\n        cs.length (branchingCount T (· ∈ Q)) * (L:ℝ)⁻¹^(branchingCount T (· ∈ Q)))"
+  },
+  {
+   "name": "shiftedCharge",
+   "kind": "def",
+   "file": "lean/OAI/Probability/DilutedSpin/MatrixRoot.lean",
+   "line": 30,
+   "text": "noncomputable def shiftedCharge (Q : Finset ℕ) (T S : PrescribedTree L) (k : ℕ) : ℝ :=\n  chargeBound (2*(leaves S+k:ℕ)) ((Q.card:ℝ)*(leaves S+k:ℕ)) k (branchingCount T (· ∈ Q)) *\n    (L:ℝ)⁻¹^(branchingCount T (· ∈ Q))"
+  },
+  {
+   "name": "shiftedCharge_relative_bound",
+   "kind": "theorem",
+   "file": "lean/OAI/Probability/DilutedSpin/RootMatrixTriple.lean",
+   "line": 110,
+   "text": "/-- The manuscript's relative absolute-cost bound. Its dimensional power of\nL cancels EXACTLY, including distinct target vertices sharing a depth. -/\ntheorem shiftedCharge_relative_bound (hL : 0 < L) (Q : Finset ℕ)\n    (T S : PrescribedTree L) (k : ℕ) (a b : T.Leaf) (hab : a ≠ b)\n    (η : ℝ) (hη : 0 < η) (hr : BranchRegular T (grid L 0 L) η)\n    (hb : branchingCount T (fun _ => True) = branchingCount T (· ∈ Q)+1) :\n    shiftedCharge Q T S k /\n        |partialKappa T (grid L 0 L) Finset.univ / partialKappa T (grid L 0 L) {b,a}| ≤\n      chargeBound (2*(leaves S+k:ℕ)) ((Q.card:ℝ)*(leaves S+k:ℕ)) k\n        (branchingCount T (· ∈ Q)) / η^(branchExcess T)"
+  },
+  {
+   "name": "shiftedPrefixDepths",
+   "kind": "def",
+   "file": "lean/OAI/Probability/DilutedSpin/ShiftedFrameGeometry.lean",
+   "line": 24,
+   "text": "/-- Charged depths after retaining the genuine shared prefix above d. -/\nnoncomputable def shiftedPrefixDepths (S : PrescribedTree n) (d : ℕ) : Finset ℕ :=\n  (shiftedTwinDepths S).image (fun u => u+d)"
+  },
+  {
+   "name": "qExpect_grid_branching",
+   "kind": "lemma",
+   "file": "lean/OAI/Probability/DilutedSpin/QTreeLaw.lean",
+   "line": 112,
+   "text": "lemma qExpect_grid_branching {L : ℕ} (hL : 0<L) (Q : Finset ℕ) (k b : ℕ)\n    (S : PrescribedTree L) :\n    qExpect (grid L 0 L) (fun T => if branchingCount S (·∈Q)+b≤branchingCount T (·∈Q)\n      then 1 else 0) k S≤\n    chargeBound (2*(leaves S+k:ℕ)) ((Q.card:ℝ)*(leaves S+k:ℕ)) k b * (L:ℝ)⁻¹^b"
+  },
+  {
+   "name": "symmetric_trial_lower",
+   "kind": "lemma",
+   "file": "lean/OAI/Probability/DilutedSpin/SymmetricTrialLower.lean",
+   "line": 13,
+   "text": "lemma symmetric_trial_lower {q : ℕ} (M : Model (q+1)) (hα : 0 < M.alpha)\n    (hθ : Integrable (fun z : InteractionSample (q+1) => ‖z.1‖) M.disorder.toMeasure)\n    (hh : Integrable (fun h : ℝ => |h|) M.field.toMeasure)\n    (hsym : ∀ e : Equiv.Perm (Fin (q+1)),IdentDistrib (fun z : InteractionSample (q+1) => z.1)\n      (fun z : InteractionSample (q+1) => fun s => z.1 (fun i => s (e i))) M.disorder.toMeasure M.disorder.toMeasure)\n    {ε : ℝ} (hε : 0 < ε) :\n    ∃ (r : ℕ) (ζ : Hierarchy (r+1)) (m : Fin r → ℝ),Exponents m ∧\n      functional M r ζ m ≤ liminf (pressure M) atTop+ε"
+  }
+ ],
+ "speedup_targets": [
+  {
+   "title": "Conditional decorrelation / three-copy bound inside the MP lower bound (root_matrix_three_copy, regular_node_pointwise) with vs without the shift lemmas",
+   "statement": "Paper: the k>=2 induction step of the decorrelation theorem (decorrelation.tex 'Shifted copies and their coefficients' onward): projection errors of two copies of the target shape, after division by the small reference coefficient, are bounded uniformly in L. Lean: root_matrix_three_copy (RootMatrixTriple.lean:17), node_frame_charge_uniform (RegularNodeGeometry.lean:64), regular_node_pointwise (RegularNodeProducer.lean:19).",
+   "reference": "221 paper sections/decorrelation.tex:292-490, trees.tex:393-456; OAI DilutedSpin.",
+   "status": "proved (this family)",
+   "current_size": "paper: charging lemma ~1 p., shifted-copies argument ~3 pp.; Lean: the shift/charge files ShiftedTree 308, ShapeCharging 61, ActualCharging 830, HistorySelector (part), RootMatrixTriple, ShiftedFrameGeometry 134, TopologyChargeBound 101, ScheduledRelativeCharge 60, RegularNodeGeometry ~2,050 lines in total; regular_node_pointwise dominated share 0.086.",
+   "how_item_helps": "Ablation/discoverability target: withhold shiftedTwinDepths/shifted_twin_*/prescribed_history_charging_bound. Without the shift, errors after division by kappa ~ delta^{2b} grow like delta^{-2b} (the trace's learned clause C10), so a prover must find the shift or another general-position device.",
+   "expected_speedup": "high (it is the item's own job; calibration arm, not reach)",
+   "confidence": 0.65,
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI DilutedSpin PrescribedTree, KernelTower, Sample, partialKappa, grid, labeledHistory",
+    "missing": [],
+    "formal_proof_to_compare": "Yes: OAI proof (~2k lines of shift/charge files)."
+   }
+  },
+  {
+   "title": "Regular-shapes lemma for the random tree law Q_k (trees.tex Lemma tree:regular-shapes; Lean qExpect_grid_branching / qExpect_subtree_*)",
+   "statement": "Q_k{T not regular} <= C_k(eta + 1/L) and Q_k{given topology and depth assignment} <= C_k L^{-a}.",
+   "reference": "221 paper trees.tex:468-517; Lean QTreeLaw.lean:112, QTopologyBound.lean:89-95, TopologyDecay.lean:138.",
+   "status": "proved (this family)",
+   "current_size": "paper ~1 p.; Lean QTreeLaw/QTopologyBound/TopologyDecay a few hundred lines, on top of charging_final_shape.",
+   "how_item_helps": "The Lean proves it by calling the charging bound (charging_final_shape) on an empty old tree: each prescribed branching vertex costs one 1/L. This is in-family reuse of the CHARGING half only; the shift is not needed. Speedup test: give vs withhold charging_final_shape.",
+   "expected_speedup": "low-med (the paper's direct probabilistic proof is short)",
+   "confidence": 0.5,
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI DilutedSpin qExpect, grid, PrescribedTree, branchingCount",
+    "missing": [],
+    "formal_proof_to_compare": "Yes: OAI proof."
+   }
+  },
+  {
+   "title": "Panchenko's finite-RSB Mézard-Parisi structure theorem for diluted models",
+   "statement": "If an asymptotic Gibbs measure of a (perturbed) diluted model is finite-RSB (overlap takes finitely many values), then its spin distribution is given by the MP hierarchical cavity construction (and hence the free energy equals the MP functional at that order).",
+   "reference": "D. Panchenko, Structure of finite-RSB asymptotic Gibbs measures in the diluted spin glass models, J. Stat. Phys. 162 (2016), arXiv:1406.4702.",
+   "status": "known",
+   "current_size": "~40 pp. plus the hierarchical Aldous-Hoover/Ghirlanda-Guerra background (Panchenko 2013 Annals; Austin-Panchenko 2014).",
+   "how_item_helps": "The obstruction is the same (multioverlaps are not determined by pair overlaps; one needs conditional decorrelation along the replica tree). The prescribed-tree identities plus the shift/charging device give conditional decorrelation directly at finite depth without the asymptotic Gibbs-measure machinery. Whether this shortens Panchenko's structural statement (which is about limits of Gibbs measures) is unclear; it shortens the route to the free-energy consequence, which is a corollary of 221.",
+   "expected_speedup": "med (for the free-energy consequence); low (for the structural theorem itself)",
+   "confidence": 0.3,
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "Would need asymptotic Gibbs measures, Ghirlanda-Guerra identities, hierarchical exchangeability; none in Mathlib/OAI",
+    "missing": [
+     "asymptotic Gibbs measures as limits of spin distributions (>1000 lines)"
+    ],
+    "formal_proof_to_compare": "None."
+   }
+  }
+ ],
+ "open_problems": [
+  {
+   "title": "Mézard-Parisi formula for the diluted antiferromagnetic Potts model / random graph q-colouring at positive temperature",
+   "statement": "Show the limiting free energy of the Potts antiferromagnet on Erdős-Rényi graphs equals the full Mézard-Parisi (finite-hierarchy infimum) cavity formula.",
+   "reference": "Contucci, Dommers, Giardinà, Starr, Antiferromagnetic Potts model on the Erdős-Rényi random graph, CMP 323 (2013), arXiv:1106.4714 (interpolation upper bound); Panchenko, Free energy in the Potts spin glass, Ann. Probab. 46 (2018), arXiv:1512.00370 (dense case).",
+   "status": "open (upper bound by interpolation known; matching lower bound open beyond RS/1RSB regimes, as far as we know; not re-verified this session)",
+   "obstruction_match": "The lower bound needs multioverlap (here: multi-colour-overlap) conditional decorrelation in a sparse model; the shift/charging device is purely combinatorial on prescribed replica trees and does not see the spin alphabet.",
+   "adaptation_sketch": "Replace Rademacher marks by colour-valued marks; redo the canceled-anchor tree calculus with vector observables; the shift S -> S+ and the delta-per-fresh-split charge carry over unchanged; the cavity/upper-bound side uses CDGS interpolation.",
+   "payoff": "high",
+   "confidence": 0.3,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Generalize OAI DilutedSpinGlass.Model/functional/pressure from Ising spins to Fin q",
+    "missing": [
+     "Potts Model and Boltzmann weights (~80 lines)",
+     "hierarchical trial functional over probability vectors (~150-250 lines)"
+    ],
+    "formal_proof_to_compare": "None."
+   }
+  },
+  {
+   "title": "Mézard-Parisi formula for diluted models on random regular graphs (fixed degree)",
+   "statement": "For Ising spin glasses on random d-regular (hyper)graphs, the limiting free energy equals the MP finite-hierarchy infimum.",
+   "reference": "Concetti, arXiv:2508.17049 (full-RSB <= finite-RSB bound on random regular graphs); Franz-Leone / Panchenko-Talagrand interpolation is for Poisson degrees.",
+   "status": "open (one inequality/partial results only, per the novelty pass)",
+   "obstruction_match": "Same lower-bound obstruction; the device lives in the tree calculus, not in the Poisson structure. What changes is the cavity/perturbation layer (Poisson insertions) which the device does not touch.",
+   "adaptation_sketch": "Use configuration-model cavity with a sublinear number of marked Poisson perturbations added on top of the regular graph; keep the prescribed-tree identities and the shift; check the interpolation upper bound for regular graphs separately.",
+   "payoff": "high",
+   "confidence": 0.25,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "Random regular (hyper)graph law is absent from Mathlib/OAI",
+    "missing": [
+     "configuration model + its pressure (~400+ lines)"
+    ],
+    "formal_proof_to_compare": "None."
+   }
+  },
+  {
+   "title": "Multi-species / bipartite diluted spin glasses (positivity fails)",
+   "statement": "Free energy of diluted bipartite or multi-species Ising models (e.g. diluted bipartite Viana-Bray).",
+   "reference": "Panchenko, The free energy in a multi-species Sherrington-Kirkpatrick model, Ann. Probab. 43 (2015), arXiv:1310.6679; Mourrat, Nonconvex interactions in mean-field spin glasses, PMP (2021), arXiv:2004.01679.",
+   "status": "open (even the dense bipartite SK is open)",
+   "obstruction_match": "Only the lower-bound half matches. The Lean shows the device's lower bound is arity-free and needs no positivity; the obstruction in these models is the UPPER bound (non-convexity), which the device does not address.",
+   "adaptation_sketch": "Run the 221 lower-bound machinery with species-labelled sites to get liminf F_N >= inf of a multi-species MP functional; the open part (upper bound) is untouched.",
+   "payoff": "med (a one-sided bound)",
+   "confidence": 0.4,
+   "difficulty": "med-high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI DilutedSpinGlass.Model with species labels",
+    "missing": [
+     "species-indexed interaction law and trial functional (~150 lines)"
+    ],
+    "formal_proof_to_compare": "None."
+   }
+  },
+  {
+   "title": "Mézard-Parisi-type formula for diluted vector-spin (O(m), Potts-simplex or XY) spin glasses",
+   "statement": "Limiting free energy of Poisson-diluted models with spins on S^{m-1} or a finite simplex equals a hierarchical cavity formula over overlap-matrix-valued hierarchies.",
+   "reference": "Panchenko, Free energy in the mixed p-spin models with vector spins, Ann. Probab. 46 (2018), arXiv:1512.04441 (dense case, synchronization); no diluted analogue known to us (not re-verified).",
+   "status": "open (dense case known via synchronization; diluted case open as far as we know)",
+   "obstruction_match": "Multioverlaps are again not determined by pair overlaps; conditional decorrelation along the replica tree is needed, and the shift/charging device is combinatorial on trees.",
+   "adaptation_sketch": "Combine Panchenko's synchronization (matrix overlaps) with the 221 tree calculus; marks become vector-valued; the S -> S+ shift and the delta-per-fresh-split charge are unchanged.",
+   "payoff": "med-high",
+   "confidence": 0.2,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "Vector-spin diluted model and matrix-valued hierarchies are absent",
+    "missing": [
+     "vector-spin Model, Gibbs integrals over spheres, matrix-overlap hierarchies (>500 lines)"
+    ],
+    "formal_proof_to_compare": "None."
+   }
+  },
+  {
+   "title": "Replica-symmetry / multioverlap concentration in sparse Bayesian inference without strong-RS hypotheses",
+   "statement": "For Bayes-optimal sparse (Poisson factor graph) inference models, prove multioverlap concentration conditional on the pair-overlap structure, giving the cavity (RS) formula in the full regime.",
+   "reference": "Barbier-Panchenko, Strong replica symmetry in high-dimensional optimal Bayesian inference, CMP 393 (2022), arXiv:2005.03115; Coja-Oghlan, Krzakala, Perkins, Zdeborová, Adv. Math. 333 (2018), arXiv:1611.00814.",
+   "status": "partly known (RS formulas under Nishimori symmetry); multioverlap structure in sparse settings partly open",
+   "obstruction_match": "Weak: the 221 trace tried this Bayesian transfer and it failed (posterior-sampled vs fractionally weighted observations differ). Under Nishimori symmetry the hierarchy is trivial (r = 0), so the device is idle; a match exists only for non-Bayes-optimal (mismatched) inference.",
+   "adaptation_sketch": "Mismatched sparse inference = diluted spin glass with planted disorder; apply the 221 lower bound after a contiguity argument.",
+   "payoff": "med",
+   "confidence": 0.15,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "Planted factor-graph models absent",
+    "missing": [
+     "planted model + posterior (>400 lines)"
+    ],
+    "formal_proof_to_compare": "None."
+   }
+  },
+  {
+   "title": "Soft random k-SAT / odd-arity diluted models: lower bound with the standard MP functional",
+   "statement": "For odd arity (e.g. soft random 3-SAT), liminf pressure >= inf_r Phi_r (MP functional).",
+   "reference": "OAI release: the SATComputability formalization (lean/docs/235.md; paper Computing the Random 3-SAT Threshold, Sep 27 2026) and lean/OAI/Probability/SATComputability/SATVariational.lean:18-60.",
+   "status": "ALREADY USED in the release (the SATComputability formalization (docs/235) applies 221's symmetric_trial_lower to satModel : Model 3); the matching upper bound there is SAT-specific positive interpolation",
+   "obstruction_match": "Theorem-level reuse of the lower bound (a corollary-type application), not a new use of the device.",
+   "adaptation_sketch": "n/a (done in Lean).",
+   "payoff": "(realized)",
+   "confidence": 0.9,
+   "difficulty": "done",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI DilutedSpin + SATComputability",
+    "missing": [],
+    "formal_proof_to_compare": "Yes: OAI SATComputability."
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "The SATComputability formalization (lean/docs/235.md; paper Computing the Random 3-SAT Threshold): satPressure_tendsto, exists_rational_trial_near_pressure and exists_fully_rational_trial_near_pressure call DilutedSpin's symmetric_trial_lower at arity 3; TrialCompleteness.lean:58 uses it, and Main.lean -> threshold_program -> satTrialSeparation -> satTrialEvaluation_negative_witness/dense depend on it. So the SATComputability comparator transitively depends on 221's lower bound and hence on the shift/charging device. This is theorem-level reuse (the lower bound applied to a new model), NOT device reuse. Note the paper's remark (consequences.tex:131-138) describes the 3-SAT companion as using a different trial functional; at the Lean level the lower bound is shared.",
+  "Viana-Bray model, symmetric diluted even-spin models, weighted soft even-K-SAT (CONTENTS.md entry 221) and the zero-temperature ground-state formula (consequences.tex) are instances/corollaries.",
+  "High-temperature RS formulas for diluted models (Guerra-Toninelli; Talagrand vol. II) are the r = 0 case (corollary; the device is idle there since b = 0)."
+ ],
+ "release_reuse": [
+  "Device (shift + charging): no use outside DilutedSpin. Grep of lean/OAI/Probability for chargeBound|PrescribedTree|branchingCount|shiftedTwin: the only non-DilutedSpin hit is SATComputability/InterpolationUpper.lean, which reuses the PrescribedTree/KernelTower data types for its UPPER bound (no charging). SATComputability imports DilutedSpin.SymmetricTrialLower (theorem-level reuse, see theorem_corollaries).",
+  "In-family: the charging half (fresh split costs 1/L) is used twice, in the decorrelation step (with the shift) and in the Q_k regular-shapes bound (qExpect_grid_branching, without the shift)."
+ ],
+ "negative_controls": [
+  {
+   "setting": "Panchenko-Talagrand / Franz-Leone interpolation upper bound",
+   "reason": "Already proved in the Lean (pressure_le_variationalValue_exact) without any charging/shift declarations; an upper-bound proof has no division by small reference coefficients.",
+   "expected": "no speedup (ideal control: same library, same model)"
+  },
+  {
+   "setting": "SK (dense Gaussian) Parisi formula",
+   "reason": "Multioverlaps are determined by pair overlaps via Gaussian integration by parts plus ultrametricity, so no conditional-decorrelation-after-division step exists.",
+   "expected": "no speedup"
+  },
+  {
+   "setting": "Replica-symmetric (r = 0) diluted models at high temperature",
+   "reason": "Target shapes are singletons (b = 0): nothing to charge, and kappa is not small.",
+   "expected": "no speedup"
+  },
+  {
+   "setting": "Upper bound for odd-arity or non-positive diluted models",
+   "reason": "The obstruction is the failure of interpolation positivity; the device only serves the lower bound.",
+   "expected": "device irrelevant"
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "title": "Decorrelation step with vs without the shift lemmas (root_matrix_three_copy / node_frame_charge_uniform)",
+   "lean": "statable now",
+   "argument": "The cleanest Lean-usable test of the item: everything is defined in OAI DilutedSpin, the OAI proof gives a size baseline, and the trace provides a natural hint arm (clause C10). It measures discoverability and local speedup but cannot show reach, since it is the device's own job."
+  },
+  {
+   "rank": 2,
+   "title": "Regular-shapes lemma for Q_k via the charging bound",
+   "lean": "statable now",
+   "argument": "The only in-family statement other than the decorrelation step that uses the machinery (charging half only). Weak: the paper proves it directly in a paragraph, so the expected speedup is small; useful as a second data point."
+  },
+  {
+   "rank": 3,
+   "title": "One-sided MP lower bound for multi-species / bipartite diluted models",
+   "lean": "statable with < 300 lines of new definitions",
+   "argument": "A genuinely new statement where the device should carry over unchanged (the Lean lower bound is arity- and positivity-free). It gives only half a theorem, since the open difficulty is the upper bound, so the payoff is moderate."
+  },
+  {
+   "rank": 4,
+   "title": "MP formula for diluted antiferromagnetic Potts / random graph colouring",
+   "lean": "statable with < 300 lines of new definitions",
+   "argument": "The most valuable external target: an interpolation upper bound exists (CDGS 2013), and the lower bound needs exactly the multioverlap conditional decorrelation that the shift/charging device enables. Needs a colour-valued version of the tree calculus; confidence low."
+  },
+  {
+   "rank": 5,
+   "title": "Panchenko 2016 finite-RSB structure theorem",
+   "lean": "needs major new library",
+   "argument": "Same obstruction, and the device bypasses the asymptotic-Gibbs-measure route for the free-energy consequence; not usable in Lean now."
+  }
+ ],
+ "precedent_check": {
+  "after_2026_10_06": "Not searched on the web this session (web access hit a session limit before the 221 queries). The novelty pass (2026-10-09) found no model-produced or human precedent and no post-release use.",
+  "earlier_equivalent": "None found in the novelty pass (GG98, AC98, Barra-De Sanctis 2007, Panchenko 2013/15/16, Barbier-Panchenko 2022, MP01, PT04 are cousins without the shift). An expert check (Panchenko/Talagrand/Mourrat) remains the main risk. No downgrade on current evidence.",
+  "note": "Release-internal: the SATComputability formalization (docs/235) uses the lower-bound theorem (not the device) at arity 3."
+ },
+ "sources": [
+  "data/pilot/221/novelty.json, novelty.md, trace.json, trace.md; data/eureka_shortlist.json",
+  "scripts/extract_lean.py re-run for 221 into the scratchpad (v2 DAG); data/items/221_lean.json (v1) left untouched",
+  "lean/OAI/Probability/DilutedSpin/{ShiftedTree,ShapeCharging,HistorySelector,ActualCharging,MatrixRoot,RootMatrixTriple,ShiftedFrameGeometry,TopologyChargeBound,ScheduledRelativeCharge,RegularNodeGeometry,QTreeLaw,QTopologyBound,SymmetricTrialLower,Main}.lean",
+  "lean/OAI/Probability/SATComputability/{SATVariational,TrialCompleteness,Main,InterpolationUpper}.lean; lean/ComparatorChallenges/{DilutedSpin,SATComputability}.json; lean/docs/{221,235}.md",
+  "preprints/The-Mezard-Parisi-formula-for-diluted-spin-glasses-September-23-2026/build/sections/{trees.tex:380-517, decorrelation.tex:280-370, comparison.tex:225-235, model.tex:3, consequences.tex:131-138}",
+  "data/raw/openai-math/CONTENTS.md (entries 221, 3-SAT family)"
+ ],
+ "search_log": [
+  "Located the item: grep of DilutedSpin for charging|shifted -> ShiftedTree.lean, ShapeCharging.lean, ActualCharging.lean, ScheduledRelativeCharge.lean, TopologyChargeBound.lean, ShiftedFrameGeometry.lean; matched against paper Lemma tree:charging and 'Shifted copies'.",
+  "BFS paths from mezard_parisi to each item declaration in the regenerated DAG (all reachable).",
+  "Direct users of chargeBound/shiftedCharge/prescribed_history_charging_bound -> found the Q_k reuse (qExpect_grid_branching).",
+  "Grep of lean/OAI/Probability outside DilutedSpin -> SATComputability imports DilutedSpin.SymmetricTrialLower; traced Main -> threshold_program -> satTrialSeparation -> ... -> symmetric_trial_lower.",
+  "Paper check: model.tex fixes even p; Cor. comp:bounded-lower holds for bounded permutation-invariant laws; remark consequences.tex:131-138 on 3-SAT.",
+  "Web: no 221-specific queries ran (session limit hit). Open-problem references are from memory and not re-verified this session; statuses are flagged."
+ ],
+ "analysis_mode": "Text level only; the Lean was not compiled (no local toolchain)."
+}

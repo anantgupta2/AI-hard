@@ -1,0 +1,2233 @@
+{
+ "family": 297,
+ "title": "A ZFC counterexample to Naimark's problem",
+ "manuscript_dir": "data/raw/openai-math/preprints/A-counterexample-to-Naimarks-problem-in-ZFC-September-24-2026",
+ "source_root": "data/raw/openai-math/preprints/A-counterexample-to-Naimarks-problem-in-ZFC-September-24-2026/build",
+ "commit": "fd4aeeb",
+ "analyst_role": "family analyst (paper + Lean); no reasoning trace exists for this family",
+ "base_library_L": "Mathlib d13f23b + references.bib of this manuscript (14 entries: AkemannWeaver2004, CalderonFarah2022, KishimotoOzawaSakai2003, AkemannAndersonPedersen1986, Kadison1957, BlanchardDykema2001, Ueda2008, UedaPreprint2008, AkemannWassermannWeaver2010, Vaccaro2018, Vaccaro2020, Tanaka2026, FarahHirshberg2017, NaimpallyPeters2013). L contains one 2026 entry, Tanaka2026 (arXiv:2609.26930), which discloses that its construction was developed predominantly by OpenAI ChatGPT.",
+ "subject": "Operator algebras",
+ "main_statement": {
+  "file_line": "sections/introduction.tex:10-15",
+  "latex": "\\begin{theorem}\\label{na:main} There exists a unital infinite-dimensional simple complex $C^*$-algebra $A$ with a faithful tracial state such that all its nonzero irreducible representations are unitarily equivalent. In particular, $A$ is not isomorphic to $K(H)$ for any complex Hilbert space $H$. \\end{theorem}",
+  "paraphrase": "In ZFC there is a unital, simple, infinite-dimensional C*-algebra with a faithful trace and exactly one irreducible representation up to unitary equivalence; being unital and infinite-dimensional it is not K(H). This answers Naimark's 1951 question negatively without diamond (Akemann-Weaver 2004 needed diamond).",
+  "priority_note": "Not the first ZFC answer. Tanaka2026 (arXiv:2609.26930v1, 22 Sep 2026, two days before this preprint) already gives a ZFC counterexample with a faithful tracial state; the paper says so: 'the existence conclusion of Theorem~\\ref{na:main} is already present there' (introduction.tex:49-50). This paper is an alternative proof by a different route.",
+  "lean_comparator": {
+   "challenge_file": "lean/ComparatorChallenges/Naimark.lean",
+   "config": {
+    "challenge_module": "ComparatorChallenges.Naimark",
+    "solution_module": "OAI.Analysis.Naimark.Tracial",
+    "theorem_names": [
+     "OAI.NaimarkZFC.main"
+    ],
+    "definition_names": [
+     "IsSimpleCStar",
+     "IsState",
+     "IsFaithfulTracialState",
+     "IsIrreducible",
+     "UnitarilyEquivalent",
+     "HasUniqueIrreducibleRepresentation",
+     "IsIsomorphicToCompacts"
+    ],
+    "permitted_axioms": [
+     "propext",
+     "Quot.sound",
+     "Classical.choice"
+    ],
+    "enable_nanoda": false
+   },
+   "target": "OAI.NaimarkZFC.main",
+   "solution_decl": "lean/OAI/Analysis/Naimark/Tracial.lean:243-278",
+   "statement": "exists (A : Type u) (_ : CStarAlgebra A), IsSimpleCStar A and not FiniteDimensional C A and (exists tau, IsFaithfulTracialState tau) and HasUniqueIrreducibleRepresentation.{u,v,w} A and forall H : Type v Hilbert, not IsIsomorphicToCompacts A H",
+   "definitions_identical_to_solution": "Yes: Basic.lean:11-43 is textually identical to ComparatorChallenges/Naimark.lean:11-43 (diff run).",
+   "match_check": "Exact match with Thm na:main. IsIrreducible = nonzero and no nontrivial closed invariant subspace (matches introduction.tex:17-18); IsFaithfulTracialState matches introduction.tex:18-19; HasUniqueIrreducibleRepresentation quantifies over Hilbert spaces in arbitrary universes v,w (stronger form of 'all nonzero irreducible representations are unitarily equivalent'); the non-compacts clause is stated for H : Type v, universe-polymorphic. The paper's 'in particular' is proved, not assumed (not_isIsomorphicToCompacts, Recursion.lean:2037).",
+   "formalized_vs_claimed": "Everything claimed is formalized, including the cited Kishimoto-Ozawa-Sakai theorem (re-proved, KOS.homogeneity, Operators.lean:927), Kadison transitivity, AAP excision, Ueda's HNN construction and the set-theoretic bookkeeping (constructionCardinal = Order.succ c, Dependencies.lean:425). The algebra is built in Type 0 and lifted with ULift (Tracial.lean:257). Lean history: a conditional theorem main_of_approxNearCentralRows (Recursion.lean:2074, hypothesis KOS.SimpleSeparableRows) precedes the unconditional main.",
+   "catalog_note": "formalization.yaml has no entry for this family (catalog in_formalization_yaml=False, any_ms_formalized=False), but OAI.lean:159 imports OAI.Analysis.Naimark.Tracial and lean/docs/297.md links the comparator. The catalog flag understates the formalization."
+  }
+ },
+ "trust_surface": {
+  "grep_scope": "lean/OAI/Analysis/Naimark/*.lean (16 files, 25,931 lines) + ComparatorChallenges/Naimark.{lean,json}; imports: only `import Mathlib` (Basic.lean, DirectLimit.lean) plus the in-directory chain. No other OAI dirs (lean_dirs_imported empty).",
+  "counts": {
+   "sorry": "0 in the solution (1 in the comparator challenge stub, Naimark.lean:51, expected)",
+   "axiom": 0,
+   "admit": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque": 0,
+   "partial def": 0,
+   "set_option": 0,
+   "#eval/run_cmd": 0,
+   "decide (plain)": "8, all trivial (2 != 0, Bool false != true, Fin cases on matrix units)",
+   "Classical.choose/choice (in defs)": 10,
+   "noncomputable": "whole development (noncomputable section)"
+  },
+  "comparator_permitted_axioms": [
+   "propext",
+   "Quot.sound",
+   "Classical.choice"
+  ],
+  "other_risks": "Lean was not built here (text-level reading). Universe handling: the construction lives in Type 0 with Ordinal.{0}; main lifts to Type u. The comparator's definition_names lock the seven statement definitions, and they are verbatim copies. No patches to Mathlib are involved.",
+  "verdict": "Clean trust surface; formalization claims to be complete and kernel-checkable under the standard axioms."
+ },
+ "labels": {
+  "A": {
+   "label": "A2",
+   "secondary": {
+    "hard_direction_form": null,
+    "explicit_rate": false
+   },
+   "evidence": {
+    "quote": "There exists a unital infinite-dimensional simple complex $C^*$-algebra",
+    "file_line": "sections/introduction.tex:11"
+   },
+   "confidence": "high",
+   "note": "Pure existence of a counterexample. Lean main is an existential over a type and a CStarAlgebra instance."
+  },
+  "B": {
+   "label": "B2",
+   "flags": {
+    "full_only_with_prior_results": false,
+    "full_only_with_prior_results_detail": "Self-contained given cited background (KOS03 homogeneity, Kadison transitivity, AAP excision, Ueda's HNN). No prior partial result on the problem is used; Tanaka2026 is cited but not used.",
+    "adds_corollaries_for_other_conjectures": false,
+    "adds_corollaries_detail": "None stated. Implicit: answers CF22's question whether a counterexample exists in ZFC (CF22 Sec. 8) and gives a ZFC construction whose recursion length is c^+.",
+    "not_first_resolution": true,
+    "not_first_detail": "Tanaka2026 (ChatGPT-developed, 22 Sep 2026) gave a ZFC counterexample 2 days earlier; this is an alternative proof (introduction.tex:48-62)."
+   },
+   "evidence": {
+    "quote": "Naimark's problem asks whether this property characterizes the algebras $K(H)$. We give a negative answer in ZFC.",
+    "file_line": "sections/introduction.tex:7-8"
+   },
+   "confidence": "high",
+   "note": "Naimark's question is answered negatively, so B2 (refutes). Priority belongs to Tanaka2026."
+  },
+  "C": {
+   "primary": "C1",
+   "primary_evidence": {
+    "quote": "Build a continuous bridge iteration $(X_\\beta)_{\\beta\\le\\kappa}$",
+    "file_line": "sections/construction.tex:43"
+   },
+   "secondaries": [
+    {
+     "label": "C2",
+     "evidence": {
+      "quote": "At limits their inequivalence persists by \\cref{na:inequivalent-limit}. Transfinite induction proves the claim.",
+      "file_line": "sections/iteration.tex:209-210"
+     },
+     "note": "Genuine transfinite recursion (construction) and transfinite inductions (L17, T21) with an invariant carried through stages."
+    },
+    {
+     "label": "C4",
+     "evidence": {
+      "quote": "\\|x a_0b_1a_1\\cdots b_m a_m y\\|\\longrightarrow0",
+      "file_line": "sections/bridge.tex:113"
+     },
+     "note": "Norm-decay chain for reduced words: module bound, endpoint expectations, Dini, cross-excision."
+    },
+    {
+     "label": "C5",
+     "evidence": {
+      "quote": "This is \\cite[Theorem~1.1]{KishimotoOzawaSakai2003}",
+      "file_line": "sections/construction.tex:18"
+     },
+     "note": "KOS homogeneity, Kadison transitivity and Dini are invoked without proof in the paper (Lean re-proves KOS and Kadison). AAP excision, AW cross-excision and Ueda's HNN are re-proved in the paper, so they are not C5."
+    },
+    {
+     "label": "C3",
+     "evidence": {
+      "quote": "This contradicts cyclicity of $\\xi_k$ in the irreducible representation.",
+      "file_line": "sections/bridge.tex:323-324"
+     },
+     "note": "Minor: uniqueness and no-join steps argue by contradiction; the witness itself is built."
+    }
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "Ordinary choice and transfinite recursion in ZFC suffice.",
+    "file_line": "sections/construction.tex:102-103"
+   },
+   "computer_assisted_note": "No computation in paper or Lean; 8 plain `decide` calls are Bool/Fin trivia.",
+   "ih_strengthened": true,
+   "ih_template": "carry an extra tracked quantity (secondary match: strengthen to all subsets/substructures)",
+   "ih_evidence": {
+    "quote": "Choose countable sets $I_j\\subset j$ such that $q_n^j\\in A[I_j]$",
+    "file_line": "sections/iteration.tex:122-123"
+   },
+   "ih_note": "Each stage carries its dependency sets I_j, active set and peaking pairs (Lean structure ChronologicalHistory, Recursion.lean:14-35, with fields dependency, lower, countable, supported, chronological, inequivalent). The induction in T21 carries the pair of invariants R_beta = H_j(O_beta) and 'omitted pair inequivalent on O_beta' (iteration.tex:191-219). The statement (U) is strengthened from the chain to every dependency-closed sub-iteration (T21, L20), which matches the 'strengthen to all substructures' template. Confidence medium: a transfinite construction rather than an induction on a statement.",
+   "confidence": "high (C1 primary); medium (ih flag)"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "T16 the selective bridge (with its analytic core I20); T21 closed-subiteration theorem is the runner-up (N2, borderline N3)",
+   "evidence": {
+    "quote": "Then every pure state $h$ of $A$ has a unique state extension",
+    "file_line": "sections/bridge.tex:26"
+   },
+   "confidence": "medium-low (0.45)",
+   "caveats": [
+    "CF22 Sec. 8 (in L) explicitly proposes this architecture: separable subalgebras that uniquely determine the relevant states, followed by an 'amalgamation' of B x Z with A ('a partial crossed product of sorts', Question 8.1). CF22 Prop 8.3 shows a bridge with (U) for all pure states would give a counterexample under CH. The bridge answers a posed question, so pivot distance may be short.",
+    "Ueda's reduced HNN extension is in L; the bridge is an HNN extension along a partial isomorphism of two abelian algebras. The free-product unique-extension technique has a precedent in AWW10 Lemma 0.2.",
+    "Tanaka2026 (model-produced) already transports CAR projections of trace 2^-n by KOS automorphisms; only the HNN/bridge and closed-subiteration parts are absent there."
+   ],
+   "flag_builds_on_prior_model_produced_result": "partial (model-produced precedent for the existence result and for I25; no lemma imported)",
+   "flag_note": "Tanaka2026's AI-use statement says its construction and proofs were 'developed predominantly by OpenAI ChatGPT' (arxiv.org/html/2609.26930v1, via WebFetch summariser; verify). This paper cites it as an independent earlier ZFC construction and uses none of its results."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Operator algebras",
+    "msc2020": [
+     "46L05 (general C*-algebras)",
+     "46L30 (states)",
+     "03E75 (applications of set theory)",
+     "03E35 (consistency/independence, context)"
+    ],
+    "evidence": {
+     "quote": "\\resultentry{297}{A ZFC counterexample to Naimark's problem}",
+     "file_line": "overview.tex:686 (under \\cataloguesection{Operator algebras}, overview.tex:660)"
+    },
+    "confidence": "high"
+   },
+   "lean_dir_field": {
+    "dir": "OAI/Analysis/Naimark",
+    "field": "Analysis",
+    "note": "Lean dir field (Analysis) is coarser than the problem field (operator algebras)."
+   },
+   "method_fields": [
+    {
+     "field": "C*-algebra state theory: pure states, excision, unique extension (46L30)",
+     "tag": "essential",
+     "what": "AAP excision, AW cross-excision, peaking, trace-null supports",
+     "evidence": {
+      "quote": "The decreasing-net form of pure-state excision used here is proved by Akemann, Anderson, and Pedersen",
+      "file_line": "sections/states.tex:87-89"
+     }
+    },
+    {
+     "field": "Free products / HNN extensions of operator algebras, Hilbert C*-modules (46L09, 46L08)",
+     "tag": "essential",
+     "what": "Reduced amalgamated free product, Ueda's reduced HNN extension, reordering",
+     "evidence": {
+      "quote": "The matrix-corner construction below is the reduced HNN construction of Ueda",
+      "file_line": "sections/hnn.tex:11-12"
+     }
+    },
+    {
+     "field": "Automorphisms / homogeneity of separable C*-algebras (46L40)",
+     "tag": "essential",
+     "what": "Kishimoto-Ozawa-Sakai homogeneity (cited in paper, re-proved in Lean)",
+     "evidence": {
+      "quote": "We apply it only to the separable algebras $A[S]$",
+      "file_line": "sections/construction.tex:19-20"
+     }
+    },
+    {
+     "field": "Representation theory of C*-algebras: Kadison transitivity, GNS (46L05, 22D25)",
+     "tag": "essential",
+     "what": "Unitary conjugacy of equivalent pure states",
+     "evidence": {
+      "quote": "Kadison transitivity, including its self-adjoint form \\cite[Theorem~1]{Kadison1957}",
+      "file_line": "sections/states.tex:54"
+     }
+    },
+    {
+     "field": "UHF/CAR algebras (46L05)",
+     "tag": "essential",
+     "what": "Base algebra A_0 and reference peaking sequence",
+     "evidence": {
+      "quote": "A_0=\\bigotimes_{m=1}^{\\infty}M_2",
+      "file_line": "sections/iteration.tex:70"
+     }
+    },
+    {
+     "field": "Set theory: cardinal arithmetic, regular cardinals, transfinite recursion, bookkeeping (03E10, 03E05)",
+     "tag": "essential",
+     "what": "kappa=c^+, countable subsets bounded, c^{aleph_0}=c, schedule sigma",
+     "evidence": {
+      "quote": "Set $\\kappa=\\mathfrak c^+$.",
+      "file_line": "sections/construction.tex:23"
+     }
+    },
+    {
+     "field": "General topology: Dini's theorem for monotone nets (54C35)",
+     "tag": "essential",
+     "what": "Uniform convergence of endpoint expectations on the spectrum of D",
+     "evidence": {
+      "quote": "The uniform convergence used here is Dini's theorem for monotone nets",
+      "file_line": "sections/bridge.tex:198"
+     }
+    },
+    {
+     "field": "Spectral theory / moment problem (47A10)",
+     "tag": "essential",
+     "what": "Moment-norm formula for faithful traces",
+     "evidence": {
+      "quote": "\\|x\\|=\\lim_{r\\to\\infty}t((x^*x)^r)^{1/(2r)}",
+      "file_line": "sections/hnn.tex:236"
+     }
+    },
+    {
+     "field": "Set-theoretic prediction principles (03E65: diamond, diamond_Cohen)",
+     "tag": "background-cited",
+     "what": "AW04, CF22, Vaccaro context; not used",
+     "evidence": {
+      "quote": "Akemann and Weaver constructed a counterexample assuming Jensen's diamond principle",
+      "file_line": "sections/introduction.tex:32-34"
+     }
+    },
+    {
+     "field": "Combinatorial group theory (20E06 HNN extensions)",
+     "tag": "background-cited",
+     "what": "Origin of the HNN concept; enters only via Ueda's operator-algebraic version",
+     "evidence": {
+      "quote": "reduced HNN extension",
+      "file_line": "sections/introduction.tex:78"
+     }
+    },
+    {
+     "field": "Lean only: quasicentral approximate units / Krylov averaging (47A, 46L)",
+     "tag": "essential (Lean only)",
+     "what": "Re-proof of KOS homogeneity",
+     "evidence": {
+      "quote": "theorem nearCentralRows : NearCentralRows (A:=A)",
+      "file_line": "lean/OAI/Analysis/Naimark/Operators.lean:898"
+     }
+    }
+   ],
+   "cross_field_count_essential_nonOA": 3,
+   "cross_field_note": "Set theory (essential), general topology (Dini, minor), spectral/moment fact (minor). Everything else is operator algebras.",
+   "share_invoked_cited_theorems_from_other_fields": "1/3 (Dini; the other cited-not-reproved theorems, KOS and Kadison transitivity, are operator algebras). The set theory is used directly, not cited."
+  }
+ },
+ "items": [
+  {
+   "id": "I01",
+   "kind": "definition (inline \\emph)",
+   "name": "state / pure state",
+   "source": "paper",
+   "file_line": "sections/states.tex:9-11",
+   "lean_decls": [
+    "OAI.NaimarkZFC.IsState (Basic.lean:14)",
+    "OAI.NaimarkZFC.IsPureState (Basic.lean:328)"
+   ],
+   "statement": "Positive functional of norm one; pure = extreme point of the state space.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Vocabulary."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "IsState is in the comparator signature closure; pure states in Mathlib/L."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I02",
+   "kind": "definition (prose)",
+   "name": "GNS representation and equivalence h~k of pure states",
+   "source": "paper",
+   "file_line": "sections/states.tex:11-15",
+   "lean_decls": [
+    "OAI.NaimarkZFC.pureGNS (Representations.lean:1805)",
+    "OAI.NaimarkZFC.PureStateEquivalent (HNN.lean:1048)"
+   ],
+   "statement": "h~k iff the GNS representations are unitarily equivalent.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "I01"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Every bridge statement is phrased in ~."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "UnitarilyEquivalent is a comparator definition."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I03",
+   "kind": "definition (inline \\emph)",
+   "name": "tracial algebra",
+   "source": "paper",
+   "file_line": "sections/states.tex:18-22",
+   "lean_decls": [
+    "OAI.NaimarkZFC.IsTracialPositive (Amalgamation.lean:16)",
+    "OAI.NaimarkZFC.TracialStage (Stages.lean:12)"
+   ],
+   "statement": "Unital C*-algebra with a faithful tracial state, extended normally to B**.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "I01"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Hypothesis of the HNN construction and of the bridge."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "IsFaithfulTracialState is in the goal."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Renaming of 'C*-algebra with faithful tracial state'."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I04",
+   "kind": "definition (display tag (U))",
+   "name": "property (U): every pure state of B has exactly one state extension to C",
+   "source": "paper",
+   "file_line": "sections/states.tex:26-31",
+   "lean_decls": [
+    "OAI.NaimarkZFC.PureUEP (HNN.lean:1821)",
+    "OAI.NaimarkZFC.StateExtensionUnique (Peaking.lean:2156)"
+   ],
+   "statement": "Inclusion B in C such that each pure state of B has a unique state extension.",
+   "cited_or_new": {
+    "status": "standard (named here)",
+    "bib_key": null,
+    "cue": "none; uniqueness of extension is classical (Anderson 1979; Bunce-Chu 'pure extension property'; AW04, AWW10)"
+   },
+   "uses_items": [
+    "I01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The invariant carried by every successor step and by Thm closed-extension."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic w.r.t. goal; analytic w.r.t. L",
+    "note": "Not in the goal; occurs in AW04 Thm 2, AWW10 Thm 0.6, CF22 Prop 8.3 (all in L)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Established notion in the cited literature."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I05",
+   "kind": "definition (inline \\emph)",
+   "name": "peaking sequence ((P_n) peaks to h)",
+   "source": "paper",
+   "file_line": "sections/states.tex:63-66; introduction.tex:74-76",
+   "lean_decls": [
+    "OAI.NaimarkZFC.Peaks (Basic.lean:363)"
+   ],
+   "statement": "A decreasing sequence of projections peaks to h if h is the only state with h(P_n)=1 for all n.",
+   "cited_or_new": {
+    "status": "new name, known notion",
+    "bib_key": null,
+    "cue": "'we call it a peaking sequence' (introduction.tex:75-76)"
+   },
+   "uses_items": [
+    "I01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The bridge's data are two peaking sequences; all later control (expectations, transfer, countable determination) runs through them."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic w.r.t. goal; near-analytic w.r.t. L",
+    "note": "Not in the goal. AAP86 (in L) excises pure states by decreasing nets with support a minimal projection; a decreasing projection sequence whose infimum supports exactly h is the projection case of this (compact/closed projection supporting h)."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Projection specialisation of AAP excising nets / closed projections; Tanaka2026 (model-produced) also uses projections q_n with tau(q_n)=2^-n excising a product state."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I06",
+   "kind": "definition (inline \\emph)",
+   "name": "support projection r_h in B**",
+   "source": "paper",
+   "file_line": "sections/states.tex:84-86",
+   "lean_decls": [
+    "(implicit in pureExcisionNet, Representations.lean:1320)"
+   ],
+   "statement": "Least projection of B** on which the normal extension of h is one; minimal when h is pure.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "AAP86 Prop 2.2"
+   },
+   "uses_items": [
+    "I01"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Used in trace-null supports and in the endpoint limits of the bridge."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Standard in L (AAP86)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I07",
+   "kind": "definition (inline \\emph)",
+   "name": "conditional expectation; faithful",
+   "source": "paper",
+   "file_line": "sections/states.tex:236-239",
+   "lean_decls": [
+    "Mathlib/OAI: peakingExpectationCP (States.lean:1043)"
+   ],
+   "statement": "UCP map C->B fixing B, B-bimodular; faithful if E(a*a)=0 implies a=0.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "HNN needs expectations onto D_i."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Standard."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I08",
+   "kind": "definition (inline \\emph)",
+   "name": "reduced word in A and the stable unitary v",
+   "source": "paper",
+   "file_line": "sections/hnn.tex:23-36",
+   "lean_decls": [
+    "OAI.NaimarkZFC.HNNWord (Basic.lean:46)",
+    "OAI.NaimarkZFC.HNNWord.Reduced (Basic.lean:60)"
+   ],
+   "statement": "a_0 v^e1 a_1 ... v^em a_m with E_1(a_t)=0 at (+,-) turns and E_2(a_t)=0 at (-,+) turns.",
+   "cited_or_new": {
+    "status": "cited (Ueda)",
+    "bib_key": null,
+    "cue": "'reduced HNN construction of Ueda' (hnn.tex:11-12)"
+   },
+   "uses_items": [
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Defines the HNN extension by trace vanishing on reduced words."
+   },
+   "analytic_check": {
+    "verdict": "analytic w.r.t. L",
+    "note": "Ueda 2008 (in L) defines reduced HNN words."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Ueda's HNN words."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I09",
+   "kind": "definition (inline \\emph)",
+   "name": "centered element",
+   "source": "paper",
+   "file_line": "sections/hnn.tex:62-63",
+   "lean_decls": [
+    "IsCenteredWord (Amalgamation.lean:1716)"
+   ],
+   "statement": "x in ker E.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Plumbing."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Standard free-probability vocabulary."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I10",
+   "kind": "definition (inline \\emph)",
+   "name": "continuous chain",
+   "source": "paper",
+   "file_line": "sections/iteration.tex:12-15",
+   "lean_decls": [
+    "ChronologicalStage.limitStage (Recursion.lean:1123)"
+   ],
+   "statement": "B_gamma = closure of union at limit ordinals.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "AW04 'continuous nested transfinite sequence'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Recursion skeleton."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "AW04 (in L)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "AW04."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I11",
+   "kind": "definition (display)",
+   "name": "base algebra A_0 = CAR = (x) M_2 and p_n = e_11^{(x)n}",
+   "source": "paper",
+   "file_line": "sections/iteration.tex:68-74",
+   "lean_decls": [
+    "OAI.NaimarkZFC.CAR (CAR.lean:110)",
+    "OAI.NaimarkZFC.carPeak (CAR.lean:289)",
+    "carVector (CAR.lean:228)"
+   ],
+   "statement": "UHF(2^infty) with product vector state peaked by p_n, tau(p_n)=2^-n.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Supplies the reference class, the matched trace values 2^-n and infinite-dimensionality."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Mathlib-adjacent; classical."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical CAR algebra; same base as Tanaka2026."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I12",
+   "kind": "definition (inline \\emph)",
+   "name": "active index / bridge iteration (X_beta)",
+   "source": "paper",
+   "file_line": "sections/iteration.tex:97-111",
+   "lean_decls": [
+    "ChronologicalHistory.active (Recursion.lean:16)",
+    "TracialStage.hnn (Stages.lean:129)"
+   ],
+   "statement": "Continuous chain from A_0 adjoining at active j the bridge for (p_n),(q_n^j) with tau(q_n^j)=2^-n.",
+   "cited_or_new": {
+    "status": "new (packaging)",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "I10",
+    "I11",
+    "T16"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The construction's skeleton."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic w.r.t. goal",
+    "note": "Iteration of AW04 type with the new bridge as successor step."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "AW04-type chain with T16 as step."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I13",
+   "kind": "definition (display)",
+   "name": "A[T] = C*(A_0, v_j : j in T active)",
+   "source": "paper",
+   "file_line": "sections/iteration.tex:112-120",
+   "lean_decls": [
+    "generatedFamily (Dependencies.lean:13)",
+    "ChronologicalData.algebra (Recursion.lean:84)"
+   ],
+   "statement": "Subalgebra generated by A_0 and a subset of stable unitaries.",
+   "cited_or_new": {
+    "status": "new (notation)",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "I12"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Carrier of sub-iterations."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic w.r.t. goal",
+    "note": "Generated subalgebra; trivial definition."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Abbreviation."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I14",
+   "kind": "definition (inline \\emph)",
+   "name": "dependency sets I_j and dependency-closed T",
+   "source": "paper",
+   "file_line": "sections/iteration.tex:122-130",
+   "lean_decls": [
+    "DependencyClosed (Dependencies.lean:155)",
+    "dependencyClosure (Dependencies.lean:159)",
+    "ChronologicalHistory.dependency (Recursion.lean:18)"
+   ],
+   "statement": "Countable I_j subset j with q_n^j in A[I_j]; T is closed if j in T implies I_j subset T.",
+   "cited_or_new": {
+    "status": "new (here); known pattern",
+    "bib_key": null,
+    "cue": "none in paper; structural analogue of supports / 'adequate' index sets in forcing iterations along partial orders (Judah-Shelah JuSh292; Horowitz-Shelah arXiv:2302.08581)"
+   },
+   "uses_items": [
+    "I13"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Tracked quantity that makes Thm closed-extension and countable determination possible; carried by every stage in Lean (ChronologicalHistory)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Neither the goal nor L mentions dependency sets; closure of countable sets under countable-valued maps is a standard Loewenheim-Skolem device."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "As a definition it is a closure-under-a-function abbreviation; its value lies in T21."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I15",
+   "kind": "definition (display)",
+   "name": "schedule sigma: kappa x kappa -> kappa injective with sigma(beta,eta) >= beta, kappa = c^+",
+   "source": "paper",
+   "file_line": "sections/construction.tex:29-39",
+   "lean_decls": [
+    "exists_pair_schedule (Dependencies.lean:950)",
+    "constructionCardinal = succ c (Dependencies.lean:425)"
+   ],
+   "statement": "Bookkeeping fixed before the construction; replaces diamond's guessing.",
+   "cited_or_new": {
+    "status": "standard (set theory)",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Every pure state of stage beta is scheduled at some j>=beta."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic w.r.t. goal; analytic w.r.t. set-theoretic folklore",
+    "note": "Standard bookkeeping injection for a regular cardinal."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Folklore bookkeeping (e.g. Kunen-style iterations of length c^+)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L01",
+   "kind": "lemma",
+   "name": "unique extension of a pure state is pure",
+   "source": "paper",
+   "file_line": "sections/states.tex:35-43",
+   "lean_decls": [
+    "unique_lift_pure (Basic.lean:478)"
+   ],
+   "statement": "If h pure on B has unique extension to C, the extension is pure.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "I01",
+    "I04"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Used throughout."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Folklore; AW04 uses it."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Folklore."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L02",
+   "kind": "lemma",
+   "name": "equivalent pure states are unitarily conjugate; unique lifts of equivalent states are equivalent",
+   "source": "paper",
+   "file_line": "sections/states.tex:45-61",
+   "lean_decls": [
+    "irreducible_selfAdjoint_transitivity (Representations.lean:610)"
+   ],
+   "statement": "Kadison transitivity gives u in B with k = h o Ad(u*).",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": null,
+    "cue": "\\cite[Theorem~1]{Kadison1957}; Pedersen 3.13.4 (AW04)"
+   },
+   "uses_items": [
+    "I02"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Moves between representatives in every equivalence argument."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "In L (Kadison 1957; AW04 Cor 3 proof)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical. Lean re-proves Kadison self-adjoint transitivity."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L03",
+   "kind": "lemma",
+   "name": "peaking under restriction",
+   "source": "paper",
+   "file_line": "sections/states.tex:69-80",
+   "lean_decls": [
+    "Peaks.restrict (HNN.lean:2313)"
+   ],
+   "statement": "If (P_n) in B peaks to H on C, it peaks to H|B in B and H is the unique extension of H|B.",
+   "cited_or_new": {
+    "status": "new (elementary)",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "I05",
+    "I04"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Used in inherited iterations and countable determination; avoids assuming (U)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic but immediate",
+    "note": "Two-line consequence of the definition."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Elementary observation."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L04",
+   "kind": "lemma",
+   "name": "decreasing excision (AAP)",
+   "source": "paper",
+   "file_line": "sections/states.tex:92-158",
+   "lean_decls": [
+    "pureExcisionNet (Representations.lean:1320)",
+    "pureExcisionNet_excision (Representations.lean:1344)"
+   ],
+   "statement": "Pure h admits a decreasing net of positive contractions x with h(x)=1, x -> r_h strongly, ||x(a-h(a))x|| -> 0.",
+   "cited_or_new": {
+    "status": "cited, re-proved",
+    "bib_key": null,
+    "cue": "'proved by Akemann, Anderson, and Pedersen \\cite[Proposition~2.2]' (states.tex:88-90)"
+   },
+   "uses_items": [
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Every norm estimate starts from excision."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "AAP86 Prop 2.2 (in L)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "AAP86."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L05",
+   "kind": "lemma",
+   "name": "projection excision",
+   "source": "paper",
+   "file_line": "sections/states.tex:160-181",
+   "lean_decls": [
+    "Peaks.excision (States.lean:1200)"
+   ],
+   "statement": "A peaking sequence excises its state; ||P_n a P_t|| -> 0 when h(a)=0.",
+   "cited_or_new": {
+    "status": "variant",
+    "bib_key": null,
+    "cue": "'As in the preceding proof'"
+   },
+   "uses_items": [
+    "I05",
+    "L04"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Endpoint estimates in the bridge."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Projection case of AAP86."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Specialisation of AAP86."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L06",
+   "kind": "lemma",
+   "name": "cross-excision (Akemann-Weaver Lemma 1)",
+   "source": "paper",
+   "file_line": "sections/states.tex:187-215",
+   "lean_decls": [
+    "pureExcisionNet_cross (Representations.lean:1359)",
+    "bridge_cross_decay (HNN.lean:1110)"
+   ],
+   "statement": "h not~ k: ||x_lambda a y_nu|| -> 0 on the product net.",
+   "cited_or_new": {
+    "status": "cited, re-proved",
+    "bib_key": null,
+    "cue": "'the cross-excision estimate of Akemann and Weaver \\cite[Lemma~1]' (states.tex:183-185)"
+   },
+   "uses_items": [
+    "L04"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Excludes unintended joins; also the m=1 case of the bridge."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "AW04 Lemma 1 (in L)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "AW04 Lemma 1."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L07",
+   "kind": "lemma",
+   "name": "trace-null supports",
+   "source": "paper",
+   "file_line": "sections/states.tex:217-231",
+   "lean_decls": [
+    "excision_trace_null_of_small_projections (Representations.lean:1716)",
+    "pureExcisionNet_trace_null (Representations.lean:1772)"
+   ],
+   "statement": "No f.d. irreps + tracial tau => tau(r_h)=0 for every pure h.",
+   "cited_or_new": {
+    "status": "new (folklore-level)",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "I06",
+    "L02"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Kills the finite atoms in the bridge's endpoint criterion; this is why the bridge works for ALL old pure states, not just two."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic w.r.t. goal",
+    "note": "Not stated in L; a short orthogonal-translates argument. Folklore in vN-algebra theory (a normal trace vanishes on minimal projections in an infinite type I factor summand)."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Short folklore fact; key role but easy."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L08",
+   "kind": "lemma",
+   "name": "at most one trace-preserving expectation; it is faithful",
+   "source": "paper",
+   "file_line": "sections/states.tex:241-251",
+   "lean_decls": [],
+   "statement": "Uniqueness and faithfulness of trace-preserving conditional expectations.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Used to identify expectations in reordering."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Standard."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Folklore."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L09",
+   "kind": "lemma",
+   "name": "peaking expectation onto D=C*(p_n)=C(N_0 u {infty})",
+   "source": "paper",
+   "file_line": "sections/states.tex:253-290",
+   "lean_decls": [
+    "peakingExpectation (States.lean:607)",
+    "peakingExpectationCP (States.lean:1043)"
+   ],
+   "statement": "E(a)(n)=tau(d_n a d_n)/tau(d_n), E(a)(infty)=h(a) is a trace-preserving conditional expectation when traces strictly decrease to 0.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "I05",
+    "L05",
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Provides the expectations E_i needed by the HNN construction (HNN input data)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "No such formula in L; the point-at-infinity coordinate being the peaked state is the bridge's hinge."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Atomic diagonal expectation is standard for c_0-type masas; the twist (value h(a) at infinity, continuity via excision, trace has no mass at infinity) is new but short."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L10",
+   "kind": "lemma",
+   "name": "(U) + faithful expectation + simple base => simple extension",
+   "source": "paper",
+   "file_line": "sections/states.tex:295-307",
+   "lean_decls": [
+    "simple_extension_of_uep_expectation (HNN.lean:1641)"
+   ],
+   "statement": "Simplicity is inherited without ideal analysis.",
+   "cited_or_new": {
+    "status": "new (short)",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "I04",
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Simplicity of every stage."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic but immediate",
+    "note": "Short argument; AW04 instead quotients by a maximal ideal."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Short, folklore-level."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P11",
+   "kind": "proposition",
+   "name": "reduced HNN adjunction H(A) with stable unitary and expectation; uniqueness by reduced-word trace vanishing",
+   "source": "paper",
+   "file_line": "sections/hnn.tex:38-54 (proof 176-246)",
+   "lean_decls": [
+    "PeakingPairData.HNNAlgebra (HNN.lean:893)",
+    "hnnFaithfulEquiv (Basic.lean:1326)",
+    "starAlgEquivOfFaithfulMoments (Basic.lean:1183)"
+   ],
+   "statement": "For trace-preserving theta:D_1->D_2 with expectations, there is a faithfully tracial H(A)=C*(A,v), v d v*=theta(d), E_A killing reduced words; unique up to iso.",
+   "cited_or_new": {
+    "status": "cited, re-proved",
+    "bib_key": null,
+    "cue": "'reduced HNN construction of Ueda; see \\cite[Proposition~2.2 and Remark~2.3]{UedaPreprint2008}' (hnn.tex:11-13)"
+   },
+   "uses_items": [
+    "I08",
+    "L12"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The adjunction used at every active step."
+   },
+   "analytic_check": {
+    "verdict": "analytic w.r.t. L",
+    "note": "Ueda 2008 (in L)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Ueda's reduced HNN extension; re-proved with the needed expectations."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L12",
+   "kind": "lemma",
+   "name": "reduced amalgamated free product Z=F*_D G with E_D, E_F, traces",
+   "source": "paper",
+   "file_line": "sections/hnn.tex:65-174",
+   "lean_decls": [
+    "atomicFockRepresentation (Amalgamation.lean:1102)",
+    "AtomicTraceData (Amalgamation.lean:1579)",
+    "atomicCStar_trace (Amalgamation.lean:2911)"
+   ],
+   "statement": "Hilbert D-module free product; E_F kills a_0 b_1 ... b_m a_m words; trace faithful.",
+   "cited_or_new": {
+    "status": "cited, re-proved",
+    "bib_key": null,
+    "cue": "'\\cite[Lemma~1.1 and Theorem~1.3]{BlanchardDykema2001}' (hnn.tex:14-16)"
+   },
+   "uses_items": [
+    "I07",
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Model for H(A) and the module projection P_G used in the bridge."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Voiculescu / Blanchard-Dykema (in L)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard reduced amalgamated free product. Lean builds it differently: a scalar l^2 Fock space over the atoms of D (AtomicTraceData), possible because D=C(N u infty) with no trace mass at infinity."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "C13",
+   "kind": "corollary",
+   "name": "restriction: C*(A',v) = H(A') for D_1,D_2 subset A'",
+   "source": "paper",
+   "file_line": "sections/hnn.tex:260-275",
+   "lean_decls": [
+    "(Extension.lean pullback, 1269)"
+   ],
+   "statement": "HNN commutes with shrinking the base.",
+   "cited_or_new": {
+    "status": "new (immediate)",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "P11"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Inherited iterations and reordering."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Immediate from uniqueness in P11."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P14",
+   "kind": "proposition",
+   "name": "reordering two adjunctions: H_k(H_j(O)) = H_j(H_k(O))",
+   "source": "paper",
+   "file_line": "sections/hnn.tex:285-332",
+   "lean_decls": [
+    "reorderEquiv (Extension.lean:750)",
+    "hnn_reorder_of_peaks (Extension.lean:802)",
+    "jointFreeEquiv (Extension.lean:547)"
+   ],
+   "statement": "Two HNN adjunctions with data in a common base O commute, fixing O, v_j, v_k.",
+   "cited_or_new": {
+    "status": "new (statement); known pattern",
+    "bib_key": null,
+    "cue": "none; consequence of freeness over O (associativity of amalgamated free products / Ueda's HNN with a family of partial isomorphisms)"
+   },
+   "uses_items": [
+    "P11",
+    "C13",
+    "L08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Engine of Thm closed-extension."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic w.r.t. goal; near-analytic w.r.t. L",
+    "note": "Ueda's HNN extensions with families of partial isomorphisms are symmetric in the family, so the iso is a short corollary."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Symmetric multi-letter HNN extension."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L15",
+   "kind": "lemma",
+   "name": "HNN commutes with inductive limits of bases",
+   "source": "paper",
+   "file_line": "sections/hnn.tex:338-376",
+   "lean_decls": [
+    "ambient_presentation_ordinal_limit (Omission.lean:671)",
+    "cstarDirectLimitEquiv (DirectLimit.lean:287)"
+   ],
+   "statement": "R = closure of union of H(O_beta) is H(O).",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "P11",
+    "C13"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Limit stages of the reordering."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Routine continuity."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "T16",
+   "kind": "theorem",
+   "name": "the selective bridge (HNN along two matched peaking sequences)",
+   "source": "paper",
+   "file_line": "sections/bridge.tex:11-39 (proof 41-357)",
+   "lean_decls": [
+    "PeakingPairData (Peaking.lean:1046)",
+    "PeakingPairData.hnn_unique (HNN.lean:1412)",
+    "PeakingPairData.hnn_join (HNN.lean:1416)",
+    "hnn_simple (HNN.lean:1778)",
+    "TracialStage.hnn (Stages.lean:129)",
+    "TracialStage.hnn_reference_join (Stages.lean:157)"
+   ],
+   "statement": "A faithfully tracial, no f.d. irreps; (p_n^1),(p_n^2) peak to f_1 not~ f_2 with equal traces strictly decreasing to 0. The reduced HNN extension along theta(p_n^1)=p_n^2 gives (U) for ALL pure states of A, and h~ ~ k~ iff h~k or {[h],[k]}={[f_1],[f_2]}; H(A) faithfully tracial, simple if A is.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "'The two features established here are the selective bridge for all old pure states and its compatibility with dependency-closed subiterations' (introduction.tex:127-128)"
+   },
+   "uses_items": [
+    "I05",
+    "L05",
+    "L06",
+    "L07",
+    "L09",
+    "P11",
+    "L12",
+    "L02",
+    "L10",
+    "I20"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "Successor step of the recursion and the key input of Thm closed-extension (no-other-join keeps omitted pairs apart). 2,430 (Peaking) + 2,718 (HNN) + 4,456 (Amalgamation) Lean lines serve it."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Neither HNN extensions nor peaking projection algebras occur in the goal. L contains: AW04 Cor 3 (crossed product joining two states, separable A, uniqueness only for f,g), FH17 Lemma 2.3 (crossed product, countable state sets), CF22 Prop 8.3 (shows a class with a bridge giving (U) for all pure states would suffice under CH) and Q8.1 (asks for an amalgamation / 'partial crossed product' preserving unique extension), AWW10 Lemma 0.2 (free-product unique extension). None states this theorem."
+   },
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "No equivalent in L or found elsewhere; it supplies what CF22 Sec. 8 asked for, in a form that works for nonseparable bases."
+   },
+   "provisional_F": "F3 (auxiliary construction), F5 flavour (partial isomorphism of small abelian subalgebras replaces a global automorphism)"
+  },
+  {
+   "id": "I20",
+   "kind": "construction (in proof)",
+   "name": "peak transfer through stable letters and the two-ended endpoint criterion",
+   "source": "paper",
+   "file_line": "sections/bridge.tex:123-166, 209-292",
+   "lean_decls": [
+    "PeakingPairData.Endpoint (Peaking.lean:1645)",
+    "Endpoint.cut (Peaking.lean:1664)",
+    "Endpoint.word_decay (Peaking.lean:1823)",
+    "model_word_decay (Peaking.lean:1951)",
+    "bridge_word_decay (Peaking.lean:1593)"
+   ],
+   "statement": "||dP_G|| <= ||E_D^F(d*d)||^{1/2}; a word decays under x..y if both endpoint expectations decay; matched endpoints are split as phi(a)1 + a^0 and the scalar term moves the peak through the letter, P_n^{l(b)} b = b P_n^{r(b)}, exposing a centered internal coefficient.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "L12",
+    "L07",
+    "L06",
+    "L05",
+    "L09"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "The analytic core of T16 (Lean word_decay dominated share 0.042-0.044)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "No neighbour in L; AWW10 Lemma 0.2 uses a different averaging argument for free group words."
+   },
+   "provisional_N": {
+    "grade": "N3 (as part of T16)",
+    "justification": "Inseparable from T16; graded with it."
+   },
+   "provisional_F": "F3"
+  },
+  {
+   "id": "L17",
+   "kind": "lemma",
+   "name": "(U) along a continuous chain; unique lifts of equivalent states equivalent",
+   "source": "paper",
+   "file_line": "sections/iteration.tex:17-31",
+   "lean_decls": [
+    "PureUEP.comp (HNN.lean:1829)",
+    "ChronologicalStage.limit_eventual_pure (Recursion.lean:1893)"
+   ],
+   "statement": "Transfinite composition of (U).",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "AW04 Thm 5 proof"
+   },
+   "uses_items": [
+    "I04",
+    "L01",
+    "L02"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Recursion bookkeeping."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "AW04."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "AW04."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L18",
+   "kind": "lemma",
+   "name": "inequivalence persists at limits",
+   "source": "paper",
+   "file_line": "sections/iteration.tex:33-53",
+   "lean_decls": [
+    "ambient_preserves_omitted_inequivalence (Omission.lean:912)"
+   ],
+   "statement": "Inequivalent on a tail => inequivalent on the limit.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "I02",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Limit step of T21."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Routine intertwiner argument."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L19",
+   "kind": "lemma",
+   "name": "base peak: A_0 separable simple, p_n peaks, tau(p_n)=2^-n; no f.d. irreps above A_0",
+   "source": "paper",
+   "file_line": "sections/iteration.tex:76-95",
+   "lean_decls": [
+    "carPeak_peaks (CAR.lean)",
+    "carInfiniteDimensional"
+   ],
+   "statement": "Properties of the CAR base.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "I11"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Supplies hypotheses of T16 at every stage."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Classical."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L20",
+   "kind": "lemma",
+   "name": "inherited iteration: A[T cap beta] is a bridge iteration for dependency-closed T",
+   "source": "paper",
+   "file_line": "sections/iteration.tex:132-164",
+   "lean_decls": [
+    "dependency_closed_retained_successor (Omission.lean:1575)",
+    "dependency_closed_retained_simple"
+   ],
+   "statement": "Sub-iterations over closed index sets are again bridge iterations; A[T] simple, tracial, separable if T countable.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "I14",
+    "C13",
+    "L03",
+    "T16",
+    "L10"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Precondition of T21 and of KOS application."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Structural analogue of 'restriction of an iteration to a closed set of indices is an iteration' (JuSh292)."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Forcing-iteration analogue; C*-proof routine given C13 and L03."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "T21",
+   "kind": "theorem",
+   "name": "closed-subiteration theorem: A[S] subset X_delta has (U) for every dependency-closed S",
+   "source": "paper",
+   "file_line": "sections/iteration.tex:172-279",
+   "lean_decls": [
+    "PeakingPairData.dependency_closed_pureUEP (Omission.lean:1596)",
+    "literal_dependency_closed_ambientUEP (Omission.lean:1689)",
+    "omitted_endpoint_bridge (Omission.lean:1528)",
+    "OmittedModel (Omission.lean:711)",
+    "hnn_reorder_via_equivs (Homogeneity.lean:841)"
+   ],
+   "statement": "Postpone each omitted active step j past the retained ones: R_beta = H_j(O_beta) by P14 and L15, and the omitted pair stays inequivalent on O_beta by T16's no-other-join clause; then T16 gives (U) for A[S u j] subset A[S u (j+1)], and L17 composes.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "'we postpone an omitted adjunction past the retained ones' (introduction.tex:95)"
+   },
+   "uses_items": [
+    "T16",
+    "P14",
+    "L15",
+    "L18",
+    "L20",
+    "L17",
+    "L03",
+    "L08"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "Gives the unique-extension half of countable determination; dominated share 0.107 (dependency_closed_pureUEP), 0.095 (omitted_endpoint_bridge)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal or L. Nearest: AWW10 Thm 0.6 ((U) from C*_r(F_S) to C*_r(F_R), via homogeneity + automorphism extension, a different mechanism); forcing: complete sub-iterations along closed index sets (JuSh292; Horowitz-Shelah 2302.08581)."
+   },
+   "provisional_N": {
+    "grade": "N2 (borderline N3)",
+    "justification": "Structural pattern exists in set theory (sub-iterations over adequate index sets are complete suborders) and AWW10 has the free-group special case; the C*-mechanism (reordering HNN adjunctions + no-other-join) is new."
+   },
+   "provisional_F": "F2 if upgraded (strengthened invariant: (U) for all closed sub-iterations)"
+  },
+  {
+   "id": "L22",
+   "kind": "lemma",
+   "name": "countable determination",
+   "source": "paper",
+   "file_line": "sections/iteration.tex:288-319",
+   "lean_decls": [
+    "PeakingPairData.literal_countable_determination (Omission.lean:1699)",
+    "ChronologicalData.countable_determination (Recursion.lean:93)",
+    "generatedFamily_countable_pure_restriction (Dependencies.lean:324)"
+   ],
+   "statement": "Every pure h on X_delta has a countable dependency-closed S with h|A[S] pure and h its unique extension.",
+   "cited_or_new": {
+    "status": "new (combination)",
+    "bib_key": null,
+    "cue": "'closely related to \\cite[Proposition~2.3 and concluding Remark~1]{AkemannWassermannWeaver2010}' (iteration.tex:283-286)"
+   },
+   "uses_items": [
+    "T21",
+    "L04",
+    "I14"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "Replaces diamond: bounds the pure states (C23) and supplies the separable determining algebra for KOS. Dominated share 0.153-0.156 (highest substantive node)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic w.r.t. goal; pure-restriction half analytic w.r.t. L",
+    "note": "Pure restriction to a countable closure: AWW10 Prop 0.3/Remark 1 (in L), AW04 Lemma 4 (club). Unique-extension half is T21."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Pure-restriction half is AWW10; uniqueness half is T21."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "C23",
+   "kind": "corollary",
+   "name": "state count: |delta| <= c => X_delta has <= c pure states",
+   "source": "paper",
+   "file_line": "sections/iteration.tex:321-337",
+   "lean_decls": [
+    "pureList_covers (Recursion.lean:1679)",
+    "fullTower_count_unconditional (Tracial.lean:202)"
+   ],
+   "statement": "Counting via countable determination.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "L22"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Makes a length-c^+ schedule possible."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic w.r.t. goal",
+    "note": "Cardinal arithmetic given L22."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "T24",
+   "kind": "theorem (cited)",
+   "name": "Kishimoto-Ozawa-Sakai homogeneity",
+   "source": "paper",
+   "file_line": "sections/construction.tex:9-20",
+   "lean_decls": [
+    "KOS.homogeneity (Operators.lean:927)",
+    "KOS.nearCentralRows (Operators.lean:898)",
+    "KOS.row_controlled_matching (Stages.lean:1529)",
+    "finite_quasicentral_columns (Operators.lean:559)"
+   ],
+   "statement": "Pure states of a separable simple C*-algebra are automorphism-conjugate.",
+   "cited_or_new": {
+    "status": "cited (paper); re-proved (Lean)",
+    "bib_key": null,
+    "cue": "'\\cite[Theorem~1.1]{KishimotoOzawaSakai2003}'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Transports p_n to a peaking sequence for the target state."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "In L."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "KOS03; Lean re-proves it by a quasicentral Krylov-row argument (dominated share 0.111)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I25",
+   "kind": "construction",
+   "name": "q_n^j = gamma(p_n) via KOS on separable A[S], with tau(q_n^j)=2^-n from uniqueness of the trace on gamma(M_{2^n})",
+   "source": "paper",
+   "file_line": "sections/construction.tex:61-86",
+   "lean_decls": [
+    "homogeneousCARPeakPair (CAR.lean:445)",
+    "TracialStage.exists_supported_peak_pair_unconditional (Tracial.lean:22)"
+   ],
+   "statement": "A matched-trace peaking sequence for the target state, supported on a countable dependency-closed set.",
+   "cited_or_new": {
+    "status": "new here; close variant in model-produced Tanaka2026",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "T24",
+    "L22",
+    "T21",
+    "I11"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Supplies the second sequence of every bridge; the matched-trace check avoids needing gamma to preserve tau."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic w.r.t. goal",
+    "note": "Tanaka2026 (ChatGPT-developed, 2 days earlier) excises the product state by q_n with tau(q_n)=2^-n and transports these projections with KOS automorphisms; AW04/FH17 transport states by KOS automorphisms."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Close variant exists in Tanaka2026 (model-produced)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "T25",
+   "kind": "theorem (main)",
+   "name": "ZFC recursion of length kappa=c^+ with a state-independent schedule",
+   "source": "paper",
+   "file_line": "sections/construction.tex:22-139; introduction.tex:10-15",
+   "lean_decls": [
+    "OAI.NaimarkZFC.main (Tracial.lean:243)",
+    "fullTower_pure_reference_unconditional (Tracial.lean:206)",
+    "scheduled_pure_equivalent_to_reference (Dependencies.lean:489)"
+   ],
+   "statement": "Build X_beta by bridges scheduled by sigma; countable determination + regularity of c^+ catch every final pure state.",
+   "cited_or_new": {
+    "status": "new (assembly)",
+    "bib_key": null,
+    "cue": "'This last conclusion replaces the state-guessing role of a set-theoretic prediction principle' (introduction.tex:104-105)"
+   },
+   "uses_items": [
+    "I15",
+    "C23",
+    "L22",
+    "T16",
+    "T21",
+    "I25",
+    "T24"
+   ],
+   "load_bearing_guess": {
+    "level": "very high",
+    "reason": "Main theorem."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Recursion pattern from AW04 with diamond replaced by bookkeeping over c^+; CF22 Prop 8.3 replaced diamond by CH + L[X] given a bridge class."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Standard bookkeeping once L22 and T16 exist."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I26",
+   "kind": "fact (display)",
+   "name": "moment-norm formula ||x|| = lim t((x*x)^r)^{1/2r} for faithful tracial t",
+   "source": "paper",
+   "file_line": "sections/hnn.tex:234-245",
+   "lean_decls": [
+    "starAlgEquivOfFaithfulMoments (Basic.lean:1183)"
+   ],
+   "statement": "Faithful traces determine norms from moments.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Uniqueness of H(A) and reordering."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Standard."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Folklore."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I27",
+   "kind": "Lean-only",
+   "name": "atomic Fock-space model of the amalgamated free product",
+   "source": "lean",
+   "file_line": "Amalgamation.lean:851-1720",
+   "lean_decls": [
+    "ReducedPath (Amalgamation.lean:851)",
+    "AtomicFockSpace (1072)",
+    "AtomicTraceData (1579)"
+   ],
+   "statement": "Replaces Hilbert C*-modules by l^2 over reduced paths through the atoms of D.",
+   "cited_or_new": {
+    "status": "new (formalization device)",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "L12"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Lean route for L12."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Re-implementation."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Formalization device."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I28",
+   "kind": "Lean-only",
+   "name": "KOS re-proof via near-central rows (Krylov band averages)",
+   "source": "lean",
+   "file_line": "Operators.lean:266-939; Homogeneity.lean:17-460; Stages.lean:173-1529",
+   "lean_decls": [
+    "KOS.NearCentralRows (Homogeneity.lean:307)",
+    "krylovChain (Operators.lean:403)",
+    "KOS.rowAverage (Stages.lean:881)"
+   ],
+   "statement": "Quasicentral Cesaro averages of Krylov projection chains give near-central row isometries; with Kadison transitivity this yields same-class control and an intertwining limit automorphism.",
+   "cited_or_new": {
+    "status": "re-proof of cited theorem",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [
+    "L02"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Discharges KOS (earlier Lean version had it as hypothesis KOS.SimpleSeparableRows, Recursion.lean:970, main_of_approxNearCentralRows)."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Re-proof of a theorem in L; Krylov/quasicentral averaging is Halmos/Arveson/Voiculescu technique."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Known theorem, known technique."
+   },
+   "provisional_F": null
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Kishimoto-Ozawa-Sakai homogeneity of pure states of separable simple C*-algebras",
+   "bib_key": "KishimotoOzawaSakai2003",
+   "locator": "Theorem 1.1",
+   "field": "Operator algebras (automorphisms)",
+   "used_at": "construction.tex:9-20, 66-70",
+   "status": "cited, not re-proved (paper); re-proved in Lean (KOS.homogeneity, Operators.lean:927)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Kadison transitivity (self-adjoint form)",
+   "bib_key": "Kadison1957",
+   "locator": "Theorem 1",
+   "field": "Operator algebras",
+   "used_at": "states.tex:54-57, 114-116",
+   "status": "cited, not re-proved (paper); re-proved in Lean (irreducible_selfAdjoint_transitivity)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "AAP decreasing excision of pure states",
+   "bib_key": "AkemannAndersonPedersen1986",
+   "locator": "Proposition 2.2",
+   "field": "Operator algebras",
+   "used_at": "states.tex:92-158",
+   "status": "cited and re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Akemann-Weaver cross-excision",
+   "bib_key": "AkemannWeaver2004",
+   "locator": "Lemma 1",
+   "field": "Operator algebras",
+   "used_at": "states.tex:187-215",
+   "status": "cited and re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Ueda reduced HNN extension as matrix corner of amalgamated free product",
+   "bib_key": "UedaPreprint2008; Ueda2008",
+   "locator": "Prop 2.2, Remark 2.3",
+   "field": "Operator algebras (free products)",
+   "used_at": "hnn.tex:11-246",
+   "status": "cited and re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Blanchard-Dykema expectations/embeddings for reduced amalgamated free products",
+   "bib_key": "BlanchardDykema2001",
+   "locator": "Lemma 1.1, Theorem 1.3",
+   "field": "Operator algebras (free products)",
+   "used_at": "hnn.tex:14-16",
+   "status": "cited, re-proved (Lemma free-product)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Dini's theorem for monotone nets",
+   "bib_key": "NaimpallyPeters2013",
+   "locator": "Theorem 1.5",
+   "field": "General topology",
+   "used_at": "bridge.tex:198-205",
+   "status": "cited; proof recalled",
+   "essential_for_headline": true
+  },
+  {
+   "name": "AWW separable pure restriction",
+   "bib_key": "AkemannWassermannWeaver2010",
+   "locator": "Proposition 2.3, Remark 1",
+   "field": "Operator algebras",
+   "used_at": "iteration.tex:283-286",
+   "status": "named as related; argument re-done",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Hahn-Banach (positive extension), open mapping theorem",
+   "bib_key": null,
+   "locator": null,
+   "field": "Functional analysis",
+   "used_at": "states.tex:30-31, 117-118",
+   "status": "standard background",
+   "essential_for_headline": true
+  },
+  {
+   "name": "CF22 Prop 7.2 (irreducible representation on separable space forces compacts)",
+   "bib_key": "CalderonFarah2022",
+   "locator": "Proposition 7.2",
+   "field": "Operator algebras",
+   "used_at": "introduction.tex:27-29",
+   "status": "context only",
+   "essential_for_headline": false
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "State tools: excision nets, projection excision, cross-excision, trace-null supports, peaking expectation onto C(N u infty).",
+   "items": [
+    "I05",
+    "I06",
+    "L03",
+    "L04",
+    "L05",
+    "L06",
+    "L07",
+    "L09",
+    "L10"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Reduced HNN adjunction H(A) as a corner of F*_D G with F=M_2(A), G=M_2(D_1), D=D_1+D_2; expectation onto A; uniqueness by reduced-word trace vanishing; restriction, reordering and limits.",
+   "items": [
+    "I08",
+    "P11",
+    "L12",
+    "C13",
+    "P14",
+    "L15",
+    "I26"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "Selective bridge: for matched peaking sequences of inequivalent f_1,f_2, every old pure state extends uniquely and only [f_1],[f_2] merge. Proof: words decay under excision nets via the module bound, endpoint expectations (trace-null at atoms, cross-excision at infinity, Dini), and peak transfer through letters.",
+   "items": [
+    "T16",
+    "I20"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "Bridge iteration from the CAR algebra with dependency sets; dependency-closed sub-iterations are bridge iterations; closed-subiteration theorem gives (U) for A[S] in X_delta by postponing omitted steps (reordering + no-other-join).",
+   "items": [
+    "I11",
+    "I12",
+    "I13",
+    "I14",
+    "L17",
+    "L18",
+    "L19",
+    "L20",
+    "T21"
+   ]
+  },
+  {
+   "step": 5,
+   "claim": "Countable determination: each pure state of X_delta is the unique extension of its pure restriction to a separable A[S]; hence at most c pure states when |delta| <= c.",
+   "items": [
+    "L22",
+    "C23"
+   ]
+  },
+  {
+   "step": 6,
+   "claim": "ZFC recursion of length c^+: a fixed schedule; at stage j, KOS on separable A[S] transports p_n to a matched-trace peaking sequence for the scheduled state, and the bridge joins it to the reference class; countable determination and regularity of c^+ catch every final pure state.",
+   "items": [
+    "I15",
+    "T24",
+    "I25",
+    "T25"
+   ]
+  },
+  {
+   "step": 7,
+   "claim": "Conclusion: all pure states equivalent, so one irrep; simple, faithful trace, unital and infinite-dimensional, hence not K(H).",
+   "items": [
+    "L10",
+    "L19"
+   ]
+  }
+ ],
+ "lean_route_differences": [
+  "Amalgamated free product: built on a scalar l^2 Fock space indexed by reduced paths through the atoms of D (AtomicTraceData, AtomicFockSpace; Amalgamation.lean), not on Hilbert C*-modules. Possible because D = C(N u infty) carries atoms of positive trace summing to 1.",
+  "KOS homogeneity is re-proved (Homogeneity/Operators/Stages: near-central rows from Krylov projection chains, row-controlled matching, intertwining limit automorphism). An earlier conditional main (main_of_approxNearCentralRows, Recursion.lean:2074) took it as a hypothesis.",
+  "Faithfulness of traces is derived from simplicity (tracialState_strictPos_of_simple, Extension.lean:1177) rather than carried.",
+  "Endpoints are bundled as a structure (PeakingPairData.Endpoint, Peaking.lean:1645) with a tag recording matched peaks; the paper's case analysis becomes Endpoint.cut / word_decay.",
+  "The recursion is a functor-valued transfinite tower (recursiveTower over ConstructionIndex, CategoryTheory.SmallObject.SuccStruct) with ChronologicalHistory carrying active set, dependencies, pairs and 'chronological' ambient presentations."
+ ],
+ "dag_summary": {
+  "extractor": "scripts/extract_lean.py -> data/items/297_lean.json",
+  "n_files": 16,
+  "n_lines": 25931,
+  "n_decls": 2104,
+  "kind_counts": {
+   "theorem": 1544,
+   "def": 396,
+   "instance": 87,
+   "abbrev": 54,
+   "structure": 17,
+   "inductive": 5,
+   "class": 1
+  },
+  "proof_dag_decls": 1762,
+  "proof_dag_theorems": 1314,
+  "dominated_share_of_main_branches": {
+   "fullTower_pure_reference_unconditional (wrapper)": 0.178,
+   "ChronologicalStage.limit_eventual_pure": 0.161,
+   "ChronologicalData.countable_determination (L22)": 0.156,
+   "literal_countable_determination (L22)": 0.153,
+   "exists_joining_successor_unconditional": 0.136,
+   "KOS.homogeneity (T24, Lean re-proof)": 0.111,
+   "literal_dependency_closed_ambientUEP (T21)": 0.111,
+   "dependency_closed_pureUEP (T21)": 0.107,
+   "omitted_endpoint_bridge (T21)": 0.095,
+   "Endpoint.model_word_decay (I20)": 0.044,
+   "hnn_reorder_via_equivs (P14)": 0.042,
+   "atomicCStar_trace (L12)": 0.037,
+   "peakingExpectation (L09, def)": 0.004,
+   "PeakingPairData.hnn_unique / hnn_join (T16 conclusions)": 0.001
+  },
+  "frac_dag_dependents_examples": {
+   "peakingExpectation": 0.192,
+   "hnnMatrixInput": 0.18,
+   "tracialColumnBasis": 0.213,
+   "IsTracialPositive": 0.302
+  },
+  "lines_by_branch": {
+   "state theory, GNS, excision, transitivity (Basic, States, Representations)": 4717,
+   "free product model (Amalgamation)": 4456,
+   "bridge word decay (Peaking)": 2430,
+   "HNN corner, unique extension, join, simplicity (HNN)": 2718,
+   "reordering and limits (Extension, DirectLimit)": 1689,
+   "CAR base (CAR)": 494,
+   "iteration, closed-subiteration, countable determination, recursion (Dependencies, Omission, Recursion)": 5484,
+   "KOS re-proof + stages (Stages, Homogeneity, Operators)": 3659,
+   "assembly (Tracial)": 284
+  },
+  "note": "The bridge (T16) has tiny dominated share because it is used twice: as the successor step and inside T21 (omitted_endpoint_bridge). Knockout, not domination, is the right test: removing T16 disconnects both the recursion step and T21, i.e. essentially all of main. Its supporting branch (Amalgamation+Peaking+HNN+States) is ~10.8k of 25.9k lines (42%). The 20% frac_dag_dependents proxy again selects carriers (IsTracialPositive 0.30, tracialColumnBasis 0.21, peakingExpectation 0.19)."
+ },
+ "eureka_candidates_ranked": [
+  {
+   "rank": 1,
+   "id": "E1",
+   "items": [
+    "T16",
+    "I20",
+    "L09",
+    "L07"
+   ],
+   "name": "Selective bridge: reduced HNN extension along a partial isomorphism of two matched peaking-projection algebras",
+   "provisional_N": "N3",
+   "provisional_F": "F3 (auxiliary construction), F5 flavour",
+   "for": [
+    "Replaces the global automorphism of AW04/FH17 crossed products (which needs separability via KOS and cannot give (U) for all pure states; CF22 Q8.2 is open) with a partial isomorphism of two copies of C(N u infty). The data are countable, so the step works over nonseparable bases.",
+    "Gives (U) for ALL old pure states and exactly one join; CF22 Prop 8.3 shows this property is what a diamond-free construction needs.",
+    "Small and non-obvious: matched trace values make theta trace-preserving; trace-null supports kill finite atoms; the point at infinity is the peaked state, so cross-excision and peak transfer handle it.",
+    "Knockout: used both as the successor step and inside T21."
+   ],
+   "against": [
+    "CF22 Sec. 8 (in L) explicitly suggests an amalgamation / 'partial crossed product' of B x Z with A preserving unique extension (Question 8.1). The direction is posed; only the means is new.",
+    "Ueda's reduced HNN (in L) and AWW10's free-product unique-extension lemma are close technical ingredients; an expert might call the bridge a natural combination.",
+    "No trace, so discoverability cannot be probed from process."
+   ],
+   "nearest_neighbours": [
+    "AW04 Theorem 2 / Corollary 3 (crossed product by KOS automorphism; separable; uniqueness only for f,g)",
+    "FH17 Lemma 2.3 (crossed product; countable families X,Y)",
+    "CF22 Prop 8.3, Questions 8.1-8.2 (posed)",
+    "AWW10 Lemma 0.2 (unique extension in reduced free group algebras)",
+    "Ueda 2008 (reduced HNN extensions)"
+   ],
+   "literature_check": "WebSearch 2026-10-09 ('HNN extension C*-algebra pure states unique extension Naimark peaking projections'; 'Naimark problem amalgamated free product / HNN / partial crossed product unique pure state extension'): no source combines HNN or amalgamated free products with unique pure-state extension. Full text read: AW04, CF22, FH17 (Lemma 2.3), AWW10."
+  },
+  {
+   "rank": 2,
+   "id": "E2",
+   "items": [
+    "T21",
+    "P14",
+    "L20",
+    "I14"
+   ],
+   "name": "Closed-subiteration theorem: (U) from every dependency-closed sub-iteration by postponing omitted adjunctions",
+   "provisional_N": "N2 (borderline N3)",
+   "provisional_F": "F2 if N3",
+   "for": [
+    "Converts the bridge's no-other-join clause into a global statement; this is the step that removes diamond (introduction.tex:104-105).",
+    "No C*-algebraic precedent found; dominated share ~0.11."
+   ],
+   "against": [
+    "Structural pattern is standard in forcing (sub-iterations over closed/adequate index sets are complete suborders: Judah-Shelah; Horowitz-Shelah 2302.08581).",
+    "AWW10 Thm 0.6 proves the free-group special case (independent adjunctions).",
+    "Strengthens (U) to all closed substructures, a template from docs: capped at N2."
+   ],
+   "nearest_neighbours": [
+    "AWW10 Theorem 0.6",
+    "Judah-Shelah complete sub-iterations of Suslin ccc FS iterations",
+    "Horowitz-Shelah arXiv:2302.08581"
+   ],
+   "literature_check": "WebSearch 2026-10-09 (forcing sub-iteration complete subforcing): found JuSh292 / Horowitz-Shelah; no C*-algebra analogue found."
+  },
+  {
+   "rank": 3,
+   "id": "E3",
+   "items": [
+    "L22",
+    "C23",
+    "T25",
+    "I15"
+   ],
+   "name": "Countable determination replacing diamond; schedule of length c^+",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Bounds the pure states by c at every stage and supplies a separable determining subalgebra for KOS; highest substantive dominated share (0.153-0.156)."
+   ],
+   "against": [
+    "Pure-restriction half is AWW10 Prop 0.3 / Remark 1 and AW04 Lemma 4; CF22 Sec. 8 proposes 'separable subalgebras that uniquely determine' the states; bookkeeping over c^+ is folklore."
+   ],
+   "nearest_neighbours": [
+    "AWW10 Prop 0.3, Remark 1",
+    "AW04 Lemma 4",
+    "CF22 Sec. 8 and Prop 8.3"
+   ],
+   "literature_check": "Read in full: AWW10, AW04, CF22 Sec. 8."
+  },
+  {
+   "rank": 4,
+   "id": "E4",
+   "items": [
+    "L09"
+   ],
+   "name": "Peaking expectation E(a)(n)=tau(d_n a d_n)/tau(d_n), E(a)(infty)=h(a)",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Makes the HNN data available from a peaking sequence alone; no formula of this form found."
+   ],
+   "against": [
+    "Elementary given projection excision; atomic diagonal expectations are standard."
+   ],
+   "nearest_neighbours": [
+    "Diagonal expectations onto c_0-type masas"
+   ],
+   "literature_check": "Not searched separately (sub-item of E1)."
+  },
+  {
+   "rank": 5,
+   "id": "E5",
+   "items": [
+    "I25"
+   ],
+   "name": "Matched-trace peaking sequence q_n = gamma(p_n) via KOS on a separable determining subalgebra",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Avoids needing gamma to preserve the trace: uniqueness of the trace on gamma(M_{2^n})."
+   ],
+   "against": [
+    "Tanaka2026 (model-produced) uses projections with trace 2^-n transported by KOS automorphisms; AW04/FH17 transport states by KOS."
+   ],
+   "nearest_neighbours": [
+    "Tanaka2026 (arXiv:2609.26930)"
+   ],
+   "literature_check": "WebFetch of arXiv html 2609.26930v1 (summariser)."
+  }
+ ],
+ "literature_check_sources": [
+  "https://arxiv.org/abs/2609.26930 and https://arxiv.org/html/2609.26930v1 (Tanaka 2026; AI-use statement; via WebFetch summariser)",
+  "https://arxiv.org/pdf/math/0312135 (Akemann-Weaver 2004; full text extracted locally)",
+  "https://arxiv.org/pdf/2006.06886v3 (Calderon-Farah; full text extracted locally; Sec. 7-8)",
+  "https://arxiv.org/pdf/1612.01170v2 (Farah-Hirshberg; Lemma 2.3 read)",
+  "https://arxiv.org/pdf/0705.1182 (Akemann-Wassermann-Weaver; full text extracted locally)",
+  "https://arxiv.org/abs/2302.08581 (Horowitz-Shelah, Abstract corrected iterations; search snippet)",
+  "https://exactmathematics.org/mathlibannex/projects/naimark-problem/ (Tanaka companion project page; summariser)"
+ ],
+ "correctness_audit": {
+  "verdict": "No gap found on a line-by-line reading of all six sections, and the Lean library proves the comparator statement verbatim with no sorry/axiom/native_decide and with KOS re-proved. Lean was not compiled here. The claim is unrefereed; an independent earlier ZFC construction (Tanaka2026, model-produced) exists, which raises plausibility but is itself unrefereed.",
+  "checked": [
+   "Peaking expectation: continuity at infinity from projection excision; bimodularity via Cauchy-Schwarz at the evaluation character; trace preservation since tau(p_N)->0.",
+   "Trace-null supports: r_h u_i* u_j r_h = h(u_i* u_j) r_h = <eta_j, eta_i> r_h = 0 gives m orthogonal translates of trace tau(r_h).",
+   "HNN corner: v = e_12^F s is a unitary of e_1 Z e_1 and v p_n^1 v* = p_n^2 because D_2 embeds into G via theta^{-1}; the coefficient table at turns matches the reduced-word conditions.",
+   "Bridge endpoint criterion: ||d P_G|| <= ||E_D^F(d*d)||^{1/2}; at a finite atom the limit vanishes by normality and trace-null supports; at infinity it is phi_l(a0* r_h a0), zero unless h = phi_l; Dini gives uniformity because the limit function is 0.",
+   "Bridge cases m=1 (double match impossible: s has different range and source), m=2 with both transfers (h=k=phi_i, remaining P_n^j a_1 P_t^j with phi_j(a_1)=0), m>=3 (exposed internal coefficients are centered, so phi_1, phi_2 vanish on them).",
+   "Closed-subiteration: O_beta, R_beta are dependency-closed; at active k in S, I_k subset S cap k, so the k-data lie in O_k; three particular states have unique extensions to X_k by peaking-restriction (no circularity); reordering hypotheses (expectations agree by uniqueness of trace-preserving expectations) hold.",
+   "Construction step: gamma from KOS on A[S] (simple, separable, infinite-dimensional because it contains A_0); (q_n) peaks to g|A[S] by composing with gamma; T21 lifts peaking to X_j; tau(q_n)=2^-n since gamma(M_{2^n}) is a unital matrix subalgebra.",
+   "Final catch: kappa = c^+ regular so countable S is bounded; h|X_beta is pure as a unique extension; sigma(beta,eta) >= beta schedules it."
+  ],
+  "consistency_checks_passed": [
+   "AW04 Prop 6: a counterexample needs >= 2^aleph_0 generators. Here the length is c^+, so no conflict, and the paper makes no density claim (introduction.tex:59-61).",
+   "AW04 Cor 7 (under not-CH, no aleph_1-generated counterexample): consistent, since nothing here bounds the generators by aleph_1.",
+   "Rosenberg / CF22 Prop 7.2: no counterexample has its irreducible representation on a separable space. Here the irreducible representation is nonseparable (it carries c pairwise-distance-2 pure states); the paper explicitly distinguishes this from faithful separable representations (introduction.tex:27-31).",
+   "No over-reach: the bridge requires a faithful trace and no f.d. irreps; both are maintained (CAR inside every stage)."
+  ],
+  "residual_concerns": [
+   "Lean not compiled here; the 25.9k-line development is long and its compile status is unverified.",
+   "Paper relies on cited KOS homogeneity (Lean re-proves it).",
+   "Wording tension in the literature: AW04 and CF22's abstract say Rosenberg excludes 'separably acting' / 'separably represented' counterexamples, while Tanaka2026 claims a 'separably representable' counterexample. The OpenAI paper sides with reading Rosenberg as a statement about the irreducible representation (introduction.tex:27-31) and does not claim separable representability. This bears on Tanaka2026, not on this paper's theorem.",
+   "Dependency on choice: well-ordering of codes (construction.tex:95-103) is fine in ZFC; Lean uses Classical.choice, as permitted."
+  ]
+ },
+ "extraction_friction": [
+  "The bridge's analytic core (module bound, endpoint criterion, peak transfer) lives in \\emph-titled paragraphs inside the proof of Thm bridge (bridge.tex:109-292), not in numbered lemmas. Lean promotes them to Endpoint.cut, word_decay, model_word_decay.",
+  "Load-bearing objects defined in display math without environments: P_n^i, phi_i, P_G, l(b)/r(b), O_beta/R_beta, I_j, sigma, kappa, q_n^j = gamma(p_n).",
+  "There are no definition environments at all: all twelve definitions are inline \\emph (state, pure, tracial algebra, peaks to / peaking sequence, support projection, conditional expectation, reduced, stable unitary, centered, continuous, active, dependency-closed).",
+  "Lean is 3.4x longer than any previous pilot family (25.9k lines, 2,104 decls); the extractor's dominated_share ranks wrappers first and gives the bridge ~0.001 because it is used twice.",
+  "Catalog says any_ms_formalized=False / in_formalization_yaml=False, yet a complete formalization with a comparator exists (OAI.lean:159 imports it). The catalog flag should not be used as a formalization filter for this family.",
+  "Lean names carry history ('_unconditional', 'literal_', SimpleSeparableRows); a conditional main and an unconditional main coexist (Recursion.lean:2074, Tracial.lean:243). The comparator config points at Tracial, the unconditional one.",
+  "Two files named 'Naimark' in lean/OAI: OAI/InformationTheory/AmplitudeDamping/Naimark.lean (Naimark dilation) is unrelated; a name-based search for 'Naimark' over-collects.",
+  "Cue phrases for N-grading: 'Here we give an alternative proof organized around a selective bridge', 'The ingredients have several useful precedents', 'closely related to', 'We record a proof in the net form used below', 'We give the details'."
+ ]
+}

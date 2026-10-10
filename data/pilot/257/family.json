@@ -1,0 +1,2655 @@
+{
+ "family": 257,
+ "title": "A hyperbolic group without a geometric CAT(0) action",
+ "manuscript_title": "A hyperbolic group with no geometric CAT(0) action",
+ "manuscript_dir": "preprints/A-hyperbolic-group-with-no-geometric-CAT0-action-September-25-2026",
+ "source_root": "data/raw/openai-math",
+ "tex_files_read": [
+  "build/main.tex",
+  "build/preamble.tex",
+  "build/sections/01-introduction.tex",
+  "build/sections/02-model.tex",
+  "build/sections/03-diagrams.tex",
+  "build/sections/04-sampling.tex",
+  "build/sections/05-energy.tex",
+  "build/sections/06-obstruction.tex",
+  "build/sections/07-completion.tex",
+  "build/references.bib",
+  "README.md (figures/*.tex are TikZ only)"
+ ],
+ "lean_files_read": [
+  "lean/docs/257.md",
+  "lean/ComparatorChallenges/HyperbolicObstruction.{json,lean}",
+  "lean/formalization.yaml:1305-1307",
+  "OAI/Geometry/HyperbolicGroups/Main.lean",
+  "CompactLocalCATGeometric.lean",
+  "Selection.lean",
+  "Exceptional.lean",
+  "MetricHexagon.lean (decl list + 1-60, 360-430)",
+  "CATZeroFurther.lean:39-300",
+  "CATZero.lean:440-677",
+  "ConditionalStar.lean:88-108,195-235",
+  "IndexedFillingValue.lean:5180-5460, 6680-6760",
+  "LiftedDiagramSampling.lean",
+  "Template.lean / IncidenceTemplate.lean / Test.lean (decl lists)",
+  "module docstrings of all 422 files",
+  "data/items/257_lean.json (extractor dump, re-analysed with patched edges)"
+ ],
+ "commit": "fd4aeeb",
+ "analyst_role": "FAMILY analyst (paper + Lean), following docs/family_agent_prompt.md",
+ "base_library_L": "Mathlib d13f23b (no CAT(0) spaces, tangent cones, hyperbolic groups, Dehn functions, van Kampen diagrams or planar separators in Mathlib) + the 22-entry bibliography (BH1999, Hatcher2002, Ballmann1995, LiptonTarjan1979, Gromov1987, Gromov2003, IzekiNayatani2005, IzekiKondoNayatani2012, Toyoda2016, Sturm2003, GigliNobili2021, Ollivier2004, AntoniukFriedgutLuczak2017, OllivierWise2011, BradyCrisp2007, KleinerLeeb1997, Stark2025, DuchesneSimon2026, BaumslagMyasnikovShpilrain1999, RaussenSkau2010, Wilton2011 and Cashen2023 [the last two are in the .bib but never cited in the text]).",
+ "reasoning_trace": "none (catalog reasoning_trace empty)",
+ "main_statement": {
+  "file_line": "sections/01-introduction.tex:6-13",
+  "latex": "\\begin{theorem}\\label{thm:main} There exist a finite connected two-dimensional aspherical simplicial complex $K$ and a constant $C<\\infty$ with the following properties. (i) Every combinatorial edge loop of length $\\ell$ in the universal cover of $K$ bounds a disk diagram with at most $C\\ell$ triangular faces. (ii) The group $\\pi_1K$ admits no geometric action on a proper complete $\\CAT(0)$ space. In particular, $\\pi_1K$ is word-hyperbolic, and no finite simplicial complex homotopy equivalent to $K$ admits a locally $\\CAT(0)$ geodesic length metric inducing its given topology. Consequently, no such model admits a compatible locally $\\CAT(-1)$ geodesic length metric. \\end{theorem}",
+  "paraphrase": "There is a torsion-free word-hyperbolic group G (pi_1 of a finite aspherical 2-complex with linear Dehn function) that admits no proper cocompact isometric action on any proper complete CAT(0) space, of any dimension. Hence G is not a CAT(0) group and not a CAT(-1) group, answering negatively Gromov's realization question (BMS Problem H11 for CAT(-1); Stark 2025 OP 2.15; Duchesne-Simon 2026 Question W). The proof is non-constructive: K comes from a random finite presentation selected along a diagonal sequence.",
+  "definitions": {
+   "geometric action": "proper, cocompact action by isometries (01-introduction.tex:4)",
+   "metric models": "geodesic length metrics inducing the given complex topology (01:4)"
+  },
+  "headline_corollaries": [
+   {
+    "file_line": "sections/01-introduction.tex:12",
+    "paraphrase": "No finite complex homotopy equivalent to K carries a locally CAT(0) (hence no locally CAT(-1)) geodesic metric: a finite aspherical complex with a linear isoperimetric inequality need not have a nonpositively curved finite model (abstract)."
+   },
+   {
+    "file_line": "sections/01-introduction.tex:12",
+    "paraphrase": "pi_1 K is word-hyperbolic (from (i) via linear Dehn function <=> hyperbolic)."
+   }
+  ],
+  "effectivity": {
+   "quote": "The proof is an existence argument and does not give an effective size for $K$.",
+   "file_line": "sections/01-introduction.tex:15"
+  },
+  "lean_comparator": {
+   "challenge_file": "lean/ComparatorChallenges/HyperbolicObstruction.lean",
+   "config": {
+    "challenge_module": "ComparatorChallenges.HyperbolicObstruction",
+    "solution_module": "OAI.Geometry.HyperbolicGroups.Main",
+    "theorem_names": [
+     "OAI.HyperbolicObstruction.main"
+    ],
+    "definition_names": [],
+    "permitted_axioms": [
+     "propext",
+     "Quot.sound",
+     "Classical.choice"
+    ],
+    "enable_nanoda": false
+   },
+   "verbatim_core": "def MainStatement : Prop := ∃ K : FiniteComplex, ∃ x : K.Carrier, ∃ C : ℝ, ConnectedSpace K.Carrier ∧ K.Aspherical x ∧ 0 ≤ C ∧ K.LinearDiskFilling C ∧ NoGeometricCATZeroAction.{u} (FundamentalGroup K.Carrier x) ∧ WordHyperbolic (FundamentalGroup K.Carrier x) ∧ ∀ L : FiniteComplex, Nonempty (K.Carrier ≃ₕ L.Carrier) → ¬ CompatibleLocallyCATNegOne L\ntheorem main : MainStatement.{u} := by sorry",
+   "challenge_definitions": "FiniteComplex = barycentric realization of an AbstractSimplicialComplex (Fin n); Aspherical = Subsingleton (π_{n+2}) ∀n; LinearDiskFilling C = every closed null edge path has a DiskHomotopy (stutter/spur cost 0, triangle cost 1) with area ≤ C·length; CATZero = CN inequality along constant-speed segments for every pair; CATNegOne = cosh-midpoint inequality; GeometricAction = hom G →* (X ≃ᵢ X) with compact-set properness and a compact fundamental set; NoGeometricCATZeroAction quantifies over every nonempty proper complete CAT(0) X : Type u; WordHyperbolic = four-point condition for some finite generating set; CompatibleLocallyCATNegOne L = a geodesic metric inducing the polyhedral topology, locally CAT(-1) on balls.",
+   "solution_decl": "lean/OAI/Geometry/HyperbolicGroups/Main.lean:15-20 (main := exists_finite_aspherical_hyperbolic_noAction + homotopy_incompatibleLocalCATNegOne)",
+   "match_check": "WEAKER THAN HEADLINE, otherwise faithful. Matches: finite connected aspherical complex, linear disk filling (on loops in K, which is equivalent to loops in the universal cover since disks lift), no geometric action on nonempty proper complete CAT(0) spaces (universe-polymorphic), word-hyperbolicity (four-point condition), exclusion of locally CAT(-1) compatible metrics on every homotopy-equivalent finite complex. Omitted: (a) K two-dimensional; (b) exclusion of locally CAT(0) metrics on homotopy-equivalent finite models (only the weaker CAT(-1) consequence is stated). The definitions of CAT(0) (CN inequality, BH II.1.9), proper action, cocompactness and the four-point condition are standard and I found no loophole (e.g. Nonempty X is required; the action is a genuine homomorphism to isometries).",
+   "formalized": [
+    "existence of K with connectedness, asphericity, linear filling",
+    "no geometric CAT(0) action of pi_1 K (full clause (ii))",
+    "word-hyperbolicity of pi_1 K",
+    "no compatible locally CAT(-1) geodesic metric on any homotopy-equivalent finite complex",
+    "infinitude of pi_1 K (inside exists_finite_aspherical_hyperbolic_noAction, IndexedFillingValue.lean:6747)"
+   ],
+   "claimed_not_formalized": [
+    "K is two-dimensional (paper: Hatcher 2C.5 same-dimension model)",
+    "no locally CAT(0) compatible metric on homotopy-equivalent finite models (formalized only for CAT(-1))"
+   ],
+   "docs": "lean/docs/257.md: 'The stronger claims that the witness is two-dimensional and that those models admit no locally CAT(0) metric are not included.'",
+   "formalization_yaml": "lean/formalization.yaml:1305-1307 (comparator_config HyperbolicObstruction.json, declaration OAI.HyperbolicObstruction.main, file Main.lean)"
+  }
+ },
+ "trust_surface": {
+  "grep_scope": "lean/OAI/Geometry/HyperbolicGroups/*.lean (422 files, 57,027 lines) + challenge file",
+  "counts": {
+   "sorry": 0,
+   "axiom (declarations)": 0,
+   "admit (tactic)": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque": 0,
+   "partial def": 0,
+   "set_option (incl. maxHeartbeats)": 0,
+   "#eval": 0,
+   "macro/elab (commands)": 0,
+   "decide (kernel-checked)": 230,
+   "Classical.choose": 12,
+   "Classical.choice": 24,
+   "attribute [local instance] Classical.propDecidable / DecidableEq": "~310 lines in 240 files"
+  },
+  "false_positives": "Raw grep hits for 'axiom' (Parity.lean:126 comment 'standard-axiom reports'), 'admit' (3 prose occurrences 'groups admit no geometric CAT(0) action' in docstrings: IndexedFillingValue.lean:5331, LiftedDiagramSampling.lean:79, Selection.lean:99) and 'macro' (271 occurrences of the word 'macro graph/walk' in names and comments) are all prose, not commands.",
+  "decide_uses": "All 230 are finite case checks on the fixed Fano template (Fin 7/Fin 11/Fin 44 incidence tables, 32 edges, 90 two-paths, 212 fields, hexagon codes: e.g. Template.lean:24 card_edges = 32, :26 fan cards (6,6,6,4,3,3,3), :34 card_twoPaths = 90; MetricHexagon.lean:181-182; MacroCertificate.lean 49 uses) and trivial Fin/Nat side conditions. Kernel-checked, no search, no native code.",
+  "classical_uses": "Classical.choose/choice for noncomputable selections (cutoffs, realizations of tables, witnesses of actions in Selection.lean:31-36); within permitted axioms.",
+  "custom_axioms": "none",
+  "only_sorry": "the comparator challenge stub itself (ComparatorChallenges/HyperbolicObstruction.lean, `theorem main : MainStatement.{u} := by sorry`)",
+  "external_packages": "only `import Mathlib`; no other OAI dirs imported (catalog lean_dirs_imported empty; every OAI import is OAI.Geometry.HyperbolicGroups.*, 877 import lines).",
+  "verdict": "Clean at the text level. Lean not installed, so not compiled here. If the comparator run passed, the existence of a hyperbolic group with no geometric CAT(0) action is machine-checked against a slightly weaker-than-headline but faithful statement, with all heavy external theorems (Hurewicz/Whitehead, planar separators, Cartan-Hadamard, linear-Dehn => hyperbolic, tangent cones) re-proved or bypassed inside the 57k-line development."
+ },
+ "labels": {
+  "A": {
+   "label": "A2",
+   "secondary": {
+    "hard_direction_form": "A5 (clause (ii): ¬∃ geometric action on any proper complete CAT(0) space) is the hard conjunct; clause (i) is a universal/quantitative linear filling bound (A3-flavoured) on the witness.",
+    "explicit_rate": false,
+    "explicit_rate_note": "The filling constant C = 60/κ (κ=min{β-7α, α/5, δ}) exists for each fixed presentation but K itself is not effective."
+   },
+   "evidence": {
+    "quote": "There exist a finite connected two-dimensional aspherical simplicial complex $K$ and a constant $C<\\infty$ with the following properties.",
+    "file_line": "sections/01-introduction.tex:7"
+   },
+   "confidence": "high",
+   "note": "Existence of a counterexample to 'every hyperbolic group is CAT(0)'. The witness is not explicit."
+  },
+  "B": {
+   "label": "B2",
+   "flags": {
+    "full_only_with_prior_results": false,
+    "full_only_with_prior_results_detail": "Self-contained modulo standard textbook theorems (BH CAT(0) toolkit, Hurewicz/Whitehead, Lipton-Tarjan, Sturm inductive means, linear Dehn <=> hyperbolic, Cartan-Hadamard). No prior partial result on the problem is used.",
+    "adds_corollaries_for_other_conjectures": true,
+    "adds_corollaries_detail": "Also answers the CAT(-1) realization question (Baumslag-Myasnikov-Shpilrain Problem H11) and shows a finite aspherical complex with linear filling need not have a finite locally CAT(0)/CAT(-1) homotopy model (abstract; 01:12)."
+   },
+   "evidence": {
+    "quote": "The geometric realization question asks whether every hyperbolic group admits a geometric action on a proper $\\CAT(0)$ space, or on a proper $\\CAT(-1)$ space. We construct a group for which neither action exists.",
+    "file_line": "sections/01-introduction.tex:2"
+   },
+   "confidence": "high (as a classification of the claim); the claim itself is unreviewed",
+   "note": "Problem cited as open in Stark 2025 (OP 2.15) and Duchesne-Simon March 2026 (Question W); web search (Oct 2026) found no prior resolution."
+  },
+  "C": {
+   "primary": "C3",
+   "primary_evidence": {
+    "quote": "The proof is an existence argument and does not give an effective size for $K$.",
+    "file_line": "sections/01-introduction.tex:15"
+   },
+   "primary_note": "Precedence: the witness is NOT built; it is a random presentation chosen with positive probability along a diagonal sequence (07:15-26), and the no-action half is a proof by contradiction via a limiting configuration (07:39-41). Hence non-constructive C3 is primary.",
+   "secondaries": [
+    {
+     "label": "C1",
+     "evidence": {
+      "quote": "We organize the relations using a fixed modification of the incidence graph of the projective plane over $\\mathbb F_2$.",
+      "file_line": "sections/01-introduction.tex:98-99"
+     },
+     "note": "The deterministic template (doubled Fano incidence graph with omitted Y_D-CD edge) and nested table model are explicit constructions; only the labels are random."
+    },
+    {
+     "label": "C4",
+     "evidence": {
+      "quote": "$A\\le C_0 B,\\qquad C_0=\\frac{1}{\\kappa}.$",
+      "file_line": "sections/03-diagrams.tex:500-501"
+     },
+     "note": "Heavy estimation chains: coincidence-rank first-moment bounds, weighted contact/apex inequalities, planar separator absorption, second-moment variance of star counts, Chernoff, total-variation and inductive-mean estimates (E||m_t||^2 <= 1/t)."
+    },
+    {
+     "label": "C5",
+     "evidence": {
+      "quote": "one may take $c=2\\sqrt2$ \\cite[Corollary~2]{LiptonTarjan1979}",
+      "file_line": "sections/03-diagrams.tex:568-569"
+     },
+     "note": "Invoked without re-proof in the paper: Lipton-Tarjan separator, Hurewicz/Whitehead, BH comparison/tangent-cone/flat-triangle/parallel-set theorems, ultralimit completeness, Cartan-Hadamard, linear Dehn => hyperbolic. All are textbook tools in neighbouring fields; the Lean re-proves or bypasses all of them."
+    },
+    {
+     "label": "C2",
+     "evidence": {
+      "quote": "Starting with $a_1=1$, induction yields $a_j\\le1/j$.",
+      "file_line": "sections/05-energy.tex:225"
+     },
+     "note": "Only local inductions/iterations: inductive mean recursion, path-bound induction adding one per step (05:360), recursive separator, terminating normal-form switches, diagonal selection over stages j."
+    }
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "All estimates specific to the new construction are proved below.",
+    "file_line": "sections/01-introduction.tex:180"
+   },
+   "computer_assisted_note": "No search or enumeration is used in the paper. Lean uses 230 kernel `decide` calls only for finite Fano-template case checks (incidence tables, card 32/90/212, hexagon codes) - Bool/finite-type coercions, not search.",
+   "ih_strengthened": false,
+   "ih_template": null,
+   "ih_note": "No statement-level induction. Path bounds (05:331-364) induct on k<=3 with the hypothesis 'every prefix of the field set is admissible', which is the statement itself. The inductive-mean bound a_j <= 1/j is a direct recursion.",
+   "confidence": "high for C3 primary (non-constructive selection + contradiction); medium on whether C1 should share primacy (the template is the creative construction, but the witness group is random)."
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "Uniform conditional test (P37, built on the star coupling P31 and displacement bound P35) and the nested near-critical model (P08), both provisional N3; doubled-Fano gadget + finite CAT(0) obstruction (P03 + P47, with P42, P46) provisional N3/N2 borderline.",
+   "evidence": {
+    "quote": "Here a hypothetical target and its action can be chosen after the finite presentation is known. We obtain the required uniformity from bounds on every generator displacement and total-variation couplings of table matches.",
+    "file_line": "sections/01-introduction.tex:86-89"
+   },
+   "confidence": "low-medium",
+   "caveats": [
+    "Every ingredient has a named or obvious precedent field: random-group diagram counting (Ollivier 2004, AFL 2017), fixed-length square/hexagonal random models near density 1/2 (Odrzygozdz), harmonic-energy fixed point criteria (Gromov 2003, Izeki-Nayatani 2005, IKN 2012, Toyoda 2016), Sturm inductive means, Spencer-style extension counting with closures, ultralimits of rescaled actions, flat-triangle rigidity. Novelty may lie only in the combination and in the specific template; the novelty pass must test each candidate.",
+    "Unreviewed proof of a famous open problem; if wrong, D is moot (Lean formalization mitigates this strongly)."
+   ],
+   "flag_builds_on_prior_model_produced_result": false,
+   "flag_detail": "No citation to model-produced work. 2025-2026 citations: Stark2025 (arXiv 2506.10108, survey, problem status) and DuchesneSimon2026 (arXiv 2603.03863, problem status). Both only cited for the open-problem status; novelty pass to fetch their abstracts for AI-assistance disclosure. Author line is 'OpenAI'."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Group theory",
+    "msc2020": [
+     "20F67",
+     "20F65",
+     "20F06",
+     "20P05",
+     "51F15/53C23 (CAT(0) geometry)"
+    ],
+    "evidence": {
+     "quote": "Group theory (catalog_families.csv row 257)",
+     "file_line": "data/catalog_families.csv"
+    },
+    "confidence": "high"
+   },
+   "lean_dir_field": {
+    "dir": "OAI/Geometry/HyperbolicGroups",
+    "field": "Geometry",
+    "note": "Lean field Geometry vs problem field Group theory; the bulk of the Lean (≈60% of the DAG) is combinatorial group theory/diagram combinatorics and ≈18% algebraic topology."
+   },
+   "method_fields": [
+    {
+     "field": "Probabilistic combinatorics / random graphs (05C80, 60C05)",
+     "tag": "essential",
+     "what": "Bernoulli tables, first-moment coincidence-rank bounds, critical exponents h(W) (submodular), closures, star (extension) counts, second-moment variance, Chernoff, total variation couplings.",
+     "evidence": {
+      "quote": "The function $h$ is submodular.",
+      "file_line": "sections/04-sampling.tex:56"
+     }
+    },
+    {
+     "field": "Combinatorial group theory: random groups, van Kampen diagrams / pictures (20F06, 20P05)",
+     "tag": "essential",
+     "what": "Disk and spherical pictures, normal forms, multiplicity-weighted counting, local-to-global linear filling, asphericity via no spherical pictures.",
+     "evidence": {
+      "quote": "Counting constraints while retaining repeated relator occurrences is standard in random-group diagram arguments",
+      "file_line": "sections/03-diagrams.tex:41-42"
+     }
+    },
+    {
+     "field": "Graph theory: planar separators (05C10, 68R10)",
+     "tag": "essential",
+     "what": "Lipton-Tarjan separator recursion to cut large pictures into bounded fragments.",
+     "evidence": {
+      "quote": "one may take $c=2\\sqrt2$ \\cite[Corollary~2]{LiptonTarjan1979}",
+      "file_line": "sections/03-diagrams.tex:568-569"
+     }
+    },
+    {
+     "field": "Metric geometry: CAT(0)/CAT(1) spaces, tangent cones, flat rigidity, parallel sets (53C23, 51F99)",
+     "tag": "essential",
+     "what": "Strong convexity, first variation, flat triangle/quadrilateral theorems, tangent cones, parallel-set splitting BH II.2.14, local geodesics in CAT(1) BH II.1.4.",
+     "evidence": {
+      "quote": "The parallel-set product decomposition \\cite[Theorem~II.2.14]{BH1999} now applies in $T$",
+      "file_line": "sections/06-obstruction.tex:407-408"
+     }
+    },
+    {
+     "field": "Nonlinear harmonic maps / barycenters in Hadamard spaces; fixed-point theory (58E20, 20F65)",
+     "tag": "essential",
+     "what": "Energy minimizing basepoint (Gromov 2003, Izeki-Nayatani), barycenter variance, Sturm inductive means, Gigli-Nobili concavity.",
+     "evidence": {
+      "quote": "The obstruction to actions uses the harmonic-energy framework of Gromov~\\cite[Sections~3.3 and~3.7]{Gromov2003} and Izeki--Nayatani~\\cite{IzekiNayatani2005}.",
+      "file_line": "sections/01-introduction.tex:73-75"
+     }
+    },
+    {
+     "field": "Asymptotic geometry: ultralimits / ultraproducts of metric spaces (51F99, 03C20)",
+     "tag": "essential",
+     "what": "Product over matches with L2 metric and pointed ultralimit to get the limiting configuration.",
+     "evidence": {
+      "quote": "Fix a nonprincipal ultrafilter on the sequence index set $\\mathbb N$ and take the pointed metric ultralimit $Z$.",
+      "file_line": "sections/05-energy.tex:318-319"
+     }
+    },
+    {
+     "field": "Finite geometry: Fano plane PG(2,2), GL_3(F_2) (51E20)",
+     "tag": "essential",
+     "what": "Incidence template; basis-change generation argument for a common hexagon center.",
+     "evidence": {
+      "quote": "Permutations and elementary additions generate all changes of basis over $\\mathbb F_2$, so the centers of all $X$ hexagons agree.",
+      "file_line": "sections/05-energy.tex:474-476"
+     }
+    },
+    {
+     "field": "Algebraic topology (55P20, 55Q05, 57M20)",
+     "tag": "essential",
+     "what": "Hurewicz and Whitehead for asphericity; simplicial model of a CW complex; covering spaces.",
+     "evidence": {
+      "quote": "the Whitehead theorem makes it contractible~\\cite[Theorem~4.5]{Hatcher2002}",
+      "file_line": "sections/03-diagrams.tex:630-631"
+     }
+    },
+    {
+     "field": "Hyperbolic groups: linear Dehn function <=> hyperbolic (20F67)",
+     "tag": "essential (for the 'in particular word-hyperbolic' clause)",
+     "what": "BH III.H.2.5/2.7/2.9.",
+     "evidence": {
+      "quote": "The equivalence between a linear Dehn function and word hyperbolicity gives the final group-theoretic assertion",
+      "file_line": "sections/07-completion.tex:61"
+     }
+    },
+    {
+     "field": "Riemannian/metric Cartan-Hadamard theory (53C23)",
+     "tag": "corollary-only",
+     "what": "Locally CAT(0) finite model => geometric action on universal cover (BH II.4.1, I.3.7, I.3.25).",
+     "evidence": {
+      "quote": "The Cartan--Hadamard theorem makes the cover globally $\\CAT(0)$~\\cite[Theorem~II.4.1(2)]{BH1999}.",
+      "file_line": "sections/07-completion.tex:63"
+     }
+    },
+    {
+     "field": "Fixed points of random groups on CAT(0) spaces (IKN 2012, Toyoda 2016), cubulation (Ollivier-Wise), CAT(0) dimension (Brady-Crisp)",
+     "tag": "background-cited",
+     "what": "Context and contrast only.",
+     "evidence": {
+      "quote": "Toyoda~\\cite[Theorem~1.4]{Toyoda2016} supplies such spectral bounds for a prescribed finite family",
+      "file_line": "sections/01-introduction.tex:82-85"
+     }
+    }
+   ],
+   "cross_field_count_essential_non_problem_field": 6,
+   "cross_field_detail": "Essential fields outside group theory: probabilistic combinatorics, planar graph separators, CAT(0) metric geometry, harmonic-map/barycenter theory, ultralimits, finite geometry (plus algebraic topology, which is standard companion of combinatorial group theory).",
+   "share_invoked_cited_theorems_from_other_fields": "Of ~16 invoked external results (see invoked_external_theorems), ~13 are from fields other than group theory (metric geometry 8, algebraic topology 3, graph theory 1, probability 1); 3 of these are re-proved in the paper (Sturm, Gigli-Nobili, energy minimizer) and essentially all are re-proved or bypassed in Lean.",
+   "confidence": "medium-high"
+  }
+ },
+ "items": [
+  {
+   "id": "P00",
+   "kind": "theorem (thm:main)",
+   "name": "Main theorem",
+   "file_line": "sections/01-introduction.tex:6-13",
+   "statement": "Exists finite connected 2-dim aspherical simplicial K with linear combinatorial filling and pi_1 K with no geometric action on proper complete CAT(0) spaces; corollaries hyperbolicity, no locally CAT(0)/CAT(-1) finite models.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'We construct a group for which neither action exists.' (01:2)"
+   },
+   "uses_items": [
+    "P48",
+    "P49",
+    "P50",
+    "P51",
+    "P25"
+   ],
+   "load_bearing_guess": {
+    "level": "target",
+    "reason": "headline"
+   },
+   "analytic_check": {
+    "verdict": "is the goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "n/a",
+    "justification": "target, not graded"
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P01",
+   "kind": "inline definition (\\emph)",
+   "name": "geometric action",
+   "file_line": "sections/01-introduction.tex:4",
+   "statement": "proper, cocompact action by isometries.",
+   "cited_or_new": {
+    "status": "cited (standard)",
+    "bib_key": "none",
+    "cue": "'Throughout the paper, a \\emph{geometric action} is ...'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Vocabulary."
+   },
+   "analytic_check": {
+    "verdict": "subterm of goal",
+    "note": "Occurs in the statement."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard (BH)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P03",
+   "kind": "definition (def:template)",
+   "name": "Incidence template Gamma (doubled Fano incidence graph with omitted edge Y_D-CD)",
+   "file_line": "sections/02-model.tex:5-17",
+   "statement": "Bipartite graph with vertices X_i for the 7 points of PG(2,F2), extra Y_i for i in {A=e1,B=e2,C=e3,D=e1+e2+e3} (no three collinear), and the 7 lines; both representatives joined to each incident line except the edge Y_D-CD is omitted. 18 vertices, 32 edges, cycle rank 15.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'We organize the relations using a fixed modification of the incidence graph of the projective plane over F_2. Four point vertices are doubled. At one of them we omit one incidence' (01:98-101); no precedent named."
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Every relation, every metric identity and the final contradiction live on this graph; the doubling creates the squares X_i,H,Y_i,H' (fan identities) and the omitted incidence supplies the asymmetry used for antipodality (06:204-205)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal or L",
+    "note": "Goal mentions only CAT(0), hyperbolicity, filling. The Fano incidence (Heawood) graph is classical (it is the link of the A~2 building over F2), but the doubled-with-one-omitted-incidence modification occurs nowhere I know of."
+   },
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Tiny finite gadget, not a subterm of the goal or L, whose specific shape (which points doubled, which incidence omitted) is tuned so that (a) all fans stay connected with cycle-rank budget compatible with hyperbolicity and (b) the limiting metric configuration is contradictory. Cook-like profile. Risk: once one decides to use a near-critical random model with a finite template, searching small templates for a metric contradiction may be routine (could be N2)."
+   },
+   "provisional_F": {
+    "type": "F3",
+    "justification": "Auxiliary construction: a finite gadget built only to drive the proof (also the 'witness template')."
+   }
+  },
+  {
+   "id": "P04",
+   "kind": "inline definition (\\emph)",
+   "name": "loose edge e_0 = X_D-CD",
+   "file_line": "sections/02-model.tex:13-16",
+   "statement": "The incidence edge at D whose Y-counterpart is omitted; it belongs to no fan.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'is called the \\emph{loose edge}'"
+   },
+   "uses_items": [
+    "P03"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Source of the three-field ternary test (P50) and the exceptional-incidence identity (P57)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Part of P03; credited there."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P05",
+   "kind": "inline definition (\\emph)",
+   "name": "fan F_i",
+   "file_line": "sections/02-model.tex:16-23",
+   "statement": "Edges over point i other than the loose edge; K_{2,3} at A,B,C, K_{2,2} at D, 3-star elsewhere; k_i=(6,6,6,4,3,3,3), sum 31.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'Every other edge belongs to the \\emph{fan} $F_i$ at its point $i$.'"
+   },
+   "uses_items": [
+    "P03"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Unit of the nested random model: fans are sampled first, so shared fan costs are counted once."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "A partition of P03's edges; the idea it serves is in P08."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P06",
+   "kind": "inline definitions (\\emph)",
+   "name": "field, assignment",
+   "file_line": "sections/02-model.tex:36",
+   "statement": "A field is an edge position in a template or polygon word; an assignment gives a signed letter to each field.",
+   "cited_or_new": {
+    "status": "new (bookkeeping)",
+    "bib_key": "none",
+    "cue": "'A \\emph{field} is an edge position ...'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Coordinates for all counting."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Bookkeeping."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P07",
+   "kind": "inline definition (\\emph)",
+   "name": "core hexagon",
+   "file_line": "sections/02-model.tex:38",
+   "statement": "Six-cycle from three noncollinear points, their joining lines, one representative per point with all six incidences present; any three successive edges contain at most two fields of each fan.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'A \\emph{core hexagon} is the six-cycle obtained from ...'"
+   },
+   "uses_items": [
+    "P03"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Carrier of the common-center argument (P48-P49)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Ordinary 6-cycles of the Heawood graph (apartments of the F2 building link)."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard 6-cycles of the incidence graph, restricted by representative choice."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P08",
+   "kind": "definition (def:tables) + eq (model-parameters)",
+   "name": "Nested independent Bernoulli tables (fans, top marks, 90 square decorations, six-letter table)",
+   "file_line": "sections/02-model.tex:42-62",
+   "statement": "Alphabet S_n of N=2n signed letters; parameters f=2-α, p=3-β, 0<α,δ<1, 7α<β<1. (i) fan tuples included w.p. N^{f-k_i}; (ii) full core tuples marked w.p. N^{p-gf-1}, a top occurrence = marked tuple all of whose 7 fan restrictions are included; (iii) for each of 90 two-edge core paths a 4-field square table w.p. N^{-2-δ}; (iv) a six-letter table w.p. N^{-3-δ}. Expected counts N^{2-α}, N^{3-β}, N^{2-δ}, N^{3-δ}.",
+   "cited_or_new": {
+    "status": "new (model); components are variants of known random models",
+    "bib_key": "none",
+    "cue": "'Fans are selected first; a labelled copy of the whole graph is selected only when its seven fan restrictions have already been selected.' (01:105-106); 'related to the multiplicity and constraint methods in Ollivier ... and Antoniuk--Friedgut--Luczak' (01:63-66)"
+   },
+   "uses_items": [
+    "P03",
+    "P05"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Defines the group. Its two-level (nested) structure is what reconciles sparsity (hyperbolicity: shared fan costs counted once) with density of constraints (each two-step core path is closed by a square at density just below 1/2, forcing squared two-step distance 2 in the limit)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal or L",
+    "note": "Fixed-length random models are classical (Zuk triangular; Odrzygozdz square/hexagonal models, hyperbolic below density 1/2, trivial above). Decorations are a square/hexagonal model at density (2-δ)/4, (3-δ)/6 -> 1/2. The nested fan/top tables over a fixed graph template are not in any model I know."
+   },
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "The idea of operating at near-critical density (just below the 1/2 collapse threshold) so that hyperbolicity survives while metric constraints become exact in the limit, combined with nested occurrences whose shared costs are counted once, is the conceptual core. Neighbours: square/hexagonal models (Odrzygozdz), Gromov graphical random groups. Could drop to N2 if a neighbour with nested tables exists."
+   },
+   "provisional_F": {
+    "type": "F3",
+    "justification": "Auxiliary construction (the random model is built to drive the proof); F1 flavour (new defined object)."
+   }
+  },
+  {
+   "id": "P09",
+   "kind": "inline definitions (\\emph)",
+   "name": "fan occurrence, top occurrence (a->b), decorations",
+   "file_line": "sections/02-model.tex:56-61",
+   "statement": "Included fan tuple with its type; marked core tuple whose fan restrictions are included; included square/six rows.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'is a \\emph{fan occurrence}'; 'We call them \\emph{decorations}'"
+   },
+   "uses_items": [
+    "P08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Units of the diagram count."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Names for P08's parts."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P10",
+   "kind": "construction (cone complex P)",
+   "name": "Two-complex P: letter bouquet + cones on fans, cone on the subdivided Fano macro graph B for each top, decoration polygons",
+   "file_line": "sections/02-model.tex:88-104",
+   "statement": "Cones on labelled graphs instead of one 2-cell per relator; B = Fano incidence graph with D-CD subdivided (15 vertices, 22 edges, cycle rank 8 = 15-7).",
+   "cited_or_new": {
+    "status": "new (variant)",
+    "bib_key": "none",
+    "cue": "'For the diagram arguments we use a specific finite two-dimensional CW complex $P$.'"
+   },
+   "uses_items": [
+    "P08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The asphericity and filling arguments are about P; cones record occurrences not words (Remark rem:model-finite)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Coning off labelled graphs is standard in graphical small cancellation (Gromov 2003, Ollivier) and in presentation complexes of graph-groups."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Standard cone-off device adapted to the two-level occurrence structure."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P11",
+   "kind": "lemma (lem:model-presentation)",
+   "name": "Presentation equivalence + C2 quotient",
+   "file_line": "sections/02-model.tex:106-115",
+   "statement": "pi_1 P equals the letter presentation group; it maps onto C_2 (all relators have even length).",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": "none",
+    "cue": "'This follows from van Kampen'"
+   },
+   "uses_items": [
+    "P10"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Identifies the group; parity used for infinitude."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine van Kampen."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P12",
+   "kind": "remark (rem:model-finite)",
+   "name": "Occurrences, not words",
+   "file_line": "sections/02-model.tex:117-119",
+   "statement": "A fan shared by several tops is coned once; each top and decoration has its own cell.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'These distinctions are essential in the multiplicity count'"
+   },
+   "uses_items": [
+    "P10"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Conceptual pointer for P22."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Remark."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P13",
+   "kind": "definition (inline \\emph) master pattern M; match; Omega_n",
+   "name": "Master pattern M and matches",
+   "file_line": "sections/02-model.tex:121-124; 04-sampling.tex:12-26",
+   "statement": "M = one top with its 7 fans + one square row for each of 90 two-edge paths (212 fields, 98 entries); a match is an assignment with all required entries present; Omega_n the random set of matches with uniform law mu_N; E|Omega_n| = N^{3-β-90δ}.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'Define the finite \\emph{master pattern} $\\mathcal M$ ...'"
+   },
+   "uses_items": [
+    "P08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "All metric tests are averages over matches."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Analogue of counting copies of a fixed pattern (strictly balanced subgraph counts in random graphs)."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Pattern-count object, new for this model, standard in random-graph theory."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P14",
+   "kind": "definition (def:admissible)",
+   "name": "Admissible field sets",
+   "file_line": "sections/02-model.tex:126-135",
+   "statement": "Either <=3 distinct core fields with <=2 from each fan (loose field exempt), or <=2 fields of one square decoration.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'A set of fields is \\emph{admissible} if ...'"
+   },
+   "uses_items": [
+    "P05",
+    "P13"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Exactly the sets for which the sampling coupling exists (h(W) >= |S|); includes the decisive (two F_C fields + loose field) triple."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Quota tuned to critical exponents."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Tailored definition; content is a computation of where the critical exponent stays positive."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P15",
+   "kind": "inline definitions (\\emph)",
+   "name": "occurrence, field positions, unsigned coincidence rank R",
+   "file_line": "sections/03-diagrams.tex:4-54",
+   "statement": "R = #positions - #distinct underlying generators; fan fields counted once even if the fan sits in several tops.",
+   "cited_or_new": {
+    "status": "variant",
+    "bib_key": "Ollivier2004; AntoniukFriedgutLuczak2017",
+    "cue": "'Counting constraints while retaining repeated relator occurrences is standard in random-group diagram arguments; see Ollivier ... and Antoniuk--Friedgut--Luczak' (03:41-44)"
+   },
+   "uses_items": [
+    "P08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Input of the first-moment bound."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Ollivier's decorated abstract diagrams / AFL constraint counting, adapted with shared fans."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P16",
+   "kind": "lemma (diagram:rank)",
+   "name": "Coincidence-rank bound R <= (p-7f)s + fu + sum(h_e - δ)",
+   "file_line": "sections/03-diagrams.tex:56-95",
+   "statement": "W.h.p., simultaneously for all collections of <= M distinct occurrences containing all fan slots of their tops.",
+   "cited_or_new": {
+    "status": "variant",
+    "bib_key": "Ollivier2004",
+    "cue": "'We count the shared fan entries explicitly' (03:45)"
+   },
+   "uses_items": [
+    "P15"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Only probabilistic input to Theorem 3.1."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "First-moment over finitely many patterns."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Standard first-moment argument with the new shared-fan exponent."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P17",
+   "kind": "definition + lemma (diagram:existence)",
+   "name": "Elementary (spherical/disk) pictures; existence with exact lifted chain",
+   "file_line": "sections/03-diagrams.tex:108-167",
+   "statement": "Pictures with side pairings; every null word has a disk picture; every nonzero 2-cycle of the universal cover is the chain of a finite collection of spherical pictures (via Hurewicz, general position).",
+   "cited_or_new": {
+    "status": "cited (standard)",
+    "bib_key": "Hatcher2002",
+    "cue": "'The disk assertion is the cellular van Kampen construction' (03:135)"
+   },
+   "uses_items": [
+    "P10"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Interface between topology and counting."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Rourke/Pride pictures; van Kampen."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P18",
+   "kind": "inline definitions (\\emph)",
+   "name": "top polygon, ports",
+   "file_line": "sections/03-diagrams.tex:169-182",
+   "statement": "Grouping cone triangles at a top-apex instance into a polygon tracing a macro walk; ports = radial labels of a fan (exceptional port X_D at D).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'We call it a \\emph{top polygon}'"
+   },
+   "uses_items": [
+    "P10"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Normal-form currency."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Bookkeeping."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P19",
+   "kind": "lemma (diagram:normal-form)",
+   "name": "Normal pictures: simple macro cycles, no same-side adjacency, fan-apex links without repeated radial labels",
+   "file_line": "sections/03-diagrams.tex:184-288",
+   "statement": "Lexicographic minimal pictures satisfy the three properties; the radial-label switch preserves genus zero and the lifted chain.",
+   "cited_or_new": {
+    "status": "new (variant)",
+    "bib_key": "none",
+    "cue": "'grouped into polygons tracing simple macro cycles' (03:101-103)"
+   },
+   "uses_items": [
+    "P17",
+    "P18"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Bounds multiplicities near apices."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Diagram reduction (cancellation of reducible pairs) is standard; the crosswise re-pairing of spokes with Euler-characteristic bookkeeping is a variant."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Standard reduction moves adapted to cones."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P20",
+   "kind": "inline definitions (\\emph) + display",
+   "name": "fragment, partial instance, multiplicities r_b, m_b, S_b and fan weight w_b = max{r_b, m_b}",
+   "file_line": "sections/03-diagrams.tex:296-330",
+   "statement": "Fragments are arbitrary face selections; fan weight dominates both the represented-apex count and the largest multiplicity of a top using the fan.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'The fan weight must therefore dominate the largest such top multiplicity.' (03:314-315)"
+   },
+   "uses_items": [
+    "P19",
+    "P16"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Makes the weighted level sets eligible collections (t_a >= j implies w_b >= j), which is what lets the per-distinct-occurrence bound control repeated cells."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Ollivier-type multiplicities; the max{r_b,m_b} choice is specific."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Multiplicity weighting is a known technique; the specific domination rule for shared prerequisites is a tuned variant. Candidate for 'shared-cost-once' idea (see P21)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P21",
+   "kind": "lemma (diagram:weighted-rank)",
+   "name": "Weighted contact bound I <= pT + f·sum_b(w_b - S_b) + sum_e (h_e - δ) t_e",
+   "file_line": "sections/03-diagrams.tex:343-394",
+   "statement": "Layer-cake: apply the rank bound to positions of weight >= j for each j and sum; charge each internal contact to a non-maximal endpoint in its value class.",
+   "cited_or_new": {
+    "status": "new (variant)",
+    "bib_key": "Ollivier2004",
+    "cue": "'This argument allows arbitrary cycles and repetitions in the contact graph.' (03:392-394)"
+   },
+   "uses_items": [
+    "P16",
+    "P20",
+    "P19"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Converts the probabilistic bound into a deterministic bound on contacts of a fragment with repeated cells."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Ollivier 2004 Sec 2 'multiplicity' and AFL Sec 3 handle repeated relators by similar summations."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Named precedents; adaptation to shared fan prerequisites."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P22",
+   "kind": "lemma (diagram:apex)",
+   "name": "Local apex inequality with dominant top + partial-link bound 2 sum J_b <= B_rad",
+   "file_line": "sections/03-diagrams.tex:396-491",
+   "statement": "sum_z d_z + 2(w_b - S_b) <= (sum q_z + P*_b)/2 + 2 J_b; dominant/nondominant turn counting in cyclic links; loose-side payments at the exceptional port.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'Choose the dominant occurrence $a_0$ once for the entire fan occurrence $b$' (03:477)"
+   },
+   "uses_items": [
+    "P20",
+    "P19"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Local curvature-type accounting; combined with P21 gives the fragment inequality."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Analogous to local link conditions / weight tests in small cancellation, but specific."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Local combinatorial estimate specific to the template; standard genre."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P23",
+   "kind": "lemma (diagram:fragment)",
+   "name": "Fragment isoperimetry A <= B/κ, κ = min{β-7α, α/5, δ}",
+   "file_line": "sections/03-diagrams.tex:493-544",
+   "statement": "Every fragment of area A has boundary B >= κA when the rank bound holds for <= 8A occurrences.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "-"
+   },
+   "uses_items": [
+    "P21",
+    "P22"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Core diagram estimate."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Assembly of P21+P22; the margins β-7α, α, δ are the deficits of the model."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P24",
+   "kind": "lemma (diagram:separator)",
+   "name": "Bounded-piece partition of planar bounded-degree multigraphs",
+   "file_line": "sections/03-diagrams.tex:556-588",
+   "statement": "Recursive Lipton-Tarjan separators: parts of size <= K(D,η) cutting <= η·#vertices edges.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "LiptonTarjan1979",
+    "cue": "'apply the planar separator theorem' (03:565)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Local-to-global step."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Standard (Lipton-Tarjan; used e.g. in Papasoglu-style local-to-global)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard corollary of Lipton-Tarjan."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P25",
+   "kind": "theorem (thm:diagram)",
+   "name": "Linear filling and asphericity w.h.p.",
+   "file_line": "sections/03-diagrams.tex:10-16, 590-662",
+   "statement": "For fixed small α,β,δ with β>7α, w.h.p. P is aspherical and the letter presentation has a linear isoperimetric inequality (area <= 60 C_0 ℓ).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "-"
+   },
+   "uses_items": [
+    "P23",
+    "P24",
+    "P17",
+    "P19"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Gives hyperbolicity and asphericity (clause (i))."
+   },
+   "analytic_check": {
+    "verdict": "partially in goal",
+    "note": "Linear filling is the goal's clause (i)."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Assembly; local-to-global via separators is standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P26",
+   "kind": "definition (sample:def-test)",
+   "name": "Conditional test (I, e, t)",
+   "file_line": "sections/04-sampling.tex:32-36",
+   "statement": "I subset of fields, e outside I, I∪{e} admissible, t a positive integer (number of coupled branches).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "-"
+   },
+   "uses_items": [
+    "P14"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Index set of the uniform metric tests."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Tailored definition."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P27",
+   "kind": "definition + lemma (sample:eq-h, sample:lem-budget)",
+   "name": "Critical exponent h(W) = |W| - sum_{E_rho ⊆ W} c_rho; budget h(W) >= min{2,|W|}, h(W) >= |S| for admissible S ⊆ W",
+   "file_line": "sections/04-sampling.tex:38-103",
+   "statement": "Expected-count exponent with critical costs (fan k_i-2, top 12, square 2); submodular; h(F)=3.",
+   "cited_or_new": {
+    "status": "variant",
+    "bib_key": "none",
+    "cue": "'Thus $N^{h_\\theta(W)}$ is the expected number of assignments' (04:54-55)"
+   },
+   "uses_items": [
+    "P13",
+    "P14"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Positivity of every extension margin; the template counts (k_i, 32, 90) are tuned so h(F)=3 and every subset keeps >= min{2,|W|}."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Standard density/exponent function of random graph theory (e(H)-v(H)p-type, Spencer's extension exponents)."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard exponent computation for this pattern; its numerical design is credited to P03/P08."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P28",
+   "kind": "construction (sample:eq-closure)",
+   "name": "Closure U: inclusion-maximal U ⊇ I with h(U)=|I|; gap h(U∪V)-h(U) >= 1",
+   "file_line": "sections/04-sampling.tex:119-137",
+   "statement": "Enlarging the conditioning set so every further extension strictly increases the exponent.",
+   "cited_or_new": {
+    "status": "variant",
+    "bib_key": "none",
+    "cue": "'The purpose of this enlargement is to make every further extension increase the critical exponent.' (04:107-108)"
+   },
+   "uses_items": [
+    "P27"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Makes star/extension counts concentrate uniformly."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Equivalent in spirit to the rigid/safe closure of rooted extensions in random graphs (Spencer 'Counting extensions' 1990; Shelah-Spencer closure)."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Close variant of a known random-graph device (not cited in paper)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P29",
+   "kind": "construction (star M_U^(t)) + overlap counting rule",
+   "name": "Stars: t copies of M glued along U, injective in each field; overlap types; variance rule C_t N^{-q+C}",
+   "file_line": "sections/04-sampling.tex:139-219",
+   "statement": "Second-moment machinery for counts of t-fold extensions.",
+   "cited_or_new": {
+    "status": "variant",
+    "bib_key": "none",
+    "cue": "'We give the overlap count in detail because the coordinates are not disjoint letter domains.' (04:158-159)"
+   },
+   "uses_items": [
+    "P28",
+    "P13"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Concentration of star counts."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Second-moment for extension counts (Spencer; Janson)."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Variant of standard extension counting."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P30",
+   "kind": "lemma (sample:lem-conditional-counts)",
+   "name": "Concentration of extension counts A_sigma and leaf counts B_b",
+   "file_line": "sections/04-sampling.tex:237-354",
+   "statement": "Means a_N, b_N independent of sigma/b; relative variances o(1) uniformly.",
+   "cited_or_new": {
+    "status": "new (variant)",
+    "bib_key": "none",
+    "cue": "-"
+   },
+   "uses_items": [
+    "P29",
+    "P28"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Input to the coupling."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Spencer-type extension statements."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Variant."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P31",
+   "kind": "lemma (sample:lem-coupling)",
+   "name": "Star coupling: law on t matches agreeing on I, each branch ~ mu_N in TV, leaves ~ iid uniform letters in TV",
+   "file_line": "sections/04-sampling.tex:368-434",
+   "statement": "Use the uniform law on present injective stars.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'we couple several matches so that the conditioning labels agree, each match is approximately uniform among all matches, and the further labels are approximately independent uniform generators' (01:141-144)"
+   },
+   "uses_items": [
+    "P30"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Turns finite table statistics into statements valid for ANY bounded test chosen after the tables (including action-dependent tests)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal or L",
+    "note": "Couplings via uniform measure on extensions are folklore in random graphs; the use as a target-independent device for fixed points appears new."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Technique is standard probabilistic combinatorics; its role is credited to P43."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P32",
+   "kind": "display (sample:eq-six-pair) + Chernoff",
+   "name": "Six-letter pair counts uniformly ~ N^{1-δ}",
+   "file_line": "sections/04-sampling.tex:468-490",
+   "statement": "For all positions r<q and letters u,v, Q_rq(u,v)/N^{1-δ} -> 1 uniformly w.h.p.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "none",
+    "cue": "'The binomial Chernoff bound gives' (04:477)"
+   },
+   "uses_items": [
+    "P08"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Feeds P40."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Chernoff + union bound."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P33",
+   "kind": "proposition (prop:sampling) + remark (sample:rem-diagonal)",
+   "name": "Sampling proposition (finite families of tests)",
+   "file_line": "sections/04-sampling.tex:493-533",
+   "statement": "For any finite family of tests and small parameters: |Omega_n| ~ N^{3-β-90δ}, single-field marginals uniform, all couplings exist, six-letter counts uniform.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "-"
+   },
+   "uses_items": [
+    "P30",
+    "P31",
+    "P32"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Interface to Sec 5; quantifier order (tests -> parameters -> n)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Assembly."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P34",
+   "kind": "lemma (energy:minimizer)",
+   "name": "Energy minimizing basepoint with zero tangent barycenter and variance inequality",
+   "file_line": "sections/05-energy.tex:44-107",
+   "statement": "For a geometric action of an infinite f.g. group on a proper complete CAT(0) space, E(x)=avg d(x,sx)^2 attains a positive minimum; sum <h,v_s> <= 0.",
+   "cited_or_new": {
+    "status": "cited/re-proved",
+    "bib_key": "Gromov2003; IzekiNayatani2005",
+    "cue": "'is part of the harmonic-map framework of Gromov ... and Izeki--Nayatani. We give the argument' (05:37-42)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Normalizes every action; barycenter feeds inductive mean."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Gromov 2003 Sec 3; Izeki-Nayatani 2005."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Known."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P35",
+   "kind": "lemma (energy:displacement-bound)",
+   "name": "Uniform displacement bound max_s ||v_s||^2 <= 25(1+ε)/(1-ε) from the six-letter table",
+   "file_line": "sections/05-energy.tex:125-164",
+   "statement": "Each row (a,s2..s6) gives a^{-1}=s2...s6; Cauchy-Schwarz + near-uniform conditional distributions bound every generator displacement by the average.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'The six-letter relations supply the uniform displacement bound that makes these tests bounded.' (01:150-151)"
+   },
+   "uses_items": [
+    "P32",
+    "P34"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Makes all action-dependent tests uniformly bounded, the precondition for TV transfer; without it the uniformity over targets fails."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Dense random relators bounding displacements: reminiscent of Gromov's density-1/2 collapse argument (every pair of letters in a common relator) and of Zuk/Ollivier spectral arguments, but the use to bound max displacement by mean is specific."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Short, clever device with a clear neighbour (density arguments). Could be argued N3-lite."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P36",
+   "kind": "lemma (energy:cone-mean) + identity (energy:radial-identity)",
+   "name": "Concavity of <h,·> in CAT(0) cones; inductive mean E||m_t||^2 <= 1/t",
+   "file_line": "sections/05-energy.tex:168-226",
+   "statement": "Sturm's inductive mean bound (unit variance) and Gigli-Nobili concavity, re-proved.",
+   "cited_or_new": {
+    "status": "cited (re-proved)",
+    "bib_key": "Sturm2003; GigliNobili2021",
+    "cue": "'The inductive-mean estimate is the unit-variance case of Sturm's bound' (05:186-187)"
+   },
+   "uses_items": [
+    "P34"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Averaging estimate inside the conditional test."
+   },
+   "analytic_check": {
+    "verdict": "occurs in L",
+    "note": "In the bibliography (Sturm 2003 Thm 4.7; Gigli-Nobili 2021 Prop 2.6)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Cited results."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P37",
+   "kind": "lemma (lem:conditional-test)",
+   "name": "Uniform conditional test: limsup_nu E_mu <h_I, v_{sigma(e)}> <= 0 for bounded h_I depending only on labels in I",
+   "file_line": "sections/05-energy.tex:246-295",
+   "statement": "Couple t matches agreeing on I; average ⟨h_I, v_{e_j}⟩ <= ⟨h_I, m_t⟩ <= B||m_t||; leaves near iid uniform so E||m_t||^2 <= 1/t + error; let ν->∞ then t->∞. Uniform over actions chosen after the tables.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'Here a hypothetical target and its action can be chosen after the finite presentation is known. We obtain the required uniformity from bounds on every generator displacement and total-variation couplings of table matches.' (01:86-89)"
+   },
+   "uses_items": [
+    "P31",
+    "P33",
+    "P35",
+    "P36",
+    "P34"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The single bridge from combinatorics to geometry; every metric lower bound (P39, P44) is an application. It is what defeats the target-dependence that limited IKN/Toyoda (constants depending on the target family) and Kondo-type CAT(0) spaces with δ=1."
+   },
+   "analytic_check": {
+    "verdict": "not in goal or L",
+    "note": "Nearest: Gromov 2003 / Izeki-Nayatani 'nonlinear spectral gap' fixed-point criteria (target-dependent constants); Sturm's law of large numbers in CAT(0); Naor-Silberman. None gives a target-uniform statement for tests chosen after sampling."
+   },
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Non-analytic (a 'conditional orthogonality' statement in the tangent cone, not a subterm of goal or L), load-bearing for the whole metric half, and its design (combinatorial coupling + inductive mean + displacement bound) circumvents the known obstruction to uniformity. Risk: an expert in Sturm/IKN might regard it as a natural combination (N2)."
+   },
+   "provisional_F": {
+    "type": "F5",
+    "justification": "Change of representation: target-dependent metric quantities are replaced by finite total-variation statements about table matches, then pulled back through barycentric inductive means. F3 flavour (coupling built only for the proof)."
+   }
+  },
+  {
+   "id": "P38",
+   "kind": "construction (Gamma-hat, product over matches, ultralimit Z)",
+   "name": "Limiting configuration: L2-product of orbit realizations over Omega_nu, pointed ultralimit",
+   "file_line": "sections/05-energy.tex:297-328",
+   "statement": "Orbit realizations of the core graph + square closing paths, product metric averaged over matches, nonprincipal ultralimit; complete CAT(0) (BH I.5.53, II.3.10).",
+   "cited_or_new": {
+    "status": "cited (standard device)",
+    "bib_key": "BH1999",
+    "cue": "'Take the finite product over the matches with metric ...' (05:311)"
+   },
+   "uses_items": [
+    "P13",
+    "P34",
+    "P35"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Converts averaged inequalities into exact metric identities in one CAT(0) space."
+   },
+   "analytic_check": {
+    "verdict": "occurs in L (standard)",
+    "note": "Standard ultralimit/ultraproduct of CAT(0) spaces (BH; Kleiner-Leeb; Gromov). L2 product over a finite probability space is standard."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard construction applied to the matches."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P39",
+   "kind": "lemma (energy:path-bounds)",
+   "name": "Edges length 1; admissible k-paths have squared endpoint distance >= k",
+   "file_line": "sections/05-energy.tex:331-364",
+   "statement": "Via log comparison and the uniform conditional test at each step.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "-"
+   },
+   "uses_items": [
+    "P37",
+    "P38"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Lower bounds that become equalities."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Direct application of P37."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P40",
+   "kind": "lemma (energy:quadrilateral)",
+   "name": "CAT(0) quadrilateral inequality d13^2 + d24^2 + 4 d(m,n)^2 <= sum of side squares",
+   "file_line": "sections/05-energy.tex:374-392",
+   "statement": "Midpoint convexity.",
+   "cited_or_new": {
+    "status": "cited (folklore)",
+    "bib_key": "none",
+    "cue": "-"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Upper bound that forces equality (squares, hexagon centers)."
+   },
+   "analytic_check": {
+    "verdict": "occurs in L",
+    "note": "Berg-Nikolaev / Reshetnyak quadruple inequality; Sturm; known in CAT(0) literature."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Known inequality (re-derived)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P41",
+   "kind": "lemmas (energy:hexagon-flatness, energy:common-center) + eq (two-step-equality)",
+   "name": "Two-step distance = sqrt 2; all core hexagons share one center c at radius sqrt3/2; central triangles flat",
+   "file_line": "sections/05-energy.tex:394-492",
+   "statement": "Square equality, hexagon opposite-pair midpoints coincide, connectivity of hexagons via GL_3(F_2) elementary moves and X/Y swaps.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "-"
+   },
+   "uses_items": [
+    "P39",
+    "P40",
+    "P07"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Rigidifies the configuration around one point."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Standard rigidity arguments on a new configuration."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P42",
+   "kind": "construction + argument (ternary midpoint test)",
+   "name": "Ternary midpoint test: angle at CD between mid(X_C,Y_C) and X_D is >= π/2",
+   "file_line": "sections/05-energy.tex:494-547",
+   "statement": "Conditional test with I = the two F_C fields at CD and e = loose field; fixed-fraction points pass through the ultralimit.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'the combination that will produce the decisive midpoint identity' (02:135)"
+   },
+   "uses_items": [
+    "P37",
+    "P41",
+    "P04"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The only place where the omitted incidence enters the metric data; drives P46-P47."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Application of P37 to the gadget; novelty credited to P03/P37."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P43",
+   "kind": "proposition (prop:configuration)",
+   "name": "Resulting finite configuration (i)-(iii)",
+   "file_line": "sections/05-energy.tex:554-591",
+   "statement": "If every pi_1 P_nu acts geometrically, a complete CAT(0) Z carries the core configuration with exact distances, common center and the exceptional right angle.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "-"
+   },
+   "uses_items": [
+    "P39",
+    "P41",
+    "P42"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Interface to Sec 6."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Assembly."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P44",
+   "kind": "definition (geom:cone-addition) + ineq (geom:sum-concavity)",
+   "name": "Cone addition u ⊕ v = 2 mid(u,v); <w, u⊕v> >= <w,u> + <w,v>",
+   "file_line": "sections/06-obstruction.tex:22-41",
+   "statement": "Additive surrogate in a non-linear CAT(0) cone.",
+   "cited_or_new": {
+    "status": "variant",
+    "bib_key": "none",
+    "cue": "'This operation is commutative, but no associativity or cancellation law will be used.'"
+   },
+   "uses_items": [
+    "P36"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Algebra of Sec 6."
+   },
+   "analytic_check": {
+    "verdict": "occurs in L (essentially)",
+    "note": "Standard in tangent-cone calculus."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Notation + concavity."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P45",
+   "kind": "lemma (geom:square)",
+   "name": "Square rigidity: unit sides and sqrt2 diagonals span a flat unit square",
+   "file_line": "sections/06-obstruction.tex:51-82",
+   "statement": "Via midpoint convexity and BH II.2.11 flat quadrilateral theorem.",
+   "cited_or_new": {
+    "status": "cited (standard)",
+    "bib_key": "BH1999",
+    "cue": "'The flat quadrilateral theorem ... applies'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Fan squares and transverse square."
+   },
+   "analytic_check": {
+    "verdict": "occurs in L",
+    "note": "BH II.2.11."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard rigidity."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P46",
+   "kind": "lemmas (geom:fan-sums, geom:exceptional)",
+   "name": "Fan identities M_i = x_i ⊕ y_i = h_H ⊕ h_H' and exceptional identity h_0 = M_C ⊕ x_D",
+   "file_line": "sections/06-obstruction.tex:118-293",
+   "statement": "Line vectors pairwise <h,h'>=-1/4 (cos=-1/3); at doubled points the midpoint vector M_i is shared by all full-line pairs; at CD the loose edge forces h_0 = 2j + x_D in one sector.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'The missing edge from $Y_D$ to $H_0$ is responsible for the asymmetry used in the next lemma.' (06:204-205)"
+   },
+   "uses_items": [
+    "P43",
+    "P45",
+    "P44"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Converts metric configuration into tangent-cone vector identities."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Computations on the new gadget; credited to P03/P47."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P47",
+   "kind": "lemma (geom:antipodal) + proposition (prop:no-configuration)",
+   "name": "Finite CAT(0) obstruction: M_C, M_D antipodal; parallel-set splitting gives a transverse flat square; M_A, M_B antipodal, contradicting <M_A,M_B> >= 0",
+   "file_line": "sections/06-obstruction.tex:297-477",
+   "statement": "No complete CAT(0) space contains the configuration of Prop 5.x.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "'The remaining argument will force $M_A,M_B$ to be antipodal' (06:188)"
+   },
+   "uses_items": [
+    "P46",
+    "P45",
+    "P44"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Closes the proof. Lean: no_finite_obstruction dominates 1.3% of DAG (reach 5.5%)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal or L",
+    "note": "Neighbours: rigidity of flats / parallel sets (BH II.2.14); non-realizability of the Fano configuration over R (Sylvester-Gallai); Brady-Crisp translation-length obstructions (2-dim only). None is this configuration."
+   },
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "A finite metric configuration that is consistent in many CAT(0) cones (7 line vectors at cos -1/3 do NOT fit in Hilbert space but fit in branching cones) yet contradictory once the doubled points + one omitted incidence are added: the obstruction must be valid in ALL CAT(0) spaces, which is exactly what made the problem hard. Together with P03 this is the 'gadget'. Could be N2 if the configuration search is easy once the target identities (two-step = sqrt 2, common center) are known."
+   },
+   "provisional_F": {
+    "type": "F3",
+    "justification": "Auxiliary finite configuration/gadget."
+   }
+  },
+  {
+   "id": "P48",
+   "kind": "lemma (lem:completion-diagonal)",
+   "name": "Deterministic diagonal sequence (n_j, α_j=δ_j=ε_j, β_j=8ε_j)",
+   "file_line": "sections/07-completion.tex:4-33",
+   "statement": "Stage j requests all admissible tests with t <= j; chooses ε_j < 1/(400j); infinitude via χ and the C_2 quotient.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": "none",
+    "cue": "-"
+   },
+   "uses_items": [
+    "P25",
+    "P33",
+    "P11"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Quantifier management (tests -> parameters -> threshold -> n)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "Standard diagonalization."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P49",
+   "kind": "proposition (prop:completion-no-action)",
+   "name": "Eventually no geometric action",
+   "file_line": "sections/07-completion.tex:35-42",
+   "statement": "If infinitely many G_j acted, Props configuration + no-configuration give a contradiction.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": "none",
+    "cue": "-"
+   },
+   "uses_items": [
+    "P48",
+    "P43",
+    "P47"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Clause (ii)."
+   },
+   "analytic_check": {
+    "verdict": "subterm of goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Assembly."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P50",
+   "kind": "lemma (lem:completion-transfer)",
+   "name": "Finite-model filling transfer",
+   "file_line": "sections/07-completion.tex:47-58",
+   "statement": "Finite simplicial homotopy model of P with contractible universal cover and linear combinatorial filling; filling constants change by bounded substitutions.",
+   "cited_or_new": {
+    "status": "cited (standard)",
+    "bib_key": "Hatcher2002",
+    "cue": "'A finite CW complex has a finite simplicial homotopy model of the same dimension~\\cite[Theorem~2C.5]{Hatcher2002}'"
+   },
+   "uses_items": [
+    "P25"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Clause (i) in simplicial form."
+   },
+   "analytic_check": {
+    "verdict": "occurs in L",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "P51",
+   "kind": "proof (thm:main) final paragraph",
+   "name": "Locally CAT(0) finite model => geometric action (Cartan-Hadamard, Hopf-Rinow)",
+   "file_line": "sections/07-completion.tex:60-66",
+   "statement": "Universal cover of a compact locally CAT(0) geodesic space is proper CAT(0) with geometric deck action.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "BH1999",
+    "cue": "'The Cartan--Hadamard theorem makes the cover globally $\\CAT(0)$'"
+   },
+   "uses_items": [
+    "P49"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Corollary part of the main theorem."
+   },
+   "analytic_check": {
+    "verdict": "occurs in L",
+    "note": "BH II.4.1."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null
+  }
+ ],
+ "lean_items": [
+  {
+   "id": "L01",
+   "kind": "theorem + structure (Lean)",
+   "name": "FiniteObstructionData / no_finite_obstruction",
+   "file_line": "lean/OAI/Geometry/HyperbolicGroups/CATZeroFurther.lean:189-298",
+   "statement": "Metric data (radii 3/4, line distances, fan squares, two-step, loose, missing >= 3, fractional test) => False in any CAT(0) X.",
+   "cited_or_new": {
+    "status": "new (formal encoding)",
+    "bib_key": "none",
+    "cue": "docstring 'The complete finite CAT(0) metric obstruction from Section 6. The proof constructs the completed tangent cone and all rigidity identities internally.'"
+   },
+   "uses_items": [
+    "P47",
+    "L02",
+    "L03"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "dominated 1.3% / reach 5.5% of patched DAG"
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Formal counterpart of P47 (same candidate)."
+   },
+   "provisional_F": {
+    "type": "F3",
+    "justification": "same as P47"
+   }
+  },
+  {
+   "id": "L02",
+   "kind": "theorems (Lean)",
+   "name": "ConeData.exceptional_antipodes, opposite_cross_sums, five_line_fans_contradiction",
+   "file_line": "lean/OAI/Geometry/HyperbolicGroups/CATZero.lean:465-667",
+   "statement": "Algebraic route: antipodality of M_C,M_D from <M_D,y_D>=<M_D,x_D>=1/2, y_D opposite h_0, h_0 = M_C ⊕ x_D and the unit Cauchy lower bound; transverse square via 'translates' along the axis and add_eq_of_pairings, instead of BH II.1.4 (CAT(1) local geodesics) and II.2.14 (parallel-set splitting).",
+   "cited_or_new": {
+    "status": "new (formal encoding)",
+    "bib_key": "none",
+    "cue": "docstring 'Source Lemma geom:antipodal, in an algebraic form that avoids a local-to-global theorem in the completed space of directions.'"
+   },
+   "uses_items": [
+    "P47"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Simplifies the paper's Sec 6 (shorter antipodality proof)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Re-proof of P47's steps; a genuine simplification but not a new concept."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L03",
+   "kind": "defs + theorems (Lean)",
+   "name": "TangentRay / TangentCone construction (tangentPairing as bounded sup, representedMid, coneMid, catZero of tangent cone)",
+   "file_line": "lean/OAI/Geometry/HyperbolicGroups/TangentRay.lean, TangentCone.lean",
+   "statement": "From-scratch completed tangent cone of a CAT(0) space and its CAT(0)-ness (Mathlib has none).",
+   "cited_or_new": {
+    "status": "new (formal encoding)",
+    "bib_key": "none",
+    "cue": "docstring 'Definition by bounded supremum, so no completeness of the ambient CAT(0)'"
+   },
+   "uses_items": [
+    "P36",
+    "P44"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Infrastructure for Secs 5-6."
+   },
+   "analytic_check": {
+    "verdict": "occurs in L (BH II.3.19) but not in Mathlib",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Formalization of standard theory."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L04",
+   "kind": "structure + theorem (Lean)",
+   "name": "EnergyOrbit / exists_of_geometric (M = 8)",
+   "file_line": "lean/OAI/Geometry/HyperbolicGroups/ConditionalStar.lean:88-96, 213-235",
+   "statement": "Normalized minimizing basepoint, symmetric generators, energy 1, displacement bound 8 from six-letter rows with marginals <= 2/|L|.",
+   "cited_or_new": {
+    "status": "new (formal encoding)",
+    "bib_key": "none",
+    "cue": "docstring 'Six-letter relative counts provide the bound M=8 for the rescaled genuine geometric action; no bound on the action is assumed before sampling.'"
+   },
+   "uses_items": [
+    "P34",
+    "P35"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Entry point of the metric branch."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Encoding of P34+P35."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L05",
+   "kind": "structure + theorems (Lean)",
+   "name": "SamplingSequence; MasterGraph.exists_noAction / eventually_noAction; impossible_sequence",
+   "file_line": "lean/OAI/Geometry/HyperbolicGroups/Selection.lean:84-125; Exceptional.lean:105-149",
+   "statement": "Abstract interface: any infinite-group sequence with the sampling assertions and six-letter rows has a no-action member; proof picks actions by choice, rescales, takes Ultrafilter.of atTop and derives MetricCore + ExceptionalTest in the limit.",
+   "cited_or_new": {
+    "status": "new (formal encoding)",
+    "bib_key": "none",
+    "cue": "docstring 'The geometric half of selection'"
+   },
+   "uses_items": [
+    "P49",
+    "P43",
+    "L04"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "impossible_sequence dominates 9.7% (reach 12.2%) of the patched DAG."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Encoding."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L06",
+   "kind": "def + theorems (Lean)",
+   "name": "FinitePolygonModel.Data.coverContraction / finalCover_higher / finalFinite_aspherical",
+   "file_line": "lean/OAI/Geometry/HyperbolicGroups/PolygonContraction.lean:100-128; IndexedFillingValue.lean:5414-5441",
+   "statement": "Asphericity proved by an explicit based contraction of the actual voltage universal cover (cochain correction of pi_2 obstructions, prism gluing), not Hurewicz + Whitehead.",
+   "cited_or_new": {
+    "status": "new (formal encoding)",
+    "bib_key": "none",
+    "cue": "docstring 'The SAME selected arrays give a literal basepoint-fixing contraction of their actual universal cover.'"
+   },
+   "uses_items": [
+    "P25",
+    "P17"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "finalFinite_aspherical dominates 16.2% (reach 77.6%) - the largest single dominated branch."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Formal route difference (obstruction theory), standard mathematics."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L07",
+   "kind": "theorem (Lean)",
+   "name": "ConeSkeleton.infinite_of_boundary_and_six",
+   "file_line": "lean/OAI/Geometry/HyperbolicGroups/IndexedFillingValue.lean:5236-5243",
+   "statement": "Infinitude: if the group were finite, injectivity of the 2-boundary would bound the number of six-cells by n+1 via a rank count; the six-letter table has more rows.",
+   "cited_or_new": {
+    "status": "new (formal encoding)",
+    "bib_key": "none",
+    "cue": "docstring 'An exact algebraic infinitude criterion for the actual presentation.'"
+   },
+   "uses_items": [
+    "P11",
+    "P25"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Replaces the paper's Euler characteristic + C_2 argument."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Route difference."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L08",
+   "kind": "theorem (Lean)",
+   "name": "WordPictures.wordHyperbolic_of_linear (via VertexPath.cochain_thin / thin_fourpoint)",
+   "file_line": "lean/OAI/Geometry/HyperbolicGroups/IndexedFillingValue.lean:6667-6719",
+   "statement": "Linear filling => thin triangles => four-point hyperbolicity with δ = 3(112K)+2, K=3L^2C. Re-proves BH III.H.2.9 direction.",
+   "cited_or_new": {
+    "status": "new (formal encoding)",
+    "bib_key": "none",
+    "cue": "-"
+   },
+   "uses_items": [
+    "P25"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "dominated 3.5%."
+   },
+   "analytic_check": {
+    "verdict": "subterm of goal (WordHyperbolic)",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard theorem formalized."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L09",
+   "kind": "theorems (Lean)",
+   "name": "LocalGeodesic development: developed_catZero, deckGeometricAction, not_noGeometricCATZeroAction_of_compact_localCATNegOne",
+   "file_line": "lean/OAI/Geometry/HyperbolicGroups/CompactLocalCATGeometric.lean:19-66; LocalGeodesic*.lean; Development*.lean",
+   "statement": "Cartan-Hadamard for compact locally CAT(-1) geodesic spaces via the space of local geodesics.",
+   "cited_or_new": {
+    "status": "new (formal encoding)",
+    "bib_key": "none",
+    "cue": "docstring 'Compact locally CAT(-1) geodesic metrics yield genuine geometric CAT(0) actions of the actual fundamental group.'"
+   },
+   "uses_items": [
+    "P51"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "dominated 3.8-4.4%."
+   },
+   "analytic_check": {
+    "verdict": "occurs in L (BH II.4.1)",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard theorem formalized."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L10",
+   "kind": "defs + theorems (Lean)",
+   "name": "Template / criticalExponent_admissible / exists_critical_closure / ConditionalTest.closure_gap",
+   "file_line": "lean/OAI/Geometry/HyperbolicGroups/Template.lean:14-300; IncidenceTemplate.lean:14-110; Test.lean:17-40",
+   "statement": "Exact template (Edge = incidences minus (10,4); fans; 90 two-paths; 212 fields; 98 rows) and the budget lemmas.",
+   "cited_or_new": {
+    "status": "new (formal encoding)",
+    "bib_key": "none",
+    "cue": "docstring 'Source Lemma sample:lem-budget, the strengthened admissible-set budget.'"
+   },
+   "uses_items": [
+    "P03",
+    "P14",
+    "P27",
+    "P28"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Used by 1.7-1.9% of DAG (signature-level carriers)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Encoding."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L11",
+   "kind": "theorems (Lean)",
+   "name": "PictureSwitch planar separators (planar_component_separator, sqrt_component_separator, uniform_genusZero_face_partition)",
+   "file_line": "lean/OAI/Geometry/HyperbolicGroups/PicturePlanarSeparator.lean:21-40; PictureSqrtSeparator.lean:21-30; PlanarFacePartition.lean:17",
+   "statement": "Lipton-Tarjan-type sqrt separators re-proved for genus-zero rotation systems; recursive partition.",
+   "cited_or_new": {
+    "status": "new (formal encoding)",
+    "bib_key": "none",
+    "cue": "-"
+   },
+   "uses_items": [
+    "P24"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "uniform_genusZero_face_partition dominated 3.3%."
+   },
+   "analytic_check": {
+    "verdict": "not in Mathlib",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard theorem formalized."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L12",
+   "kind": "theorems (Lean)",
+   "name": "Coincidence.contacts_le_weighted_rank; RelDisk.actual_fragment_bound; original_letter_linear_filling_list",
+   "file_line": "lean/OAI/Geometry/HyperbolicGroups/WeightedCoincidence.lean:135; RelativeFragment.lean:67; OriginalLinearFilling.lean:16-78",
+   "statement": "Formal P21/P23/P25.",
+   "cited_or_new": {
+    "status": "new (formal encoding)",
+    "bib_key": "none",
+    "cue": "-"
+   },
+   "uses_items": [
+    "P21",
+    "P23",
+    "P25"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "original_letter_linear_filling_list dominates 8.6% (reach 42%); actual_fragment_bound 4.7% (reach 22.7%)."
+   },
+   "analytic_check": {
+    "verdict": "not in goal",
+    "note": "-"
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Encodings of N2 paper items."
+   },
+   "provisional_F": null
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Hurewicz theorem",
+   "bib_key": "Hatcher2002",
+   "locator": "Thm 4.32",
+   "field": "Algebraic topology",
+   "used_at": "03:138-140, 626-629",
+   "status": "cited, invoked (Lean bypasses via explicit contraction L06)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Whitehead theorem",
+   "bib_key": "Hatcher2002",
+   "locator": "Thm 4.5",
+   "field": "Algebraic topology",
+   "used_at": "03:630-631",
+   "status": "cited, invoked (Lean bypasses)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Finite simplicial model of a finite CW complex",
+   "bib_key": "Hatcher2002",
+   "locator": "Thm 2C.5",
+   "field": "Algebraic topology",
+   "used_at": "07:51",
+   "status": "cited, invoked (Lean builds its own FinitePolygonModel triangulation)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Planar separator theorem",
+   "bib_key": "LiptonTarjan1979",
+   "locator": "Cor 2",
+   "field": "Graph theory / algorithms",
+   "used_at": "03:565-569",
+   "status": "cited, invoked (Lean re-proves L11)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "CAT(0) basics: strong convexity, first variation, comparison angles",
+   "bib_key": "BH1999",
+   "locator": "II.1-II.3, II.2.9-II.2.10, II.3.6",
+   "field": "Metric geometry",
+   "used_at": "05:22-32",
+   "status": "cited, invoked (Lean re-proves the needed parts)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Flat triangle / interior comparison equality",
+   "bib_key": "BH1999; Ballmann1995",
+   "locator": "BH II.2.9, Ex II.2.10(1); Ballmann I.3.13(ii)",
+   "field": "Metric geometry",
+   "used_at": "06:43-49",
+   "status": "cited, invoked",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Flat quadrilateral theorem",
+   "bib_key": "BH1999",
+   "locator": "II.2.11",
+   "field": "Metric geometry",
+   "used_at": "06:77-80",
+   "status": "cited, invoked (Lean: CATZero.square_mid, metric only)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Tangent cone is CAT(0), space of directions CAT(1)",
+   "bib_key": "BH1999; KleinerLeeb1997",
+   "locator": "II.3.19; KL 2.1.3 (Nikolaev)",
+   "field": "Metric geometry",
+   "used_at": "01:177-179; 06:93-94",
+   "status": "cited, invoked (Lean constructs the cone, L03)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Local geodesics of length <= π in CAT(1) are geodesics",
+   "bib_key": "BH1999",
+   "locator": "II.1.4(2)",
+   "field": "Metric geometry",
+   "used_at": "06:349-352",
+   "status": "cited, invoked (Lean avoids, L02)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Parallel-set product decomposition",
+   "bib_key": "BH1999",
+   "locator": "II.2.14",
+   "field": "Metric geometry",
+   "used_at": "06:407-414",
+   "status": "cited, invoked (Lean avoids via translates, L02)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Ultralimits of (complete) CAT(0) spaces are complete CAT(0)",
+   "bib_key": "BH1999",
+   "locator": "I.5.53, II.3.10(2)",
+   "field": "Metric geometry",
+   "used_at": "05:319-321",
+   "status": "cited, invoked",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Euclidean cone metric formulas",
+   "bib_key": "BH1999",
+   "locator": "I.5.6, I.5.10",
+   "field": "Metric geometry",
+   "used_at": "05:180-181",
+   "status": "cited",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Sturm inductive means (unit variance case)",
+   "bib_key": "Sturm2003",
+   "locator": "Def 4.6, Thm 4.7 proof (a)",
+   "field": "Probability on metric spaces",
+   "used_at": "05:186-226",
+   "status": "cited; re-proved in paper",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Concavity of scalar product in CAT(0) cones",
+   "bib_key": "GigliNobili2021",
+   "locator": "Prop 2.6 (2.7f), Prop 3.8 proof",
+   "field": "Analysis on metric spaces",
+   "used_at": "05:184-185",
+   "status": "cited; re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Energy minimizer / zero barycenter (harmonic-energy framework)",
+   "bib_key": "Gromov2003; IzekiNayatani2005",
+   "locator": "Gromov Secs 3.3, 3.7",
+   "field": "Geometric group theory / harmonic maps",
+   "used_at": "05:37-107",
+   "status": "cited; re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Binomial Chernoff bound",
+   "bib_key": "none",
+   "locator": "-",
+   "field": "Probability",
+   "used_at": "04:477-482",
+   "status": "invoked without citation (standard); Lean Chernoff.lean re-proves",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Linear Dehn function <=> word hyperbolic",
+   "bib_key": "BH1999; Gromov1987",
+   "locator": "III.H.2.5(5), III.H.2.7, III.H.2.9",
+   "field": "Geometric group theory",
+   "used_at": "07:61",
+   "status": "cited, invoked (Lean re-proves direction, L08)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Cartan-Hadamard, Hopf-Rinow, covering local isometry, CAT(-1) => CAT(0)",
+   "bib_key": "BH1999",
+   "locator": "II.4.1(2), I.3.7, I.3.25, II.1.12(1)",
+   "field": "Metric geometry",
+   "used_at": "07:63-65",
+   "status": "cited, invoked for the finite-model corollary (Lean re-proves for CAT(-1), L09)",
+   "essential_for_headline": false
+  },
+  {
+   "name": "IKN Cor 3.8, Toyoda Thm 1.4, Ollivier-Wise Thm 10.4, Brady-Crisp Thms 1-2",
+   "bib_key": "IzekiKondoNayatani2012; Toyoda2016; OllivierWise2011; BradyCrisp2007",
+   "locator": "-",
+   "field": "Geometric group theory",
+   "used_at": "01:40-85",
+   "status": "background-cited (not used)",
+   "essential_for_headline": false
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Fixed template and random nested tables: doubled-Fano incidence graph Gamma with loose edge; fans, top marks, 90 square decoration tables and one six-letter table at near-critical exponents; cone complex P presents the group.",
+   "items": [
+    "P03",
+    "P04",
+    "P05",
+    "P08",
+    "P09",
+    "P10",
+    "P11",
+    "P13",
+    "P14"
+   ],
+   "lean": [
+    "L10"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Diagrams: coincidence-rank first moment with shared fans counted once; normal pictures; multiplicity weights w_b; weighted contact + local apex inequalities give A <= B/κ for every fragment; planar separators globalize to linear filling and no spherical pictures, hence asphericity (Thm 3.1).",
+   "items": [
+    "P15",
+    "P16",
+    "P17",
+    "P18",
+    "P19",
+    "P20",
+    "P21",
+    "P22",
+    "P23",
+    "P24",
+    "P25"
+   ],
+   "lean": [
+    "L11",
+    "L12",
+    "L06",
+    "L08"
+   ],
+   "lean_share": "≈60% of patched DAG nodes classified to diagrams/presentation files (incl. IndexedFillingValue); original_letter_linear_filling_list dominates 8.6%, finalFinite_aspherical 16.2%."
+  },
+  {
+   "step": 3,
+   "claim": "Sampling uniform over later actions: critical exponent h, closures U, stars glued along U, second-moment concentration, uniform law on stars gives a TV coupling of t matches agreeing on I with near-iid uniform leaves; six-letter pair counts uniform.",
+   "items": [
+    "P26",
+    "P27",
+    "P28",
+    "P29",
+    "P30",
+    "P31",
+    "P32",
+    "P33"
+   ],
+   "lean": [
+    "L10"
+   ],
+   "lean_share": "≈11% of patched DAG nodes (sampling files); exists_rankSamplingStage dominates 6.8%."
+  },
+  {
+   "step": 4,
+   "claim": "Energy: normalized minimizing basepoint, displacement bound from six-letter relators, uniform conditional test <h_I, v_e> <= 0 (coupling + Sturm inductive mean), L2-product/ultralimit Z; path lower bounds; quadrilateral equality forces two-step = sqrt2 and common hexagon center at radius sqrt3/2; ternary midpoint test at the loose edge.",
+   "items": [
+    "P34",
+    "P35",
+    "P36",
+    "P37",
+    "P38",
+    "P39",
+    "P40",
+    "P41",
+    "P42",
+    "P43"
+   ],
+   "lean": [
+    "L04",
+    "L05"
+   ],
+   "lean_share": "≈5% of nodes in energy/limit files; impossible_sequence dominates 9.7% (reach 12.2%)."
+  },
+  {
+   "step": 5,
+   "claim": "Finite obstruction in the tangent cone at c: line vectors at cos -1/3; fan identities; exceptional identity h_0 = M_C ⊕ x_D; M_C, M_D antipodal; splitting the axis gives a flat square in the transverse factor, forcing M_A, M_B antipodal, contradicting <M_A,M_B> >= 0.",
+   "items": [
+    "P44",
+    "P45",
+    "P46",
+    "P47"
+   ],
+   "lean": [
+    "L01",
+    "L02",
+    "L03"
+   ],
+   "lean_share": "≈6.4% of nodes in obstruction files; no_finite_obstruction dominates 1.3% (reach 5.5%); MetricCore.impossible 3.0%."
+  },
+  {
+   "step": 6,
+   "claim": "Diagonal selection of one realization per stage; eventually no action; transfer to a finite simplicial model; Cartan-Hadamard for the finite-model corollary; linear Dehn => hyperbolic.",
+   "items": [
+    "P48",
+    "P49",
+    "P50",
+    "P51"
+   ],
+   "lean": [
+    "L06",
+    "L07",
+    "L08",
+    "L09"
+   ],
+   "lean_share": "≈18% of nodes in topology/CAT(-1)/hyperbolicity files; homotopy_incompatibleLocalCATNegOne dominates 3.8%."
+  }
+ ],
+ "lean_route_differences": [
+  "Asphericity: paper uses Hurewicz + Whitehead after showing H_2 = 0 (03:620-632); Lean constructs an explicit contraction of the voltage universal cover via pi_2-obstruction cochains and prism gluing (L06), the largest dominated branch (16%).",
+  "Infinitude: paper uses Euler characteristic with the C_2 quotient (07:28-32); Lean uses a rank bound on the six-cell boundary map (L07).",
+  "Word hyperbolicity: paper cites BH III.H; Lean proves linear filling => thin => four-point (L08).",
+  "Planar separators: cited in paper; re-proved in Lean for genus-zero rotation systems (L11).",
+  "Antipodality of M_C, M_D: paper uses a semicircle/local-geodesic argument in the CAT(1) space of directions (BH II.1.4); Lean proves it algebraically in 10 lines from pairings (L02 exceptional_antipodes).",
+  "Transverse square: paper splits the parallel set (BH II.2.14); Lean uses explicit 'translates' along the axis and add_eq_of_pairings (L02 opposite_cross_sums) - no product decomposition theorem.",
+  "Displacement bound: paper 25(1+ε)/(1-ε) on squared norms; Lean M=8 on norms from marginals <= 2/|L| (L04).",
+  "Tangent cone, ultralimit space, inductive means, Chernoff, Cartan-Hadamard: all built from scratch in Lean (Mathlib lacks them).",
+  "Statement: Lean omits 2-dimensionality and the locally CAT(0) model exclusion (keeps CAT(-1))."
+ ],
+ "lean_dag_summary": {
+  "n_files": 422,
+  "n_lines": 57027,
+  "n_decls": 4576,
+  "kind_counts": {
+   "theorem": 3071,
+   "def": 1047,
+   "abbrev": 244,
+   "instance": 142,
+   "structure": 58,
+   "inductive": 14
+  },
+  "extractor_proof_dag_decls": 3287,
+  "patched_proof_dag_decls": 3726,
+  "patched_proof_dag_theorems": 2503,
+  "patch_note": "extract_lean.py dropped every edge written as dot-notation on a theorem name (e.g. `finalFinite_noAction.exists`, `finalDiagramStage_noAction.mono`), so the entire no-action (metric) branch had in_proof_dag = False. I re-scanned bodies for `<name>.(exists|mono|choose|choose_spec|...)` and added 77 edges (scratch script dag257.py), then recomputed dominators from OAI.HyperbolicObstruction.main.",
+  "dominated_share_main_branches": {
+   "finalFinite_aspherical (explicit contraction)": 0.162,
+   "finalFinite_noAction (selection + metric)": 0.117,
+   "MasterGraph.impossible_sequence (metric half)": 0.097,
+   "original_letter_linear_filling_list (diagram estimate)": 0.086,
+   "exists_rankSamplingStage": 0.068,
+   "RelDisk.actual_fragment_bound": 0.047,
+   "homotopy_incompatibleLocalCATNegOne (Cartan-Hadamard)": 0.038,
+   "finalFinite_hyperbolic": 0.031,
+   "MetricCore.impossible": 0.03,
+   "finalFinite_linear": 0.029,
+   "no_finite_obstruction": 0.013
+  },
+  "section_share_of_patched_dag_nodes": {
+   "diagrams/presentation (Sec 3, incl. IndexedFillingValue)": 0.599,
+   "topology/CAT(-1)/hyperbolicity (Sec 7)": 0.177,
+   "sampling (Sec 4)": 0.111,
+   "obstruction (Sec 6)": 0.064,
+   "energy/limit (Sec 5)": 0.048
+  },
+  "section_share_of_lines": {
+   "diagrams/presentation": 36012,
+   "topology": 8210,
+   "sampling": 6702,
+   "obstruction": 3188,
+   "energy/limit": 2915
+  },
+  "proxy_note": "No single paper candidate passes the 20% dominated-share proxy; the candidates are spread across a 5-section architecture. By reach (fraction of DAG below the node), the template carriers (Template.Edge/Field: used by most nodes) and the diagram estimate (42%) dominate. The extractor's own load-bearing ranking (candidate_defs) is dominated by plumbing (coverContraction, foldAt, Voltage gluing)."
+ },
+ "eureka_candidates_ranked": [
+  {
+   "rank": 1,
+   "item": "P37 (with P31, P35)",
+   "name": "Uniform conditional test: target-independent orthogonality <h_I, v_e> <= 0 from total-variation couplings of table matches + Sturm inductive mean + six-letter displacement bound",
+   "provisional_N": "N3",
+   "provisional_F": "F5",
+   "for": [
+    "It is exactly the missing uniformity that previous approaches lacked: IKN 2012 and Toyoda 2016 give fixed points only for target classes with Izeki-Nayatani invariant bounded below 1, with constants depending on the target family (01:78-85); the paper's test holds for ANY action chosen after the tables.",
+    "Not a subterm of the goal or L; it is a new kind of statement (conditional orthogonality in tangent cones uniformly over targets).",
+    "Every metric identity in Secs 5-6 is an application (path bounds, ternary test)."
+   ],
+   "against": [
+    "Each ingredient is cited or standard: Sturm 2003 inductive means, Gigli-Nobili concavity, barycenter of minimizer (Gromov/IN), uniform-on-extensions couplings (random graphs).",
+    "Could be viewed as a natural 'law of large numbers in CAT(0)' argument once one decides to test averages over matches."
+   ],
+   "nearest_neighbour_quick_check": "Gromov 2003 Sec 3 / Izeki-Nayatani 2005 / Izeki-Kondo-Nayatani 2012 (target-dependent δ<1 criterion); Toyoda 2016 (δ<1 for geodesically complete cocompact X, family-dependent constants); Sturm 2003 law of large numbers. Search (Oct 2026) found no target-uniform version."
+  },
+  {
+   "rank": 2,
+   "item": "P08 (with P05, P09, P13)",
+   "name": "Nested near-critical random model: fans sampled first, tops only over selected fans, plus square/hexagon decorations at density just below 1/2",
+   "provisional_N": "N3",
+   "provisional_F": "F3",
+   "for": [
+    "Reconciles two opposing requirements (sparsity for hyperbolicity/asphericity vs. enough constraints for metric rigidity) explicitly called out at 01:95-97.",
+    "Near-critical density makes the lower bounds of P39 tight: in the limit squares become exactly flat (two-step distance sqrt2) while hyperbolicity survives because deficits α, β-7α, δ stay positive.",
+    "Nested occurrences with shared prerequisite costs counted once (P20) are not a standard random-group model."
+   ],
+   "against": [
+    "Square and hexagonal models (Odrzygozdz 2016, 2019) are hyperbolic below density 1/2: the decoration layer is a known model near its threshold.",
+    "Graphical random groups (Gromov 2003) already impose relations from labelled graphs; the paper names Ollivier and AFL as related."
+   ],
+   "nearest_neighbour_quick_check": "Odrzygozdz, The square model for random groups (arXiv 1405.2773: hyperbolic below 1/2, trivial above); Bent walls in square/hexagonal models (arXiv 1906.05417); Gromov graph model (IKN 2012). No nested fan/top model found."
+  },
+  {
+   "rank": 3,
+   "item": "P03 + P47 (with P42, P46)",
+   "name": "Doubled Fano incidence gadget with one omitted incidence, and its finite CAT(0) obstruction (M_C,M_D antipodal -> transverse flat square -> M_A,M_B antipodal vs <M_A,M_B> >= 0)",
+   "provisional_N": "N3",
+   "provisional_F": "F3",
+   "for": [
+    "Tiny combinatorial object, not a subterm of goal or L, whose exact shape (4 doubled points, no three collinear; omit Y_D-CD) is tuned to both the counting budget (k_i, h(F)=3) and the metric contradiction.",
+    "The obstruction must hold in every complete CAT(0) space with no dimension or properness bound - 7 vectors at cos -1/3 are impossible in Hilbert space but possible in branching cones, so a cleverer configuration is required.",
+    "Lean confirms it as a self-contained 300-line algebraic argument (L01-L02)."
+   ],
+   "against": [
+    "Once the target metric identities are known, a small search over Fano-type templates for a contradiction may be routine for a model with good CAT(0) algebra; the Lean version is short.",
+    "Fano/Heawood graphs are classical (A~2 building links), and rigidity via flats is standard."
+   ],
+   "nearest_neighbour_quick_check": "Brady-Crisp 2007 (translation-length obstructions in dim 2 only); Fano non-realizability over R (Sylvester-Gallai); Ballmann-Swiatkowski / CMSZ A~2 groups with Fano links (which ARE CAT(0)). No matching obstruction found."
+  },
+  {
+   "rank": 4,
+   "item": "P20/P21 (with P22)",
+   "name": "Multiplicity weights w_b = max{r_b, m_b} charging shared fan prerequisites once",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Needed to make level sets eligible collections; resolves the conflict between 'shared fan costs once' and 'repeated cells in diagrams' (01:127-131)."
+   ],
+   "against": [
+    "Paper itself names Ollivier 2004 Sec 2 and AFL 2017 Sec 3 multiplicity/constraint methods as related."
+   ],
+   "nearest_neighbour_quick_check": "Ollivier 2004 decorated abstract diagrams; AFL 2017 (search did not surface details)."
+  },
+  {
+   "rank": 5,
+   "item": "P35",
+   "name": "Six-letter displacement bound: dense length-6 relators bound every generator's displacement by the mean energy",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Short and essential: without a uniform max-displacement bound the TV transfer of action-dependent tests fails."
+   ],
+   "against": [
+    "Simple Cauchy-Schwarz once one adds a dense table; kin to density-1/2 collapse arguments."
+   ],
+   "nearest_neighbour_quick_check": "No direct neighbour found in quick search; the idea of adding an independent dense random relator family to control displacements seems specific."
+  }
+ ],
+ "correctness_audit": {
+  "verdict": "No gap found in a full read, but this is an extraordinary claim (resolves Gromov's CAT(0)/CAT(-1) realization question) made in an unreviewed, non-effective proof. The decisive mitigating evidence is the 57k-line Lean development with 0 sorry/axiom proving a faithful (slightly weaker) comparator statement; if the comparator check passed, the existence of a hyperbolic group with no geometric CAT(0) action is machine-verified. I could not compile Lean.",
+  "checked": [
+   "Counts: k_i=(6,6,6,4,3,3,3) sum 31, |E(Γ)|=32, 18 vertices, cycle rank 32-18+1=15; macro graph B: 15 vertices, 22 edges, cycle rank 8 (02:19-28, 94-97). Lean Template.lean:24-26 checks 32 and fan cards by decide.",
+   "Expected top count N^{32}N^{p-7f-1}∏N^{f-k_i} = N^{32+p-7f-1+7f-31} = N^p (02:77-79). Correct.",
+   "h(F) = 212 - (17+12+180) = 3 with fan critical costs sum(k_i-2)=31-14=17 (04:60). Correct.",
+   "Master mean exponent 212 - sum c_rho(θ) = 3 - β - 90δ (fan α each: 7α; top 12+β-7α; squares 90(2+δ)). Correct.",
+   "Lemma fragment: Δ = (β-7α)T + αW + δE >= κ(T+Q+E) using Q <= 5W and κ <= α/5 (03:516-525). Correct.",
+   "Inductive mean recursion a_j <= (1-1/j)^2 a_{j-1} + 1/j^2 => a_j <= 1/j: (1-1/j)^2/(j-1) + 1/j^2 = (j-1)/j^2 + 1/j^2 = 1/j. Correct.",
+   "Hexagon: side-square sum 1+2+1+2=6, diagonals >= 3 each => equal 3, r^2 = 3/4 (05:414-424). Correct.",
+   "Fan identity: d(c,J)^2 = r^2 - d(H,H')^2/4 = 3/4 - 1/2 = 1/4; ||M_i||^2 = 4·1/4 = 1; <M_i,h_H> = 3/4 - 1/4 = 1/2 (06:143-167). Correct.",
+   "Exceptional identity: d(H0,B0)^2 = (2/3)^2/2 + 1/9 = 1/3; d(c,B0)^2 <= (2/3)(1/4)+(1/3)(3/4)-(2/9)(3/2) = 1/6+1/4-1/3 = 1/12; 1/√3 + 1/(2√3) = √3/2 (06:251-272). Correct. ||h0||^2: 3/4 = 1 + 3/4 + 2<M_C,x_D> => -1/2. Correct.",
+   "Antipodality: a=arccos(1/√3), b=arccos(1/3), cos(2a) = 2/3-1 = -1/3 = cos(π-b) so 2a+b=π. Correct. Lean proves it differently (L02).",
+   "Final contradiction: <M_A,M_B> >= 3/4 - 1/4 - 1/4 - 1/4 = 0 (06:181-186) vs -1. Correct.",
+   "Diagonal parameters: j(β_j+90δ_j) = 98jε_j < 98/400 < 1/2 (07:22). Correct."
+  ],
+  "consistency_checks_passed": [
+   "Paper and Lean agree on template indices: loose edge (3,4) = X_D-CD, omitted (10,4) = Y_D-CD; ExceptionalTest uses fields (2,4),(9,4) [X_C-CD, Y_C-CD] and (3,4).",
+   "Lean FiniteObstructionData fields correspond one-to-one to Prop configuration (i)-(iii).",
+   "Lean impossible_sequence obtains the configuration only from the sampling interface + EnergyOrbit, matching the paper's order (displacement bound before TV tests).",
+   "Comparator definitions are standard (CN-inequality CAT(0), compact-set properness, four-point hyperbolicity)."
+  ],
+  "residual_concerns": [
+   "Section 3 (normal forms, apex accounting, partial links) is long and intricate - historically the error-prone part of random-group arguments. Lean formalizes it (≈60% of DAG), so the residual risk is mainly whether the Lean actually compiles and whether the comparator run was performed.",
+   "Section 4 quantifier order: tests are fixed before parameters, parameters before n; uniformity over the action rests on TV statements about finite laws plus the six-letter bound being in force BEFORE action-dependent tests (05:5-8). I found it consistent; Lean SamplingSequence encodes the same order.",
+   "The ternary test applies Lemma conditional-test with h_I depending on two F_C fields and e = loose field; admissibility (2 fields of F_C + loose) is satisfied. The fixed-fraction (rather than angle) passage through the ultralimit is handled explicitly (05:529-547).",
+   "Non-effectivity: no explicit group or even explicit parameters/size; cannot be sanity-checked by computer on an example.",
+   "Formal statement is weaker than the headline: 2-dimensionality and locally CAT(0) model exclusion are paper-only (but follow by standard arguments: Hatcher 2C.5 and Cartan-Hadamard)."
+  ]
+ },
+ "extraction_friction": [
+  "extract_lean.py misses dot-notation uses of theorem names (`foo.exists`, `foo.mono`): the whole no-action/metric branch (Selection, Exceptional, MetricHexagon, CATZero obstruction, EnergyOrbit, OrbitLimit) was marked in_proof_dag = False. Patched with 77 extra edges (reach 3726 vs 3287).",
+  "57,027 Lean lines in 422 files; a single 7,843-line file (IndexedFillingValue.lean) mixes the asphericity contraction, linear-filling transfer, hyperbolicity (thin triangles/four-point), infinitude and final assembly.",
+  "Most paper definitions are inline \\emph (geometric action, loose edge, fan, field, core hexagon, match, decorations, fan/top occurrence, master pattern, admissible, elementary picture, top polygon, ports, fragment, partial, star, overlap type) or unnamed displays (w_b, h(W), U, closure gap).",
+  "Comparator target is weaker than the headline (no 2-dimensionality, CAT(-1) only for models).",
+  "Grep false positives: 'admit' (prose 'groups admit no ...'), 'axiom' in a comment, 'macro' as a mathematical word (macro graph) - 271 hits.",
+  "Lean namespaces (HyperbolicObstruction, IncidenceTemplate, ConeSkeleton, PictureSwitch, MasterGraph, CoreGeometry) do not mirror paper sections; I classified files to sections by name regex for DAG shares (approximate).",
+  "Two bibliography entries (Wilton2011, Cashen2023) are never cited in the text (residue of drafting).",
+  "No reasoning trace for this family."
+ ],
+ "sources_quick_lit_check": [
+  "https://arxiv.org/pdf/1405.2773 (Odrzygozdz, square model: hyperbolic below 1/2)",
+  "https://arxiv.org/pdf/1906.05417 (bent walls, square/hexagonal models)",
+  "https://arxiv.org/pdf/1210.5829 (Izeki-Kondo-Nayatani, N-step energy, graph model, δ<1 class)",
+  "https://arxiv.org/pdf/1102.0729 (Toyoda 2016)",
+  "https://arxiv.org/pdf/1012.4147 (Fujiwara-Toyoda, random groups fixed points on CAT(0) cube complexes)",
+  "https://arxiv.org/pdf/2603.03863 (Duchesne-Simon 2026; problem still open)",
+  "https://math.ou.edu/~nbrady/papers/cathyp2.pdf (Brady-Crisp)",
+  "https://arxiv.org/pdf/2004.08593 (contractible hyperbolic non-CAT(0) complexes; not groups)",
+  "https://arxiv.org/abs/1403.3516 (Antoniuk-Friedgut-Luczak)",
+  "Web searches 'hyperbolic group not CAT(0) OpenAI GPT 2026' etc.: no prior resolution or model-produced precursor found."
+ ]
+}

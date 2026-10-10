@@ -1,0 +1,2474 @@
+{
+ "family": 242,
+ "title": "Single-fold Diophantine representations and undecidability under an at-most-one-solution promise",
+ "manuscript_dir": "data/raw/openai-math/preprints/Single-fold-Diophantine-representations-September-24-2026",
+ "source_root": "data/raw/openai-math/preprints/Single-fold-Diophantine-representations-September-24-2026/build",
+ "commit": "fd4aeeb",
+ "analyst_role": "family analyst (paper + Lean); no reasoning trace exists for this family",
+ "base_library_L": "Mathlib d13f23b (incl. Mathlib.NumberTheory.Dioph Poly, Pell, Height.logHeight/Northcott, WeierstrassCurve group law and addSubMap height bound, Computability REPred/ToPartrec/PartrecToTM2) + references.bib of this manuscript (16 entries)",
+ "subject": "Mathematical logic",
+ "main_statement": {
+  "file_line": "main.tex:62-73",
+  "latex": "\\begin{theorem}\\label{thm:main} For every integer $n\\ge1$ and every recursively enumerable set $S\\subseteq\\NN^n$, there are an integer $m\\ge1$ and a polynomial $P\\in\\ZZ[A_1,\\ldots,A_n,W_1,\\ldots,W_m]$ such that, for every $a\\in\\NN^n$, \\[ \\#\\{w\\in\\NN^m:P(a,w)=0\\}= \\begin{cases}1,&a\\in S,\\\\0,&a\\notin S.\\end{cases} \\] \\end{theorem}",
+  "paraphrase": "Every r.e. set of natural-number tuples has a polynomial Diophantine representation over N in which each member has exactly one complete auxiliary witness tuple and each nonmember has none (Matiyasevich's single-fold conjecture, hence also the finite-fold conjecture).",
+  "corollary": {
+   "file_line": "main.tex:116-127; proof consequences.tex:11-33",
+   "paraphrase": "There are fixed m, D such that solvability over N of polynomials in m variables of degree <= D is undecidable even under the promise of at most one solution.",
+   "formalized": false
+  },
+  "lean_comparator": {
+   "challenge_file": "lean/ComparatorChallenges/SingleFold.lean",
+   "config": {
+    "challenge_module": "ComparatorChallenges.SingleFold",
+    "solution_module": "OAI.NumberTheory.SingleFold.Main",
+    "theorem_names": [
+     "OAI.SingleFold.main"
+    ],
+    "definition_names": [],
+    "permitted_axioms": [
+     "propext",
+     "Quot.sound",
+     "Classical.choice"
+    ],
+    "enable_nanoda": false
+   },
+   "target": "OAI.SingleFold.main",
+   "solution_decl": "lean/OAI/NumberTheory/SingleFold/Main.lean:47 (via recursively_enumerable_sf and Compiler.export_polynomial)",
+   "verbatim": "def Represents {n m : ℕ} (P : MvPolynomial (Fin n ⊕ Fin m) ℤ) (S : Set (Fin n → ℕ)) : Prop := ∀ a, (a ∈ S ↔ ∃ w, evalNat P a w = 0) ∧ ∀ w v, evalNat P a w = 0 → evalNat P a v = 0 → w = v\ndef MainStatement : Prop := ∀ (n : ℕ), 1 ≤ n → ∀ (S : Set (Fin n → ℕ)), REPred (fun a => a ∈ S) → ∃ (m : ℕ), 1 ≤ m ∧ ∃ P : MvPolynomial (Fin n ⊕ Fin m) ℤ, Represents P S\ntheorem main : MainStatement",
+   "readable": "For n >= 1 and every S subset (Fin n -> N) that is r.e. in Mathlib's sense, there are m >= 1 and an integer polynomial P in n+m variables such that, for every a, a in S iff P(a,w)=0 for some w in N^m, and any two zeros w, v of P(a,-) in N^m are equal.",
+   "definitions_unfolded": [
+    "evalNat = MvPolynomial.eval at natural inputs cast to Z (Model.lean:8)",
+    "Represents (Model.lean:14)",
+    "MainStatement (Model.lean:20)",
+    "REPred (Mathlib, Computability)"
+   ],
+   "challenge_defs_identical_to_library": "ComparatorChallenges/SingleFold.lean lines 1-22 are textually identical to OAI/NumberTheory/SingleFold/Model.lean; the challenge adds only `theorem main : MainStatement := by sorry`.",
+   "match_check": "Exact match with Thm main: same quantifier order (forall n>=1, forall r.e. S, exists m>=1, exists P), witnesses over N, coefficients in Z, existence iff membership and uniqueness for every input (so 'exactly one' on members and 'none' on nonmembers). The 'complete tuple' requirement is automatic since w ranges over all of Fin m -> N.",
+   "formalized_vs_claimed": {
+    "formalized_in_comparator": [
+     "Thm main (single-fold conjecture over N)"
+    ],
+    "formalized_in_library_but_not_compared": [
+     "Prop growth (GrowthCompilation.growth)",
+     "Prop power (PowerCompilation.power)",
+     "Prop subset (Compiler.bits)",
+     "Prop machine-compiler (CounterCompilation.halts_sf)",
+     "Prop rank-one (CurveRank.rank_one, Torsion.torsion_iff)",
+     "Neron-Tate uniform bound and quadraticity (CurveHeight.uniform_height, canonicalHeight_zsmul)",
+     "Mordell-Weil for E (instance AddGroup.FG E.Point)"
+    ],
+    "not_formalized": [
+     "Cor unique-h10 (promise undecidability); lean/docs/242.md: 'not separately formalized'",
+     "finite-fold conjecture (trivial corollary)",
+     "Appendix witness ledger as a document (replaced by typed variable sets)"
+    ],
+    "extra_hypotheses": "none",
+    "formalization_yaml": "lean/formalization.yaml:1597-1599 lists ComparatorChallenges/SingleFold.json, declaration OAI.SingleFold.main, file OAI/NumberTheory/SingleFold/Main.lean"
+   },
+   "verdict": "The comparator states exactly the paper's headline theorem; the library proves it with no sorry/axiom and only Mathlib imports. The corollary is not formalized."
+  }
+ },
+ "trust_surface": {
+  "grep_scope": "lean/OAI/NumberTheory/SingleFold/*.lean (28 files, 7,598 lines) + ComparatorChallenges/SingleFold.{lean,json}; imports: only `import Mathlib` (Model.lean) plus the linear in-directory chain",
+  "counts": {
+   "sorry": 0,
+   "axiom": 0,
+   "admit": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque": 0,
+   "partial def": 0,
+   "set_option": 0,
+   "#eval/run_cmd/macro/elab": 0,
+   "decide +kernel": 6,
+   "decide (plain)": "~12, all on literal side conditions (Fin/ZMod 5/Bool/small naturals)",
+   "Classical.choose/choice (in defs)": 4,
+   "attribute [local instance] Classical.propDecidable": 2,
+   "noncomputable defs/sections": "many (heights, codes, decoders)"
+  },
+  "decide_uses": "Duplication.bounded_points (Duplication.lean:125-128) runs `fin_cases k <;> fin_cases i <;> revert j <;> decide +kernel` over 13*19*20 = 4,940 rational candidates to show the only x with height < 185 and x^3-25x a square are {0,+-5,-4,45,25/4,-5/9}; Duplication.lean:178-212 checks the duplication inequality on these points by kernel decide. LocalDescent.lean:13-14 decides over ZMod 5 (25 cases). All are kernel-checked; no native code is trusted.",
+  "comparator_permitted_axioms": [
+   "propext",
+   "Quot.sound",
+   "Classical.choice"
+  ],
+  "comparator_flags": {
+   "definition_names": [],
+   "enable_nanoda": false
+  },
+  "other_risks": "Lean was not built here (text-level reading). lean/patches/*.patch target other external packages (AINTLIB, iut, ...), none Mathlib, and SingleFold imports none of them. The family relies on recent Mathlib height API (Height.logHeight, Northcott, WeierstrassCurve.addSubMap, abs_logHeight_addSubMap_sub_two_mul_logHeight_le) at d13f23b.",
+  "verdict": "Clean: no custom axioms or escape hatches; one modest kernel-checked finite enumeration."
+ },
+ "labels": {
+  "A": {
+   "label": "A2",
+   "secondary": {
+    "hard_direction_form": null,
+    "explicit_rate": false,
+    "note_corollary": "Cor unique-h10 is A5 (no algorithm exists)."
+   },
+   "evidence": {
+    "quote": "there are an integer $m\\ge1$ and a polynomial $P\\in\\ZZ[A_1,\\ldots,A_n,W_1,\\ldots,W_m]$ such that",
+    "file_line": "main.tex:64-65"
+   },
+   "confidence": "medium-high",
+   "note": "forall S (indexing parameter, treated as outer) exists P with an exact-count property. The 'exactly one' clause makes it an existence claim for an object with a sharp property; one could argue A3 (sharp count), but the innermost new quantifier is the existence of P. Lean MainStatement has the same shape."
+  },
+  "B": {
+   "label": "B1",
+   "flags": {
+    "full_only_with_prior_results": false,
+    "full_only_with_prior_results_detail": "All reductions are re-proved; invoked prior theorems are standard background (Neron-Tate, Mordell-Weil, Nagell-Lutz, isogeny theorem), not prior partial results on the problem. Lean re-proves even these for this curve.",
+    "adds_corollaries_for_other_conjectures": true,
+    "adds_corollaries_detail": "Implies the finite-fold conjecture (mati2010) and promise-undecidability of H10 over N (Cor unique-h10). As a by-product, Prop growth is a new Diophantine Julia-Robinson-type relation built from an elliptic curve rather than Pell/Fibonacci, i.e. an alternative route to the exponential-growth step of MRDP (not claimed in the paper)."
+   },
+   "evidence": {
+    "quote": "This proves the single-fold conjecture and, consequently, the finite-fold conjecture.",
+    "file_line": "main.tex:33-35"
+   },
+   "confidence": "high (as a claim); correctness see audit",
+   "note": "Matiyasevich posed the problem in 1974 (mati1974, Section 1); open per Omodeo's 2023 history and cco2024."
+  },
+  "C": {
+   "primary": "C1",
+   "primary_evidence": {
+    "quote": "Substituting the single-fold arithmetic systems and taking a sum of squares proves Theorem~\\ref{thm:main}.",
+    "file_line": "main.tex:175-177"
+   },
+   "secondaries": [
+    {
+     "label": "C5",
+     "evidence": {
+      "quote": "These are precisely the uniform comparison and quadraticity statements of \\cite[Chapter~VIII, Proposition~9.1 and Theorem~9.3]{silverman}.",
+      "file_line": "elliptic.tex:196-197"
+     },
+     "note": "Neron-Tate, Mordell-Weil, isogeny theorem and Nagell-Lutz are invoked without proof (paper). Reduction r.e. -> counter machine -> polynomial system is re-proved (so C5 only for the arithmetic-geometry citations)."
+    },
+    {
+     "label": "C4",
+     "evidence": {
+      "quote": "\\log\\frac{L_0}{D_0} &=a_E\\bigl((2k)^2+r^2+1-2k^2-(r+1)^2\\bigr)+e",
+      "file_line": "elliptic.tex:344-346"
+     },
+     "note": "Height error bands, Pell ratio bounds, quotient error (power.tex:207-217), growth asymptotics."
+    },
+    {
+     "label": "C2",
+     "evidence": {
+      "quote": "Induction therefore yields $2a-1\\le R_i(a)\\le2a$.",
+      "file_line": "power.tex:70"
+     },
+     "note": "Routine inductions (Pell ratios, addition chains); no strengthened hypothesis."
+    }
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "The theorem therefore gives existence of an integer polynomial without displaying its coefficients",
+    "file_line": "main.tex:111-113"
+   },
+   "computer_assisted_note": "Paper: no computation (constants are not even computed). Lean only: one kernel-checked enumeration of 4,940 small rationals (Duplication.bounded_points) replacing Nagell-Lutz in the torsion proof; it is a side lemma, not a search for the main construction. Flag kept False with this note.",
+   "ih_strengthened": false,
+   "ih_template": null,
+   "ih_evidence": {
+    "quote": "We also have $R_i(bu)\\ge bR_i(u)$ for every $i\\ge1$. There is equality for $i=1$",
+    "file_line": "power.tex:77-78"
+   },
+   "ih_note": "The only inductions are on Pell indices, addition chains and machine time; none strengthens a hypothesis.",
+   "confidence": "high"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "I19/I20 cluster: elliptic-height square window producing a single-fold growth function (candidate E1)",
+   "evidence": {
+    "quote": "A fixed multiplicative window for the ratio therefore singles out $r=k^2$, once $a_E$ is large enough to separate distinct integer values of $k^2-r$.",
+    "file_line": "main.tex:151-153"
+   },
+   "confidence": "medium",
+   "caveats": [
+    "Rank-one elliptic curves and denominator/height growth are established tools in Diophantine definability (Poonen 2002, Denef, Shlapentokh, Eisentraeger-Everest), so the pivot distance may be short.",
+    "The reduction from a growth relation to exponentiation is classical (Robinson 1952); cco2024 explicitly suggests replacing exponentiation by any exponential-growth relation, so the target of the eureka step was known; only the means is new.",
+    "No reasoning trace exists, so discoverability cannot be probed from the process."
+   ],
+   "flag_builds_on_prior_model_produced_result": false,
+   "flag_note": "All cited works are human-authored (1878-2024); no OAI or model-produced precedent is cited."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Mathematical logic",
+    "msc2020": [
+     "03D35 (undecidability)",
+     "11U05 (decidability in number theory)",
+     "03D25 (r.e. sets)",
+     "11D99"
+    ],
+    "evidence": {
+     "quote": "subject = Mathematical logic (data/catalog_families.csv, family 242)",
+     "file_line": "data/catalog_families.csv"
+    },
+    "confidence": "high"
+   },
+   "lean_dir_field": {
+    "dir": "OAI/NumberTheory/SingleFold",
+    "field": "Number theory",
+    "note": "Lean dir field differs from the problem field (logic)."
+   },
+   "method_fields": [
+    {
+     "field": "Arithmetic geometry: elliptic curves over Q, Mordell-Weil, 2-descent (11G05, 14H52)",
+     "tag": "essential",
+     "what": "Rank-one structure E(Q)=ZP+T, point arithmetic, descent",
+     "evidence": {
+      "quote": "The group \\(E(\\QQ)\\) has rank one and torsion subgroup",
+      "file_line": "elliptic.tex:20-21"
+     }
+    },
+    {
+     "field": "Heights on abelian varieties / Neron-Tate theory (11G50)",
+     "tag": "essential",
+     "what": "Uniform bound |log H(x(Q)) - 2 hat h(Q)| <= c_E and quadraticity",
+     "evidence": {
+      "quote": "The N\\'eron--Tate canonical-height theorem gives existence of this limit",
+      "file_line": "elliptic.tex:186"
+     }
+    },
+    {
+     "field": "Diophantine equations: Pell equations (11D09)",
+     "tag": "essential",
+     "what": "Paired Pell exponentiation with index congruences",
+     "evidence": {
+      "quote": "The use of Pell sequences to recover exponentiation belongs to the classical Diophantine representation method.",
+      "file_line": "power.tex:8-9"
+     }
+    },
+    {
+     "field": "Elementary/combinatorial number theory: binomial coefficients mod 2 (11B65)",
+     "tag": "essential",
+     "what": "Lucas's theorem mod 2 for binary containment",
+     "evidence": {
+      "quote": "the parity criterion is the case modulo two of Lucas's theorem",
+      "file_line": "power.tex:299-300"
+     }
+    },
+    {
+     "field": "Computability: counter/register machines (03D10, 68Q05)",
+     "tag": "essential",
+     "what": "Minsky machine universality and run encoding",
+     "evidence": {
+      "quote": "This is the classical counter instruction set of Minsky",
+      "file_line": "computation.tex:34"
+     }
+    },
+    {
+     "field": "Hilbert's tenth problem / Diophantine definability (11U05, 03D35)",
+     "tag": "essential",
+     "what": "Single-fold closure operations, bit masking, JR growth reduction (home field)",
+     "evidence": {
+      "quote": "The following closure operations belong to the single-fold constructions of",
+      "file_line": "main.tex:209"
+     }
+    },
+    {
+     "field": "Real asymptotics (elementary)",
+     "tag": "essential",
+     "what": "Growth estimates, binomial error bounds",
+     "evidence": {
+      "quote": "\\delta(\\log u)^2<\\log g(u)<u\\log u",
+      "file_line": "elliptic.tex:290"
+     }
+    },
+    {
+     "field": "Diophantine definability over rings of integers / function rings (Poonen; Miller-Shlapentokh)",
+     "tag": "background-cited",
+     "what": "Precedents for rank-one curves and single-fold definitions in other rings",
+     "evidence": {
+      "quote": "Poonen uses rank-one curves and denominator growth",
+      "file_line": "main.tex:91"
+     }
+    },
+    {
+     "field": "Algorithmic information theory (Chaitin)",
+     "tag": "background-cited",
+     "what": "Precedent for determining the base from input and time",
+     "evidence": {
+      "quote": "Determining the base from the input and computation time already appears in Chaitin's account",
+      "file_line": "main.tex:102-103"
+     }
+    }
+   ],
+   "cross_field_count_essential_nonlogic": 4,
+   "share_invoked_cited_theorems_from_other_fields": "4/4 of the theorems invoked without proof in the paper (Neron-Tate canonical height, Mordell-Weil, isogeny homomorphism theorem, Nagell-Lutz) are arithmetic geometry; every logic/computability ingredient is re-proved. Counting re-proved invocations too: about 7/14 from outside logic.",
+   "lean_imports": "Mathlib only (whole library). Areas used: NumberTheory.Dioph (Poly), NumberTheory.PellMatiyasevic (Pell.yn), Height / Northcott, AlgebraicGeometry.EllipticCurve (Weierstrass affine points, addSubMap), Computability (REPred, ToPartrec, PartrecToTM2), Analysis (Real.log, limits), GroupTheory (index, FG).",
+   "confidence": "medium-high"
+  }
+ },
+ "items": [
+  {
+   "id": "I01",
+   "kind": "definition (inline \\emph)",
+   "name": "recursively enumerable set",
+   "source": "paper",
+   "file_line": "main.tex:43-45",
+   "lean_decls": [
+    "Mathlib REPred (used in ComparatorChallenges/SingleFold.lean:21)"
+   ],
+   "statement": "S subset N^n is r.e. if a deterministic computation accepts exactly its members.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Background vocabulary; enters only through Lemma counter-universality."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Occurs in the goal (hypothesis of Thm main); Lean: Mathlib REPred."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook notion; Mathlib REPred."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I02",
+   "kind": "definition (inline \\emph)",
+   "name": "Diophantine representation",
+   "source": "paper",
+   "file_line": "main.tex:45-51",
+   "lean_decls": [
+    "OAI.SingleFold.evalNat (Model.lean:8)",
+    "OAI.SingleFold.Represents (Model.lean:14)"
+   ],
+   "statement": "P in Z[A,W] with a in S iff P(a,w)=0 for some w in N^m.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": null
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Goal vocabulary."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Subterm of the goal."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical (DPR/MRDP)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I03",
+   "kind": "definition (inline \\emph)",
+   "name": "single-fold / finite-fold representation",
+   "source": "paper",
+   "file_line": "main.tex:52-56",
+   "lean_decls": [
+    "OAI.SingleFold.Represents (Model.lean:14-17)"
+   ],
+   "statement": "Single-fold: the complete auxiliary tuple w is unique when it exists; finite-fold: finitely many tuples. All auxiliary variables are counted.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "mati1974",
+    "cue": "[cite mati1974, mati2010]; 'These definitions count all auxiliary variables'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Goal vocabulary."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Subterm of the goal (uniqueness clause of Represents)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Matiyasevich 1974 notion."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I04",
+   "kind": "definition (environment)",
+   "name": "single-fold polynomial system / single-fold graph",
+   "source": "paper",
+   "file_line": "main.tex:186-195",
+   "lean_decls": [
+    "Compiler.Representation (PolynomialCompiler.lean:17)",
+    "Compiler.SF (PolynomialCompiler.lean:27)",
+    "Compiler.MapSF (FunctionalCompiler.lean:7)",
+    "Compiler.ScalarSF (FunctionalCompiler.lean:161)"
+   ],
+   "statement": "A finite list of integer polynomial equations F_i(a,z)=0 whose set of complete tuples z is a singleton for a in R and empty otherwise; a single-fold graph of f:D->N^e is such a system for {(a,f(a))}.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "mati1974",
+    "cue": "'belong to the single-fold constructions of [mati1974, Sections 3.1-3.3]'"
+   },
+   "uses_items": [
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Every later construction is stated as a single-fold system or graph; Lean's Representation/SF/MapSF structures carry the whole compiler."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Relativised form of I03 (unique witness for a relation, not just a set)."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Abbreviation of Matiyasevich's single-fold notion for relations and graphs."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I05",
+   "kind": "convention (prose)",
+   "name": "unique slacks and sign codes",
+   "source": "paper",
+   "file_line": "main.tex:197-207",
+   "lean_decls": [
+    "Representation.le / lt (PolynomialCompiler.lean:214,235)"
+   ],
+   "statement": "F>=G is F-G=s with fresh s in N (strict: F-G=1+s); an integer z is z+ - z- with z+ z- = 0; polynomial arguments are named by fresh variables.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I04"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Every inequality in the paper introduces exactly one slack; uniqueness of slacks is used in every uniqueness proof."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Standard encoding of order and sign over N."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Folklore in Diophantine coding."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I06",
+   "kind": "lemma",
+   "name": "Composition and disjoint cases (lem:composition)",
+   "source": "paper",
+   "file_line": "main.tex:216-249",
+   "lean_decls": [
+    "Representation.and (PolynomialCompiler.lean:57)",
+    "Representation.ex (PolynomialCompiler.lean:90)",
+    "Representation.or (PolynomialCompiler.lean:128)",
+    "MapSF.comp / pullback (FunctionalCompiler.lean:30,62)"
+   ],
+   "statement": "Conjunctions with separate auxiliary tuples, compositions of single-fold graphs, and finite unions with pairwise disjoint argument sets are single-fold; disjoint cases use Boolean selectors e_i, gate each equation as e_i F = 0, and force every case-local variable to zero via (1-e_i) z = 0.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "mati1974; cco2024",
+    "cue": "'The following closure operations belong to the single-fold constructions of [mati1974, Sections 3.1-3.3]... see also [cco2024, Section 2, pp. 590-591]. We state the precise version needed here.'"
+   },
+   "uses_items": [
+    "I04",
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Every case split (point addition, max, normalized decoding) uses the gated/zeroed form; without zeroing inactive variables uniqueness fails."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Closure properties of the defined notion; in L via mati1974/cco2024."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Re-proof of known closure operations; precision about zeroing inactive variables is the only addition."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I07",
+   "kind": "construction (display)",
+   "name": "sum-of-squares conversion",
+   "source": "paper",
+   "file_line": "main.tex:270-276; computation.tex:360-370",
+   "lean_decls": [
+    "Compiler.export_polynomial (PolynomialCompiler.lean:254)"
+   ],
+   "statement": "F_1=...=F_r=0 over N iff sum F_i^2 = 0; no new variables.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I04"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Final packaging step only."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Textbook."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Folklore."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I08",
+   "kind": "key construction (choice)",
+   "name": "the curve E: y^2 = x^3 - 25x",
+   "source": "paper",
+   "file_line": "elliptic.tex:11-17",
+   "lean_decls": [
+    "PointCompiler.E (EllipticCoordinates.lean:11)",
+    "CurveHeight.E (EllipticHeight.lean:67)"
+   ],
+   "statement": "Projective closure of y^2=x^3-25x with chord-tangent group law; the congruent-number curve for n=5.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "no cue; Poonen cited for rank-one curves generally"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "All of Sections 3-4 rest on this curve having rank exactly one with full 2-torsion."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic w.r.t. goal",
+    "note": "Elliptic curves occur nowhere in the goal; the curve itself is classical (Silverman's running example)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Known curve; choosing a rank-one curve is part of candidate E1, not novel by itself."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I09",
+   "kind": "proposition",
+   "name": "Rank one and torsion (prop:rank-one)",
+   "source": "paper",
+   "file_line": "elliptic.tex:19-27; proof rank-one-proof.tex:44-230",
+   "lean_decls": [
+    "CurveRank.rank_one (Rank.lean:336)",
+    "CurveRank.rank_at_most_one (Rank.lean:193)",
+    "Torsion.torsion_iff (Torsion.lean:88)"
+   ],
+   "statement": "E(Q) has rank one and torsion {O,(0,0),(5,0),(-5,0)}; every rational point is uniquely nP+t.",
+   "cited_or_new": {
+    "status": "re-proved (cites standard theorems)",
+    "bib_key": "silverman",
+    "cue": "'A complete two-isogeny descent proof is given in Appendix'"
+   },
+   "uses_items": [
+    "I08",
+    "I37",
+    "I38",
+    "I39"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The unique index n of each point is what the height window measures; rank one is needed for a one-dimensional index."
+   },
+   "analytic_check": {
+    "verdict": "analytic in L",
+    "note": "Statement is a known fact (5 is a congruent number; LMFDB rank 1)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Known; re-proved by standard descent."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I10",
+   "kind": "definition (display)",
+   "name": "six-coordinate rational code with shifted inverse",
+   "source": "paper",
+   "file_line": "elliptic.tex:40-47 (eq:rational-code)",
+   "lean_decls": [
+    "RationalCode / RationalCode.Valid (RationalCodes.lean:7,18)"
+   ],
+   "statement": "(p,n,d,t,s,q) with pn=0, d=1+t+s, (p+n)t+d=1+qd; value (p-n)/d; t is the inverse of p+n mod d restricted to [0,d-1], and the shift by d handles d=1 without a case split.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "cco2024",
+    "cue": "'Restricting a Bezout coefficient to one residue interval is a standard way to make coprimality witnesses unique; see [cco2024, Section 2]. The following shifted inverse identity also handles denominator one without a separate case.'"
+   },
+   "uses_items": [
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "All point coordinates are coded this way; uniqueness of rational witnesses is the base case of every uniqueness argument."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic but trivial",
+    "note": "Not a subterm of the goal; a small variant of a cited device."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Variant of the bounded-Bezout-coefficient trick in cco2024; the shift is a minor convenience."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I11",
+   "kind": "lemma",
+   "name": "Unique rational codes and arithmetic (lem:rational-codes)",
+   "source": "paper",
+   "file_line": "elliptic.tex:49-83",
+   "lean_decls": [
+    "RationalCode.existsUnique (RationalCodes.lean:106)",
+    "RationalCompiler.Expr.compile_spec (RationalCodes.lean:273)",
+    "Expr.eq_single_fold/le_single_fold (RationalCodes.lean:284,291)"
+   ],
+   "statement": "Every rational has exactly one valid code; any fixed finite sequence of rational field operations and comparisons has a polynomial implementation with unique outputs and auxiliaries.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I10",
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Base of the elliptic coding."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Direct consequence of reducedness."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I12",
+   "kind": "definition (prose)",
+   "name": "point code with identity flag",
+   "source": "paper",
+   "file_line": "elliptic.tex:85-97",
+   "lean_decls": [
+    "PointCompiler.Code / Code.Valid (EllipticCoordinates.lean:19,24)",
+    "PointCompiler.encode (EllipticCoordinates.lean:29)"
+   ],
+   "statement": "Two valid rational codes and a flag o in {0,1}; o=1 forces both numerators zero (represents O), o=0 imposes the curve equation after clearing denominators.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I10",
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Every quantified point is coded this way."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Encoding of projective points."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine encoding."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I13",
+   "kind": "lemma",
+   "name": "Single-fold point arithmetic (lem:point-arithmetic)",
+   "source": "paper",
+   "file_line": "elliptic.tex:99-151",
+   "lean_decls": [
+    "PointCompiler.AddEq (EllipticCoordinates.lean:138; 5 cases, slope-free 'Line' relation)",
+    "addEq_encode (EllipticCoordinates.lean:153)",
+    "mulRel_sf (EllipticCoordinates.lean:367)",
+    "PointSF.add / smul (FunctionalCompiler.lean:102,126)"
+   ],
+   "statement": "Addition of coded points has a single-fold implementation via seven disjoint cases with a case-local slope code; the same holds for fixed addition chains and multiplication by a fixed positive integer.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "none (chord-tangent formulas)"
+   },
+   "uses_items": [
+    "I06",
+    "I11",
+    "I12"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "W(Q) needs [m_*]Q, [2]Q and Q+-P computed single-fold."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Group law written as gated polynomial equations."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine single-fold transcription of the group law."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I14",
+   "kind": "definition + cited theorem",
+   "name": "naive x-height, canonical height, uniform comparison",
+   "source": "paper",
+   "file_line": "elliptic.tex:176-197 (eq:uniform-height)",
+   "lean_decls": [
+    "CurveHeight.naiveHeight (EllipticHeight.lean:216)",
+    "QuadraticLimit.limit (QuadraticHeight.lean:43)",
+    "CurveHeight.canonicalHeight (QuadraticHeight.lean:167)",
+    "CurveHeight.uniform_height (QuadraticHeight.lean:197)",
+    "CurveHeight.canonicalHeight_pos (QuadraticHeight.lean:209)",
+    "CurveHeight.approximate_parallelogram (EllipticHeight.lean:218)"
+   ],
+   "statement": "H(a/d)=max(|a|,d), h_x(Q)=log H(x(Q)); hat h(Q) = (1/2) lim 4^{-N} h_x([2^N]Q); hat h([j]Q)=j^2 hat h(Q), hat h>0 on nontorsion, and |log H(x(Q)) - 2 hat h(Q)| <= c_E.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "silverman",
+    "cue": "'These are precisely the uniform comparison and quadraticity statements of [silverman, Chapter VIII, Proposition 9.1 and Theorem 9.3]'"
+   },
+   "uses_items": [
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The bounded additive error c_E is what makes the exact window possible."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic w.r.t. goal; in wider literature",
+    "note": "Not in the goal; textbook Neron-Tate theory (transfer). Mathlib d13f23b has Weil heights (Height.logHeight, Northcott, addSubMap bound) but the Lean builds the canonical height itself."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Cross-field transfer of Neron-Tate theory."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I15",
+   "kind": "key construction (display)",
+   "name": "height constants kappa, m_*, a_E",
+   "source": "paper",
+   "file_line": "elliptic.tex:199-208 (eq:height-constants)",
+   "lean_decls": [
+    "EllipticModel.height_constants (EllipticGrowth.lean:217)"
+   ],
+   "statement": "kappa > e^{6 c_E} integer; m_* even with a_E = 2 m_*^2 hat h(P) satisfying a_E > 2c_E and 2a_E - 6c_E > log kappa: 'A fixed scalar multiplication enlarges the quadratic coefficient while leaving the uniform error bound unchanged.'",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I14",
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Separates the error band 6c_E from the index gap 2a_E; m_* also kills torsion."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Parameter choice not present in goal or L."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Parameter tuning inside candidate E1; by itself a routine choice."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I16",
+   "kind": "definition (display)",
+   "name": "W(Q) = H(x([m_*]Q)) and the quadratic sequence W_j",
+   "source": "paper",
+   "file_line": "elliptic.tex:210-236 (eq:quadratic-sequence)",
+   "lean_decls": [
+    "EllipticModel.W / sequence (EllipticGrowth.lean:69-70)",
+    "sequence_approx (EllipticGrowth.lean:97)",
+    "W_index (EllipticGrowth.lean:85)",
+    "GrowthEstimate.sequence_strict / sequence_unbounded (HeightGrowth.lean:11,28)"
+   ],
+   "statement": "W(Q)=H(x([m_*]Q)) (1 if [m_*]Q=O); W(nP+t) depends only on j=|n|; log W_j = a_E j^2 + eps_j with |eps_j|<=c_E; (W_j) strictly increasing and unbounded.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I13",
+    "I14",
+    "I15"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "W turns the hidden group index into an integer with quadratic log-growth that a polynomial system can compute single-fold."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not a subterm of the goal; a Diophantine 'quadratic-exponential' integer sequence indexed by E(Q)/T is not in L."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Component of candidate E1; the ingredients (heights of multiples, Poonen's denominator growth) are known, the use as a single-fold integer sequence is new."
+   },
+   "provisional_F": {
+    "type": "F3",
+    "justification": "Auxiliary integer-valued object built only to drive the growth construction."
+   }
+  },
+  {
+   "id": "I17",
+   "kind": "definition (inline \\emph) + lemma",
+   "name": "representative point; Lemma representatives",
+   "source": "paper",
+   "file_line": "elliptic.tex:238-274 (eq:representative, lem:representatives)",
+   "lean_decls": [
+    "EllipticModel.Representative (EllipticGrowth.lean:145)",
+    "representative_exists / representative_unique (EllipticGrowth.lean:183,178)"
+   ],
+   "statement": "Q is a representative if Q != O, y(Q)>=0, W(Q)>1 and x(Q) >= x(Q+t) for all t in T; for each j>=1 exactly one point of (jP+T) u (-jP+T) is a representative.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "'Call a rational point Q a \\emph{representative}'"
+   },
+   "uses_items": [
+    "I13",
+    "I16",
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Removes the 8-fold ambiguity (sign and torsion) so that the selected points, hence all codes, are unique."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic but routine",
+    "note": "Canonical section of E(Q)/T modulo sign."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Simple normalization device (max x in a torsion coset, nonnegative y)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I18",
+   "kind": "key construction (proof paragraph)",
+   "name": "index bracket at input scale",
+   "source": "paper",
+   "file_line": "elliptic.tex:296-313 (eq:index-bracket)",
+   "lean_decls": [
+    "EllipticModel.Bracket (EllipticGrowth.lean:281)",
+    "bracket_iff (EllipticGrowth.lean:287)",
+    "GrowthEstimate.bracket_unique (HeightGrowth.lean:41)",
+    "neighbor_max (EllipticGrowth.lean:259)"
+   ],
+   "statement": "Require a representative Q with W(Q) <= u + W_1 < max{W(Q+P), W(Q-P)}; the neighbour maximum equals W_{k+1}, so exactly one k>=1 (and one Q) qualifies.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\\emph{Selecting an index at the input scale.}"
+   },
+   "uses_items": [
+    "I16",
+    "I17"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Converts the input u into a point whose index k is about sqrt(log u / a_E)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal; standard 'locate between consecutive terms' pattern."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard bracketing of a strictly increasing sequence; neighbour-max trick avoids sign of the index."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I19",
+   "kind": "key construction / lemma (proof paragraph; Lean lemma)",
+   "name": "square window: multiplicative test of r = k^2",
+   "source": "paper",
+   "file_line": "elliptic.tex:316-358 (eq:square-window); height-window-figure.tex",
+   "lean_decls": [
+    "HeightWindow.square_window (HeightGrowth.lean:233)",
+    "HeightWindow.separated_window (HeightGrowth.lean:191)",
+    "HeightWindow.multiplicative_window (HeightGrowth.lean:214)",
+    "EllipticModel.Window / window_iff (EllipticGrowth.lean:283,293)"
+   ],
+   "statement": "With L_0 = W([2]Q) W(R) W_1 and D_0 = W(Q)^2 max{W(R+P),W(R-P)}, log(L_0/D_0) = 2a_E(k^2 - r) + e with |e| <= 6c_E (from the identity (2k)^2 - 2k^2 - ((r+1)^2 - r^2) + 1 = 2(k^2-r)); hence L_0 <= kappa D_0 and D_0 <= kappa L_0 iff r = k^2.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\\emph{Selecting the squared index.} 'The quadratic main terms ... suggest the identity'; 'The bounded additive error makes the exact index selection below possible.' (main.tex:96-97)"
+   },
+   "uses_items": [
+    "I15",
+    "I16",
+    "I17",
+    "I18"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The only place where superpolynomial growth is created: it squares the index without a logarithm, an index variable, or a cutoff."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Neither the quadratic relation r=k^2 between hidden indices nor its expression by products of heights occurs in the goal or in L."
+   },
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Passes a quick test 1 (no precedent found for using quadratic Neron-Tate growth to test a quadratic index relation by a bounded number of multiplicative comparisons); non-analytic; logically load-bearing for the whole elliptic branch. Syntactically tiny (one identity), Cook-like."
+   },
+   "provisional_F": {
+    "type": "F3",
+    "justification": "Auxiliary test built only to pin R; it has an F5 flavour (index arithmetic is moved into multiplicative height arithmetic)."
+   }
+  },
+  {
+   "id": "I20",
+   "kind": "proposition",
+   "name": "single-fold growth function (prop:growth)",
+   "source": "paper",
+   "file_line": "elliptic.tex:283-403 (eq:growth-bounds)",
+   "lean_decls": [
+    "EllipticModel.growth_model (EllipticGrowth.lean:327)",
+    "EllipticModel.growth_pair_existsUnique (EllipticGrowth.lean:307)",
+    "GrowthCompilation.graph_sf (EllipticGrowth.lean:440)",
+    "GrowthCompilation.growth (EllipticGrowth.lean:487)",
+    "GrowthEstimate.eventual_output (HeightGrowth.lean:143)"
+   ],
+   "statement": "There are a total g: N->N with single-fold graph (output and all auxiliaries unique), delta>0 and u_0>=4 such that delta (log u)^2 < log g(u) < u log u for u >= u_0; concretely g(u) = W_{k^2} where k is the bracket index of u.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "'We now use the curve to construct a total single-fold function whose growth is faster than every fixed power and slower than u^u.' (elliptic.tex:162-163)"
+   },
+   "uses_items": [
+    "I13",
+    "I16",
+    "I17",
+    "I18",
+    "I19",
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Supplies the single-fold Julia-Robinson-type relation that the power construction needs as its cutoff; Lean: growth has dominated_share 0.49 of the target DAG."
+   },
+   "analytic_check": {
+    "verdict": "partly analytic",
+    "note": "The statement shape (a Diophantine relation of growth between u^k and u^u) is Robinson's 1952 notion, which is in L as the hypothesis of a known reduction; the single-fold version and its elliptic construction are not."
+   },
+   "provisional_N": {
+    "grade": "N3",
+    "justification": "Head of candidate cluster E1: a single-fold Diophantine JR-type function did not exist in the literature (the obstruction is the periodicity of Pell-based constructions); built from a rank-one curve via I16-I19."
+   },
+   "provisional_F": {
+    "type": "F3",
+    "justification": "Auxiliary object (a growth function) built only to supply the cutoff; transfer of Neron-Tate theory is N0 but the construction is new."
+   }
+  },
+  {
+   "id": "I21",
+   "kind": "lemma",
+   "name": "Pell sequences (lem:pell-sequences)",
+   "source": "paper",
+   "file_line": "power.tex:18-90 (eq:pell-bounds, eq:pell-ratio)",
+   "lean_decls": [
+    "PowerEstimate.power_bounds (Pell.lean:20)",
+    "ratio_bounds (Pell.lean:88)",
+    "Mathlib Pell.yn / Pell.yn_modEq_a_sub_one"
+   ],
+   "statement": "For a>=2: positive solutions of x^2-(a^2-1)y^2=1 are exactly (x_i,y_i); y_i == i mod (a-1); (2a-1)^{i-1} <= y_i <= (2a)^{i-1}; and b^n <= y_{n+1}(bu)/y_{n+1}(u) <= b^n (1+1/(2u-1))^n.",
+   "cited_or_new": {
+    "status": "re-proved (classical)",
+    "bib_key": "cco2024",
+    "cue": "'We begin with the elementary facts about Pell equations needed'; ratio bound adapted from [cco2024, Lemma 6.1]"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Index recovery by congruence and the quotient recovering b^n."
+   },
+   "analytic_check": {
+    "verdict": "analytic in L",
+    "note": "Classical Pell facts (Mathlib Pell.yn, yn_modEq_a_sub_one)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical; the ratio bound via R_i(bu) >= b R_i(u) is a short induction."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I22",
+   "kind": "lemma (proof paragraph)",
+   "name": "index cutoff u^u < (2u-1)^{u-1}",
+   "source": "paper",
+   "file_line": "power.tex:151-162 (eq:pell-index-cutoff)",
+   "lean_decls": [
+    "PowerEstimate.index_cutoff (Pell.lean:160)"
+   ],
+   "statement": "For u>=4, u^u < (2u-1)^{u-1}; combined with g(u) < u^u it forces Pell indices below u.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I21"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Turns the upper growth bound into an index bound."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Elementary inequality."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I23",
+   "kind": "proposition",
+   "name": "single-fold power graph from a growth function (prop:power)",
+   "source": "paper",
+   "file_line": "power.tex:96-277",
+   "lean_decls": [
+    "PowerSystem.System (Power.lean:101)",
+    "PowerSystem.sound / unique / complete (Power.lean:140,151,174)",
+    "PowerCompilation.power_of_growth (Power.lean:279)",
+    "PowerCompilation.power (Power.lean:299)",
+    "PowerEstimate.pell_pinned / quotient_sound (Pell.lean:231,243)"
+   ],
+   "statement": "If g has a complete single-fold graph and delta(log u)^2 < log g(u) < u log u for u >= u_0, then Pow(b,n,c) <=> (b>=2 and c=b^n) has a complete single-fold representation, using two Pell equations with parameters bu and u, cutoffs 0<F,H<g(u), residues F == H == n+1, and integer quotient F = cH + r.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "mati1974; cco2024",
+    "cue": "'The paired Pell equations, index congruences, and quotient used here adapt Matiyasevich's exponential single-fold construction [mati1974, Section 4], as presented in [cco2024, Section 6, Lemma 6.1 and Theorem 5]. Our cutoff is supplied by ... Proposition~growth.'"
+   },
+   "uses_items": [
+    "I20",
+    "I21",
+    "I22",
+    "I24",
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Every later step calls Pow; Lean: power dominated_share 0.54."
+   },
+   "analytic_check": {
+    "verdict": "partly analytic",
+    "note": "Robinson-style reduction 'growth relation -> exponentiation' is in L (robinson1952; cco2024 proposes replacing exponentiation by any exponential-growth relation); the single-fold bookkeeping is the content."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Close variant of the paired-Pell single-fold construction of mati1974/cco2024 with a different cutoff."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I24",
+   "kind": "key construction (display)",
+   "name": "self-referential Pell scale u = (c+1)^l (n+1)(b+1) + u_0",
+   "source": "paper",
+   "file_line": "power.tex:116-147 (eq:power-input, eq:power-ell)",
+   "lean_decls": [
+    "PowerEstimate.input (Power.lean:16)",
+    "input_bounds (Power.lean:17)",
+    "choose_ell (Power.lean:6)",
+    "cutoff (Power.lean:50)",
+    "quotient_error (Pell.lean:173)"
+   ],
+   "statement": "u is a fixed polynomial in the output c and the inputs; once indices are pinned, c >= b^n from the lower ratio bound, so the error c n/(2u-1-n) < 1 is controlled by the output itself; l > 3/(delta log 2) ensures the intended Pell coordinates lie below g(u).",
+   "cited_or_new": {
+    "status": "new (variant)",
+    "bib_key": null,
+    "cue": "'To make its error less than one without introducing a free scale, we prescribe u as a polynomial in c,b,n.'"
+   },
+   "uses_items": [
+    "I21",
+    "I23"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Removes the free large parameter that destroys uniqueness in classical exponentiation definitions."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal; neighbouring devices in mati1974 / cco2024 (exponential cutoffs)."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Small, clever variant; a free-scale removal of this kind is the standard aim of single-fold constructions (mati1974 Sec.4)."
+   },
+   "provisional_F": {
+    "type": "F2",
+    "justification": "If N3: an invariant ('the output bounds its own error')."
+   }
+  },
+  {
+   "id": "I25",
+   "kind": "definition (display)",
+   "name": "binary containment x <= y (bitwise)",
+   "source": "paper",
+   "file_line": "power.tex:285-292",
+   "lean_decls": [
+    "Binary.Bits (Binary.lean:7)",
+    "Packed.Bits (Packed.lean:11)",
+    "Counter.Bits (CounterMachine.lean:110)"
+   ],
+   "statement": "x \\bits y iff every binary 1-digit of x is a 1-digit of y.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": "jm1991",
+    "cue": null
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Masking relation for the machine encoding."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Standard (masking relation of Jones-Matiyasevich)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Known."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I26",
+   "kind": "proposition",
+   "name": "single-fold binary containment (prop:subset)",
+   "source": "paper",
+   "file_line": "power.tex:304-361",
+   "lean_decls": [
+    "Binary.System (Binary.lean:89)",
+    "Binary.choose_odd_iff (Binary.lean:32)",
+    "Binary.choose_digit (Binary.lean:74)",
+    "Compiler.bits (Binary.lean:192)"
+   ],
+   "statement": "x \\bits y has a single-fold representation: B=2^{y+1}, H=B^x, N=(B+1)^y, N = sBH + dH + r with d<B, r<H, d = 2t+1 (digit = binom(y,x), odd iff x \\bits y by Lucas mod 2).",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "robinson1952; jm1991; lucas1878",
+    "cue": "'Large-base extraction of binomial coefficients goes back to Julia Robinson ... binary-masking method used by Jones and Matiyasevich ... We give its short proof and retain all witnesses'"
+   },
+   "uses_items": [
+    "I23",
+    "I25",
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Needed for every mask in the machine system."
+   },
+   "analytic_check": {
+    "verdict": "analytic in L",
+    "note": "Known construction; only single-fold bookkeeping added."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Known construction re-checked for uniqueness."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I27",
+   "kind": "definition (prose)",
+   "name": "counter machine model (INC / TESTDEC, single halt state)",
+   "source": "paper",
+   "file_line": "computation.tex:20-39",
+   "lean_decls": [
+    "Counter.Instr / Machine / Cfg / run / HaltsAt (CounterMachine.lean:8-38)"
+   ],
+   "statement": "Deterministic machine with finitely many states and counters, instructions INC(j) and TESTDEC(j), and a unique halt state with no instruction.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "minsky1961; shepherdson1963",
+    "cue": "'This is the classical counter instruction set of Minsky'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Target of the compilation."
+   },
+   "analytic_check": {
+    "verdict": "analytic in L",
+    "note": "Standard model."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Minsky machines."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I28",
+   "kind": "lemma",
+   "name": "counter-machine universality for tuple inputs (lem:counter-universality)",
+   "source": "paper",
+   "file_line": "computation.tex:41-92",
+   "lean_decls": [
+    "TM2Macro.exists_code (RecursiveEnumeration.lean:128)",
+    "TM2Macro.exists_counter (RecursiveEnumeration.lean:143)",
+    "Macro.compile / simulate (MacroMachine.lean:89,295)",
+    "TM2Macro.program / respects (TuringSimulation.lean:60,144)"
+   ],
+   "statement": "For every r.e. S subset N^n there is a counter machine that, with the first n counters initialised to a, halts iff a in S (simulation of a Turing machine by two base-D stacks).",
+   "cited_or_new": {
+    "status": "re-proved (classical)",
+    "bib_key": "minsky1961; shepherdson1963",
+    "cue": "'We include the simulation needed for the direct tuple inputs used here, so no encoded-input convention is imported'"
+   },
+   "uses_items": [
+    "I27",
+    "I01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Connects r.e. sets to machine runs."
+   },
+   "analytic_check": {
+    "verdict": "analytic in L",
+    "note": "Classical (Minsky 1961); Lean derives it from Mathlib ToPartrec / PartrecToTM2."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I29",
+   "kind": "definition (display)",
+   "name": "bound constant C and arc set",
+   "source": "paper",
+   "file_line": "computation.tex:94-113 (eq:machine-C)",
+   "lean_decls": [
+    "Counter.baseC / arc / incoming / increments / decrements (CounterMachine.lean:92-108)"
+   ],
+   "statement": "C = 1 + s + sum d_j; counters at time t are below C+t; arcs labelled +j, 0j, -j with destinations.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I27"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Gives the common digit bound and the transition bookkeeping."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Bookkeeping."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I30",
+   "kind": "key construction (display)",
+   "name": "run encoding system (state, branch and counter masks)",
+   "source": "paper",
+   "file_line": "computation.tex:133-196 (eq:machine-base ... eq:machine-zero-test)",
+   "lean_decls": [
+    "Counter.Witness / System (CounterMachine.lean:75,112)",
+    "Counter.System.* decoding lemmas (CounterRecords.lean)",
+    "Packed.bits_mask / update_coefficients (Packed.lean:153,245)"
+   ],
+   "statement": "B=2^w=4b, J=B^{k-1}, M=sum B^t; I_q \\bits M with sum_q I_q = M; Z_q+N_q=I_q, Z_q+V_q=M; I_q = 1_{q=q*} + B sum E_a; R_j \\bits (2b-1)M (top bit reserved), R_j = rho_j J + eta_j, R_j = d_j + B(R_j - rho_j J + sum E^+ - sum E^-); zero test R_j \\bits (B-1)V_q.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "jm1984; jm1991",
+    "cue": "'The method of recording register computations in a large power-of-two base comes from Jones and Matiyasevich's bit-masking construction'"
+   },
+   "uses_items": [
+    "I25",
+    "I26",
+    "I23",
+    "I29",
+    "I33"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Encodes the whole run in finitely many integers."
+   },
+   "analytic_check": {
+    "verdict": "analytic in L",
+    "note": "Variant of Jones-Matiyasevich 1984 encoding."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Known method; the exact-halt identity I_h = J (derived from summing state equations), final-digit removal and top-bit reservation are small single-fold-specific modifications."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I31",
+   "kind": "key construction (display)",
+   "name": "clock register and dyadic scale window",
+   "source": "paper",
+   "file_line": "computation.tex:198-208, 282-302 (eq:machine-clock-update, eq:machine-clock-scale, eq:machine-unique-scale)",
+   "lean_decls": [
+    "Counter.System.clock / scale_lower / scale_upper (CounterMachine.lean:130-132)",
+    "Packed.unique_scale (Packed.lean:198)"
+   ],
+   "statement": "R_0 = C + B(R_0 - rho_0 J + M - J) forces rho_0 = C + k - 1; b <= rho_0 and 2 rho_0 < B force 2(C+T) < B <= 4(C+T), which contains exactly one power of two, so the base is a function of the run.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "chaitin1987",
+    "cue": "'Determining the base from the input and computation time already appears in Chaitin's account ... Here a clock and a dyadic interval determine the base.'"
+   },
+   "uses_items": [
+    "I30",
+    "I34"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Without it the same run has infinitely many encodings (any large base)."
+   },
+   "analytic_check": {
+    "verdict": "non-analytic",
+    "note": "Not in goal; precedent named by the paper."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Named precedent (Chaitin 1987); the dyadic window is a clean but small device."
+   },
+   "provisional_F": {
+    "type": "F3",
+    "justification": "If N3: auxiliary clock gadget."
+   }
+  },
+  {
+   "id": "I32",
+   "kind": "proposition",
+   "name": "machine compiler (prop:machine-compiler)",
+   "source": "paper",
+   "file_line": "computation.tex:117-343",
+   "lean_decls": [
+    "CounterCompilation.system_sf (CounterCompilation.lean:131)",
+    "CounterCompilation.halts_sf (CounterCompilation.lean:168)",
+    "Counter.system_unique (CounterRecords.lean:389)",
+    "Counter.system_complete (CounterBounds.lean:348)",
+    "Counter.trace_system (CounterBounds.lean:254)"
+   ],
+   "statement": "For a fixed deterministic counter machine with input initialisation, a finite polynomial system in a and natural auxiliaries has exactly one complete solution when the machine halts and none otherwise.",
+   "cited_or_new": {
+    "status": "new (adapted)",
+    "bib_key": "jm1984; chaitin1987",
+    "cue": "'We verify both the decoding of every solution and the uniqueness of its complete auxiliary tuple.'"
+   },
+   "uses_items": [
+    "I30",
+    "I31",
+    "I23",
+    "I26",
+    "I33",
+    "I34",
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Final compilation step; Lean halts_sf dominated_share 0.78."
+   },
+   "analytic_check": {
+    "verdict": "partly analytic",
+    "note": "Exponential-Diophantine single-fold analog is mati1974 Main Theorem; this is its polynomial version given Pow and \\bits."
+   },
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Single-fold variant of the Jones-Matiyasevich register-machine proof."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I33",
+   "kind": "lemma (proof paragraph)",
+   "name": "no-carry coefficient argument",
+   "source": "paper",
+   "file_line": "computation.tex:252-270",
+   "lean_decls": [
+    "Packed.update_coefficients (Packed.lean:245)",
+    "Packed.digits_ext (Packed.lean:98)"
+   ],
+   "statement": "If sum_{t<k} c_t B^t = 0 with |c_t| < B then all c_t = 0; used to read off counter updates without carries or borrows.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Decoding of every solution."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Base-B uniqueness."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Folklore."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I34",
+   "kind": "lemma (proof paragraph)",
+   "name": "unique power of two in (2L,4L]",
+   "source": "paper",
+   "file_line": "computation.tex:298-302",
+   "lean_decls": [
+    "Packed.unique_scale (Packed.lean:198)"
+   ],
+   "statement": "For L>0 the interval (2L,4L] contains exactly one power of two.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Makes the base unique."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Elementary."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Elementary."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I35",
+   "kind": "theorem",
+   "name": "Main theorem (thm:main)",
+   "source": "paper",
+   "file_line": "main.tex:62-73; proof computation.tex:347-371",
+   "lean_decls": [
+    "OAI.SingleFold.main (Main.lean:47)",
+    "SingleFold.recursively_enumerable_sf (Main.lean:34)"
+   ],
+   "statement": "Every r.e. S subset N^n (n>=1) has P in Z[A_1..A_n, W_1..W_m] (m>=1) with #{w : P(a,w)=0} = 1 if a in S and 0 otherwise.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "'This proves the single-fold conjecture'"
+   },
+   "uses_items": [
+    "I28",
+    "I32",
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Headline."
+   },
+   "analytic_check": {
+    "verdict": "goal",
+    "note": "The goal itself."
+   },
+   "provisional_N": {
+    "grade": "n/a",
+    "justification": "Headline result, not an item to grade."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I36",
+   "kind": "corollary",
+   "name": "undecidability under an at-most-one-solution promise (cor:unique-h10)",
+   "source": "paper",
+   "file_line": "main.tex:116-127; proof consequences.tex:11-33",
+   "lean_decls": [],
+   "statement": "There exist m, D such that no algorithm decides solvability over N of degree-<=D polynomials in m variables promised to have at most one solution.",
+   "cited_or_new": {
+    "status": "new (routine consequence)",
+    "bib_key": null,
+    "cue": "'The stronger uniqueness assertion yields the promise undecidability result'"
+   },
+   "uses_items": [
+    "I35"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Corollary only; not formalized."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Standard specialization of a fixed universal-style polynomial."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Immediate reduction from a nonrecursive r.e. set."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I37",
+   "kind": "construction + lemma (appendix)",
+   "name": "2-isogeny descent: phi, psi, squareclass homomorphism alpha, ker alpha = psi E'(Q), index bound",
+   "source": "paper",
+   "file_line": "rank-one-proof.tex:44-162 (eq:phi-descent, eq:psi-descent, eq:descent-kernel, eq:descent-index)",
+   "lean_decls": [
+    "(route differs) Descent.alphaVal / alpha / kummer / kummer_eq_zero_iff (DescentMap.lean:68,215,311,319)",
+    "Descent.exists_half_of_squares (DescentMap.lean:267)"
+   ],
+   "statement": "Standard descent via 2-isogeny; [E(Q):2E(Q)] <= |im alpha| |im alpha'|.",
+   "cited_or_new": {
+    "status": "cited (re-proved)",
+    "bib_key": "silverman",
+    "cue": "'we use the standard two-isogeny descent [silverman, Ch. III Ex. 4.5; Ch. X Ex. 4.8, Prop. 4.9], giving the kernel and index calculations explicitly'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Rank upper bound."
+   },
+   "analytic_check": {
+    "verdict": "analytic in L",
+    "note": "Textbook."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Textbook descent."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I38",
+   "kind": "lemma (appendix)",
+   "name": "image computations; [2] not in im alpha' (mod 5)",
+   "source": "paper",
+   "file_line": "rank-one-proof.tex:164-201",
+   "lean_decls": [
+    "(route differs) LocalDescent.no_norm_five / no_norm_ten / alpha_five_when_zero / mod_two_cover (LocalDescent.lean:41,59,73,170)",
+    "SquareSupport.* (SquareSupport.lean)"
+   ],
+   "statement": "im alpha subset {+-1,+-5}; im alpha' subset {1,2,5,10} and omits [2] by a mod-5 descent on N^2 = 2m^4 + 50e^4; hence index <= 8.",
+   "cited_or_new": {
+    "status": "re-proved (standard)",
+    "bib_key": "silverman",
+    "cue": null
+   },
+   "uses_items": [
+    "I37"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Rank <= 1."
+   },
+   "analytic_check": {
+    "verdict": "analytic in L",
+    "note": "Standard local computation."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I39",
+   "kind": "lemma (appendix)",
+   "name": "nontorsion point (-4,6); torsion via Nagell-Lutz",
+   "source": "paper",
+   "file_line": "rank-one-proof.tex:203-229",
+   "lean_decls": [
+    "(route differs) CurveRank.G_nontorsion via vx_dyadic, G=(25/4,75/8) (Rank.lean:311,325)",
+    "Torsion.torsion_iff via DuplicationBound.height_dup_strict + bounded_points (Torsion.lean:88; Duplication.lean:125,166)"
+   ],
+   "statement": "[E(Q):2E(Q)] = 2^{r+2}, so r <= 1; (-4,6) is nontorsion by Nagell-Lutz (36 does not divide 62500); affine torsion has y=0.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "silverman",
+    "cue": "'[silverman, Chapter VIII, Corollary 7.2]'"
+   },
+   "uses_items": [
+    "I37",
+    "I38"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Rank = 1 and exact torsion."
+   },
+   "analytic_check": {
+    "verdict": "analytic in L",
+    "note": "Standard."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I40",
+   "kind": "construction (appendix)",
+   "name": "complete witness ledger",
+   "source": "paper",
+   "file_line": "witness-ledger.tex:1-138",
+   "lean_decls": [
+    "Representation.vars (PolynomialCompiler.lean:18)"
+   ],
+   "statement": "Explicit recursive specification of every auxiliary coordinate (rational codes, addition tuples, height tuples, growth tuple xi, power tuple, containment tuple, computation tuple); counts s+3tau+r+1 containment calls and r+5 slacks.",
+   "cited_or_new": {
+    "status": "new (bookkeeping)",
+    "bib_key": null,
+    "cue": "'Its purpose is to make explicit which coordinates the single-fold assertion counts.'"
+   },
+   "uses_items": [
+    "I04",
+    "I06",
+    "I13",
+    "I20",
+    "I23",
+    "I26",
+    "I32"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Documentation of the complete tuple; Lean replaces it by typed variable sets."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Bookkeeping."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Bookkeeping."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L01",
+   "kind": "definition (Lean only)",
+   "name": "Semi: R and not-R both single-fold",
+   "source": "lean",
+   "file_line": "RationalCodes.lean:303",
+   "lean_decls": [
+    "Compiler.Semi (RationalCodes.lean:303)",
+    "Semi.and/or/not/all (RationalCodes.lean:306-336)"
+   ],
+   "statement": "Semi R := SF R and SF (not R); closed under and/or/not/all; used to build guarded case splits whose guards and negated guards are both single-fold.",
+   "cited_or_new": {
+    "status": "new (formalization device)",
+    "bib_key": null,
+    "cue": "no docstring"
+   },
+   "uses_items": [
+    "I04",
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "All case analyses (point addition, max, normalized decoding) go through Semi; 9.8% of DAG declarations depend on it."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "A conjunction of two instances of SF."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Abbreviation; the paper's disjoint-cases lemma is implemented via complements instead of explicit selectors."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L02",
+   "kind": "definition (Lean only)",
+   "name": "rational / point / scalar functional compiler",
+   "source": "lean",
+   "file_line": "RationalCodes.lean:160-298; FunctionalCompiler.lean:7-259",
+   "lean_decls": [
+    "RationalCompiler.FractionPoly / Expr (RationalCodes.lean:160,253)",
+    "Compiler.MapSF / ScalarSF (FunctionalCompiler.lean:7,161)",
+    "PointCompiler.PointSF (FunctionalCompiler.lean:94)",
+    "PointCompiler.normalized_graph (FunctionalCompiler.lean:79)"
+   ],
+   "statement": "FractionPoly and Expr compile rational expressions to integer polynomial (in)equalities on rational codes; MapSF/PointSF/ScalarSF express single-fold graphs of maps to tuples, points and scalars, with comp/pair/pullback.",
+   "cited_or_new": {
+    "status": "new (formalization plumbing)",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I04",
+    "I06",
+    "I11",
+    "I13"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Infrastructure for every compiled system."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Plumbing."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Plumbing."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L03",
+   "kind": "construction (Lean only)",
+   "name": "Tate-limit canonical height from Mathlib Weil heights",
+   "source": "lean",
+   "file_line": "QuadraticHeight.lean:13-224; EllipticHeight.lean:15-242",
+   "lean_decls": [
+    "QuadraticLimit.sequence / limit / error_bound / limit_parallelogram / limit_zsmul (QuadraticHeight.lean:13-115)",
+    "CurveHeight.symmetric_height_bound (EllipticHeight.lean:40)",
+    "CurveHeight.addSub_projective (EllipticHeight.lean:177)",
+    "CurveHeight.approximate_parallelogram (EllipticHeight.lean:218)"
+   ],
+   "statement": "Generic: if h(P+Q)+h(P-Q) = 2h(P)+2h(Q)+O(1), the limit 4^{-n}h(2^n P) exists, is within C/3 of h, satisfies the parallelogram law and is quadratic; instantiated with h = logHeight of xRep using Mathlib's addSubMap height bound and a symmetric-height bound proved here.",
+   "cited_or_new": {
+    "status": "re-proved (classical)",
+    "bib_key": "silverman",
+    "cue": "none"
+   },
+   "uses_items": [
+    "I14"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Gives c_E and the quadratic main term formally."
+   },
+   "analytic_check": {
+    "verdict": "analytic in wider literature",
+    "note": "Tate's construction; textbook."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Transfer (formalized)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L04",
+   "kind": "theorem (Lean only)",
+   "name": "Mordell-Weil for E via height descent",
+   "source": "lean",
+   "file_line": "FiniteGeneration.lean:11-104",
+   "lean_decls": [
+    "HeightDescent.finitely_generated (FiniteGeneration.lean:11)",
+    "CurveRank.representatives_cover (FiniteGeneration.lean:92)",
+    "instance AddGroup.FG E.Point (FiniteGeneration.lean:102)"
+   ],
+   "statement": "HeightDescent.finitely_generated: a Northcott, nonnegative quadratic height plus finite index of 2A gives finite generation; instance AddGroup.FG E.Point from the 8-element cover of E(Q)/2E(Q).",
+   "cited_or_new": {
+    "status": "re-proved (classical)",
+    "bib_key": "silverman",
+    "cue": "none"
+   },
+   "uses_items": [
+    "L03",
+    "L05"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Needed for the structure theorem rank_one; invisible to the extractor (instance-only use)."
+   },
+   "analytic_check": {
+    "verdict": "analytic in wider literature",
+    "note": "Textbook descent theorem."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical (the paper cites Silverman VIII 4.1)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L05",
+   "kind": "construction (Lean only)",
+   "name": "full 2-descent via the Kummer map",
+   "source": "lean",
+   "file_line": "DescentMap.lean:21-358; LocalDescent.lean:7-180; SquareSupport.lean",
+   "lean_decls": [
+    "Descent.kummer_eq_zero_iff (DescentMap.lean:319)",
+    "Descent.mod_two_cover (LocalDescent.lean:170)"
+   ],
+   "statement": "alpha_e(P) = class of x - e (adjusted at x=e) for e in {0,5}; kummer = alpha_0 x alpha_5; kummer P = 0 iff P in 2E(Q) (explicit halving formula); local mod-5 obstructions give mod_two_cover with G=(25/4,75/8) and torsion representatives.",
+   "cited_or_new": {
+    "status": "re-proved (classical)",
+    "bib_key": "silverman",
+    "cue": "none"
+   },
+   "uses_items": [
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Replaces the paper's 2-isogeny descent."
+   },
+   "analytic_check": {
+    "verdict": "analytic in wider literature",
+    "note": "Textbook full 2-descent (Silverman X.1)."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L06",
+   "kind": "lemma (Lean only; kernel-checked enumeration)",
+   "name": "duplication height growth and small-point enumeration",
+   "source": "lean",
+   "file_line": "Duplication.lean:7-215; Torsion.lean:17-90",
+   "lean_decls": [
+    "DuplicationBound.height_dup_lower (Duplication.lean:55)",
+    "DuplicationBound.bounded_points (Duplication.lean:125)",
+    "DuplicationBound.small_points (Duplication.lean:130)",
+    "DuplicationBound.height_dup_strict (Duplication.lean:166)",
+    "Torsion.torsion_iff (Torsion.lean:88)"
+   ],
+   "statement": "height(x)^4 <= 6250000 * height(dupX x); bounded_points enumerates 19*20*13 = 4,940 candidate x with height < 185 by `decide +kernel`, finding only x in {0,+-5,-4,45,25/4,-5/9}; hence H strictly increases under doubling for y != 0, so torsion = E[2].",
+   "cited_or_new": {
+    "status": "new (formalization route)",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Replaces Nagell-Lutz for the torsion subgroup."
+   },
+   "analytic_check": {
+    "verdict": "analytic in wider literature",
+    "note": "Standard height-growth argument with a finite check."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Routine; the only kernel-level finite enumeration in the family."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L07",
+   "kind": "lemma (Lean only)",
+   "name": "abstract rank-one structure",
+   "source": "lean",
+   "file_line": "Rank.lean:11-204, 291-346",
+   "lean_decls": [
+    "AbstractRank.exists_rank_le_one (Rank.lean:127)",
+    "CurveRank.rank_at_most_one (Rank.lean:193)",
+    "CurveRank.vx_dyadic (Rank.lean:311)",
+    "CurveRank.rank_one (Rank.lean:336)"
+   ],
+   "statement": "index formula [A:2A] = 2^n |A[2]| for A = Z^n x T; exists_rank_le_one; 2-adic valuation of x drops by 2 under doubling (vx_double, vx_dyadic) so G is nontorsion; rank_one gives E(Q) = Z x T.",
+   "cited_or_new": {
+    "status": "re-proved",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "L04",
+    "L05",
+    "L06"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Supplies the AddEquiv f used by every EllipticModel definition."
+   },
+   "analytic_check": {
+    "verdict": "analytic in wider literature",
+    "note": "Standard structure theory."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L08",
+   "kind": "definition (Lean only)",
+   "name": "macro machine and TM2 simulation",
+   "source": "lean",
+   "file_line": "MacroMachine.lean; TuringSimulation.lean; RecursiveEnumeration.lean",
+   "lean_decls": [
+    "Macro.compile (MacroMachine.lean:89)",
+    "TM2Macro.program (TuringSimulation.lean:60)",
+    "TM2Macro.counter_halts (RecursiveEnumeration.lean:105)"
+   ],
+   "statement": "Macro instructions (div by radix 2 or 5, muladd) compiled to counter programs; Mathlib's PartrecToTM2 stacks encoded base 5; finite-state restriction of the label set.",
+   "cited_or_new": {
+    "status": "re-proved (classical)",
+    "bib_key": "minsky1961",
+    "cue": "none"
+   },
+   "uses_items": [
+    "I27",
+    "I28"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Universality route in Lean."
+   },
+   "analytic_check": {
+    "verdict": "analytic in L",
+    "note": "Classical simulation; Mathlib supplies Partrec -> TM2."
+   },
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L09",
+   "kind": "definition (Lean only)",
+   "name": "packed base-B digit library",
+   "source": "lean",
+   "file_line": "Packed.lean:7-290",
+   "lean_decls": [
+    "Packed.pack / digit (Packed.lean:7-9)",
+    "Packed.bits_mask (Packed.lean:153)"
+   ],
+   "statement": "digit, pack, ones, bits_mask, digit_sum, division_last, update_coefficients/update_identity.",
+   "cited_or_new": {
+    "status": "new (plumbing)",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I30",
+    "I33"
+   ],
+   "load_bearing_guess": {
+    "level": "medium",
+    "reason": "Decoding of machine records."
+   },
+   "analytic_check": {
+    "verdict": "analytic",
+    "note": "Plumbing."
+   },
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Plumbing."
+   },
+   "provisional_F": null
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Neron-Tate canonical height: existence, quadraticity, positivity on nontorsion, uniform comparison with log H(x)",
+   "bib_key": "silverman",
+   "locator": "Ch. VIII, Prop. 9.1, Thm 9.3",
+   "field": "Arithmetic geometry (heights)",
+   "used_at": "elliptic.tex:186-197",
+   "status": "cited, not re-proved (paper); re-proved for this curve in Lean (QuadraticHeight.lean) from Mathlib's Weil-height API",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Mordell-Weil theorem (finite generation of E(Q))",
+   "bib_key": "silverman",
+   "locator": "Ch. VIII, Thm 4.1",
+   "field": "Arithmetic geometry",
+   "used_at": "rank-one-proof.tex:203-204",
+   "status": "cited, not re-proved (paper); re-proved in Lean (FiniteGeneration.lean, height descent)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Isogenies are homomorphisms",
+   "bib_key": "silverman",
+   "locator": "Ch. III, Thm 4.8",
+   "field": "Arithmetic geometry",
+   "used_at": "rank-one-proof.tex:90-92",
+   "status": "cited, not re-proved; Lean avoids it (direct full 2-descent)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Nagell-Lutz theorem",
+   "bib_key": "silverman",
+   "locator": "Ch. VIII, Cor. 7.2",
+   "field": "Arithmetic geometry",
+   "used_at": "rank-one-proof.tex:213-226",
+   "status": "cited, not re-proved; Lean replaces it by a duplication-height argument plus a kernel enumeration",
+   "essential_for_headline": true
+  },
+  {
+   "name": "2-isogeny descent template",
+   "bib_key": "silverman",
+   "locator": "Ch. III Ex. 4.5; Ch. X Ex. 4.8, Prop. 4.9",
+   "field": "Arithmetic geometry",
+   "used_at": "rank-one-proof.tex:44-162",
+   "status": "re-proved explicitly",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Single-fold closure under conjunction, composition and disjoint cases",
+   "bib_key": "mati1974; cco2024",
+   "locator": "mati1974 Sec. 3.1-3.3; cco2024 Sec. 2 pp. 590-591",
+   "field": "Logic (Diophantine definability)",
+   "used_at": "main.tex:209-249",
+   "status": "re-proved (Lemma composition)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Paired-Pell single-fold exponential construction",
+   "bib_key": "mati1974; cco2024",
+   "locator": "mati1974 Sec. 4; cco2024 Sec. 6 Lemma 6.1, Thm 5",
+   "field": "Logic / Diophantine NT",
+   "used_at": "power.tex:8-14, 96-277",
+   "status": "adapted and re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Pell equation structure and congruence y_i == i (mod a-1)",
+   "bib_key": null,
+   "locator": "classical",
+   "field": "Number theory (Pell)",
+   "used_at": "power.tex:18-90",
+   "status": "re-proved (paper); Lean uses Mathlib Pell",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Lucas's theorem mod 2",
+   "bib_key": "lucas1878",
+   "locator": "Sec. 3, p. 52",
+   "field": "Combinatorial number theory",
+   "used_at": "power.tex:334-345",
+   "status": "re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Large-base binomial extraction; bit-masking register-machine encoding",
+   "bib_key": "robinson1952; jm1984; jm1991",
+   "locator": "robinson1952 Sec. 5; jm1991 Sec. 3-4",
+   "field": "Logic (H10)",
+   "used_at": "power.tex:296-302; computation.tex:9-13",
+   "status": "method re-implemented and re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Counter-machine universality",
+   "bib_key": "minsky1961; shepherdson1963",
+   "locator": "Minsky Thm Ia; S-S Result 10.3",
+   "field": "Computability",
+   "used_at": "computation.tex:34-92",
+   "status": "re-proved from a Turing-machine simulation (paper); Lean uses Mathlib ToPartrec.Code.exists_code and PartrecToTM2.tr_eval",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Base determined by input and time",
+   "bib_key": "chaitin1987",
+   "locator": "Sec. 2.3, 2.6",
+   "field": "Algorithmic information theory",
+   "used_at": "computation.tex:13-15",
+   "status": "precedent only",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Julia Robinson growth-to-exponentiation strategy; DPR; Matiyasevich 1970",
+   "bib_key": "robinson1952; dpr1961; mati1970",
+   "locator": "various",
+   "field": "Logic (H10)",
+   "used_at": "main.tex:75-87",
+   "status": "background",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Rank-one curves in Diophantine definability",
+   "bib_key": "poonen2002",
+   "locator": "Thm 1; Sec. 2.3 Lemma 8",
+   "field": "Arithmetic geometry / H10 over rings of integers",
+   "used_at": "main.tex:91-93; elliptic.tex:168-170",
+   "status": "background precedent",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Single-fold / finite-fold definitions in polynomial rings",
+   "bib_key": "millershlapentokh2022",
+   "locator": "main results",
+   "field": "Logic",
+   "used_at": "main.tex:80-84",
+   "status": "background",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Finite-fold conjecture",
+   "bib_key": "mati2010",
+   "locator": "-",
+   "field": "Logic",
+   "used_at": "main.tex:77-78",
+   "status": "background (implied)",
+   "essential_for_headline": false
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Single-fold calculus: slacks, sign codes, conjunction/composition/disjoint cases with zeroed inactive variables, sum of squares.",
+   "items": [
+    "I04",
+    "I05",
+    "I06",
+    "I07",
+    "L01",
+    "L02"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Arithmetic on E: y^2=x^3-25x has E(Q)=ZP+E[2] (appendix descent); unique 6-coordinate rational codes and flagged point codes; single-fold addition and fixed scalar multiples.",
+   "items": [
+    "I08",
+    "I09",
+    "I10",
+    "I11",
+    "I12",
+    "I13",
+    "I37",
+    "I38",
+    "I39",
+    "L03",
+    "L04",
+    "L05",
+    "L06",
+    "L07"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "Heights: W(Q)=H(x([m_*]Q)) depends only on |index| j and log W_j = a_E j^2 + O(c_E) with a_E tunable through m_*; representatives give one point per j.",
+   "items": [
+    "I14",
+    "I15",
+    "I16",
+    "I17"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "Growth function: bracket selects k with W_k <= u+W_1 < W_{k+1}; square window pins the representative of index k^2; g(u)=W_{k^2} has a single-fold graph and growth exp(Theta((log u)^2)), i.e. between every polynomial and u^u.",
+   "items": [
+    "I18",
+    "I19",
+    "I20"
+   ]
+  },
+  {
+   "step": 5,
+   "claim": "Exponentiation: paired Pell equations with parameters bu and u, cutoff g(u), residues n+1 and integer quotient; u is a fixed polynomial in (c,b,n), so c=b^n and the whole witness are unique.",
+   "items": [
+    "I21",
+    "I22",
+    "I23",
+    "I24"
+   ]
+  },
+  {
+   "step": 6,
+   "claim": "Binary containment via (B+1)^y digit extraction and Lucas mod 2.",
+   "items": [
+    "I25",
+    "I26"
+   ]
+  },
+  {
+   "step": 7,
+   "claim": "Machine compiler: r.e. -> counter machine; encode the run in base B=2^w with masks; clock + dyadic window fix B; exactly one complete tuple per halting run; sum of squares gives Thm main; specialization gives the promise corollary.",
+   "items": [
+    "I27",
+    "I28",
+    "I29",
+    "I30",
+    "I31",
+    "I32",
+    "I33",
+    "I34",
+    "I35",
+    "I36",
+    "I40",
+    "L08",
+    "L09"
+   ]
+  }
+ ],
+ "lean_route_differences": [
+  "Point addition: Lean AddEq has 5 cases and a slope-free relation Line d n (d^2(x3+x1+x2)=n^2, d(y3+y1)=n(x1-x3)) instead of 7 ordered cases with a local slope code (EllipticCoordinates.lean:96-145).",
+  "Disjoint cases: Lean uses Semi (both R and not R single-fold) and Representation.or with a selector and zeroed inactive blocks, rather than the paper's guard partition lemma.",
+  "Rank: full 2-descent with the Kummer map (alpha_0, alpha_5) into (Q*/Q*^2)^2 and an explicit generator G=(25/4,75/8) = (-4,6)+(0,0), instead of 2-isogeny descent; nontorsion of G by 2-adic valuation decreasing by 2 under doubling instead of Nagell-Lutz on (-4,6).",
+  "Torsion: E(Q)_tors = E[2] via strict height growth under doubling plus a kernel-checked enumeration of points of height < 185, instead of Nagell-Lutz.",
+  "Mordell-Weil and Neron-Tate: proved inside the family (generic height-descent theorem; Tate limit built on Mathlib's Weil height and addSubMap bound) instead of cited.",
+  "Universality: Mathlib ToPartrec.Code + PartrecToTM2 (TM2 with stacks) encoded by base-5 stack counters through a 'macro' counter machine, instead of the paper's one-tape TM two-stack simulation.",
+  "Pell: written as X^2 + F^2 = 1 + a^2 F^2 over N; Mathlib Pell.xn/yn.",
+  "Export: Compiler.export_polynomial adds one dummy variable forced to zero so that m >= 1."
+ ],
+ "dag_summary": {
+  "extractor": "scripts/extract_lean.py -> data/items/242_lean.json",
+  "n_files": 28,
+  "n_lines": 7598,
+  "n_decls": 836,
+  "kind_counts": {
+   "theorem": 617,
+   "def": 166,
+   "abbrev": 19,
+   "instance": 18,
+   "structure": 9,
+   "inductive": 7
+  },
+  "proof_dag_decls": 756,
+  "proof_dag_theorems": 561,
+  "dominated_share_of_main_branches": {
+   "recursively_enumerable_sf (wrapper)": 0.989,
+   "CounterCompilation.halts_sf (machine compiler)": 0.78,
+   "PowerCompilation.power (exponentiation)": 0.542,
+   "GrowthCompilation.growth (elliptic growth function)": 0.493,
+   "GrowthCompilation.graph_sf": 0.197,
+   "EllipticModel.growth_model": 0.147,
+   "TM2Macro.exists_counter (universality)": 0.141,
+   "CurveRank.rank_one": 0.122,
+   "HeightWindow.square_window": 0.005
+  },
+  "lines_by_branch": {
+   "elliptic arithmetic geometry (DescentMap..Torsion, 9 files)": 1947,
+   "growth (HeightGrowth+EllipticGrowth)": 779,
+   "coding/compiler (PolynomialCompiler, RationalCodes, EllipticCoordinates, FunctionalCompiler)": 1442,
+   "Pell+Power+Binary": 787,
+   "machine (Packed..RecursiveEnumeration, 8 files)": 2589,
+   "Model+Main": 54
+  },
+  "note": "dominated_share = fraction of the target DAG reachable only through the item. The 20% 'frac_dag_dependents' proxy rewards carriers (Representation 0.216, SF 0.214, RationalCode 0.214, Counter.Witness 0.193) and fails every substantive lemma, as in 287. HeightDescent.finitely_generated shows share 0 / not in DAG because it is used only through `instance : AddGroup.FG E.Point`; the identifier-matching extractor misses instance dependencies."
+ },
+ "eureka_candidates_ranked": [
+  {
+   "rank": 1,
+   "id": "E1",
+   "items": [
+    "I19",
+    "I20",
+    "I16",
+    "I15"
+   ],
+   "name": "Elliptic-height square window producing a single-fold growth function",
+   "provisional_N": "N3",
+   "provisional_F": "F3 (with F5 flavour)",
+   "for": [
+    "Supplies exactly the object the 1974 problem lacked: a Diophantine relation of super-polynomial, sub-u^u growth whose graph is single-fold. Pell/Fibonacci relations fail because their solution sets are periodic in the index.",
+    "Key idea is tiny and non-obvious: because log W_j is quadratic in the hidden index with bounded error, a fixed product of heights at Q, 2Q, R, R+-P, P tests the quadratic relation r = k^2 exactly ((2k)^2 - 2k^2 - ((r+1)^2 - r^2) + 1 = 2(k^2 - r)). With linear log-growth (Pell) no bounded multiplicative test can square an index.",
+    "Neither elliptic curves nor heights occur in the goal or in the cited reduction; quick literature search found no Julia-Robinson relation built from canonical heights.",
+    "Load-bearing: growth dominates 49% of the Lean DAG and everything from Pow onward depends on it."
+   ],
+   "against": [
+    "Rank-one curves and height or denominator growth are standard in Diophantine definability (Poonen 2002, cited; Denef; Shlapentokh; Eisentraeger-Everest), so the pivot from L may be one or two steps.",
+    "The target (single-fold exponential-growth relation suffices) was explicitly identified in the literature (Robinson 1952 reduction; cco2024 'replace exponentiation by any exponential-growth relation'). So the step answers a known sub-question rather than inventing the plan.",
+    "Neron-Tate quadraticity and the bounded error are textbook; the novelty is in how they are combined, which a judge may grade N2."
+   ],
+   "nearest_neighbours": [
+    "Poonen 2002 (rank-one curves, denominator growth, rings of integers)",
+    "Eisentraeger-Everest 2007/2009 descent on elliptic curves for H10 over Q-subrings",
+    "Matiyasevich 1970 Fibonacci growth relation and Robinson 1952 JR predicates",
+    "cco2024 Sec. 7 (problem of replacing the exponential cutoff)"
+   ],
+   "literature_check": "WebSearch (2026-10-09): no source defines a Julia-Robinson / exponential-growth relation via canonical heights; single-fold conjecture reported open as of 2023-2024 surveys (Omodeo; Cantone-Cuzziol-Omodeo)."
+  },
+  {
+   "rank": 2,
+   "id": "E2",
+   "items": [
+    "I19"
+   ],
+   "name": "Square-window lemma as a standalone device (second difference of quadratic heights)",
+   "provisional_N": "N3 (as part of E1); N2 if graded alone",
+   "provisional_F": "F3",
+   "for": [
+    "Formalized as a self-contained lemma (HeightWindow.square_window) with clean hypotheses: any integer sequence with log W_j = a j^2 + O(c) and log kappa between 6c and 2a-6c admits the exact test.",
+    "Reusable beyond this curve: any quadratically growing Diophantine sequence would do."
+   ],
+   "against": [
+    "Once one has quadratic log-growth, choosing a linear combination that isolates k^2 - r is an elementary exercise; most of the difficulty is in E1's idea of using heights at all.",
+    "dominated_share only 0.005 (it is a small lemma high in the DAG)."
+   ],
+   "nearest_neighbours": [
+    "Discrete second differences in additive combinatorics; quadratic form tests on heights (parallelogram law)"
+   ],
+   "literature_check": "No direct precedent found."
+  },
+  {
+   "rank": 3,
+   "id": "E3",
+   "items": [
+    "I24",
+    "I23"
+   ],
+   "name": "Self-referential Pell scale u = (c+1)^l (n+1)(b+1) + u_0 with cutoff g(u)",
+   "provisional_N": "N2",
+   "provisional_F": "F2 (if upgraded)",
+   "for": [
+    "Removes the free large parameter of classical exponentiation definitions by letting the output bound its own error; the lower ratio bound c >= b^n makes this consistent.",
+    "Uses the two growth bounds for two distinct jobs (upper: index pinning; lower: admitting the intended solution)."
+   ],
+   "against": [
+    "The paper itself names the precedent: mati1974 Sec. 4 and cco2024 Lemma 6.1/Thm 5 (paired Pell with exponential cutoff). The new element is the substitution of g for the exponential cutoff.",
+    "Classical step once a single-fold growth relation exists."
+   ],
+   "nearest_neighbours": [
+    "Matiyasevich 1974 Sec. 4",
+    "Cantone-Cuzziol-Omodeo 2024 Sec. 6"
+   ],
+   "literature_check": "Could not fetch cco2024 or Omodeo 2023 full text (connection refused); search snippets confirm cco2024 proposes replacing exponentiation by any exponential-growth relation."
+  },
+  {
+   "rank": 4,
+   "id": "E4",
+   "items": [
+    "I31",
+    "I30"
+   ],
+   "name": "Clock register with dyadic scale window (and exact halt mask I_h = J)",
+   "provisional_N": "N2",
+   "provisional_F": "F3 (if upgraded)",
+   "for": [
+    "Pins the encoding base as a function of the run (B in (2(C+T),4(C+T)]), which is exactly what the classical Jones-Matiyasevich encoding lacks for uniqueness.",
+    "The halt identity B I_h = H derived by summing the state equations rules out padded records without extra variables."
+   ],
+   "against": [
+    "Named precedent: Chaitin 1987 Sec. 2.3/2.6 determines the base from input and time; mati1974 already has a single-fold exponential-Diophantine machine encoding.",
+    "Small bookkeeping device."
+   ],
+   "nearest_neighbours": [
+    "Chaitin 1987",
+    "Jones-Matiyasevich 1984/1991",
+    "Matiyasevich 1974 Main Theorem (exponential single-fold)"
+   ],
+   "literature_check": "Precedent named by paper; not further checked."
+  },
+  {
+   "rank": 5,
+   "id": "E5",
+   "items": [
+    "I10",
+    "I06",
+    "I17"
+   ],
+   "name": "Complete-witness discipline: shifted-inverse rational codes, zeroed inactive cases, canonical representatives",
+   "provisional_N": "N1",
+   "provisional_F": null,
+   "for": [
+    "Necessary for uniqueness of every auxiliary coordinate; done carefully and verified in Lean."
+   ],
+   "against": [
+    "Paper cites cco2024 Sec. 2 for bounded Bezout coefficients and mati1974 for gated cases; standard hygiene."
+   ],
+   "nearest_neighbours": [
+    "cco2024 Sec. 2",
+    "mati1974 Sec. 3"
+   ],
+   "literature_check": "Precedents named by paper."
+  }
+ ],
+ "literature_check_sources": [
+  "https://ceur-ws.org/Vol-3428/paper5.pdf (Omodeo, A Brief History of Singlefold Diophantine Definitions, 2023; search snippet only)",
+  "https://lematematiche.dmi.unict.it/index.php/lematematiche/article/download/2044/1126 (Cantone-Cuzziol-Omodeo 2024; search snippet only, fetch failed)",
+  "https://www.mathnet.ru/eng/znsl3816 (Matiyasevich 2010)",
+  "https://arxiv.org/pdf/0707.1485 (Eisentraeger-Everest, Descent on elliptic curves and H10)",
+  "https://arxiv.org/pdf/1309.0441 (Poonen, Undecidability in number theory)"
+ ],
+ "correctness_audit": {
+  "verdict": "No gap found on a line-by-line reading of all eight source files, and the Lean library (no sorry/axiom, Mathlib only) proves the comparator statement verbatim. Lean was not compiled here. The claim resolves a 1974 open problem, so independent build of the Lean and expert review remain necessary before treating it as settled.",
+  "checked": [
+   "Rational codes: d=1 forces t=s=q=0; zero only with d=1; the inverse t is unique in [0,d-1] (Lean RationalCode.unique).",
+   "Height normalization: deg x = 2 so log H(x) - 2 hat h = O(1) matches Silverman VIII 9.3 with hat h = (1/2) lim 4^{-N} h_x.",
+   "W depends only on |n| because m_* is even and T = E[2]; log W_j = a_E j^2 + eps_j with a_E = 2 m_*^2 hat h(P).",
+   "Monotonicity: log W_{j+1} - log W_j >= a_E(2j+1) - 2c_E > 0 given a_E > 2c_E; W_1 > 1.",
+   "Representatives: x-coordinates in a coset jP+T are distinct (else 2jP torsion); exactly one of the two maximal points has y > 0.",
+   "Bracket: neighbour maximum is W_{k+1} for both signs of the index; unique k for every u including u = 0.",
+   "Window algebra: 4k^2 + r^2 + 1 - 2k^2 - (r+1)^2 = 2(k^2 - r); six error terms give |e| <= 6c_E < log kappa < 2a_E - 6c_E.",
+   "Growth: k^2 > log u/(8a_E) eventually, so log g >= a_E k^4 - c_E > (log u)^2/(128 a_E); upper bound O((log u)^2) < u log u.",
+   "Pell: index cutoff u^u < (2u-1)^{u-1} (f(4)=343/256); indices i,j in [1,u-1] pinned to n+1 by residues mod u-1 and bu-1 since n+1 < u-1.",
+   "Quotient: (1+z)^n - 1 <= nz/(1-nz); with u >= (c+1)(n+1)+4, 2u-1-n-cn >= cn+2c+n+9 > 0, so floor(F/H) = b^n.",
+   "Existence in Prop power: log F <= n log(2bu) <= 3(log u)^2/(l log 2) < delta (log u)^2 < log g(u), using u >= (c+1)^l > b^{nl}.",
+   "Binary containment: coefficients of (B+1)^y are < 2^y < B, so the extracted digit is binom(y,x); parity by Frobenius in F_2[Z].",
+   "Machine: digit sums < B (s < B, |A| <= 2s < B); summing state equations gives B I_h = 1 + (B-1)M = H, so the halt occurs exactly at time k-1; counter coefficients have |c_t| <= B/2; clock gives rho_0 = C+k-1 and B in (2(C+T),4(C+T)], unique power of two, B >= 8 so 4 | B.",
+   "Ledger counts: s+3tau+r+1 containment calls and r+5 comparison slacks match the system.",
+   "Appendix: (-4,6) lies on E; 4A^3+27B^2 = -62500 and 36 does not divide 62500; the [2] exclusion mod 5 is correct (2 is a non-residue mod 5)."
+  ],
+  "consistency_checks_passed": [
+   "Non-effectivity: a single-fold representation implies Matiyasevich's 1974 non-effectivizable estimates; the paper's constants (P, c_E, kappa, m_*, u_0, l) are effectively computable in principle, so non-effectivity comes from the r.e. set, not from the construction. No conflict.",
+   "Davis's quartic equation route and the Shanks-Wagstaff conjecture are unaffected (different route).",
+   "The construction does not 'prove too much' over Z or Q: the promise corollary is stated only over N (consequences.tex:39-40); the elliptic quantification is over Q-points encoded by natural numbers, which is legitimate in Diophantine sets over N.",
+   "Lean independently re-derives the arithmetic-geometry inputs by a different route (full 2-descent, own canonical height, enumeration-based torsion), so the paper's cited theorems are not a single point of failure."
+  ],
+  "residual_concerns": [
+   "Extraordinary claim (open since 1974); the Lean library was not compiled in this analysis.",
+   "Paper relies on cited Neron-Tate, Mordell-Weil, isogeny and Nagell-Lutz theorems (standard, and re-proved in Lean).",
+   "Constants and the polynomial are not exhibited; the corollary's (m, D) are existential.",
+   "Corollary unique-h10 is not formalized (lean/docs/242.md says so).",
+   "Minor presentation: the overview's 'logarithm of the output is comparable to (log u)^2' (main.tex:159-160) holds only for large u; Proposition growth handles this with u_0."
+  ]
+ },
+ "extraction_friction": [
+  "The eureka construction (bracket and square window) lives in \\emph-titled paragraphs inside the proof of Prop growth (elliptic.tex:296-358), not in numbered lemmas; Lean promotes it to HeightWindow.square_window.",
+  "Most load-bearing objects are display-math definitions with no environment: W, W_j, kappa, m_*, a_E, L_0, D_0, g, u = (c+1)^l..., B, J, M, I_q, Z_q, N_q, V_q, R_j, rho_j, eta_j, R_0, C. The only \\emph definitions are recursively enumerable, Diophantine representation, single-fold, finite-fold, representative.",
+  "File/section mismatch: Section 'Testing containment of binary digits' is inside power.tex; Appendix A (rank) is rank-one-proof.tex.",
+  "Lean namespaces (CurveHeight, CurveRank, HeightDescent, QuadraticLimit, AbstractRank, DuplicationBound, EllipticModel, GrowthCompilation, TM2Macro, Macro) do not match file names; E is redefined in five namespaces; Bits in three; System in three; `or`/`bits` twice.",
+  "Instance-only dependency: HeightDescent.finitely_generated is reached through `instance : AddGroup.FG E.Point` and is invisible to the identifier-matching DAG (share 0).",
+  "The Lean arithmetic-geometry route differs from the paper's (full 2-descent, own canonical height, enumeration-based torsion), so name-based LaTeX-Lean joining fails for Appendix A.",
+  "dominated_share ranks compilation wrappers first (recursively_enumerable_sf 0.99, halts_sf 0.78); the novel square_window has 0.005; frac_dag_dependents >= 0.2 selects only carriers (Representation, SF, RationalCode, Witness).",
+  "Computer-assisted ambiguity: one kernel `decide` enumeration in Lean only (not in the paper).",
+  "Cue phrases useful for N-grading: 'adapt Matiyasevich's exponential single-fold construction', 'as presented in', 'already appears in Chaitin's account', 'We state the precise version needed here', 'The construction below proves the required single-fold graph directly'."
+ ]
+}

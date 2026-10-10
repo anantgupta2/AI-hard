@@ -1,0 +1,756 @@
+{
+ "family": 287,
+ "title": "An isomorphism of the free group factors",
+ "analyst_role": "novelty",
+ "date": "2026-10-09",
+ "inputs": [
+  "docs/PLAN.md",
+  "data/pilot/287/paper.json",
+  "data/pilot/287/trace.json",
+  "data/traces/287.txt",
+  "preprint build/ main.tex + sections",
+  "data/pilot/287/lean.json + lean.md (arrived during this analysis)",
+  "lean/OAI/Analysis/FreeGroupFactor/*.lean (spot checks)"
+ ],
+ "base_library_L": "Mathlib d13f23b + references.bib of 287 (17 entries, INCLUDING shlyakhtenko2026fuchsian). L- excludes it for contamination control.",
+ "shlyakhtenko_check": {
+  "exists": true,
+  "resolves_to_cited_paper": true,
+  "access": {
+   "date_checked": "2026-10-09",
+   "methods": [
+    "WebSearch (3 queries)",
+    "WebFetch arxiv.org/abs/2609.11074v1 (ok)",
+    "WebFetch arxiv.org/html/2609.11074 (ok, 3 passes)",
+    "WebFetch arxiv.org/abs/2609.11074 and /pdf/2609.11074 (failed: tool returned no output)",
+    "curl from Bash (no network in sandbox)"
+   ],
+   "quote_caveat": "Quotes were obtained through WebFetch, whose output passes through a summarizing model; Bash had no network access, so the PDF could not be downloaded. Spot-check every quote against https://arxiv.org/pdf/2609.11074v1 before citing externally."
+  },
+  "metadata": {
+   "arxiv_id": "2609.11074v1",
+   "title": "On the II_1 Factors of Fuchsian Groups",
+   "authors": [
+    "Dimitri (Dima) Shlyakhtenko (sole author)"
+   ],
+   "submitted": "2026-09-10 04:31:05 UTC (v1, 20 KB)",
+   "versions": "v1 only as of 2026-10-09",
+   "primary_class": "math.OA",
+   "msc": "46L54",
+   "comments_field": "none shown",
+   "funding": "ARO W911NF-25-1-0075; NSF DMS-2348633",
+   "references": 17,
+   "bib_entry_in_287": "references.bib:147-155, key shlyakhtenko2026fuchsian, 'Preprint, version 1, 10 September 2026' (matches)",
+   "in_openai_math_release": false,
+   "in_openai_math_release_note": "No Fuchsian / Shlyakhtenko family in CONTENTS.md at fd4aeeb; not found on OpenAI's 2026-08-01 'Ten advances' list in searches."
+  },
+  "claim": {
+   "headline": "For closed orientable surface groups of genus g>=2, L(pi_1 Sigma_g) = L(F_{2g-1}); more generally for every finitely generated torsion-free non-elementary discrete Gamma < PSL_2(R), L(Gamma) is a free group factor, settling the de la Harpe-Voiculescu conjecture in the torsion-free case.",
+   "theorem_1_as_reported": "Gamma(g; m_1..m_k : t, s): L(Gamma) = L(F_r), r = 2g-1+s+t+sum(1-1/m_j), if t+s>0, or g>=2, or (g>=1 and k>=2). [statement as relayed by WebFetch; verify]",
+   "theorem_2": "Any f.g. non-elementary discrete Gamma < PSL_2(R): L(Gamma) contains a free group factor as a finite-index subfactor and sits with finite index in an interpolated free group factor.",
+   "theorem_3_main_technical": "For every eta>0 there is a Haar unitary v in L(F_2) with ||v-A||_2<eta and L(F_2) = W*(w) * W*(v), where w = ABA^{-1}B^{-1}.",
+   "theorem_4": "Closed surfaces S with chi(S)<0 (including non-orientable): L(pi_1 S) = L(F_{1-chi(S)}).",
+   "proposition_3": "A product of commutators w = c_1...c_n in L(F_{2n}) is freely complemented, with complement L(F_{2n-1}).",
+   "self_limitation": "Section 1 says the author is unable to settle the de la Harpe-Voiculescu conjecture in all cases (torsion)."
+  },
+  "architecture": [
+   "Prop 1 (Baire): if for all finite x_1..x_n and eps,eta>0 there is an automorphism theta with theta(w)=w, ||theta(A)-A||_2<eta and sum ||x_i - E_{theta(N)} x_i||_2^2 < eps (N = W*(A,w)), then for every delta there is a Haar v free from w with ||v-A||_2<delta and M = W*(w)*W*(v). Proof: Baire category in the L2-closure X of the orbit {theta(A): theta(w)=w}; generation from L2-totality.",
+   "Prop 2: replaces E_N by positive contractions T_k (T_0=E_N, T_k -> id) with forms Q_k; the hypothesis is a one-step improvement Q_k -> Q_{k+1}; proof telescopes with budgets eps/(2J), eta/(2J) chosen backward.",
+   "Section 3: T_q = radial multiplier q^{l(g)}, l = Bass-Serre length relative to H = <A,w>. Automorphisms S_f: A->Af(B), B->B; R_m: A->A, B->BA^m (Nielsen transvection fixing H); Psi_{f,m} = R_{-m} o S_f o R_m, so Psi(A) = A f(BA^{-m}) and Psi(w) = w. f_{m,t}(z) = exp(i sqrt(t/2m)(z+zbar)) gives ||f-1||_2 <= sqrt(t/m) per step. Lemma 9: Q_q(theta_{m,t}^{-1}(B)) >= F_t(q) - eps; iterating q_{j+1} = F_{t_j}(q_j) drives q_j up to 1. Lemma 10 verifies the hypothesis of Prop 2.",
+   "Section 4: amalgamated free products over W*(w), surface groups, non-orientable surfaces."
+  ],
+  "comparison": [
+   {
+    "item": "one-step absorption (prop:perturbation, I31)",
+    "verdict": "close variant",
+    "detail": "Same architectural role: a small automorphism (L2-small on A, fixing w) that improves how well the perturbed subalgebra approximates prescribed targets (Lemma 10 = hypothesis of Prop 1/2). 287's version is norm-small, fixes nothing, and makes one extra free generator C approximable by a word, so the free rank drops. Shlyakhtenko keeps rank 2 and complements a fixed element. The mechanisms differ: explicit finite automorphisms with Fourier estimates, against a flow with a cocycle.",
+    "evidence": [
+     "Lemma 1: \"the map A->Af(B), B->B extends to a normal trace-preserving automorphism\"",
+     "Lemma 5: Psi_{f,m}(A) = A f(BA^{-m}), Psi_{f,m}(w) = w"
+    ]
+   },
+   {
+    "item": "small-cocycle lemma (lem:small-cocycle, I23; trace PV4)",
+    "verdict": "absent",
+    "detail": "No 1-cocycles, Fox derivatives, prefix sums 1+sum lambda(p_j), free Poisson/Marchenko-Pastur law, spectral-cutoff inverse, Haagerup inequality, or l2-cohomology. Closest analogue: the 1/sqrt(m)-per-step, O(1)-cumulative scaling of f_{m,t} along the long word BA^{-m} (Lemma 9's exponential limit). That is the same amplification principle in a different formalism.",
+    "evidence": [
+     "f_{m,t}(z) = exp(i sqrt(t/2m)(z+zbar)), ||f_{m,t}-1||_2 <= sqrt(t/m)"
+    ]
+   },
+   {
+    "item": "cocycle-driven polynomial flow (prop:flow, I22; trace PV3)",
+    "verdict": "absent from the final argument; present as the author's abandoned approach",
+    "detail": "Section 1.1 describes the author's earlier (human) approach of transporting by a flow, which ChatGPT Pro 5.6 helped explore (about 70 pages, never closed). The final paper explicitly does not use that transport construction.",
+    "evidence": [
+     "Sec. 1.1: \"integrating a time-dependent divergence-free vector field\""
+    ]
+   },
+   {
+    "item": "S = Arg(C) bounded logarithm (I07; trace insight backtrack d1.2->d1.3)",
+    "verdict": "absent",
+    "detail": "Unnecessary there: S_f is an exact automorphism defined by functional calculus of B. The only logarithm in the paper is scalar (Section 3.4). The nearest precedent for Arg(C) is Ioana-Peterson-Popa 2008 (Borel f with exp(i pi f(z)) = z), not this preprint.",
+    "evidence": []
+   },
+   {
+    "item": "adaptive error-budget iteration (I34) and L2 generation (I35)",
+    "verdict": "close variant",
+    "detail": "Both papers produce the new generator(s) as limits of images under compositions of small automorphisms and prove generation through L2-totality. Shlyakhtenko uses Baire category (Prop 1) plus backward telescoping budgets (Prop 2). 287 uses an explicit forward diagonal with future budgets fixed after each witness word, plus a conditional-expectation argument. 287 flags the parallel itself (main.tex:105).",
+    "evidence": [
+     "Sec. 1.2: \"v_n = (beta_1 o ... o beta_n)(A)\""
+    ]
+   },
+   {
+    "item": "Nielsen correction (gamma: C -> C A_w; alpha = gamma^{-1} o beta; I32)",
+    "verdict": "close variant",
+    "detail": "Both papers conjugate or compose a non-group 'small' automorphism with a Nielsen transvection that fixes the protected subgroup: R_m fixes H = <A,w>, while gamma fixes the A_j. The purposes differ. R_m moves the perturbation onto a long word to control cancellations; gamma retargets C A_w to C.",
+    "evidence": [
+     "Lemma 2: \"the map A->A, B->BA^m extends to a normal trace-preserving automorphism\""
+    ]
+   }
+  ],
+  "provenance": {
+   "ai_assistance_declared": true,
+   "statements": [
+    "Abstract: \"This result was obtained using OpenAI's ChatGPT Pro 6.0.\"",
+    "Sec. 1.1 (titled 'How this result was obtained: use of AI'): \"This work was developed with substantial assistance from ChatGPT (OpenAI),\"",
+    "Sec. 1.1: ChatGPT Pro 5.6 was used to explore approaches (about 70 pages that did not close). The newer model then \"returned a 7-page proof that became the basis of this manuscript.\"",
+    "Sec. 1.1: the final argument \"should not be understood as an unmodified output from a single prompt\"; the author is \"fully responsible\" and checked and rewrote it."
+   ],
+   "model_version_inconsistency": "The abstract credits Pro 6.0; Section 1.1 also names Pro 5.6 for the exploratory phase.",
+   "human_contribution_declared": "The research question, the initial geometric/transport motivation, direction, and checking and rewriting. No per-lemma attribution is given.",
+   "openai_connection": "Uses OpenAI's ChatGPT Pro product. Cites no OpenAI paper. Not part of the openai/math release.",
+   "citations_between_papers": "287 cites 2609.11074v1 (main.tex:105) and states 'No result from that preprint is used below'. 2609.11074 does not cite 287, which was not public before 2026-10-06.",
+   "chronology": "2609.11074v1 was public on 2026-09-10. The 287 preprint is dated 2026-09-23 and the release was 2026-10-06. Shlyakhtenko is first in public priority by 13 days. Priority of discovery cannot be determined: the 287 trace is undated, does not mention 2609.11074, and its latest dated reference is arXiv:2608.15385 (Aug 2026).",
+   "shared_vendor_note": "Both works come from OpenAI models (ChatGPT Pro 5.6/6.0, and the internal model behind 287). Common lineage is possible but undocumented."
+  },
+  "bearing_on_free_group_factor_problem": "None directly. The identifications have r = 1 - chi(Gamma), consistent with both branches of the Dykema-Radulescu dichotomy, and the free rank never changes (Prop 3: 1 + (2n-1) = 2n). Its relevance is methodological. It shows, two weeks before 287, that small automorphisms plus a limiting generation argument can produce new free generating sets in L(F_n). 287's new ingredient is the mechanism that makes the free rank drop. If 287 is correct, every interpolated identification in Shlyakhtenko's Theorem 1 collapses to L(Gamma) = L(F_2).",
+  "verdict": "The citation is real, correctly identified (ID, sole author, title, v1 date), and accurately summarised by 287 ('free complement to a commutator ... finite automorphisms and a limiting generation argument'). 287's claim that no result is used is consistent with the comparison: none of S_f, R_m, Q_q or the Baire Prop 1 appears in 287. The preprint is itself declared model-assisted (ChatGPT Pro 6.0). It contains close variants of 287's outer architecture: the one-step 'small automorphism improving approximation' step, the Nielsen-transvection conjugation, and limiting generation. It contains none of 287's inner mechanism: no small-cocycle lemma, no cocycle-driven flow in the final argument, no Arg(C). Net effect on grading: I31, I34 and the Nielsen correction drop to N2/N1. The eureka candidacy concentrates on the small-cocycle lemma I23 and its coupling I15."
+ },
+ "candidates": [
+  {
+   "id": "C1",
+   "name": "One-step absorption of a free generator",
+   "paper_items": [
+    "I31 prop:perturbation (generation.tex:13-83)"
+   ],
+   "trace": "PV3+PV5 assembly (L260 goal stated first; L313-315)",
+   "statement": "For a freely generating Haar (n+1)-tuple (A,C), n>=3, and every eps>0, there are a trace-preserving automorphism alpha and a word w in F_n with max_j ||alpha(A_j)-A_j|| < eps and ||alpha(A)_w - C|| < eps.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Shlyakhtenko, arXiv:2609.11074 (Sep 2026; ChatGPT Pro 6.0-assisted), Lemma 10 / hypothesis of Props 1-2",
+      "relation": "small automorphism, L2-close on A, fixing w, improving approximation of targets by the perturbed subalgebra; constant rank",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Ornstein (1970) isomorphism theorem; Krieger generator theorem (successive small partition perturbations making a target measurable)",
+      "relation": "ergodic-theory template of perturb-then-limit generation",
+      "verdict": "close variant (template)"
+     },
+     {
+      "ref": "Ornstein-Weiss (J. Anal. Math. 48, 1987); Bowen, arXiv:0812.2718 (2-shift over F_2 factors onto 4-shift)",
+      "relation": "absorbing extra base entropy over free groups (trace PV2 analogy)",
+      "verdict": "genuinely different (classical analogy, not perturbative)"
+     },
+     {
+      "ref": "Dykema 1993/1994; Radulescu 1994 (free absorption L(F_r)*L(F_s)=L(F_{r+s}))",
+      "relation": "structural absorption, not perturbative",
+      "verdict": "genuinely different"
+     }
+    ],
+    "verdict": "close variant exists (Shlyakhtenko 2609.11074)",
+    "searches": "WebSearch (standard/extended): arXiv 2609.11074; Shlyakhtenko Fuchsian free complement; Sinclair/Peterson-Sinclair Gaussian cocycle deformations; IPP free malleable deformation; Bowen/Ornstein-Weiss free-group Bernoulli factors; 'l2 1-cocycle free group small on generators prescribed value Fox derivative free Poisson'; 'free group factor generating tuple perturbation absorb extra generator'; Hartglass-Nelson free transport. zbMATH and Google Scholar could not be queried directly (WebFetch failures, no network in Bash), so absence claims rest on WebSearch plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail (borderline)",
+    "evidence": "The statement is the approximate form of the goal. The trace states 'absorbing a free generator through small perturbations' (L260) before any mechanism. Up to unfolding, it is the hypothesis of a w-free version of Shlyakhtenko Prop 1, which is in L because shlyakhtenko2026fuchsian is in references.bib: take x = C and N = W*(A_1..A_n)."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "down": 0.114,
+    "cone": 0.771,
+    "lean": "one_step / FiniteActive.one_step / one_step_ge_two (L2 form). lean.json gives dag_share 0.006-0.017 and dominated_share 0.0004-0.080, far below 20% like every novel item (the classical interpolation branch dominates 66%). It lies on every path from the rank steps to the target.",
+    "note": "paper.json DAG: P = 35 items on the path to I39. 'down' = share of P that transitively depends on the item (PLAN proxy, k=20%). 'cone' = share of P the item transitively uses. The chain is essentially linear, so the downstream proxy mechanically penalises top-of-chain items. Test 3 is therefore judged by knockout (does removing the item disconnect I39 with no alternative path?) with both shares reported."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1 once I22, I23 and I32 are given (a 3-line composition)",
+    "chain_depth": 3,
+    "protocol": "P-C1"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "Its form is precedented in L by a model-assisted preprint and in ergodic theory, and it is close to analytic in the goal. Its non-trivial content is inherited from I22+I23. The provisional N3 in paper.json is withdrawn."
+   }
+  },
+  {
+   "id": "C2",
+   "name": "Small cocycle with a prescribed word value",
+   "paper_items": [
+    "I23 lem:small-cocycle (cocycle.tex:31-46)",
+    "I24 free-prefix words",
+    "I27 spectral limit",
+    "I28 cutoff inverse"
+   ],
+   "trace": "PV4 (L272-284)",
+   "statement": "For n>=3 and eta>0 there are a word w in F_n and a finitely supported real h with ||h||_2 < eta such that the Fox cocycle D with D_{x_1}=h, D_{x_j}=0 (j>=2) satisfies ||D_w - delta_e||_2 < eta.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Peterson-Thom, Invent. Math. 185 (2011), 'Group cocycles and the ring of affiliated operators'",
+      "relation": "beta_1^(2)(G)>0 iff G has an unbounded 1-cocycle into the real left regular representation; qualitative, no prescribed direction",
+      "verdict": "genuinely different (nearest conceptual)"
+     },
+     {
+      "ref": "Fox, Ann. Math. 1953 (in L)",
+      "relation": "D is the Fox derivative; no smallness or inverse problem",
+      "verdict": "genuinely different (ingredient)"
+     },
+     {
+      "ref": "Kesten 1959; Haagerup 1979; Voiculescu free CLT 1985/1990 (in L); Marchenko-Pastur",
+      "relation": "spectral law of 1+sum of free Haar unitaries, normalized, tends to free Poisson",
+      "verdict": "ingredient (N0)"
+     },
+     {
+      "ref": "Shlyakhtenko 2609.11074, Lemma 9",
+      "relation": "perturbation of size sqrt(t/m) per step along a long word, accumulating to an O(t) effect: the same amplification scaling, with no cocycle formulation",
+      "verdict": "related principle, genuinely different statement"
+     },
+     {
+      "ref": "Charlesworth-Shlyakhtenko (2016); Mai-Speicher-Weber (2017): no atoms for noncommutative derivatives/polynomials",
+      "relation": "spectral regularity of Fox-type Jacobians",
+      "verdict": "genuinely different"
+     },
+     {
+      "ref": "Sinclair, JFA 2011; Peterson-Sinclair, ETDS 2012 (arXiv:0910.3958)",
+      "relation": "cocycles drive Gaussian deformations; small cocycles are used for rigidity, never constructed with a prescribed value",
+      "verdict": "genuinely different"
+     }
+    ],
+    "verdict": "no near-equivalent found",
+    "searches": "WebSearch (standard/extended): arXiv 2609.11074; Shlyakhtenko Fuchsian free complement; Sinclair/Peterson-Sinclair Gaussian cocycle deformations; IPP free malleable deformation; Bowen/Ornstein-Weiss free-group Bernoulli factors; 'l2 1-cocycle free group small on generators prescribed value Fox derivative free Poisson'; 'free group factor generating tuple perturbation absorb extra generator'; Hartglass-Nelson free transport. zbMATH and Google Scholar could not be queried directly (WebFetch failures, no network in Bash), so absence claims rest on WebSearch plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "The goal L(F_2)=L(F_3) mentions no cocycles. Fox calculus (in L) defines D_w but contains no small-generator / prescribed-word statement. Mathlib d13f23b has FreeGroup but no l2 1-cohomology. No statement in L has this form."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "down": 0.143,
+    "cone": 0.2,
+    "lean": "OAI.FreeGroupFactorMain.smallCocycle (lean/OAI/Analysis/FreeGroupFactor/SmallCocycle.lean:213), used in LocalAutomorphism.lean:268 and FiniteActive.lean:398, then InfiniteGeneration, then rankThreeInfinite. Lean proves it by an elementary alternating, Cesaro-averaged radial series (Radial.averagedInverse -> exists_small_prefix_inverse), not the free-Poisson cutoff, so the lemma has at least two independent proofs. A separate rank-two version (smallCocycleTwo, about 1.8k lines) lets Lean prove the n=2 step directly. lean.json: smallCocycle dag_share 0.018, dominated 0.013; smallCocycleTwo dominated 0.079. Lean step 3b: additive growth only (tree +11%, DAG +0), with no PHP-style multiplicative signature.",
+    "note": "paper.json DAG: P = 35 items on the path to I39. 'down' = share of P that transitively depends on the item (PLAN proxy, k=20%). 'cone' = share of P the item transitively uses. The chain is essentially linear, so the downstream proxy mechanically penalises top-of-chain items. Test 3 is therefore judged by knockout (does removing the item disconnect I39 with no alternative path?) with both shares reported."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": ">=2 overall (trace). Each component is 1 step from invoked literature. If prop:flow's word-displacement bound is given, the coefficient problem is already posed, so the distance is about 1.",
+    "chain_depth": 2,
+    "protocol": "P-C2"
+   },
+   "final": {
+    "N": "N3 (provisional: tests 1-3 pass, test 4 pending)",
+    "F": "F3",
+    "confidence": 0.4,
+    "justification": "The only item with no neighbour found and no retrieval trigger in the trace. It is where non-amenability enters: it fails for Z (Dirichlet kernel) and for property (T) groups. The eureka content lies in posing the problem: small generator values, a word value near delta_e, coupled to absorption. Solving it is textbook once posed, and Lean found a second elementary proof. If Test 4 is decided at pivot level (prop:flow given), expect N2. The N3 claim really attaches to the cluster C2+C4."
+   }
+  },
+  {
+   "id": "C3",
+   "name": "Cocycle-driven polynomial flow",
+   "paper_items": [
+    "I22 prop:flow (flow.tex:41-69)",
+    "I14",
+    "I18",
+    "I20"
+   ],
+   "trace": "PV3 (L260-271)",
+   "statement": "dA_j/dt = i s_t(h_j) A_j with s_t(k) = sum_g k(g) A_g(t) S A_g(t)^*, which generates trace-preserving automorphisms beta_t fixing S, with ||beta_1(A_j)-A_j|| <= 3pi||h_j|| and ||beta_1(A_w) - C A_w|| <= 3pi||D_w - delta_e||.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Voiculescu, Cyclomorphy, IMRN 2002, Thm 3.8 (in L)",
+      "relation": "exponentiates trace-preserving polynomial vector fields on algebraically free generators",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Ioana-Peterson-Popa, Acta Math. 200 (2008); Popa's free malleable deformation",
+      "relation": "A_j -> C^t A_j with C^t = exp(itS); this is exactly the case h_j = delta_e",
+      "verdict": "close variant (special case)"
+     },
+     {
+      "ref": "Sinclair, JFA 260 (2011); Peterson-Sinclair, ETDS 32 (2012)",
+      "relation": "Gaussian cocycle deformation alpha_t(u_g) = omega(t b(g)) u_g; 287's flow is a free, time-ordered version internal to M",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Guionnet-Shlyakhtenko, Invent. 2014 (in L); Hartglass-Nelson arXiv:1702.08643",
+      "relation": "isomorphisms of free group factors by transport flows",
+      "verdict": "close variant (genre)"
+     },
+     {
+      "ref": "Shlyakhtenko 2609.11074 Sec. 1.1",
+      "relation": "human-proposed 'time-dependent divergence-free vector field' transport for the commutator problem, abandoned",
+      "verdict": "related (unsuccessful precedent)"
+     }
+    ],
+    "verdict": "close variants exist",
+    "searches": "WebSearch (standard/extended): arXiv 2609.11074; Shlyakhtenko Fuchsian free complement; Sinclair/Peterson-Sinclair Gaussian cocycle deformations; IPP free malleable deformation; Bowen/Ornstein-Weiss free-group Bernoulli factors; 'l2 1-cocycle free group small on generators prescribed value Fox derivative free Poisson'; 'free group factor generating tuple perturbation absorb extra generator'; Hartglass-Nelson free transport. zbMATH and Google Scholar could not be queried directly (WebFetch failures, no network in Bash), so absence claims rest on WebSearch plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail (borderline)",
+    "evidence": "An instance of the cyclomorphy exponentiation scheme (in L) outside its literal hypotheses (Haar unitaries plus a Borel log instead of self-adjoint algebraically free generators)."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "down": 0.143,
+    "cone": 0.457,
+    "lean": "lean.json: PolynomialFlow.hamiltonian dag_share 0.044, field 0.041, laurent_flow_automorphisms 0.022. one_step_from_laurent is used 3 times (tree +59%, mild constant-factor growth). It is on every path to the target.",
+    "note": "paper.json DAG: P = 35 items on the path to I39. 'down' = share of P that transitively depends on the item (PLAN proxy, k=20%). 'cone' = share of P the item transitively uses. The chain is essentially linear, so the downstream proxy mechanically penalises top-of-chain items. Test 3 is therefore judged by knockout (does removing the item disconnect I39 with no alternative path?) with both shares reported."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1 (field proposed first, matched to cyclomorphy afterwards)",
+    "chain_depth": 2,
+    "protocol": "P-C3"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.75,
+    "justification": "A free/internal analogue of known cocycle deformations. Neither Popa/IPP nor Sinclair/Peterson-Sinclair is cited by 287, but both are standard in the field."
+   }
+  },
+  {
+   "id": "C4",
+   "name": "Word derivative equals cocycle value (exact operator-norm word displacement)",
+   "paper_items": [
+    "I15 (flow.tex:104-114)",
+    "eq:word-displacement"
+   ],
+   "trace": "PV3/PV4 bridge ('Fox derivatives of long words were intended to amplify small coefficients', L271-272)",
+   "statement": "delta a_g = i sigma(D_g) a_g, hence ||beta_1(A_w) - C A_w|| <= 3pi ||D_w - delta_e|| exactly (no BCH error).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Sinclair 2011; Peterson-Sinclair 2012",
+      "relation": "displacement of u_g under a Gaussian deformation is controlled by ||b(g)||",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Peterson, L2-rigidity, Invent. 2009",
+      "relation": "derivations from 1-cocycles on group algebras",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "close variant",
+    "searches": "WebSearch (standard/extended): arXiv 2609.11074; Shlyakhtenko Fuchsian free complement; Sinclair/Peterson-Sinclair Gaussian cocycle deformations; IPP free malleable deformation; Bowen/Ornstein-Weiss free-group Bernoulli factors; 'l2 1-cocycle free group small on generators prescribed value Fox derivative free Poisson'; 'free group factor generating tuple perturbation absorb extra generator'; Hartglass-Nelson free transport. zbMATH and Google Scholar could not be queried directly (WebFetch failures, no network in Bash), so absence claims rest on WebSearch plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "pass (weak)",
+    "evidence": "Combines Fox (in L) with the flow derivation; it is not a subterm of any L statement. Sinclair and Peterson are not in L."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "down": 0.229,
+    "cone": 0.114,
+    "note": "paper.json DAG: P = 35 items on the path to I39. 'down' = share of P that transitively depends on the item (PLAN proxy, k=20%). 'cone' = share of P the item transitively uses. The chain is essentially linear, so the downstream proxy mechanically penalises top-of-chain items. Test 3 is therefore judged by knockout (does removing the item disconnect I39 with no alternative path?) with both shares reported."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1 from Sinclair-type deformations once the flow exists",
+    "chain_depth": 2,
+    "protocol": "scored inside P-C3 (sub-criterion b)"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.65,
+    "justification": "The expected noncommutative analogue. It matters as the coupling that makes C2 meaningful, so grade C2+C4 together for the cluster test."
+   }
+  },
+  {
+   "id": "C5",
+   "name": "S = Arg(C): bounded Borel logarithm as flow driver",
+   "paper_items": [
+    "I07 (preliminaries.tex:42-50)"
+   ],
+   "trace": "PV5; the only insight-driven backtrack (d1.2 -> d1.3, d=2)",
+   "statement": "Replace the semicircular driver by S = arg(C), so e^{iS} = C and any flow fixing S fixes C. The discontinuity of the logarithm sidesteps the K_1 obstruction in C*_r(F_{n+1}).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Ioana-Peterson-Popa 2008 (and Popa's s-malleable deformations)",
+      "relation": "Borel f: T -> (-1,1] with exp(i pi f(z)) = z, v^t = exp(i t pi f(v)), whose time-1 map is the Nielsen-type move u -> uv",
+      "verdict": "equivalent"
+     }
+    ],
+    "verdict": "equivalent exists",
+    "searches": "WebSearch (standard/extended): arXiv 2609.11074; Shlyakhtenko Fuchsian free complement; Sinclair/Peterson-Sinclair Gaussian cocycle deformations; IPP free malleable deformation; Bowen/Ornstein-Weiss free-group Bernoulli factors; 'l2 1-cocycle free group small on generators prescribed value Fox derivative free Poisson'; 'free group factor generating tuple perturbation absorb extra generator'; Hartglass-Nelson free transport. zbMATH and Google Scholar could not be queried directly (WebFetch failures, no network in Bash), so absence claims rest on WebSearch plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Borel functional calculus (haase2020, in L) applied to a generator."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "down": 0.457,
+    "cone": 0.0,
+    "note": "paper.json DAG: P = 35 items on the path to I39. 'down' = share of P that transitively depends on the item (PLAN proxy, k=20%). 'cone' = share of P the item transitively uses. The chain is essentially linear, so the downstream proxy mechanically penalises top-of-chain items. Test 3 is therefore judged by knockout (does removing the item disconnect I39 with no alternative path?) with both shares reported."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 2,
+    "protocol": "P-C5 (negative-control-like)"
+   },
+   "final": {
+    "N": "N0",
+    "F": null,
+    "confidence": 0.8,
+    "justification": "Retrieval and transfer of IPP's deformation device. The insight backtrack it triggered has origin 'retrieved', not 'constructed'. The trace analyst's N2 and the paper analyst's N1 are overridden (alt N1 if the representational use is credited)."
+   }
+  },
+  {
+   "id": "C6",
+   "name": "Adaptive error-budget iteration with L2 generation",
+   "paper_items": [
+    "I34 (generation.tex:111-204)",
+    "I35",
+    "I33"
+   ],
+   "trace": "PV7 (inverts C17 error-compounding lesson)",
+   "statement": "Iterate C1. Fix eps_k before the witness word w_k and the future budget r_k after it. The A^(k) converge in norm to a free Haar tuple whose word algebra is L2-dense, so it generates M via E_N.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Shlyakhtenko 2609.11074, Props 1-2 (Baire + backward telescoping budgets)",
+      "relation": "same conclusion from the same kind of one-step hypothesis",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Elliott approximate intertwining; Ornstein/Krieger diagonal constructions",
+      "relation": "adaptive tolerance diagonal limits",
+      "verdict": "close variant (template)"
+     },
+     {
+      "ref": "287's own Lean formalization: Generation.baire_local_approximation",
+      "relation": "Lean replaces the paper's explicit iteration with a Baire-category lemma, which is exactly the device of Shlyakhtenko's Prop 1",
+      "verdict": "equivalent replacement"
+     }
+    ],
+    "verdict": "close variants exist",
+    "searches": "WebSearch (standard/extended): arXiv 2609.11074; Shlyakhtenko Fuchsian free complement; Sinclair/Peterson-Sinclair Gaussian cocycle deformations; IPP free malleable deformation; Bowen/Ornstein-Weiss free-group Bernoulli factors; 'l2 1-cocycle free group small on generators prescribed value Fox derivative free Poisson'; 'free group factor generating tuple perturbation absorb extra generator'; Hartglass-Nelson free transport. zbMATH and Google Scholar could not be queried directly (WebFetch failures, no network in Bash), so absence claims rest on WebSearch plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Shlyakhtenko Prop 1 (in L) gives the generation conclusion. The paper names the precedent (main.tex:105)."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "down": 0.086,
+    "cone": 0.857,
+    "lean": "Generation.lean / InfiniteGeneration.lean (orbit_local_approximation, generating_haar_tuple)",
+    "note": "paper.json DAG: P = 35 items on the path to I39. 'down' = share of P that transitively depends on the item (PLAN proxy, k=20%). 'cone' = share of P the item transitively uses. The chain is essentially linear, so the downstream proxy mechanically penalises top-of-chain items. Test 3 is therefore judged by knockout (does removing the item disconnect I39 with no alternative path?) with both shares reported."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": "3+ (final assembly)",
+    "protocol": "P-C6"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.65,
+    "justification": "A standard diagonal template whose same-problem-area precedent is in L. 287's own Lean proof swaps it for a Baire argument, so the explicit forward-budget ordering is dispensable. Borderline N2 only if that ordering is credited."
+   }
+  },
+  {
+   "id": "C7",
+   "name": "Nielsen correction (gamma: C -> C A_w, alpha = gamma^{-1} beta)",
+   "paper_items": [
+    "I32 (generation.tex:56-65)"
+   ],
+   "trace": "PV5 'self-correction of the target' (L313)",
+   "statement": "Compose the flow with the inverse of the free-basis change c -> cw, so that beta(A_w) ~ C A_w becomes alpha(A_w) ~ C.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Shlyakhtenko 2609.11074 R_m and Psi = R_{-m} S_f R_m",
+      "relation": "Nielsen transvection fixing the protected subgroup, composed with a small automorphism",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Aut(F_n) acting on L(F_n); IPP time-1 deformation u -> uv",
+      "relation": "standard",
+      "verdict": "equivalent (object)"
+     }
+    ],
+    "verdict": "equivalent object; close variant of the use",
+    "searches": "WebSearch (standard/extended): arXiv 2609.11074; Shlyakhtenko Fuchsian free complement; Sinclair/Peterson-Sinclair Gaussian cocycle deformations; IPP free malleable deformation; Bowen/Ornstein-Weiss free-group Bernoulli factors; 'l2 1-cocycle free group small on generators prescribed value Fox derivative free Poisson'; 'free group factor generating tuple perturbation absorb extra generator'; Hartglass-Nelson free transport. zbMATH and Google Scholar could not be queried directly (WebFetch failures, no network in Bash), so absence claims rest on WebSearch plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "lem:haar-identification plus Aut(F_{n+1}); R_m in L."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "down": 0.143,
+    "cone": 0.057,
+    "lean": "Nielsen.lean",
+    "note": "paper.json DAG: P = 35 items on the path to I39. 'down' = share of P that transitively depends on the item (PLAN proxy, k=20%). 'cone' = share of P the item transitively uses. The chain is essentially linear, so the downstream proxy mechanically penalises top-of-chain items. Test 3 is therefore judged by knockout (does removing the item disconnect I39 with no alternative path?) with both shares reported."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 2,
+    "protocol": "P-C7 (negative control)"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.75,
+    "justification": "A known object used one step from its standard role."
+   }
+  },
+  {
+   "id": "C8",
+   "name": "Universal initial trace identity (first-variation proof of tau o delta = 0)",
+   "paper_items": [
+    "I16 (flow.tex:116-189)",
+    "I20"
+   ],
+   "trace": "PV3 ('preferred direct cumulant pairing', L267)",
+   "statement": "tau(ev_0(delta^r p)) = 0 for all p in the free formal algebra and r >= 1. Analyticity then gives moment invariance.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Voiculescu, Cyclomorphy 2002 (in L)",
+      "relation": "trace-preservation criterion for polynomial vector fields",
+      "verdict": "close variant (new proof)"
+     }
+    ],
+    "verdict": "close variant",
+    "searches": "WebSearch (standard/extended): arXiv 2609.11074; Shlyakhtenko Fuchsian free complement; Sinclair/Peterson-Sinclair Gaussian cocycle deformations; IPP free malleable deformation; Bowen/Ornstein-Weiss free-group Bernoulli factors; 'l2 1-cocycle free group small on generators prescribed value Fox derivative free Poisson'; 'free group factor generating tuple perturbation absorb extra generator'; Hartglass-Nelson free transport. zbMATH and Google Scholar could not be queried directly (WebFetch failures, no network in Bash), so absence claims rest on WebSearch plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "The cyclomorphy criterion is in L."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "down": 0.2,
+    "cone": 0.286,
+    "note": "paper.json DAG: P = 35 items on the path to I39. 'down' = share of P that transitively depends on the item (PLAN proxy, k=20%). 'cone' = share of P the item transitively uses. The chain is essentially linear, so the downstream proxy mechanically penalises top-of-chain items. Test 3 is therefore judged by knockout (does removing the item disconnect I39 with no alternative path?) with both shares reported."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 1,
+    "protocol": "low priority"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "A new proof of a known criterion."
+   }
+  },
+  {
+   "id": "C9",
+   "name": "Free sum s(k): l2_R(F_n) realised inside M through the free complement",
+   "paper_items": [
+    "I11 (preliminaries.tex:75-78)",
+    "I08"
+   ],
+   "trace": "a22 salvage (Haar conjugates b, cbc*)",
+   "statement": "s(k) = sum_g k(g) A_g S A_g^*, with the S_g free, so l2 cocycle values become operators in M.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Free Bernoulli decomposition L(F_{n+1}) = (*_g W*(S_g)) x F_n; Voiculescu free Gaussian functor",
+      "relation": "standard",
+      "verdict": "equivalent"
+     }
+    ],
+    "verdict": "equivalent exists",
+    "searches": "WebSearch (standard/extended): arXiv 2609.11074; Shlyakhtenko Fuchsian free complement; Sinclair/Peterson-Sinclair Gaussian cocycle deformations; IPP free malleable deformation; Bowen/Ornstein-Weiss free-group Bernoulli factors; 'l2 1-cocycle free group small on generators prescribed value Fox derivative free Poisson'; 'free group factor generating tuple perturbation absorb extra generator'; Hartglass-Nelson free transport. zbMATH and Google Scholar could not be queried directly (WebFetch failures, no network in Bash), so absence claims rest on WebSearch plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Reduced free products (voiculescu1985, in L)."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "down": 0.371,
+    "cone": 0.029,
+    "note": "paper.json DAG: P = 35 items on the path to I39. 'down' = share of P that transitively depends on the item (PLAN proxy, k=20%). 'cone' = share of P the item transitively uses. The chain is essentially linear, so the downstream proxy mechanically penalises top-of-chain items. Test 3 is therefore judged by knockout (does removing the item disconnect I39 with no alternative path?) with both shares reported."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 1,
+    "protocol": "low priority"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "A repackaging of the free Bernoulli field. It has an F5 flavour but is not new."
+   }
+  },
+  {
+   "id": "C10",
+   "name": "Support-independent free-sum bound (K = 3 pi)",
+   "paper_items": [
+    "I12 lem:free-sum (preliminaries.tex:85-115)"
+   ],
+   "trace": "PV6",
+   "statement": "||sum_j z_j|| <= 2 (sum ||z_j||_2^2)^{1/2} + max ||z_j|| for free centred self-adjoint z_j.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Ricard-Xu 2006 (in L); Voiculescu; Haagerup inequality",
+      "relation": "free Khintchine",
+      "verdict": "equivalent"
+     }
+    ],
+    "verdict": "equivalent exists",
+    "searches": "WebSearch (standard/extended): arXiv 2609.11074; Shlyakhtenko Fuchsian free complement; Sinclair/Peterson-Sinclair Gaussian cocycle deformations; IPP free malleable deformation; Bowen/Ornstein-Weiss free-group Bernoulli factors; 'l2 1-cocycle free group small on generators prescribed value Fox derivative free Poisson'; 'free group factor generating tuple perturbation absorb extra generator'; Hartglass-Nelson free transport. zbMATH and Google Scholar could not be queried directly (WebFetch failures, no network in Bash), so absence claims rest on WebSearch plus analyst domain knowledge."
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "ricard_xu2006 in L."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "down": 0.171,
+    "cone": 0.114,
+    "lean": "FreeSum.lean",
+    "note": "paper.json DAG: P = 35 items on the path to I39. 'down' = share of P that transitively depends on the item (PLAN proxy, k=20%). 'cone' = share of P the item transitively uses. The chain is essentially linear, so the downstream proxy mechanically penalises top-of-chain items. Test 3 is therefore judged by knockout (does removing the item disconnect I39 with no alternative path?) with both shares reported."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": 1,
+    "chain_depth": 1,
+    "protocol": "negative control"
+   },
+   "final": {
+    "N": "N0",
+    "F": null,
+    "confidence": 0.9,
+    "justification": "Known inequality, re-proved."
+   }
+  }
+ ],
+ "excluded_from_candidates": [
+  {
+   "trace": "PV1 NEG->POS switch",
+   "reason": "strategic, not a mathematical item"
+  },
+  {
+   "trace": "PV2 Cayley-tree root recovery",
+   "reason": "not in the final proof; N0 transfer from Ornstein-Weiss 1987 / Bowen"
+  },
+  {
+   "paper": "I24 free-prefix words, I27 free-Poisson limit, I28 cutoff inverse",
+   "reason": "folded into C2 as its proof gadgets; individually N0-N2"
+  }
+ ],
+ "family_D": {
+  "label": "D3 (provisional)",
+  "confidence": 0.45,
+  "rests_on": "C2 alone (I23), whose N3 meaning attaches to the cluster C2+C4. All other candidates are N0-N2.",
+  "falls_to": "D2 if Test 4 arm B (cluster) exceeds the calibrated threshold, or if an expert identifies a known prescribed-value cocycle statement for groups with beta_1^(2) > 0.",
+  "not_transfer": "The ingredients (Fox calculus, free CLT, free Khintchine, IPP logarithm, cyclomorphy) are transfer/N0. The candidate is their coupling, so the cross-field-transfer exclusion does not apply.",
+  "correctness_caveat": "All grades are conditional on the proof being correct. The claim is unrefereed and extraordinary. Per lean.md, the comparator allInterpolatedIsomorphic has no sorry/axiom/native_decide, uses only the permitted axioms, and imports only Mathlib, but Lean was not run (compile status unverified). The Lean route differs from the paper: the n=2 step is proved directly via smallCocycleTwo, generation uses Baire, the small cocycle uses a radial averaged inverse, and the interpolation layer is re-proved. Non-integer L(F_r) is defined through Dykema's formula (trusted).",
+  "compression_note": "The Lean analyst's step-3b estimate finds no PHP-style multiplicative blow-up for any novel item. They are single-use bottleneck lemmas with shallow definitions and additive inlining cost. Even if C2 passes Test 4, the 'confirmed eureka step' route (PLAN step 9) will rest on the downstream-speedup test, not on compression."
+ },
+ "provenance_flag": {
+  "applies": "partial",
+  "builds_on_prior_model_result_strict": false,
+  "model_produced_precedent": true,
+  "explanation": "287 cites arXiv:2609.11074, which declares itself obtained with OpenAI's ChatGPT Pro 6.0. 287 states that no result is used, and the comparison confirms that no lemma is imported. The 287 trace never mentions it. The precedent nonetheless anticipates 287's outer architecture (small automorphisms, Nielsen transvection, limiting generation) 13 days before the 287 preprint date. Flag as 'model-produced precedent (architecture), not builds-on'. For contamination control, exclude 2609.11074 and any post-2026-09-10 model."
+ },
+ "discoverability_protocols": {
+  "common": {
+   "models": "Training-data cutoff strictly before 2026-09-10 (2609.11074v1). Confirm with a canary probe: ask for the title/content of arXiv:2609.11074 and whether L(F_2)=L(F_3) is known, and exclude any model that recognises either. No browsing, retrieval or tools. Exclude from the main pool the OpenAI model(s) that produced 287 and the ChatGPT Pro 5.6/6.0 lineage that assisted 2609.11074; run them only as an uncontrolled upper-reference arm. Eligible: frontier and open-weight models with documented pre-September-2026 cutoffs. The judge must be a different model from the proposer.",
+   "context_L_minus": "Mathlib d13f23b (curated digest of relevant API: FreeGroup, lp, StarSubalgebra, CStarAlgebra, functional calculus) plus 287's bibliography minus shlyakhtenko2026fuchsian (16 entries, given as abstracts plus the invoked statements).",
+   "arms": {
+    "L-": "main, contamination-controlled",
+    "L": "adds 2609.11074 to measure how much the model-produced precedent raises hit rates",
+    "open": "problem statement only, no direction (tests PV1 too)",
+    "directed": "states the constructive absorption strategy and gives all non-hidden upstream items"
+   },
+   "sampling": "n = 256 independent samples per arm, temperature 1.0, fixed reasoning budget (e.g. 32k tokens). Report unbiased pass@k for k in {1,2,4,8,16,32,64,128,256}; K = 256.",
+   "judging": "Two independent LLM judges, with the paper's precedent remarks (main.tex:103-105) and the neighbour list from this file in the prompt. A human operator-algebraist checks all hits and 10% of misses. Lean equivalence where a Lean statement exists. Hits are 'equivalent up to normalisation'; partial credit is recorded but not counted.",
+   "controls": "Positive: Cook-Reckhow ER extension variables for PHP. Negative: C10 (free-sum bound), C7 (Nielsen move), C5 (Arg(C)) in the same format. Threshold calibrated as in PLAN step 4.",
+   "prompt_template": "Problem: Is L(F_2) isomorphic to L(F_3) as tracial von Neumann algebras? Library: [L- digest]. Established results you may use: [non-hidden upstream items, verbatim statements]. [directed arm only: Strategy: show L(F_n)=L(F_{n+1}) for n>=3 by perturbing a free Haar n-tuple so that it absorbs an extra free Haar generator.] Propose the single most useful new lemma, definition or construction, stated precisely, with a proof sketch."
+  },
+  "P-C2": {
+   "item": "C2 small-cocycle lemma (I23)",
+   "hide": "I23, I24-I29 and everything downstream: I31, I34, I35, I36, I37, I39, I41, I42",
+   "arm_A_pivot": "Give I01-I22, I30, I32, I33 (including prop:flow and its word-displacement bound). Expected high hit rate, since the coefficient problem is posed by eq:word-displacement.",
+   "arm_B_cluster_decisive": "Also hide I14-I22 (the flow and its displacement bound). Keep I13 (Fox cocycle, fox1953 in L) and I07/I08/I11/I12. This decides N3 for the cluster C2+C4.",
+   "equivalence": "Hit (A): for every eta>0, a word w and an l2 (finitely supported real) coefficient vector with generator values of norm < eta whose cocycle (Fox) value at w is within eta of delta_e, or of any fixed nonzero vector, up to normalisation. Hit (B): the same, plus coupling it to absorption (word displacement controlled by the cocycle value). Lean: OAI.FreeGroupFactorMain.smallCocycle. Partial: identifies the need for l2 cocycles small on generators and large on some word via beta_1^(2)(F_n) > 0, with no construction.",
+   "k": "1..256 (powers of 2)",
+   "pivot_distance": ">=2 (trace); about 1 in arm A",
+   "chain_depth": 2
+  },
+  "P-C1": {
+   "item": "C1 one-step absorption (I31)",
+   "hide": "I31, I34-I37, I39, I41, I42",
+   "arm_A": "Give I22, I23, I32 and the other upstream items (expected near-certain hit).",
+   "arm_B": "Also hide I22 and I23.",
+   "equivalence": "A trace-preserving automorphism moving each A_j by < eps (operator or L2 norm) under which a word in the moved tuple is within eps of C. The Shlyakhtenko-style 'approximate any finite set' form is accepted. Lean: LocalAutomorphism.one_step.",
+   "k": "1..256",
+   "pivot_distance": "1 (arm A)",
+   "chain_depth": 3
+  },
+  "P-C3": {
+   "item": "C3 cocycle-driven flow (I22, with C4 as sub-criterion b)",
+   "hide": "I14-I22 and downstream (I31+); give I01-I13 and I23",
+   "equivalence": "(a) A continuous family of trace-preserving automorphisms fixing W*(C), moving A_j by unitaries generated by sum_g h_j(g) A_g S A_g^* (any self-adjoint S in W*(C) with free conjugates). (b) A word-displacement bound by ||D_w - delta_e||. Report (a) and (a)+(b) separately.",
+   "k": "1..256",
+   "pivot_distance": 1,
+   "chain_depth": 2
+  },
+  "P-C5": {
+   "item": "C5 Arg(C)",
+   "hide": "I07 (replace with the semicircular-driver flow of trace branch d1.2 plus the K-theory sanity remark)",
+   "equivalence": "Any bounded self-adjoint S in W*(C) with exp(iS) = C (any Borel branch).",
+   "k": "1..64",
+   "pivot_distance": 1,
+   "chain_depth": 2
+  },
+  "P-C6": {
+   "item": "C6 adaptive budgets plus L2 generation",
+   "hide": "I33-I35 and downstream; give I31",
+   "equivalence": "Any iteration of C1 with tolerances chosen after each witness word, yielding a free Haar generating limit. A Baire-category argument is accepted.",
+   "k": "1..64",
+   "pivot_distance": 1,
+   "chain_depth": "3+"
+  },
+  "P-C7": {
+   "item": "C7 Nielsen correction",
+   "hide": "I32 and its use in I31; give beta with beta(A_w) ~ C A_w",
+   "equivalence": "A free-basis change fixing the A_j that sends c -> c w^{+-1} (or w^{+-1} c, with matching conventions).",
+   "k": "1..64",
+   "pivot_distance": 1,
+   "chain_depth": 2
+  }
+ },
+ "open_questions": [
+  "Spot-check all quotes from 2609.11074 against the PDF (WebFetch summarised them; Bash had no network).",
+  "Run dates of the 287 search: did it precede 2026-09-10, and did the model or its operators see the ChatGPT Pro sessions behind 2609.11074? Only OpenAI can answer this.",
+  "Compression check: can I31+I34 be replaced by a w-free version of Shlyakhtenko's Prop 1 (Baire) with the I23-driven one-step as hypothesis? If yes, that confirms C1/C6 as N2/N1.",
+  "Expert query (e.g. Peterson, Thom, Gaboriau, Sinclair): is a prescribed-direction small-cocycle statement for groups with beta_1^(2) > 0 known or folklore? This is the main risk to C2's N3.",
+  "Run Lean and the comparator: lean.md is text-only. Confirm that smallCocycle/smallCocycleTwo -> one_step -> rankStep/rankTwo -> allInterpolatedIsomorphic compiles under the permitted axioms.",
+  "Does the existence of smallCocycleTwo (n=2) weaken the paper's n>=3 restriction, and does it matter for Test 4 framing?",
+  "zbMATH and Google Scholar searches were not executable in this session; repeat them for 'cocycle prescribed value free group', 'Fox derivative spectral measure', and 'absorption free group factor perturbation'.",
+  "Correctness: reconcile the trace's b1.4 lesson ('generating set accumulates at a free tuple separated from all free generating tuples') with the final norm-limit construction.",
+  "Shlyakhtenko's Lemma 9 sqrt(m)-scaling: will judges count it as a neighbour of C2? Include it in the judge prompt and record the disagreement rate."
+ ]
+}
