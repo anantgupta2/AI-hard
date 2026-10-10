@@ -1,0 +1,486 @@
+{
+ "fid": "242",
+ "item": "Elliptic-height single-fold growth function (Prop growth): on y^2 = x^3 - 25x with W(Q) = H(x([m*]Q)), an index bracket W(Q) <= u + W_1 < max W(Q +- P) pins the index k at the input scale, and a square window W(2Q) W(R) W_1 vs W(Q)^2 max W(R +- P) (ratio within kappa) holds iff index(R) = k^2. Output g(u) = W_{k^2}, a single-fold Julia Robinson-type function with delta (log u)^2 < log g(u) < u log u.",
+ "item_type": "F3 (+F5): auxiliary construction, lemma-level device (Prop growth = GrowthCompilation.growth)",
+ "lean_status": "as in paper",
+ "lean_status_why": "GrowthCompilation.growth states Prop growth verbatim (single-fold graph of g, delta (log u)^2 < log g(u) < u log u, delta = 1/(128a) as in the paper), Bracket/Window/Representative are the paper's displays eq:index-bracket, eq:square-window and eq:representative, and the comparator OAI.SingleFold.main depends on it through PowerCompilation.power; only the upstream arithmetic geometry is proved by a different route.",
+ "lean_gaps": [
+  "Upstream inputs proved by a different route (does not change the item's statement): rank one via a full 2-descent through the Kummer map (paper: 2-isogeny descent); torsion = E[2] via strict height growth under doubling plus a kernel-checked `decide +kernel` enumeration of 4,940 small rationals (Duplication.bounded_points; paper: Nagell-Lutz); uniform naive-vs-canonical height bound and canonical height built in-house via a Tate limit (QuadraticHeight.uniform_height; paper cites Silverman).",
+  "Lean generalises the window and the growth estimates: HeightWindow.square_window, GrowthEstimate.bracket_unique and eventual_output are stated for an arbitrary W : N -> N with |log W_j - a j^2| <= c, not just for elliptic heights. This is the reusable form of the device.",
+  "The elliptic part is tied to the single curve E : y^2 = x^3 - 25x (abbrev CurveHeight.E); the model takes an abstract iso f : E.Point ~+ (Fin 1 -> Z) x T, but the height API (naiveHeight, canonicalHeight, uniform_height) is proved for this curve only, so reuse on another rank-one curve needs that API re-proved.",
+  "Constants m*, kappa, c_E are existential (height_constants), as in the paper; neither gives explicit values, so no explicit (unknowns, degree) bound follows from the Lean.",
+  "The comparator target MainStatement never mentions g; the item is load-bearing only via power -> ScalarSF.powerRel -> CounterCompilation.system_sf/halts_sf. Dominated share of the 756-decl proof DAG: growth 0.49, growth_model 0.15, square_window 0.005 (from data/items/242_lean.json).",
+  "The paper's corollary (undecidability under an at-most-one-solution promise) is not formalized (lean/docs/242.md).",
+  "Text-level analysis only: no Lean toolchain here, nothing was compiled."
+ ],
+ "comparator_chain": [
+  "OAI.SingleFold.main",
+  "OAI.SingleFold.recursively_enumerable_sf",
+  "OAI.SingleFold.CounterCompilation.halts_sf",
+  "OAI.SingleFold.CounterCompilation.system_sf",
+  "OAI.SingleFold.Compiler.ScalarSF.powerRel",
+  "OAI.SingleFold.PowerCompilation.power",
+  "OAI.SingleFold.GrowthCompilation.growth",
+  "OAI.SingleFold.EllipticModel.growth_model",
+  "OAI.SingleFold.EllipticModel.window_iff  (also via growth_pair_existsUnique)",
+  "OAI.SingleFold.HeightWindow.square_window"
+ ],
+ "comparator_chain_note": "Shortest path found by BFS over the `uses` edges of data/items/242_lean.json (text-level extractor). power is also reached via Binary.bits (Binary.lean:162 calls powerRel). Comparator: lean/ComparatorChallenges/SingleFold.json, solution_module OAI.NumberTheory.SingleFold.Main, theorem OAI.SingleFold.main, standard axioms only.",
+ "lean_source": [
+  {
+   "name": "OAI.SingleFold.GrowthCompilation.growth",
+   "kind": "theorem",
+   "file": "lean/OAI/NumberTheory/SingleFold/EllipticGrowth.lean",
+   "line": 487,
+   "text": "theorem growth : ∃ (g : ℕ → ℕ) (δ : ℝ) (u₀ : ℕ), 0 < δ ∧ 4 ≤ u₀ ∧\n    SF (fun z : Fin 2 → ℕ => z 1=g (z 0)) ∧\n    (∀ u, u₀ ≤ u → δ*(Real.log (u:ℝ))^2 < Real.log (g u:ℝ) ∧\n      Real.log (g u:ℝ) < (u:ℝ)*Real.log (u:ℝ)) := by"
+  },
+  {
+   "name": "OAI.SingleFold.EllipticModel.growth_model",
+   "kind": "theorem",
+   "file": "lean/OAI/NumberTheory/SingleFold/EllipticGrowth.lean",
+   "line": 327,
+   "text": "theorem growth_model [Finite T] : ∃ (m κ : ℕ) (g : ℕ → ℕ) (δ : ℝ) (u₀ : ℕ),\n    0 < m ∧ Even m ∧ 0 < κ ∧ 0 < δ ∧ 4 ≤ u₀ ∧\n    (∀ u, ∃! A : E.Point × E.Point, GrowthPair f m κ u A) ∧\n    (∀ u v, (∃ A, GrowthPair f m κ u A ∧ W m A.2=v) ↔ v=g u) ∧\n    (∀ u, u₀ ≤ u → δ*(Real.log (u:ℝ))^2 < Real.log (g u:ℝ) ∧\n      Real.log (g u:ℝ) < (u:ℝ)*Real.log (u:ℝ)) := by"
+  },
+  {
+   "name": "OAI.SingleFold.HeightWindow.square_window",
+   "kind": "theorem",
+   "file": "lean/OAI/NumberTheory/SingleFold/HeightGrowth.lean",
+   "line": 233,
+   "text": "theorem square_window {W : ℕ → ℕ} {a c : ℝ} {κ k r : ℕ}\n    (hW : ∀ j, 0 < W j)\n    (happrox : ∀ j, 1 ≤ j → |Real.log (W j : ℝ) - a * (j : ℝ) ^ 2| ≤ c)\n    (hc : 0 ≤ c) (hκ : 0 < κ) (h₁ : 6 * c < Real.log κ)\n    (h₂ : Real.log κ < 2 * a - 6 * c) (hk : 1 ≤ k) (hr : 1 ≤ r) :\n    (W (2 * k) * W r * W 1 ≤ κ * (W k ^ 2 * W (r + 1)) ∧\n      W k ^ 2 * W (r + 1) ≤ κ * (W (2 * k) * W r * W 1)) ↔ r = k ^ 2 := by"
+  },
+  {
+   "name": "OAI.SingleFold.HeightWindow.separated_window",
+   "kind": "lemma",
+   "file": "lean/OAI/NumberTheory/SingleFold/HeightGrowth.lean",
+   "line": 191,
+   "text": "lemma separated_window {a c K e : ℝ} {k r : ℕ}\n    (hc : 0 ≤ c) (hK : 6 * c < K) (ha : K < 2 * a - 6 * c)\n    (he : |e| ≤ 6 * c) :\n    |2 * a * ((k : ℝ) ^ 2 - (r : ℝ)) + e| ≤ K ↔ r = k ^ 2 := by"
+  },
+  {
+   "name": "OAI.SingleFold.GrowthEstimate.bracket_unique",
+   "kind": "lemma",
+   "file": "lean/OAI/NumberTheory/SingleFold/HeightGrowth.lean",
+   "line": 41,
+   "text": "lemma bracket_unique (hW : StrictMono W) (hunb : ∀ U, ∃ j, U<W j) (u : ℕ) :\n    ∃! k : ℕ, 1≤k ∧ W k≤u+W 1 ∧ u+W 1<W (k+1) := by"
+  },
+  {
+   "name": "OAI.SingleFold.GrowthEstimate.eventual_output",
+   "kind": "theorem",
+   "file": "lean/OAI/NumberTheory/SingleFold/HeightGrowth.lean",
+   "line": 143,
+   "text": "theorem eventual_output (hW : ∀ j, 0<W j) (ha : 0<a) (hc : 0≤c)\n    (happrox : ∀ j, 1≤j → |Real.log (W j:ℝ)-a*(j:ℝ)^2|≤c) :\n    ∃ u₀ : ℕ, 4≤u₀ ∧ ∀ u≥u₀, ∀ k, 1≤k →\n      W k≤u+W 1 ∧ u+W 1<W (k+1) →\n      (1/(128*a))*(Real.log (u:ℝ))^2 < Real.log (W (k^2):ℝ) ∧\n      Real.log (W (k^2):ℝ) < (u:ℝ)*Real.log (u:ℝ) := by"
+  },
+  {
+   "name": "OAI.SingleFold.EllipticModel.Hx",
+   "kind": "def",
+   "file": "lean/OAI/NumberTheory/SingleFold/EllipticGrowth.lean",
+   "line": 9,
+   "text": "def Hx : E.Point → ℕ\n  | zero => 1\n  | WeierstrassCurve.Affine.Point.some x _ _ => max x.num.natAbs x.den"
+  },
+  {
+   "name": "OAI.SingleFold.EllipticModel.W",
+   "kind": "def",
+   "file": "lean/OAI/NumberTheory/SingleFold/EllipticGrowth.lean",
+   "line": 69,
+   "text": "noncomputable def W (m : ℕ) (Q : E.Point) : ℕ := Hx (m • Q)"
+  },
+  {
+   "name": "OAI.SingleFold.EllipticModel.sequence",
+   "kind": "def",
+   "file": "lean/OAI/NumberTheory/SingleFold/EllipticGrowth.lean",
+   "line": 70,
+   "text": "noncomputable def sequence (m : ℕ) (j : ℕ) : ℕ := W m (j • P f)"
+  },
+  {
+   "name": "OAI.SingleFold.EllipticModel.sequence_approx",
+   "kind": "lemma",
+   "file": "lean/OAI/NumberTheory/SingleFold/EllipticGrowth.lean",
+   "line": 97,
+   "text": "lemma sequence_approx (m : ℕ) (c : ℝ)\n    (hc : ∀ Q : E.Point, |CurveHeight.naiveHeight Q-2*CurveHeight.canonicalHeight Q|≤c) (j : ℕ) :\n    |Real.log (sequence f m j:ℝ)-(2*(m:ℝ)^2*CurveHeight.canonicalHeight (P f))*(j:ℝ)^2|≤c := by"
+  },
+  {
+   "name": "OAI.SingleFold.EllipticModel.Representative",
+   "kind": "def",
+   "file": "lean/OAI/NumberTheory/SingleFold/EllipticGrowth.lean",
+   "line": 145,
+   "text": "def Representative (m : ℕ) (Q : E.Point) : Prop :=\n  Q≠0 ∧ 0≤ycoord Q ∧ 1<W m Q ∧\n  ∀ t : T, Q+point f 0 t≠0 ∧ xcoord (Q+point f 0 t)≤xcoord Q"
+  },
+  {
+   "name": "OAI.SingleFold.EllipticModel.Bracket",
+   "kind": "def",
+   "file": "lean/OAI/NumberTheory/SingleFold/EllipticGrowth.lean",
+   "line": 281,
+   "text": "def Bracket (m u : ℕ) (Q : E.Point) : Prop :=\n  W m Q ≤ u+W m (P f) ∧ u+W m (P f) < max (W m (Q+P f)) (W m (Q-P f))"
+  },
+  {
+   "name": "OAI.SingleFold.EllipticModel.Window",
+   "kind": "def",
+   "file": "lean/OAI/NumberTheory/SingleFold/EllipticGrowth.lean",
+   "line": 283,
+   "text": "def Window (m κ : ℕ) (Q R : E.Point) : Prop :=\n  W m (2 • Q)*W m R*W m (P f) ≤ κ*(W m Q^2*max (W m (R+P f)) (W m (R-P f))) ∧\n  W m Q^2*max (W m (R+P f)) (W m (R-P f)) ≤ κ*(W m (2 • Q)*W m R*W m (P f))"
+  },
+  {
+   "name": "OAI.SingleFold.EllipticModel.GrowthPair",
+   "kind": "def",
+   "file": "lean/OAI/NumberTheory/SingleFold/EllipticGrowth.lean",
+   "line": 304,
+   "text": "def GrowthPair (m κ u : ℕ) (A : E.Point × E.Point) : Prop :=\n  Representative f m A.1 ∧ Bracket f m u A.1 ∧ Representative f m A.2 ∧ Window f m κ A.1 A.2"
+  },
+  {
+   "name": "OAI.SingleFold.EllipticModel.window_iff",
+   "kind": "lemma",
+   "file": "lean/OAI/NumberTheory/SingleFold/EllipticGrowth.lean",
+   "line": 293,
+   "text": "lemma window_iff [Finite T] {m κ : ℕ} {a c : ℝ} (hm : Even m) (hs : StrictMono (sequence f m))\n    (hc : 0 ≤ c) (hκ : 0 < κ) (h₁ : 6*c < Real.log κ) (h₂ : Real.log κ < 2*a-6*c)\n    (ha : ∀ j, 1 ≤ j → |Real.log (sequence f m j:ℝ)-a*(j:ℝ)^2| ≤ c)\n    {Q R : E.Point} (hQ : Representative f m Q) (hR : Representative f m R) :\n    Window f m κ Q R ↔ (index f R).natAbs=(index f Q).natAbs^2 := by"
+  },
+  {
+   "name": "OAI.SingleFold.EllipticModel.growth_pair_existsUnique",
+   "kind": "lemma",
+   "file": "lean/OAI/NumberTheory/SingleFold/EllipticGrowth.lean",
+   "line": 307,
+   "text": "lemma growth_pair_existsUnique [Finite T] {m κ : ℕ} {a c : ℝ}\n    (hm : Even m) (hs : StrictMono (sequence f m))\n    (hu : ∀ U, ∃ j, U < sequence f m j) (hc : 0 ≤ c) (hκ : 0 < κ)\n    (h₁ : 6*c < Real.log κ) (h₂ : Real.log κ < 2*a-6*c)\n    (ha : ∀ j, 1 ≤ j → |Real.log (sequence f m j:ℝ)-a*(j:ℝ)^2| ≤ c) (u : ℕ) :\n    ∃! A, GrowthPair f m κ u A := by"
+  },
+  {
+   "name": "OAI.SingleFold.PowerCompilation.power_of_growth",
+   "kind": "lemma",
+   "file": "lean/OAI/NumberTheory/SingleFold/Power.lean",
+   "line": 279,
+   "text": "lemma power_of_growth (g : ℕ → ℕ) (δ : ℝ) (u₀ : ℕ) (hδ : 0<δ) (h₀ : 4≤u₀)\n    (hgraph : SF (fun z : Fin 2 → ℕ => z 1=g (z 0)))\n    (hg : ∀ u, u₀≤u → δ*(Real.log (u:ℝ))^2<Real.log (g u:ℝ) ∧ Real.log (g u:ℝ)<(u:ℝ)*Real.log (u:ℝ)) :\n    SF (fun z : Fin 3 → ℕ => 2≤z 0 ∧ z 2=z 0^z 1) := by"
+  },
+  {
+   "name": "OAI.SingleFold.PowerCompilation.power",
+   "kind": "theorem",
+   "file": "lean/OAI/NumberTheory/SingleFold/Power.lean",
+   "line": 299,
+   "text": "theorem power : SF (fun z : Fin 3 → ℕ => 2≤z 0 ∧ z 2=z 0^z 1) := by"
+  },
+  {
+   "name": "OAI.SingleFold.Compiler.SF",
+   "kind": "def",
+   "file": "lean/OAI/NumberTheory/SingleFold/PolynomialCompiler.lean",
+   "line": 27,
+   "text": "def SF {α : Type} (R : (α → ℕ) → Prop) : Prop := Nonempty (Representation R)"
+  },
+  {
+   "name": "OAI.SingleFold.MainStatement (target statement; Represents + MainStatement with docstrings)",
+   "kind": "def",
+   "file": "lean/OAI/NumberTheory/SingleFold/Model.lean",
+   "line": 12,
+   "text": "/-- Exact existence on members, no witness on nonmembers, and uniqueness of the\nwhole witness on every input. No coordinates are hidden outside `w`. -/\ndef Represents {n m : ℕ} (P : MvPolynomial (Fin n ⊕ Fin m) ℤ)\n    (S : Set (Fin n → ℕ)) : Prop :=\n  ∀ a, (a ∈ S ↔ ∃ w, evalNat P a w = 0) ∧\n    ∀ w v, evalNat P a w = 0 → evalNat P a v = 0 → w = v\n\n/-- Single-fold representation with positive input and witness lengths. -/\ndef MainStatement : Prop :=\n  ∀ (n : ℕ), 1 ≤ n → ∀ (S : Set (Fin n → ℕ)), REPred (fun a => a ∈ S) →\n    ∃ (m : ℕ), 1 ≤ m ∧ ∃ P : MvPolynomial (Fin n ⊕ Fin m) ℤ, Represents P S"
+  }
+ ],
+ "speedup_targets": [
+  {
+   "title": "Garcia-Fritz-Pasten-Vidaux: positive-existential interpretation of (N,+,x) in Q with height-comparison predicates",
+   "statement": "There is a positive existential interpretation of (N;0,1,+,x,=) in Q over the language of rings plus height-comparison relations H_{m,n} (m,n <= 3); hence H10 over Q with finitely many height-comparison conditions is undecidable (Thms 1.1-1.2).",
+   "reference": "N. Garcia-Fritz, H. Pasten, X. Vidaux, 'Effectivity for existence of rational points is undecidable', J. Number Theory 276 (2025) 81-97; arXiv:2311.01958 (v2, 6 Nov 2023). https://arxiv.org/abs/2311.01958",
+   "status": "known (2023/2025). Also the closest earlier precedent of the item itself (see precedent_check).",
+   "current_proof_size": "11 pages (arXiv v2). No formalization known.",
+   "how_item_helps": "GPV's key step (Lemmas 4.2-4.7) defines the consecutive-squares relation B(k^2,(k+1)^2) on a rank-one curve from approximate height comparisons with bounded error. HeightWindow.square_window (generic-sequence form) decides r = k^2 with one five-term comparison, and the OAI library already supplies a rank-one curve with a uniform naive-vs-canonical height bound (CurveRank.rank_one, CurveHeight.uniform_height, sequence_approx). GPV's curve-specific inputs (LMFDB rank, h(P1), Silverman bound for y^2 = x^3 + 2) are the expensive part to formalize; the OAI curve y^2 = x^3 - 25x can replace them because GPV say any rank-one curve works. What remains is translating product comparisons over N into height comparisons over Q.",
+   "expected_speedup": "med-high in Lean (the arithmetic-geometry inputs dominate); low on paper (GPV is already short)",
+   "confidence": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib d13f23b: Height.logHeight (used by OAI SingleFold's naiveHeight), first-order/positive-existential formulas need a small custom encoding; OAI: SingleFold.CurveHeight.*, CurveRank.rank_one, HeightWindow.square_window.",
+    "missing": [
+     "height-comparison predicates H_{m,n} on Q-tuples (~40 lines)",
+     "positive-existential definability/interpretation over a structure with extra predicates (~150-250 lines; Mathlib's ModelTheory has languages and formulas but no ready 'positive existential interpretation')"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Pell-free proof that exponentiation is Diophantine (Pheidas, AIM Question 9, strict reading)",
+   "statement": "Prove c = b^n is Diophantine (Mathlib: Dioph.pow_dioph) using elliptic curves in place of Pell equations.",
+   "reference": "AIM problem list 'Problems related to Extensions of Hilbert's Tenth Problem' (Poonen-Scanlon moderators, c. 2005), Question 9 (Pheidas); Mathlib/NumberTheory/Dioph.lean and PellMatiyasevic.lean (Carneiro's MRDP-exponent formalization).",
+   "status": "Exponentiation Diophantine: known (Matiyasevich 1970). Pell-free route: not known to us. Note: 242 does NOT give it. Its Prop power still uses Pell (Power.lean imports Pell.lean; PowerSystem.System uses Pell.xn); the elliptic part only supplies the cutoff function g.",
+   "current_proof_size": "Paper: about 10 pages (Davis 1973 exposition). Lean: Mathlib's PellMatiyasevic.lean plus the exponent part of Dioph.lean, roughly 1,500 lines combined (estimate, Mathlib not available locally).",
+   "how_item_helps": "The device supplies the 'growth' half of Robinson's 1952 reduction without Pell. Its generic window also gives index multiplication on E(Q) by polarisation (W_{k+l} vs W_k W_l), so (N,+,x) on indices becomes single-fold Diophantine through point codes. A Pell-free exponentiation would still need an elliptic substitute for the Pell 'index-congruence' step (x_n(a) mod (a-1) recovers n). No such substitute is in 242.",
+   "expected_speedup": "low (as a speedup); this is a proof-route test, success = a proof of pow_dioph that imports no Pell file",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib Dioph / Poly; OAI SingleFold Compiler.SF (Representation uses Mathlib Poly). The 'Pell-free' condition is checked on imports, not on the statement.",
+    "missing": [],
+    "formal_proof_to_compare": "Mathlib Dioph.pow_dioph via PellMatiyasevic.lean"
+   }
+  },
+  {
+   "title": "Poonen 2002: Z is Diophantine in O_K given a rank-stable elliptic curve (index-squaring step)",
+   "statement": "If E/Q has rank E(Q) = rank E(K) = 1 then Z is Diophantine over O_K (Poonen 2002, refined by Cornelissen-Pheidas-Zahidi 2005 and Shlapentokh 2008).",
+   "reference": "B. Poonen, 'Using elliptic curves of rank one towards the undecidability of Hilbert's tenth problem over rings of algebraic integers', ANTS V, LNCS 2369 (2002) 33-42.",
+   "status": "known",
+   "current_proof_size": "about 10 pages; no formalization known",
+   "how_item_helps": "Poonen's Lemma 8 extracts m^2 from x(P)/x(mP) through a p-adic (formal-group) divisibility. The square window extracts k^2 archimedeanly. Over O_K this needs Diophantine size comparisons of numerators and denominators, which are not available in general (only norms and positivity of sums of squares). So the window most likely cannot replace Lemma 8 there.",
+   "expected_speedup": "low",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "Mathlib has number fields and Weierstrass curves, but no Diophantine sets over O_K, no Mordell-Weil over K and no heights over K.",
+    "missing": [
+     "Diophantine definability over a ring (~150 lines)",
+     "Mordell-Weil/rank over a number field and heights over K (thousands of lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Eisenträger-Everest: undecidability for large subrings of Q via descent on elliptic curves",
+   "statement": "For suitable infinite sets of primes S, H10 is undecidable over Z[S^-1] (via a Diophantine model of Z built from elliptic-curve points approximated in E(R)).",
+   "reference": "K. Eisenträger, G. Everest, 'Descent on elliptic curves and Hilbert's tenth problem', Proc. AMS 137 (2009) 1951-1959; arXiv:0707.1485.",
+   "status": "known",
+   "current_proof_size": "about 9 pages; no formalization known",
+   "how_item_helps": "Both pin an index by size and approximation data on a rank-one curve. In Z[S^-1], though, numerator and denominator are not separable Diophantinely, so W(Q) = max(|num|, den) is not available. The bracket/window would need replacing by real approximation, which is EE's own mechanism.",
+   "expected_speedup": "low",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "as for Poonen 2002",
+    "missing": [
+     "Diophantine sets over subrings of Q, S-integers, real approximation on E(R)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "speedup_summary": "Only one known theorem (GPV 2023/2025) is a strong speedup target, and it is also the item's closest precedent. Every other candidate either lives in rings where archimedean height comparisons are not Diophantine (O_K, Z[S^-1], Q) or is a corollary of 242's own theorem. Verdict for known theorems other than GPV: no strong candidate found.",
+ "open_problems": [
+  {
+   "title": "Explicit single-fold universal pair (number of unknowns, degree)",
+   "statement": "Give explicit (m, D) such that every r.e. set has a single-fold representation with <= m unknowns and degree <= D; equivalently, make 242's promise-undecidability corollary explicit.",
+   "reference": "Matiyasevich, 'Hilbert's tenth problem: what was done and what is to be done', in Contemp. Math. 270 (2000) (open problems on single-/finite-fold and on the number of unknowns); 242 main.tex:116-127 (fixed but non-explicit m, D).",
+   "url": "https://doi.org/10.1090/conm/270",
+   "status": "open: 242 gives existence of fixed m, D but no values; its Lean has existential constants (height_constants).",
+   "obstruction_match": "Exact. The only non-explicit inputs are the height constants c_E, kappa, m* of the window. Effective canonical-height bounds (Silverman-type) for y^2 = x^3 - 25x would make them explicit.",
+   "adaptation_sketch": "Bound |h - 2h_hat| for E explicitly (Silverman 1990 / Cremona-Prickett-Siksek), compute h_hat(P), choose m*, kappa, then count variables through the compiler (the witness ledger already counts them).",
+   "payoff": "medium (a quantitative refinement of the theorem, not device reuse)",
+   "confidence": "medium",
+   "difficulty": "medium (engineering)",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "MvPolynomial.totalDegree, Fintype.card of the variable type, OAI SingleFold Represents",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Diophantine representation of exponentiation with polynomially bounded (bit-length) witnesses; D vs NP",
+   "statement": "Adleman-Manders: is D (sets with Diophantine representations whose witnesses have bit-length polynomial in the input's) equal to NP? A natural sub-question: does c = b^n have a Diophantine representation whose witnesses have bit-length poly(log c)?",
+   "reference": "L. Adleman, K. Manders, 'Diophantine complexity', FOCS 1976; C. Pollett, 'On the bounded version of Hilbert's tenth problem', Arch. Math. Logic 42 (2003). NOT re-verified this session (web tools rate-limited).",
+   "url": null,
+   "status": "open (D = NP conjecture), to the best of our knowledge; the exact reduction from 'exponentiation in D' to D = NP was not re-checked here.",
+   "obstruction_match": "Partial, and speculative. Classical Pell-based representations of exponentiation need auxiliary solutions that are exponentially longer than the input. In 242, every growth witness has height at most g(u), with log g(u) = O((log u)^2). Prop power bounds its Pell witnesses F, H below g(u), with u a fixed polynomial in (b, c, n). If the remaining witnesses (rational codes, residues, slacks) are polynomially bounded too, c = b^n gets witnesses of bit-length O((log c)^2).",
+   "adaptation_sketch": "Audit PowerSystem.System (Fin 9 witnesses) and graph_sf's point codes for explicit size bounds. State a bit-bounded variant of Represents and prove it for power. Then check whether Jones-Matiyasevich's polynomially bounded exponential-Diophantine representation of NP composes with it.",
+   "payoff": "very high if it goes through. A hidden obstruction is likely (e.g., the machine compiler, or the codes for 2-power bases).",
+   "confidence": "low",
+   "difficulty": "medium for the audit; high for any D vs NP consequence",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI SingleFold Representation/Poly; Nat.size for bit-length. The sub-claim about exponentiation is statable now; D = NP itself needs complexity classes, which Mathlib lacks.",
+    "missing": [
+     "bit-bounded Represents (~30 lines)",
+     "NP / polynomial-time verifiers for the full D=NP statement (major library)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Finite-fold / single-fold Diophantine definition of Z in rings of integers O_K",
+   "statement": "Is there a finite-fold (or single-fold) Diophantine definition of Z in O_K for every number field K? Pheidas's AIM Q9 asks the analogous question for all r.e. sets over Z.",
+   "reference": "AIM problem list on extensions of H10, Question 9 (c. 2005); H10 over every O_K: Koymans-Pagano (2024, arXiv) and Alpöge-Bhargava-Ho-Shnidman (2025); arXiv numbers not re-checked here.",
+   "url": null,
+   "status": "Undecidability over O_K is known (2024-25). Finite-fold definitions of Z in O_K: no result found (absence not verified on zbMATH).",
+   "obstruction_match": "Partial. The same problem: rank-one curves give Diophantine models of Z whose witnesses are not unique. The square window's uniqueness comes from archimedean comparisons over N, which O_K lacks in general. Infinite unit groups also break witness uniqueness.",
+   "adaptation_sketch": "Use the rank-stable curves of Koymans-Pagano. Replace max(|num|, den) by norms of numerator/denominator ideals, expressed via N_{K/Q}. Fix unit ambiguity with canonical representatives, e.g. a reduction-theory fundamental domain, if one is Diophantine.",
+   "payoff": "medium-high",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "Mathlib NumberField, Weierstrass curves",
+    "missing": [
+     "Diophantine sets over O_K",
+     "Mordell-Weil and heights over K",
+     "rank-stable curves"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Finite-fold Diophantine representations over polynomial rings F_q[t] and Z[T]",
+   "statement": "Do r.e. relations over F_q[t] (or Z[T]) admit single-fold or finite-fold Diophantine representations? Undecidability itself is known (Denef 1978, Pheidas 1991, Videla 1994).",
+   "reference": "T. Pheidas, 'Hilbert's tenth problem for fields of rational functions over finite fields', Invent. Math. 103 (1991); J. Denef, 'The Diophantine problem for polynomial rings and fields of rational functions', Trans. AMS 242 (1978).",
+   "url": null,
+   "status": "Single-fold over these rings: no result found; status unverified.",
+   "obstruction_match": "Good on the height side. Over function fields the Neron-Tate height of a non-isotrivial rank-one curve is a quadratic form with bounded error measured by degrees, so log-heights are replaced by degrees. The window needs Diophantine degree comparisons deg x <= deg y, which are available or partly available in F_q[t] (Pheidas/Denef machinery).",
+   "adaptation_sketch": "Take E/F_q(t) of rank one. W(Q) := deg(x([m]Q)). Bracket and window become linear inequalities between degrees. Uniqueness via representatives as in 242. The Pell-type step uses the existing Pell equation over F_q[t].",
+   "payoff": "medium",
+   "confidence": "low-medium",
+   "difficulty": "medium-high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "Mathlib Polynomial over finite fields; Weierstrass curves over function fields exist, heights do not",
+    "missing": [
+     "Mordell-Weil/heights over F_q(t)",
+     "Diophantine sets over F_q[t]"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "CCO §7 goal (2) and §8 candidates: a concrete univocal exponential-growth relation with an explicit polynomial specification",
+   "statement": "Exhibit a concrete relation M(u,v) of (sub)exponential growth with an explicit univocal polynomial specification. Decide whether any of CCO's eight Davis-quartic/Pell candidates is univocal.",
+   "reference": "D. Cantone, L. Cuzziol, E. G. Omodeo, Le Matematiche 79(2) (2024), §§6-8 (title not re-checked here; full text read by the novelty analyst)",
+   "url": "https://lematematiche.dmi.unict.it/index.php/lematematiche/article/download/2044/1126",
+   "status": "Goal (1) answered by 242 via the weaker quasi-polynomial cutoff. Goal (2) answered non-explicitly by the elliptic g. The CCO candidates themselves remain open.",
+   "obstruction_match": "Same target (a univocal growth relation). The device answers it with a different object (elliptic heights), not with CCO's quartics.",
+   "adaptation_sketch": "Make g explicit (see the first open problem). For the CCO candidates the device is irrelevant: they need Pell-type uniqueness arguments.",
+   "payoff": "low-medium",
+   "confidence": "medium",
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI SingleFold SF, Mathlib Poly",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Minimal height predicates for GPV-type undecidability over Q",
+   "statement": "GPV need height comparisons H_{m,n} for tuples of length <= 3. Is the positive-existential theory of Q with only the single-element comparison h(x) <= h(y) (or h(x) = h(y)) already undecidable?",
+   "reference": "Garcia-Fritz-Pasten-Vidaux, arXiv:2311.01958, remark after Thm 1.2 (m, n <= 3 suffice).",
+   "url": "https://arxiv.org/abs/2311.01958",
+   "status": "Not stated as open by GPV; status unverified (our formulation).",
+   "obstruction_match": "Direct. 242's window compares products of single-point heights. Over Q, h(xy) is not h(x) + h(y) in general, but it is for coprime integers, which is how 242 and GPV's Lemma 3.1 use it.",
+   "adaptation_sketch": "Express W-products as heights of single rationals with controlled coprimality, then run the square window inside GPV's framework.",
+   "payoff": "low-medium",
+   "confidence": "low",
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib Height.logHeight; ModelTheory languages",
+    "missing": [
+     "height predicates and positive-existential theory (~200 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "Finite-fold conjecture (Matiyasevich 1974): immediate from MainStatement.",
+  "Undecidability of H10 under an at-most-one-solution promise, with fixed m, D (paper main.tex:116-127; not formalized).",
+  "Single-fold Diophantine exponentiation (PowerCompilation.power, Power.lean:299), and hence single-fold versions of every classical Diophantine representation: primes (JSWW-type polynomial), factorial, binomial, universal equation.",
+  "A single-fold Julia Robinson relation of quasi-polynomial growth. This is the item itself and answers CCO 2024 §7 goal (1) with a weaker requirement than the (‡) condition CCO expected.",
+  "Non-effectivity of finite-fold bounds (no computable bound on solution size for equations with finitely many solutions), as anticipated by Matiyasevich."
+ ],
+ "release_reuse": {
+  "lean": "None. Grep shows no OAI directory outside OAI/NumberTheory/SingleFold imports OAI.NumberTheory.SingleFold.*.",
+  "families": [
+   {
+    "fid": "004",
+    "title": "Hilbert's tenth problem over Q (manuscripts dated 2026-09-24 and 2026-10-06; not formalized in Lean, no lean/docs/004.md)",
+    "relation": "Uses the same N0 ingredient: quadratic growth of canonical height in the index on a fixed rank-one curve, hgt(x(nP)) = 2 h_hat(P) n^2 + O(1) (02-reduction.tex around line 851). It is used only to bound embedded indices in a compactness/nonstandard-model argument. No bracket, no window, no growth function. 004 cites GPV 2025 (intro lines 159-167) and describes its 'elliptic canonical heights to encode consecutive squares'. Not reuse of the device; it is evidence that the release's own authors knew the GPV precedent."
+   }
+  ]
+ },
+ "negative_controls": [
+  {
+   "title": "Mathlib Dioph.pow_dioph (exponentiation is Diophantine, no uniqueness)",
+   "why_should_fail": "No growth cutoff is needed without uniqueness, so the Pell route is already direct, and 242's own power_of_growth still uses Pell. Expected speedup: none (a prover given growth should not shorten pow_dioph).",
+   "lean": "statable now; Mathlib proof exists"
+  },
+  {
+   "title": "Diophantine definition of Z (or of heights) over Q in the pure ring language",
+   "why_should_fail": "The window needs archimedean comparisons of numerators and denominators, which are not known to be Diophantine over Q. GPV had to add them as predicates, and 004 uses heights only in the metatheory. The device should give nothing here.",
+   "lean": "statable with < 300 lines (definability over Q)"
+  },
+  {
+   "title": "Linear-growth (Pell/Lucas) analogue of the square window",
+   "why_should_fail": "If log W_j = a j + O(c), every bounded multiplicative window tests only linear index relations, because the second-difference identity (2k)^2 - 2k^2 - ((r+1)^2 - r^2) + 1 = 2(k^2 - r) has no linear analogue that isolates k^2. square_window's hypothesis |log W_j - a j^2| <= c fails for Pell sequences. This is the paper's own explanation of why Pell cannot produce a single-fold growth function. Not a published theorem, so it is an expected failure, not a proved-false analogue.",
+   "lean": "statable now: instantiate square_window's conclusion with W_j = Pell.xn and show it is false for a specific (k, r)"
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "title": "Re-prove GPV Thm 1.1 (height-predicate interpretation of (N,+,x) in Q) with HeightWindow.square_window in the library",
+   "lean_usable": true,
+   "argument": "This is the one known theorem whose key step is the same mechanism: index squaring on a rank-one curve via bounded-error height comparisons. It is therefore the cleanest measurable speedup test. With square_window, sequence_approx and the in-house height API for y^2 = x^3 - 25x available, GPV's Lemmas 4.2-4.7 and its LMFDB/Silverman inputs collapse to an instantiation plus a translation layer. Stating it needs about 200 lines of height-predicate and interpretation definitions over Mathlib's Height.logHeight. A positive result shows that the device transfers. It does not by itself make the item a jump, because GPV predates it (see precedent_check)."
+  },
+  {
+   "rank": 2,
+   "title": "Pell-free proof of Dioph.pow_dioph (Pheidas Q9, strict reading)",
+   "lean_usable": true,
+   "argument": "The statement is already in Mathlib, and success is objective: a proof importing no Pell file. The device supplies the growth half (and index multiplication via a polarisation variant of the window), but the Pell 'index from congruence' step has no elliptic substitute in 242. The test separates 'growth device' from 'Pell machinery'. A prover that succeeds would show the device carries much more than its own theorem. Failure is the expected outcome and would be informative."
+  },
+  {
+   "rank": 3,
+   "title": "Witness-size audit: does power give c = b^n with poly(log c)-bit witnesses?",
+   "lean_usable": true,
+   "argument": "Statable now as a bit-bounded variant of Represents. If true, it would be a genuinely new use of the device's quasi-polynomial growth, which Pell cannot provide, and it touches the Adleman-Manders D vs NP question. Low confidence: a hidden obstruction is likely and the D = NP link was not re-verified. But the audit is cheap and decisive."
+  },
+  {
+   "rank": 4,
+   "title": "Explicit single-fold (unknowns, degree) bounds",
+   "lean_usable": true,
+   "argument": "Statable now with MvPolynomial.totalDegree and the variable count. It needs explicit height constants for y^2 = x^3 - 25x. It is a quantitative refinement of the theorem, not reuse of the device on another problem, so it measures the theorem's reach rather than a jump. Ranked here because it is Lean-ready and has a long-standing open-problem status."
+  },
+  {
+   "rank": 5,
+   "title": "Finite-fold definition of Z in O_K / over F_q[t] (Pheidas-type questions)",
+   "lean_usable": false,
+   "argument": "These are the natural open homes for the device: rank-one curves are already the standard tool, and the missing ingredient is uniqueness. Archimedean comparisons are unavailable over O_K. Over F_q[t], degree comparisons may substitute, making the function-field case the more promising. Both need major new Lean libraries, so they are not usable for the speedup test now."
+  }
+ ],
+ "precedent_check": {
+  "verdict": "EARLIER EQUIVALENT OF THE CORE MECHANISM FOUND, so the item is downgraded. Garcia-Fritz, Pasten and Vidaux (arXiv:2311.01958, Nov 2023; J. Number Theory 276 (2025) 81-97) already use a rank-one elliptic curve (y^2 = x^3 + 2, Gamma = [200]E(Q), h_hat(Q_k) = k^2 D) together with bounded-error height comparisons to define the consecutive-squares relation on indices, and so interpret (N,+,x). This is the step the 242 novelty pass called unprecedented ('none of them uses an archimedean height comparison to pin a nonlinear index relation'). 242 does not cite GPV. OpenAI's own family 004 does (and describes it as using 'elliptic canonical heights to encode consecutive squares').",
+  "what_remains_new_in_242": "(i) Height comparisons are realised as Diophantine product inequalities over N, so no extra predicates are needed (GPV work over Q with added predicates). (ii) Uniqueness of every witness (representatives; bracket via the neighbour max), i.e. the single-fold property. (iii) The specific five-term window W(2Q)W(R)W_1 vs W(Q)^2 W(R+-P) and the bracket that turns it into a growth function g feeding Prop power. (i) is routine over N. (ii) is N1-style witness hygiene. (iii) is a close variant of GPV's use. Recommended: C1 goes from N3 (conf 0.45) to N2 (close variant of GPV), unless an expert judges single-fold-ness itself to be the hard step. Test 4's L+ arm must include GPV.",
+  "after_2026_10_06": "Nothing found that uses the device after the release (arXiv API queries only; WebSearch/WebFetch hit a session limit mid-run, so Google Scholar, zbMATH and MathOverflow were not queried).",
+  "other_precedents_confirmed": "Pheidas AIM Q9 poses the elliptic-for-Pell bridge without a mechanism. Poonen 2002 Lemma 8 squares indices p-adically. Both are unchanged from novelty.json. Note: 242 still uses Pell for Prop power, so Q9's 'instead of Pell' is not fully realised."
+ },
+ "sources": [
+  {
+   "what": "Brief",
+   "where": "docs/downstream_agent_prompt.md"
+  },
+  {
+   "what": "Family and novelty analyses",
+   "where": "data/pilot/242/family.md, novelty.md, novelty.json; data/eureka_shortlist.json"
+  },
+  {
+   "what": "Lean (text level)",
+   "where": "data/raw/openai-math/lean/OAI/NumberTheory/SingleFold/{HeightGrowth,EllipticGrowth,Power,Main,Model,PolynomialCompiler,CounterCompilation,Binary,QuadraticHeight,Rank}.lean; lean/ComparatorChallenges/SingleFold.{json,lean}; lean/docs/242.md"
+  },
+  {
+   "what": "Extractor DAG",
+   "where": "data/items/242_lean.json (BFS over uses edges)"
+  },
+  {
+   "what": "Paper",
+   "where": "preprints/Single-fold-Diophantine-representations-September-24-2026/build/elliptic.tex:283-400 (Prop growth)"
+  },
+  {
+   "what": "Family 004 (H10 over Q)",
+   "where": "preprints/Hilberts-tenth-problem-over-the-rational-numbers-October-6-2026/build/sections/01-introduction.tex:159-167, 02-reduction.tex:840-870, references/references.bib:647"
+  },
+  {
+   "what": "GPV full text (arXiv v2 PDF, read via pypdf)",
+   "where": "https://arxiv.org/abs/2311.01958"
+  },
+  {
+   "what": "Release index",
+   "where": "data/raw/openai-math/CONTENTS.md"
+  }
+ ],
+ "search_log": [
+  "BFS from OAI.SingleFold.main to square_window, growth_model, growth and power_of_growth in data/items/242_lean.json: chain recorded.",
+  "Grep of OAI for imports of OAI.NumberTheory.SingleFold outside its own directory: none.",
+  "Grep of CONTENTS.md for diophantine/elliptic/height/Julia Robinson: found family 004 (H10 over Q, same release) with height and elliptic sections.",
+  "Read 004 intro/reduction: it cites GarciaFritzPastenVidaux2025 and uses quadratic height growth only for index bounding.",
+  "arXiv API search au:Pasten AND au:Vidaux gave 2311.01958. Full PDF read (11 pp): Lemma 4.7 defines consecutive squares via height comparisons on y^2 = x^3 + 2 with h_hat(Q_k) = k^2 D and |h - h_hat| <= 4.",
+  "Grep of 242's references.bib for Pasten/Vidaux/Garcia: none (not cited).",
+  "Grep of 242's paper for NP/Adleman/bounded witnesses: none.",
+  "WebSearch for Adleman-Manders D = NP: blocked (session limit). Formulation given from memory and flagged unverified.",
+  "Mathlib not available locally: Dioph/Pell line counts are estimates."
+ ],
+ "notes": "Text-level only; Lean not compiled. Downloads made this session (GPV PDF, arXiv API XML) were saved in the session scratchpad and treated as data."
+}

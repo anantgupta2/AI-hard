@@ -1,0 +1,748 @@
+{
+ "fid": "075",
+ "item": "Thermal noisy labels Z = Y + theta (theta ~ K_A), label updates A+ = A + S_p + D_i, two-law Fisher sum and exact character decoding (I26 + I27 + I10)",
+ "item_type": "F1",
+ "lean_status": "formalized, different route",
+ "lean_status_why": "The label, its update, the two-law Fisher sum and the decoding identity all lie on the proof DAG of the comparator paperMain, whose statement matches the headline exactly. The setting is a finite ZMod 2^M model with integrated (not sampled) labels and several route substitutions. GridBound fixes epsilon_j = r_{j+1} (Gi = the paper's g_I). That is exactly the only instance the paper ever uses, and it affects only output-side path lemmas, so the Lean does certify the label's role. Checked at text level only, without compiling.",
+ "lean_gaps": [
+  "NOT COMPILED (no toolchain; nanoda off). Text-level only. lean_layer_notes.md: no sorry, axiom or native_decide in the Procedure-through-Assembly layers.",
+  "epsilon_j fixed to r_{j+1} (Gi = g_I) in GridBound, against arbitrary F_{j+1}-measurable |epsilon_j| <= 1 in Prop dyadic. This is the exact instance used in 11-fourier.tex:63-65, and it is output-side only; see epsilon_j_check. It does NOT affect the label.",
+  "Good-set form instead of a stopped sum: finGood with cutoff (j+1)^3 replaces tau with threshold e^{4h} = (log d)^4. The layer height is d = 2^j (rho <= exp(2^j)). This is a different but adequate exceptional-set bookkeeping.",
+  "Finite model: Grid M = ZMod 2^M and finite laws, with no MeasureTheory martingales. Labels are integrated as a law (Thermal.label, Thermal.channel = label.send (x + .)), never sampled.",
+  "The simultaneous regular-evidence statement is replaced by a multiplicative path-product score supermartingale (Rare.lean:66 rare). log_mass_budget covers only the final state. Scalar potential psi becomes Huber + b x^2. Relative entropy for snapshots becomes triangular discrimination. The count cap is derived (fund_est) instead of being a transfer rule.",
+  "Extra hypothesis 1000 * 2^J <= 2^M in grossOur, rating_bound, rare and stake_upper. Harmless, since GridBound quantifies 'eventually in M'.",
+  "Constant C = 10^222 (gridProof). The comparator paperMain matches the headline exactly (full symmetric partial sums, a.e., integrable |f| log(2+|f|))."
+ ],
+ "epsilon_j_check": {
+  "question": "The Lean GridBound fixes the signs epsilon_j that the paper's Prop dyadic quantifies over. Does that mean the Lean does not certify the label's role?",
+  "answer": "No. The specialisation is the paper's own application instance, and it lives on the output side. The label's job, a majorant uniform over all modulations u, is fully present in GridBound and is discharged through the label lemmas.",
+  "evidence": [
+   "Paper Prop dyadic (06-procedure.tex:10-47) quantifies over F_{j+1}-measurable epsilon_j with |epsilon_j| <= 1, 'the same epsilon_j for all modulations'. The procedure section (06-procedure.tex:55-66) says the coefficient is formed on the INPUT side and epsilon_j(x) only multiplies the OUTPUT, and 'the same multipliers are used for every piece and every label coordinate'. So the multipliers never enter the label construction.",
+   "The paper's only use of Prop dyadic is Thm good-set (11-fourier.tex:63-65): 'on the output side choose epsilon_j = r_{j+1}, so that g_I = r_{j+1} r_{j+2}'. A grep for prop:dyadic finds only the intro, the procedure statement, its proof in 09-assembly, and this application.",
+   "Lean: FinJump p F x = p.Gi(pos x) * p.avg(Hi * F) (Dyadic/Grid.lean:234). Gi = haarG o normarg, haarG x = haarH(2x) - haarH(2x-1) (Fourier/Haar.lean:18), and Gi_eq: Gi = L.Hi - R.Hi (Grid.lean:120). This is exactly the paper's summand E_p[rho chi_u h_I] * g_I with epsilon_j = r_{j+1}.",
+   "The fixed sign is consumed only in the output-path layer: Paths/Trip.lean (Gi_half, blow, trip_delay: blow x c = curl c.bit * curl d.bit; trip_final: |blow| = 1), Paths/Frost.lean last_lag (uses t^2 = k^2 and |blow| = 1), Paths/Letters.lean (proceeds/duties), Paths/Tilt.lean, Assembly/Rail.lean and Assembly/Cast.lean stage_shift. Grep finds NO use of Gi, haarG or blow in Thermal/ or Procedure/, where label, channel, fisher, bit_def, space_deficit and fisher_bound live.",
+   "The frequency supremum is intact. GridBound has 'exists W ... forall x good, forall u : Grid M, ||FinShift J (finMod rho u) x|| <= W x' with expU W <= C 2^j, i.e. one majorant for all 2^M modulations, uniformly as M -> infinity.",
+   "The label lemmas are on the comparator chain (extract_lean BFS): paperMain -> almost_everywhere_fourier_convergence -> gridProof -> grossOur -> upper_total -> Road.fisher_bound -> one_split_price -> space_deficit -> bit_def, with fisher_bound -> Thermal.channel -> Thermal.label. Separately: gridProof -> annual_valid -> gala -> main_stage -> ride -> below_decode -> decode_track -> gain_decode -> duet_decode. And: gridProof -> plant -> fund_est -> certified_add -> F_increment -> cred_mono -> cred_add_mono -> ginibre. Thermal.label has 323 dependents in the DAG (24% of 2014 declarations)."
+  ],
+  "residual_caveat": "The Lean does NOT certify the general-multiplier Prop dyadic. Downstream targets that need other output multipliers would need the general form: variational Carleson, other Haar kernels, Walsh variants whose output signs are not r_{j+1} r_{j+2}. The fix looks local: replace curl c.bit by an arbitrary depth-(j+1)-measurable epsilon with |epsilon| <= 1 in trip_delay, trip_final and last_lag, using t^2 <= k^2 instead of equality, and complex parts in Frost. The extra lines (perhaps 100-300) are a guess from reading these four files, not a measurement.",
+  "recommended_check": "State GeneralGridBound (epsilon : N -> Grid M -> C, constant on depth-(j+1) blocks, ||epsilon|| <= 1, FinJump with epsilon j * r_{j+2} in place of Gi). This is statable now in about 25 lines from Dyadic/Grid.lean. Then verify that the proof changes are confined to Paths/ and Assembly/Cast. Doing so would close the issue formally.",
+  "verdict": "The specialisation does not undercut the label. Remove the 'Lean may not certify the label's step' caveat from the shortlist and replace it with 'Lean certifies the epsilon_j = r_{j+1} instance (the one the paper uses); general multipliers are unformalised and are output-side only'."
+ },
+ "comparator_chain": [
+  "OAI.FourierLLogL.paperMain (PaperMain.lean:8; comparator target)",
+  "OAI.FourierLLogL.almost_everywhere_fourier_convergence (Main.lean:25)",
+  "OAI.FourierLLogL.main_of_grid (Main.lean:17; GridBound -> unitTreeBound -> affine -> realGoodBound -> goodBound -> main_bound_consequence)",
+  "OAI.FourierLLogL.Dyadic.gridProof : GridBound (Assembly/Endpoint.lean:18)",
+  "OAI.FourierLLogL.Dyadic.Procedure.Paths.CastShow.grossOur (Assembly/Weighted.lean:82)",
+  "OAI.FourierLLogL.Dyadic.Procedure.Paths.CastShow.upper_total (Verdict.lean:147)",
+  "OAI.FourierLLogL.Dyadic.Procedure.Road.fisher_bound (Procedure/Fisher.lean:118)",
+  "OAI.FourierLLogL.Dyadic.Procedure.Road.one_split_price (Procedure/Fisher.lean:68)",
+  "OAI.FourierLLogL.Dyadic.Procedure.space_deficit (Procedure/Deficit.lean:147)",
+  "OAI.FourierLLogL.Dyadic.Procedure.bit_def (Procedure/Deficit.lean:100)",
+  "OAI.FourierLLogL.Dyadic.Thermal.channel (Thermal/Piece.lean:30; reached from fisher_bound)",
+  "OAI.FourierLLogL.Dyadic.Thermal.label (Thermal/Form.lean:163)  <- THE ITEM"
+ ],
+ "comparator_chain_branches": {
+  "decoding": "gridProof -> annual_valid (Gross.lean:35) -> gala -> main_stage -> ride -> below_decode -> decode_track -> gain_decode -> duet_decode (Assembly/Phase.lean:28)",
+  "update": "gridProof -> Procedure.Play.Follows (Play.lean:102) -> Thermal.Update.Good -> Thermal.Update.next (Update.lean:33)",
+  "positivity": "gridProof -> plant (Procedure/Tree.lean:58) -> Fund.fund_est -> certified_add -> F_increment -> cred_mono -> cred_add_mono -> ginibre (Thermal/Ginibre.lean:212)",
+  "fixed_sign_use": "gridProof -> stage_shift (Assembly/Cast.lean:138; FinJump unfolding) and the Paths/Trip.lean trip_delay / trip_final consumers (output side only)",
+  "dag_stats": "extract_lean v2: 2448 declarations in 156 files (FourierLLogL plus the imported OAI/Analysis/Fourier). 2014 are in the comparator DAG. gridProof dominates 89.7%. Thermal.label has 323 dependents and Thermal.K 24.7%. Every label lemma is in the DAG."
+ },
+ "lean_source": [
+  {
+   "name": "OAI.FourierLLogL.Dyadic.Thermal.Form",
+   "kind": "abbrev",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Form.lean",
+   "line": 15,
+   "text": "/-- coefficient form. Throughout, nonnegativity of the coefficients means `0 ≤ A`. -/\nabbrev Form (M : ℕ) := Grid M → ℝ",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Thermal.wave / cost / form",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Form.lean",
+   "line": 18,
+   "text": "def wave (s y : Grid M) : ℝ := (chi s y).re\ndef cost (s y : Grid M) : ℝ := 1-wave s y\ndef form (A : Form M) : Grid M → ℝ := fun y => ∑ s, A s * cost s y",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Thermal.boltz / q",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Form.lean",
+   "line": 89,
+   "text": "def boltz (A : Form M) (y : Grid M) : ℝ := exp (-form A y)\ndef q (A : Form M) (u : Grid M) : ℝ := (fc (fun y => (↑(boltz A y):ℂ)) u).re",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Thermal.F / K (free energy, label density K_A = e^{F-A})",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Form.lean",
+   "line": 132,
+   "text": "def F (A : Form M) := -log (q A 0)\ndef K (A : Form M) (x : Grid M) : ℝ := boltz A x / q A 0",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Thermal.label (noise law theta ~ K_A)",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Form.lean",
+   "line": 162,
+   "text": "/-- Label noise law centered at zero relative to counting measure. -/\ndef label (A : Form M) : Law (Grid M) :=\n  ⟨fun x => side M * K A x, fun x => mul_nonneg (side_pos _).le (K_pos _ _).le, by\n    rw [← Finset.mul_sum]\n    exact K_total _⟩",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Thermal.cred (thermal Fourier coefficient c_A(u) = int chi_u K_A)",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Form.lean",
+   "line": 181,
+   "text": "def cred (A : Form M) (u : Grid M) := q A u/q A 0",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Thermal.delta (metric Delta_A)",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Order.lean",
+   "line": 89,
+   "text": "def delta (A : Form M) (s : Grid M) := √((label A).Ex fun i => ‖1-chi s i‖^2)",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Thermal.channel (the label Z = Y + theta)",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Piece.lean",
+   "line": 29,
+   "text": "/-- Observation type-A. -/\ndef channel (A : Form M) (x : Grid M) : Law (Grid M) :=\n  (label A).send (fun z => x+z)",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Thermal.omegaObs / Mz / fz (label-weighted masses M(z) and moments f(z))",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Piece.lean",
+   "line": 97,
+   "text": "/-- Observation law weighted by the local subpiece. -/\ndef omegaObs (p : Node) (a : Grid M → ℝ) (α : ℝ) (A : Form M) (y z : Grid M) :=\n    wt p a α y * channel A y z\ndef Mz (p : Node) (a : Grid M → ℝ) (α : ℝ) (A : Form M) (z : Grid M) :=\n    ∑ y, omegaObs p a α A y z\ndef fz (p : Node) (a : Grid M → ℝ) (α : ℝ) (A : Form M) (u z : Grid M) : ℂ :=\n    ∑ y, (omegaObs p a α A y z:ℂ) * chi u y",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Thermal.S (spatial form S_p = R^2 (1 - Re chi_1))",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Spatial.lean",
+   "line": 50,
+   "text": "/-- Spatial form, specified by inverse width -/\ndef S (M : ℕ) (R : ℝ) : Form M := fun s => if s=1 then R^2 else 0",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Thermal.place",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/History.lean",
+   "line": 15,
+   "text": "def place (p : Node) (M : ℕ) := S M p.invlen",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Thermal.Update.next (label update A+ = A + S_p + D_i)",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Update.lean",
+   "line": 33,
+   "text": "def next (u : Update j M p) (A : Form M) : Form M := A+place p M+u.changeForm",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Procedure.Fund.advance (main channel 'mood' replaced by u.next)",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Procedure/Capital.lean",
+   "line": 25,
+   "text": "def advance (p : Node) (c : Fund M) (u : Update j M p) : Fund M :=\n    ⟨u.next c.mood,p,c.uses+1,c.spend+u.credit,c.bank+u.bill⟩",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Procedure.hist / diff / fisher (J_p = sum |D|^2/M)",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Procedure/Deficit.lean",
+   "line": 69,
+   "text": "/-- Observation mass relative to s.norm. -/\ndef hist (s : Scene M) (k : Grid M → Law α) (i : α) :=\n    ∑ x : Grid M, wt s.here s.wage s.norm x*k x i\ndef diff (s : Scene M) (k : Grid M → Law α) (i : α) :=\n    (hist (s.smaller false) k i - hist (s.smaller true) k i)/2\n\ndef fisher (s : Scene M) (k : Grid M → Law α) :=\n    ∑ i : α, (diff s k i)^2 / hist s k i",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Procedure.givenD / massInfo (per-node label Fisher charge)",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Procedure/Fisher.lean",
+   "line": 55,
+   "text": "def givenD (s : Scene M) := deficit s (channel s.fund.mood)\n\ndef massInfo (s : Scene M) :=\n    1/4*(s.norm/s.mass)*fisher s (channel s.fund.mood)",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Thermal.ginibre (key lemma: Griffiths-Ginibre covariance positivity)",
+   "kind": "theorem (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Thermal/Ginibre.lean",
+   "line": 212,
+   "text": "theorem ginibre {A : Form M} (hA : 0 ≤ A) (s t : Grid M) :\n    cred A s * cred A t ≤ (label A).Ex (fun i => wave s i * wave t i)",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Procedure.bit_def (key lemma: Fisher information of label <= 4 x bit relative-entropy deficit)",
+   "kind": "lemma (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Procedure/Deficit.lean",
+   "line": 100,
+   "text": "lemma bit_def (s : Scene M) (k : Grid M → Law α) (hp : s.here.valid)\n    (he : s.here.lev < M) (hh : 0 ≤ s.wage) (hm : 0 < s.mass) (hn : 0 < s.norm) :\n    s.norm/s.mass * fisher s k ≤ 4*(log 2-sideH (step s) k)",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Procedure.space_deficit (key lemma: one-step chain-rule identity charging the Fisher term to the entropy deficit)",
+   "kind": "lemma (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Procedure/Deficit.lean",
+   "line": 147,
+   "text": "lemma space_deficit (s : Scene M) (k : Grid M → Law α) (hp : s.here.valid)\n    (he : s.here.lev < M) (hh : 0 ≤ s.wage) (hm : 0 < s.mass) (hn : 0 < s.norm) :\n    (step s).probs.Ex (fun b => deficit (s.smaller b) k) +\n      (1/4:ℝ)*(s.norm/s.mass)*fisher s k ≤ deficit s k",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Procedure.Road.fisher_bound (key lemma: global label Fisher sum <= limitC * height j, i.e. O(d))",
+   "kind": "lemma (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Procedure/Fisher.lean",
+   "line": 118,
+   "text": "lemma fisher_bound :\n    ∀ᶠ j : ℕ in atTop, ∀ M J : ℕ, ∀ f : Grid M → ℝ,\n      (∀ x, f x ≤ exp (height j)) →\n      let s := beginPlay f true\n      ∀ t : Road j M s, Trusted J f t → 1/Thermal.H j ≤ s.mass →\n        t.flatFee infoFee ≤ limitC* height j",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Procedure.Paths.Troupe.duet_decode (key lemma: exact decoding identity int chi_k a^v = c_A(k) * scalar(v+k))",
+   "kind": "lemma (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Assembly/Phase.lean",
+   "line": 28,
+   "text": "lemma duet_decode (s : Scene M) (v k : Grid M) :\n    ∑ z, chi k z*letter s v z = (cred (dye s) k:ℂ)*scalar s (v+k)",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Procedure.Paths.Troupe.energy_near_channel (label energy of v controlled by that of v+k plus Delta_A(k)^2)",
+   "kind": "lemma (statement only)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Assembly/Phase.lean",
+   "line": 55,
+   "text": "lemma energy_near_channel (s : Scene M) (h : Fit s) (v k : Grid M) :\n    energy s v ≤ 2*energy s (v+k)+2*(share s*delta (dye s) k^2)",
+   "note": "from F1 report (verbatim)"
+  },
+  {
+   "name": "Dyadic.FinJump",
+   "kind": "def (one delayed Haar summand; output sign Gi is FIXED)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Dyadic/Grid.lean",
+   "line": 234,
+   "text": "def FinJump {M : ℕ} (p : Node) (F : Grid M → ℂ) (x : Grid M) :=\n  p.Gi (pos x) • p.avg (fun y => p.Hi (pos y) • F y)",
+   "note": "added in downstream pass (verbatim, proof cut at :=)"
+  },
+  {
+   "name": "Dyadic.FinShift",
+   "kind": "def (finite modulated delayed Haar shift)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Dyadic/Grid.lean",
+   "line": 237,
+   "text": "def FinShift {M : ℕ} (J : ℕ) (F : Grid M → ℂ) (x : Grid M) :=\n  ∑ n ∈ Finset.range J, ∑ k ∈ Finset.range (2^n), FinJump ⟨n,k⟩ F x",
+   "note": "added in downstream pass (verbatim, proof cut at :=)"
+  },
+  {
+   "name": "Dyadic.finMod",
+   "kind": "def (modulation rho * chi_u)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Dyadic/Grid.lean",
+   "line": 240,
+   "text": "def finMod {M : ℕ} (ρ : Grid M → ℝ) (u : Grid M) (x : Grid M) :=\n  (ρ x : ℂ)*chi u x",
+   "note": "added in downstream pass (verbatim, proof cut at :=)"
+  },
+  {
+   "name": "Dyadic.finGood",
+   "kind": "def (good set: dyadic averages <= D on the path)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Dyadic/Grid.lean",
+   "line": 243,
+   "text": "def finGood {M : ℕ} (D : ℝ) (J : ℕ) (ρ : Grid M → ℝ) (x : Grid M) :=\n  ∀ p : Node, p.valid → p.lev < J → x ∈ p.block M → p.avg ρ ≤ D",
+   "note": "added in downstream pass (verbatim, proof cut at :=)"
+  },
+  {
+   "name": "Dyadic.GridBound",
+   "kind": "def (Lean's version of Prop dyadic: sup over ALL u, u-independent majorant W)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Dyadic/Grid.lean",
+   "line": 248,
+   "text": "/-- Finite cut statement; asks for an L¹ majorant restricted to points where density steps stay\nbelow threshold. There is no dependence on a frequency or depth cutoff in the constant. -/\ndef GridBound : Prop :=\n  ∃ C : ℝ, 0 ≤ C ∧ ∀ᶠ j : ℕ in atTop, ∀ J : ℕ, ∀ᶠ M : ℕ in atTop,\n    ∀ (ρ : Grid M → ℝ), (∀ x, 0 ≤ ρ x) → expU ρ ≤ 2 →\n      (∀ x, ρ x ≤ Real.exp ((2:ℝ)^j)) →\n    ∃ W : Grid M → ℝ, (∀ x, 0 ≤ W x) ∧ expU W ≤ C*(2:ℝ)^j ∧\n      ∀ x : Grid M, finGood (((j:ℝ)+1)^3) J ρ x →\n        ∀ u : Grid M, ‖FinShift J (finMod ρ u) x‖ ≤ W x",
+   "note": "added in downstream pass (verbatim, proof cut at :=)"
+  },
+  {
+   "name": "Dyadic.Node.Gi_eq",
+   "kind": "lemma (Gi = H_L - H_R, i.e. the paper's g_I = r_{j+1} r_{j+2})",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Dyadic/Grid.lean",
+   "line": 120,
+   "text": "lemma Gi_eq (p : Node) (x : ℝ) : p.Gi x = p.L.Hi x - p.R.Hi x := ...",
+   "note": "added in downstream pass (verbatim, proof cut at :=)"
+  },
+  {
+   "name": "haarG",
+   "kind": "def (the paper's g profile)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Fourier/Haar.lean",
+   "line": 18,
+   "text": "def haarG (x : ℝ) := haarH (2*x) - haarH (2*x-1)",
+   "note": "added in downstream pass (verbatim, proof cut at :=)"
+  },
+  {
+   "name": "Dyadic.gridProof",
+   "kind": "theorem (GridBound holds, C = 10^222)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Assembly/Endpoint.lean",
+   "line": 18,
+   "text": "theorem gridProof : GridBound := ...",
+   "note": "added in downstream pass (verbatim, proof cut at :=)"
+  },
+  {
+   "name": "Procedure.Paths.Gi_half",
+   "kind": "lemma (fixed sign factors as curl b * child Haar)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Paths/Trip.lean",
+   "line": 110,
+   "text": "lemma Gi_half (p : Node) (b : Bool) (x : Grid M) (h : x∈(p.child b).block M) :\n    p.Gi (pos x)=curl b * (p.child b).Hi (pos x) := ...",
+   "note": "added in downstream pass (verbatim, proof cut at :=)"
+  },
+  {
+   "name": "Procedure.Paths.blow",
+   "kind": "def (output multiplier along a path)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Paths/Trip.lean",
+   "line": 120,
+   "text": "def blow (x : Grid M) (b : Beat M) := b.post.here.Gi (pos x)",
+   "note": "added in downstream pass (verbatim, proof cut at :=)"
+  },
+  {
+   "name": "Procedure.Paths.trip_delay",
+   "kind": "lemma (output multiplier = r_{j+1} r_{j+2}; where the epsilon_j specialisation is used)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Paths/Trip.lean",
+   "line": 122,
+   "text": "lemma trip_delay {x : Grid M} {c d : Beat M} {l : Path M}\n    (h : Trip x s (c::d::l)) : blow x c=curl c.bit*curl d.bit := ...",
+   "note": "added in downstream pass (verbatim, proof cut at :=)"
+  },
+  {
+   "name": "FourierLLogL.main_of_grid",
+   "kind": "theorem (GridBound => headline)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/Main.lean",
+   "line": 17,
+   "text": "theorem main_of_grid (h : Dyadic.GridBound) {f : Torus → ℂ} (hf : MemLLogL f) :\n    ∃ E : Set Torus, MeasurableSet E ∧ circleMeasure E = 0 ∧ ∀ x ∉ E,\n      Tendsto (fun N : ℕ ↦ symmetricPartialSum f N x) atTop (𝓝 (f x)) := ...",
+   "note": "added in downstream pass (verbatim, proof cut at :=)"
+  },
+  {
+   "name": "FourierLLogL.paperMain",
+   "kind": "theorem (comparator target)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/PaperMain.lean",
+   "line": 8,
+   "text": "theorem paperMain (f : AddCircle (2 * Real.pi) → ℂ)\n    (hfm : AEStronglyMeasurable f AddCircle.haarAddCircle)\n    (hfi : Integrable (fun x ↦ ‖f x‖ * Real.log (2 + ‖f x‖))\n      AddCircle.haarAddCircle) :\n    ∃ E : Set (AddCircle (2 * Real.pi)),\n      MeasurableSet E ∧ AddCircle.haarAddCircle E = 0 ∧ ∀ x ∉ E,\n        Tendsto\n          (fun N : ℕ ↦\n            ∑ k ∈ Finset.Icc (-(N : ℤ)) (N : ℤ), fourierCoeff f k * fourier k x)\n          atTop (𝓝 (f x)) := ...",
+   "note": "added in downstream pass (verbatim, proof cut at :=)"
+  }
+ ],
+ "speedup_targets": [
+  {
+   "id": "S1",
+   "title": "Walsh-Carleson theorem (Billard / Sjolin), proved through a Walsh GridBound",
+   "statement": "For f in L^2[0,1), the Walsh-Paley partial sums S_N f converge to f a.e. Finite core: ||sup_u |sum_{j<J} sum_p g_p(x) E_p[f w_u h_p]| ||_2 <= C ||f||_2 on (Z/2)^M, uniformly in M.",
+   "reference": "Billard 1967; Sjolin 1969; Thiele, Wave packet analysis (CBMS 105, 2006), Walsh chapters",
+   "status": "known theorem",
+   "current_proof_size": "about 20-30 pp. via Walsh tiles; no Lean formalisation found",
+   "how_item_helps": "On the Walsh group, label decoding is exact multiplicatively (w_n(y + theta) = w_n(y) w_n(theta) under dyadic addition). Ginibre becomes the GKS second inequality for Ising-type forms. The Fisher lemmas (bit_def, space_deficit, fisher_bound) take an arbitrary channel k : Grid M -> Law alpha and transfer verbatim. The Fourier/ transfer layer (2514 lines) is not needed. L^2 is inside the density/entropy regime the device already handles (it gives L log L), so a Walsh L log L proof would give this as a corollary.",
+   "expected_speedup": "high relative to tiles if the Walsh L log L port (O1) works; otherwise med",
+   "confidence": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib MeasureTheory integral on [0,1), Int.floor for Rademacher functions; OAI Dyadic.Grid (Node, avg, expU) for the finite core.",
+    "missing": [
+     "Walsh-Paley functions and Walsh-Fourier partial sums on [0,1) (about 80-150 lines)",
+     "finite Walsh character on Grid M or (ZMod 2)^M (about 30-60 lines)",
+     "PROOF: GKS/Ginibre on (ZMod 2)^M (about 300-600 lines; the OAI Ginibre is specialised to the cyclic ZMod 2^M with a half-translation branch)"
+    ],
+    "formal_proof_to_compare": "OAI 075 Lean: 156 files, about 29.2k lines; comparator DAG 2014 declarations. Layers (lines): Thermal 4575, Compress 4385, Paths 3720, Procedure 2759, Assembly 2695, Fourier 2514, Finite 1599, Dyadic 1528, Capture 1453, Snapshot 1323, Edges 1075, Weak 825, Plateau 666. The Walsh port should reuse Dyadic/Procedure/Paths/Assembly and drop Fourier/ and Lift."
+   }
+  },
+  {
+   "id": "S2",
+   "title": "Bourgain's multi-frequency lemma in a finite dyadic model",
+   "statement": "For Lambda a subset of Grid M with |Lambda| = N (separated at scale 2^{-j0}) and f : Grid M -> C, expU(sup_{j >= j0} |sum_{theta in Lambda} chi_theta E_j(chi_{-theta} f)|^2) <= C (log N)^2 expU |f|^2, uniformly in M. E_j is the depth-j dyadic average (OAI Node.avg).",
+   "reference": "Bourgain 1989 (IHES) Lemma 4.11; Nazarov-Oberlin-Thiele arXiv:0912.3010; Krause-Mirek-Trojan arXiv:1504.04132; Krause arXiv:2502.12887",
+   "status": "the Euclidean smooth-window version is known with (log N)^2, and the optimal power is open. For this rough dyadic-average variant I have NOT verified that the same bound is in the literature; check before use.",
+   "current_proof_size": "about 8-12 pp. (Rademacher-Menshov chaining plus Littlewood-Paley); not formalised",
+   "how_item_helps": "Several frequencies in a Delta_A-ball are decoded from one label moment. The packing term log|B_A(r)| ~ log N would be the only loss, suggesting (log N)^2 -> log N. TWO MISMATCHES lower confidence: (i) the label's budget is the relative entropy of a density (an L log L quantity), while Bourgain's lemma is an L^2 bound, so it needs an L^2 or Gaussian analogue of the two-law transfer; (ii) the operator is a SUM over theta inside |.|, not the sup over a single modulation that GridBound controls.",
+   "expected_speedup": "low-med (high value of information: a frequency-count saving on a different theorem would confirm the item)",
+   "confidence": "low-medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI Dyadic.Grid: chi, Node.avg, expU, Grid M = ZMod 2^M. Mathlib Finset.sup' and Real.log. A smooth-window version would use Mathlib ZMod.dft (recalled from memory, not verified at d13f23b).",
+    "missing": [
+     "depth-j conditional expectation as a function (about 20-40 lines, wrapping Node.avg)",
+     "separation predicate on Lambda (about 10 lines)"
+    ],
+    "formal_proof_to_compare": "none (no formal proof of Bourgain's lemma found). Size baseline: the 075 Procedure/Thermal layers."
+   }
+  },
+  {
+   "id": "S3",
+   "title": "Walsh analogue of Sjolin-Soria / Antonov: Walsh series converge a.e. in L log L log log log L",
+   "statement": "If integral |f| log(2+|f|) log log log(16+|f|) < infinity, then S_N^{Walsh} f -> f a.e.",
+   "reference": "Sjolin-Soria 2003; Di Plinio arXiv:1312.0398; Oniani arXiv:2002.00350",
+   "status": "known theorem (Walsh)",
+   "current_proof_size": "extrapolation from weak-L^p Walsh-Carleson bounds with sharp constants: about 15-25 pp. plus Walsh-Carleson",
+   "how_item_helps": "Subsumed by O1 (Walsh L log L) if the port works. As a speedup target it measures whether a prover equipped with the label lemmas finds the stronger result faster than the extrapolation route.",
+   "expected_speedup": "med",
+   "confidence": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "as S1 plus an Orlicz integrability predicate (inline)",
+    "missing": [
+     "Walsh partial sums (shared with S1)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "S4",
+   "title": "CONTROL: scalar dyadic entropy/Fisher bound (label-free, A = 0)",
+   "statement": "sum_I |I| (<rho>_{I+} - <rho>_{I-})^2 / <rho>_I <= C integral rho log(rho/<rho>)",
+   "reference": "folklore (chain rule + Pinsker)",
+   "status": "known",
+   "current_proof_size": "about 1 p.; Lean: special case of bit_def/space_deficit with the trivial channel (Procedure/Fisher.lean:51 no_label)",
+   "how_item_helps": "It should NOT help: this checks that the measurement is not just rewarding the entropy chain rule.",
+   "expected_speedup": "none (control)",
+   "confidence": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI Procedure (no_label, bit_def, space_deficit), Dyadic.Grid",
+    "missing": [],
+    "formal_proof_to_compare": "OAI 075 Procedure/Deficit.lean + Fisher.lean"
+   }
+  },
+  {
+   "id": "S5",
+   "title": "NEGATIVE CONTROL: sharpness of Rademacher-Menshov for general orthonormal systems",
+   "statement": "There is an orthonormal system and coefficients with sum |a_n|^2 w(n) < infinity for every w = o(log^2 n) whose series diverges a.e. (Menshov).",
+   "reference": "Rademacher 1922; Menshov 1923",
+   "status": "known",
+   "current_proof_size": "about 3-6 pp.",
+   "how_item_helps": "It must not help: there is no translation structure, so no positive-definite noise exists. An apparent 'speedup' would indicate a broken evaluation.",
+   "expected_speedup": "none (negative control)",
+   "confidence": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib Orthonormal in Lp 2, Summable, ae",
+    "missing": [
+     "series-of-functions a.e. divergence wrapper (about 40-80 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "open_problems": [
+  {
+   "id": "O1",
+   "title": "Walsh-Fourier series converge a.e. for f in L log L (finite form: Walsh GridBound)",
+   "statement": "GridBound with chi u replaced by the Walsh character on (ZMod 2)^M: exists W with expU W <= C 2^j and, for all good x and all u, |FinShift_Walsh J (rho w_u) x| <= W x. This finite estimate plus the Walsh analogue of Lift / unitTreeBound gives the a.e. statement. The Walsh case needs no Fourier transfer.",
+   "reference": "Di Plinio arXiv:1312.0398; Sjolin-Soria 2003",
+   "url": "https://arxiv.org/abs/1312.0398",
+   "status": "open (best known L log L log log log L)",
+   "obstruction_match": "exact: the supremum over characters of a modulated dyadic martingale at the L log L endpoint",
+   "adaptation": "Ising-type forms sum lambda_s (1 - w_s); GKS for positivity; exact multiplicative decoding; channel-agnostic Fisher lemmas reused verbatim; the output-side sign structure is identical (Haar profiles).",
+   "payoff": "resolves the Walsh L log L problem; best CHEAP Lean check (shortlist next_test)",
+   "confidence": "medium-high (device ports), medium (full proof)",
+   "difficulty": "moderate (mostly transcription plus GKS)",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI Dyadic/Grid.lean (Node, FinJump with Gi, finGood, expU) with a Walsh character in place of chi",
+    "missing": [
+     "walsh u x on Grid M via bits, or a (ZMod 2)^M grid (about 30-60 lines)",
+     "PROOF: GKS on (ZMod 2)^M (about 300-600), Walsh decoding (small), Thermal layer re-typed (part of 4575 lines)"
+    ],
+    "formal_proof_to_compare": "OAI 075 Lean: 156 files, about 29.2k lines; comparator DAG 2014 declarations. Layers (lines): Thermal 4575, Compress 4385, Paths 3720, Procedure 2759, Assembly 2695, Fourier 2514, Finite 1599, Dyadic 1528, Capture 1453, Snapshot 1323, Edges 1075, Weak 825, Plateau 666. Direct baseline: gridProof's DAG minus Fourier/ (2514) and Lift."
+   }
+  },
+  {
+   "id": "O2",
+   "title": "Sharp power of log N in Bourgain's multi-frequency lemma",
+   "statement": "Is the (log N)^2 loss optimal? Can it be log N?",
+   "reference": "Bourgain 1989; NOT arXiv:0912.3010; KMT arXiv:1504.04132; Krause arXiv:2502.12887",
+   "url": "https://arxiv.org/abs/0912.3010",
+   "status": "open",
+   "obstruction_match": "strong (loss in the number of frequencies), but the L^2-versus-entropy and sum-versus-sup mismatches noted in S2 apply",
+   "adaptation": "label form over the N centres; gap potential's packing term ~ log N",
+   "payoff": "possible (log N)^2 -> log N",
+   "confidence": "low-medium",
+   "difficulty": "hard",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "as S2",
+    "missing": [
+     "as S2"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O3",
+   "title": "Variational Carleson near L^1 (r-variation of partial sums for f in L log L, r > 2)",
+   "statement": "sup over N_0 < ... < N_K of (sum_k |S_{N_k} f - S_{N_{k-1}} f|^r)^{1/r} < infinity a.e. for f in L log L",
+   "reference": "Oberlin-Seeger-Tao-Thiele-Wright, JEMS 14 (2012)",
+   "url": "",
+   "status": "open near L^1 as far as found",
+   "obstruction_match": "strong but same family; needs GENERAL output multipliers (see the epsilon_j caveat)",
+   "adaptation": "variation in place of the max in Prop dyadic; Fisher budget unchanged",
+   "payoff": "likely new endpoint result",
+   "confidence": "medium",
+   "difficulty": "moderate-hard",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI Analysis/Fourier symmetricPartialSum; Mathlib integrals",
+    "missing": [
+     "r-variation functional (about 30-60 lines)",
+     "PROOF: general-epsilon GridBound (see epsilon_j_check)"
+    ],
+    "formal_proof_to_compare": "OAI 075 Lean: 156 files, about 29.2k lines; comparator DAG 2014 declarations. Layers (lines): Thermal 4575, Compress 4385, Paths 3720, Procedure 2759, Assembly 2695, Fourier 2514, Finite 1599, Dyadic 1528, Capture 1453, Snapshot 1323, Edges 1075, Weak 825, Plateau 666."
+   }
+  },
+  {
+   "id": "O4",
+   "title": "Vilenkin series of bounded type converge a.e. in L log L",
+   "statement": "as titled",
+   "reference": "Oniani arXiv:2002.00350",
+   "url": "https://arxiv.org/abs/2002.00350",
+   "status": "open",
+   "obstruction_match": "exact (m-ary trees)",
+   "adaptation": "clock-model forms; m-ary Pinsker; Ginibre for Z_m clock models",
+   "payoff": "resolves",
+   "confidence": "medium",
+   "difficulty": "moderate",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib ZMod, AddChar on product groups",
+    "missing": [
+     "Vilenkin characters and partial sums (about 100-200 lines)",
+     "PROOF: clock-model Ginibre on prod Z_{m_j}"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O5",
+   "title": "Cubic partial sums on T^d in L log L",
+   "statement": "Square partial sums of multiple Fourier series converge a.e. for f in L log L(T^d)?",
+   "reference": "Antonov 2004 (L(log L)^d log log log L)",
+   "url": "https://www.mathnet.ru/eng/sm8303",
+   "status": "open as far as found",
+   "obstruction_match": "medium (iterated one-dimensional losses)",
+   "adaptation": "a joint label on T^d with 2^d-ary digits",
+   "payoff": "L(log L)^d -> L log L",
+   "confidence": "low-medium",
+   "difficulty": "hard",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib UnitAddTorus / multivariate Fourier coefficients (recalled from memory, not verified at d13f23b)",
+    "missing": [
+     "cubic partial sum (about 20-40 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O6",
+   "title": "Konyagin's lacunary conjecture (L log log L)",
+   "statement": "S_{n_k} f -> f a.e. for lacunary n_k and f in L log log L",
+   "reference": "Lie arXiv:1902.03630; Di Plinio arXiv:1304.3943",
+   "url": "https://arxiv.org/abs/1304.3943",
+   "status": "open",
+   "obstruction_match": "partial: the budget would have to be log d, not d",
+   "adaptation": "unclear",
+   "payoff": "new bound at best",
+   "confidence": "low",
+   "difficulty": "hard",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI symmetricPartialSum + Mathlib integrability with an inline Orlicz condition and lacunarity hypothesis",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O7",
+   "title": "Pointwise ergodic averages along squares in L log L",
+   "statement": "(1/N) sum_{n<N} f(T^{n^2} x) converges a.e. for f in L log L?",
+   "reference": "Buczolich-Mauldin arXiv:math/0504067 (fails in L^1); Bourgain (L^p)",
+   "url": "https://arxiv.org/abs/math/0504067",
+   "status": "open",
+   "obstruction_match": "partial (multi-frequency at rationals)",
+   "adaptation": "labels built from major-arc frequencies",
+   "payoff": "new bound at best",
+   "confidence": "low",
+   "difficulty": "very hard",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib MeasurePreserving, iterates, ae convergence",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O8",
+   "title": "Return-times theorem near L^1",
+   "statement": "extend the DLTT/Demeter range toward L log L x L log L",
+   "reference": "DLTT arXiv:math/0601455; Demeter arXiv:0904.1254",
+   "url": "https://arxiv.org/abs/math/0601455",
+   "status": "open near the endpoint",
+   "obstruction_match": "medium (a Carleson-type input uniform over selectors)",
+   "adaptation": "label-based Prop dyadic as the Carleson input",
+   "payoff": "range extension",
+   "confidence": "low",
+   "difficulty": "hard",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib measure-preserving systems",
+    "missing": [
+     "two-system return-times statement (about 40-80 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O9",
+   "title": "Polynomial Carleson near L^1",
+   "statement": "sup over polynomial phases of degree <= k, L log L endpoint",
+   "reference": "Lie arXiv:1105.4504",
+   "url": "https://arxiv.org/abs/1105.4504",
+   "status": "open near L^1",
+   "obstruction_match": "medium; decoding FAILS for nonlinear phases (no translation factorisation)",
+   "adaptation": "would need noise on a nilmanifold with a positivity theorem (none known)",
+   "payoff": "—",
+   "confidence": "low",
+   "difficulty": "very hard",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib principal-value integrals are awkward; a truncated version works",
+    "missing": [
+     "polynomial Carleson operator (about 60-100 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "Carleson's theorem (L^2), since L^2 is inside L log L on the circle. With paperMain in L it is about 5 lines; it must be EXCLUDED from any speedup measurement, or L must omit paperMain/gridProof. F1 listed it as a speedup target; it is moved here.",
+  "Kolmogorov-Seliverstov-Plessner (its hypothesis gives f in L^2). Moved here from the F1 speedup list for the same reason.",
+  "Hunt's theorem in L^p, p > 1; Sjolin's L log L log log L; Antonov's L log L log log log L (trigonometric): all contained in L log L.",
+  "Weak-L^1 maximal bound on L log L (already in Lean: Main.lean weak_L1_maximal_bound) and maximal_good_sets.",
+  "The gap in Konyagin's optimal-Orlicz-class problem shrinks to between the divergence class and L log L."
+ ],
+ "release_reuse": {
+  "text": "No other family in the release uses thermal labels, the label-update rule, or the two-law Fisher-sum identity (grep over all preprint .tex for 'Ginibre', 'noisy label', 'noisy observation', 'thermal form', 'Fisher sum', 'label character'; Ginibre hits elsewhere are ordinary stat-mech uses in Ising/XY/O(n) papers). Closest sibling device: family 093 (dimension-free log-Sobolev for subgaussian log-concave measures, 01-introduction.tex:166-178) predicts w(Y) from a noisy observation Y + sqrt(r) G with repeated Gaussian observations and entropy-loss accounting - the same 'noisy side-channel + entropy budget' pattern but with standard Gaussian noise, no decoding of characters, no adaptive tightening; it is in the stochastic-localization tradition. Families that could use the device: 083 (Hilbert transform along Lipschitz directions; uses Lacey-Thiele tiles for the Carleson-along-lines input, 03-ordinary-tiles.tex:6), 082 (maximal/variational triangular Hilbert transform, time-frequency), 154 (pointwise multiple ergodic averages for mixing transformations), 080 (Schrodinger maximal estimates). None of them currently uses it; only 083 has a clear Carleson-operator sub-step where it could slot in.",
+  "lean_notes_2026_10_09": "075 imports OAI/Analysis/Fourier (HeightLayers, SphereExtension; symmetricPartialSum). The ExactFourier and UniformFourier comparators belong to Computability families and are unrelated. No other OAI directory uses Thermal.label, the channel or the Fisher lemmas."
+ },
+ "negative_controls": [
+  {
+   "title": "Label-free scalar entropy bound (A = 0)",
+   "why_device_must_fail": "The trivial channel: no speedup expected (S4).",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI no_label",
+    "missing": [],
+    "formal_proof_to_compare": "OAI 075"
+   }
+  },
+  {
+   "title": "Rademacher-Menshov sharpness for general ONS",
+   "why_device_must_fail": "No translation structure, so no positive-definite label (S5).",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib Orthonormal",
+    "missing": [
+     "wrapper"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Kolmogorov's L^1 divergence example",
+   "why_device_must_fail": "A proved-false analogue: the device must not 'prove' a.e. convergence in L^1. Budgets scale with d = log ||rho||_inf and are unbounded for L^1 densities. A prover that derives L^1 convergence from the label lemmas has a broken library.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI symmetricPartialSum; Mathlib Integrable",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "target": "O1: Walsh GridBound (finite Walsh L log L)",
+   "lean_usable": true,
+   "argument": "This is the cheapest and most decisive Lean check, and the shortlist's own 'run first' test. The statement is about 30-60 new lines on top of Dyadic/Grid.lean. The obstruction is identical. Decoding becomes exactly multiplicative, the output-side Haar sign structure is the same one GridBound already fixes (so the epsilon_j specialisation is no obstacle), and the Fisher lemmas are channel-agnostic. The formal baseline is gridProof's 2014-declaration DAG minus the Fourier transfer layer. A successful port shows the device is portable. A sceptic will call it 'the same theorem on another group', so it confirms portability, not a jump."
+  },
+  {
+   "rank": 2,
+   "target": "S2 / O2: Bourgain's multi-frequency lemma, finite dyadic model",
+   "lean_usable": true,
+   "argument": "This is the only DIFFERENT theorem where the obstruction (a loss in the number of frequencies) is the whole difficulty. The statement takes about 30-50 new lines using OAI's chi, Node.avg and expU. Any frequency-count saving would be a speedup on a 35-year-old theorem and would confirm the item. I rate it low-medium because of two real mismatches: the label budget is entropy (L log L), while Bourgain is L^2; and Bourgain's operator sums over theta inside the absolute value, while GridBound takes a sup over one modulation. Also check that the rough dyadic-average variant has a known (log N)^2 bound before using it."
+  },
+  {
+   "rank": 3,
+   "target": "S1: Walsh-Carleson theorem via the label route",
+   "lean_usable": true,
+   "argument": "This is a known theorem with a tile proof of about 20-30 pp. and no formalisation. It is statable in under 300 lines (Walsh-Paley functions on [0,1)). If O1 works it becomes a corollary. If O1 stalls, an L^2-only version measures whether the label lemmas shorten a tile-free proof."
+  },
+  {
+   "rank": 4,
+   "target": "S3: Walsh L log L log log log L (Sjolin-Soria)",
+   "lean_usable": true,
+   "argument": "This is a known Walsh theorem strictly weaker than O1. As a speedup target it compares the label route against extrapolation from weak-L^p Walsh-Carleson bounds. It is statable in under 300 lines and shares definitions with S1."
+  },
+  {
+   "rank": 5,
+   "target": "O3: Variational Carleson in L log L",
+   "lean_usable": true,
+   "argument": "This is likely new and the Fisher budget is unchanged. It is statable in under 300 lines with OAI's symmetricPartialSum. It is the target that most needs the GENERAL-multiplier Prop dyadic, so it doubles as the test of whether the epsilon_j specialisation costs anything downstream. It is in the same family of problems, so it is weaker evidence than S2."
+  }
+ ],
+ "precedent_check": {
+  "text": "No earlier equivalent of the full device (noisy label of the input point with ferromagnetic thermal noise, adaptive tightening A+ = A + S_p + D_i, two-law Fisher sum, exact character decoding) was found in harmonic analysis: searches for information-theoretic / noisy-observation proofs of Carleson-type theorems returned only tile-based proofs (Carleson, Fefferman, Lacey-Thiele, Lie, Di Plinio) and the 2026 Lean formalisation of Carleson's theorem. However, every ingredient has a precedent: (i) the noise law K_A is a centred generalised von Mises distribution (Maksimov 1967; Gatto-Jammalamadaka 2007) = one-site plane-rotator Gibbs measure; its covariance positivity is Ginibre 1970 (cited); (ii) 'observe a hidden variable through progressively less noisy channels and bound the total information by the entropy via the chain rule' is stochastic localization in its information-theoretic form (Eldan; El Alaoui-Montanari arXiv:2109.00709, where the I-MMSE/chain-rule identity bounds the integrated estimation error by the entropy) and the pinning lemma (Montanari 2008; Raghavendra-Tan 2012), already noted as an uncited precedent for item I12; (iii) 'sum over scales of squared conditional biases <= relative entropy via chain rule + Pinsker' is Tao's entropy-decrement method (arXiv:1509.05422; Tao-Teravainen arXiv:1710.02112) and the folklore dyadic entropy bound; (iv) 'cost of an adaptively selected statistic is paid by mutual information rather than by a union bound over the statistics' is Russo-Zou (arXiv:1511.05219) / information-theoretic generalisation bounds, and noise injection to limit information is the Gaussian mechanism of differential privacy; (v) recovering characters from a positive-definite smoothing kernel with coefficient close to 1 on a metric ball is the Bohr-set / large-spectrum duality of additive combinatorics. Verdict: the combination (a label whose information is charged under the input law, whose decoding is exact and frequency-count-free, and whose noise is tightened adaptively with a free-energy/packing potential) has no equivalent found; the abstract mechanism is a cross-field transfer of stochastic-localization / information-budget ideas into Carleson theory. Recommend keeping N3 provisionally but flag a real N2 risk (transfer of the stochastic-localization template). Post-release (after Oct 6, 2026): no paper, blog or forum post found that uses or discusses the device; press coverage only lists family 075 by title; the release's history.md has no entry for 075.",
+  "update_2026_10_09_downstream": "No new web search in this pass: the brief allowed reuse, and WebFetch hit a session limit. The F1 verdict stands: no earlier equivalent of the full device; every ingredient is precedented (generalised von Mises / Ginibre, stochastic localization, Tao's entropy decrement, Russo-Zou); real N2 risk. No post-Oct-6 use was found in the F1 search."
+ },
+ "sources": [
+  "data/pilot/075/family.json, family.md, lean_layer_notes.md",
+  "preprints/Almost-everywhere-Fourier-convergence-in-L-log-L-September-23-2026/build/sections/01-introduction.tex:108-188; 05-thermal.tex:1-210; 06-procedure.tex:60-240, 590-650; 08-paths.tex:155-245; 09-assembly.tex:100-210",
+  "Lean: FourierLLogL/Thermal/{Form,Order,Piece,Spatial,History,Update,Ginibre}.lean; Procedure/{Capital,Deficit,Fisher}.lean; Assembly/Phase.lean",
+  "https://arxiv.org/abs/1312.0398 (Di Plinio, Walsh-Carleson weak L^p)",
+  "https://arxiv.org/abs/2002.00350 (Oniani, Vilenkin)",
+  "https://arxiv.org/abs/0912.3010 (Nazarov-Oberlin-Thiele)",
+  "https://arxiv.org/abs/1504.04132 (Krause-Mirek-Trojan)",
+  "https://arxiv.org/abs/2502.12887 (Krause 2025)",
+  "https://arxiv.org/abs/1902.03630 and https://arxiv.org/abs/1408.4783 (Lie)",
+  "https://arxiv.org/abs/1304.3943 (Di Plinio lacunary)",
+  "https://arxiv.org/abs/math/0504067 (Buczolich-Mauldin)",
+  "https://arxiv.org/abs/1907.11060 (Buczolich-Eisner)",
+  "https://arxiv.org/abs/math/0601455 (DLTT)",
+  "https://arxiv.org/abs/0904.1254 (Demeter)",
+  "https://arxiv.org/abs/1209.0856 (return times survey)",
+  "https://arxiv.org/abs/1105.4504 (polynomial Carleson)",
+  "https://arxiv.org/abs/2507.05124, https://arxiv.org/abs/2605.25108 (nonlinear Carleson)",
+  "https://www.mathnet.ru/eng/sm8303 (Antonov, multiple Fourier series)",
+  "https://arxiv.org/abs/2609.31334 (Carleson in Lean), https://arxiv.org/abs/2405.06423 (blueprint), https://api.github.com/repos/fpvandoorn/carleson/languages",
+  "https://arxiv.org/abs/2109.00709 (El Alaoui-Montanari, stochastic localization)",
+  "https://arxiv.org/abs/1509.05422, https://arxiv.org/abs/1710.02112 (Tao entropy decrement)",
+  "https://arxiv.org/abs/1511.05219 (Russo-Zou)",
+  "https://arxiv.org/abs/2105.00833 (generalised von Mises; Gatto-Jammalamadaka 2007)",
+  "https://redreamality.com/blog/ai-math-verification-lean-faithfulness/ (post-release corrections; no 075 mention)",
+  "data/raw/openai-math/lean/ComparatorChallenges/FourierLLogL.{json,lean}",
+  "data/raw/openai-math/lean/OAI/Analysis/FourierLLogL/{PaperMain,Main}.lean, Dyadic/Grid.lean, Fourier/Haar.lean, Assembly/{Endpoint,Cast}.lean, Paths/{Trip,Frost,Letters}.lean, Thermal/{Form,Ginibre}.lean",
+  "preprints/Almost-everywhere-Fourier-convergence-in-L-log-L-September-23-2026/build/sections/06-procedure.tex:1-75; 11-fourier.tex:30-130; 01-introduction.tex:80-110",
+  "data/pilot/075/lean_layer_notes.md; data/eureka_shortlist.json (075 entry, f1_review)",
+  "scripts/extract_lean.py v2 output (scratchpad)"
+ ],
+ "search_log": [
+  "Local: read family.json items I10,I12,I24-I27,I29-I31,I33,I34 and lean_items L20-L26; read paper sections 01,05,06,08,09; read Lean Thermal/Form, Piece, Update, History, Spatial, Order, Ginibre; Procedure/Capital, Deficit, Fisher; Assembly/Phase.",
+  "Local: grep CONTENTS.md for fisher|noisy|thermal|Griffiths|Ginibre|label|Carleson|modulat|maximal|ergodic|Walsh|lacunary|Chowla|variation -> families 080, 082, 083, 093, 154, 007 inspected by title; grep all preprint .tex for Ginibre|noisy label|noisy observation|thermal form|Fisher sum|label character and for stochastic localization|de Bruijn|I-MMSE -> only 093 has a related noisy-observation device.",
+  "Local: history.md has no 075 entry. Lean footprint: 53/155 FourierLLogL files (~10.0k/29.2k lines) reference channel/label/fisher/mood.",
+  "Web: 'Bourgain multi-frequency lemma logarithmic loss sharp' -> NOT, KMT, Krause 2025.",
+  "Web: 'Walsh-Fourier series a.e. convergence L log L open' -> Di Plinio 1312.0398, Oniani; still open.",
+  "Web (extended): 'information-theoretic proof Carleson theorem entropy noisy observation' -> nothing; only tile proofs and the Lean formalisation.",
+  "Web (extended): 'L log L Fourier OpenAI proof October 2026' -> press coverage of release, no technical discussion of 075.",
+  "Web: 'thermal labels noisy label Fisher information dyadic martingale Carleson' -> nothing relevant.",
+  "WebFetch androma.org (403); redreamality.com correction-week post (no 075 mention).",
+  "Web: dyadic square function relative entropy chain rule Pinsker -> no explicit source (folklore).",
+  "Web: Russo-Zou adaptive data analysis; Tao entropy decrement; Montanari pinning / stochastic localization (El Alaoui-Montanari).",
+  "Web: lacunary Carleson L log log L (Lie, Di Plinio); squares ergodic L log L (Buczolich-Mauldin); return times endpoint (DLTT, Demeter, survey); Carleson Lean size (GitHub API); nonlinear Carleson status; Vilenkin (Oniani); cubic sums (Antonov 2004); generalised von Mises.",
+  "2026-10-09 downstream pass: read Prop dyadic (06-procedure.tex:10-47) and its only application (11-fourier.tex:63-65, epsilon_j = r_{j+1}).",
+  "Read GridBound / FinJump / FinShift (Dyadic/Grid.lean:234-255), Gi_eq (Grid.lean:120) and haarG (Fourier/Haar.lean:18), and confirmed Gi = g_I.",
+  "Grep for Gi / haarG / blow: used only in Dyadic, Fourier, Paths/Trip, Paths/Frost, Paths/Letters, Paths/Tilt, Assembly/Rail and Assembly/Cast; never in Thermal/ or Procedure/.",
+  "Ran extract_lean.py 075; BFS paths from paperMain to label, channel, fisher_bound, bit_def, duet_decode, ginibre and Update.next. All reachable.",
+  "Checked that the Thermal layer is typed on Grid M = ZMod 2^M, with Ginibre specialised to the even cyclic group (so the Walsh port needs GKS on (ZMod 2)^M).",
+  "WebFetch of Mathlib d13f23b (ZMod.dft, UnitAddTorus) failed on a session limit; those Mathlib claims are from memory and marked as such."
+ ],
+ "reused_from": "data/pilot/075/f1_thermal_labels.json (candidates, precedent, lean_source). New here: epsilon_j check, comparator chain, lean_feasibility, re-ranking; Carleson L^2 and KSP moved to theorem_corollaries.",
+ "lean_checked_at_text_level_only": true
+}

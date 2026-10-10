@@ -1,0 +1,335 @@
+{
+ "fid": "362",
+ "item": "Direction-change count (Lemma ang:direction): under the signed increment bootstrap, the number of δ-direction first-exit intervals of a supported characteristic with q ~ w on an interval of length ≤ (w/P)² is ≤ C(M,A) L^6/δ, L = log(2+P)",
+ "item_type": "F3",
+ "lean_status": "as in paper",
+ "lean_status_why": "WeightedDirectionPartition encodes the paper's stopping partition with ramp weights and signed exits (eq. ang:weighted-exit), weighted_direction_partition constructs it from the bootstrap, and direction_count_bound proves count ≤ C L^6/δ; all lie on the proof DAG of OAI.RVM.global_classical_solution.",
+ "lean_gaps": [
+  "Checked at text level only; the Lean was not compiled.",
+  "Lean hypotheses: P^(3/5) ≤ w ≤ P, w^(-3/5) ≤ δ ≤ 1. The paper requires δ ≤ w^(-1/10), so the Lean upper bound on δ is weaker (more general); the constant C and 'eventually in P' match 'for sufficiently large P'.",
+  "Lean bounds D.count for every WeightedDirectionPartition (any family with the listed properties), not only the greedy first-exit one; the greedy construction is IncrementBootstrap.finite_direction_stops + exists_weighted_angular_exit.",
+  "Lean also assumes |V| ≥ w/16 on the interval and the bootstrap for all source characteristics in a compact S ⊇ supp f₀; these are paper context assumptions made explicit.",
+  "The count goes through direction_complete_count_cost_bound, which bounds (count−1)·wδ/2 by a sum of budget terms in ENNReal; the absorption step (direction_count_absorb, eventually_direction_absorption) is separate.",
+  "Dominated share in the comparator DAG: direction_count_bound 0.103 (extract_lean.py); DirectionCounts file-level downstream 0.15 (novelty.md)."
+ ],
+ "comparator": "ComparatorChallenges/VlasovMaxwell.json: OAI.RVM.global_classical_solution",
+ "comparator_chain": [
+  "OAI.RVM.global_classical_solution (Main)",
+  "OAI.RVM.Admissible.uniform_physical_population_increment",
+  "OAI.RVM.Admissible.population_increment",
+  "OAI.RVM.Admissible.uniform_signed_increment",
+  "OAI.RVM.Admissible.signed_increment_strict",
+  "OAI.RVM.Admissible.force_bulk_uniform",
+  "OAI.RVM.Admissible.force_bulk_retarded_uniform",
+  "OAI.RVM.Admissible.force_bulk_receiver_residual_uniform",
+  "OAI.RVM.Admissible.unselected_label_uniform",
+  "OAI.RVM.Admissible.unselected_source_uniform",
+  "OAI.RVM.Admissible.unselected_small_source_uniform",
+  "OAI.RVM.Admissible.unselected_good_uniform",
+  "OAI.RVM.Admissible.representative_good_envelope",
+  "OAI.RVM.Admissible.representative_pure_occupation",
+  "OAI.RVM.Admissible.direction_closedEulerian_improved",
+  "OAI.RVM.Admissible.direction_closedEulerian_grid",
+  "OAI.RVM.Admissible.direction_closed_bin_grid",
+  "OAI.RVM.Admissible.direction_stable_closed_cell_bound",
+  "OAI.RVM.Admissible.exists_stable_direction_partition",
+  "OAI.RVM.Admissible.exists_bounded_direction_partition",
+  "OAI.RVM.Admissible.direction_count_bound (DirectionCounts.lean:1065)",
+  "OAI.RVM.Admissible.direction_complete_count_real_bound (DirectionCounts.lean:993)",
+  "OAI.RVM.Admissible.direction_complete_count_cost_bound (DirectionCounts.lean:711)",
+  "[side branch] exists_bounded_direction_partition -> OAI.RVM.IncrementBootstrap.weighted_direction_partition (:471) -> IncrementBootstrap.finite_direction_stops (Retarded/AngularBump.lean:96); WeightedDirectionPartition (:451) is used from exists_stable_direction_partition"
+ ],
+ "lean_source": [
+  {
+   "name": "OAI.RVM.IncrementBootstrap",
+   "kind": "def",
+   "file": "OAI/Analysis/VlasovMaxwell/Continuation/IncrementBootstrap.lean",
+   "line": 133,
+   "text": "def IncrementBootstrap (V : ℝ → Vec) (T M A P L : ℝ) : Prop :=\n  ∀ (n : ℕ) (a b : ℝ), 0 ≤ a → a ≤ b → b ≤ T →\n    (∀ t ∈ Icc a b, (2 : ℝ)^n/8 ≤ q (V t) ∧ q (V t) ≤ 8*(2 : ℝ)^n) →\n    ‖V b-V a‖ ≤ M*P*Real.sqrt (b-a)+A*(b-a)*(P^2*L/(2 : ℝ)^n)"
+  },
+  {
+   "name": "OAI.RVM.momentumDirection",
+   "kind": "def",
+   "file": "OAI/Analysis/VlasovMaxwell/Population/MomentumDirection.lean",
+   "line": 119,
+   "text": "def momentumDirection (v : Vec) : Vec := ‖v‖⁻¹ • v"
+  },
+  {
+   "name": "OAI.RVM.WeightedDirectionPartition",
+   "kind": "structure",
+   "file": "OAI/Analysis/VlasovMaxwell/Population/DirectionCounts.lean",
+   "line": 451,
+   "text": "structure WeightedDirectionPartition (V K : ℝ → Vec) (a b w δ : ℝ) where\n  count : ℕ\n  time : ℕ → ℝ\n  ramp : ℕ → ℝ\n  initial : time 0 = a\n  terminal : time count = b\n  time_mem : ∀ i ≤ count, time i ∈ Icc a b\n  strict : StrictMonoOn time (Iic count)\n  direction_control : ∀ i < count, ∀ t ∈ Icc (time i) (time (i+1)),\n    ‖momentumDirection (V t) - momentumDirection (V (time i))‖ ≤ δ\n  exit : ∀ i < count-1,\n    ‖momentumDirection (V (time (i+1))) - momentumDirection (V (time i))‖ = δ\n  ramp_pos : ∀ i < count-1, 0 < ramp i\n  ramp_separation : ∀ i < count-1, 2*ramp i ≤ time (i+1)-time i\n  signed_exit : ∀ i < count-1,\n    w*δ/2 ≤ ‖∫ t in time i..time (i+1),\n      directionWeight (time i) (time (i+1)) (ramp i) t • angularMultiplier w (V t) (K t)‖\n  variation : ∀ i < count-1,\n    (∫ t in time i..time (i+1), |deriv (directionWeight (time i) (time (i+1)) (ramp i)) t|) = 2"
+  },
+  {
+   "name": "OAI.RVM.IncrementBootstrap.weighted_direction_partition",
+   "kind": "lemma",
+   "file": "OAI/Analysis/VlasovMaxwell/Population/DirectionCounts.lean",
+   "line": 471,
+   "text": "lemma IncrementBootstrap.weighted_direction_partition {V K : ℝ → Vec}\n    {T M A P L a b δ : ℝ} (H : IncrementBootstrap V T M A P L)\n    (k : ℕ) (hk : 16 ≤ (2:ℝ)^k) (hab : a ≤ b)\n    (hJ : Icc a b ⊆ Icc 0 T) (hV : ContinuousOn V (Icc a b))\n    (hK : ContinuousOn K (Icc a b))\n    (hd : ∀ t ∈ Ioo a b, HasDerivAt V (K t) t)\n    (hband : ∀ t ∈ Icc a b, (2:ℝ)^k/8 ≤ q (V t) ∧ q (V t) ≤ 8*(2:ℝ)^k)\n    (hM : 0 < M) (hA : 0 < A) (hP : 0 < P) (hL : 0 < L) (hδ : 0 < δ) :\n    Nonempty (WeightedDirectionPartition V K a b ((2:ℝ)^k) δ)"
+  },
+  {
+   "name": "OAI.RVM.WeightedDirectionPartition.complete_force_lower",
+   "kind": "lemma",
+   "file": "OAI/Analysis/VlasovMaxwell/Population/DirectionCounts.lean",
+   "line": 560,
+   "text": "lemma complete_force_lower (D : WeightedDirectionPartition V K a b w δ) :\n    (D.count-1 : ℕ)*w*δ/2 ≤ ∑ i ∈ Finset.range (D.count-1),\n      ‖∫ t in D.time i..D.time (i+1),\n        directionWeight (D.time i) (D.time (i+1)) (D.ramp i) t •\n          angularMultiplier w (V t) (K t)‖"
+  },
+  {
+   "name": "OAI.RVM.Admissible.direction_complete_count_cost_bound",
+   "kind": "lemma",
+   "file": "OAI/Analysis/VlasovMaxwell/Population/DirectionCounts.lean",
+   "line": 711,
+   "text": "lemma Admissible.direction_complete_count_cost_bound {d : Datum} (hd₀ : Admissible d)\n    (T₀ : ℝ) :\n    ∃ Ct Cr Cf Cl Cg Ci Ck Cw Cb : ℝ,\n      0≤Ct ∧ 0≤Cr ∧ 0≤Cf ∧ 0≤Cl ∧ 0≤Cg ∧ 0≤Ci ∧ 0≤Ck ∧ 0≤Cw ∧ 0≤Cb ∧\n    ∀ (s : Solution) (T : ℝ) (F : PhaseFlowOn s.E s.B T),\n      SmoothClassicalPrefix d s T → 0≤T → T≤T₀ →\n    ∀ (zX : Phase) (S : Set Phase) (a b w M A P δ : ℝ) (_ : 0<w),\n      zX∈tsupport d.f₀ → IsCompact S → tsupport d.f₀⊆S →\n      0≤a → b≤T → a≤b → b-a≤(w/P)^2 →\n      0<M → 0≤A → 1≤P → 1≤Real.log (2+P) → 1≤w → w≤P → P≤w^2 →\n      (∀z,s.f (0,z)≠0→∀r∈Icc 0 T,q (F.flow z r).2≤P) →\n      (∀t∈Icc a b,q (F.flow zX t).2∈Icc (w/8) (8*w)) →\n      (∀t∈Icc a b,w/16≤‖(F.flow zX t).2‖) →\n      IncrementBootstrap (fun t=>(F.flow zX t).2) T M A P (Real.log (2+P)) →\n      (∀z∈S,IncrementBootstrap (fun t=>(F.flow z t).2) T M A P (Real.log (2+P))) →\n    ∀ D : WeightedDirectionPartition (fun t=>(F.flow zX t).2)\n        (fun t=>s.E (t,(F.flow zX t).1)+cross (velocity (F.flow zX t).2) (s.B (t,(F.flow zX t).1))) a b w δ,\n      ENNReal.ofReal ((D.count-1:ℕ)*w*δ/2)≤\n      ENNReal.ofReal (4*Real.pi)⁻¹ *\n       (directionUnionBudget (∫x : Vec,totalEnergy s (0,x)) T w M A P Ct Cr Cf Cl Cg+\n        ENNReal.ofReal (Ci*T*(b-a))+\n        (D.count-1:ℕ)*ENNReal.ofReal (2*Cw*Real.sqrt (max 1 T)*(Real.log (2+P))^2)+\n        (∫⁻t in Icc a b,ENNReal.ofReal ‖prefixMomentumForce s F.flow T zX t‖)*\n          ENNReal.ofReal (Ck*Real.sqrt (max 1 T)*(Real.log (2+P))^2/w))+\n      ENNReal.ofReal (Cb*(b-a))"
+  },
+  {
+   "name": "OAI.RVM.Admissible.direction_count_bound",
+   "kind": "lemma",
+   "file": "OAI/Analysis/VlasovMaxwell/Population/DirectionCounts.lean",
+   "line": 1065,
+   "text": "lemma Admissible.direction_count_bound {d : Datum} (hd : Admissible d)\n    (T₀ M A : ℝ) (hM : 0<M) (hA : 0≤A) :\n    ∃ C : ℝ,0<C ∧ ∀ᶠ P : ℝ in atTop,\n    ∀ (s : Solution) (T : ℝ) (F : PhaseFlowOn s.E s.B T),\n      SmoothClassicalPrefix d s T → 0≤T → T≤T₀ →\n    ∀ (zX : Phase) (S : Set Phase) (a b w δ : ℝ),\n      zX∈tsupport d.f₀ → IsCompact S → tsupport d.f₀⊆S →\n      0≤a → b≤T → a≤b → b-a≤(w/P)^2 →\n      P^(3/5:ℝ)≤w → w≤P → w^(-3/5:ℝ)≤δ → δ≤1 →\n      (∀z,s.f (0,z)≠0→∀r∈Icc 0 T,q (F.flow z r).2≤P) →\n      (∀t∈Icc a b,q (F.flow zX t).2∈Icc (w/8) (8*w)) →\n      (∀t∈Icc a b,w/16≤‖(F.flow zX t).2‖) →\n      IncrementBootstrap (fun t=>(F.flow zX t).2) T M A P (Real.log (2+P)) →\n      (∀z∈S,IncrementBootstrap (fun t=>(F.flow z t).2) T M A P (Real.log (2+P))) →\n    ∀ D : WeightedDirectionPartition (fun t=>(F.flow zX t).2)\n        (fun t=>s.E (t,(F.flow zX t).1)+cross (velocity (F.flow zX t).2) (s.B (t,(F.flow zX t).1))) a b w δ,\n      (D.count:ℝ)≤C*(Real.log (2+P))^6/δ"
+  },
+  {
+   "name": "OAI.RVM.IncrementBootstrap.finite_direction_stops",
+   "kind": "lemma",
+   "file": "OAI/Analysis/VlasovMaxwell/Retarded/AngularBump.lean",
+   "line": 96,
+   "text": "lemma IncrementBootstrap.finite_direction_stops {V : ℝ→Vec} {T M A P L a b δ : ℝ}\n    (H : IncrementBootstrap V T M A P L) (k : ℕ) (hk : 16≤(2:ℝ)^k)\n    (hab : a≤b) (hV : ContinuousOn V (Icc a b)) (hJ : Icc a b⊆Icc 0 T)\n    (hband : ∀t∈Icc a b,(2:ℝ)^k/8≤q (V t) ∧ q (V t)≤8*(2:ℝ)^k)\n    (hM : 0<M) (hA : 0<A) (hP : 0<P) (hL : 0<L) (hδ : 0<δ) :\n    let B"
+  }
+ ],
+ "speedup_targets": [
+  {
+   "id": "S1",
+   "title": "Global classical solutions of the 2.5D relativistic Vlasov–Maxwell system",
+   "statement": "For smooth compactly supported data, the 2.5-dimensional RVM system (x in ℝ², p in ℝ³) has a global classical solution.",
+   "reference": "R. Glassey, J. Schaeffer, CMP 185 (1997) / Arch. Rational Mech. Anal. 141 (1998).",
+   "status": "known",
+   "current_proof_size": "about 30 journal pages; no formalization",
+   "how_item_helps": "Speculative: their momentum-support bound uses 2D field representations. A direction-change count could replace part of the high-momentum analysis, but the 2D proof does not need the receiver-acceleration loss that the count was built to absorb.",
+   "expected_speedup": "low",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI VlasovMaxwell Model.lean (109 lines: Datum, Solution, Admissible) as a template; Mathlib calculus",
+    "missing": "2.5D Maxwell + Vlasov model and solution notion (~150–250 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "S2",
+   "title": "Nearly neutral multi-species 3D RVM (Glassey–Schaeffer 1988)",
+   "statement": "Global classical solutions for 3D RVM when total positive and negative charges nearly cancel.",
+   "reference": "R. Glassey, J. Schaeffer, CMP 119 (1988) 353–384.",
+   "status": "known",
+   "current_proof_size": "about 30 pages",
+   "how_item_helps": "Low: the proof is a smallness/perturbative argument; the direction count is a large-data device and has no obvious place.",
+   "expected_speedup": "low (likely none)",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI VlasovMaxwell Model.lean",
+    "missing": "multi-species model with charges and masses (~100–200 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "S3",
+   "title": "In-family positive control: direction-change count for supported characteristics",
+   "statement": "Under the signed increment bootstrap, the number of δ-direction stopping intervals on a short interval with q ~ w is ≤ C(M,A) L^6/δ.",
+   "reference": "362 paper, Lemma ang:direction; Lean OAI.RVM.Admissible.direction_count_bound.",
+   "status": "proved in-family (unrefereed); formalized",
+   "current_proof_size": "paper ~3 pages; Lean DirectionCounts.lean 1,098 lines plus Retarded/AngularBump and RetardedMomentumForce pieces",
+   "how_item_helps": "Is the device; hide DirectionCounts.lean and measure the cost of re-deriving direction_count_bound.",
+   "expected_speedup": "high (by construction)",
+   "confidence": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI.RVM Admissible, Solution, PhaseFlowOn, IncrementBootstrap, WeightedDirectionPartition",
+    "missing": "none",
+    "formal_proof_to_compare": "yes: the OAI proof"
+   }
+  }
+ ],
+ "open_problems": [
+  {
+   "id": "O1",
+   "title": "Large-data global classical solutions for multi-species 3D relativistic Vlasov–Maxwell",
+   "statement": "Several species with different charges/masses, arbitrary smooth compactly supported data.",
+   "reference": "Glassey–Schaeffer CMP 119 (1988) (nearly neutral only); 362 (one species)",
+   "url": "https://projecteuclid.org/journals/communications-in-mathematical-physics/volume-119/issue-3/",
+   "status": "open beyond near-neutrality (362 covers one species)",
+   "obstruction_match": "Same receiver-acceleration loss on each characteristic; the count is per characteristic and species-agnostic.",
+   "adaptation_sketch": "Run the signed bootstrap per species; the signed force identity is linear in sources, so charges enter as signs; recheck that the selection/exponent bookkeeping tolerates opposite-sign sources.",
+   "payoff": "new theorem",
+   "confidence": "medium-low",
+   "difficulty": "medium-high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI VlasovMaxwell Model.lean",
+    "missing": "species index, charges, masses (~100–200 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O2",
+   "title": "3D RVM with non-compactly supported (decaying) momentum data",
+   "statement": "Global classical solutions for smooth data with polynomial decay in (x, p), large field.",
+   "reference": "Wei–Yang arXiv:2005.06130 (small density, large field)",
+   "url": "https://arxiv.org/abs/2005.06130",
+   "status": "open for large density",
+   "obstruction_match": "Partial: the count needs a momentum ceiling P; with unbounded support, P must be replaced by a weighted tail bound.",
+   "adaptation_sketch": "Truncate at momentum P(t), control the tail mass by weights, apply the count to the truncated population.",
+   "payoff": "new theorem",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI Admissible datum",
+    "missing": "decay-weighted admissibility class (~50–100 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O3",
+   "title": "3D RVM on the torus T³",
+   "statement": "Large-data global classical solutions on T³.",
+   "reference": "standard open variant",
+   "url": "",
+   "status": "open (believed adaptable)",
+   "obstruction_match": "Same local mechanism; retarded representation over periodic images.",
+   "adaptation_sketch": "Finite propagation speed localizes to a fundamental domain on short times; reuse the count verbatim.",
+   "payoff": "new theorem (routine)",
+   "confidence": "medium",
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib AddCircle / UnitAddTorus; OAI Model.lean",
+    "missing": "periodic model (~100–200 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O4",
+   "title": "Large-data global classical solutions for the Vlasov–Darwin system",
+   "statement": "Global classical solutions for the Darwin approximation of VM, arbitrary data.",
+   "reference": "Benachour–Filbet–Laurençot–Sonnendrücker (small data); Pallard (2006, weak/local)",
+   "url": "",
+   "status": "open for large data (to my knowledge)",
+   "obstruction_match": "Weak: fields are instantaneous (elliptic), so the retarded signed identity does not apply; only the stopping-time count abstraction transfers.",
+   "adaptation_sketch": "Replace the Heaviside–Feynman representation by the elliptic Darwin representation; count direction exits of characteristics.",
+   "payoff": "possible new theorem",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib Fourier / Laplacian notions",
+    "missing": "Darwin system (~200 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O5",
+   "title": "RVM in a bounded domain (perfect conductor boundary)",
+   "statement": "Global classical solutions with specular/absorbing particle boundary and perfect-conductor fields.",
+   "reference": "Y. Guo, CMP 154 (1993) (weak solutions)",
+   "url": "",
+   "status": "open (classical)",
+   "obstruction_match": "Interior part matches; boundary reflections of fields and particles break the retarded representation.",
+   "adaptation_sketch": "Method of images in half-spaces only.",
+   "payoff": "partial",
+   "confidence": "low",
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "",
+    "missing": "boundary-value Maxwell and kinetic boundary conditions (>300 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "Wang 2022/2026 large-data global existence with cylindrical symmetry (arXiv:2203.01199): a special case of the 362 main theorem.",
+  "Glassey–Strauss / Pallard-type momentum-support bounds and Luk–Strain continuation criteria become vacuous given global smoothness.",
+  "Uniqueness among classical solutions (part of the comparator statement)."
+ ],
+ "release_reuse": [
+  {
+   "where": "Release (CONTENTS.md, Lean dirs)",
+   "use": "No other family formalizes Vlasov–Maxwell or kinetic characteristics; only Boltzmann (MathematicalPhysics/Boltzmann) is kinetic and does not use direction counts (not grepped in detail).",
+   "counts_as_device_reuse": "no"
+  }
+ ],
+ "negative_controls": [
+  {
+   "id": "N1",
+   "setting": "3D Vlasov–Poisson (Pfaffelmoser, Schaeffer, Lions–Perthame)",
+   "expected": "no help",
+   "why": "The field is a gradient of an elliptic potential, so there is no receiver-acceleration loss; Pfaffelmoser's occupation count closes without direction counting. Any speedup here would mean the harness credits the item for Pfaffelmoser machinery."
+  },
+  {
+   "id": "N2",
+   "setting": "1.5D RVM (Glassey–Schaeffer 1990)",
+   "expected": "no help",
+   "why": "Momentum support is controlled directly from conservation laws; nothing to count."
+  },
+  {
+   "id": "N3",
+   "setting": "Trajectories with only absolute force control (no signed increment bootstrap)",
+   "expected": "fails",
+   "why": "Without cancellation, each δ-exit costs ∫|K| ~ wδ and the count can be ~ (∫_J|K|)/(wδ) ~ w^{1/2}L/δ, which is too large; the device depends on the signed bootstrap and the signed force identity."
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "id": "S3",
+   "title": "In-family control (direction_count_bound)",
+   "argument": "The only target where the device is known to be load-bearing; statable now. Use it as the positive control for the hide-the-file speedup harness."
+  },
+  {
+   "rank": 2,
+   "id": "O1",
+   "title": "Multi-species RVM",
+   "argument": "The natural next problem; the obstruction is the same per characteristic and the statement is < 300 lines on top of Model.lean. Risk: opposite-sign sources may break the selection bookkeeping, not the count."
+  },
+  {
+   "rank": 3,
+   "id": "O3",
+   "title": "RVM on T³",
+   "argument": "Likely routine transfer, statable in < 300 lines; cheap test of whether a prover reuses the count."
+  },
+  {
+   "rank": 4,
+   "id": "S1",
+   "title": "2.5D RVM (Glassey–Schaeffer)",
+   "argument": "The only known theorem where the count could plausibly shorten a high-momentum argument; low expected speedup."
+  },
+  {
+   "rank": 5,
+   "id": "N1",
+   "title": "Vlasov–Poisson (negative control)",
+   "argument": "Statable with < 300 lines; should show no speedup."
+  }
+ ],
+ "precedent_check": {
+  "earlier_equivalent": "none found",
+  "summary": "The generic pattern (count first exits of size δ by a stopping-time partition, lower-bound each exit, sum against a global budget) is standard (Lépingle / p-variation jump counting; Pfaffelmoser's cells). The specific use (each exit forced through a signed, weighted Lorentz-force integral via the bootstrap, then summed against the signed force identity with disjoint unit-variation weights so that only weight derivatives cost a factor N, absorbed for large P) has no near-equivalent found; novelty.json grades it N3 provisional (0.30) with D2 more likely. Cheverry–Ibrahim explicitly avoid controlling directions. Wang 2020/2026 close the same loss by symmetry.",
+  "post_oct6": "No post-Oct-6 work using the count was found (web search for large-data 3D RVM 2026 returned only Wei–Yang 2020, Wang 2022 and Glassey–Schaeffer 1988)."
+ },
+ "speedup_verdict": "No strong external speedup candidate found: the device is tailored to the receiver-acceleration loss in large-data 3D RVM; known theorems in the area are either corollaries of the main theorem or do not face that loss.",
+ "sources": [
+  "https://arxiv.org/abs/2203.01199 (Wang)",
+  "https://arxiv.org/abs/2005.06130 (Wei–Yang)",
+  "https://arxiv.org/abs/2003.14192 (Wang 2020)",
+  "https://arxiv.org/abs/2306.11812 (Cheverry–Ibrahim)",
+  "Glassey–Schaeffer CMP 119 (1988); CMP 185 (1997)",
+  "Guo CMP 154 (1993)",
+  "data/pilot/362/novelty.json, trace.json"
+ ],
+ "search_log": [
+  "Read the brief, shortlist entry and novelty.md.",
+  "Read DirectionCounts.lean 440–600, 705–740, 990–1085; IncrementBootstrap def; paper direction.tex L1–120.",
+  "Ran scripts/extract_lean.py 362 (scratchpad) and BFS from OAI.RVM.global_classical_solution.",
+  "Web: 'relativistic Vlasov-Maxwell global classical solutions large data three dimensions October 2026 arXiv' -> Wei–Yang 2020, Wang 2022, Glassey–Schaeffer 1988; nothing post-Oct 6."
+ ]
+}

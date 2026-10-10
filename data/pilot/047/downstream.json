@@ -1,0 +1,558 @@
+{
+ "fid": "047",
+ "item": "The witness polynomial H = x^2 F - (1+2sx)J - p^2 J^2 - pu, x = s^2 + u^3 + p^2 F (Zariski cancellation counterexample over ℂ in dimension 4)",
+ "item_type": "witness (F3)",
+ "lean_status": "as in paper",
+ "lean_status_why": "H is literally the comparator's witness (ComparatorChallenges/ComplexCancellation.lean:17, identical to OAI/Algebra/AffineCancellation/Model.lean:17) and the full headline theorem (A[w] ≅ ℂ^[5], A ≇ ℂ^[4], domain, dim 4) is the proved target; only the proof route of the hard half differs.",
+ "lean_gaps": [
+  "Proof route differs from the paper for the obstruction: Rees algebra B ⊂ A[T^±] with B/qB ≅ G instead of the ord_p valuation; a possibly non-homogeneous LND on G; the lift to the SL2 torsor uses a rational slice, a Bézout SL2-frame over F[t] and a replica instead of Picard groups and Brion linearization; the last rigidity step uses an sl2 highest-weight argument. (family.md §3; text-level check of Main.lean, EquivariantLift.lean, PositiveObstruction.lean.)",
+  "Domain and dimension are read off the cylinder isomorphism (Dimension.lean), not proved as in the paper.",
+  "Corollaries (SCC in ambient dimension 5, Dolgachev–Weisfeiler in relative dimension 3) are not formalized (lean/docs/047.md).",
+  "The Lean is stated over ℂ only; the paper's 𝕜 = ℂ as well.",
+  "H appears in the target statement, so H is analytic relative to the formal goal by construction (Test 2 must be judged against the posed problem, as the novelty analysis did).",
+  "Not compiled here (no local toolchain); all checks are text-level. Trust surface reported clean in family.md (no sorry/axiom/native_decide)."
+ ],
+ "comparator_chain": [
+  "OAI.ComplexCancellation.main  (ComparatorChallenges/ComplexCancellation.json, solution_module OAI.Algebra.AffineCancellation.Main)",
+  "  := ⟨finiteType, domain, dimension, stabilization, nonpolynomiality⟩",
+  "OAI.ComplexCancellation.stabilization -> Cylinder.equivalence -> Cylinder.forward/backward -> Cylinder.decode/encode -> Cylinder.Frame.coordinate_equation, Cylinder.Point.shift_equation -> Cylinder.Point.equation (= H on points) ; Cylinder.Point.eval_equation ties Point.equation to H",
+  "OAI.ComplexCancellation.domain / dimension -> Cylinder.equivalence (domain and Krull dimension are read off the cylinder isomorphism)",
+  "OAI.ComplexCancellation.nonpolynomiality -> Rees.positive_invariant_of_polynomial -> Rees.bad_invariant, Rees.positive_clear, Rees.scaled_restriction, Rees.primitive_reduction -> Degeneration.G = P/(relation) (relation = H + p*u)",
+  "OAI.ComplexCancellation.nonpolynomiality -> PolynomialTorsor.exists_equivariant_lift -> RationalSlice/local_slice, TorsorFrame (Bezout frame), ReplicaLift -> Bundle.pullback -> Bundle.inclusion_f/inclusion_g/certificate -> Determinant.v",
+  "OAI.ComplexCancellation.nonpolynomiality -> GradedLND.highest, GradedLND.component -> Bundle.no_positive_invariant -> AffineModification.fixed_V_of_positive_invariant, AffineModification.extract -> Bundle.rigidity (DeterminantRigidity, OrbitRigidity with Mathlib Polynomial.abc, HighestWeight)",
+  "H itself: OAI.ComplexCancellation.H is in the target-statement closure (MainStatement unfolds to A = P/(H)); every branch above is about this H or its top-weight form"
+ ],
+ "lean_source": [
+  {
+   "name": "OAI.ComplexCancellation.{P,p,s,u,F,J,x,H,A,MainStatement}",
+   "kind": "abbrev/def (the witness H and the target statement)",
+   "file": "data/raw/openai-math/lean/OAI/Algebra/AffineCancellation/Model.lean",
+   "line": 9,
+   "text": "abbrev P := MvPolynomial (Fin 5) ℂ\n\ndef p : P := MvPolynomial.X 0\ndef s : P := MvPolynomial.X 1\ndef u : P := MvPolynomial.X 2\ndef F : P := MvPolynomial.X 3\ndef J : P := MvPolynomial.X 4\ndef x : P := s ^ 2 + u ^ 3 + p ^ 2 * F\ndef H : P := x ^ 2 * F - (1 + 2 * s * x) * J - p ^ 2 * J ^ 2 - p * u\nabbrev A := P ⧸ Ideal.span {H}\n\ndef MainStatement : Prop :=\n  Algebra.FiniteType ℂ A ∧ IsDomain A ∧ ringKrullDim A = 4 ∧\n  Nonempty (Polynomial A ≃ₐ[ℂ] MvPolynomial (Fin 5) ℂ) ∧\n  ¬ Nonempty (A ≃ₐ[ℂ] MvPolynomial (Fin 4) ℂ)"
+  },
+  {
+   "name": "ComparatorChallenges.ComplexCancellation (H as fixed by the comparator)",
+   "kind": "def (comparator copy)",
+   "file": "data/raw/openai-math/lean/ComparatorChallenges/ComplexCancellation.lean",
+   "line": 9,
+   "text": "abbrev P := MvPolynomial (Fin 5) ℂ\n\ndef p : P := MvPolynomial.X 0\ndef s : P := MvPolynomial.X 1\ndef u : P := MvPolynomial.X 2\ndef F : P := MvPolynomial.X 3\ndef J : P := MvPolynomial.X 4\ndef x : P := s ^ 2 + u ^ 3 + p ^ 2 * F\ndef H : P := x ^ 2 * F - (1 + 2 * s * x) * J - p ^ 2 * J ^ 2 - p * u\nabbrev A := P ⧸ Ideal.span {H}\n\ndef MainStatement : Prop :=\n  Algebra.FiniteType ℂ A ∧ IsDomain A ∧ ringKrullDim A = 4 ∧\n  Nonempty (Polynomial A ≃ₐ[ℂ] MvPolynomial (Fin 5) ℂ) ∧\n  ¬ Nonempty (A ≃ₐ[ℂ] MvPolynomial (Fin 4) ℂ)"
+  },
+  {
+   "name": "OAI.ComplexCancellation.Cylinder.Point / Point.x / Point.equation",
+   "kind": "structure + def (H as a polynomial identity on points of any ring)",
+   "file": "data/raw/openai-math/lean/OAI/Algebra/AffineCancellation/CylinderShift.lean",
+   "line": 12,
+   "text": "@[ext] structure Point (R : Type*) where\n  p : R\n  s : R\n  u : R\n  f : R\n  j : R\n\nnamespace Point\n\ndef x (q : Point R) : R := q.s ^ 2 + q.u ^ 3 + q.p ^ 2 * q.f\ndef equation (q : Point R) : R :=\n  q.x ^ 2 * q.f - (1 + 2 * q.s * q.x) * q.j - q.p ^ 2 * q.j ^ 2 - q.p * q.u"
+  },
+  {
+   "name": "OAI.ComplexCancellation.Cylinder.Point.shift",
+   "kind": "def (finite exponential shift fixing p, x, y, z; the exp(wΔ) of the paper)",
+   "file": "data/raw/openai-math/lean/OAI/Algebra/AffineCancellation/CylinderShift.lean",
+   "line": 37,
+   "text": "/-- A finite exponential shift fixing `p`, `x`, `y`, `z` and translating `u` by `-p²w`. -/\ndef shift (q : Point R) (w : R) : Point R :=\n  let k := cubicDiff q.p q.u w\n  ⟨q.p, q.s + q.p ^ 2 * q.x * k, q.u - q.p ^ 2 * w,\n    q.f - (2 * q.s * q.x + 1) * k - q.p ^ 2 * q.x ^ 2 * k ^ 2,\n    q.j - q.x ^ 2 * k⟩"
+  },
+  {
+   "name": "OAI.ComplexCancellation.Cylinder.equivalence",
+   "kind": "def (explicit cylinder isomorphism A[w] ≃ ℂ[5 vars])",
+   "file": "data/raw/openai-math/lean/OAI/Algebra/AffineCancellation/Cylinder.lean",
+   "line": 181,
+   "text": "/-- The explicit scalar-preserving polynomial cylinder isomorphism. -/\ndef equivalence : Polynomial A ≃ₐ[ℂ] P :="
+  },
+  {
+   "name": "OAI.ComplexCancellation.Degeneration.{xp,yp,zp,relation,identity}",
+   "kind": "def + lemma (top-weight part H_top = H + p·u and the quadric identity)",
+   "file": "data/raw/openai-math/lean/OAI/Algebra/AffineCancellation/Degeneration.lean",
+   "line": 10,
+   "text": "def xp : P := X 1^2+X 2^3+X 0^2*X 3\ndef yp : P := X 1+xp*(xp-X 2^3)\ndef zp : P := X 1*xp+X 0^2*X 4\ndef relation : P := xp^2*X 3-(1+2*X 1*xp)*X 4-X 0^2*X 4^2\nlemma identity : xp*yp-zp*(zp+1)=X 0^2*relation := by"
+  },
+  {
+   "name": "OAI.ComplexCancellation.Determinant.{relation,T,a,d,b,c,u,v}",
+   "kind": "def (SL2 torsor ring and the principal generator v)",
+   "file": "data/raw/openai-math/lean/OAI/Algebra/AffineCancellation/Determinant.lean",
+   "line": 32,
+   "text": "def relation : Poly := X 0 * X 3 - X 2 * X 1 - 1\nabbrev T := Poly ⧸ Ideal.span {relation}\ndef π : Poly →ₐ[ℂ] T := Ideal.Quotient.mkₐ ℂ _\ndef a : T := π (X 0)\ndef d : T := π (X 1)\ndef b : T := π (X 2)\ndef c : T := π (X 3)\ndef u : T := π (X 4)\ndef v : T := a ^ 3 * b - a ^ 2 * u ^ 3 - d ^ 2"
+  },
+  {
+   "name": "OAI.ComplexCancellation.Bundle.inclusion_f",
+   "kind": "lemma",
+   "file": "data/raw/openai-math/lean/OAI/Algebra/AffineCancellation/Bundle.lean",
+   "line": 76,
+   "text": "lemma inclusion_f : inclusion Quadric.f=C₁*v := by"
+  },
+  {
+   "name": "OAI.ComplexCancellation.Bundle.inclusion_g",
+   "kind": "lemma",
+   "file": "data/raw/openai-math/lean/OAI/Algebra/AffineCancellation/Bundle.lean",
+   "line": 79,
+   "text": "lemma inclusion_g : inclusion Quadric.g=b^2*v := by"
+  },
+  {
+   "name": "OAI.ComplexCancellation.Bundle.certificate",
+   "kind": "lemma (principalization certificate: I·T = (v))",
+   "file": "data/raw/openai-math/lean/OAI/Algebra/AffineCancellation/Bundle.lean",
+   "line": 82,
+   "text": "lemma certificate : α*C₁+β*b^2=1 := by"
+  },
+  {
+   "name": "OAI.ComplexCancellation.Rees.positive_invariant_of_polynomial",
+   "kind": "lemma (if A ≅ ℂ^[4], an LND of gr A kills a positive-degree element)",
+   "file": "data/raw/openai-math/lean/OAI/Algebra/AffineCancellation/PositiveInvariant.lean",
+   "line": 111,
+   "text": "lemma positive_invariant_of_polynomial (e : A ≃ₐ[ℂ] MvPolynomial (Fin 4) ℂ) :\n    ∃ (i : ℤ) (r : Degeneration.G) (D : Derivation ℂ Degeneration.G Degeneration.G),\n      0 < i ∧ r ≠ 0 ∧ r ∈ Degeneration.pieces i ∧ LND.LocallyNilpotent D ∧ D ≠ 0 ∧ D r=0 := by"
+  },
+  {
+   "name": "OAI.ComplexCancellation.PolynomialTorsor.exists_equivariant_lift",
+   "kind": "lemma (lift to the torsor, commuting with fiber Euler)",
+   "file": "data/raw/openai-math/lean/OAI/Algebra/AffineCancellation/EquivariantLift.lean",
+   "line": 10,
+   "text": "lemma exists_equivariant_lift (D : Derivation ℂ Degeneration.G Degeneration.G)\n    (hD : LND.LocallyNilpotent D) (hDn : D ≠ 0) :\n    ∃ (c : Degeneration.G) (E : Derivation ℂ Bundle.B Bundle.B),\n      c ≠ 0 ∧ LND.LocallyNilpotent E ∧ E ≠ 0 ∧\n      (∀ r, E (Bundle.pullback r)=Bundle.pullback (c*D r)) ∧\n      ∀ b, Bundle.fiberEuler (E b)=E (Bundle.fiberEuler b) := by"
+  },
+  {
+   "name": "OAI.ComplexCancellation.Bundle.no_positive_invariant",
+   "kind": "theorem (rigidity obstruction on the pullback ring)",
+   "file": "data/raw/openai-math/lean/OAI/Algebra/AffineCancellation/PositiveObstruction.lean",
+   "line": 21,
+   "text": "/-- The positive-invariant obstruction on the pullback ring. -/\ntheorem no_positive_invariant\n    (D : Derivation ℂ B B) (hD : LND.LocallyNilpotent D) (hDn : D ≠ 0)\n    (j : ℤ) (hshift : ∀ e r, r ∈ valuationPieces e → D r ∈ valuationPieces (e+j))\n    (hcomm : ∀ z, fiberEuler (D z)=D (fiberEuler z))\n    (w : B) (hw : w ≠ 0) (e : ℤ) (he : 0 < e)\n    (hwg : w ∈ valuationPieces e) (hDw : D w=0) : False := by"
+  },
+  {
+   "name": "OAI.ComplexCancellation.nonpolynomiality",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Algebra/AffineCancellation/Main.lean",
+   "line": 9,
+   "text": "/-- The hypersurface algebra is not a polynomial algebra over ℂ. -/\ntheorem nonpolynomiality : ¬ Nonempty (A ≃ₐ[ℂ] MvPolynomial (Fin 4) ℂ) := by"
+  },
+  {
+   "name": "OAI.ComplexCancellation.main",
+   "kind": "theorem (comparator target)",
+   "file": "data/raw/openai-math/lean/OAI/Algebra/AffineCancellation/Main.lean",
+   "line": 31,
+   "text": "/-- A four-dimensional complex domain with polynomial cylinder, but not itself polynomial. -/\ntheorem main : MainStatement :="
+  },
+  {
+   "name": "OAI.ComplexCancellation.stabilization",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Algebra/AffineCancellation/Dimension.lean",
+   "line": 42,
+   "text": "theorem stabilization : Nonempty (Polynomial A ≃ₐ[ℂ] MvPolynomial (Fin 5) ℂ) :="
+  },
+  {
+   "name": "OAI.StableCoordinate (family 049): quad",
+   "kind": "def (049's x)",
+   "file": "data/raw/openai-math/lean/OAI/AlgebraicGeometry/StableCoordinate/MatrixChange.lean",
+   "line": 19,
+   "text": "/-- The negative determinant of the displayed two-by-two matrix. -/\ndef quad (p s u F : K) : K := s ^ 2 - u ^ 2 + p * F"
+  },
+  {
+   "name": "OAI.StableCoordinate (family 049): relation",
+   "kind": "def (049's re-parametrized H; for release_reuse comparison)",
+   "file": "data/raw/openai-math/lean/OAI/AlgebraicGeometry/StableCoordinate/MatrixChange.lean",
+   "line": 34,
+   "text": "/-- The defining equation of the five-variable hypersurface. -/\ndef relation (p s u F J : K) : K :=\n  (quad p s u F) ^ 2 * F - (1 + 2 * s * quad p s u F) * J - p * J ^ 2 - u"
+  },
+  {
+   "name": "OAI.StableCoordinate.Obstruction (family 049): xP / Hstar / H",
+   "kind": "def (049's H and its top-weight part)",
+   "file": "data/raw/openai-math/lean/OAI/AlgebraicGeometry/StableCoordinate/ObstructionDefinitions.lean",
+   "line": 23,
+   "text": "/-- The source's determinant invariant in `k[p,s,u,F,J]`. -/\nnoncomputable def xP : P k 5 := X 1 ^ 2 - X 2 ^ 2 + X 0 * X 3\n\n/-- Highest weighted part of the source hypersurface equation. -/\nnoncomputable def Hstar : P k 5 :=\n  xP k ^ 2 * X 3 - (1 + 2 * X 1 * xP k) * X 4 - X 0 * X 4 ^ 2\n\nnoncomputable def H : P k 5 := Hstar k - X 2"
+  },
+  {
+   "name": "OAI.StableCoordinate.Obstruction (family 049): determinantRelation, sB, f0, g0, I, v",
+   "kind": "def (049's SL2 torsor ring and v = a^3 b + a^2 u^2 - d^2)",
+   "file": "data/raw/openai-math/lean/OAI/AlgebraicGeometry/StableCoordinate/ObstructionDefinitions.lean",
+   "line": 47,
+   "text": "noncomputable def determinantRelation : P k 5 := X 0 * X 3 - X 2 * X 1 - 1\nnoncomputable def idealC : Ideal (P k 5) := Ideal.span {determinantRelation k}\nabbrev C := P k 5 ⧸ idealC k\n/-- Determinant-ring variables `a,d,b,c,u`, in this order. -/\nnoncomputable def cX (i : Fin 5) : C k := Ideal.Quotient.mk (idealC k) (X i)\n\nnoncomputable def sB : B k := bX k 1 - bX k 0 * (bX k 0 + bX k 3 ^ 2)\nnoncomputable def f0 : B k := bX k 0 - sB k ^ 2 + bX k 3 ^ 2\nnoncomputable def g0 : B k := bX k 2 - sB k * bX k 0\nnoncomputable def I : Ideal (B k) := Ideal.span {f0 k, g0 k}\nnoncomputable def v : C k := cX k 0 ^ 3 * cX k 2 + cX k 0 ^ 2 * cX k 4 ^ 2 - cX k 1 ^ 2"
+  },
+  {
+   "name": "OAI.StableCoordinate.polynomialPresentation (family 049)",
+   "kind": "def (049's A IS a polynomial ring: proved-false analogue of 047's non-polynomiality)",
+   "file": "data/raw/openai-math/lean/OAI/AlgebraicGeometry/StableCoordinate/Presentation.lean",
+   "line": 216,
+   "text": "/-- Proposition 2.1, stable under adjoining any number of independent variables. -/\ndef polynomialPresentation (n : ℕ) : A n ≃ₐ[ℂ] R (4+n) :="
+  }
+ ],
+ "speedup_targets": [
+  {
+   "title": "Family 049: stable coordinate that is not a coordinate in four variables (StableCoordinate.principal_package)",
+   "statement": "f = x1 - 2Q(Q(x2+x4) + x1 x4), Q = x2^2 - x4^2 + x1 x3 in ℂ[x1..x4] is sent to x1 by an automorphism of ℂ[x1..x4,w] but by no automorphism of ℂ[x1..x4]; every fiber f = λ is ≅ A^3 and non-rectifiable (refutes SCC and Abhyankar–Sathaye in ambient dimension 4).",
+   "reference": "OpenAI release, 'A stable coordinate that is not a coordinate in four variables' (2026-10-05), family 049; comparator lean/ComparatorChallenges/StableCoordinateFour.lean",
+   "status": "claimed proved in the release; Lean comparator exists (not compiled here)",
+   "current_proof_size": "paper sections 2–5: 884 TeX lines (~15 pp); Lean: OAI/AlgebraicGeometry/StableCoordinate, 118 files, 15,542 lines, imports NO OAI.Algebra.AffineCancellation file (re-formalized from scratch). 047 Lean for comparison: 55 files, 5,573 lines.",
+   "how_item_helps": "049's paper says its graded-ring and line-bundle strategy 'adapts the construction in [Cancellation2026, Sections 2–6]'. With 047's H-template plus its pipeline (Rees degeneration, positive-invariant extraction, SL2-torsor principalization, equivariant lift, rigidity) in the library, the prover only has to (i) re-parametrize H (p^2→p, u^3→-u^2, p*u→u), (ii) add the determinant-1 matrix change showing A_049 ≅ ℂ^[4], (iii) redo rigidity with the factorization (au-d)(au+d) instead of abc. Most of the 047 pipeline is stated for its own fixed rings, so the Lean speedup requires generalizing those lemmas over the parameters first.",
+   "expected_speedup": "high (paper level: the design is given); medium in Lean as-is, because 047's lemmas are not parametrized",
+   "confidence": 0.7,
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib MvPolynomial, AlgEquiv, Ideal.span; the comparator is already written (StableCoordinateFour.lean)",
+    "missing": "none to state. To test the speedup cleanly, a parametrized version of 047's pipeline (Degeneration/Determinant/Bundle over exponents) is ~300–600 lines of refactoring",
+    "formal_proof_to_compare": "yes: 049's own Lean (15,542 lines) vs a run with 047's library available"
+   },
+   "counts_as": "device (design) reuse — the theorem of 047 does not imply 049"
+  },
+  {
+   "title": "Russell cubic is not isomorphic to ℂ^3 (Makar-Limanov 1996; Kaliman–Makar-Limanov 1997)",
+   "statement": "X = {x + x^2 y + z^2 + t^3 = 0} ⊂ ℂ^4 is not isomorphic to ℂ^3 (ML(X) = ℂ[x] ≠ ℂ).",
+   "reference": "L. Makar-Limanov, Israel J. Math. 96 (1996), https://doi.org/10.1007/BF02937314 ; Kaliman–Makar-Limanov, AK-invariant of affine domains (2007), https://www.math.miami.edu/~kaliman/library/KM-L.miyanishi.pdf",
+   "status": "known theorem",
+   "current_proof_size": "~15–20 pp originally; filtered/graded LND proofs ~8–10 pp. No Lean formalization known (not in Mathlib; none in OAI).",
+   "how_item_helps": "Not via H. Via 047's generic pipeline lemmas: LND conjugation (LND.conjugate), Rees degeneration to a graded ring, GradedLND.highest/component (homogeneous leading LND), which are exactly the Kaliman–Makar-Limanov filtration method. The H-specific parts (torsor, rigidity) do not transfer.",
+   "expected_speedup": "low–medium, and attributable to generic LND infrastructure, not to the witness",
+   "confidence": 0.35,
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "¬ Nonempty ((MvPolynomial (Fin 4) ℂ ⧸ Ideal.span {X 0 + X 0^2 * X 1 + X 2^2 + X 3^3}) ≃ₐ[ℂ] MvPolynomial (Fin 3) ℂ)",
+    "missing": "none to state",
+    "formal_proof_to_compare": "no existing formal proof; compare prover budget with/without OAI/Algebra/AffineCancellation in context"
+   },
+   "counts_as": "infrastructure reuse (not design reuse)"
+  },
+  {
+   "title": "Danielewski surfaces: non-isomorphic surfaces with isomorphic cylinders",
+   "statement": "S1 = {xy = z^2 - 1} and S2 = {x^2 y = z^2 - 1} in ℂ^3 are not isomorphic, but S1 × ℂ ≅ S2 × ℂ.",
+   "reference": "W. Danielewski 1989 (preprint); K.-H. Fieseler, Comment. Math. Helv. 69 (1994); Makar-Limanov, 'On the group of automorphisms of a surface x^n y = P(z)' (Israel J. Math. 2001)",
+   "status": "known theorem",
+   "current_proof_size": "non-isomorphism via ML invariant ~5–10 pp; cylinder iso ~2 pp. No Lean formalization known.",
+   "how_item_helps": "047's construction twists the SL2/T quadric xy = z(z+1) (itself a Danielewski surface) by p^3 u; the cylinder half uses the same 'exp of an LND + residual coordinate' trick (Cylinder.Point.shift, decode/encode) that proves Danielewski cylinder isomorphisms; non-isomorphism uses the same graded-LND method. Again the generic part, not H, is what transfers.",
+   "expected_speedup": "low–medium",
+   "confidence": 0.3,
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "MvPolynomial (Fin 3) ℂ quotients; Polynomial (A) ≃ₐ[ℂ] Polynomial (B); ¬ Nonempty (A ≃ₐ[ℂ] B)",
+    "missing": "none",
+    "formal_proof_to_compare": "none known"
+   },
+   "counts_as": "infrastructure reuse"
+  },
+  {
+   "title": "First Vénéreau polynomial is a 1-stable coordinate / a hyperplane (Kaliman–Vénéreau–Zaidenberg; Freudenburg)",
+   "statement": "v1 = y + x(xz + y(yu + z^2)) is a coordinate of ℂ[x,y,z,u,w] and ℂ[x,y,z,u]/(v1) ≅ ℂ^[3].",
+   "reference": "Kaliman–Vénéreau–Zaidenberg, 'Simple birational extensions of the polynomial algebra C^[3]', Trans. AMS 356 (2004) (arXiv math/0308191 is their companion 'Vénéreau polynomials and related fiber bundles'); Freudenburg, Algebraic Theory of Locally Nilpotent Derivations (2nd ed. 2017)",
+   "status": "known theorem",
+   "current_proof_size": "~3–6 pp; no Lean formalization known",
+   "how_item_helps": "047's cylinder half is an explicit El Kahoui–Ouali / Edo–Vénéreau residual-coordinate transfer (Cylinder.lean: decode/encode, Point.shift); 049 reused the same two steps for its f. The Vénéreau 1-stability proof has the same shape (residual coordinate over ℂ[x] + exponential of a triangular LND).",
+   "expected_speedup": "medium for the stabilization half only",
+   "confidence": 0.35,
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "049's own definitions IsCoordinate / IsOneStableCoordinate (OAI.StableCoordinate.Definitions) with a different f",
+    "missing": "none",
+    "formal_proof_to_compare": "049's StableCoordinate.Stabilization* files give the size of an analogous formal stabilization (several hundred lines)"
+   },
+   "counts_as": "infrastructure / sub-route reuse"
+  },
+  {
+   "title": "047's main theorem over ℚ (or any characteristic-0 field)",
+   "statement": "MainStatement with ℂ replaced by ℚ: A_ℚ = ℚ[p,s,u,F,J]/(H) has A_ℚ[w] ≅ ℚ^[5], A_ℚ ≇ ℚ^[4].",
+   "reference": "follows the 047 paper; the paper works over ℂ, the Lean too",
+   "status": "not stated in the release; the cylinder half is a polynomial identity valid over ℤ; non-polynomiality over ℚ follows from ℂ by base change only if an iso over ℚ base-changes to one over ℂ (it does: A_ℚ ⊗ ℂ = A_ℂ). So this is in fact a near-immediate corollary",
+   "current_proof_size": "same as 047",
+   "how_item_helps": "trivial: same witness",
+   "expected_speedup": "high but uninformative (corollary)",
+   "confidence": 0.8,
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "same as MainStatement with ℚ",
+    "missing": "none",
+    "formal_proof_to_compare": "047 Lean"
+   },
+   "counts_as": "theorem corollary — listed here only as a sanity/positive control for the harness, not as evidence"
+  }
+ ],
+ "open_problems": [
+  {
+   "title": "Parametric reach of the H-design (which exponents/twists give cancellation counterexamples?)",
+   "statement": "For the template x = s^2 + φ(u) + p^m F, H = x^2 F - (1+2sx)J - p^m J^2 - p^j u (so that xy - z(z+1) = p^m (H + p^j u) with y = s + x(x - φ(u)), z = sx + p^m J), classify (m, j, φ) for which A = ℂ[p,s,u,F,J]/(H) satisfies A[w] ≅ ℂ^[5] but A ≇ ℂ^[4]. 047 is (m,j,φ) = (2,1,u^3); 049 is (1,0,-u^2) and there A ≅ ℂ^[4] (049 Prop. 2.1).",
+   "reference": "derived here from 047 (01-introduction.tex:48-70; Degeneration.lean:10-14) and 049 (02-construction.tex, eq. con:presentation, con:quadric-identity); the identity xy - z(z+1) = p^m(x^2F - (1+2sx)J - p^m J^2) was checked by hand",
+   "url": "https://github.com/openai/math (preprints of families 047 and 049)",
+   "status": "new question (not posed in the literature)",
+   "obstruction_match": "exactly the 047 design: Danielewski-type twist of the SL2/T quadric plus a residual coordinate; the non-principal centre I = (f,g) and its principalization v on the SL2 torsor",
+   "adaptation_sketch": "Run 047's pipeline with symbolic exponents: cylinder half is the same LND/residual-coordinate argument for every (m,j,φ); obstruction half needs (a) gr A = R[τ, I/τ^m'] exact, (b) v on the torsor, (c) a rigidity argument (abc for φ = u^3, factorization for φ = -u^2). 049 shows the obstruction can fail to apply to A itself (A polynomial) while still applying to p.",
+   "payoff": "medium (maps how far the design generalizes; direct device-reuse test)",
+   "confidence": 0.5,
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "MvPolynomial (Fin 5) ℂ with parameters; same MainStatement shape",
+    "missing": "none to state; a parametrized pipeline is ~300–600 lines of refactoring",
+    "formal_proof_to_compare": "047 (5,573 lines) and 049 (15,542 lines) are two instances"
+   }
+  },
+  {
+   "title": "Zariski cancellation over ℂ in dimensions n ≥ 5",
+   "statement": "Is there, for each n ≥ 5, an affine ℂ-variety X with X × A^1 ≅ A^{n+1} and X ≇ A^n?",
+   "reference": "047 intro (01-introduction.tex:31-35) notes that adjoining variables to a 4-dimensional example whose cylinder is already polynomial does not give higher-dimensional counterexamples (X × A^k ≅ A^{4+k} for k ≥ 1). Gupta needed a separate family for all n ≥ 3 in characteristic p (Adv. Math. 264 (2014), https://doi.org/10.1016/j.aim.2014.07.012). Gupta ICM 2022 survey https://doi.org/10.4171/ICM2022/151",
+   "url": "https://doi.org/10.4171/ICM2022/151",
+   "status": "open as far as found (047 settles only n = 4; no other dimension claimed in the release)",
+   "obstruction_match": "same as 047: need a residual coordinate whose degeneration has a non-principal centre principalized only on a torsor",
+   "adaptation_sketch": "Replace the base R = (SL2/T quadric) × A^1_u by quadric × A^{n-3} (several u's), H by a version with the twist p^3 u_1 and the other u_i as passive variables, or use a higher-dimensional homogeneous space with Pic = ℤ (e.g. SL_k/T-type quadrics) to keep the non-principal centre. Then redo rigidity. Passive variables tend to make the obstruction vanish (extra LNDs ∂/∂u_i), which is the main risk.",
+   "payoff": "high",
+   "confidence": 0.25,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "∃ (A : Type) [CommRing A] [Algebra ℂ A], Algebra.FiniteType ℂ A ∧ Nonempty (Polynomial A ≃ₐ[ℂ] MvPolynomial (Fin (n+1)) ℂ) ∧ ¬ Nonempty (A ≃ₐ[ℂ] MvPolynomial (Fin n) ℂ)",
+    "missing": "none",
+    "formal_proof_to_compare": "047 for n = 4"
+   }
+  },
+  {
+   "title": "Zariski cancellation over ℂ in dimension 3",
+   "statement": "Does X × A^1 ≅ A^4 imply X ≅ A^3 over ℂ?",
+   "reference": "Gupta, ICM 2022 survey; Gupta–(Ghosh) arXiv:2208.14736 (survey 'The Zariski Cancellation Problem and related problems'); Gaifullin–Petrov arXiv:2607.13593 (lists char-0 n ≥ 3 open)",
+   "url": "https://arxiv.org/abs/2208.14736",
+   "status": "open",
+   "obstruction_match": "partial: the design needs a 2-dimensional base with Pic ≠ 0 (the SL2/T quadric) plus the twisted variable u, which already forces dim A = 4",
+   "adaptation_sketch": "Would need a 1-dimensional analogue of the quadric with a non-principal divisor and an A^1-fibration — smooth affine rational curves have trivial Pic, so the direct analogue fails. Listed for completeness; the design probably does not reach n = 3.",
+   "payoff": "very high",
+   "confidence": 0.05,
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "as above with Fin 4 / Fin 3",
+    "missing": "none",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "First Vénéreau polynomial: is v1 = y + x(xz + y(yu + z^2)) a coordinate of ℂ[x,y,z,u]?",
+   "statement": "Is v1 a variable (coordinate) of ℂ[x,y,z,u]? It is a hyperplane and a 1-stable coordinate; v2 is a coordinate (Lewis), v_n (n ≥ 3) are ℂ[x]-coordinates (Vénéreau).",
+   "reference": "D. Lewis, 'Vénéreau-type polynomials as potential counterexamples', JPAA 217 (2013), https://doi.org/10.1016/j.jpaa.2012.09.018 (arXiv:1007.2230); Kaliman–Zaidenberg arXiv math/0308191; Blanc–Poloni, Ann. Fac. Sci. Toulouse (2022), https://doi.org/10.5802/afst.1724",
+   "url": "https://arxiv.org/abs/1007.2230",
+   "status": "open (no resolution found; web check 2026-10-09)",
+   "obstruction_match": "strong: 049 refuted SCC with a Vénéreau-shaped degree-5 polynomial using exactly 047's obstruction (filtration by the distinguished variable, graded LND killing an element of the ideal I, SL2-torsor principalization, rigidity). The question 'is this one-stable coordinate a coordinate' is the same as 049's.",
+   "adaptation_sketch": "Present ℂ[x,y,z,u] as a hypersurface P/(H') in which x is the distinguished element (as 049 does for p), take the x-adic filtration, compute gr and the centre I, look for a torsor on which I becomes principal, and try the rigidity argument. If the associated graded has a trivializing torsor with v nonsquare-type rigidity, v1 is not a coordinate.",
+   "payoff": "high (settles a 20-year-old problem; refines the Abhyankar–Sathaye picture)",
+   "confidence": 0.15,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI.StableCoordinate.IsCoordinate (049 Definitions.lean) applied to v1 ∈ MvPolynomial (Fin 4) ℂ",
+    "missing": "none",
+    "formal_proof_to_compare": "049's f_not_coordinate (NonCoordinate.lean:24) is the analogous formal proof"
+   }
+  },
+  {
+   "title": "Is the Koras–Russell cubic cylinder X × A^1 isomorphic to A^4?",
+   "statement": "For X = {x + x^2 y + z^2 + t^3 = 0}, is X × A^1 ≅ A^4? (ML(X × A^1) = ℂ by Dubouloz.) A yes would be a 3-dimensional ZCP counterexample.",
+   "reference": "A. Dubouloz, 'The cylinder over the Koras–Russell cubic threefold has a trivial Makar-Limanov invariant', Transform. Groups 14 (2009), arXiv:0807.4085",
+   "url": "https://arxiv.org/abs/0807.4085",
+   "status": "open (listed open in arXiv:2208.14736)",
+   "obstruction_match": "the cylinder half only: 047 makes A[w] polynomial by an explicit residual-coordinate transfer (LND exponential + determinant-1 change). The non-polynomiality half is already known for X.",
+   "adaptation_sketch": "Look for p ∈ ℂ[X] (e.g. x) such that x is a residual coordinate of the cylinder and X[x^-1] is trivial, then imitate Cylinder.decode/encode. KR's x-fibration has a non-reduced fibre, which is exactly what blocked earlier attempts; 047's p has reduced fibres A^3, so the analogy is weak.",
+   "payoff": "very high",
+   "confidence": 0.05,
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Polynomial (MvPolynomial (Fin 4) ℂ ⧸ Ideal.span {KR}) ≃ₐ[ℂ] MvPolynomial (Fin 4) ℂ",
+    "missing": "none",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Makar-Limanov invariant of the 047 fourfold, and the ML characterization of A^4",
+   "statement": "Compute ML(X) for 047's X = Spec A. If ML(X) = ℂ, X is a smooth contractible affine fourfold with trivial ML invariant and X × A^1 ≅ A^5 that is not A^4, refuting the dimension-4 form of the 'ML-trivial + contractible ⇒ affine space' characterization question.",
+   "reference": "Kaliman's characterization question (see Gupta ICM 2022 survey, https://doi.org/10.4171/ICM2022/151; Dubouloz arXiv:0807.4085 discusses its dimension-4 status via KR × A^1)",
+   "url": "https://arxiv.org/abs/0807.4085",
+   "status": "open (ML(X) not computed in 047; the 047 proof only shows no LND of A kills a positive-degree element of the degeneration)",
+   "obstruction_match": "same witness, different invariant; 047's positive-invariant obstruction is a filtered ML-type statement",
+   "adaptation_sketch": "Exhibit LNDs of A: restrictions of LNDs of P that preserve (H) (e.g. ∂-type derivations built from the residual coordinate) and intersect their kernels. If p is in every kernel, ML(X) ⊇ ℂ[p] ≠ ℂ (then X is also distinguished from A^4 by ML, a shorter non-polynomiality proof).",
+   "payoff": "medium–high either way (trivial ML: refutes a characterization; nontrivial ML: much shorter proof of 047's hard half — a speedup measurement in itself)",
+   "confidence": 0.3,
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI's LND.LocallyNilpotent (AffineCancellation/PositiveInvariant.lean namespace LND) + Derivation ℂ A A",
+    "missing": "ML invariant as ⨅ over LNDs of ker D (~30–60 lines)",
+    "formal_proof_to_compare": "047 nonpolynomiality (~82% of its DAG) if ML(X) ≠ ℂ"
+   }
+  },
+  {
+   "title": "Dubouloz–Ghosh A^1-contractible varieties: are their cylinders affine spaces?",
+   "statement": "For the smooth A^1-contractible varieties of dimension n ≥ 4 constructed by Dubouloz–Ghosh (non-isomorphic to A^n), is X × A^1 ≅ A^{n+1}?",
+   "reference": "A. Dubouloz, P. Ghosh, arXiv:2501.09613 (2025)",
+   "url": "https://arxiv.org/abs/2501.09613",
+   "status": "open (authors call them potential counterexamples)",
+   "obstruction_match": "cylinder half: needs an explicit residual-coordinate trivialization of the kind 047 builds",
+   "adaptation_sketch": "Find a distinguished function p with X[p^-1] trivial over ℂ[p^±] and reduced A^{n-1} fibres, then a residual coordinate in X × A^1 over ℂ[p]; the El Kahoui–Ouali criterion then gives X × A^1 ≅ A^{n+1}. 047's explicit decode/encode is the template.",
+   "payoff": "high (new ZCP counterexamples in many dimensions, complementing the n ≥ 5 question)",
+   "confidence": 0.15,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "explicit quotient of MvPolynomial if the equations are explicit (they are hypersurface-type in loc. cit.)",
+    "missing": "none if equations explicit",
+    "formal_proof_to_compare": "047 Cylinder.lean (cylinder half)"
+   }
+  },
+  {
+   "title": "Abhyankar–Sathaye embedding conjecture in A^3",
+   "statement": "Is every closed embedding A^2 ↪ A^3 rectifiable (equivalently: f ∈ ℂ[x,y,z] with ℂ[x,y,z]/(f) ≅ ℂ^[2] is a coordinate)?",
+   "reference": "Kraft, 'Challenging problems on affine n-space', Sém. Bourbaki 802 (1995); 049's Sep-24 manuscript refutes the ambient-dimension-4 case by a different (critical-point) method",
+   "url": "https://www.numdam.org/item/SB_1994-1995__37__295_0/",
+   "status": "open",
+   "obstruction_match": "weak: SCC is true in 3 variables (Shpilrain–Yu via Kaliman 2002), so 049-style stable-noncoordinate witnesses cannot exist there",
+   "adaptation_sketch": "Not promising; included because the brief asks for any-field matches. Expect failure.",
+   "payoff": "very high",
+   "confidence": 0.03,
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "MvPolynomial (Fin 3) ℂ quotient ≃ₐ MvPolynomial (Fin 2) ℂ ⇒ coordinate",
+    "missing": "none",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Is the 047 fourfold X biholomorphic to ℂ^4?",
+   "statement": "X is algebraically exotic with algebraic cylinder ℂ^5; is X analytically ℂ^4 (as for the open analytic question on the Koras–Russell cubic)?",
+   "reference": "analytic exotic-structure questions, see Kraft's Bourbaki survey and Gupta ICM 2022",
+   "url": "https://doi.org/10.4171/ICM2022/151",
+   "status": "open (new for this X)",
+   "obstruction_match": "same witness; holomorphic triviality of p: X → ℂ over ℂ^* plus Oka-type arguments might give an analytic trivialization",
+   "adaptation_sketch": "Use the A^3-fibration p with trivialization over p ≠ 0 and the special fibre A^3, and attempt an analytic residual-coordinate argument (Oka–Grauert for the fibration).",
+   "payoff": "medium",
+   "confidence": 0.15,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "complex-analytic manifolds and biholomorphisms in Mathlib are too thin for this",
+    "missing": "analytic spaces / biholomorphism of affine varieties (>1000 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  {
+   "title": "Stable Coordinate Conjecture fails in ambient dimension 5 (047 Cor. stable-coordinate): H is a coordinate of P[w] but not of P",
+   "formalized": "no (excluded per lean/docs/047.md)",
+   "note": "corollary of the main theorem (H coordinate of P ⇒ A ≅ ℂ^[4]); superseded in dimension by 049 (ambient dimension 4), which is NOT a corollary"
+  },
+  {
+   "title": "Dolgachev–Weisfeiler fails in relative dimension 3: p: X → A^1 and (p,H): A^5 → A^2 are A^3-fibrations, not Zariski-locally trivial",
+   "formalized": "no",
+   "note": "corollary"
+  },
+  {
+   "title": "047 main theorem over any field of characteristic 0 containing ℚ",
+   "formalized": "no",
+   "note": "base change; corollary"
+  },
+  {
+   "title": "Affine fibrations / stable-coordinate consequences listed in 07-affine-fibrations.tex",
+   "formalized": "no",
+   "note": "corollaries"
+  }
+ ],
+ "release_reuse": {
+  "summary": "Exactly one in-release reuse: family 049's Oct-5 manuscript ('A stable coordinate that is not a coordinate in four variables'). It reuses the DESIGN of H, not the theorem. 049's Sep-24 manuscript (noncoordinate with A^3 zero fibre) uses an unrelated design (cusp relation x^2 + y^3 = hs and a critical-point obstruction). No other release preprint cites 047 (grep of all preprints for 'Cancellation2026' / the title). No other Lean dir imports OAI.Algebra.AffineCancellation (grep of lean/OAI).",
+  "what_changed": [
+   "x: s^2 + u^3 + p^2 F  →  s^2 - u^2 + p F",
+   "H: x^2 F - (1+2sx)J - p^2 J^2 - p u  →  x^2 F - (1+2sx)J - p J^2 - u",
+   "quadric identity: xy - z(z+1) = p^2 (H + p u)  [twist p^3 u]  →  xy - z(z+1) = p (H + u)  [twist p u]; same quadric B = k[x,y,z,u]/(xy - z(z+1)), same y = s + x(x - φ(u)), z = sx + p^m J",
+   "role of A: in 047 A ≇ ℂ^[4] is the point; in 049 A ≅ ℂ^[4] (new determinant-1 matrix change M' = (I - 2 n e^T) M, which needs the QUADRATIC u-term) and the target is the distinguished element p, shown to be a 1-stable coordinate but not a coordinate",
+   "degeneration: gr A = R[τ, I/τ^2]  →  G = B[τ, I/τ]",
+   "torsor: same SL2 ring k[a,d,b,c,u]/(ac - bd - 1); principal generator v = a^3 b - a^2 u^3 - d^2  →  v = a^3 b + a^2 u^2 - d^2",
+   "rigidity: Mason–Stothers abc + '-u^3 is not a square'  →  factorization of the top auxiliary part as (au - d)(au + d), no abc needed",
+   "Lean: 049 re-formalizes everything (118 files, 15,542 lines; imports Mathlib only, including RingTheory.PicardGroup), sharing no code with 047 (55 files, 5,573 lines, which avoided Picard groups)"
+  ],
+  "design_or_theorem": "Design. 047's main theorem implies SCC failure only in ambient dimension 5 (its own corollary); 049's ambient-dimension-4 result does not follow from it, and 049's A is a polynomial ring, so 049 cannot be obtained by applying 047's theorem. What 049 takes from 047 is the template (Danielewski-type twist of the SL2/T quadric written as a residual coordinate H in k[p,s,u,F,J]) and the obstruction pipeline (filtration by p, graded LND killing an element of the centre I, principalization on the SL2 torsor, lift, rigidity). 049 says so: it 'adapts the construction in [Cancellation2026, Sections 2–6]' (01-introduction.tex:47; 02-construction.tex:7-8).",
+  "caveats": [
+   "Same producer, 12 days later, explicitly citing 047: this is adaptation by the author, not independent rediscovery; it shows the design transfers, not that it is easy to find.",
+   "The transfer needed a genuinely new ingredient (the determinant-preserving matrix change making A polynomial), so 049 is 'design + one new idea', not mechanical re-instantiation.",
+   "Reuse is of the whole package (H + C2–C4 of the novelty analysis), not of H alone; H by itself (a fixed polynomial) is never reused verbatim.",
+   "Both results are unrefereed; neither Lean development was compiled here."
+  ],
+  "verdict": "Genuine in-release design reuse refuting a different conjecture (SCC/Abhyankar–Sathaye in ambient dimension 4). Counts toward 'device reuse' for a witness item under the brief's rule, with the caveats above."
+ },
+ "negative_controls": [
+  {
+   "title": "049's own A_049 = P/(H_049) IS a polynomial ring (OAI.StableCoordinate.polynomialPresentation)",
+   "why": "Same template with parameters (m,j,φ) = (1,0,-u^2) gives A ≅ ℂ^[4]: the design does NOT always produce a cancellation counterexample. A proved-false analogue of 047's nonpolynomiality, already formalized in the release. A prover given the 047 design should not 'prove' ¬(A_049 ≅ ℂ^[4])."
+  },
+  {
+   "title": "Cancellation for surfaces over ℂ (Fujita; Miyanishi–Sugie)",
+   "why": "Proved true; the design (which needs a 2-dimensional quadric base plus the twisted variable) cannot produce dimension-2 witnesses."
+  },
+  {
+   "title": "Second Vénéreau polynomial v2 is a coordinate (Lewis 2013)",
+   "why": "Proved-true coordinate statement: 049's derivation obstruction must fail on v2; a run of the open-problem target (first Vénéreau) should be paired with this control."
+  },
+  {
+   "title": "Stable Coordinate Conjecture in 3 variables over ℂ (Shpilrain–Yu, using Kaliman 2002)",
+   "why": "True; no 3-variable analogue of 049 can exist."
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "target": "049 SCC in four variables (StableCoordinate.principal_package)",
+   "lean_usable": true,
+   "argument": "The only measurable, Lean-statable target where the 047 design is known to transfer: the comparator exists, 049's own formal proof (15,542 lines, no code shared with 047) gives a baseline, and the paper states that it adapts 047 §§2–6. Run the prover on principal_package with and without OAI/Algebra/AffineCancellation (and with a parametrized refactor of 047's pipeline). Caveat: the transfer needed one new idea (the determinant-1 matrix change), so success with 047 available measures 'design given' vs 'design withheld', which is exactly the 047 Test-4 arm D vs arm O contrast."
+  },
+  {
+   "rank": 2,
+   "target": "Parametric reach of the H-design (open; includes the 049-A negative control)",
+   "lean_usable": true,
+   "argument": "The cleanest device-reuse test for a witness: does the template produce further witnesses? Statable now as MainStatement with symbolic (m, j, φ); one instance is known positive (047), one known negative for cancellation (049's A is polynomial). New instances (e.g. φ = u^5, twist p^2 u) would be other witnesses from the same design."
+  },
+  {
+   "rank": 3,
+   "target": "First Vénéreau polynomial coordinate problem (open)",
+   "lean_usable": true,
+   "argument": "The strongest external open problem with the same obstruction: a Vénéreau-shaped one-stable coordinate whose coordinate status is open, exactly the situation 049 resolved with 047's pipeline. Statable now with 049's IsCoordinate. Low success probability (0.15) but a hit would be strong evidence for a reusable device; pair with the Lewis v2 negative control."
+  },
+  {
+   "rank": 4,
+   "target": "ZCP over ℂ in dimensions n ≥ 5 (open)",
+   "lean_usable": true,
+   "argument": "047's own remark shows dimension 4 does not propagate upward, so a dimension-5 witness needs the design again (Gupta needed a second family in characteristic p). Statable now; tests whether the design survives extra variables, where extra partial-derivative LNDs threaten the obstruction."
+  },
+  {
+   "rank": 5,
+   "target": "Russell cubic / Danielewski non-isomorphism (known)",
+   "lean_usable": true,
+   "argument": "Known theorems, statable now, with no formal proof anywhere; they measure whether 047's GENERIC LND infrastructure (Rees degeneration, homogeneous leading LND) speeds proofs. Any speedup here should be credited to infrastructure, not to H — useful as a contrast to targets 1–4."
+  }
+ ],
+ "precedent_check": {
+  "after_2026_10_06": "No post-release use of the H-design found. Web searches on 2026-10-09 (ZCP char 0 2026; release follow-ups; Vénéreau status) returned only pre-release work (Ghosh–Pal arXiv:2404.13803, char p; Dubouloz–Ghosh arXiv:2501.09613, potential counterexamples) and news about the release. The 049 Oct-5 adaptation predates the public release and is in-release reuse.",
+  "earlier_equivalent": "None found. The nearest ancestors remain Asanuma's ring / affine-fibration route (in L, the route not the object), Danielewski-type twists, and Vénéreau-type residual coordinates. No earlier char-0 witness. The novelty analysis's main risk (an expert-known quadric-twist with non-principal centre) is unresolved; no downgrade from this pass.",
+  "limits": "Web search was rate-limited for part of the session; only 6 queries ran. zbMATH/MathSciNet were not queried."
+ },
+ "sources": [
+  "data/raw/openai-math/lean/ComparatorChallenges/ComplexCancellation.{json,lean}; lean/docs/047.md; lean/docs/049.md",
+  "data/raw/openai-math/lean/OAI/Algebra/AffineCancellation/*.lean (55 files, 5,573 lines)",
+  "data/raw/openai-math/lean/OAI/AlgebraicGeometry/StableCoordinate/*.lean (118 files, 15,542 lines)",
+  "data/raw/openai-math/preprints/An-explicit-failure-of-complex-affine-space-cancellation-September-23-2026/build/sections/*.tex",
+  "data/raw/openai-math/preprints/A-stable-coordinate-that-is-not-a-coordinate-in-four-variables-October-5-2026/build/source/sections/01-introduction.tex, 02-construction.tex, refs.bib",
+  "data/raw/openai-math/preprints/An-explicit-noncoordinate-polynomial-with-affine-three-space-zero-fibre-September-24-2026/build/paper.tex",
+  "data/items/047_lean.json (extract_lean.py v2 output)",
+  "data/pilot/047/novelty.json, family.json",
+  "https://doi.org/10.4171/ICM2022/151",
+  "https://arxiv.org/abs/2208.14736",
+  "https://arxiv.org/abs/2501.09613",
+  "https://arxiv.org/abs/2404.13803",
+  "https://arxiv.org/abs/0807.4085",
+  "https://arxiv.org/abs/1007.2230",
+  "https://arxiv.org/pdf/math/0308191",
+  "https://doi.org/10.1016/j.jpaa.2012.09.018",
+  "https://doi.org/10.5802/afst.1724",
+  "https://doi.org/10.1006/jabr.2001.9124",
+  "https://doi.org/10.2140/pjm.2002.203.161",
+  "https://doi.org/10.1016/j.aim.2014.07.012",
+  "https://doi.org/10.1007/BF02937314"
+ ],
+ "search_log": [
+  "Read docs/downstream_agent_prompt.md, docs/PLAN.md, data/eureka_shortlist.json (047 entry), data/pilot/047/novelty.md, family.md.",
+  "Read comparator ComplexCancellation.{json,lean}; Model.lean, Main.lean, Dimension.lean, Cylinder*.lean, Degeneration.lean, Determinant.lean, Bundle.lean, PositiveInvariant.lean, EquivariantLift.lean, PositiveObstruction.lean.",
+  "Grep lean/OAI for AffineCancellation/ComplexCancellation outside the dir: no hits (no Lean reuse).",
+  "Grep all preprints for 'Cancellation2026' / title: only 047 and 049 (Oct-5) hit.",
+  "Grep CONTENTS.md for cancellation / LND / Makar / Danielewski / Abhyankar / Dolgachev: only 047 and 049 relevant.",
+  "Read 049 Oct-5 intro + construction and Lean ObstructionDefinitions/MatrixChange/Presentation; listed imports (Mathlib only).",
+  "Read 049 Sep-24 manuscript abstract and method (different design).",
+  "WebSearch (2026-10-09): 'Zariski cancellation problem characteristic zero counterexample 2026 dimension four OpenAI'; 'first Vénéreau polynomial coordinate open problem'; 'Dubouloz cylinder Koras-Russell trivial ML'; 'openai/math release October 2026 ... follow-up'. Several earlier queries failed on a session rate limit.",
+  "Hand check of the template identity xy - z(z+1) = p^m(x^2 F - (1+2sx)J - p^m J^2) for general m and φ."
+ ],
+ "notes": "All Lean work is text-level; nothing was compiled."
+}

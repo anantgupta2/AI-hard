@@ -1,0 +1,437 @@
+{
+ "fid": "112",
+ "item": "Clause-count-free restriction lemma (Lemma 2.1, 'Restriction bound'): under a p-random restriction, a width-k CNF H satisfies |E G·H_{T,rho}| <= W(H,T,rho)·corr_b(G) for every G, with E W <= 1/(1-theta), theta = sum_{l>b} C(k,l)(2p/(1-p))^l, valid for any constant pk (b chosen large) and independent of the number of clauses",
+ "item_type": "F3 (lemma; F5 flavour: change of representation of a restricted CNF into a signed mixture of narrow CNFs)",
+ "analysis_date": "2026-10-09",
+ "method_note": "Text-level only. The Lean was NOT compiled (no local toolchain, no local Mathlib checkout). Chain traced by reading proofs; grep over OAI/Computability for reuse. WebSearch was unavailable for the whole session (account session limit); no web query returned results. Literature items below are from the analyst's own knowledge and from data/pilot/112/{family,novelty}.* and must be checked.",
+ "lean_status": "as in paper",
+ "lean_status_why": "cnf_restriction_bound (Restriction.lean:59) states Lemma 2.1 exactly: W depends only on H and the restriction, restrictionAvg p W <= 1/(1-theta) with the paper's theta, and |E G·H_restricted| <= W·corr b G for all real G. The proof follows the paper's route (violation-path expansion, marker mixture, reweighting, backward counting) in Restriction*/MarkerMixture/ReversePath* files, and the comparator target consumes it through wide_correlation_of_good_restrictions.",
+ "lean_gaps": [
+  "No mathematical gap found. The comparator uses only the theta <= 1/2 corollary (restrictionAvg_cnfRestrictionCost_le_two, bound 2); the general 1/(1-theta) form is also proved (restrictionAvg_cnfRestrictionCost_le).",
+  "W is the explicit cnfRestrictionCost: a sum over violation paths, up to card V/(b+1) layers, of products of reciprocal covered-clause counts. It is computed on H.normalize, which drops tautological and true clauses as the paper does.",
+  "corr b G is a sup over narrowTests b, i.e. all Boolean functions on the live cube computable by some width-<=b CNF. This matches corr_b.",
+  "Restriction law: each coordinate is live with probability p, else fixed to each bit with probability (1-p)/2. Matches the paper.",
+  "The downstream counting lemma circuit_lower_bound_of_small_cnf_correlations is generic in f but hard-wires the omega(sqrt n) constants (k >= 3(s+1)sqrt d, correlation <= 6·2^{-4(s+1)sqrt d}). Reusing it for parity-type c·sqrt(n) bounds needs a re-parametrised copy.",
+  "Load-bearing: the restriction cluster (Restriction*.lean, ReversePath*.lean, Marker*.lean) is 4,238 of 25,007 lines; Tape*/Machine*/Language* plumbing is 12,740 lines. The novelty pass gives a DAG closure of 16.9% overall and about 38% of the lower-bound sub-DAG."
+ ],
+ "comparator_chain": [
+  "OAI.DepthThreeLowerBound.exists_polynomial_time_language_depth_three_lower_bound (Main.lean:8)",
+  "OAI.DepthThreeLowerBound.language_depth_three_gate_lower_bound (LanguageLowerBound.lean:8)",
+  "OAI.DepthThreeLowerBound.exists_language_slice_small_correlations (HardSlice.lean:12) [+ circuit_lower_bound_of_small_cnf_correlations, CircuitQuantitative.lean:10]",
+  "OAI.DepthThreeLowerBound.wide_correlation_of_good_restrictions (WideCorrelation.lean:17)",
+  "OAI.DepthThreeLowerBound.restrictionAvg_cnfRestrictionCost_le_two (Restriction.lean:71) and cnf_restricted_correlation_le_cost (Restriction.lean:37)",
+  "restrictionAvg_cnfRestrictionCost_le (Restriction.lean) -> restrictionAvg_restrictionCost_le (RestrictionExpectedCost.lean:163) -> restrictionAvg_restrictionCost_le_sum -> restrictionAvg_pathCost_le (RestrictionExpectedCost.lean:132; reverse-path recurrence, reverseTheta)",
+  "restricted_correlation_le_cost (RestrictionCostCorrelation.lean:155) -> indexedCNF_restriction_expansion (RestrictionCostCorrelation.lean:124) -> finite_violation_expansion; marker mixture (MarkerMixture.lean, RestrictionMarkerCNF.lean, RestrictionPathMixture.lean)"
+ ],
+ "lean_source": [
+  {
+   "name": "OAI.DepthThreeLowerBound.Circuit3",
+   "kind": "structure",
+   "file": "data/raw/openai-math/lean/OAI/Computability/DepthThree/Model.lean",
+   "line": 39,
+   "text": "structure Circuit3 (V : Type uV) where\n  bottomCount : ℕ\n  middleCount : ℕ\n  bottom : Fin bottomCount → RawClause V\n  middle : Fin middleCount → Finset (Fin bottomCount)\n  top : Finset (Fin middleCount)"
+  },
+  {
+   "name": "OAI.DepthThreeLowerBound.Restriction / Live",
+   "kind": "abbrev",
+   "file": "data/raw/openai-math/lean/OAI/Computability/DepthThree/FiniteProbability.lean",
+   "line": 19,
+   "text": "abbrev Restriction (V : Type uDepth1) := V → Option Bool\nabbrev Live {V : Type uDepth2} (σ : Restriction V) := {v : V // σ v = none}"
+  },
+  {
+   "name": "OAI.DepthThreeLowerBound.restrictionAvg",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Computability/DepthThree/FiniteProbability.lean",
+   "line": 135,
+   "text": "def restrictionCoordinateWeight (p : ℝ) : Option Bool → ℝ\n  | none => p\n  | some _ => (1 - p) / 2\n\ndef restrictionWeight {V : Type uDepth11} [Fintype V] (p : ℝ) (σ : Restriction V) : ℝ :=\n  ∏ v, restrictionCoordinateWeight p (σ v)\n\ndef restrictionAvg {V : Type uDepth12} [Fintype V] (p : ℝ)\n    (F : Restriction V → ℝ) : ℝ :=\n  ∑ σ, restrictionWeight p σ * F σ"
+  },
+  {
+   "name": "OAI.DepthThreeLowerBound.corr",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Computability/DepthThree/RestrictionCorrelation.lean",
+   "line": 50,
+   "text": "def corr (b : ℕ) (G : Cube V → ℝ) : ℝ :=\n  (narrowTests b).sup' (narrowTests_nonempty b)\n    (fun J => |finiteAvg (fun x => G x * indicator (J x))|)"
+  },
+  {
+   "name": "OAI.DepthThreeLowerBound.pathWeight / pathCost / restrictionCost",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Computability/DepthThree/RestrictionPathData.lean",
+   "line": 61,
+   "text": "def pathWeight (C : I → Clause V) (σ : Restriction V) (P : List I) : ℝ :=\n  ∏ h : Fin P.length, (pathCoveredCount C σ P h : ℝ)⁻¹\n\ndef pathCost (C : I → Clause V) (b : ℕ) (σ : Restriction V) (j : ℕ) : ℝ :=\n  ∑ P ∈ paths (fun i => (C i).scope) (liveSet σ) b j,\n    if pathCompatible C σ P then pathWeight C σ P else 0\n\ndef restrictionCost (C : I → Clause V) (b : ℕ) (σ : Restriction V) : ℝ :=\n  ∑ j ∈ Finset.range (Fintype.card V / (b + 1) + 1), pathCost C b σ j"
+  },
+  {
+   "name": "OAI.DepthThreeLowerBound.restrictionTheta",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Computability/DepthThree/Restriction.lean",
+   "line": 17,
+   "text": "def restrictionTheta (k b : ℕ) (p : ℝ) : ℝ :=\n  ∑ l ∈ Finset.Icc (b + 1) k, (k.choose l : ℝ) * (2 * p / (1 - p)) ^ l"
+  },
+  {
+   "name": "OAI.DepthThreeLowerBound.cnfRestrictionCost",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Computability/DepthThree/Restriction.lean",
+   "line": 30,
+   "text": "def cnfRestrictionCost (H : CNF V) (b : ℕ) (σ : Restriction V) : ℝ :=\n  restrictionCost (cnfIndexFamily H.normalize) b σ"
+  },
+  {
+   "name": "OAI.DepthThreeLowerBound.cnf_restricted_correlation_le_cost",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Computability/DepthThree/Restriction.lean",
+   "line": 37,
+   "text": "theorem cnf_restricted_correlation_le_cost (H : CNF V) (b : ℕ) (hb : 1 ≤ b)\n    (σ : Restriction V) (G : Cube (Live σ) → ℝ) :\n    |finiteAvg (fun x => G x * indicator (H.eval (fill σ x)))| ≤\n      cnfRestrictionCost H b σ * corr b G :="
+  },
+  {
+   "name": "OAI.DepthThreeLowerBound.cnf_restriction_bound",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Computability/DepthThree/Restriction.lean",
+   "line": 59,
+   "text": "theorem cnf_restriction_bound (H : CNF V) (b k : ℕ) (hb : 1 ≤ b)\n    (hH : H.WidthAtMost k) (p : ℝ) (hp0 : 0 < p) (hp1 : p < 1)\n    (hθ : restrictionTheta k b p < 1) :\n    ∃ W : Restriction V → ℝ,\n      (∀ σ, 0 ≤ W σ) ∧\n      restrictionAvg p W ≤ 1 / (1 - restrictionTheta k b p) ∧\n      ∀ (σ : Restriction V) (G : Cube (Live σ) → ℝ),\n        |finiteAvg (fun x => G x * indicator (H.eval (fill σ x)))| ≤ W σ * corr b G :="
+  },
+  {
+   "name": "OAI.DepthThreeLowerBound.restrictionAvg_cnfRestrictionCost_le_two",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Computability/DepthThree/Restriction.lean",
+   "line": 71,
+   "text": "theorem restrictionAvg_cnfRestrictionCost_le_two (H : CNF V) (b k : ℕ)\n    (hH : H.WidthAtMost k) (p : ℝ) (hp0 : 0 < p) (hp1 : p < 1)\n    (hθ : restrictionTheta k b p ≤ 1 / 2) :\n    restrictionAvg p (cnfRestrictionCost H b) ≤ 2 :="
+  },
+  {
+   "name": "OAI.DepthThreeLowerBound.indexedCNF_restriction_expansion",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Computability/DepthThree/RestrictionCostCorrelation.lean",
+   "line": 124,
+   "text": "theorem indexedCNF_restriction_expansion (C : I → Clause V) (b : ℕ)\n    (σ : Restriction V) (x : Cube (Live σ)) :\n    indicator ((indexedCNF C).eval (fill σ x)) =\n      indicator ((easyBaseCNF C b σ).eval x) +\n        ∑ j ∈ Finset.range ((liveSet σ).card / (b + 1)),\n          (-1 : ℝ) ^ (j + 1) * pathLayer C b σ (easyBaseCNF C b σ) (j + 1) x :="
+  },
+  {
+   "name": "OAI.DepthThreeLowerBound.restrictionAvg_restrictionCost_le",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Computability/DepthThree/RestrictionExpectedCost.lean",
+   "line": 163,
+   "text": "theorem restrictionAvg_restrictionCost_le (C : I → Clause V) (p : ℝ)\n    (hp0 : 0 < p) (hp1 : p < 1) (b k : ℕ)\n    (hn : ∀ i, (C i).Normalized) (hwidth : ∀ i, (C i).scope.card ≤ k)\n    (hθ : reverseTheta (2 * p / (1 - p)) b k < 1) :\n    restrictionAvg p (fun σ => restrictionCost C b σ) ≤\n      (1 - reverseTheta (2 * p / (1 - p)) b k)⁻¹ :="
+  },
+  {
+   "name": "OAI.DepthThreeLowerBound.wide_correlation_of_good_restrictions",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Computability/DepthThree/WideCorrelation.lean",
+   "line": 17,
+   "text": "theorem wide_correlation_of_good_restrictions {p ε : ℝ}\n    (hp0 : 0 < p) (hp1 : p < 1) (hε : 0 ≤ ε)\n    (b k : ℕ) (hb : 1 ≤ b) (hθ : restrictionTheta k b p ≤ 1 / 2)\n    (f : Cube V → Bool)\n    (hbad : restrictionAvg p (fun σ => if ¬ goodRestriction p ε b f σ then 1 else 0) ≤\n      4 * ε) :\n    ∀ H : CNF V, H.WidthAtMost k →\n      |finiteAvg (fun x => sign (f x) * indicator (H.eval x))| ≤ 6 * ε :="
+  },
+  {
+   "name": "OAI.DepthThreeLowerBound.circuit_lower_bound_of_small_cnf_correlations",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Computability/DepthThree/CircuitQuantitative.lean",
+   "line": 10,
+   "text": "theorem circuit_lower_bound_of_small_cnf_correlations\n    (d k : ℕ) (s : ℝ) (hs : 0 ≤ s) (hd : 4 ≤ d)\n    (hk : 3 * (s + 1) * Real.sqrt (d : ℝ) ≤ (k : ℝ))\n    (f : Cube (Fin d) → Bool)\n    (hcorr : ∀ H : CNF (Fin d), H.WidthAtMost k →\n      |finiteAvg (fun x : Cube (Fin d) => sign (f x) * indicator (H.eval x))| ≤\n        6 * (2 : ℝ) ^ (-(64 * (s + 1) * Real.sqrt (d : ℝ)) / 16))\n    (C : Circuit3 (Fin d)) (hC : C.Computes f) :\n    (2 : ℝ) ^ (s * Real.sqrt (d : ℝ)) < (C.gateCount : ℝ) :="
+  },
+  {
+   "name": "OAI.DepthThreeLowerBound.exists_polynomial_time_language_depth_three_lower_bound",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Computability/DepthThree/Main.lean",
+   "line": 8,
+   "text": "theorem exists_polynomial_time_language_depth_three_lower_bound :\n    ∃ (L : List Bool → Bool) (M : FiniteMultiTapeMachine) (C a : ℕ),\n      0 < C ∧ 0 < a ∧\n      (∀ w : List Bool, MultiTapeHaltsIn M w (L w) (C * (w.length + 1) ^ a)) ∧\n      ∀ A : ℝ, 0 < A → ∃ N : ℕ, ∀ n : ℕ, N ≤ n →\n        ∀ D : Circuit3 (Fin n), D.Computes (fun x => L (List.ofFn x)) →\n          (2 : ℝ) ^ (A * Real.sqrt (n : ℝ)) < (D.gateCount : ℝ) :="
+  }
+ ],
+ "speedup_targets": [
+  {
+   "title": "Depth-3 parity lower bound 2^{Omega(sqrt n)} (Håstad 1986/89; PPZ99 sharp form)",
+   "statement": "Every OR-AND-OR circuit computing parity of n bits has 2^{c·sqrt n} gates for some absolute c > 0 (sharp: Theta(n^{1/4} 2^{sqrt n}), PPZ99).",
+   "reference": "J. Håstad, 'Almost optimal lower bounds for small depth circuits', STOC 1986 / Computational limitations of small-depth circuits (MIT Press 1987), cited as H89; Paturi-Pudlák-Zane, 'Satisfiability coding lemma', Chicago J. TCS 1999, Thm 6; HJP95 Thm 3.3.",
+   "status": "known theorem",
+   "current_proof_size": "Switching-lemma route: about 8-10 pages including the switching lemma. PPZ route: about 3-4 pages. No Lean formalization known (see switching_lemma_formalizations).",
+   "how_item_helps": "With C1 and the f-generic Lean skeleton (wide_correlation_of_good_restrictions plus a re-parametrised circuit_lower_bound_of_small_cnf_correlations), the only new ingredient is a parity-vs-narrow-CNF correlation bound corr_b(parity on m live vars) <= 2^{-Omega(m/b)}. That bound is expected true but was NOT verified here, and the paper does not state it. Taking b = O(1) and pk a small constant gives 2^{c sqrt n}. This replaces the switching lemma by C1. It would not beat the short PPZ argument, so the gain is mainly against the switching-lemma route.",
+   "expected_speedup": "medium vs switching-lemma route; low vs PPZ",
+   "confidence": "medium",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI DepthThreeLowerBound: Circuit3, Circuit3.Computes, gateCount, CNF, CNF.WidthAtMost, finiteAvg, sign, indicator, corr, Restriction, restrictionAvg; parity as fun x => decide (Odd (card {i | x i}))",
+    "missing": "none for the statement; proof needs a parity/narrow-CNF correlation lemma (~150-300 lines) and a re-parametrised counting lemma (~100-200 lines)",
+    "formal_proof_to_compare": "none in Lean (no switching-lemma or PPZ formalization known)"
+   }
+  },
+  {
+   "title": "PPSZ05 code-membership depth-3 lower bound ((pi/sqrt 6)·sqrt n exponent)",
+   "statement": "Membership in suitable codes requires depth-3 circuits of size 2^{(pi/sqrt6 - o(1)) sqrt n}.",
+   "reference": "Paturi-Pudlák-Saks-Zane, 'An improved exponential-time algorithm for k-SAT', JACM 52 (2005), Thm 6 (as cited in 00_introduction.tex).",
+   "status": "known theorem",
+   "current_proof_size": "a few pages on top of the PPSZ isolated-solution analysis (about 20 pages); no formalization.",
+   "how_item_helps": "C1 gives a correlation route to some 2^{c sqrt n} bound for any function whose random restrictions have b-independent correlation decay against narrow CNFs. Code membership with large dual distance is a candidate. It cannot recover the sharp constant pi/sqrt6, because C1's constants are crude.",
+   "expected_speedup": "low",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI DepthThreeLowerBound: Circuit3, Circuit3.Computes, gateCount, CNF, CNF.WidthAtMost, finiteAvg, sign, indicator, corr, Restriction, restrictionAvg",
+    "missing": "linear codes / dual distance on Fin n -> Bool (~100 lines; Mathlib has basic coding-theory pieces only)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Bounded independence fools CNFs (Bazzi 2009; Razborov's simplified proof)",
+   "statement": "Every polylog(m/epsilon)-wise independent distribution epsilon-fools every m-clause CNF.",
+   "reference": "L. Bazzi, 'Polylogarithmic independence can fool DNF formulas', SICOMP 38 (2009); A. Razborov, 'A simple proof of Bazzi's theorem', ACM TOCT 1 (2009).",
+   "status": "known theorem",
+   "current_proof_size": "Razborov: about 5 pages; no formalization known.",
+   "how_item_helps": "Speculative. C1 says a randomly restricted wide CNF is, in the dual (correlation) sense, an O(1)-mass mixture of width-b CNFs, with no dependence on the number of clauses. If width-b CNFs are fooled by O(b)-wise-independent restrictions, a clause-count-free fooling statement could follow. But Bazzi's bound depends on m only polylogarithmically, and fooling needs the distribution itself, not a random restriction, so the fit is weak.",
+   "expected_speedup": "low",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "CNF, finiteAvg; Mathlib PMF",
+    "missing": "k-wise independent distributions on the cube (~120 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Håstad's depth-d AC0 parity lower bound exp(Omega(n^{1/(d-1)}))",
+   "statement": "Depth-d unbounded fan-in circuits computing parity need size exp(Omega(n^{1/(d-1)})).",
+   "reference": "Håstad 1986/89 (switching lemma); Rossman's entropy proof of the switching lemma (2017, cited in novelty.json); Håstad-Rossman-Servedio-Tan (JACM 2017) average-case depth hierarchy.",
+   "status": "known theorem",
+   "current_proof_size": "about 10-15 pages including the switching lemma; no Lean formalization known.",
+   "how_item_helps": "Probably none. The switching lemma converts CNFs into DNFs, so layers can be collapsed and the argument iterates. C1 only bounds correlations, and its output is still a CNF mixture, so it cannot collapse a depth-4 middle layer, which is a DNF of CNFs. This is a boundary test of whether a prover over-applies C1.",
+   "expected_speedup": "low (expected none)",
+   "confidence": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "CNF/Clause from DepthThree",
+    "missing": "general depth-d circuit inductive type and size (~150 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "switching_lemma_formalizations": "No Lean formalization of Håstad's switching lemma (or Razborov's or Rossman's proofs) is known to the analyst in Mathlib or in public Lean 4 repositories. Mathlib d13f23b has no circuit-complexity library. This could not be verified: there is no local Mathlib checkout and web search was unavailable. A grep of the release's lean/OAI/Computability, InformationTheory and Combinatorics found no 'switching', 'Hastad' or 'random restriction' mentions; DepthThree deliberately avoids the switching lemma. Possible Isabelle or Coq developments were not checked. Rerun with web access: 'switching lemma Lean', 'Hastad switching lemma formalization Isabelle AFP Coq'.",
+ "open_problems": [
+  {
+   "title": "An explicit function with depth-3 complexity 2^{n^{1/2+epsilon}} (HJP95 Problem 2)",
+   "statement": "Find an explicit f with S_3(f) >= 2^{n^{1/2+epsilon}} for a fixed epsilon > 0.",
+   "reference": "Håstad-Jukna-Pudlák, 'Top-down lower bounds for depth-three circuits', Comput. Complexity 5 (1995), Sec. 5 Problem 2; GPPST24 Sec. 1.1; GKPRT26 (arXiv 2601.04446).",
+   "url": "https://arxiv.org/abs/2601.04446",
+   "status": "open",
+   "obstruction_match": "Exact match of the barrier C1 partly breaks. C1 needs pk = O(1) for a constant b. At width k ~ n^{1/2+epsilon} this forces p ~ n^{-1/2-epsilon}, so the live set m ~ n^{1/2-epsilon} is smaller than k and the slice correlation 2^{-m/16} cannot beat 2^{-k}. Letting pk grow forces b to grow, and the sparse partition then becomes tower-sized.",
+   "adaptation_sketch": "Either a version of C1 with E W <= 2 for pk = n^{delta} at b = n^{O(delta)}, or slices whose corr_b decays like 2^{-m·g(b)} with g growing.",
+   "payoff": "very high",
+   "confidence": "low",
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI DepthThreeLowerBound: Circuit3, Circuit3.Computes, gateCount, CNF, CNF.WidthAtMost, finiteAvg, sign, indicator, corr, Restriction, restrictionAvg; TM model from DepthThree (MultiTapeHaltsIn) for explicitness",
+    "missing": "none",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Valiant's depth-3 program: 2^{omega(n/log log n)} for an explicit function",
+   "statement": "An explicit f with S_3(f) >= 2^{omega(n/log log n)} would rule out linear-size logarithmic-depth circuits for a related function.",
+   "reference": "L. Valiant, 'Graph-theoretic arguments in low-level complexity', MFCS 1977; surveyed in GPPST24.",
+   "url": "https://doi.org/10.1007/3-540-08353-7_135",
+   "status": "open",
+   "obstruction_match": "Same correlation-decay obstruction, far more extreme.",
+   "adaptation_sketch": "None concrete; listed for completeness.",
+   "payoff": "very high",
+   "confidence": "very low",
+   "difficulty": "extreme",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI DepthThreeLowerBound: Circuit3, Circuit3.Computes, gateCount, CNF, CNF.WidthAtMost, finiteAvg, sign, indicator, corr, Restriction, restrictionAvg",
+    "missing": "none for the depth-3 statement (the Valiant implication would need a general circuit library)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Effective rate: an explicit omega(1) factor",
+   "statement": "Give an explicit unbounded g (e.g. iterated log) with S_3(f_n) >= 2^{g(n) sqrt n} for an explicit language.",
+   "reference": "Open question 3 in data/pilot/112/novelty.md; the paper's omega is ineffective (b(A), M(b,1/8) tower-like).",
+   "url": "",
+   "status": "open",
+   "obstruction_match": "C1 itself is effective: theta is explicit and E W <= 2. The loss is in the sparse-partition count M(b, eta) from Erdős-Rado, which C1 makes necessary by pushing b up.",
+   "adaptation_sketch": "Replace Erdős-Rado sparsification with a sunflower bound à la Alweiss-Lovett-Wu-Zhang (2020) in SparsePartition.lean, then track b(A) explicitly.",
+   "payoff": "medium",
+   "confidence": "medium",
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI DepthThreeLowerBound: Circuit3, Circuit3.Computes, gateCount, CNF, CNF.WidthAtMost, finiteAvg, sign, indicator, corr, Restriction, restrictionAvg; Real.sqrt, Real.logb",
+    "missing": "none",
+    "formal_proof_to_compare": "partial: the existing ineffective proof"
+   }
+  },
+  {
+   "title": "A natural explicit function without advice-style parameter bits",
+   "statement": "Prove 2^{omega(sqrt n)} for a natural function (e.g. a fixed polynomial evaluation, a Paley/quadratic-character function, or a function in NP) instead of a language whose hard slice is chosen by the probabilistic method and supplied through input bits.",
+   "reference": "GKPRT26 Sec. 1 (problem still listed open); PSZ00 Sec. 5 (input-index trick).",
+   "url": "https://arxiv.org/abs/2601.04446",
+   "status": "open",
+   "obstruction_match": "C1 transfers the problem to finding f whose random restrictions have corr_b <= 2^{-cm} with c independent of b. Any explicit function with that pseudorandomness property works, through the generic wide_correlation_of_good_restrictions.",
+   "adaptation_sketch": "Test candidate functions with small-bias or k-wise independent restrictions (e.g. Nisan-Wigderson or quadratic-residue-based) for the good-restriction property, using the IPZ01 moment method in HardSliceMoment.lean.",
+   "payoff": "high",
+   "confidence": "low-medium",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI DepthThreeLowerBound: Circuit3, Circuit3.Computes, gateCount, CNF, CNF.WidthAtMost, finiteAvg, sign, indicator, corr, Restriction, restrictionAvg; goodRestriction (HardSliceSelection.lean:63)",
+    "missing": "definition of the candidate function (~50-150 lines)",
+    "formal_proof_to_compare": "the paper's slice proof as template"
+   }
+  },
+  {
+   "title": "Average-case version: depth-3 correlation bounds beyond sqrt n",
+   "statement": "An explicit f such that every OR-AND-OR circuit of size 2^{A sqrt n} agrees with f on at most a 1/2 + o(1) fraction of inputs, for every A.",
+   "reference": "Natural strengthening; cf. correlation bounds for AC0 (Håstad 2014 SICOMP; Impagliazzo-Matthews-Paturi SODA 2012).",
+   "url": "",
+   "status": "open (to the analyst's knowledge)",
+   "obstruction_match": "C1 already gives correlation control for each middle CNF. The present counting step uses exactness (gH = H for middle gates of an exact OR), so it fails for approximate computation.",
+   "adaptation_sketch": "Bound the correlation of an OR of S CNFs by inclusion-exclusion truncation or a Fourier argument over the middle layer; each term is again a CNF and C1 applies.",
+   "payoff": "medium",
+   "confidence": "low-medium",
+   "difficulty": "medium-high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI DepthThreeLowerBound: Circuit3, Circuit3.Computes, gateCount, CNF, CNF.WidthAtMost, finiteAvg, sign, indicator, corr, Restriction, restrictionAvg",
+    "missing": "none",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Pseudorandom version of C1 and PRGs for depth-3 circuits",
+   "statement": "Does C1 hold (E W = O(1)) when the restriction is drawn from a k-wise independent or small-bias family? If so, does it yield improved PRGs for depth-3 or CNF-of-CNF circuits, in the Trevisan-Xue / Servedio-Tan pseudorandom switching-lemma line?",
+   "reference": "Trevisan-Xue, 'A derandomized switching lemma and an improved derandomization of AC0', CCC 2013; Servedio-Tan, 'Improved pseudorandom generators from pseudorandom multi-switching lemmas', RANDOM 2019. Titles from memory.",
+   "url": "",
+   "status": "open (new question)",
+   "obstruction_match": "The C1 proof uses full independence in the reweighting step (sample y first, then mask) and in the backward count. That is exactly where the pseudorandom switching lemmas pay their cost.",
+   "adaptation_sketch": "Check whether restrictionAvg_pathCost_le only needs O(k·j)-wise independence of the mask on each path's revealed set.",
+   "payoff": "medium",
+   "confidence": "low",
+   "difficulty": "medium-high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI DepthThreeLowerBound: Circuit3, Circuit3.Computes, gateCount, CNF, CNF.WidthAtMost, finiteAvg, sign, indicator, corr, Restriction, restrictionAvg",
+    "missing": "k-wise independent restriction families (~150 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Res(k) lower bounds for k >= log n",
+   "statement": "Superpolynomial lower bounds for k-DNF resolution refutations of natural formulas when k = Omega(log n).",
+   "reference": "Segerlind-Buss-Impagliazzo, FOCS 2002 / SICOMP 2004; A. Razborov, 'Pseudorandom generators hard for k-DNF resolution and polynomial calculus resolution', Annals of Math. 181 (2015).",
+   "url": "https://mathweb.ucsd.edu/~sbuss/ResearchWeb/resK/focs02.pdf",
+   "status": "open",
+   "obstruction_match": "Weak. These lower bounds are stuck at the small-restriction (pk small) switching regime that C1 escapes. But proof complexity needs restrictions that preserve the structure of proof lines, and C1 is a correlation statement only.",
+   "adaptation_sketch": "Look for a semantic (correlation or measure) Res(k) lower-bound framework into which C1 would plug.",
+   "payoff": "high",
+   "confidence": "very low",
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "-",
+    "missing": "proof systems, Res(k) derivations",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "Pi_3 (AND-OR-AND) version: the complement language (also in P) needs 2^{omega(sqrt n)} AND-OR-AND gates (De Morgan).",
+  "One-sided structural corollary from the proof: every middle CNF of an exact OR representation accepts at most 6·2^{-m0/16} + S·2^{-k} of the inputs.",
+  "Any other result that only needs 'explicit P-language with Sigma_3 complexity 2^{omega(sqrt n)}' as a black box. None in the release."
+ ],
+ "release_reuse": [
+  "grep for restrictionCost|narrowTests|MarkerMixture|reverseTheta over lean/OAI/Computability outside DepthThree: no hits. The device is used only in family 112.",
+  "No other family in CONTENTS.md mentions random restrictions or switching lemmas. Family 135 (homogeneous depth-5 arithmetic circuits, DepthFive comparator) and family 274 (QAC0 parity) are circuit lower bounds by unrelated methods."
+ ],
+ "negative_controls": [
+  {
+   "title": "N1 (proved-false analogue): parity requires 2^{omega(sqrt n)} depth-3 gates",
+   "statement": "False: parity has OR-AND-OR circuits of size O(n^{1/4} 2^{sqrt n}) (PPZ99).",
+   "why": "corr_b(parity on m live vars) decays like 2^{-m/b}, at a rate that depends on b. So taking b large to allow constant pk destroys the slice bound. The C1 route must stall at c·sqrt n for parity, and a prover using C1 must not 'prove' the false statement.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI DepthThreeLowerBound: Circuit3, Circuit3.Computes, gateCount, CNF, CNF.WidthAtMost, finiteAvg, sign, indicator, corr, Restriction, restrictionAvg",
+    "missing": "the upper-bound circuit to make it a proved negation (~300+ lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "N2: Majority",
+   "statement": "Depth-3 lower bounds for Majority (HJP95 Thm 3.5; GPPST24 bottom fan-in 3).",
+   "why": "Majority correlates Theta(1/sqrt m) with a single literal, so corr_1 does not decay exponentially and C1 yields nothing. Majority bounds need top-down or enumeration methods.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI DepthThreeLowerBound: Circuit3, Circuit3.Computes, gateCount, CNF, CNF.WidthAtMost, finiteAvg, sign, indicator, corr, Restriction, restrictionAvg",
+    "missing": "none",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "N3: depth-2 parity correlation 2^{-Omega(n/log S)}",
+   "statement": "Parity has correlation 2^{-Omega(n/log S)} with size-S CNFs.",
+   "why": "After deleting clauses wider than log S, a direct width-k correlation bound already suffices. C1's width reduction is redundant here, so no speedup is expected.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "CNF, finiteAvg, sign, indicator",
+    "missing": "none",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "N4: Parity not in QAC0 (family 274)",
+   "statement": "OAI.QAC.parity_lower_bound (QACParity comparator).",
+   "why": "Quantum circuits with Toffoli gates have no CNF structure, so C1 is inapplicable. Importing DepthThree should not shorten the 274 proof.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "release QACParity comparator",
+    "missing": "none",
+    "formal_proof_to_compare": "yes (release Lean for 274)"
+   }
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "target": "Depth-3 parity 2^{Omega(sqrt n)} via C1",
+   "lean": "statable now",
+   "argument": "This is the cleanest measurable device-reuse test. The statement uses only DepthThree's own Circuit3 vocabulary, the downstream skeleton (wide_correlation_of_good_restrictions) is already generic in f, and the target is a classic switching-lemma consequence. With C1 the remaining work is a parity/narrow-CNF correlation lemma plus re-parametrised counting; without it a prover must find a switching lemma or the PPZ coding lemma. The expected gain is medium against the switching route and low against PPZ, and either outcome is informative."
+  },
+  {
+   "rank": 2,
+   "target": "Natural explicit function with 2^{omega(sqrt n)}",
+   "lean": "statable now",
+   "argument": "This is genuine reuse of C1 on new functions. C1 reduces the open question to a pseudorandomness property of random restrictions, and the Lean pipeline after the slice is f-generic. A success would be new mathematics using the device unchanged."
+  },
+  {
+   "rank": 3,
+   "target": "Average-case (correlation) version",
+   "lean": "statable now",
+   "argument": "C1 already controls each middle CNF's correlation; only the counting step uses exact computation. A prover with C1 in its library should reach this much faster than one without, which makes it a good speedup probe with a plausible positive outcome."
+  },
+  {
+   "rank": 4,
+   "target": "Effective omega rate",
+   "lean": "statable now",
+   "argument": "C1 is effective, so this tests whether provers can isolate the true bottleneck (sparsification) once the device is given. Moderate payoff and moderate difficulty."
+  },
+  {
+   "rank": 5,
+   "target": "HJP95 2^{n^{1/2+epsilon}}",
+   "lean": "statable now",
+   "argument": "This is the true frontier. C1 provably does not suffice as stated (see obstruction_match), so it doubles as a check on whether provers over-claim. Low confidence."
+  }
+ ],
+ "precedent_check": {
+  "post_release_uses": "Not checked: web search unavailable in this session. Rerun queries: 'restriction lemma clause count depth-three', 'signed combination width-b CNF random restriction', 'Beyond the square-root exponent depth-three' after 2026-10-06.",
+  "earlier_equivalent": "None found in the novelty pass. Neighbours: H89 switching (needs pk < 1/5), Razborov encoding (pays log w bits), SBI/Razborov small-p, Lovett-Wu-Zhang 2020 mild restrictions (term compression, not CNF-to-CNF correlation transfer), IMP12, GMR sparsification. No new precedent found here; the release contains no other use.",
+  "verdict": "No downgrade from this pass. The main risk remains an expert-known folklore expansion."
+ },
+ "sources": [
+  "data/raw/openai-math/lean/OAI/Computability/DepthThree/{Main.lean, LanguageLowerBound.lean, HardSlice.lean, WideCorrelation.lean, Restriction.lean, RestrictionCostCorrelation.lean, RestrictionExpectedCost.lean, RestrictionPathData.lean, RestrictionPaths.lean, RestrictionCorrelation.lean, FiniteProbability.lean, CircuitQuantitative.lean, Core.lean, Model.lean}",
+  "data/raw/openai-math/lean/ComparatorChallenges/DepthThree.json, QACParity.json, DepthFive.json; lean/docs/112.md",
+  "data/raw/openai-math/preprints/Beyond-the-Square-Root-Exponent-for-Depth-Three-Boolean-Circuits-September-23-2026/build/latex/sections/{00_introduction,02_restriction}.tex",
+  "data/pilot/112/family.md, family.json, novelty.md, novelty.json; data/eureka_shortlist.json",
+  "https://arxiv.org/abs/2601.04446 (GKPRT26; via novelty pass)",
+  "https://mathweb.ucsd.edu/~sbuss/ResearchWeb/resK/focs02.pdf (SBI; via novelty pass)"
+ ],
+ "search_log": [
+  "Read the Restriction*.lean chain and the comparator; traced Main -> LanguageLowerBound -> HardSlice -> WideCorrelation -> Restriction",
+  "wc -l: restriction cluster 4,238 lines; plumbing (Tape/Machine/Language) 12,740 of 25,007",
+  "grep restrictionCost|narrowTests|MarkerMixture|reverseTheta over lean/OAI/Computability excluding DepthThree -> none",
+  "grep -i switching|random restriction|Hastad over lean/OAI/{Computability,InformationTheory,Combinatorics} -> none",
+  "Searched for a local Mathlib checkout to grep for switching lemmas -> none present",
+  "WebSearch 'Lean 4 formalization Håstad switching lemma' and 'switching lemma formalized Lean' -> FAILED (session limit)",
+  "WebSearch was unavailable for the whole session (account session limit); no web query returned results. Literature items below are from the analyst's own knowledge and from data/pilot/112/{family,novelty}.* and must be checked."
+ ]
+}

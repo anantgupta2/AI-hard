@@ -1,0 +1,399 @@
+{
+ "fid": "102",
+ "item": "Explicit quadratic latent alphabet gadget: block C_blk(x,y) = y + Q(x) with Q(x) = (x2x3, x1x3, x1x2) on F_{2^d}^3, update spaces U_A, oriented recursion, quotient and enlargement (lem:latent of The Unique Games Theorem)",
+ "item_type": "F3 (auxiliary construction / gadget; witness-like object whose design could be reused)",
+ "analysis_date": "2026-10-09",
+ "method_note": "Text-level only. The Lean was NOT compiled (no local toolchain, no local Mathlib checkout). Dependencies traced by reading imports and proofs and by grep over the whole OAI tree. WebSearch was unavailable for the whole session (account session limit); no web query returned results. Literature items below are from the analyst's own knowledge and from data/pilot/102/novelty.* and must be checked.",
+ "lean_status": "as in paper",
+ "lean_status_why": "Quadratic/Block.lean defines exactly Q, its polar D and the block spaces U_A of eq. (2.4)/(2.5), and Gadgets/ runs the same oriented recursion, harmonic-rank argument, quotient and enlargement to prove exists_actual_gadget, which is lem:latent (equivariance, change probability <= p, detection >= 1/8 above a rank threshold fixed before l) and which feeds theorem11 through exists_split_gadget.",
+ "lean_gaps": [
+  "lem:latent also asserts that for rational p_* the threshold and finite data are produced by a terminating deterministic algorithm. exists_actual_gadget is purely existential (noncomputable section, Classical); the algorithmic clause is not formalized. theorem11 is unaffected because the gadget is fixed data for fixed errors.",
+  "Noise law: the paper uses a rational distribution mu; Lean uses the uniform law on a finite nonempty NoiseIndex with multiplicities. Equivalent.",
+  "Detection: the paper quantifies over subspaces G <= V* with dim(G|_K) >= r_* and asks Pr[exists g in G, g(a) != 0] >= 1/8; Lean quantifies over linear maps S with finrank(range(S . embed)) >= r and asks Pr[S(noise) = 0] <= 7/8. Equivalent reformulation.",
+  "Lean's rank threshold is explicit, r = finrank(B) + 2 = 3d + 2 for the chosen field size 2^d (Final.lean). The paper only asserts existence of r_*.",
+  "Comparator theorem11 matches thm:ugc (binary 3SAT, epsilon, delta in (0,1/2)) and is stronger in format: simple bipartite, unweighted, translation constraints, explicit TM2 polytime machine.",
+  "Section 7 consequences (Raghavendra, ordering CSPs, multicut and sparsest cut, Min-2CNF deletion, correlation clustering) are not Lean targets. The OptimalMaxCut and DirectedFeedback comparators DO depend on the gadget, but only through namespace-renamed full copies of the UG development (MaxCutGames.theorem11, DFVSGames.theorem11). That is a different route from the Max-Cut paper, which avoids the gadget and works from DKKMS 2-to-1 games plus Majority Is Stablest.",
+  "VertexCover and MinUncut do not depend on the gadget: no Q, no exists_actual_gadget and no theorem11 in those directories.",
+  "Load-bearing share was not recomputed here. The novelty pass found a line share of 4.9% (Quadratic/ + Gadgets/ = 9,106 of about 186.5k lines), diluted by Machines/ and Inverse/; knockout is unambiguous because the sole consumer is parameters_of_inverse."
+ ],
+ "comparator_chain": [
+  "OAI.UniqueGamesTheorem.theorem11 (UniqueGames/Theorem.lean:26)",
+  "OAI.UniqueGamesTheorem.Theorem.exists_binaryGapReduction (Theorem.lean:10)",
+  "OAI.UniqueGamesTheorem.Decoder.MatrixGap.exists_parameters (Decoding/MatrixGapFromInverseLemmas.lean:77)",
+  "OAI.UniqueGamesTheorem.Decoder.MatrixGap.parameters_of_inverse (Decoding/MatrixGapFromInverseLemmas.lean:22)",
+  "OAI.UniqueGamesTheorem.Gadget.exists_split_gadget (Gadgets/Final.lean:68)",
+  "OAI.UniqueGamesTheorem.Gadget.exists_actual_gadget (Gadgets/Final.lean:19)",
+  "OAI.UniqueGamesTheorem.Gadget.BaseConstruction.exists_base (Gadgets/BaseConstruction.lean:97) + EnlargementEndpoint.exists_data",
+  "BaseConstruction.quotient_detection / quotient_error_le -> BaseDetection.full_lift_detection, QuotientDetection.target_detection_after_quotient",
+  "OAI.UniqueGamesTheorem.Gadget.QuadraticStageNoise.quotientStage / stage / stage_error / actual_kernel",
+  "OrientedBlockKernel.mean_oriented_block_kernel",
+  "OAI.UniqueGamesTheorem.Quadratic.U, Quadratic.Q, Quadratic.D (Q_add_of_mem_line, D_eq_polar; Quadratic/Block.lean)"
+ ],
+ "comparator_chain_other_comparators": {
+  "OptimalMaxCut": "OAI.OptimalMaxCut.main (MaxCut/Main.lean) -> MaxCutGames.theorem11 (MaxCut/Games/Theorem.lean:23) -> ... -> MaxCutGames.Gadget.exists_split_gadget (MaxCut/Games/StageData.lean:276) -> exists_actual_gadget (StageData.lean:227) -> copy of Q (MaxCut/Games/OrientationVectors.lean:95). Depends on a copy of the item.",
+  "DirectedFeedback": "OAI.DirectedFeedback.main (DirectedFeedback/Main.lean:1132) -> DFVSGames.theorem11 (RankGraph/OutputDef.lean:20) -> ... -> exists_actual_gadget (DirectedFeedback/Games/StageData.lean:210) -> copy of Q (Games/ChildLifts.lean:422). Depends on a copy of the item.",
+  "VertexCover": "No dependence (direct Label Cover reduction; no Q, no gadget, no theorem11).",
+  "MinUncut": "No dependence (own graph gadgets; no Q, no theorem11)."
+ },
+ "lean_source": [
+  {
+   "name": "OAI.UniqueGamesTheorem.Quadratic.Q",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Computability/UniqueGames/Quadratic/Block.lean",
+   "line": 19,
+   "text": "/-- The three-coordinate quadratic block from equation (2.4). -/\ndef Q (x : Vec F) : Vec F := ![x 1 * x 2, x 0 * x 2, x 0 * x 1]"
+  },
+  {
+   "name": "OAI.UniqueGamesTheorem.Quadratic.D",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Computability/UniqueGames/Quadratic/Block.lean",
+   "line": 22,
+   "text": "/-- Its polar cross-terms.  In characteristic two these equal\n`Q (x + a) + Q x + Q a`. -/\ndef D (x a : Vec F) : Vec F :=\n  ![x 1 * a 2 + a 1 * x 2, x 0 * a 2 + a 0 * x 2,\n    x 0 * a 1 + a 0 * x 1]"
+  },
+  {
+   "name": "OAI.UniqueGamesTheorem.Quadratic.D_eq_polar",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Computability/UniqueGames/Quadratic/Block.lean",
+   "line": 107,
+   "text": "theorem D_eq_polar (x a : Vec F) : D x a = Q (x + a) + Q x + Q a :="
+  },
+  {
+   "name": "OAI.UniqueGamesTheorem.Quadratic.Q_add_of_mem_line",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Computability/UniqueGames/Quadratic/Block.lean",
+   "line": 145,
+   "text": "/-- The restriction of the quadratic map to one field line is additive. -/\ntheorem Q_add_of_mem_line (v a b : Vec F)\n    (ha : a ∈ line v) (hb : b ∈ line v) : Q (a + b) = Q a + Q b :="
+  },
+  {
+   "name": "OAI.UniqueGamesTheorem.Quadratic.U",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Computability/UniqueGames/Quadratic/Block.lean",
+   "line": 152,
+   "text": "/-- The block space `U_A`, as an actual binary submodule.  Membership uses\n`y + Q a` because subtraction equals addition in characteristic two. -/\ndef U (v : Vec F) : Submodule (ZMod 2) (Vec F × Vec F) where\n  carrier := {p | p.1 ∈ line v ∧ dot v (p.2 + Q p.1) = 0}"
+  },
+  {
+   "name": "OAI.UniqueGamesTheorem.Gadget.ActualGadget.Data",
+   "kind": "structure",
+   "file": "data/raw/openai-math/lean/OAI/Computability/UniqueGames/Gadgets/ActualGadgetLemmas.lean",
+   "line": 21,
+   "text": "structure Data (C : Type) [AddCommGroup C] [Module F2 C] where\n  Ambient : Type\n  [ambientAddCommGroup : AddCommGroup Ambient]\n  [ambientModule : Module F2 Ambient]\n  [ambientFintype : Fintype Ambient]\n  embed : C →ₗ[F2] Ambient\n  embed_injective : Function.Injective embed\n  f : Ambient → C\n  equivariant : ∀ x c, f (x + embed c) = f x + c\n  NoiseIndex : Type\n  [noiseFintype : Fintype NoiseIndex]\n  [noiseNonempty : Nonempty NoiseIndex]\n  noise : NoiseIndex → Ambient"
+  },
+  {
+   "name": "OAI.UniqueGamesTheorem.Gadget.ActualGadget.Satisfies",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Computability/UniqueGames/Gadgets/ActualGadgetLemmas.lean",
+   "line": 99,
+   "text": "/-- The stability and dispersion claim of Theorem 3.4 for fixed errors and rank. -/\ndef Satisfies (g : Data C) (ζ ν : ℚ) (r : Nat) : Prop :=\n  stabilityError g ≤ ζ ∧\n  ∀ (P : Type) [AddCommGroup P] [Module F2 P] (S : g.Ambient →ₗ[F2] P),\n    r ≤ Module.finrank F2 (S.comp g.embed).range → kernelError g S ≤ ν"
+  },
+  {
+   "name": "OAI.UniqueGamesTheorem.Gadget.QuadraticStageNoise.actual_kernel",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Computability/UniqueGames/Gadgets/QuadraticStageNoise.lean",
+   "line": 33,
+   "text": "theorem actual_kernel (d : Vec F) (hd : d ≠ 0) :\n    (𝔼 i : BlockOrientationIndex F, 𝔼 p : Vec F × Vec F,\n      NonlinearRecurrence.change (fun z => z.2 + Q z.1) p (blockEmbedding i d)) =\n      rate F :="
+  },
+  {
+   "name": "OAI.UniqueGamesTheorem.Gadget.QuadraticStageNoise.stage_error",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Computability/UniqueGames/Gadgets/QuadraticStageNoise.lean",
+   "line": 44,
+   "text": "theorem stage_error (n : ℕ) :\n    StageNoiseRecurrence.error (stage (F := F) n) =\n      (1 - 1 / (Nat.card F : ℚ) ^ 3) * rate F ^ n :="
+  },
+  {
+   "name": "OAI.UniqueGamesTheorem.Gadget.BaseConstruction.exists_base",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Computability/UniqueGames/Gadgets/BaseConstruction.lean",
+   "line": 95,
+   "text": "/-- The unconditional finite base endpoint. All choices depend only on `p`;\nthe larger logical alphabet used by the final enlargement is absent here. -/\ntheorem exists_base (p : ℚ) (hp : 0 < p) :\n    ∃ d : ℕ, 0 < d ∧ ∃ n : ℕ,\n      StageNoiseRecurrence.error (quotientStage (F := BinaryField d) n) ≤ p ∧\n      ∀ (E : Type) [AddCommGroup E] [Module (ZMod 2) E]\n        (T : (quotientStage (F := BinaryField d) n).Input →ₗ[ZMod 2] E),\n        Function.Injective (T.comp (quotientStage (F := BinaryField d) n).embed) →\n        (1 / 4 : ℚ) ≤ StageNoiseRecurrence.average (fun t =>\n          if T ((quotientStage (F := BinaryField d) n).noise t) ≠ 0 then 1 else 0) :="
+  },
+  {
+   "name": "OAI.UniqueGamesTheorem.Gadget.exists_actual_gadget",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Computability/UniqueGames/Gadgets/Final.lean",
+   "line": 17,
+   "text": "/-- Actual finite gadget data, with a rank threshold independent of the final\nlogical dimension and an arbitrarily small nonlinear change probability. -/\ntheorem exists_actual_gadget (p : ℚ) (hp : 0 < p) :\n    ∃ r : ℕ, 1 ≤ r ∧ ∀ ℓ : ℕ, r ≤ ℓ →\n      ∃ g : UniqueGamesTheorem.Gadget.ActualGadget.Data (Vector ℓ),\n        UniqueGamesTheorem.Gadget.ActualGadget.Satisfies g p (7 / 8) r :="
+  },
+  {
+   "name": "OAI.UniqueGamesTheorem.Gadget.exists_split_gadget",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Computability/UniqueGames/Gadgets/Final.lean",
+   "line": 68,
+   "text": "theorem exists_split_gadget (p : ℚ) (hp : 0 < p) :\n    ∃ r : ℕ, 1 ≤ r ∧ ∀ ℓ : ℕ, r ≤ ℓ →\n      ∃ d : ℕ, ∃ g : UniqueGamesTheorem.Reduction.ActualSource.SplitGadget ℓ d,\n        g.stabilityError ≤ p ∧\n        ∀ (P : Type) [AddCommGroup P] [Module F2 P]\n          (S : UniqueGamesTheorem.Reduction.ActualSource.Ambient ℓ d →ₗ[F2] P),\n          r ≤ Module.finrank F2\n            (S.comp (UniqueGamesTheorem.Reduction.ActualSource.alphabetEmbedding ℓ d)).range →\n          UniqueGamesTheorem.Integration.SplitGadget.kernelProbability g S ≤ 7 / 8 :="
+  },
+  {
+   "name": "OAI.UniqueGamesTheorem.theorem11",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Computability/UniqueGames/Theorem.lean",
+   "line": 23,
+   "text": "/-- For every fixed pair of errors in `(0, 1/2)`, binary 3SAT reduces in\npolynomial time to translation Unique Games with completeness at least `1 - ε`\nand soundness at most `δ`. The alphabet and machine depend only on the errors. -/\ntheorem theorem11 (ε δ : ℝ)\n    (hε : 0 < ε) (hεhalf : ε < 1 / 2)\n    (hδ : 0 < δ) (hδhalf : δ < 1 / 2) :\n    Nonempty (Explicit.MachineOutputContract.BinaryGapReduction ε δ) :="
+  }
+ ],
+ "speedup_targets": [
+  {
+   "title": "Perfect completeness for 2-to-1 games (release family 105)",
+   "statement": "For every rational delta in (0,1) it is NP-hard to distinguish satisfiable 2-to-1 games from games of value <= delta, over a fixed alphabet (OAI.PerfectCompleteness.Theorem11.exists_reduction).",
+   "reference": "OpenAI release fd4aeeb, preprints/Perfect-completeness-for-2-to-1-games-September-23-2026; Lean OAI/Computability/PerfectCompleteness (581 files).",
+   "status": "claimed proved (unrefereed); Lean-formalized end to end in the release",
+   "current_proof_size": "Paper about 60+ pages (not counted precisely); Lean 581 files.",
+   "how_item_helps": "The two proofs share an architecture: a recursive tree whose spaces are spanned by products of child functions, explored along a random root-to-leaf path. The genericity and harmonic rank-loss lemmas in UniqueGames/Quadratic (GenericSeparationLemmas, HarmonicLoss, GenericSubspaceProbability) might replace parts of 105's rank-splitting decoders (Algebra/DecoderRankSplit, FunctionSpaceLowerRank). The Q block itself cannot be used as completeness noise, because perfect completeness forbids change probability p > 0 (see negative control N1).",
+   "expected_speedup": "low",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "PerfectCompleteness comparator as released",
+    "missing": "none",
+    "formal_proof_to_compare": "yes: run the 105 comparator with and without UniqueGames/Quadratic + Gadgets imported; Lean-vs-Lean size comparison is direct"
+   }
+  },
+  {
+   "title": "Near-perfect-completeness hardness with quadratic or low-degree codes (Khot-Saket 2014; Dinur-Guruswami 2013)",
+   "statement": "Khot-Saket (FOCS 2014): given a graph that is almost q-colorable (q-colorable after removing an epsilon fraction of vertices or edges), it is NP-hard to find an independent set of small relative size. Exact size bound not recalled; check against the paper. Dinur-Guruswami (FOCS 2013): PCPs via the low-degree long code, giving hardness for constrained hypergraph coloring.",
+   "reference": "S. Khot, R. Saket, 'Hardness of finding independent sets in almost q-colorable graphs', FOCS 2014 (arXiv 1408.0262 per novelty.json); I. Dinur, V. Guruswami, 'PCPs via the low-degree long code and hardness for constrained hypergraph coloring', FOCS 2013 / Israel J. Math 2015. Parameters quoted from memory, unverified.",
+   "status": "known theorems",
+   "current_proof_size": "about 30-40 pages each (from memory); no formalization known.",
+   "how_item_helps": "Both papers face the same obstruction as lem:latent: tests that are linear in the code lose completeness under translation noise, and quadratic or low-degree codes are used to recover completeness close to 1. The latent gadget is a different fix: the honest answer is nonlinear in the table, while any linear observation of high rank detects the noise. A gadget-based test could replace the low-degree-code completeness analysis. This is speculative; no concrete reduction was worked out.",
+   "expected_speedup": "low",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib SimpleGraph.Coloring / IsIndepSet; the release's BinaryFormula, BinaryLanguage and TM2ComputableInPolyTime reduction contract (UniqueGamesTheorem.Explicit.MachineOutputContract pattern)",
+    "missing": "almost-q-colorable promise and gap-reduction contract for independent sets (~150 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Håstad's 3-bit PCP / Max-3-Lin(F2) with completeness 1-epsilon (calibration)",
+   "statement": "For every epsilon, delta > 0 it is NP-hard to distinguish Max-3-Lin(F2) instances with value >= 1-epsilon from those with value <= 1/2 + delta.",
+   "reference": "J. Håstad, 'Some optimal inapproximability results', JACM 48 (2001).",
+   "status": "known theorem",
+   "current_proof_size": "about 15 pages for the 3-Lin part (on top of Label Cover and parallel repetition); no Lean formalization known.",
+   "how_item_helps": "This is the classical case where completeness 1-epsilon comes from long-code noise. The latent gadget is an alternative noise mechanism that keeps a nonlinear decoder stable. One expects no gain, because Håstad's noise analysis is already short; the target is useful as a calibration point that should show no speedup.",
+   "expected_speedup": "low (expected none; calibration)",
+   "confidence": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "release reduction contract plus a 3-Lin instance type (~80 lines)",
+    "missing": "Max-3-Lin instance/value definitions; Label Cover with parallel repetition is NOT in the library, so the proof needs a major library even though the statement is cheap",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "speedup_verdict": "No strong device-level speedup target found. Every known theorem that clearly gets shorter with the gadget available (Max-Cut at alpha_GW, Vertex Cover 2-epsilon, Raghavendra CSPs, DFVS, Min-UnCut, sparsest cut, kernel clustering, 2-to-2 games with completeness 1-epsilon) gets shorter through theorem11, so it is a corollary and does not count as device reuse. The release's own Lean is the strongest measurable evidence: for OptimalMaxCut and DirectedFeedback the formalizers chose the gadget/theorem11 route over the papers' direct routes, and vendored about 63k-66k lines of copied UG development each.",
+ "open_problems": [
+  {
+   "title": "Quantitative gadget trade-off r_*(p_*) and the UG alphabet size",
+   "statement": "Determine the least rank threshold r_*(p) for which a latent gadget (equivariant C, change probability <= p, detection >= 1/8 for every linear family with restriction rank >= r) exists, and the least ambient dimension. Lower bounds on r_*(p) would bound how small the UG alphabet F_2^s can be for given (epsilon, delta).",
+   "reference": "New question raised by lem:latent (preprints/The-Unique-Games-Theorem-September-23-2026, sec. 2). Context: Khot's UGC alphabet dependence; ABS10 subexponential algorithm (Arora-Barak-Steurer, FOCS 2010), https://doi.org/10.1145/2775105",
+   "url": "https://github.com/openai/math (release fd4aeeb)",
+   "status": "open (new)",
+   "obstruction_match": "Directly the item: the Lean threshold r = 3d + 2 depends on the field size 2^d chosen for genericity (exists_uniform_generic_field), and the harmonic depth governs p.",
+   "adaptation_sketch": "Upper bound: optimise d and the depth in BaseConstruction.effective_parameters. Lower bound: extend the p = 0 impossibility argument (N1) to a quantitative statement, e.g. show r_*(p) >= c log(1/p) by a counting/Fourier argument on the noise support.",
+   "payoff": "medium (alphabet-size bounds for UG hardness)",
+   "confidence": "medium",
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI ActualGadget.Data / Satisfies, Module.finrank, ZMod 2",
+    "missing": "none",
+    "formal_proof_to_compare": "partial: exists_actual_gadget gives the upper-bound side"
+   }
+  },
+  {
+   "title": "Odd-characteristic latent gadget (direct translation UG over F_p^s)",
+   "statement": "For odd prime p, construct C: V -> K = F_p^l with C(x+k) = C(x)+k, small change probability under a noise law, and detection by every F_p-linear family of restriction rank >= r_* with r_* independent of l.",
+   "reference": "New; adaptation of lem:latent. KKMO07 (SICOMP 37) reduce UG to Gamma-Max-2-Lin(Z_q), so the hardness consequence is already a corollary; the payoff is a direct construction.",
+   "url": "https://doi.org/10.1137/S0097539705447372",
+   "status": "open (new)",
+   "obstruction_match": "Lean's block relies on characteristic 2 (Block.lean: D_eq_polar, cross_self_zero, D_smul_smul_zero, and U being closed under addition). In odd characteristic D(tv, sv) = 2ts*Q(v)-type terms do not vanish on lines, so U_A is not a subgroup.",
+   "adaptation_sketch": "Replace F-lines by Q-isotropic lines, or use a quadratic map whose polar vanishes on chosen lines; then rerun the oriented-recursion and harmonic-rank argument with F_p characters.",
+   "payoff": "low-medium",
+   "confidence": "medium",
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "generalise ActualGadget.Data from F2 to ZMod p (~50 lines)",
+    "missing": "Data/Satisfies over ZMod p",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "NP-hardness of Small-Set Expansion (SSEH)",
+   "statement": "For every eta there is delta such that it is NP-hard to distinguish graphs having a set of measure delta with expansion <= eta from graphs in which every set of measure delta has expansion >= 1-eta.",
+   "reference": "P. Raghavendra, D. Steurer, 'Graph expansion and the unique games conjecture', STOC 2010; Raghavendra-Steurer-Tulsiani, CCC 2012.",
+   "url": "https://doi.org/10.1145/1806689.1806792",
+   "status": "open as of the analyst's knowledge; status after the release unverified (no web)",
+   "obstruction_match": "Weak. SSEH needs UG hardness on constraint graphs that are small-set expanders. The gadget only fixes the completeness noise. The shortcode/Grassmann test graphs have non-expanding zoom-in/zoom-out sets, and the gadget does not change that.",
+   "adaptation_sketch": "Check whether the latent noise law mu, run over the matrix shortcode, changes the expansion profile of the test graph. If it does, try the RST12 route from UG on SSE graphs to SSE.",
+   "payoff": "very high",
+   "confidence": "very low",
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib SimpleGraph, Finset measure; release reduction contract",
+    "missing": "edge expansion of vertex sets and SSE gap promise (~120 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Sliding Scale Conjecture / Projection Games Conjecture",
+   "statement": "NP-hardness of Label Cover with soundness 1/poly(n) (BGLR93), or with alphabet size and soundness polynomially related at near-linear size (Moshkovitz 2012).",
+   "reference": "Bellare-Goldwasser-Lund-Russell, STOC 1993; D. Moshkovitz, 'The projection games conjecture and the NP-hardness of ln n-approximating set-cover', APPROX 2012.",
+   "url": "https://doi.org/10.1007/978-3-642-32512-0_24",
+   "status": "open",
+   "obstruction_match": "Weak. The gadget's rank threshold is fixed before the alphabet dimension, which gives alphabet-independent decoding loss. That is the property sliding-scale reductions need. But the gadget only works at constant soundness.",
+   "adaptation_sketch": "Ask whether r_* can be kept constant while the detection probability 1/8 is pushed towards 1 (amplified detection). That would feed low-soundness Label Cover through the matrix decoder.",
+   "payoff": "high",
+   "confidence": "very low",
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "release reduction contract",
+    "missing": "projection Label Cover instance/value (~100 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "UG reduction size vs the ABS subexponential algorithm",
+   "statement": "Find the optimal blow-up n^{f(epsilon, delta)} of 3SAT -> UG reductions, and whether Unique Games with completeness 1-epsilon requires time exp(n^{epsilon^c}) under ETH, matching Arora-Barak-Steurer.",
+   "reference": "S. Arora, B. Barak, D. Steurer, 'Subexponential algorithms for unique games and related problems', FOCS 2010 / JACM 2015.",
+   "url": "https://doi.org/10.1145/2775105",
+   "status": "open",
+   "obstruction_match": "The gadget's size (field 2^d, depth n) and the repetition-before-alphabet step determine the reduction's exponent; quantitative gadget bounds (first open problem) feed in directly.",
+   "adaptation_sketch": "Instrument the Lean parameter selection (ParameterSelection.exists_outerParameters, BaseConstruction.effective_parameters) to extract f(epsilon, delta), then compare with ABS's exp(n^{poly(epsilon)}).",
+   "payoff": "medium",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib Turing.TM2ComputableInPolyTime; release contract",
+    "missing": "ETH hypothesis and explicit size accounting (~150 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Near-perfect-completeness agreement tests on HDX / quasi-linear PCPs with small soundness",
+   "statement": "Construct agreement or linearity-type tests on high-dimensional expanders with completeness 1-epsilon and small soundness, usable in quasi-linear-size PCPs that reach UG- or 2-to-2-type gaps.",
+   "reference": "Bafna-Minzer-Vyas (2024) and Dikstein-Dinur-Lubotzky (2024) HDX-based PCP line; titles and venues from memory, unverified.",
+   "url": "",
+   "status": "open (active area)",
+   "obstruction_match": "Medium in form. Linear tests on subspace complexes lose completeness under translation-type noise. The gadget converts completeness 1/2 into 1-epsilon while keeping linear-rank soundness.",
+   "adaptation_sketch": "Replace the matrix-shortcode test noise by latent noise over HDX-based subspace codes, and check whether the inverse theorem there tolerates the extra ambient coordinates.",
+   "payoff": "medium",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "-",
+    "missing": "high-dimensional expanders, agreement tests",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "Max-Cut NP-hard beyond alpha_GW (KKMO07 + MOO10). In Lean, OptimalMaxCut is proved via a vendored theorem11 copy; the Max-Cut paper proves it directly without the gadget.",
+  "Vertex Cover NP-hard below factor 2 (Khot-Regev 2008), paper sec. 7. The release proves VertexCover directly (66k Lean lines, no gadget). That gives a measurable with/without comparison at corollary level, if KR08 were formalized.",
+  "Raghavendra's optimal CSP thresholds (cor:raghavendra-consequence) and ordering CSPs (Guruswami-Håstad-Manokaran-Raghavendra-Charikar 2011).",
+  "Multicut, non-uniform sparsest cut, Min-2CNF-equivalence deletion, correlation clustering (CKKRS06; sec. 7).",
+  "DFVS constant-factor hardness (Svensson's UG reduction). In Lean, DirectedFeedback is proved via a vendored DFVSGames.theorem11 copy.",
+  "Uniform sparsest cut constant-factor hardness (family 117 paper uses the UG theorem as premise; its Lean comparator covers only the integrality gap).",
+  "Kernel clustering hardness (family 096; Lean covers only the propeller bound).",
+  "2-to-2 games with completeness 1-epsilon: immediate from UG by label doubling (KMS18 then becomes a corollary)."
+ ],
+ "release_reuse": [
+  "Full-tree grep: Q is defined in exactly three places in OAI: UniqueGames/Quadratic/Block.lean:20, MaxCut/Games/OrientationVectors.lean:95 and DirectedFeedback/Games/ChildLifts.lean:422. exists_actual_gadget / StableNonlinearDispersion appear only in those three trees.",
+  "MaxCut/Games (117 files, about 63k lines) and DirectedFeedback/Games (about 66k lines) are namespace-renamed copies of the UG development, consumed through theorem11. That is reuse of the theorem, not independent reuse of the design.",
+  "Family 105 (2-to-1 perfect completeness) shares the recursive product-tree architecture (quadraticSpan, dependentQuadraticSpan in Construction/FactoredFunctionsLemmas.lean) but not Q, U_A or the latent separation property. This looks like a house style; priority between the two is unknown.",
+  "The Max-Cut paper's 'latent resampling rows' (decoding.tex) are a different device (planted zero coefficients); only the name is shared."
+ ],
+ "negative_controls": [
+  {
+   "title": "N1 (proved-false analogue): latent gadget with p_* = 0",
+   "statement": "There is no Data g over K = F_2^l with stabilityError g = 0 and kernelError <= nu < 1 for every S of restriction rank >= r, whenever l >= r.",
+   "why": "If C(x+a) = C(x) for all a in supp(mu), let A = span(supp mu). Equivariance forces A ∩ K = 0. Then G = A^perp restricts onto all of K^*, so it has rank l >= r_*, yet it vanishes on every noise vector, so the detection probability is 0. Any gadget must therefore pay p > 0. This is why perfect-completeness results (105, approximate coloring under 2-to-1) cannot use it as completeness noise.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "ActualGadget.Data, Satisfies, Submodule.dualAnnihilator",
+    "missing": "none (proof about 60-100 lines)",
+    "formal_proof_to_compare": "n/a"
+   }
+  },
+  {
+   "title": "N2: Unique Games with perfect completeness, on expanders, or with entangled provers",
+   "statement": "Satisfiable UG is in P (propagation / Gaussian elimination for translations); UG on spectral expanders is easy (Arora-Khot-Kolla-Steurer-Tulsiani-Vishnoi 2008); entangled-prover UG is in P (Kempe-Regev-Toner 2008).",
+   "why": "Gadget-based reductions must yield imperfect completeness, non-expanding constraint graphs and classical-only soundness. Targets that need any of these three properties should show no speedup.",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "release UG Instance; Mathlib spectral graph theory is thin",
+    "missing": "expansion/eigenvalue promise; quantum strategies need a major library",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "N3: VertexCover and MinUncut comparators",
+   "statement": "The release's own direct proofs of Vertex Cover 2-epsilon and Min-UnCut hardness.",
+   "why": "They contain no Q or gadget. Importing UniqueGames/Quadratic + Gadgets should not shorten them unless they are rerouted through theorem11, and that rerouting would be corollary use.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "release comparators",
+    "missing": "none",
+    "formal_proof_to_compare": "yes (66k / 125k lines)"
+   }
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "target": "Quantitative trade-off r_*(p_*) / UG alphabet size",
+   "lean": "statable now",
+   "argument": "This is the only target that tests the device itself rather than its theorem, and it needs no new definitions: Data and Satisfies already express it. An upper-bound improvement is a direct measure of how much the construction can be compressed. A lower bound, extending the proved-false p = 0 control, would show whether the gadget's parameters are forced. Both feed the alphabet and size of UG hardness."
+  },
+  {
+   "rank": 2,
+   "target": "Odd-characteristic latent gadget",
+   "lean": "statable with < 300 lines",
+   "argument": "This is a clean test of device generality. The Lean pins exactly which lemmas are characteristic-2 specific (D_eq_polar, cross_self_zero, D_smul_smul_zero). If a prover with Quadratic/ in its library finds an odd-characteristic analogue much faster than one without it, that is device reuse. The hardness consequence is already a corollary via KKMO, so the result has to be judged as a construction."
+  },
+  {
+   "rank": 3,
+   "target": "Family 105 Lean (2-to-1 perfect completeness)",
+   "lean": "statable now; formal proof exists",
+   "argument": "This is the only Lean-vs-Lean measurable device-level comparison. Run the 105 comparator with and without UniqueGames/Quadratic + Gadgets imported. Expectation is low: N1 forbids using the gadget as noise, but the genericity and harmonic lemmas may transfer. Even a null result calibrates the test."
+  },
+  {
+   "rank": 4,
+   "target": "Khot-Saket / Dinur-Guruswami near-perfect-completeness hardness",
+   "lean": "statable with < 300 lines",
+   "argument": "These are the closest known theorems facing the same completeness-under-linear-structure obstruction, which they solve with quadratic or low-degree codes. A gadget-based reproof would be genuine device reuse. Confidence is low, and the PCP infrastructure (Label Cover, repetition) exists only inside the UG tree."
+  },
+  {
+   "rank": 5,
+   "target": "Small-Set Expansion Hypothesis",
+   "lean": "statable with < 300 lines",
+   "argument": "The payoff is very high, but the obstruction match is weak: the gadget does not touch the expansion of the constraint graph. Include it as a long shot and as a check on whether a prover over-generalises the device."
+  }
+ ],
+ "precedent_check": {
+  "post_release_uses": "Not checked: web search unavailable in this session. MUST be rerun (queries: 'latent alphabet gadget', '(x2x3, x1x3, x1x2) unique games', 'quadratic block Unique Games Theorem' after 2026-10-06).",
+  "earlier_equivalent": "None found in the novelty pass (data/pilot/102/novelty.md): Khot-Saket quadratic code, low-degree/short codes, Cremona map (object only), FMW ECCC TR26-179 (2026-09-14; no nonlinear decoder). The closest is the same-release 2-to-1 companion (architecture only). No new precedent found here; the release-internal copies in MaxCut/DirectedFeedback are not independent.",
+  "verdict": "No downgrade from this pass."
+ },
+ "sources": [
+  "data/raw/openai-math/lean/OAI/Computability/UniqueGames/{Quadratic/Block.lean, Gadgets/ActualGadgetLemmas.lean, Gadgets/QuadraticStageNoise.lean, Gadgets/BaseConstruction.lean, Gadgets/Final.lean, Decoding/MatrixGapFromInverseLemmas.lean, Theorem.lean}",
+  "data/raw/openai-math/lean/OAI/Computability/MaxCut/{Main.lean, Games/StageData.lean, Games/OrientationVectors.lean, Games/Theorem.lean}",
+  "data/raw/openai-math/lean/OAI/Computability/DirectedFeedback/{Main.lean, Games/StageData.lean, Games/ChildLifts.lean, RankGraph/OutputDef.lean}",
+  "data/raw/openai-math/lean/ComparatorChallenges/{UniqueGamesTheorem,OptimalMaxCut,VertexCover,MinUncut,DirectedFeedback,PerfectCompleteness,UniformSparsestCut,GaussianPropeller}.json; lean/docs/102.md",
+  "data/raw/openai-math/preprints/The-Unique-Games-Theorem-September-23-2026/build/sections/{00-introduction,02-latent,07-consequences}.tex",
+  "data/raw/openai-math/preprints/A-Direct-Proof-of-Optimal-Max-Cut-Hardness-September-23-2026/build/sections/introduction.tex",
+  "data/raw/openai-math/CONTENTS.md (families 096, 102, 105, 117)",
+  "data/pilot/102/novelty.md, novelty.json; data/eureka_shortlist.json"
+ ],
+ "search_log": [
+  "grep 'x 1 * x 2, x 0 * x 2' over all of lean/OAI -> 3 hits (UniqueGames, MaxCut, DirectedFeedback)",
+  "grep exists_actual_gadget|exists_split_gadget|StableNonlinearDispersion over lean/OAI/Computability -> UG, MaxCut, DFVS only",
+  "grep theorem11 in MaxCut, DirectedFeedback, MinUncut, VertexCover -> MaxCut/Games/Theorem.lean:23, DirectedFeedback/RankGraph/OutputDef.lean:20; none in MinUncut/VertexCover",
+  "grep latent|gadget in sibling preprints; read Max-Cut paper introduction",
+  "grep Unique|theorem11 in Combinatorics/SparsestCut, Computability/PerfectCompleteness, Probability/GaussianPropeller -> no gadget copies",
+  "WebSearch 'Unique Games theorem 2026 latent gadget quadratic follow-up' -> FAILED (session limit)",
+  "WebSearch was unavailable for the whole session (account session limit); no web query returned results. Literature items below are from the analyst's own knowledge and from data/pilot/102/novelty.* and must be checked."
+ ]
+}
