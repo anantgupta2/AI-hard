@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Install Lean v4.34.1 and prepare the openai/math Lean project (data/raw/openai-math/lean) for building.
-# Works where releases.lean-lang.org, reservoir.lean-lang.org and the Mathlib cache hosts are blocked
+# Also works where releases.lean-lang.org, reservoir.lean-lang.org and the Mathlib cache hosts are blocked
 # (as in Claude cloud sessions): the toolchain comes from GitHub release assets, dependencies are
 # resolved from lake-manifest.json without `lake update` (whose Mathlib hook runs `cache get`), and
 # the lakefile's post_update compatibility patches are applied by hand with the same checks.
-# Mathlib then compiles from source; build only the modules you need, e.g.
+# Finally it tries `lake exe cache get` for prebuilt Mathlib, falling back to a source build.
+# Build only the modules you need, e.g.
 #   (cd data/raw/openai-math/lean && lake build OAI.GroupTheory.Thompson.Main)
 # Run scripts/fetch_release.sh first.
 set -euo pipefail
@@ -53,3 +54,10 @@ for name in fixed-point-theorems PrimeNumberTheoremAnd Zeta3Irrational rellich-k
     exit 1
   fi
 done
+
+# Prebuilt Mathlib (needs cache.mathlib.org and lakecache.blob.core.windows.net in the network allowlist).
+if lake exe cache get; then
+  echo "Mathlib cache downloaded."
+else
+  echo "Mathlib cache unavailable; Mathlib will compile from source on the first build." >&2
+fi

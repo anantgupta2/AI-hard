@@ -10,7 +10,7 @@ The corpus is OpenAI's Oct 6, 2026 math release (`openai/math`, 372 families / 7
 - `bash scripts/fetch_release.sh` fetches the release into `data/raw/openai-math`. It is not committed.
 - `python scripts/build_catalog.py` rebuilds `data/catalog_*.csv`.
 - `python scripts/extract_lean.py` regenerates `data/items/`. That output is not committed (~117 MB).
-- `bash scripts/setup_lean.sh` installs Lean v4.34.1 and prepares `data/raw/openai-math/lean` (deps plus compatibility patches). In cloud sessions the Mathlib cache hosts are blocked, so Mathlib compiles from source. Build only the modules you need: `lake build <module>`.
+- `bash scripts/setup_lean.sh` installs Lean v4.34.1 and prepares `data/raw/openai-math/lean` (deps plus compatibility patches). It also fetches prebuilt Mathlib with `lake exe cache get`, which needs `cache.mathlib.org` and `lakecache.blob.core.windows.net` in the environment allowlist; without them Mathlib compiles from source (hours). Build only the modules you need: `lake build <module>`.
 - Python on Windows: use `sys.stdout.reconfigure(encoding="utf-8")` when printing Unicode.
 
 ## The jump definition is STRICT
