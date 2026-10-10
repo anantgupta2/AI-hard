@@ -380,12 +380,15 @@ def main():
     shortlist = []
     for it in sl_doc.get("items", []):
         row = dict(it)
-        row["key"] = f"{it['fid']}|{it['rank']}"
+        row["key"] = f"{it['fid']}|{it.get('rank') or it.get('candidate_id') or 'x'}"
+        row["rank"] = it.get("rank") or 50 + len(shortlist)
         row["tier_label"] = tiers.get(str(it["tier"]), "")
         shortlist.append(row)
-    for i, it in enumerate(sl_doc.get("excluded_no_lean", [])):
-        row = dict(it)
-        row.update(tier=9, rank=100 + i, key=f"{it['fid']}|x", tier_label="Excluded: not formalized in Lean, so untestable there")
+    # The informal list (data/eureka_informal.json): N3 items with no Lean, so not prover work. It supersedes excluded_no_lean.
+    informal = (load(Path("data/eureka_informal.json")) or {}).get("items") or sl_doc.get("excluded_no_lean", [])
+    for i, it in enumerate(informal):
+        row = {k: (txt(v) if isinstance(v, (dict, list)) else v) for k, v in it.items()}
+        row.update(tier=9, rank=100 + i, key=f"{it['fid']}|x", tier_label="Informal list: N3, but no Lean, so not prover work")
         shortlist.append(row)
     by_fid_sl = {r["fid"]: r for r in shortlist if r["tier"] != 9}
     # Downstream targets per shortlisted item (data/pilot/<fid>/downstream.json; Lean-usable related problems).

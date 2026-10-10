@@ -19,6 +19,7 @@ DESC = {
     "f1_lean": ("F1 exact Lean source", "Verbatim Lean declarations of each F1 definition and its key lemmas, copied from the openai/math Lean library at commit fd4aeeb."),
     "shortlist": ("Eureka-step shortlist", "Priority tiers for the items that survived the novelty pass at N3, with the evidence for and against each and the next test to run. Curated by Claude in data/eureka_shortlist.json from the agents' findings."),
     "downstream": ("Related problems per shortlisted item", "For each Lean-formalized shortlist item: top-5 targets, known theorems for the speedup test, open problems, negative controls and theorem corollaries, each with how easily it can be stated in Lean. From the downstream agents' data/pilot/<fid>/downstream.json."),
+    "prover_tasks": ("Prover task queue", "What the next agent should try to prove for each Lean eureka-shortlist item: speedup tests (with vs without the item), discoverability tests, negative controls and open problems, each with its statement, library arms, baseline and success criterion. Built by scripts/build_prover_tasks.py; the same list is data/prover_tasks.json."),
     "items": ("Lemmas and definitions", "Every extracted lemma, definition and construction with its novelty grade (N0-N3) and eureka type (F), from the paper, family, trace and novelty analysts."),
 }
 assets = json.loads(Path(sys.argv[1]).read_text())

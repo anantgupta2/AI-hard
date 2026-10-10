@@ -191,10 +191,48 @@
   </section>
 
   <section class="ax-page" id="shortlist" role="tabpanel" aria-labelledby="tab-shortlist" hidden>
+    <div class="ax-card" id="prover-intro">
+      <h2>Prover task queue: what the next agent should try to prove</h2>
+      <p class="ax-note">Each eureka step below comes with concrete proving work. Take tasks from the top of the queue. The same list is in the repository as <code>data/prover_tasks.json</code>, which an agent can read directly.</p>
+      <div class="ax-figs" id="prover-figs" data-source="prover_counts">
+        <div class="ax-fig"><span class="v" data-source="prover_counts" data-field="n" data-where="kind=all">—</span><span class="l">tasks in the queue</span></div>
+        <div class="ax-fig"><span class="v" data-source="prover_counts" data-field="runnable" data-where="kind=all">—</span><span class="l">can be stated in Lean now</span></div>
+        <div class="ax-fig"><span class="v" data-source="prover_counts" data-field="n" data-where="kind=speedup">—</span><span class="l">speedup tests</span></div>
+        <div class="ax-fig"><span class="v" data-source="prover_counts" data-field="n" data-where="kind=discoverability">—</span><span class="l">discoverability tests</span></div>
+        <div class="ax-fig"><span class="v" data-source="prover_counts" data-field="n" data-where="kind=negative_control">—</span><span class="l">negative controls</span></div>
+        <div class="ax-fig"><span class="v" data-source="prover_counts" data-field="n" data-where="kind=open_problem">—</span><span class="l">open problems</span></div>
+      </div>
+      <details id="prover-protocol" open>
+        <summary><b>How to run a task</b></summary>
+        <div class="body">
+          <div><b>Setup.</b> Clone the project, then run <code>bash scripts/fetch_release.sh</code> and <code>bash scripts/setup_lean.sh</code>. That gives Lean v4.34.1, Mathlib d13f23b (prebuilt) and the openai/math Lean library at commit fd4aeeb in <code>data/raw/openai-math/lean</code>. Build only the modules a task needs: <code>lake build &lt;module&gt;</code>.</div>
+          <div><b>Speedup test (the one that can confirm a eureka step).</b> Write the target statement in Lean. Run the same prover with the same budget in two arms. <i>With item</i>: the library includes the declarations listed for the task. <i>Without item</i>: remove those declarations and everything that depends on them, and keep the rest. Record success, tokens, attempts and wall-clock time per arm, and report pass@k. A large gap on a theorem <i>other</i> than the item's own counts as a speedup. Corollaries of the item's theorem do not count.</div>
+          <div><b>Discoverability test (test 4).</b> Hide the item and everything downstream of it. Use only models whose training cutoff predates the paper, and run the listed arms and sampling. Have independent judges decide whether each proposal is equivalent to the hidden item. Report the hit rate against k.</div>
+          <div><b>Negative controls.</b> These are settings where the device should not help, or false statements it must not prove. A gap between arms here means something is leaking.</div>
+          <div><b>Open problems.</b> These are exploratory. Attempt them with the item in the library, and record any proof and the budget it took.</div>
+          <div><b>Checking a proof.</b> Use <a href="https://github.com/leanprover/comparator">Comparator</a>: the proof must state exactly the target and use only <code>propext</code>, <code>Quot.sound</code> and <code>Classical.choice</code>. The tier-1 families already pass.</div>
+        </div>
+      </details>
+    </div>
+    <div class="ax-card" id="prover-queue-card">
+      <div class="ax-filters" id="prover-kind" role="group" aria-label="Task kind"></div>
+      <div class="ax-filters" id="prover-fid" role="group" aria-label="Family"></div>
+      <div class="ax-scroll">
+        <table class="ax-pq" data-source="prover_tasks" data-row-key="task_id">
+          <thead><tr>
+            <th data-field="queue" class="num">#</th><th data-field="task_id">Task</th><th data-field="fid">Family</th>
+            <th data-field="kind">Kind</th><th data-field="title">What to prove</th><th data-field="lean_score">Lean</th>
+            <th data-field="top5_rank" class="num">Top 5</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="prover-detail"></div>
+    </div>
     <div class="ax-card" id="shortlist-intro">
       <h2>Which surviving items are most plausibly eureka steps</h2>
       <p class="ax-note">The items that survived the novelty pass at N3, ranked into four priority tiers for the next experiments: the discoverability test and the speedup test. Tiers weigh the novelty confidence, how far the step sits from known material or from the model's own learned lessons, whether anyone found it independently, and how strong the nearest precedent is. This is a judgement for prioritising, not a result: none is a confirmed eureka step.</p>
-      <p class="ax-note">The tests run in Lean, so only items formalized in the openai/math Lean library are ranked. Each item shows where it lives in the Lean, whether the comparator target depends on it, and the related problems to try it on, with how easily each can be stated in Lean. Items with no Lean counterpart are listed at the bottom as excluded.</p>
+      <p class="ax-note">The tests run in Lean, so only items formalized in the openai/math Lean library are ranked. Each item shows where it lives in the Lean, whether the comparator target depends on it, and the related problems to try it on, with how easily each can be stated in Lean. N3 items with no Lean counterpart are on the informal list at the bottom. They are not prover work.</p>
     </div>
     <div id="shortlist-tiers" class="ax-page" data-source="shortlist"></div>
   </section>
@@ -886,7 +924,7 @@ dash.calc('summary', {
     host.replaceChildren(...tiers.map((t) => {
       const group = rows.filter((r) => r.tier === t);
       const card = S.el('div', 'ax-card'); card.id = 'tier-' + t;
-      const h = S.el('h2'); h.append(S.el('span', 'ax-badge' + (t === 1 ? ' n3' : t === 2 ? ' n2' : ''), t === 9 ? 'Excluded' : 'Tier ' + t), document.createTextNode(' ' + (group[0].tier_label || '')));
+      const h = S.el('h2'); h.append(S.el('span', 'ax-badge' + (t === 1 ? ' n3' : t === 2 ? ' n2' : ''), t === 9 ? 'Informal list' : t === 5 ? 'New, untiered' : 'Tier ' + t), document.createTextNode(' ' + (group[0].tier_label || '')));
       card.append(h);
       group.forEach((r, i) => {
         const d = S.el('details'); if (t === 1) d.open = true;
@@ -896,7 +934,7 @@ dash.calc('summary', {
         const body = S.el('div', 'body');
         [['Distance from known material', r.pivot_distance], ['For', r['for']], ['Against', r.against], ['Claude’s verdict', r.verdict], ['Downstream and Lean findings', r.downstream],
           ['Chance of a confirmed jump (rough judgement)', r.p_jump != null ? d3.format('.0%')(r.p_jump) : null], ['Next test', r.next_test],
-          ['Why excluded', r.excluded_reason], ['Lean status', r.lean_status], ['Lean status, why', r.lean_status_why], ['Lean declarations', r.lean_decls],
+          ['Why it is informal', r.excluded_reason || r.why_informal], ['Lean status', r.lean_status], ['Lean status, why', r.lean_status_why], ['Lean declarations', r.lean_decls],
           ['Comparator chain', r.comparator_chain], ['Gaps between paper and Lean', r.lean_gaps]]
           .filter(([, v]) => v).forEach(([k, v]) => { const p = S.el('div'); p.append(S.el('b', null, k + ': '), document.createTextNode(v)); body.append(p); });
         const tg = S.rows('downstream').filter((x) => x.fid === r.fid);
@@ -935,5 +973,77 @@ dash.calc('summary', {
     }));
   }
   dash.onData(render);
+})();
+</script>
+
+<script>
+dash.calc('prover_counts', {
+  inputs: ['prover_tasks'],
+  title: 'Prover tasks by kind',
+  description: 'Number of prover tasks per kind, and how many can be stated in Lean now.',
+  fn: (prover_tasks) => ['all', 'speedup', 'discoverability', 'negative_control', 'open_problem'].map((kind) => {
+    const rows = prover_tasks.filter((t) => kind === 'all' || t.kind === kind);
+    return { kind, n: rows.length, runnable: rows.filter((t) => t.runnable_now === true || t.runnable_now === 'true').length };
+  }),
+});
+(() => {
+  const S = window.AX;
+  S.pk = S.pk || { kind: 'all', fid: 'all', now: false, sel: null };
+  const kindBox = document.getElementById('prover-kind'), fidBox = document.getElementById('prover-fid');
+  const table = document.querySelector('.ax-pq'), tbody = table.querySelector('tbody'), detail = document.getElementById('prover-detail');
+  const KINDS = [['all', 'All kinds'], ['speedup', 'Speedup'], ['discoverability', 'Discoverability'], ['negative_control', 'Negative control'], ['open_problem', 'Open problem']];
+  const KLABEL = Object.fromEntries(KINDS);
+  const chip = (label, pressed, on) => { const b = S.el('button', 'ax-chip', label); b.type = 'button'; b.setAttribute('aria-pressed', String(pressed)); b.addEventListener('click', on); return b; };
+  const runnable = (t) => t.runnable_now === true || t.runnable_now === 'true';
+  S.sortable(table, 'pq', () => renderTable());
+  function filtered() {
+    return S.rows('prover_tasks').filter((t) => (S.pk.kind === 'all' || t.kind === S.pk.kind) && (S.pk.fid === 'all' || t.fid === S.pk.fid) && (!S.pk.now || runnable(t)));
+  }
+  function renderFilters() {
+    kindBox.replaceChildren(...KINDS.map(([k, l]) => chip(l, S.pk.kind === k, () => { S.pk.kind = k; renderAll(); })),
+      chip('Statable in Lean now', S.pk.now, () => { S.pk.now = !S.pk.now; renderAll(); }));
+    const fids = [...new Set(S.rows('prover_tasks').map((t) => t.fid))];
+    fidBox.replaceChildren(chip('All families', S.pk.fid === 'all', () => { S.pk.fid = 'all'; renderAll(); }),
+      ...fids.map((f) => chip(f, S.pk.fid === f, () => { S.pk.fid = f; renderAll(); })));
+  }
+  function renderTable() {
+    const rows = S.sorted(filtered(), 'pq');
+    if (!S.pk.sel || !rows.some((t) => t.task_id === S.pk.sel)) S.pk.sel = rows.length ? rows[0].task_id : null;
+    tbody.replaceChildren(...rows.map((t) => {
+      const tr = S.el('tr'); tr.setAttribute('aria-selected', String(t.task_id === S.pk.sel));
+      [t.queue, t.task_id, t.fid, KLABEL[t.kind] || t.kind, t.title, (t.lean_score || '').slice(0, 40), t.top5_rank ?? ''].forEach((v, i) => {
+        const td = S.el('td', i === 0 || i === 6 ? 'num' : null, v == null ? '' : String(v)); tr.append(td);
+      });
+      tr.addEventListener('click', () => { S.pk.sel = t.task_id; renderTable(); renderDetail(); });
+      return tr;
+    }));
+  }
+  function renderDetail() {
+    const t = S.rows('prover_tasks').find((x) => x.task_id === S.pk.sel);
+    if (!t) { detail.replaceChildren(S.el('p', 'ax-empty', 'No task matches these filters.')); return; }
+    const box = S.el('div', 'ax-card'); box.id = 'prover-task';
+    const h = S.el('h3'); h.append(S.el('span', 'ax-badge' + (t.kind === 'speedup' ? ' n3' : ''), KLABEL[t.kind] || t.kind), document.createTextNode(' ' + t.task_id + ' · ' + (t.title || '')));
+    box.append(h);
+    const dl = S.el('dl', 'ax-kv');
+    [['Eureka step', 'eureka_item'], ['Tier', 'tier'], ['Why it is a top-5 pick', 'top5_argument'], ['Statement to prove', 'statement'], ['Reference', 'reference'],
+      ['Status', 'status'], [t.kind === 'discoverability' ? 'What to hide' : t.kind === 'negative_control' ? 'Why the device must not help' : 'How the item should help', 'how_item_helps'],
+      [t.kind === 'discoverability' ? 'Distance from known material' : 'Expected payoff', 'expected'], ['Confidence', 'confidence'],
+      ['Lean: can it be stated?', 'lean_score'], ['Lean: notions it needs', 'lean_statable_with'], ['Lean: missing definitions', 'lean_missing'],
+      ['Library, with item', 'with_item_library'], ['Library, without item', 'without_item_library'], ['Baseline formal proof to compare', 'baseline_formal_proof'],
+      ['Current proof size', 'current_proof_size'], ['Models (contamination control)', 'protocol_models'], ['Arms', 'protocol_arms'], ['Sampling', 'protocol_sampling'],
+      ['Judging', 'protocol_judging'], ['Calibration controls', 'protocol_controls'], ['Item-specific protocol', 'protocol_item'],
+      ['What counts as success', 'success_criterion'], ['Lean check of the family', 'lean_check'], ['Source', 'source']]
+      .forEach(([label, f]) => {
+        const v = t[f]; if (v == null || v === '') return;
+        const dd = S.el('dd', null, String(v)); dd.dataset.source = 'prover_tasks'; dd.dataset.field = f; dd.dataset.where = 'task_id=' + encodeURIComponent(t.task_id);
+        dl.append(S.el('dt', null, label), dd);
+      });
+    box.append(dl);
+    const open = S.el('button', 'ax-chip', 'Open family ' + t.fid); open.type = 'button'; open.addEventListener('click', () => S.pickFamily(t.fid));
+    box.append(open);
+    detail.replaceChildren(box);
+  }
+  function renderAll() { renderFilters(); renderTable(); renderDetail(); }
+  dash.onData(renderAll);
 })();
 </script>
