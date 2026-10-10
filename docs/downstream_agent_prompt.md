@@ -23,7 +23,7 @@ Your item is on the project's **eureka shortlist** (`data/eureka_shortlist.json`
 
    Give a one-sentence justification. If the item is not really in the Lean, say so plainly; it will be dropped from the shortlist.
 
-The Lean has not been compiled; there is no local toolchain. Work at text level, and say that you did.
+Lean v4.34.1 with Mathlib can be installed with `bash scripts/setup_lean.sh`, and comparator results are recorded in `data/lean_checks.json`. If several agents share one checkout, leave builds to the orchestrator (concurrent Lake builds collide) and work at text level, saying that you did.
 
 ## Part B: Related problems to try it on
 Find the problems we should run the item on, in two groups.

@@ -15,7 +15,7 @@ Resolve `\input`/`\include` from main_tex and read the whole paper. If the famil
 - the comparator `lean/ComparatorChallenges/<name>.{json,lean}`;
 - the Lean dirs, plus any OAI dirs they import.
 
-`scripts/extract_lean.py <FID>` gives a first-pass declaration and DAG dump at `data/items/<FID>_lean.json`. Its load-bearing ranking over-weights type aliases, so treat it as a rough guide only. Lean is not installed, so work at the text level.
+`scripts/extract_lean.py <FID>` gives a first-pass declaration and DAG dump at `data/items/<FID>_lean.json`. Its load-bearing ranking over-weights type aliases, so treat it as a rough guide only. Lean v4.34.1 with Mathlib can be installed with `bash scripts/setup_lean.sh` (cloud sessions: see CLAUDE.md). If several agents share one checkout, leave builds and `comparator` runs to the orchestrator, because concurrent Lake builds collide; otherwise work at the text level and say so.
 
 Required content, at **maximal detail**:
 - **main_statement:** verbatim, plus a paraphrase. If there is Lean: the comparator statement, a match check against the paper, and what is formalized vs claimed.
