@@ -115,4 +115,37 @@ Details, including `lean_feasibility` (statable_with, missing, formal_proof_to_c
 
 ## Precedent
 
-No earlier equivalent was found (F1 verdict, unchanged), and there was no new web search in this pass. The "after Oct 6" check is unchanged from F1: VibeMathed lists the result as "candidate, review pending", and Kalai's post of 2026-10-07 mentions it without assessment. The theorem is unrefereed; everything downstream is conditional on it.
+**Verdict (re-checked 2026-10-10): no earlier equivalent found, so N3 is not downgraded. No error report, but the theorem is still unreviewed. The item remains an N3 candidate, not a confirmed eureka step.** The 2026-10-09 pass ran no new web search. The F1 findings were:
+- VibeMathed lists the result as "candidate, review pending".
+- Kalai's post of 2026-10-07 mentions it without assessment.
+
+**Web re-check, 2026-10-10.** Coverage was limited. WebSearch ran 28 queries. Every WebFetch failed with `ENOTFOUND`, and curl through the proxy got `CONNECT 403`: this is egress policy, not a rate limit, and retries did not help. The blocked pages were Kalai, VibeMathed, arXiv, Nature, X, Kingy AI and proofsandprompts, so primary pages were not re-read. The findings below come from search snippets.
+
+- **Post-release use of the device:** none found. Searches covered reuse on F_n, Stein groups, F_τ, Lodha–Moore, Monod's H(A) and T C\*-simplicity. The newest hits do not cite 248:
+  - arXiv:2603.28228 (2026) still treats C\*-simplicity of F as open;
+  - Farley, AGT 26(4), 2026, is on finiteness properties of piecewise-projective groups.
+- **Assessments:** no named expert verdict was found. Sources checked: Moore, Brin, Guba, Monod, Lodha, MathOverflow, Mathstodon, Lean Zulip and Quanta.
+  - Kalai's snippet: the manuscript "announces" nonamenability.
+  - VibeMathed's snippet restates Theorem 1.1 and the Benyamini–Sternfeld mechanism. Its status could not be re-confirmed.
+  - Kingy AI lists "1 manuscript, Lean scope".
+  - An X post lists the title.
+  - Release-wide coverage does not mention Thompson's group F in the snippets returned: Nature, Fortune, Futurism, the AHM statement on Tao's blog, and proofsandprompts "100+ reactions".
+  - No independent compile of the Lean files was found.
+- **Error reports:** none for the 2026 claim. The searches surfaced only the historical withdrawals:
+  - Wajnryb–Witowicz, arXiv:1408.2188;
+  - Akhmedov, arXiv:0902.3849;
+  - Shavgulidze, via the note arXiv:1102.0747.
+
+  A read-only git check found github.com/openai/math `main` still at `fd4aeeb`, the merge of PR #1 "codex/update-10-7" from 2026-10-07. No Thompson or 248 file has changed since the initial commit `adc7f12`, so there is no erratum or withdrawal.
+- **Earlier equivalents:** none. Re-verified nearest neighbours:
+  - Moore's Følner-function tower bound (arXiv:0905.1118 = GGD 7 (2013) 633–651): scalar.
+  - Moore's Ramsey reformulation (Fund. Math. 220, 2013; KST Thm 4.1): a reformulation, not a mechanism.
+  - Akhmedov's height functions (1310.4395, 0902.4755). Guba disproved TSP for F (math/0508014).
+  - Monod 2305.00796 (GGD 2025): affine.
+  - Benyamini–Sternfeld (Proc. AMS 88, 1983) and Lin–Sternfeld: no group-theoretic application found.
+  - Wiśnicki 1612.06270: a nonexpansive analogue of Day's theorem, not an obstruction.
+  - Brothier–Jones / Brothier–Wijesena Pythagorean representations: linear isometry recursions.
+
+  Searches for tree-indexed vector-valued colourings or cocycles proving nonamenability, and for fixed-point-free Lipschitz maps used for amenability, found nothing relevant.
+
+The theorem is unrefereed, on a problem with a history of withdrawn claims. Everything downstream is conditional on it. Details, per-query log and URLs are in `downstream.json` (`precedent_check.update_2026_10_10_web`, `search_log`, `sources`).

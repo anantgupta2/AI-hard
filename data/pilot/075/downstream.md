@@ -125,4 +125,20 @@ The JSON `lean_source` has 34 verbatim entries: the 21 from F1 plus GridBound, F
 
 There is no earlier equivalent of the full device (F1 verdict, unchanged; no new web search in this pass). Every ingredient is precedented, so the N2 ("new bridge") risk stays real. No post-Oct-6 use was found.
 
+### Web re-check, 2026-10-10
+
+This pass ran 32 WebSearch queries. WebFetch failed on every host tried (DNS `ENOTFOUND` on arxiv.org, androma.org, kingy.ai, news sites and Wikipedia; two retries), and the egress proxy denied curl to arxiv.org. Every finding below therefore comes from search-result snippets.
+
+- **Post-release use:** none found. No post-Oct-6 work uses thermal labels, the Fisher sum or character decoding. That includes Walsh L log L, Vilenkin systems, Bourgain's lemma, lacunary operators and return times. The third-party repositories that build on the release are for family 130 (DFT below n log n).
+- **Assessments:** none specific to 075. Searches of Tao, Kalai, MathOverflow, HN/reddit, Lacey, Di Plinio, Thiele and Lie found nothing on the L log L result. kingy.ai's release write-up lists the family as a catalogue line only. General coverage (Axios, Leiter, Futurism) is about the whole release.
+- **Error reports:** none for 075. A search hit on openai/math commit 3014888 (2026-10-07) was checked locally: it is an ancestor of the pin fd4aeeb and is the commit that first added the FourierLLogL formalization, so it is not a post-pin revision or an erratum. openai/math main is still at fd4aeeb. No error issue was found.
+- **Problem status before release:** L log L was confirmed open. The best previously known class is Antonov (1996), L log L log log log L, with Sjolin-Soria for Walsh and Oniani for Vilenkin. Arias de Reyna's QA strictly contains that class but is not known to contain L log L, and Moldavcuk (2603.04629, Mar 2026) only generalises QA. A May 2026 preprint (2605.05135) still calls Zygmund's t log t question open. Konyagin's negative threshold is o(u sqrt(log u / log log u)).
+- **Earlier equivalents of the device:** none found.
+  - No information-theoretic or noisy-observation proof of any Carleson-type theorem turned up. The nearest analogue is Friedgut-style information-theoretic hypercontractivity (1504.01506).
+  - Stochastic localization has not been applied to maximal operators.
+  - Tao's entropy decrement appears only in correlation problems for multiplicative functions.
+  - Bourgain's metric-entropy method, including 2607.05560 (Jul 2026, snippet only), is covering-number entropy, not label information.
+
+**Verdict (unchanged):** no earlier equivalent of either the theorem or the device was found, so nothing downgrades the item. It stays an N3 candidate provisionally, with a real N2 risk from the transfer of stochastic localization, entropy decrement and the information budget. It is not confirmed, because the speedup test has not been run.
+
 **Lean-specific caveat for any speedup run:** remove `paperMain`, `almost_everywhere_fourier_convergence` and `gridProof` from the library. Otherwise Carleson, KSP and every L^p result are trivial corollaries.
