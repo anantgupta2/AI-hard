@@ -304,6 +304,19 @@ The project lives at `C:\Users\anant\AI-Hard`.
    - A process study of the 10 traces, including CDCL search-dynamics metrics compared across traces and against each trace's eureka candidates.
 9. **Downstream speedup test** on N3 items, plus Mathlib knockout validation on historical eureka steps.
 
+## Working hypothesis: scaled-up resolution (informal, 2026-10-10)
+This is an analogy, not yet a formal definition.
+- **The formula is all of mathematics.** Each field is a set of clauses: its theorems and named concepts. The whole formula is their union.
+- **Resolution** is any step that combines existing clauses, from any field. Cross-field transfer is still resolution: a resolvent whose two premises come from different fields.
+- **A jump** is an extension: a concept from outside the existing vocabulary that, once named, helps resolve things already in mathematics.
+  - The line is drawn at the literature's vocabulary, not at definability from primitives. Everything is definable from primitives, including Cook–Reckhow's extension variables (x ↔ a ∧ b). What makes those an extension is that they are new names whose introduction shortens other proofs.
+  - Mapping to the codebook: N0–N2 are resolution steps, N3 is a candidate extension, and the downstream speedup test separates a real extension from a local abbreviation.
+- **Claim, as of 2026-10-10.** The model behaves like resolution scaled to the whole formula, bridging all of mathematics at once in a way no human can. No extension has been confirmed: every step is N0–N2, or an N3 candidate not yet shown to shorten anything else.
+  - Supporting: wide cross-field resolvents (004 logic ↔ heights, 075 information theory ↔ Carleson, 158 spectral rigidity ↔ colouring, 107 representation tensors ↔ complexity). Analysts repeatedly find that "new" items are new combinations of precedented parts. For 103, the best downstream targets were corollaries, not reuse of the device.
+  - Falsifier: any N3 device that passes the speedup test on a theorem other than its own. The prover queue (`data/prover_tasks.json`) is that experiment.
+  - Weakening evidence to track: device reuse across the model's own manuscripts (e.g. 002's Heisenberg-commutator choice in all three BSD papers, 271's splice, 107's separation lemma). Count it release-wide.
+- **Prediction (not a finding).** Had humans resolved this set of problems, over perhaps 100–150 years, they would very likely have produced reusable frameworks along the way, as Wiles's R = T, Gowers's higher-order Fourier analysis and Perelman's surgery did. Revisit in 12–24 months: does any model device enter the human literature or Mathlib as a named tool?
+
 ## Caveats
 - The "how" labels describe the written proof, not the search that found it.
 - Results are unreviewed. Drop withdrawals and track revisions.
