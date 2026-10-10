@@ -1,0 +1,1966 @@
+{
+ "family": "158",
+ "title": "The Euclidean plane cannot be colored with five colors",
+ "manuscript_dir": "preprints/The-Euclidean-plane-is-not-five-colorable-September-23-2026",
+ "source_root": "data/raw/openai-math/preprints/The-Euclidean-plane-is-not-five-colorable-September-23-2026/build (main.tex + sections/*.tex, figures/*.tex, references.bib)",
+ "file_line_convention": "paths relative to build/ unless they start with lean/ or overview.tex",
+ "commit": "fd4aeeb",
+ "date": "2026-10-10",
+ "analyst_role": "FAMILY analyst (paper + Lean, text level; Lean not compiled by this analyst). Influential-problems pass.",
+ "base_library_L": "Mathlib d13f23b + the paper's bibliography (33 entries: Falconer1981, Payne2009, deGrey2018, Heule2018, Parts2020x2, ExooIsmailescu2020, Furstenberg1977, Zimmer1976x2, Jamneshan, Crum1956, GneitingSasvari1999, SokolovVoronov2025, Voronov2025Interval, Townsend1981/2005, Woodall1973, MoserMoser1961, deBruijnErdos1951, Bekka2008, Hatcher2002, Tao2008, DeroinKleptsynNavas2008, BourgeatEtAl2015, GwynStavrianos2020, MatolcsiEtAl2025, Reed2026, ...)",
+ "main_statement": {
+  "verbatim": "The Euclidean plane has no proper five-coloring, even when arbitrary color classes are allowed. Consequently, \\[ 6\\le \\chi(\\R^2)\\le 7. \\]",
+  "file_line": "sections/introduction.tex:62-68",
+  "paraphrase": "Every map R^2 -> {1..5} has two points at distance 1 with the same colour; no measurability or other assumption. With Isbell's 7-colouring, chi(R^2) in {6,7}.",
+  "lean_comparator": {
+   "file": "lean/ComparatorChallenges/EuclideanFiveColor.lean (+ .json)",
+   "statement": "theorem no_proper_five_coloring : ¬ ∃ coloring : ℂ → Fin 5, ProperColoring 5 coloring  where ProperColoring k c := ∀ p q : ℂ, ‖p - q‖ = 1 → c p ≠ c q",
+   "solution_module": "OAI.Geometry.PlaneColoring.Five",
+   "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+   ],
+   "second_comparator": "OAI.Problem160.properColoring_seven (PlaneColoring.json; EuclideanSpace ℝ (Fin 2), dist x y = 1) -> classical upper bound"
+  },
+  "match_check": "Exact. The comparator quantifies over all functions ℂ → Fin 5 (no measurability), uses the Euclidean norm on ℂ = R^2, and the conclusion is the paper's Theorem 1.1 lower bound. The upper bound is a separate comparator. Both together give 6 <= chi <= 7. Statement is trivially unfaithful only if ‖·‖ on ℂ were not Euclidean; it is (Complex.abs).",
+  "formalized_vs_claimed": {
+   "formalized": [
+    "Thm 1.1 lower bound (comparator)",
+    "upper bound 7 (comparator)",
+    "Thm 1.3 (no_measurable_weak_five_coloring, for Borel c)",
+    "forward transfer (proper_to_borel_weak)",
+    "Thm 2.3 rigidity (wild_fourier)"
+   ],
+   "claimed_not_formalized": [
+    "converse transfer (Thm 1.2 <=)",
+    "Cor 1.4 positive badness",
+    "implicit chi_m >= 6 (not stated anywhere)"
+   ]
+  }
+ },
+ "trust_surface": {
+  "grep": "sorry / axiom / admit / native_decide / implemented_by / @[extern] / unsafe / opaque / maxHeartbeats / debug: zero hits in OAI/Geometry/PlaneColoring (46 files, 14,661 lines), OAI/Analysis/PlaneSpectrum (19 files, 8,466 lines), OAI/MeasureTheory/CompactFactors (14 files, 7,728 lines).",
+  "decide_uses": "~86 kernel `decide` calls, all on finite Fin 3 / Fin 5 / Fin 6 / Bool / Finset (Fin 5) statements; the largest ranges over Fin 5^6 = 15,625 tuples (Exclusion.lean:60-63). No search, no external certificate.",
+  "imports": "Only `import Mathlib` plus the three OAI dirs; no other external libraries.",
+  "compiled": "NOT compiled by this analyst (instructed not to run lake/lean; orchestrator will compile and record). All Lean claims here are text-level.",
+  "comparator_axioms": "propext, Quot.sound, Classical.choice only."
+ },
+ "labels": {
+  "A": {
+   "label": "A5",
+   "secondary": {
+    "hard_direction_form": null,
+    "explicit_rate": false
+   },
+   "evidence": {
+    "quote": "The Euclidean plane has no proper five-coloring, even when arbitrary color classes are allowed.",
+    "file_line": "sections/introduction.tex:62-64"
+   },
+   "confidence": "high",
+   "note": "Impossibility (no proper 5-colouring). The upper bound 7 is classical and A1/A2 but secondary."
+  },
+  "B": {
+   "label": "B3",
+   "alt_label": "B4",
+   "flags": {
+    "full_only_with_prior_results": false,
+    "full_only_with_prior_results_detail": "Independent of de Grey 2018 and of any finite-graph search; the upper bound 7 is the classical Isbell colouring, re-proved in one paragraph.",
+    "adds_corollaries_for_other_conjectures": true,
+    "adds_corollaries_detail": "(i) chi_m(R^2) >= 6 follows from Thm 1.3 because every measurable proper colouring is a weak measurable colouring; this improves Falconer 1981 (chi_m >= 5) but is NOT stated in the paper. (ii) Transfer theorem (all k): chi(R^2) equals the least k admitting an a.e.-proper measurable colouring, so the Shelah-Soifer-type ZFC vs measurable ambiguity cannot occur for the plane. (iii) Positive five-colour badness (Cor 1.4) for the probabilistic Hadwiger-Nelson problem. (iv) Likely, not stated: Falconer's density-point method applied to weak colourings plus the transfer gives a computer-free proof of chi >= 5."
+   },
+   "evidence": {
+    "quote": "Consequently, the chromatic number of the plane is either six or seven.",
+    "file_line": "main.tex:10-11 (abstract)"
+   },
+   "confidence": "high",
+   "note": "Hadwiger-Nelson asks for the exact value; narrowing {5,6,7} to {6,7} is partial progress (B3). B4 (extends the known lower bound 5 to 6) is an equally defensible reading."
+  },
+  "C": {
+   "primary": "C3",
+   "primary_evidence": {
+    "quote": "A proper five-coloring would give a weak measurable five-coloring by Theorem~\\ref{thm:transfer}, contrary to Theorem~\\ref{thm:weak-five}.",
+    "file_line": "sections/introduction.tex:120-121"
+   },
+   "secondaries": [
+    {
+     "label": "C5",
+     "evidence": {
+      "quote": "Apply the ordinary Bochner theorem to this continuous positive-definite function on $\\R$",
+      "file_line": "spectral.tex:202"
+     },
+     "note": "Invoked without proof: Bochner, SNAG spectral theorem, amenability/Folner (Bekka 2008), disintegration (Tao 2008), Brouwer (Hatcher), Lebesgue differentiation, ergodic decomposition; de Bruijn-Erdos only for the converse and the corollary."
+    },
+    {
+     "label": "C2",
+     "evidence": {
+      "quote": "We use transfinite induction in its universal form",
+      "file_line": "spectral.tex:341-342"
+     },
+     "note": "Transfinite induction over a Furstenberg-Zimmer tower (I16), induction on l in the multiple-average lemma (vdC), iteration of compact extensions."
+    },
+    {
+     "label": "C4",
+     "evidence": {
+      "quote": "\\frac{0.95^2}{m^2}-\\frac1{|J|} >\\frac{0.95^2-0.1}{m^2} >\\frac1{4m^2}.",
+      "file_line": "spectral.tex:613-615"
+     },
+     "note": "Estimation chains: collision counting, bounded distortion (I33), Fourier decay o(sqrt|h|) (I36), measure estimates for holes."
+    },
+    {
+     "label": "C1",
+     "evidence": {
+      "quote": "We place this graph using",
+      "file_line": "angular.tex:520"
+     },
+     "note": "Auxiliary constructions only (Moser placement, approximants); the theorem is non-constructive."
+    }
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "The full rational verification is given in Section~\\ref{sec:angular-certificate-verification}.",
+    "file_line": "angular.tex:581-582"
+   },
+   "computer_assisted_detail": {
+    "finite_unit_distance_graph_exhibited": false,
+    "graph_used": "Only the 7-vertex Moser spindle (classical, 3-colour obstruction) inside a region proved to use 3 labels. No 6-chromatic finite unit-distance graph is constructed; Cor 1.4 gets one only existentially via de Bruijn-Erdos compactness.",
+    "how_found": "Not by search. The proof is analytic/ergodic/topological; contrast de Grey 2018 (1581 vertices, computer-checked), Heule 2018 (SAT + unsat-core extraction, 553 then 529/517/510 vertices), Polymath16, Parts 2020 (509 vertices, human-verifiable proof). None is used.",
+    "certification": "Seven-point rational interval certificate verified by hand in the paper (two small tables, h=0.00011); in Lean by real-arithmetic lemmas (Moser.lean). Finite label case checks by kernel `decide` (largest: 5^6 = 15,625 tuples in five_six_constant_steps_impossible, Exclusion.lean:60-63; 32x32 subset/Bool pairs elsewhere). No native_decide, no external SAT/DRAT certificate.",
+    "unsat_certificate_size": "None. In proof-complexity terms the 'certificate' for 5-colour unsatisfiability is not a resolution/DRAT refutation of a finite CNF; it is a ~4.8k-line mathematical proof (~30.9k Lean lines). The finite residue is a 7-vertex 3-colouring refutation (Moser spindle, refutable by a handful of resolution steps) plus decide-checks over <= 15,625 assignments.",
+    "trust_surface_lean": "Mathlib d13f23b + OAI dirs PlaneColoring/PlaneSpectrum/CompactFactors; no sorry/axiom/admit/native_decide/implemented_by/extern/unsafe found by grep; comparator permits only propext, Quot.sound, Classical.choice. Not compiled by this analyst (text level)."
+   },
+   "ih_strengthened": true,
+   "ih_template": "strengthen to all subsets/substructures",
+   "ih_evidence": {
+    "quote": "at each ordinal the assertion ranges over \\emph{all} ambient ergodic standard systems, equivariant maps with wild law, and towers",
+    "file_line": "spectral.tex:342-345"
+   },
+   "ih_note": "The IH of Lemma 2.7 quantifies over all systems and maps so that it can be reapplied to the new factor Z and centre map b. This is the standard 'universal induction' template; capped at N2 for the strengthening itself.",
+   "confidence": "high (C3 primary, not computer-assisted); medium (ih template)"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "I10 rigidity of wild character laws (with I25 forward transfer; I20 radial identity); secondary I29 palettes",
+   "evidence": {
+    "quote": "Every $K$-invariant probability measure $\\nu$ on $D$ with $\\nu(C)=0$ is Haar measure.",
+    "file_line": "spectral.tex:65-66"
+   },
+   "confidence": "medium-low",
+   "caveats": [
+    "Precedent search was quick; an ergodic-theory/harmonic-analysis expert might recognise I10 as a known 'Crum-type' or solenoid rigidity result for the dual of a real-closed field.",
+    "Most of the obstruction half is adapted from named precedents (Falconer, Payne, Sokolov-Voronov, Townsend, Sullivan/DKN, Lebesgue covering).",
+    "The claim is unreviewed and very strong (also implies chi_m >= 6); Lean compilation (pending, by orchestrator) is the main check."
+   ]
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Combinatorics",
+    "msc2020": [
+     "05C15",
+     "52C10",
+     "05C10"
+    ],
+    "evidence": {
+     "quote": "\\cataloguesection{Combinatorics}{13} ... \\resultentry{158}",
+     "file_line": "overview.tex:389,397"
+    },
+    "confidence": "high"
+   },
+   "lean_dir_field": {
+    "dir": "lean/OAI/Geometry/PlaneColoring",
+    "lean_fields": "Geometry",
+    "imported_oai_dirs": [
+     "lean/OAI/Analysis/PlaneSpectrum",
+     "lean/OAI/MeasureTheory/CompactFactors"
+    ],
+    "target_dag_split": {
+     "PlaneColoring": 1091,
+     "PlaneSpectrum": 722,
+     "CompactFactors": 516,
+     "total": 2329
+    }
+   },
+   "method_fields": [
+    {
+     "field": "Ergodic theory (37A15, 37A30, 28D15)",
+     "tag": "essential",
+     "what": "Furstenberg-Zimmer compact towers, relative weak mixing, multiple averages, ergodic decomposition, disintegration",
+     "evidence": {
+      "quote": "Its structural ingredient is the Furstenberg--Zimmer compact-extension method",
+      "file_line": "introduction.tex:191-192"
+     }
+    },
+    {
+     "field": "Abstract harmonic analysis (43A35, 43A05, 22B05, 43A07)",
+     "tag": "essential",
+     "what": "Pontryagin dual of a discrete group, spectral theorem (SNAG), Bochner, invariant means, amenability",
+     "evidence": {
+      "quote": "The spectral theorem, in $L^2$ of the invariant labeling law",
+      "file_line": "introduction.tex:171"
+     }
+    },
+    {
+     "field": "Algebraic number theory / real algebraic numbers (11R04, 12D15)",
+     "tag": "essential",
+     "what": "real-closedness of F (sqrt(AB) in F), number-field general position, Cayley parametrisation",
+     "evidence": {
+      "quote": "A finite number-field argument shows",
+      "file_line": "introduction.tex:204"
+     }
+    },
+    {
+     "field": "Real analysis / geometric measure theory (28A75, 26B30, 42B10)",
+     "tag": "essential",
+     "what": "density points, change of variables, weak-* compactness, Fourier decay of circle measure",
+     "evidence": {
+      "quote": "The estimates use the decay of the Fourier transform of circle measure",
+      "file_line": "introduction.tex:233"
+     }
+    },
+    {
+     "field": "Circle dynamics (37E10)",
+     "tag": "essential",
+     "what": "Sullivan/DKN bounded distortion for binary-center separation",
+     "evidence": {
+      "quote": "an adaptation of Sullivan's expanding-action and bounded-distortion strategy",
+      "file_line": "palettes.tex:485"
+     }
+    },
+    {
+     "field": "Algebraic topology / dimension theory (55M10, 57M10)",
+     "tag": "essential",
+     "what": "graph-valued maps, Brouwer/Lebesgue covering obstruction, reduced words in graphs, annular crossings",
+     "evidence": {
+      "quote": "A planar cover obstruction forces a nontrivial loop",
+      "file_line": "introduction.tex:242-243"
+     }
+    },
+    {
+     "field": "Probability (60B05, 60G10)",
+     "tag": "essential",
+     "what": "invariant laws on labellings, conditional independence, jointly measurable versions",
+     "evidence": {
+      "quote": "gives an invariant probability law on proper labelings of $E$",
+      "file_line": "introduction.tex:152-153"
+     }
+    },
+    {
+     "field": "Discrete geometry (52C10)",
+     "tag": "essential",
+     "what": "Moser spindle; strip/interface arguments of Woodall-Townsend-Sokolov-Voronov",
+     "evidence": {
+      "quote": "We use its two overlapping-triangle constraints again in the final step",
+      "file_line": "introduction.tex:18-19"
+     }
+    },
+    {
+     "field": "Set theory / compactness (03E25, 05C63)",
+     "tag": "corollary-only",
+     "what": "de Bruijn-Erdos (converse transfer, Cor 1.4)",
+     "evidence": {
+      "quote": "graph compactness then gives a proper coloring of the whole plane",
+      "file_line": "introduction.tex:215-216"
+     }
+    }
+   ],
+   "cross_field_count": 8,
+   "share_invoked_from_other_fields": "~0.8 (almost all invoked theorems are from ergodic theory, harmonic analysis and topology; only Moser/Falconer/strip arguments are home-field)"
+  }
+ },
+ "provenance_flag": {
+  "applies": "no (provisional)",
+  "detail": "2025-2026 citations: SokolovVoronov2025 and Voronov2025Interval (human authors, arXiv; method precedents for strips/interfaces), MatolcsiRuzsaVargaZsamboki2025 (human), JamneshanCorrigendum 2026 (journal), Reed2026 (GitHub manuscript, critiqued, not used). No model-produced precedent identified; checked further in novelty phase."
+ },
+ "items": [
+  {
+   "id": "I01",
+   "kind": "definition (prose)",
+   "name": "proper k-coloring; chromatic number chi(R^2)",
+   "file_line": "sections/introduction.tex:3-9",
+   "statement": "c: R^2 -> {1..k} with c(x)!=c(y) whenever |x-y|=1; chi(R^2) the least such k, no regularity.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none (Hadwiger-Nelson)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "It is the goal vocabulary."
+   },
+   "analytic_check": "IS the goal (ProperColoring in the comparator)",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical; it is the goal itself."
+   },
+   "provisional_F": null,
+   "lean": "OAI.EuclideanFiveColor.ProperColoring (comparator)"
+  },
+  {
+   "id": "I02",
+   "kind": "definition (prose)",
+   "name": "measurable chromatic number chi_m(R^2)",
+   "file_line": "sections/introduction.tex:38-41",
+   "statement": "Least k when each colour class must be Lebesgue measurable.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "Falconer1981",
+    "cue": "\\citet{Falconer1981} proved"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Context only; the paper never states the chi_m consequence."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Falconer 1981."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I03",
+   "kind": "definition",
+   "name": "weak measurable k-coloring (Def 1.1)",
+   "file_line": "sections/introduction.tex:83-96",
+   "statement": "Lebesgue measurable c with sum_i int_{B(0,R)} int_{S^1} 1_{A_i}(x)1_{A_i}(x+u) dsigma(u) dx = 0 for all R; i.e. monochromatic unit pairs form a dx dsigma-null set.",
+   "cited_or_new": {
+    "status": "new (as a named notion)",
+    "bib_key": null,
+    "cue": "\"A weak measurable k-coloring is\" (no attribution); distinguished from Gwyn-Stavrianos frequency notion (introduction.tex:217-219)"
+   },
+   "uses_items": [
+    "I01"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "It is the interface between the two halves (transfer and obstruction); Lean WeakColoring is in 136 theorem signatures across 23 files."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "The almost-everywhere relaxation of a measurable proper colouring is the obvious relaxation; Falconer/Payne density-point arguments already work with a.e. statements. Naming and using it as the target of a transfer from arbitrary colourings is new. Not N3: it is a one-line weakening of an existing notion."
+   },
+   "provisional_F": null,
+   "lean": "OAI.EuclideanFiveColor.WeakColoring (Coloring.lean:27): AEMeasurable c and a.e. (volume x angularMeasure) c p.1 != c(p.1+direction p.2)"
+  },
+  {
+   "id": "I04",
+   "kind": "theorem",
+   "name": "Transfer of colorability (Thm 1.2): proper k-coloring exists <=> weak measurable k-coloring exists, every k, ZFC",
+   "file_line": "sections/introduction.tex:104-113; transfer.tex:297-315",
+   "statement": "Forward: Prop 4.2 (I25). Reverse: density points (I26) plus de Bruijn-Erdos compactness (I27).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"The required bridge to the unrestricted problem is the following equivalence\""
+   },
+   "uses_items": [
+    "I25",
+    "I26",
+    "I27",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Only the forward direction is used for the main theorem; it carries ~52% of the Lean target DAG (dominated share of proper_to_borel_weak = 0.519)."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N3 (candidate; carried by I10/I25)",
+    "justification": "No prior theorem identifies the unrestricted chromatic number of the plane with any measurable variant; Payne 2009 shows such identifications fail for translation-invariant subgraphs (rational unit displacements: chi=2, chi_m>=5). Shelah-Soifer 2003 show the ZFC vs ZF+DC+LM values could differ for related graphs. The transfer itself is the statement; its engine is I10."
+   },
+   "provisional_F": "F5 (change of representation: arbitrary labelling -> stationary process on algebraic plane -> continuous factor -> measurable field)",
+   "lean": "forward direction only: OAI.EuclideanFiveColor.proper_to_borel_weak (BorelTransfer.lean:436). The converse is not formalized (not needed for the comparator)."
+  },
+  {
+   "id": "I05",
+   "kind": "theorem",
+   "name": "No weak measurable five-coloring (Thm 1.3)",
+   "file_line": "sections/introduction.tex:115-117; angular.tex:603-611",
+   "statement": "There is no weak measurable 5-coloring of R^2.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "main obstruction"
+   },
+   "uses_items": [
+    "I29",
+    "I34",
+    "I39",
+    "I48",
+    "I50",
+    "I51",
+    "I52",
+    "I54"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Second half of the proof; 46% dominated share in Lean (no_measurable_weak_five_coloring 0.458)."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N2 (as a theorem: a new result; machinery graded per item)",
+    "justification": "As a statement it implies chi_m(R^2)>=6, which improves Falconer 1981 (no improvement found in searches). Its machinery is graded separately; named precedents: Falconer/Payne density points, Sokolov-Voronov 2025 interfaces and strips, Townsend 2005 annulus, Moser spindle."
+   },
+   "provisional_F": null,
+   "lean": "OAI.EuclideanFiveColor.no_measurable_weak_five_coloring (Five.lean:105)"
+  },
+  {
+   "id": "I06",
+   "kind": "construction",
+   "name": "Isbell/Hadwiger hexagonal 7-coloring (index-7 sublattice 2-omega)",
+   "file_line": "sections/introduction.tex:123-135",
+   "statement": "Voronoi hexagons, circumradius 2/5, coloured by cosets of (2-omega)(Z+Z omega).",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "Hadwiger1961",
+    "cue": "\"use the hexagonal construction described by\""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Upper bound only; separate comparator."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical (Isbell 1950, Hadwiger 1961)."
+   },
+   "provisional_F": null,
+   "lean": "OAI.Problem160.properColoring_seven (Seven.lean)"
+  },
+  {
+   "id": "I07",
+   "kind": "definition",
+   "name": "E = F(i) (F real algebraic numbers), K = algebraic unit rotations, D = dual of discrete E (Def 2.1)",
+   "file_line": "sections/spectral.tex:15-38",
+   "statement": "E as a discrete countable group; D = Pontryagin dual of E_disc (compact metrizable); action (ad)(z)=d(az); psi_z(d)=d(z).",
+   "cited_or_new": {
+    "status": "new (setup)",
+    "bib_key": null,
+    "cue": "none; standard duality"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "All of the rigidity half lives on D."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Pontryagin dual of a countable dense subgroup of R^2 with the discrete topology: a quotient of the Bohr compactification of R^2. Standard objects; the specific choice of E = Q-bar (real-closed F) is what matters, and that choice is part of I10."
+   },
+   "provisional_F": null,
+   "lean": "PlaneFiveColor.Spectral.E := algebraicClosure Q C, K, DiscreteE, D := PontryaginDual DiscreteE (PlaneSpectrum/Basic.lean)"
+  },
+  {
+   "id": "I08",
+   "kind": "definition",
+   "name": "C = j(R^2), the ordinary continuous characters inside D",
+   "file_line": "sections/spectral.tex:32-54",
+   "statement": "j(xi)(z)=exp(i xi.z); Borel subgroup, not closed.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The singular/continuous split in I10 and I24 is along C."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "The canonical embedding of R^2-hat into the Bohr-type dual."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I09",
+   "kind": "definition",
+   "name": "wild K-invariant law: nu(C)=0 (Def 2.2)",
+   "file_line": "sections/spectral.tex:56-62",
+   "statement": "A K-invariant Borel probability on D giving C measure zero.",
+   "cited_or_new": {
+    "status": "new (name)",
+    "bib_key": null,
+    "cue": "\"is called wild\""
+   },
+   "uses_items": [
+    "I07",
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Hypothesis of I10 and of the induction I16."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "A conjunction of invariance and a null condition; name only."
+   },
+   "provisional_F": null,
+   "lean": "PlaneFiveColor.Spectral.IsWild (Basic.lean:300)"
+  },
+  {
+   "id": "I10",
+   "kind": "theorem",
+   "name": "Rigidity of wild character laws (Thm 2.3): every K-invariant probability on D with nu(C)=0 is Haar",
+   "file_line": "sections/spectral.tex:64-70; proof rigidity.tex:509-617",
+   "statement": "nu wild => nu = m_D; equivalently all nonzero Fourier coefficients vanish.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"The central rigidity statement\"; analogue noted: Crum1956, GneitingSasvari1999 (spectral.tex:81-88)"
+   },
+   "uses_items": [
+    "I11",
+    "I13",
+    "I16",
+    "I18",
+    "I19",
+    "I20",
+    "I21",
+    "I22"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Engine of the transfer: residual_fourier/finite_wild_fourier/wild_fourier dominated shares 0.44/0.41/0.41 of the target DAG."
+   },
+   "analytic_check": "not in goal; not in L (Mathlib has Pontryagin duality and Haar but nothing on invariant laws on duals of dense subgroups)",
+   "provisional_N": {
+    "grade": "N3 (candidate)",
+    "justification": "Nearest neighbours: Crum 1956 (measurable positive-definite functions = continuous + a.e.-zero part; radial version continuous + c*delta_0) is a measurable-on-R^n statement; the paper's statement is on a discrete countable group with no measurability, which Crum does not cover. Measure rigidity for group actions on tori/solenoids (Furstenberg x2x3, Bourgain-Furman-Lindenstrauss-Mozes 2011, Benoist-Quint) concerns stiffness of stationary measures for lattices in SL_d(Z); here the acting group is the countable abelian group K acting by multiplication on an infinite-dimensional solenoid and the exceptional set is the dense non-closed subgroup C. No precedent found (quick search)."
+   },
+   "provisional_F": "F5 (change of representation: unit-distance constraints become a spectral statement on the dual of the algebraic plane)",
+   "lean": "PlaneFiveColor.Spectral.wild_fourier / finite_wild_fourier (Ergodicity.lean:335,364): stated as vanishing of nonzero Fourier coefficients"
+  },
+  {
+   "id": "I11",
+   "kind": "lemma",
+   "name": "Wild null events (Lemma 2.4): cosets of C null; difference law wild; L_a (continuous on a line) null",
+   "file_line": "sections/spectral.tex:96-135",
+   "statement": "Positive-mass coset has finite K-orbit; K divisible so finite images trivial; two nonparallel continuous lines give a character in C.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I07",
+    "I08",
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Base case of the induction I16 and input to I13."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Elementary: divisible groups have no nontrivial finite quotients; orbit-counting of disjoint cosets."
+   },
+   "provisional_F": null,
+   "lean": "wild_coset_null, finite_image_trivial (Basic.lean)"
+  },
+  {
+   "id": "I12",
+   "kind": "definition",
+   "name": "Invariant-mean line integral I(h) on F/Z (eq 2.4)",
+   "file_line": "sections/spectral.tex:137-172",
+   "statement": "I(h)=m(sum_k h(t+k)) for an invariant mean m on the discrete group F/Z; agrees with Lebesgue integral on C_c; needs no measurability.",
+   "cited_or_new": {
+    "status": "cited (tools)",
+    "bib_key": "Bekka2008; vonNeumann1929; Folner1955",
+    "cue": "\"exists by amenability\""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Used to integrate the (non-measurable on F) Fourier coefficient along lines in I13 and in the final step of I10."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Invariant means on amenable discrete groups are classical; periodization against them is a routine device."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I13",
+   "kind": "lemma",
+   "name": "Vanishing line average (Lemma 2.5): I(phi(t) f_nu(at)) = 0 for wild nu",
+   "file_line": "sections/spectral.tex:174-236",
+   "statement": "No strongly continuous vectors (Bochner on R after extending the coefficient, then Fourier uniqueness on F-hat); weak integral V_phi is continuous hence zero.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I11",
+    "I12"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The final contradiction of I10 and the small-parameter choice in I16 both use it (Lean wild_line_average_zero dom 0.049, exists_small_wild_parameter dom 0.074)."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Close in spirit to Wiener/Crum-type arguments that singular spectral parts have vanishing averages; the device of invariant-mean averaging along an algebraic line is a modest variant."
+   },
+   "provisional_F": null,
+   "lean": "wild_line_average_zero (Multipliers.lean:272)"
+  },
+  {
+   "id": "I14",
+   "kind": "lemma",
+   "name": "Moment-free equivariant location functional L(lambda) (Lemma 2.6)",
+   "file_line": "sections/spectral.tex:245-289",
+   "statement": "Unique minimizer of J(s)=int(sqrt(1+|s-t|^2)-sqrt(1+|t|^2))dlambda; Borel, translation- and O(2)-equivariant.",
+   "cited_or_new": {
+    "status": "new (as stated)",
+    "bib_key": null,
+    "cue": "\"elementary location rule avoids any moment assumption\""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Selects equivariant coset centers in I16."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Variant of the moment-free spatial median (minimize E(|X-s|-|X|), Kemperman/Haldane); pseudo-Huber smoothing makes it strictly convex. Known trick."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I15",
+   "kind": "definition",
+   "name": "Compact-tower approximation property (eq 2.10 / source-4)",
+   "file_line": "sections/spectral.tex:312-325",
+   "statement": "For bounded H on Y, finitely many H_r and bound B so that every rotation U_k H is within eps of sum b_r^k H_r with W-measurable coefficients.",
+   "cited_or_new": {
+    "status": "cited (adapted)",
+    "bib_key": "Furstenberg1977; ZimmerExtensions1976",
+    "cue": "\"compact/relative-weak-mixing part of the Furstenberg--Zimmer structure theorem\""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Hypothesis in the induction I16."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Uniform version of a compact (finite-rank module) extension; standard in Furstenberg-Zimmer theory."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I16",
+   "kind": "lemma",
+   "name": "Relative singularity (Lemma 2.7) along a compact tower, by universal transfinite induction",
+   "file_line": "sections/spectral.tex:327-624",
+   "statement": "For an ergodic K-system with equivariant d: X->D of wild law, the difference law of two conditionally independent samples over every tower factor gives C measure zero. Proof: failure gives m equivariant coset centers (I14), phase lists encoded by elementary symmetric functions, compact approximation forces many index collisions; line average (I13) on the earlier factor forces few collisions; x_j = k_j + k_j' (sum of two algebraic unit vectors) links them.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"We use transfinite induction in its universal form\""
+   },
+   "uses_items": [
+    "I11",
+    "I13",
+    "I14",
+    "I15"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Gives wildness of nu_Y at the terminal factor, without which the radial argument I20 has no input (Lean exact_finite_center_reduction dom 0.045; exists_terminal_factor 0.146)."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N2 (borderline N3)",
+    "justification": "Structure (induction over a Furstenberg-Zimmer tower, show a property survives compact extensions) is the standard template of Furstenberg's Szemeredi proof. The collision/phase-list counting inside the step is specific. The IH is strengthened to range over all systems (templated: 'strengthen to all substructures'), so the cap at N2 applies to the strengthening; the collision argument alone is a combinatorial estimate."
+   },
+   "provisional_F": null,
+   "lean": "PlaneSpectrum/RelativeCenters.lean, PhaseCollision.lean, PhaseEncoding.lean, FourierTests.lean"
+  },
+  {
+   "id": "I17",
+   "kind": "construction",
+   "name": "Phase-list encoding H(y) by elementary symmetric functions",
+   "file_line": "sections/spectral.tex:408-425",
+   "statement": "Unordered list of m phases encoded in C^m via Newton identities; continuous injection of T^m/S_m.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Measurability device."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Standard (symmetric-function coordinates on unordered tuples)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I18",
+   "kind": "lemma",
+   "name": "Compact tower (Lemma 3.1)",
+   "file_line": "sections/rigidity.tex:35-137",
+   "statement": "Countable-ordinal tower of compact extensions ending at a factor Y with X x_Y X ergodic; bounded fiber basis via invariant HS kernels.",
+   "cited_or_new": {
+    "status": "re-proved (classical)",
+    "bib_key": "Furstenberg1977; ZimmerExtensions1976; JamneshanStructure",
+    "cue": "\"We give the fiberwise proof because the particular approximation property ... is needed here\""
+   },
+   "uses_items": [
+    "I15"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Infrastructure: CompactFactors dir (516 of 2329 target-DAG declarations, ~22%)."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Furstenberg-Zimmer structure theorem, re-proved for K."
+   },
+   "provisional_F": null,
+   "lean": "OAI/MeasureTheory/CompactFactors (14 files, 7.7k lines); exists_terminal_factor (Stationary.lean:126)"
+  },
+  {
+   "id": "I19",
+   "kind": "lemma",
+   "name": "Conditional multiple averages (Lemma 3.2) for power maps u -> u^{n_j} along every Folner sequence",
+   "file_line": "sections/rigidity.tex:168-320",
+   "statement": "Over a relatively weak-mixing factor, averages of P(prod U_{u^{n_j}} v_j) decouple; vdC/Hilbert induction.",
+   "cited_or_new": {
+    "status": "re-proved (adapted)",
+    "bib_key": "Furstenberg1977",
+    "cue": "\"compare\""
+   },
+   "uses_items": [
+    "I18"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Feeds both radial identities."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Relative weak mixing implies characteristic factor for multiple averages: Furstenberg 1977, adapted to power maps of an abelian group (surjective since K divisible)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I20",
+   "kind": "lemma",
+   "name": "Radial identities (Lemma 3.3): w(|A-B|) <= w(A)+w(B) for w=-log m, and Avg m(2r|Re u|) -> m(r)^2",
+   "file_line": "sections/rigidity.tex:347-413",
+   "statement": "Uses |A-Bu^2|^2 = |-L+(A-B)u+Lu^2|^2 with L=sqrt(AB) in F (real-closedness), so two- and three-term multiple averages compare; m = |projected character|^2 is radial.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I19"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Turns the ergodic decoupling into a subadditivity inequality on radii; the whole number-field endgame (I21, I22) runs on it (Lean massReal_vanish dom 0.121)."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N3 (candidate, weak)",
+    "justification": "The algebraic identity among unit directions that converts multiple ergodic averages into a triangle-type inequality for -log of a radial coefficient was not found anywhere in a quick search. Against: once one has m radial and multiple-average decoupling, looking for polynomial identities in u with equal moduli is a natural move; it is a lemma inside I10 and arguably part of that candidate."
+   },
+   "provisional_F": "F2 (an inequality/invariant on the radial coefficient)",
+   "lean": "PlaneSpectrum/RadialEnergy.lean"
+  },
+  {
+   "id": "I21",
+   "kind": "lemma",
+   "name": "General position in a number field (Lemma 3.4)",
+   "file_line": "sections/rigidity.tex:428-470",
+   "statement": "Cayley parametrization u(t)=(1+it)/(1-it); arbitrarily large S in K cap N with every d_0 elements a Q-basis.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low-med",
+    "reason": "Pigeonhole for good selections in the endgame."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Generic-position via nonvanishing polynomials over infinite field; textbook."
+   },
+   "provisional_F": null,
+   "lean": "PlaneSpectrum/NumberFields.lean"
+  },
+  {
+   "id": "I22",
+   "kind": "lemma",
+   "name": "Addition under a cap (Lemma 3.5)",
+   "file_line": "sections/rigidity.tex:472-505",
+   "statement": "If w(0)=0, subadditive in the difference sense, w(p_j)<=H, then any integer combination with l1-length M landing in [0,p) has w <= 4MH.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I20"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Converts I20 into a uniform lower bound m>=e^{-4M_0H} on an interval, contradicting I13."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Elementary residue bookkeeping."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I23",
+   "kind": "proof step",
+   "name": "Syndetic-set / number-field endgame of Thm 2.3",
+   "file_line": "sections/rigidity.tex:509-617",
+   "statement": "If m(r)>0 then {u: w(2r|Re u|)<=H} is syndetic in K; general-position bases and capped residues give m>=c on (0,2rc_0) cap F, contradicting the line average.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I13",
+    "I20",
+    "I21",
+    "I22"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Closes I10."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Assembly of I20-I22 with standard syndeticity; graded with I10."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I24",
+   "kind": "lemma",
+   "name": "Continuous vectors and positivity (Lemma 4.1): H_c = L^2 of a factor = spectral subspace on C; extends to a positive strongly continuous R^2 action",
+   "file_line": "sections/transfer.tex:25-142",
+   "statement": "For a measure-preserving action of the dense subgroup E, vectors with continuous orbits form L^2 of a factor; projection is conditional expectation (so positivity and sum-one survive).",
+   "cited_or_new": {
+    "status": "new (assembled from standard parts)",
+    "bib_key": null,
+    "cue": "\"it is essential that the original T_z are Koopman operators\""
+   },
+   "uses_items": [
+    "I07",
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Makes the projected label coordinates nonnegative and summing to one, which the sampling step needs."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1-N2",
+    "justification": "Ingredients standard (SNAG spectral theorem, Bochner, Stone-Weierstrass, the fact that a closed Koopman-invariant subalgebra is L^2 of a factor). The packaging as 'the continuous factor of an action of a dense subgroup' resembles the classical extension of measurable/continuous actions (Mackey point realization) but is used here without point realization."
+   },
+   "provisional_F": null,
+   "lean": "ContinuousVectors.space, projection_range (PlaneSpectrum / BorelTransfer)"
+  },
+  {
+   "id": "I25",
+   "kind": "proposition",
+   "name": "From proper to weak measurable colorings (Prop 4.2)",
+   "file_line": "sections/transfer.tex:144-257",
+   "statement": "Restrict to E, average over the amenable group E x| K to get an invariant law on proper labellings; project label indicators onto H_c; residual has Haar spectral measure by I10 so unit correlations survive; extend to all unit directions by continuity; sample a jointly measurable field and take least positive label.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"This is a standard amenable averaging construction\" (for the first step only; introduction.tex:153)"
+   },
+   "uses_items": [
+    "I10",
+    "I24"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Forward transfer; dominated share 0.519 in Lean."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N3 (candidate, joint with I10)",
+    "justification": "The amenable averaging step is known (Bourgeat-Heinrich-Melotti-Robert 2015, Gwyn-Stavrianos 2020, Matolcsi-Ruzsa-Varga-Zsamboki fractional chromatic number); the novel part is retaining exact unit-distance exclusions while passing to ordinary measurable functions, which hinges on I10."
+   },
+   "provisional_F": "F5",
+   "lean": "proper_to_borel_weak (BorelTransfer.lean:436)"
+  },
+  {
+   "id": "I26",
+   "kind": "lemma",
+   "name": "Density-point properness (Lemma 4.3)",
+   "file_line": "sections/transfer.tex:266-295",
+   "statement": "Full-density points of a weak class contain no unit pair.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "Falconer1981; Payne2009",
+    "cue": "\"a version of the density-point method used by\""
+   },
+   "uses_items": [
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Used throughout the obstruction (typical points) and for the converse."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Falconer/Payne density-point argument, adapted to product-a.e. exclusion."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I27",
+   "kind": "theorem (invoked)",
+   "name": "de Bruijn-Erdos compactness",
+   "file_line": "sections/transfer.tex:306-314; introduction.tex:32-36",
+   "statement": "A graph is k-colorable iff every finite subgraph is.",
+   "cited_or_new": {
+    "status": "cited",
+    "bib_key": "deBruijnErdos1951",
+    "cue": "\"graph compactness principle\""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Converse transfer and the badness corollary only; not on the path to the comparator."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Classical."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I28",
+   "kind": "definition (inline \\emph)",
+   "name": "typical point; typical circle sampling",
+   "file_line": "sections/palettes.tex:20-45",
+   "statement": "A point of density one in its own colour; (y,r) with y+re typical for a.e. e.",
+   "cited_or_new": {
+    "status": "new (name)",
+    "bib_key": null,
+    "cue": "\"Call a point typical\""
+   },
+   "uses_items": [
+    "I26"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Measure-theoretic bookkeeping everywhere."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Density-one point; standard."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I29",
+   "kind": "definition",
+   "name": "Circle traces W_x and maximal palette P_x(e) (Def 5.1)",
+   "file_line": "sections/palettes.tex:47-107",
+   "statement": "W_x = weak-* limits in L^inf(S;R^5) of circle samples (a_i(y_n+r_n e))_i with y_n->x, r_n->1 typical; P_x(e) = labels with positive weight at e in some trace (essential union).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"The palette at (x,e) collects ... all labels having positive weight\""
+   },
+   "uses_items": [
+    "I28"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Every later step of the obstruction (palette transfer, cardinality, transition graph, strips) is phrased with P_x (Lean `palette` in 34 theorem signatures over 13 files)."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N3 (candidate)",
+    "justification": "Nearest neighbours: Young measures / weak-* limits of oscillating sequences (Tartar), tangent measures (Preiss), Falconer's density-point rotations, and the 'colour seen on the unit circle' arguments of Woodall/Townsend/Sokolov-Voronov for regular maps. None defines an angular, center-indexed set-valued palette from weak-* limits of unit-circle samples of an arbitrary measurable colouring. It is a natural 'blow-up' object once one wants circle information at every center, so a judge may grade it N2."
+   },
+   "provisional_F": "F1 (extension definition: new defined object carrying local unit-circle colour data)",
+   "lean": "OAI.EuclideanFiveColor.palette (Palettes.lean:35), sampleCode, Compactness.lean"
+  },
+  {
+   "id": "I30",
+   "kind": "lemma",
+   "name": "Palette transfer (Lemma 5.2): exclusion c(x+e+v) not in P_x(e) cup P_x(v); density; smooth transport P_z(f) cap P_x(s(f)) empty",
+   "file_line": "sections/palettes.tex:111-276",
+   "statement": "Strong L^1 convergence of the second factor against weak-* first factor; two-angle sum map change of variables.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I29",
+    "I26"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "All exclusions between palettes come from it."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Weak-strong pairing and change of variables are standard; the transported exclusion is the circle analogue of Falconer's rotation argument."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I31",
+   "kind": "corollary",
+   "name": "Sixty-degree exclusion P_x(f) cap P_x(Rf) = empty",
+   "file_line": "sections/palettes.tex:292-305",
+   "statement": "x+f = x+Rf+R^{-1}f.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I30"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Gives alternation of binary states; used repeatedly."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "The equilateral-triangle (Moser rhombus) relation; classical in unit-distance arguments."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I32",
+   "kind": "definition (inline \\emph)",
+   "name": "binary center for {i+,i-}; alternating sign function s_x",
+   "file_line": "sections/palettes.tex:307-334",
+   "statement": "P_x meets the pair a.e.; selection alternates under rotation by pi/3.",
+   "cited_or_new": {
+    "status": "new (name)",
+    "bib_key": null,
+    "cue": "\"Call a center x binary\""
+   },
+   "uses_items": [
+    "I29",
+    "I31"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Object of I33."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Name for a conjunction."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I33",
+   "kind": "lemma",
+   "name": "Binary-center separation (Lemma 5.5): binary centers for one pair are delta_*-separated",
+   "file_line": "sections/palettes.tex:336-613",
+   "statement": "Two close binary centers force s_x invariant under six circle diffeomorphisms F_j near rotation by 0; bounded-distortion growth of a conull interval forces full measure, contradicting measure pi.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "DeroinKleptsynNavas2008",
+    "cue": "\"This is an adaptation of Sullivan's expanding-action and bounded-distortion strategy\" (palettes.tex:485-486)"
+   },
+   "uses_items": [
+    "I30",
+    "I32"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Gives palette cardinality and the triangle case of local finiteness (Lean binary_centers_separated dom 0.040)."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Named precedent: Sullivan/DKN bounded distortion for circle group actions; adaptation replaces minimality."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I34",
+   "kind": "proposition",
+   "name": "Palette cardinality (Prop 5.6): 1 <= |P_x(e)| <= 2 a.e., every center",
+   "file_line": "sections/palettes.tex:617-663",
+   "statement": "Three labels at a positive set of angles force infinitely many binary centers on x+S, contradicting I33.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I30",
+    "I31",
+    "I33"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Makes palettes edges or vertices of K5, which the graph-valued map construction needs."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Local, circle-sampled analogue of Falconer's chi_m>=5 argument; strengthened to 'at most two'."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I35",
+   "kind": "definition",
+   "name": "Transition graph Gamma_x via limsup_{h->0} D_ij(B,h)/|h| > 0 (Def 6.1)",
+   "file_line": "sections/transitions.tex:15-52",
+   "statement": "ij is an edge at x if the area of i->j transitions under shift h near x is comparable to |h|.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "\"The normalization by |h| ... is chosen to match the circle-averaging estimate\""
+   },
+   "uses_items": [
+    "I28"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Defines the cyclic-center locus and the forest structure (Lean transitionGraph)."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "An interface density: int|1_A(x+h)-1_A(x)|/|h| is the Bourgain-Brezis-Mironescu/Davila difference-quotient characterisation of perimeter; Gamma_x records where the pairwise 'interface measure' has positive upper density. Close variant of known BV/perimeter notions, applied without finite-perimeter assumptions."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I36",
+   "kind": "lemma",
+   "name": "Avoiding trace (Lemma 6.2): an edge ij of Gamma_x gives a trace avoiding i and j",
+   "file_line": "sections/transitions.tex:54-141",
+   "statement": "Circle-average of a_s - a_s(.+h) is o(sqrt|h|) in L^2 by |sigma-hat(xi)| <= C(1+|xi|)^{-1/2} and Plancherel; average over transition set (area >= c|h|) is o(1).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I29",
+    "I35"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Excludes edge-pairs from palettes; key in all three cycle cases (Lean transition_avoiding_trace)."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Fourier decay of circle measure and the Plancherel square-function estimate are classical (Stein); matching normalisation |h| to the decay exponent 1/2 is the new twist."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I37",
+   "kind": "lemma",
+   "name": "Strict state separation (Lemma 6.3)",
+   "file_line": "sections/transitions.tex:144-226",
+   "statement": "States at x representing complementary label groups; supports have no chordal-distance-one pair.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I30"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Local finiteness and four-cycle continuity."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Direct consequence of I30."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I38",
+   "kind": "lemma",
+   "name": "Singleton-pair alternation impossible (Lemma 6.4)",
+   "file_line": "sections/transitions.tex:228-272",
+   "statement": "No state function alternating between {X} and a pair under R; uses gamma with cos gamma=5/6.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I30",
+    "I31"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Four-cycle case."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Moser-spindle-type angle (cos=5/6 is the spindle rotation) in circle form."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I39",
+   "kind": "theorem",
+   "name": "Local finiteness of cyclic centers (Thm 6.5)",
+   "file_line": "sections/transitions.tex:274-540",
+   "statement": "{x: Gamma_x contains a cycle} is closed and locally finite (triangle via binary separation; four-cycle via continuity of states; five-cycle similarly).",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I33",
+    "I34",
+    "I35",
+    "I36",
+    "I37",
+    "I38",
+    "I40"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Lets the graph-valued map be built off finitely many core disks (Lean cyclicCore_compact_finite dom 0.104)."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "New statement, assembled from I33-I38."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I40",
+   "kind": "lemma",
+   "name": "Four-cycle state continuity (Lemma 6.6) and support-contact step ban (Lemma 6.7)",
+   "file_line": "sections/transitions.tex:325-600",
+   "statement": "x -> 1_{w_x=s} continuous into L^1(S) on the four-cycle locus; contacts ban angular steps.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I36",
+    "I37"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Four-cycle part of I39."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1-N2",
+    "justification": "Technical."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I41",
+   "kind": "lemma",
+   "name": "Disk averages p^eps and p_i(q)+p_i(z) <= 1 at unit distance (Lemma 7.2)",
+   "file_line": "sections/interfaces.tex:76-115",
+   "statement": "Mollified colour probabilities; unit pairs cannot both exceed 1/2.",
+   "cited_or_new": {
+    "status": "standard",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I26"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Continuity of the approximants."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Mollification; the inequality is the averaged form of properness (as in Falconer and in fractional-chromatic arguments)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I42",
+   "kind": "construction",
+   "name": "Thresholded renormalised vector q^eps into the 1-skeleton of the 4-simplex (complete graph K5) (eq 7.4)",
+   "file_line": "sections/interfaces.tex:170-196",
+   "statement": "q_i = (p_i-alpha)_+ / sum_k (p_k-alpha)_+; off small disks at most two coordinates positive, so q^eps maps into the graph K5.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I41",
+    "I34",
+    "I43"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Turns the colouring into a continuous graph-valued map, the object of the topological contradiction (Lean thresholdMap, GraphSpace, FullApprox)."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "This is the nerve map of a cover of multiplicity <= 2 (partition of unity into the nerve), classical in dimension theory (Alexandroff/Lebesgue). Used on a colouring with arbitrary boundaries, it is a change of representation, but the device is textbook. Not N3."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I43",
+   "kind": "lemma",
+   "name": "Small holes and tree fillings (Lemma 7.4)",
+   "file_line": "sections/interfaces.tex:197-311",
+   "statement": "Off core disks around cyclic centers, Gamma_z is a forest, so violation disks can be filled continuously through trees.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I39",
+    "I42"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Builds g_n (Lean holeApprox_exists)."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Tree contractibility is standard; the measure estimates (missing edges have o(eps) overlap) are new but routine."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I44",
+   "kind": "lemma",
+   "name": "Cover obstruction on a square (Lemma 7.5): no relatively open cover of multiplicity <=2 and mesh <=2",
+   "file_line": "sections/interfaces.tex:333-365",
+   "statement": "Partition of unity into segments plus Brouwer.",
+   "cited_or_new": {
+    "status": "cited (method)",
+    "bib_key": "Hatcher2002",
+    "cue": "\"The Brouwer fixed point theorem\""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "The global contradiction (Lean PlanarCover.compact_open_cover_impossible)."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Lebesgue covering theorem (covering dimension of the square is 2), 1911/Brouwer 1913."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I45",
+   "kind": "lemma",
+   "name": "Non-null core loops (Lemma 7.6)",
+   "file_line": "sections/interfaces.tex:367-433",
+   "statement": "If every core loop were null, extend g_n over the disks and contradict I44.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I43",
+    "I44"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Produces the nontrivial label cycle."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Direct from I44."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I46",
+   "kind": "lemma",
+   "name": "Midpoint detection by a reduced circuit (Lemma 7.7)",
+   "file_line": "sections/interfaces.tex:443-499",
+   "statement": "Free homotopy classes in a graph have cyclically reduced words; loops in a class meet every edge midpoint of the word.",
+   "cited_or_new": {
+    "status": "cited (method)",
+    "bib_key": "Hatcher2002",
+    "cue": "\"compare\""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Extracts the cycle."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Fundamental group of a graph is free; textbook."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I47",
+   "kind": "lemma",
+   "name": "Connected midpoint preimage crosses the annulus (Lemma 7.8)",
+   "file_line": "sections/interfaces.tex:501-572",
+   "statement": "A component of g^{-1}(m) meets both boundary circles.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I46"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Produces continua K_j."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Standard planar separation argument."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I48",
+   "kind": "proposition",
+   "name": "A cycle of common exclusion continua (Prop 7.1) with straddling regions Delta(K)",
+   "file_line": "sections/interfaces.tex:15-74; proof 574-670",
+   "statement": "Compact connected K_j through a common x, with both endpoint labels absent from Delta(K_j) = {z: min|z-q|<1<max|z-q|}.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "SokolovVoronov2025",
+    "cue": "\"The connected-interface mechanism has a precedent in [SokolovVoronov2025, Propositions 1-2]\""
+   },
+   "uses_items": [
+    "I42",
+    "I43",
+    "I45",
+    "I47"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "Input to all three angular contradictions."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Named precedent for regular maps; new is producing the continua from measure data via topological extraction."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I49",
+   "kind": "lemma",
+   "name": "One-sided strip restrictions O(e), I(e) (Lemma 8.1)",
+   "file_line": "sections/angular.tex:20-89",
+   "statement": "Signs of e.v_j decide which labels survive just outside/inside the unit circle about x.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "SokolovVoronov2025; Voronov2025Interval",
+    "cue": "\"a counterpart of the complementary-color strips in [SokolovVoronov2025, Prop 9]\""
+   },
+   "uses_items": [
+    "I48"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "All three cases."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Named precedent."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I50",
+   "kind": "proposition",
+   "name": "Five-cycle exclusion (Prop 8.2)",
+   "file_line": "sections/angular.tex:91-135",
+   "statement": "Six-position words of diagonals mod 5: three steps can't sum to 0 or +-2 unless constant; six equal steps don't close.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I49",
+    "I34",
+    "I31"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Case l=5."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Finite combinatorics; Lean proves by `decide` over Fin 5^6 = 15,625 tuples (Exclusion.lean:60-63)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I51",
+   "kind": "proposition",
+   "name": "Four-cycle exclusion via six-position words and projective ray geometry (Lemmas 8.3-8.4, Prop 8.5)",
+   "file_line": "sections/angular.tex:137-326",
+   "statement": "Two antipodal pairs of split directions and a parity rule.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I49",
+    "I40"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Case l=4."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1-N2",
+    "justification": "Finite geometric case analysis."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I52",
+   "kind": "lemmas",
+   "name": "Triangle case: local binary rigidity, boundary is one R-orbit, alternating pi/3 sectors (Lemmas 8.6-8.7)",
+   "file_line": "sections/angular.tex:328-474",
+   "statement": "Outsider state s in {X,Y} alternates in exactly six sectors of angle pi/3.",
+   "cited_or_new": {
+    "status": "adapted",
+    "bib_key": "Townsend2005",
+    "cue": "\"The use of two complementary colors near a unit circle has a predecessor in Townsend's annulus argument\""
+   },
+   "uses_items": [
+    "I49",
+    "I31"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Case l=3."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N2",
+    "justification": "Named precedent (Townsend)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I53",
+   "kind": "lemma",
+   "name": "Polynomial three-label region (Lemma 8.8): v^2(3xi^2-v^2)^2 < l^3(1-l/4)(l-1)^2 implies only triangle labels near x+z",
+   "file_line": "sections/angular.tex:484-500",
+   "statement": "Triple-angle identities; two directions summing to z lie in opposite-outsider sectors.",
+   "cited_or_new": {
+    "status": "new",
+    "bib_key": null,
+    "cue": "none"
+   },
+   "uses_items": [
+    "I52",
+    "I30"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Region for the Moser placement."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Elementary trigonometry."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "I54",
+   "kind": "construction",
+   "name": "Moser spindle placement z_g=((35+12i)/37)(g+(-290+149i)/250) and seven-point rational certificate (Lemma 8.9, Sec 8.6)",
+   "file_line": "sections/angular.tex:500-583; 619-773",
+   "statement": "All seven Moser vertices strictly inside the three-label region; checked by hand interval arithmetic with 4-decimal boxes (h=0.00011).",
+   "cited_or_new": {
+    "status": "cited (graph) / new (placement)",
+    "bib_key": "MoserMoser1961",
+    "cue": "\"a rational placement certificate puts all seven vertices of the Moser obstruction in that region\""
+   },
+   "uses_items": [
+    "I53"
+   ],
+   "load_bearing_guess": {
+    "level": "med",
+    "reason": "Closes the triangle case."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N0 (graph) / N1 (placement)",
+    "justification": "Moser spindle is classical; the placement is a small explicit certificate (7 points, 2 tables), not a search artefact."
+   },
+   "provisional_F": null,
+   "lean": "Geometry/PlaneColoring/Moser.lean (moserPoint, region_of_rational_bounds)"
+  },
+  {
+   "id": "I55",
+   "kind": "corollary",
+   "name": "Positive five-color badness (Cor 1.4)",
+   "file_line": "sections/introduction.tex:279-324",
+   "statement": "Every 5-colouring has invariant-mean monochromatic-unit-pair frequency >= delta = 1/|E(H)| for an existential finite non-5-colourable unit-distance graph H.",
+   "cited_or_new": {
+    "status": "cited (method)",
+    "bib_key": "GwynStavrianos2020; BourgeatHeinrichMelottiRobert2015; deBruijnErdos1951",
+    "cue": "\"this is the finite-graph bound of\""
+   },
+   "uses_items": [
+    "I27"
+   ],
+   "load_bearing_guess": {
+    "level": "low",
+    "reason": "Corollary; not in Lean."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N0",
+    "justification": "Direct from known finite-graph bounds; graph H is existential (not exhibited)."
+   },
+   "provisional_F": null
+  },
+  {
+   "id": "L01",
+   "kind": "Lean structure",
+   "name": "FullApprox c alpha t: global graph-valued approximant on closedBall 0 5 with small disk holes",
+   "file_line": "lean/OAI/Geometry/PlaneColoring/FullApproximation.lean:255-265",
+   "statement": "Lean reorganisation: angular contradictions are used to show all common-interface graphs are acyclic (commonInterface_graph_acyclic), so a global map into K5 exists (fullApprox_exists), then graph_map_small_mesh_impossible + no_large_positive_sequence contradict.",
+   "cited_or_new": {
+    "status": "new (Lean-only packaging)",
+    "bib_key": null,
+    "cue": "docstring: \"All fields will be constructed, not postulated as coloring hypotheses\""
+   },
+   "uses_items": [
+    "I39",
+    "I42",
+    "I43",
+    "I48"
+   ],
+   "load_bearing_guess": {
+    "level": "high",
+    "reason": "fullApprox_exists dominated share 0.422."
+   },
+   "analytic_check": "not a subterm of the goal (goal mentions only maps C -> Fin 5 and unit distance)",
+   "provisional_N": {
+    "grade": "N1",
+    "justification": "Contrapositive packaging of paper Sec 7-8; same content."
+   },
+   "provisional_F": null
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "theorem": "Bochner's theorem (R and R^2)",
+   "field": "harmonic analysis",
+   "status": "cited (Bekka2008 Thm D.2.2)",
+   "where": "spectral.tex:202; transfer.tex:76"
+  },
+  {
+   "theorem": "SNAG spectral theorem for discrete abelian group E",
+   "field": "harmonic analysis",
+   "status": "cited (Bekka2008 Thm D.3.1)",
+   "where": "transfer.tex:54-86"
+  },
+  {
+   "theorem": "Amenability of abelian/solvable groups, Folner sequences, invariant means",
+   "field": "harmonic analysis / group theory",
+   "status": "cited (Bekka2008 G.2.1, G.5.1; vonNeumann1929; Folner1955)",
+   "where": "spectral.tex:139-150; transfer.tex:155-164"
+  },
+  {
+   "theorem": "Disintegration of measures",
+   "field": "probability",
+   "status": "cited (TaoDisintegration2008)",
+   "where": "spectral.tex:300-310"
+  },
+  {
+   "theorem": "Furstenberg-Zimmer compact extension / relative weak mixing",
+   "field": "ergodic theory",
+   "status": "re-proved in the needed form",
+   "where": "rigidity.tex:23-320"
+  },
+  {
+   "theorem": "Mean ergodic theorem (every Folner sequence)",
+   "field": "ergodic theory",
+   "status": "re-proved",
+   "where": "rigidity.tex:151-161"
+  },
+  {
+   "theorem": "Ergodic decomposition for countable group on standard space",
+   "field": "ergodic theory",
+   "status": "cited (no reference)",
+   "where": "rigidity.tex:611-616"
+  },
+  {
+   "theorem": "Lebesgue differentiation / density theorem",
+   "field": "real analysis",
+   "status": "cited (standard)",
+   "where": "transfer.tex:291"
+  },
+  {
+   "theorem": "Fourier decay |sigma-hat(xi)| <= C(1+|xi|)^{-1/2}",
+   "field": "harmonic analysis",
+   "status": "re-proved (sketch)",
+   "where": "transitions.tex:86-98"
+  },
+  {
+   "theorem": "Brouwer fixed point theorem (planar)",
+   "field": "topology",
+   "status": "cited (Hatcher2002 Thm 1.9)",
+   "where": "interfaces.tex:359-362"
+  },
+  {
+   "theorem": "Free fundamental group of graphs / reduced words",
+   "field": "topology",
+   "status": "re-proved (Hatcher2002 1.A compare)",
+   "where": "interfaces.tex:435-499"
+  },
+  {
+   "theorem": "Sullivan bounded distortion strategy",
+   "field": "circle dynamics",
+   "status": "adapted (DeroinKleptsynNavas2008)",
+   "where": "palettes.tex:484-613"
+  },
+  {
+   "theorem": "Falconer/Payne density-point method",
+   "field": "geometric measure theory / combinatorial geometry",
+   "status": "adapted, re-proved",
+   "where": "transfer.tex:259-295"
+  },
+  {
+   "theorem": "Sokolov-Voronov interface (Props 1-2) and strip (Prop 9) arguments; Townsend annulus",
+   "field": "combinatorial geometry",
+   "status": "adapted, re-proved in measurable form",
+   "where": "interfaces.tex:10-13; angular.tex:22-26, 343-347"
+  },
+  {
+   "theorem": "Moser spindle non-3-colourability",
+   "field": "combinatorial geometry",
+   "status": "re-proved (three lines)",
+   "where": "angular.tex:500-516"
+  },
+  {
+   "theorem": "de Bruijn-Erdos compactness",
+   "field": "combinatorics / set theory",
+   "status": "cited; converse transfer and Cor 1.4 only",
+   "where": "transfer.tex:306-314; introduction.tex:310-311"
+  },
+  {
+   "theorem": "Gwyn-Stavrianos Lemma 2.10/Thm 2.11; Bourgeat et al. Thms 1-2",
+   "field": "probabilistic combinatorics",
+   "status": "cited; Cor 1.4 only",
+   "where": "introduction.tex:316-320"
+  }
+ ],
+ "proof_architecture": {
+  "summary": "Two halves joined by the new notion of a weak measurable colouring (I03). (1) Forward transfer (I25): arbitrary proper k-colouring -> invariant law on proper labellings of the algebraic plane E -> project label indicators onto the continuous-translation factor (I24); the residual has a K-invariant spectral measure off C, which is Haar by rigidity (I10), so unit-distance correlations survive -> measurable sample. (2) Obstruction (I05): circle palettes (I29) have <=2 labels (I34); transition graphs (I35) are forests away from a locally finite cyclic locus (I39); thresholded disk averages give a continuous K5-valued map (I42) with tree-filled holes (I43); the Lebesgue/Brouwer cover obstruction (I44) forces a non-null loop around a cyclic center, whose reduced word gives a label cycle with common exclusion continua (I48); cycles of length 5, 4, 3 are excluded by angular word combinatorics (I50, I51) and by Moser-spindle placement in an open three-label region (I52-I54).",
+  "rigidity_chain": "I11 null events -> I13 line average -> I16 relative singularity along I18 compact tower -> I19 multiple averages -> I20 radial subadditivity w(|A-B|)<=w(A)+w(B) -> I21/I22 number-field general position + capped residues -> m>=c on an interval -> contradiction with I13 -> Fourier coefficients vanish -> Haar.",
+  "lean_dag": {
+   "n_decls": 2612,
+   "target_dag": 2329,
+   "dominated_share": {
+    "proper_to_borel_weak": 0.519,
+    "no_measurable_weak_five_coloring": 0.458,
+    "residual_fourier": 0.444,
+    "fullApprox_exists": 0.422,
+    "wild_fourier": 0.408,
+    "exists_terminal_factor": 0.146,
+    "massReal_vanish": 0.121,
+    "cyclicCore_compact_finite": 0.104,
+    "commonInterface_graph_acyclic": 0.092,
+    "exists_small_wild_parameter": 0.074
+   },
+   "core_vs_background": "CompactFactors (516 decls, ~22% of the target DAG) re-proves Furstenberg-Zimmer infrastructure (background transfer). Excluding it, the rigidity-specific core (PlaneSpectrum, 722) is ~40% of the remaining 1813 and the obstruction (PlaneColoring, 1091) ~60%."
+  },
+  "lean_vs_paper": "Same route. Differences: Lean proves the main theorem's contrapositive packaging (global FullApprox map + no large positive regions, Five.lean) instead of extracting the loop explicitly; rigidity is stated as vanishing Fourier coefficients; ergodic decomposition is replaced by an invariant-mean 'code' (InvariantDecomposition.code) since Mathlib lacks ergodic decomposition; the converse transfer and Cor 1.4 are not formalized."
+ },
+ "eureka_candidates_ranked": [
+  "I10",
+  "I25",
+  "I29",
+  "I20",
+  "I16"
+ ],
+ "eureka_candidates": [
+  {
+   "rank": 1,
+   "item": "I10 (with I16, I20, I23): rigidity of wild K-invariant laws on the dual of the discrete algebraic plane",
+   "provisional_N": "N3",
+   "provisional_F": "F5",
+   "for": [
+    "It is the entire reason an arbitrary (non-measurable) colouring can be converted to a measurable one. Before it, only symmetry could be extracted by averaging (Bourgeat et al., Gwyn-Stavrianos, Matolcsi et al.).",
+    "Nothing in the goal (maps C -> Fin 5) or in L (Mathlib + bib) mentions duals of dense subgroups, wild laws or C-singular spectral parts: non-analytic.",
+    "Load-bearing: residual_fourier dominated share 0.44 of the target DAG; ~0.40 of the non-background core.",
+    "Payne 2009's rational-unit-graph example shows that the naive transfer fails for smaller rotation groups; the theorem depends delicately on F being real closed (L=sqrt(AB) in F, x=k+k' decomposition), so it is not a formal consequence of known rigidity theorems."
+   ],
+   "against": [
+    "The paper itself names an analogue: Crum 1956 / Gneiting-Sasvari 1999 (measurable radial positive-definite functions on R^n = continuous + c*delta_0). I10 is a discrete, measurability-free version of exactly that statement; a judge could call it N2 'variant of Crum'.",
+    "The proof uses standard Furstenberg-Zimmer machinery; measure rigidity for big group actions on solenoids (BFLM-style stiffness) is a large literature that might already contain the statement for the dual of Q-bar.",
+    "Once one decides to Fourier-analyse the invariant labelling law, asking for 'the singular part is Haar' is the natural target; the difficulty is in the proof, not the statement."
+   ],
+   "nearest_neighbour": "Crum 1956 (Proc. LMS 6, 548-560) and Gneiting-Sasvari 1999 for radial measurable PD functions; Bourgain-Furman-Lindenstrauss-Mozes 2011 (JAMS) stiffness on tori; Furstenberg x2x3.",
+   "lit_check": "WebSearch 2026-10-10: Crum decomposition (snippets: continuous + a.e.-null PD part; radial delta form not confirmed by snippet); 'invariant measures dual of algebraic numbers rotation Haar rigidity Bohr' and 'positive definite function on discrete group of algebraic numbers invariant under algebraic rotations': no match; BFLM: tori/SL_d(Z) only."
+  },
+  {
+   "rank": 2,
+   "item": "I25 + I24 + I03: forward transfer (proper -> weak measurable) via the continuous-translation factor",
+   "provisional_N": "N3 (joint with I10)",
+   "provisional_F": "F5",
+   "for": [
+    "First identification of chi(R^2) with an almost-everywhere measurable chromatic number; contrasts with Payne 2009 and Shelah-Soifer 2003 where such identifications fail or depend on axioms.",
+    "The projection-is-conditional-expectation step (I24) is what keeps nonnegativity and sum-one; without it the spectral split would not produce colourings."
+   ],
+   "against": [
+    "Without I10 it is assembly of known steps (amenable averaging, SNAG, Bochner, measurable versions). Its novelty is inherited from I10; grade jointly.",
+    "The amenable averaging to an invariant law on proper labellings is explicitly 'standard' (introduction.tex:153-159)."
+   ],
+   "nearest_neighbour": "Bourgeat-Heinrich-Melotti-Robert 2015 (arXiv 1501.02441), Gwyn-Stavrianos 2020 (arXiv 2008.07987), Matolcsi-Ruzsa-Varga-Zsamboki (arXiv 2311.10069): invariant randomisation/Folner averaging but no measurable output; Payne 2009 Prop 1 (measurable chromatic number of a rotation-closed graph >= chromatic number of R^n).",
+   "lit_check": "WebSearch 2026-10-10 'non-measurable coloring plane ... reduce to measurable coloring ergodic averaging amenable rotations': only Payne/Shelah-Soifer/Steinhardt/FKW; no transfer theorem found."
+  },
+  {
+   "rank": 3,
+   "item": "I29 circle traces and maximal palettes P_x(e)",
+   "provisional_N": "N3 (weak) / N2",
+   "provisional_F": "F1",
+   "for": [
+    "A new defined object: center-indexed angular palettes from weak-* limits of unit-circle samples; every step of the 5-colour obstruction is phrased in it.",
+    "Allows Falconer-type rotation arguments at every center with no regularity of colour boundaries, which is precisely what earlier map-type arguments (Woodall, Townsend, Sokolov-Voronov) lacked."
+   ],
+   "against": [
+    "Weak-* limits of samples are the Young-measure/blow-up reflex of analysts; the palette is the essential support of the trace family, a routine construction once the circle sampling is chosen.",
+    "Falconer 1981 already samples colourings on unit circles around density points."
+   ],
+   "nearest_neighbour": "Young measures (Tartar), tangent measures (Preiss 1987), Falconer 1981 density points with rotations; Sokolov-Voronov 2025 colours seen near unit circles for regular maps.",
+   "lit_check": "Quick WebSearch on measurable chromatic number methods (Bachoc-Nebe-Oliveira-Vallentin arXiv 0801.1059; DeCorte-Golubev hyperbolic plane): spectral/LP methods, no palettes."
+  },
+  {
+   "rank": 4,
+   "item": "I20 radial identity |A-Bu^2|^2 = |-L+(A-B)u+Lu^2|^2 giving w(|A-B|) <= w(A)+w(B)",
+   "provisional_N": "N3 (weak; may merge into I10)",
+   "provisional_F": "F2",
+   "for": [
+    "Converts multiple ergodic averages into a metric-type inequality on the radial coefficient; this is the step that makes the number-field endgame possible.",
+    "Uses real-closedness essentially (L = sqrt(AB) in F)."
+   ],
+   "against": [
+    "A small algebraic identity inside the proof of I10; downstream use outside I10 unlikely; a judge may fold it into I10."
+   ],
+   "nearest_neighbour": "none found; polynomial-identity tricks in multiple recurrence (Bergelson) are the nearest genre.",
+   "lit_check": "not separately searched beyond the I10 searches."
+  },
+  {
+   "rank": 5,
+   "item": "I16 relative singularity along a compact tower (phase-collision step)",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": [
+    "Original collision-count argument linking compact approximation and the line average."
+   ],
+   "against": [
+    "Template: 'property survives compact extensions' by transfinite induction (Furstenberg 1977); IH strengthened by the 'all substructures' template -> cap N2."
+   ],
+   "nearest_neighbour": "Furstenberg 1977 SZ-property induction along the structure tower.",
+   "lit_check": "not separately searched."
+  }
+ ],
+ "correctness_audit": {
+  "overall": "The argument is long (~4.8k LaTeX lines, ~30.9k Lean lines) and claims two firsts (chi >= 6 and, implicitly, chi_m >= 6) plus a structural transfer theorem. The Lean formalization of the exact comparator with only standard axioms, if it compiles, removes most doubt about the main theorem; compilation is pending (orchestrator). Text-level concerns:",
+  "concerns": [
+   "Transfer plausibility check: the transfer implies chi = least k with an a.e.-proper measurable colouring. This is consistent with known facts (de Grey/Exoo-Ismailescu chi>=5 and Falconer chi_m>=5 agree), and with Payne's counterexample because that graph lacks the full algebraic rotation group. No contradiction found, but the consequence is strong enough that it deserves expert review.",
+   "Rigidity (I10) is the critical new theorem and is proved in ~600 lines with ordinal induction and measurable-selection details; the most delicate points are the universal induction (applying the IH to a new system Z, spectral.tex:476-486) and the choice of fiber w after fixing binning data. Lean covers this (PlaneSpectrum + CompactFactors), so it hinges on compilation.",
+   "Lean replaces ergodic decomposition by an invariant-mean construction (InvariantDecomposition.code); this is a different proof of the reduction to the ergodic case and should be checked by compile, not text.",
+   "The paper does not state chi_m(R^2) >= 6 even though Thm 1.3 implies it at once; unusual omission for a result that would itself be a 45-year improvement over Falconer (no improvement found in searches). Not a correctness problem, but a sign the abstract undersells or the authors chose not to claim it.",
+   "Footnote critiques Reed2026 (amateur GitHub manuscript claiming chi=7); not used in the proof.",
+   "Converse transfer and Cor 1.4 are not formalized; Cor 1.4's graph H is existential only."
+  ],
+  "computer_assisted_concerns": "None of the SAT/DRAT trust issues of de Grey/Heule/Polymath16 apply: no finite search, no external proof certificate, no native_decide."
+ },
+ "extraction_friction": [
+  "Lean namespaces Problem160 and PlaneFiveColor are not family IDs (cf. PLAN lesson 1).",
+  "extract_lean.py candidate-def ranking puts plumbing first (CompactFunctions.compactSigma, BoundedMeasurable.l2); lemma ranking by dominated share is informative.",
+  "Family spans three Lean dirs (PlaneColoring + imported PlaneSpectrum, CompactFactors); CompactFactors is general Furstenberg-Zimmer background and must be excluded from the core share.",
+  "Inline definitions via \\emph (typical, binary, state, triangle labels, split) and paragraph-level constructions (thresholded q^eps) are not in theorem environments.",
+  "Lean route differs in packaging (FullApprox) from the paper's loop-extraction narrative; join by docstrings.",
+  "WebFetch unavailable (arxiv blocked); literature checks rest on WebSearch summaries/snippets."
+ ]
+}

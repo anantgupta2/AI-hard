@@ -1,0 +1,717 @@
+{
+ "family": "158",
+ "title": "The Euclidean plane cannot be colored with five colors",
+ "analyst_role": "NOVELTY analyst (text level; Lean not compiled by this analyst)",
+ "date": "2026-10-10",
+ "inputs": [
+  "data/pilot/158/family.json",
+  "data/pilot/158/family.md",
+  "paper build/ (main.tex, sections/*.tex, references.bib) at fd4aeeb",
+  "lean/OAI/{Geometry/PlaneColoring,Analysis/PlaneSpectrum,MeasureTheory/CompactFactors} (text)",
+  "data/items/158_lean.json",
+  "no trace.json (no reasoning trace)",
+  "no f1_*.json"
+ ],
+ "base_library_L": "Mathlib d13f23b + the paper's 33 bibliography entries",
+ "precedent_checks": [
+  {
+   "ref": "Sokolov & Voronov, 'On the chromatic number of the plane for map-type colorings', arXiv:2502.01958v1 (Feb 2025) [SokolovVoronov2025]",
+   "role": "named method precedent for exclusion continua (Props 1-2) and one-sided strips (Prop 9)",
+   "access": "WebFetch arxiv.org failed (getaddrinfo ENOTFOUND); WebSearch summaries of abstract only",
+   "ai_disclosure": "none seen in search snippets (abstract/opening only; acknowledgments not read)",
+   "content_check": {
+    "result": "chi >= 7 for map-type colourings with non-unit-arc boundaries and degree-3 vertices; polygonal colourings as corollary (search summary)",
+    "items_present": {
+     "C1": "absent",
+     "C2": "absent",
+     "C3": "absent",
+     "C9": "close variant (interfaces for regular maps)",
+     "C10": "absent"
+    }
+   },
+   "verdict": "human preprint; precedent for I48/I49 in the regular-map setting; contains no transfer or rigidity"
+  },
+  {
+   "ref": "Voronov, 'The chromatic number of the plane with an interval of forbidden distances is at least 7', arXiv:2304.10163v3 (2023, v3 Apr 2025) [Voronov2025Interval]",
+   "role": "related circle/complementary-arc arguments (angular.tex:24-26)",
+   "access": "WebSearch result listing only",
+   "ai_disclosure": "none seen (not read)",
+   "content_check": {
+    "items_present": {
+     "C9": "related (interval of forbidden distances, not single distance)"
+    }
+   },
+   "verdict": "human; background precedent only"
+  },
+  {
+   "ref": "Matolcsi, Ruzsa, Varga, Zsamboki, 'The fractional chromatic number of the plane is at least 4', arXiv:2311.10069v4 (Mar 2025)",
+   "role": "Folner averaging over countable isometry groups (introduction.tex:157-159)",
+   "access": "WebSearch summary of v3/v4 abstract",
+   "ai_disclosure": "none seen",
+   "content_check": {
+    "items_present": {
+     "C1": "absent",
+     "C2": "close variant of the averaging step only (no measurable output)"
+    }
+   },
+   "verdict": "human; supplies symmetry via averaging, not the transfer"
+  },
+  {
+   "ref": "Jamneshan, 'An uncountable Furstenberg-Zimmer structure theory' (ETDS 2023) and Corrigendum (ETDS, online 9 Sep 2025; bib says 2026)",
+   "role": "context for the compact-tower lemma",
+   "access": "WebSearch summary of Cambridge corrigendum page",
+   "ai_disclosure": "none seen",
+   "content_check": {
+    "note": "Corrigendum reports errors in Lemma A.5/Prop A.6 on spectral analysis of conditional Hilbert-Schmidt operators (used in Lemma 4.4) and in Lemma 4.10. The OAI paper re-proves its own fiberwise version (rigidity.tex:63-101) instead of citing these lemmas, which avoids the corrected statements; Lean re-proves it too (CompactFactors)."
+   },
+   "verdict": "human; background; corrected lemmas not relied upon"
+  },
+  {
+   "ref": "Reed, 'The Hadwiger-Nelson Problem: Formal Verification of the 7-Color Chromatic Number of the Plane...' (GitHub manuscript, May 14 2026) [Reed2026]",
+   "role": "criticised in a footnote (introduction.tex:70-78); not used",
+   "access": "WebSearch found nothing on it",
+   "ai_disclosure": "unknown (not found)",
+   "content_check": {
+    "items_present": "none; the paper says Reed's density bound fails for a half-open arc"
+   },
+   "verdict": "irrelevant to the proof; provenance unknown but no influence"
+  },
+  {
+   "ref": "Mundinger, Pokutta et al., 'Neural Discovery in Mathematics: Do Machines Dream of Colored Planes?', arXiv:2501.18527 (2025)",
+   "role": "only AI-related Hadwiger-Nelson work found by search (not cited by the paper)",
+   "access": "WebSearch summary",
+   "ai_disclosure": "is itself AI-driven (neural networks guiding constructions for colouring variants)",
+   "content_check": {
+    "items_present": "absent; concerns constructions (upper bounds) for variants with a second forbidden distance"
+   },
+   "verdict": "model-assisted but unrelated to any candidate"
+  }
+ ],
+ "candidates": [
+  {
+   "id": "C1",
+   "name": "Rigidity of wild K-invariant laws on the dual of the discrete algebraic plane (Thm 2.3), with its proof engine",
+   "paper_items": [
+    "I10 Thm 2.3 (spectral.tex:64-70; rigidity.tex:509-617)",
+    "I16 relative singularity (spectral.tex:327-624)",
+    "I20 radial identities (rigidity.tex:347-413)",
+    "I21-I23 number-field endgame",
+    "I13 line average"
+   ],
+   "statement": "E = Q-bar as a discrete group, D its compact dual, C the continuous characters j(R^2), K the algebraic unit rotations. Every K-invariant probability on D with nu(C)=0 is Haar; equivalently, a K-radial positive-definite function on E whose spectral measure ignores C has all nonzero coefficients 0.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Crum 1956 (Proc./J. LMS 6, 548-560); Gneiting-Sasvari 1999 (Math. Geol. 31) - named by the paper (spectral.tex:81-88)",
+      "relation": "Statement-shape analogue: a measurable (radial) positive-definite function on R^n is continuous PD plus an a.e.-zero (radially: c*delta_0) PD part.",
+      "verdict": "close analogue in statement, genuinely different hypotheses: Crum needs Lebesgue measurability on R^n; C1 has no measurability, lives on a countable dense subgroup, and its proof (Furstenberg-Zimmer + number fields) shares nothing with Crum's. Searches did not confirm the exact radial delta form from Crum's text (snippets give continuous + a.e.-null)."
+     },
+     {
+      "ref": "Bourgain-Furman-Lindenstrauss-Mozes, JAMS 24 (2011); Benoist-Quint (stationary measures on tori)",
+      "relation": "measure rigidity / stiffness: stationary measures of Zariski-dense SL_d(Z) actions on T^d are Haar or finite-orbit",
+      "verdict": "genuinely different (non-abelian lattice actions on finite-dimensional tori; here an abelian countable rotation group acting on an infinite-dimensional solenoid with a dense non-closed exceptional subgroup C)"
+     },
+     {
+      "ref": "Furstenberg x2x3 / Rudolph-Johnson; Einsiedler-Lind entropy-rank-one solenoid actions",
+      "relation": "invariant measures for multiplicative actions on solenoids",
+      "verdict": "genuinely different (needs positive entropy; finitely generated actions)"
+     },
+     {
+      "ref": "Bohr compactification invariant-measure facts (e.g. loop quantum cosmology uniqueness of R-invariant measures on R_Bohr, arXiv:1604.08199 per snippet)",
+      "relation": "invariant measures on Bohr-type duals",
+      "verdict": "genuinely different (translation-invariance, not rotation; no exceptional C)"
+     }
+    ],
+    "verdict": "no near-equivalent found; Crum is a statement-level analogue in another setting (the paper names it)",
+    "searches": "WebSearch 2026-10-10: 'Crum theorem measurable radial positive definite ... delta at zero'; 'Crum 1956 radial ... Gneiting Sasvari'; 'invariant measures on dual of algebraic numbers ... Haar rigidity Bohr compactification plane'; 'positive definite function on discrete group of algebraic numbers invariant under algebraic rotations ...'; 'measure rigidity ... solenoid ... BFLM'. zbMATH/MathSciNet not queried; WebFetch unavailable."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "The goal (comparator) mentions only maps C -> Fin 5 and unit distance. Nothing in L (Mathlib d13f23b: Pontryagin duality, Haar, Bochner absent for discrete duals; bib: Crum is on R^n) contains invariant laws on the dual of a dense subgroup, the subgroup C, or wildness. Judged against the problem as posed in 1950: no spectral object appears."
+   },
+   "test3": {
+    "verdict": "pass",
+    "down": "residual_fourier dominated share 0.444; wild_fourier 0.408 of the 2,329-decl target DAG; excluding CompactFactors background (516) the rigidity-specific PlaneSpectrum code (722) is ~40% of the core",
+    "cone": "proper_to_borel_weak (0.519) is reachable only through it",
+    "lean": "PlaneSpectrum/*, Ergodicity.lean:335-415",
+    "note": "Knockout: without C1 the averaged law's residual part could carry unit correlations and the projected coordinates would not form a weak colouring; the transfer (and so the whole reduction from arbitrary to measurable colourings) collapses. Payne 2009's example shows the conclusion is false for smaller rotation groups."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "about 3 from L: needs (a) the idea to average a proper colouring over E x| K, (b) to split by the continuous spectral subspace, (c) then to conjecture and prove Haar rigidity for the residual",
+    "chain_depth": 3,
+    "protocol": "P-C1",
+    "trace": "no reasoning trace for 158"
+   },
+   "final": {
+    "N": "N3",
+    "F": "F5",
+    "confidence": 0.45,
+    "justification": "No near-equivalent in any field found; Crum's theorem is the closest statement-level analogue but requires measurability on R^n, which is exactly what C1 removes; non-analytic and heavily load-bearing. Not transfer: no existing theorem is imported. Downgrade risks: an expert may know a rigidity theorem for rotation-invariant measures on duals of real-closed fields, or regard C1 as 'Crum on Q-bar' (N2). F5 because it re-represents unit-distance constraints of an arbitrary labelling as a spectral statement on D. Its own proof engine (relative singularity, radial identity) is graded as C4/C5."
+   }
+  },
+  {
+   "id": "C2",
+   "name": "Forward transfer: arbitrary proper colouring -> weak measurable colouring via the continuous-translation factor (Prop 4.2 + Lemma 4.1 + Def 1.1)",
+   "paper_items": [
+    "I25 Prop 4.2 (transfer.tex:144-257)",
+    "I24 Lemma 4.1 (transfer.tex:25-142)",
+    "I03 Def 1.1",
+    "I04 Thm 1.2"
+   ],
+   "statement": "If R^2 has a proper k-colouring then it has a weak measurable k-colouring (any k, ZFC).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Bourgeat-Heinrich-Melotti-Robert 2015 (arXiv:1501.02441); Gwyn-Stavrianos 2020 (arXiv:2008.07987)",
+      "relation": "invariant randomisation/means for the probabilistic Hadwiger-Nelson problem",
+      "verdict": "close variant of the first step only (averaging); no measurable colouring produced"
+     },
+     {
+      "ref": "Matolcsi-Ruzsa-Varga-Zsamboki (arXiv:2311.10069v4)",
+      "relation": "Folner averaging over countable isometry groups for fractional colouring",
+      "verdict": "same as above"
+     },
+     {
+      "ref": "Payne 2009 (EJC 16, N31; arXiv:0707.1177) Prop 1",
+      "relation": "measurable chromatic number of rotation-closed translation-invariant graphs >= chromatic number of R^n; examples where chi and chi_m differ",
+      "verdict": "genuinely different direction (lower-bounds chi_m by chi); shows transfers fail for subgraphs"
+     },
+     {
+      "ref": "Shelah-Soifer 2003 (JCTA 103)",
+      "relation": "ZFC vs ZF+DC+LM chromatic numbers",
+      "verdict": "genuinely different; C2 implies the measurability ambiguity cannot occur for the full plane"
+     }
+    ],
+    "verdict": "no near-equivalent found",
+    "searches": "WebSearch 2026-10-10: 'non-measurable coloring plane unit distance reduce to measurable coloring ergodic averaging amenable rotations translations chromatic number'; 'Shelah Soifer axiom of choice chromatic number ... LM'; 'chromatic number of the plane at least 6 ... 2026'."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "Neither weak colourings nor continuous factors occur in the goal or L; L contains the opposite phenomenon (Payne)."
+   },
+   "test3": {
+    "verdict": "pass",
+    "down": "proper_to_borel_weak dominated share 0.519",
+    "lean": "BorelTransfer.lean:436",
+    "note": "Half of the proof; the obstruction half has no input without it."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "about 2 from L given C1: averaging is cited as standard; the continuous-factor projection is one step from SNAG + Koopman",
+    "chain_depth": 2,
+    "protocol": "P-C2",
+    "trace": "no reasoning trace for 158"
+   },
+   "final": {
+    "N": "N3",
+    "F": "F5",
+    "confidence": 0.4,
+    "justification": "Same device as C1 seen at statement level (C1 is what makes it work). Counted once with C1 for family_D. The averaging and spectral-subspace parts alone would be N1-N2 (I24 'continuous factor' packaging is close to standard Koopman/factor facts)."
+   }
+  },
+  {
+   "id": "C3",
+   "name": "Circle traces W_x and maximal palettes P_x(e) (Def 5.1) with palette transfer and cardinality <= 2",
+   "paper_items": [
+    "I29 Def 5.1 (palettes.tex:47-107)",
+    "I30 Lemma 5.2",
+    "I34 Prop 5.6"
+   ],
+   "statement": "At each center, weak-* limits of unit-circle colour samples near x define an angular set-valued palette; exclusions transport between palettes; almost every palette has <= 2 labels.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Falconer 1981 (JCTA 30) density-point + rotation argument for chi_m >= 5",
+      "relation": "samples a measurable colouring on unit circles about density points",
+      "verdict": "close variant of the mechanism (pointwise at density points rather than weak-* limits at every center)"
+     },
+     {
+      "ref": "Young measures (Tartar 1979); tangent measures (Preiss 1987)",
+      "relation": "weak-* limits of rescaled/oscillating samples",
+      "verdict": "generic technique of the same type"
+     },
+     {
+      "ref": "Woodall 1973; Townsend 2005; Sokolov-Voronov 2025",
+      "relation": "colours seen near unit circles for regular maps",
+      "verdict": "genuinely different setting (regular boundaries)"
+     }
+    ],
+    "verdict": "close variant (technique genre known; specific object new)",
+    "searches": "WebSearch 2026-10-10 on measurable chromatic number methods (Bachoc-Nebe-Oliveira-Vallentin arXiv:0801.1059; DeCorte-Golubev hyperbolic plane): spectral/LP methods, no palette-type objects."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "Not a subterm of the goal or L."
+   },
+   "test3": {
+    "verdict": "pass",
+    "down": "palette used in 34 theorem signatures over 13 Lean files; frac_dag_dependents 0.061; every obstruction step uses it",
+    "lean": "Palettes.lean:35"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1-2 from L: Falconer's circle-at-density-point argument plus a standard weak-* compactness step",
+    "chain_depth": 1,
+    "protocol": "P-C3",
+    "trace": "no reasoning trace for 158"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.55,
+    "justification": "Natural blow-up/Young-measure object built on Falconer's density-point circle sampling; the specific definition is new but a close variant of an existing technique. Not N3."
+   }
+  },
+  {
+   "id": "C4",
+   "name": "Radial identity |A-Bu^2|^2 = |-L+(A-B)u+Lu^2|^2 giving w(|A-B|) <= w(A)+w(B) for w=-log m (Lemma 3.3)",
+   "paper_items": [
+    "I20 (rigidity.tex:347-413)"
+   ],
+   "statement": "Multiple-average decoupling plus an equal-modulus polynomial identity in u (needs L=sqrt(AB) in the real-closed F) gives a triangle-type inequality for -log of the radial conditional coefficient.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "polynomial-identity tricks in multiple recurrence (Bergelson-Leibman style)",
+      "relation": "same genre",
+      "verdict": "genuinely different"
+     }
+    ],
+    "verdict": "no near-equivalent found",
+    "searches": "covered by C1 searches only (no separate search)"
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "Not in goal or L."
+   },
+   "test3": {
+    "verdict": "pass (within C1)",
+    "down": "massReal_vanish dominated share 0.121",
+    "lean": "RadialEnergy.lean"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1 step inside C1 once m is radial and multiple averages decouple",
+    "chain_depth": 4,
+    "protocol": "P-C1 (sub-target)",
+    "trace": "no reasoning trace for 158"
+   },
+   "final": {
+    "N": "N3",
+    "F": "F2",
+    "confidence": 0.3,
+    "justification": "Graded as a component of C1's device; it is the step that turns ergodic decoupling into arithmetic. Low confidence: small identity, plausibly found by a directed search for equal-modulus relations. Not counted separately for family_D."
+   }
+  },
+  {
+   "id": "C5",
+   "name": "Relative singularity along a compact tower (Lemma 2.7)",
+   "paper_items": [
+    "I16 (spectral.tex:327-624)",
+    "I14 location functional",
+    "I17 phase encoding"
+   ],
+   "statement": "Wildness of the conditional difference law survives every stage of a Furstenberg-Zimmer tower.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Furstenberg 1977 (J. Anal. Math.) SZ property along the structure tower",
+      "relation": "same induction template (property survives compact extensions and limits)",
+      "verdict": "close variant (template)"
+     }
+    ],
+    "verdict": "close variant",
+    "searches": "none separately; Furstenberg template is the paper's own cited source"
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "Not in goal; the template is in L, the property is not."
+   },
+   "test3": {
+    "verdict": "pass",
+    "down": "exact_finite_center_reduction 0.045, exists_terminal_factor 0.146",
+    "lean": "RelativeCenters.lean, PhaseCollision.lean"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 3,
+    "protocol": "not written (N2)",
+    "trace": "no reasoning trace for 158"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.65,
+    "justification": "Templated strengthening ('strengthen to all substructures': IH ranges over all systems) caps at N2; the collision count inside is new but local."
+   }
+  },
+  {
+   "id": "C6",
+   "name": "Transition graph Gamma_x (|h|-normalised transition density) and avoiding traces via circle Fourier decay (Def 6.1, Lemma 6.2)",
+   "paper_items": [
+    "I35 (transitions.tex:29-52)",
+    "I36 (transitions.tex:54-141)",
+    "I39 local finiteness"
+   ],
+   "statement": "ij is an edge at x when transitions i<->j under shift h have area >> |h| near x; then a circle trace avoids both i and j, because circle averages of a_s - a_s(.+h) are o(sqrt|h|).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Bourgain-Brezis-Mironescu 2001 / Davila 2002 difference-quotient characterisation of perimeter (analyst knowledge, not searched)",
+      "relation": "int|1_A(x+h)-1_A(x)|/|h| measures interface",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Fourier decay of circle measure (Stein, classical)",
+      "relation": "tool",
+      "verdict": "N0 component"
+     }
+    ],
+    "verdict": "close variant",
+    "searches": "none beyond analyst knowledge (flagged)"
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "Not in goal or L."
+   },
+   "test3": {
+    "verdict": "pass",
+    "down": "cyclicCore_compact_finite 0.104; transition_avoiding_trace ~0.03"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1-2",
+    "chain_depth": 2,
+    "protocol": "not written (N2)",
+    "trace": "no reasoning trace for 158"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Interface-density notion close to BV/perimeter difference quotients; matching the |h| normalisation to the circle decay exponent is new but routine."
+   }
+  },
+  {
+   "id": "C7",
+   "name": "Graph-valued thresholded disk averages + Lebesgue/Brouwer cover obstruction (eq 7.4, Lemmas 7.4-7.6)",
+   "paper_items": [
+    "I42",
+    "I43",
+    "I44",
+    "I45",
+    "L01 FullApprox"
+   ],
+   "statement": "Map the colouring to the 1-skeleton of the simplex (K5); fill holes through trees; a square has no cover of multiplicity <= 2 and mesh <= 2.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Lebesgue covering theorem (1911) / nerve maps of covers (Alexandroff)",
+      "relation": "exactly the cover obstruction and the partition-of-unity map",
+      "verdict": "equivalent (I44) / close variant (I42)"
+     }
+    ],
+    "verdict": "N0 transfer of classical dimension theory",
+    "searches": "none needed (textbook)"
+   },
+   "test2": {
+    "verdict": "fail for I44 (in L via the classical literature); pass for I42 as an object",
+    "evidence": "I44 is the covering-dimension theorem for [0,1]^2."
+   },
+   "test3": {
+    "verdict": "pass",
+    "down": "fullApprox_exists 0.422"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "0-1",
+    "chain_depth": 2,
+    "protocol": "not written",
+    "trace": "no reasoning trace for 158"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "Classical dimension theory transferred; the continuous K5-valued representation is the nerve map of the colour-threshold cover. Transfer, not a jump."
+   }
+  },
+  {
+   "id": "C8",
+   "name": "Weak measurable colouring (Def 1.1)",
+   "paper_items": [
+    "I03"
+   ],
+   "statement": "Measurable colouring whose monochromatic unit pairs are dx dsigma-null.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "measurable proper colourings (Falconer 1981); a.e. statements in Payne 2009",
+      "relation": "a.e. relaxation",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "close variant",
+    "searches": "as C2"
+   },
+   "test2": {
+    "verdict": "pass (not in goal)",
+    "evidence": "-"
+   },
+   "test3": {
+    "verdict": "pass",
+    "down": "interface of both halves"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 0,
+    "protocol": "not written",
+    "trace": "no reasoning trace for 158"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Natural relaxation; its value comes from C1/C2."
+   }
+  },
+  {
+   "id": "C9",
+   "name": "Common exclusion continua with straddling regions Delta(K) and one-sided strips (Prop 7.1, Lemma 8.1)",
+   "paper_items": [
+    "I48",
+    "I49",
+    "I52"
+   ],
+   "statement": "Compact connected K_j through a common point, both endpoint labels absent from Delta(K_j); strips just inside/outside the unit circle use only allowed labels.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Sokolov-Voronov 2025 Props 1-2, 9 (named)",
+      "relation": "same mechanism for regular maps",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Townsend 2005 annulus argument (named)",
+      "relation": "two complementary colours near a unit circle",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "close variant (named precedents)",
+    "searches": "WebSearch 2026-10-10 Sokolov-Voronov abstract"
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "-"
+   },
+   "test3": {
+    "verdict": "pass",
+    "down": "commonInterface_graph_acyclic 0.092"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 3,
+    "protocol": "not written",
+    "trace": "no reasoning trace for 158"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "Named precedents; new is producing continua from measure data."
+   }
+  },
+  {
+   "id": "C10",
+   "name": "Binary-center separation (Lemma 5.5) by Sullivan bounded distortion",
+   "paper_items": [
+    "I33"
+   ],
+   "statement": "Two distinct binary centers for the same pair are delta_*-apart.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Sullivan expanding-action / bounded-distortion strategy; Deroin-Kleptsyn-Navas arXiv:0806.1974 Sec 2.1 (named)",
+      "relation": "same technique",
+      "verdict": "close variant"
+     }
+    ],
+    "verdict": "close variant (named)",
+    "searches": "none separately"
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "-"
+   },
+   "test3": {
+    "verdict": "pass",
+    "down": "binary_centers_separated 0.040"
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": 2,
+    "protocol": "not written",
+    "trace": "no reasoning trace for 158"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "Adaptation of a named technique."
+   }
+  }
+ ],
+ "excluded_from_candidates": [
+  {
+   "item": "I06 hexagonal 7-colouring",
+   "reason": "N0 classical"
+  },
+  {
+   "item": "I27 de Bruijn-Erdos, I55 Cor 1.4",
+   "reason": "N0; corollary-only, not on comparator path"
+  },
+  {
+   "item": "I54 Moser spindle + placement certificate",
+   "reason": "N0 graph; N1 7-point certificate"
+  },
+  {
+   "item": "I18/I19 Furstenberg-Zimmer tower and multiple averages",
+   "reason": "N0/N1 re-proved background (CompactFactors)"
+  },
+  {
+   "item": "I12 invariant-mean line integral, I14 moment-free location, I21/I22 number-field lemmas",
+   "reason": "N1 routine"
+  },
+  {
+   "item": "I50/I51 five- and four-cycle word combinatorics",
+   "reason": "N1 finite case analysis (Lean decide <= 15,625 cases)"
+  }
+ ],
+ "family_D": {
+  "label": "D3",
+  "confidence": 0.4,
+  "rests_on": "C1 (Haar rigidity of wild K-invariant laws on the dual of discrete Q-bar), which is the engine of C2 (the forward transfer). C4 is a sub-lemma of C1 and is not counted separately. All other candidates are N0-N2.",
+  "falls_to": "D2 if (i) an expert identifies a known rigidity/Crum-type theorem for rotation-invariant positive-definite functions on Q-bar or on duals of dense subgroups (or judges C1 a routine combination of Furstenberg-Zimmer + Crum), or (ii) P-C1 shows a high hit rate in the 'directed' arm. Firms up with expert review, a low P-C1 hit rate, and a successful Lean compile (pending; orchestrator).",
+  "not_transfer": "C1 imports no existing theorem as its statement; Crum is an analogue in a different (measurable, R^n) setting. The cross-field machinery used to prove it (Furstenberg-Zimmer, Bochner, SNAG) is transfer and graded separately.",
+  "analyst_comparison": "Agrees with family.json provisional D3 (medium-low). Downgrades: I29 palettes N3(weak) -> N2; I16 stays N2; C2 merged with C1.",
+  "downstream_note": "Speedup prospects: C1 is a general statement about K-invariant laws and could plausibly transfer to other unrestricted-vs-measurable questions (unit-distance graphs in R^n with algebraic rotation groups, other forbidden-distance graphs, probabilistic Hadwiger-Nelson). That makes it a better downstream-test candidate than a one-off device. Corollaries of the main theorem (chi_m >= 6, badness) do not count as reuse."
+ },
+ "provenance_flag": {
+  "applies": "no",
+  "builds_on_prior_model_result_strict": false,
+  "model_produced_precedent": false,
+  "explanation": "2025-2026 citations: Sokolov-Voronov 2025 and Voronov 2025 (human arXiv preprints; no AI statement seen in snippets, acknowledgments not read), Matolcsi et al. 2025 (human), Jamneshan corrigendum (journal; the paper re-proves rather than relies on the corrected lemmas), Reed 2026 (GitHub manuscript criticised, not used; authorship/AI use unknown). Searches for Hadwiger-Nelson with ChatGPT/GPT-5/AI-assisted found only Mundinger-Pokutta et al. arXiv:2501.18527 (neural-network constructions for colouring variants), which is unrelated to any candidate. No prior chi >= 6 or chi_m >= 6 claim was found (Erdos Problems #508-style pages, Heule's FoCM 2023 talk still list 5 <= chi <= 7 and treat 6 as an open SAT target). WebFetch unavailable, so AI-disclosure checks rest on search snippets."
+ },
+ "bridge_novelty": [
+  {
+   "import": "Ergodic theory + abstract harmonic analysis (Furstenberg-Zimmer towers, SNAG/Bochner, Pontryagin duals) -> unrestricted plane colourings",
+   "classification": "new bridge",
+   "evidence": "Ergodic/harmonic methods were known for MEASURABLE distance problems (Falconer 1981; Furstenberg-Katznelson-Weiss / Bourgain 1986 on distances in measurable sets; Bachoc-Nebe-Oliveira-Vallentin 2009 spectral bounds) and invariant means for the probabilistic HN problem (Bourgeat et al. 2015, Gwyn-Stavrianos 2020). No earlier work found using them to transfer ARBITRARY colourings to measurable ones (searches above). Bridge is measured separately and does not by itself make D3."
+  },
+  {
+   "import": "Algebraic number theory (real-closed F, number-field general position)",
+   "classification": "known route",
+   "evidence": "Algebraic coordinates are standard in unit-distance graph constructions (Moser spindle uses sqrt3, sqrt11; Payne's rational graphs; de Grey/Heule graphs over Q(sqrt3, sqrt5, ...)). New use (rigidity endgame) but the field connection exists."
+  },
+  {
+   "import": "Dimension theory / algebraic topology (Lebesgue covering, nerve maps, graph pi_1)",
+   "classification": "known route (partial)",
+   "evidence": "Topological arguments are standard for map-type and closed-set colourings (Woodall 1973, Townsend 2005, Sokolov-Voronov 2025); here applied to continuous approximants of measurable colourings."
+  },
+  {
+   "import": "Circle dynamics (Sullivan bounded distortion via Deroin-Kleptsyn-Navas)",
+   "classification": "new bridge (minor)",
+   "evidence": "No earlier use in plane-colouring problems found (not searched in depth)."
+  },
+  {
+   "import": "Fourier decay of circle measure",
+   "classification": "known route",
+   "evidence": "Spectral methods for measurable chromatic numbers (Bachoc et al. 2009; Oliveira-Vallentin; DeCorte-Golubev) use Bessel-function decay of the circle measure."
+  }
+ ],
+ "discoverability_protocols": [
+  {
+   "id": "P-C1",
+   "targets": [
+    "C1",
+    "C4",
+    "C2"
+   ],
+   "hide": "Sections 2-3 (spectral, rigidity) and everything downstream: Lemma 4.1, Prop 4.2, Thm 1.2 forward direction; Lean PlaneSpectrum, CompactFactors, BorelTransfer. Keep only the problem statement and Thm 1.3 (no weak measurable 5-colouring) as a GIVEN.",
+   "prompt_context": "Problem: show that a proper 5-colouring of R^2 (arbitrary classes) is impossible, given (as a black box) that no weak measurable 5-colouring exists (definition supplied). L = Mathlib d13f23b statements + the paper's bibliography minus the paper itself: Falconer 1981, Payne 2009, Shelah-Soifer 2003, Bourgeat et al. 2015, Gwyn-Stavrianos 2020, Matolcsi et al. 2025, Crum 1956, Gneiting-Sasvari 1999, Furstenberg 1977, Zimmer 1976, Bekka-de la Harpe-Valette, de Bruijn-Erdos. Three arms: 'bare' (problem + black box), 'L' (plus L abstracts), 'directed' (plus the hint: average the colouring over translations and rotations of the algebraic plane and analyse the spectral measure of the label indicators).",
+   "equivalence_criterion": "Hit if the proposal (a) states a reduction from arbitrary to (almost-everywhere) measurable colourings that uses an invariant law on labellings of a countable dense rotation/translation-invariant subgroup, AND (b) identifies the needed rigidity: the part of the label spectral measure off the continuous characters has vanishing nonzero Fourier coefficients (Haar), or an equivalent statement on K-radial positive-definite functions on the algebraic plane. Partial hit: (a) without (b). Judge: LLM judge with the paper's spectral.tex:64-88 as reference plus a human spot check; Lean equivalence not attempted (statement-level only).",
+   "k": [
+    1,
+    5,
+    25,
+    100
+   ],
+   "models": "Training cutoff before 2026-09-23 (paper date; release 2026-10-06). Exclude: the OAI release (paper, Lean, CONTENTS/overview), any post-release discussion. Crum 1956 and Furstenberg 1977 are old and allowed in L. Claude Opus 5.5 (cutoff June 2026) qualifies.",
+   "controls": "Positive control: Falconer's chi_m >= 5 argument hidden, given measurable problem (expect high hit rate). Negative control: ask for a transfer for Payne's rational-unit graph (must fail; tests that the judge rejects generic averaging)."
+  },
+  {
+   "id": "P-C2",
+   "targets": [
+    "C2"
+   ],
+   "hide": "As P-C1, but C1 (Thm 2.3) is supplied as a black box.",
+   "prompt_context": "Problem + Thm 2.3 + L.",
+   "equivalence_criterion": "Proposal projects label indicators onto the continuous-translation subspace (as conditional expectation) and uses rigidity to keep unit correlations zero, then samples a measurable field.",
+   "k": [
+    1,
+    5,
+    25
+   ],
+   "models": "as P-C1",
+   "controls": "-"
+  },
+  {
+   "id": "P-C3",
+   "targets": [
+    "C3"
+   ],
+   "hide": "Def 5.1 and Sections 5-8 (keep the weak-colouring notion and density-point lemma).",
+   "prompt_context": "Prove there is no weak measurable 5-colouring; L as above plus Woodall/Townsend/Sokolov-Voronov.",
+   "equivalence_criterion": "Proposal defines per-center angular label data from limits of unit-circle samples (weak-* or density-point limits).",
+   "k": [
+    1,
+    5,
+    25
+   ],
+   "models": "as P-C1",
+   "controls": "-"
+  }
+ ],
+ "open_questions": [
+  "Is C1 (Haar rigidity of wild K-invariant laws on the dual of discrete Q-bar) known to harmonic analysts, e.g. as a Crum-type theorem for positive-definite functions on Q-bar invariant under algebraic rotations? Needs an expert or zbMATH search.",
+  "Does Crum 1956 state the radial 'continuous + c*delta_0' form, or is it Gneiting-Sasvari's? (Snippets only gave 'continuous + a.e.-null'.)",
+  "Lean compile result for both comparators (orchestrator). If it passes with standard axioms, the main theorem and C1 are machine-checked.",
+  "Why does the paper not state chi_m(R^2) >= 6, which follows immediately from Thm 1.3?",
+  "Does the transfer generalise to R^n (with algebraic rotations of Q-bar^n) and to other distance sets? That would be downstream reuse of C1.",
+  "Size of the finite 6-chromatic unit-distance graph guaranteed by compactness: unknown; any bound would quantify the budget gap between the SAT route (finite refutation) and this route."
+ ],
+ "sources": [
+  "https://arxiv.org/pdf/0801.1059 (Bachoc-Nebe-Oliveira-Vallentin, measurable chromatic numbers; search result)",
+  "https://ar5iv.arxiv.org/html/1708.01081 (hyperbolic plane chi_m >= 6; search result)",
+  "https://en.wikipedia.org/wiki/Hadwiger%E2%80%93Nelson_problem (search result)",
+  "https://arxiv.org/pdf/2501.18527 (Neural Discovery in Mathematics; search result)",
+  "https://www.zib.de/de/node/17471 (ZIB neural colouring variant; search result)",
+  "https://ideas.repec.org/h/spr/sprchp/978-94-017-0227-0_6.html (Crum decomposition summary; search result)",
+  "https://www.theta.ro/jot/archive/2003-050-002/2003-050-002-006.pdf (Bruzual-Dominguez on Crum; search result)",
+  "https://arxiv.org/pdf/0707.1177 (Payne 2009; search result)",
+  "https://arxiv.org/pdf/1509.01595 (Moser spindle survey citing Shelah-Soifer; search result)",
+  "https://arxiv.org/pdf/2502.01958 and https://arxiv.org/html/2502.01958v1 (Sokolov-Voronov; search result)",
+  "https://www.ams.org/jams/2011-24-01/S0894-0347-2010-00674-1/ (BFLM; search result)",
+  "https://arxiv.org/html/2311.10069v4 (Matolcsi et al.; search result)",
+  "https://resolve.cambridge.org/core/journals/ergodic-theory-and-dynamical-systems/article/an-uncountable-furstenbergzimmer-structure-theory-corrigendum/AE2447D76D75C5FEC41626841D6BCC47 (Jamneshan corrigendum; search result)",
+  "https://www.erdosproblems.com/508 (current bounds page; search result)",
+  "https://focm2023.pages.math.cnrs.fr/files/confirmed/I3-05171-Heule.pdf (Heule talk, 6 as open SAT target; search result)",
+  "https://arxiv.org/pdf/1604.08199 (invariant measures on Bohr compactification, LQC; search result)",
+  "WebFetch https://arxiv.org/abs/2502.01958 failed: getaddrinfo ENOTFOUND arxiv.org"
+ ]
+}
