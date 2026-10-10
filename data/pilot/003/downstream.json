@@ -1,0 +1,565 @@
+{
+ "fid": "003",
+ "item": "C1: sextic-twist Mobius <-> cubic-theta duality. Twist the Mobius sum of a Hecke character over Q(sqrt-3) by sextic residue symbols; Poisson in the twist gives sextic Gauss sums, which absorb mu(n) via gamma_2(n)^3 = mu(n) alpha(n) into cubic Gauss sums (Kubota-Patterson theta coefficients); theta reflection gives a quadratic twist, the quadratic large sieve and a Heath-Brown recursion give square-root cancellation on average (A04 = Q eq:raw-moment), from which the zero-free half-plane follows.",
+ "item_type": "F5 (change of representation)",
+ "lean_status": "formalized, different route",
+ "lean_status_why": "The device is in Lean and load-bearing for all three 7/8 comparators: sextic row twists (rowTwist), the Mobius-to-cubic-Gauss conversion (moebius_mixed_gauss_conversion, breveGamma1_gamma2_eq_neg_alpha_G, mobius_second_gauss_restore) and the proved mean square RawMoment (raw_reference_moment, sub-cone ~10.2k of the 18.6k-declaration zeta cone, about 55%). But the Lean follows the Q Part II probe route and appears to skip the 11/12 bootstrap, and manuscript A's direct route (A03 -> A04 -> A05 p^6 replication -> Littlewood) is not the comparator route: its replication step exists only off-cone, with exponent 23/24.",
+ "lean_gaps": [
+  "Route: the Lean 7/8 proof enters at beta > 7/8 with HighData hypotheses beta >= 51/100 and appears to bypass Q's Part I (11/12) bootstrap (text level, moderate confidence; carried over from family.json).",
+  "Manuscript A's version of the device (A03 family A_u(D), A04 mean square, A05 replication) is not the comparator route. OAI.PowerExtraction.from_mean_square_and_prime_rows (GaussSum/SexticNormalization.lean:567) is A05 in numeric form but yields 23/24 and lies in no comparator cone.",
+  "The frequency-transport form moebius_gauss_frequency_conversion (CubicTrace.lean:574) and moebius_star_canonicalNormalizedGauss are in no comparator cone; the cone reaches the identity through MixedGaussConversion.moebius_mixed_gauss_conversion and FirstCauchyArithmetic.active_productGauss_eq_mobius_converted.",
+  "The Siegel comparator (2,616 decls, ~26k decl-lines) contains no device declaration; it is an independent determinant proof (family candidate C6, graded N2).",
+  "HeckeSevenEighths defines its own L-function (theta-product WeakFEPair over CyclotomicField 3 Q); the lemmas tying it to the Euler product (LFunction_eq_ideal_tsum etc.) are outside the comparator.",
+  "Trust surface (from family.json): PrimeNumberTheoremAnd is patched with OpenAI-written Hadamard files; RellichKondrachov import; no nanoda replay; 0 sorry/axiom by text grep.",
+  "Comparator status: pending per the environment note (orchestrator). I ran no lake/lean/comparator; cones are text-level from scripts/extract_lean.py 003 (output in my scratchpad) plus my BFS: zeta 18,626 decls / ~253,878 decl-lines / 2,683 files."
+ ],
+ "comparator_chain": [
+  "OAI.riemannZeta_ne_zero_of_seven_eighths_lt_re",
+  "OAI.SevenEighths.ProbeFinalAssemblyUnconditional.zeta_nonzero",
+  "OAI.SevenEighths.ProbeFinalAssemblyCertifiedBands.zeta_of_certified",
+  "OAI.SevenEighths.ProbeFinalAssemblyCertifiedBands.chosen_moments_of_certified",
+  "OAI.SevenEighths.ProbeFinalAssemblyCertifiedBands.fine_moments_of_certified",
+  "OAI.SevenEighths.ProbeFinalAssemblyCertifiedBands.source_moments",
+  "OAI.SevenEighths.ProbeDetectorInverseFields.source_batch_inverse_fields",
+  "OAI.SevenEighths.ProbeDetectorInverseRawField.source_batch_inverse_raw",
+  "OAI.SevenEighths.ProbeDetectorInverseRawField.fixed_raw_profiles",
+  "OAI.SevenEighths.DetectorDictionaryInverseRawReference.raw_reference_moment",
+  "OAI.SevenEighths.DetectorDictionaryInverseRawReference.raw_reference_large",
+  "OAI.SevenEighths.DetectorDictionaryInverseRawInputBound.raw_input_bound",
+  "OAI.SevenEighths.InverseInitialTotalEnergy.original_input_bound",
+  "OAI.SevenEighths.InverseInitialPhysicalLimit.original_input_zero_nonzero",
+  "OAI.SevenEighths.InverseInitialRayAttachment.initial_input_physical",
+  "OAI.SevenEighths.InverseInitialRayAttachment.normalized_overlap_mode",
+  "OAI.SevenEighths.InverseInitialRayAttachment.initial_pair_rays",
+  "OAI.SecondPassArithmetic.second_gauss_ray_expansion",
+  "OAI.SecondPassArithmetic.mobius_second_gauss_restore",
+  "OAI.FirstCauchyArithmetic.active_productGauss_eq_mobius_converted",
+  "OAI.MixedGaussConversion.moebius_mixed_gauss_conversion",
+  "OAI.MixedGaussConversion.neg_localGauss_eq_converted",
+  "OAI.MixedGaussConversion.local_sign_conversion",
+  "OAI.ActualEisensteinCubic.first_poisson_prime_sign_pairing",
+  "OAI.ActualEisensteinCubic.breveGamma1_gamma2_eq_neg_alpha_G"
+ ],
+ "comparator_chain_branches": {
+  "raw_moment_definition": [
+   "OAI.riemannZeta_ne_zero_of_seven_eighths_lt_re",
+   "OAI.SevenEighths.ProbeFinalAssemblyUnconditional.zeta_nonzero",
+   "OAI.SevenEighths.ProbeFinalAssemblyCertifiedBands.zeta_of_certified",
+   "OAI.SevenEighths.ProbeFinalAssembly.zeta_of_chosen_moments",
+   "OAI.SevenEighths.ProbeFinalAssembly.ChosenMomentInput",
+   "OAI.SevenEighths.ProbeFinalAssembly.CountParameters",
+   "OAI.SevenEighths.HeckeDetectorRawFiber.Moments",
+   "OAI.SevenEighths.HeckeInverseAmplification.RawMoment"
+  ],
+  "sextic_row_twist": [
+   "OAI.riemannZeta_ne_zero_of_seven_eighths_lt_re",
+   "OAI.SevenEighths.ProbeFinalAssemblyUnconditional.zeta_nonzero",
+   "OAI.SevenEighths.ProbeFinalAssemblyCertifiedBands.zeta_of_certified",
+   "OAI.SevenEighths.ProbeFinalAssemblyCertifiedBands.DetectorCertifiedBands",
+   "OAI.SevenEighths.CenteredMomentEnergyCappedWidthInduction.CertifiedBand",
+   "OAI.SevenEighths.CenteredMomentEnergyBands.PositiveAt",
+   "OAI.SevenEighths.CenteredMomentEnergyState.NaturalState",
+   "OAI.SevenEighths.CenteredExceptionalProfile.FixedInducingRow",
+   "OAI.CanonicalRowCompletion.rowTwist"
+  ],
+  "hecke_target_to_conversion": [
+   "OAI.SevenEighths.HeckeFamily.LFunction_ne_zero_of_seven_eighths_lt_re",
+   "OAI.SevenEighths.HeckeFamily.LFunction_ne_zero_of_certified_bands",
+   "OAI.SevenEighths.ProbeFinalAssemblyCertifiedBands.chosen_moments_of_certified",
+   "OAI.SevenEighths.ProbeFinalAssemblyCertifiedBands.fine_moments_of_certified",
+   "OAI.SevenEighths.ProbeFinalAssemblyCertifiedBands.source_moments",
+   "OAI.SevenEighths.ProbeDetectorInverseFields.source_batch_inverse_fields",
+   "OAI.SevenEighths.ProbeDetectorInverseRawField.source_batch_inverse_raw",
+   "OAI.SevenEighths.ProbeDetectorInverseRawField.fixed_raw_profiles",
+   "OAI.SevenEighths.DetectorDictionaryInverseRawReference.raw_reference_moment",
+   "OAI.SevenEighths.DetectorDictionaryInverseRawReference.raw_reference_large",
+   "OAI.SevenEighths.DetectorDictionaryInverseRawInputBound.raw_input_bound",
+   "OAI.SevenEighths.InverseInitialTotalEnergy.original_input_bound",
+   "OAI.SevenEighths.InverseInitialPhysicalLimit.original_input_zero_nonzero",
+   "OAI.SevenEighths.InverseInitialRayAttachment.initial_input_physical",
+   "OAI.SevenEighths.InverseInitialRayAttachment.normalized_overlap_mode",
+   "OAI.SevenEighths.InverseInitialRayAttachment.initial_pair_rays",
+   "OAI.SecondPassArithmetic.second_gauss_ray_expansion",
+   "OAI.SecondPassArithmetic.mobius_second_gauss_restore",
+   "OAI.FirstCauchyArithmetic.active_productGauss_eq_mobius_converted",
+   "OAI.MixedGaussConversion.moebius_mixed_gauss_conversion"
+  ],
+  "note": "Shortest paths in the text-level DAG. Comparators: lean/ComparatorChallenges/{QuasiRiemannHypothesis, DirichletSevenEighths, HeckeSevenEighths, SiegelZeros}.json; the first three share solution modules OAI.NumberTheory.DirichletL.Nonvanishing / Hecke.Nonvanishing."
+ },
+ "lean_source": [
+  {
+   "name": "OAI.DirichletCharacter.LFunction_ne_zero_of_seven_eighths_lt_re",
+   "kind": "theorem",
+   "file": "lean/OAI/NumberTheory/DirichletL/Nonvanishing.lean",
+   "line": 19,
+   "text": "/-- Dirichlet L-functions do not vanish to the right of `7 / 8`, away from the\nprincipal character's pole at `1`. -/\ntheorem LFunction_ne_zero_of_seven_eighths_lt_re\n    {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) {s : ℂ}\n    (hs : (7 / 8 : ℝ) < s.re) (hpole : ¬ (χ = 1 ∧ s = 1)) :\n    _root_.DirichletCharacter.LFunction χ s ≠ 0",
+   "note": "Comparator target (DirichletSevenEighths); proved by SevenEighths.ProbeFinalAssemblyUnconditional.dirichlet_nonzero."
+  },
+  {
+   "name": "OAI.riemannZeta_ne_zero_of_seven_eighths_lt_re",
+   "kind": "theorem",
+   "file": "lean/OAI/NumberTheory/DirichletL/Nonvanishing.lean",
+   "line": 29,
+   "text": "/-- The Riemann zeta function does not vanish to the right of `7 / 8`. -/\ntheorem riemannZeta_ne_zero_of_seven_eighths_lt_re\n    {s : ℂ} (hs : (7 / 8 : ℝ) < s.re) : riemannZeta s ≠ 0",
+   "note": "Comparator target (QuasiRiemannHypothesis). Text-level cone: 18,626 decls / ~253,878 decl-lines / 2,683 files."
+  },
+  {
+   "name": "OAI.ActualEisensteinCubic.canonicalSextic",
+   "kind": "def",
+   "file": "lean/OAI/NumberTheory/DirichletL/Arithmetic/EisensteinEmbedding.lean",
+   "line": 461,
+   "text": "noncomputable def canonicalSextic (P : Ideal O) [P.IsMaximal]\n    (hgood : lambda ∉ P) : MulChar (O ⧸ P) ℂ :=\n  (sexticChar P hgood).ringHomComp ConcreteTraceCRT.eisEmbedding",
+   "note": "The sextic residue symbol at a good prime of Z[omega], valued in C."
+  },
+  {
+   "name": "OAI.CanonicalRowCompletion.rowTwist",
+   "kind": "def",
+   "file": "lean/OAI/NumberTheory/DirichletL/Eisenstein/CompactEnergyFamilies.lean",
+   "line": 486,
+   "text": "def rowTwist (Ψ : ActualEisensteinCubic.O →* ℂ) (m f z : ActualEisensteinCubic.O) : ActualEisensteinCubic.O →* ℂ :=\n  Ψ * (idealRowHom (m^6*f^4*z)).toMonoidHom.comp principalIdealHom.toMonoidHom",
+   "note": "C1 family: the Hecke character Psi twisted by the sextic symbol of m^6 f^4 z (the A03 / Q16 sextic-twisted family). In the zeta cone."
+  },
+  {
+   "name": "OAI.SevenEighths.HeckeDyadic.coefficient",
+   "kind": "def",
+   "file": "lean/OAI/NumberTheory/DirichletL/Hecke/Dyadic.lean",
+   "line": 22,
+   "text": "def coefficient (χ : Character) (inverse : Bool) (I : Ideal O) : ℂ :=\n  if inverse then (UniqueFactorizationMonoid.moebius I : ℂ)*idealCoeff χ I else idealCoeff χ I",
+   "note": "inverse = true gives the Mobius coefficients mu(I) chi(I) of 1/L."
+  },
+  {
+   "name": "OAI.SevenEighths.HeckeDyadic.polynomial",
+   "kind": "def",
+   "file": "lean/OAI/NumberTheory/DirichletL/Hecke/Dyadic.lean",
+   "line": 48,
+   "text": "def polynomial (χ : Character) (inverse : Bool) (W : ℝ → ℂ) (D σ ω : ℝ) : ℂ :=\n  (D : ℂ)^(-(1/2 : ℂ)) * ∑' I : NonzeroIdeal, summand χ inverse W D σ ω I",
+   "note": "Smoothed dyadic Dirichlet polynomial; with inverse = true it is the Mobius sum of A03."
+  },
+  {
+   "name": "OAI.SevenEighths.HeckeInverseAmplification.RawMoment",
+   "kind": "def",
+   "file": "lean/OAI/NumberTheory/DirichletL/Hecke/InverseAmplificationRaw.lean",
+   "line": 11,
+   "text": "def RawMoment (data : RowData) (W : ℝ→ℂ) (c κ C : ℝ) : Prop :=\n  ∀ H D : ℝ, 1≤H → 0<D → D^(1+c)≤H →\n    ∀ rows : Finset NonzeroElement,\n      (∀ v∈rows, ((Ideal.span {v.val}).absNorm : ℝ)≤H) →\n      ∑ v∈rows, ‖polynomial (data.character v) true W D 0 0‖^2≤\n        C*H*(H*max 1 D)^κ",
+   "note": "C1 conclusion in Lean form: mean square over sextic-twisted rows v of the Mobius polynomial is <= C H (H max 1 D)^kappa (the A04 / eq:raw-moment estimate). In the zeta cone."
+  },
+  {
+   "name": "OAI.SevenEighths.DetectorDictionaryInverseRawReference.raw_reference_moment",
+   "kind": "theorem",
+   "file": "lean/OAI/NumberTheory/DirichletL/Dictionary/InverseRawReference.lean",
+   "line": 132,
+   "text": "theorem raw_reference_moment (W:𝓢(ℝ,ℂ))(a b c κ:ℝ)(ha:0<a)(hb:0<b)\n    (hs:Function.support W⊆Set.Icc a b)(hc:0<c)(hκ:0<κ):\n    ∃J:ℕ,∀data:RowData,∃C:ℝ,0<C ∧ ∀t:ℝ,\n      RawMoment data (childLogTest W t) c κ (C*(1+‖t‖)^(2*J))",
+   "note": "Proof of RawMoment for every row datum. Sub-cone 10,161 decls / ~127k decl-lines, about 55% of the zeta cone."
+  },
+  {
+   "name": "OAI.ActualEisensteinCubic.breveGamma1_gamma2_eq_neg_alpha_G",
+   "kind": "theorem",
+   "file": "lean/OAI/NumberTheory/DirichletL/GaussSum/SexticNormalization.lean",
+   "line": 173,
+   "text": "theorem breveGamma1_gamma2_eq_neg_alpha_G (P : Ideal O) [P.IsMaximal]\n    (hgood : lambda ∉ P) (hchar : ringChar (O ⧸ P) ≠ 2)\n    (p : O) (hP : P = Ideal.span {p}) (hp : p ≠ 0)\n    (hprimary : lambda ^ 2 ∣ p - 1) :\n    breveGamma1 P hgood p hP hp * breveGamma2 P hgood p hP hp =\n      (-(eisEmbedding p) / (‖eisEmbedding p‖ : ℂ)) *\n        breveLocalG P hgood p hP hp",
+   "note": "Local Hasse / Heath-Brown identity (gamma_2^3 = -alpha type) at a primary prime. In the zeta cone."
+  },
+  {
+   "name": "OAI.MixedGaussConversion.moebius_mixed_gauss_conversion",
+   "kind": "theorem",
+   "file": "lean/OAI/NumberTheory/DirichletL/GaussSum/MixedConversion.lean",
+   "line": 162,
+   "text": "theorem moebius_mixed_gauss_conversion {ι : Type*} [Fintype ι]\n    (p : ι → O) (hp : ∀ i, p i ≠ 0) [∀ i, (Ideal.span {p i}).IsMaximal]\n    (hcop : Pairwise (Function.onFun IsCoprime (fun i => Ideal.span {p i})))\n    (hgood : ∀ i, lambda ∉ Ideal.span {p i})\n    (hchar : ∀ i, ringChar (O ⧸ Ideal.span {p i}) ≠ 2)\n    (hprimary : ∀ i, lambda ^ 2 ∣ p i - 1) (inverse : ι → Bool) :\n    (UniqueFactorizationMonoid.moebius (Ideal.span {∏ i, p i}) : ℂ) *\n      canonicalProductGauss p hp hcop hgood (fun i => if inverse i then 5 else 1) =\n      (∏ i, ∏ k ∈ Finset.univ.erase i,\n        (canonicalSextic (Ideal.span {p i}) (hgood i) ^ (if inverse i then 5 else 1))\n          (Ideal.Quotient.mk (Ideal.span {p i}) (p k))) *\n        ∏ i, convertedLocal (p i) (hp i) (hgood i) (inverse i)",
+   "note": "C1 core: mu(prod p_i) times the product sextic Gauss sum equals cross residue symbols times converted local (cubic-Gauss-type) factors. In the zeta cone; sub-cone 213 decls / ~2,470 decl-lines."
+  },
+  {
+   "name": "OAI.SecondPassArithmetic.mobius_second_gauss_restore",
+   "kind": "theorem",
+   "file": "lean/OAI/NumberTheory/DirichletL/CubicSieve/FirstPassage.lean",
+   "line": 442,
+   "text": "theorem mobius_second_gauss_restore {ι : Type*} [DecidableEq ι]\n    (p : ι → O) (hp : ∀ i, p i ≠ 0) [∀ i, (Ideal.span {p i}).IsMaximal]\n    (hinj : Function.Injective (fun i => Ideal.span {p i}))\n    (hcop : Pairwise (Function.onFun IsCoprime (fun i => Ideal.span {p i})))\n    (hg : ∀ i, lambda ∉ Ideal.span {p i})\n    (hc : ∀ i, ringChar (O ⧸ Ideal.span {p i}) ≠ 2)\n    (hpr : ∀ i, lambda ^ 2 ∣ p i - 1) (S T : Finset ι) (hd : Disjoint S T)\n    (C₁ C₂ : Finset ι → ℂ) (e k : O) :\n    star (supportMobius (fun i => Ideal.span {p i}) S * C₁ S) *\n      (supportMobius (fun i => Ideal.span {p i}) T * C₂ T) *\n      activeGaussRowFactor p hp hinj hg T S e k =\n    quadraticCrossPhase p hg T S * star (secondColumnMinus p hp hcop hg C₁ e k S) *\n      secondColumnPlus p hp hcop hg C₂ e k T",
+   "note": "Use of the conversion inside the reflected moment: Mobius-weighted Gauss rows factor into a quadratic cross phase times column blocks (the step that lets the quadratic large sieve act). In the zeta cone."
+  },
+  {
+   "name": "OAI.GaussGeneratorTransport.moebius_gauss_frequency_conversion",
+   "kind": "theorem",
+   "file": "lean/OAI/NumberTheory/DirichletL/GaussSum/CubicTrace.lean",
+   "line": 574,
+   "text": "theorem moebius_gauss_frequency_conversion {ι : Type*} [Fintype ι]\n    (p : ι → O) (hp : ∀ i, p i ≠ 0)\n    [∀ i, (Ideal.span {p i}).IsMaximal]\n    (hcop : Pairwise (Function.onFun IsCoprime (fun i => Ideal.span {p i})))\n    (hgood : ∀ i, lambda ∉ Ideal.span {p i})\n    (hchar : ∀ i, ringChar (O ⧸ Ideal.span {p i}) ≠ 2)\n    (hprimary : ∀ i, lambda ^ 2 ∣ p i - 1) (h : O) :\n    (UniqueFactorizationMonoid.moebius (Ideal.span {∏ i, p i}) : ℂ) *\n      (canonicalNormalizedGauss (fun i => Ideal.span {p i}) hcop hgood (fun _ => 1) *\n        star (finiteSexticRow (fun i => Ideal.span {p i}) hgood (fun _ => 1)\n          ((modulusUnit p : O) * h))) =\n      (star (canonicalProductG p hp hcop hgood))⁻¹ *\n        star (canonicalProductCoefficient p hp hcop hgood) *\n          star (finiteSexticRow (fun i => Ideal.span {p i}) hgood (fun _ => 1) h)",
+   "note": "Frequency-transport version of the conversion. NOT in any comparator cone (text-level)."
+  },
+  {
+   "name": "OAI.PowerExtraction.from_mean_square_and_prime_rows",
+   "kind": "theorem",
+   "file": "lean/OAI/NumberTheory/DirichletL/GaussSum/SexticNormalization.lean",
+   "line": 567,
+   "text": "theorem from_mean_square_and_prime_rows\n    (D ε J A : ℝ) (hD : 1 ≤ D) (hε : 0 ≤ ε)\n    (hA : 0 ≤ A)\n    (hJ : D ^ ((11 / 60 : ℝ) - ε) ≤ J)\n    (hmean : J * A ^ 2 ≤\n      2 * D ^ ((21 / 10 : ℝ) + ε) +\n      2 * J * D ^ (49 / 30 : ℝ)) :\n    A ≤ 2 * D ^ ((23 / 24 : ℝ) + ε)",
+   "note": "Manuscript A's p^6-replication step (A05) in numeric form (gives 23/24, not 11/12). NOT in any comparator cone: A's direct route is not the Lean route."
+  }
+ ],
+ "lean_library_arms_common": {
+  "device_declarations_with_item_arm": [
+   "OAI.ActualEisensteinCubic.canonicalSextic (Arithmetic/EisensteinEmbedding.lean:461) and sexticChar",
+   "OAI.CanonicalRowCompletion.idealRowHom, rowTwist (Eisenstein/CompactEnergyFamilies.lean:484-487)",
+   "OAI.ActualEisensteinCubic.breveGamma1_gamma2_relation, breveGamma1_gamma2_eq_neg_alpha_G (GaussSum/SexticNormalization.lean:51,173)",
+   "OAI.MixedGaussConversion.* (GaussSum/MixedConversion.lean: localGauss, convertedLocal, local_sign_conversion, moebius_mixed_gauss_conversion, pair_moebius_eq_active)",
+   "OAI.GaussGeneratorTransport.moebius_star_canonicalNormalizedGauss, moebius_gauss_frequency_conversion (GaussSum/CubicTrace.lean:556,574)",
+   "OAI.SecondPassArithmetic.mobius_second_gauss_restore (CubicSieve/FirstPassage.lean:442) and FirstCauchyArithmetic.active_productGauss_eq_mobius_converted",
+   "OAI.SevenEighths.HeckeDyadic.coefficient / polynomial with inverse = true (Hecke/Dyadic.lean:22,48)",
+   "OAI.SevenEighths.HeckeInverseAmplification.RawMoment (+ RawMoment.scaleEnergy) (Hecke/InverseAmplificationRaw.lean)",
+   "OAI.SevenEighths.DetectorDictionaryInverseRawReference.raw_reference_moment (Dictionary/InverseRawReference.lean:132)"
+  ],
+  "classical_transfer_kept_in_both_arms": [
+   "Eisenstein/* (Kubota-Patterson cubic theta from hyperbolic 3-space spectral theory; re-proved classical input = transfer, keep in both arms)",
+   "QuadraticSieve/* (Heath-Brown / Goldmakher-Louvel quadratic large sieve; classical, keep)",
+   "Reciprocity/*, Arithmetic/* minus the sextic-row items above, Poisson/*, Mellin/*, Fourier/* (classical infrastructure, keep)"
+  ],
+  "theorem_declarations_removed_unless_a_third_arm_tests_theorem_reuse": [
+   "OAI.riemannZeta_ne_zero_of_seven_eighths_lt_re, OAI.DirichletCharacter.LFunction_ne_zero_of_seven_eighths_lt_re (Nonvanishing.lean)",
+   "OAI.SevenEighths.HeckeFamily.LFunction_ne_zero_of_seven_eighths_lt_re and siblings (Hecke/Nonvanishing.lean)",
+   "OAI.SevenEighths.ProbeFinalAssemblyUnconditional.*, ProbeFinalAssemblyCertifiedBands.*, Detector/FinalAssembly*.lean, HeckeCommonProbe.*",
+   "OAI.SiegelZeros.* (independent proof of a corollary)"
+  ],
+  "note": "Three arms are recommended wherever the 7/8 theorem itself could help: (A) without device and without theorem, (B) with device, without theorem, (C) with theorem (to separate corollary-level reuse from device reuse). Only B vs A measures the device."
+ },
+ "speedup_targets": [
+  {
+   "id": "S1",
+   "title": "Patterson's first moment of cubic Gauss sums over primary Eisenstein primes (release family 023, formalized)",
+   "statement": "sum over primary Eisenstein primes p with N p <= X of g~(p) = (6/5) c_* X^{5/6}/log X + o(X^{5/6}/log X), c_* = (2 pi)^{2/3}/(3 Gamma(2/3)); plus angular comparison and cancellation in every nonzero angular mode.",
+   "lean_statement": "OAI.CubicFirstMoment.FirstMomentStatement ∧ OAI.CubicFirstMoment.AngularComparisonStatement ∧ OAI.CubicFirstMoment.AngularCancellationStatement   -- definitions verbatim in lean/ComparatorChallenges/PattersonFirstMoment.lean",
+   "reference": "Patterson 1978 (conjecture); Heath-Brown-Patterson 1979; Heath-Brown 2000; Dunn-Radziwill, Ann. of Math. 200 (2024), conditional on GRH; release family 023 'An unconditional first moment for cubic Gauss sums' (2026-09-25), unconditional, with Lean.",
+   "status": "proved conditionally (DR 2024) and, per the release, unconditionally (023, Lean comparator PattersonFirstMoment; result of a comparator run not recorded in data/lean_checks.json).",
+   "current_proof_size": "DR: about 90 pages (Annals pp. 967-1057). 023 Lean: text-level cone 11,245 decls / ~181k decl-lines; OAI/NumberTheory/CubicMoment is 3,549 files / 295,629 lines; it imports only 9 DirichletL declarations (DirichletL.CubicDyadicDecay) and none of the device.",
+   "how_item_helps": "023 handles the prime sum with classical zero-free regions plus Type I/II bounds. The device supplies exactly the Mobius-weighted (Type I with mu) cubic/sextic Gauss-sum averages with square-root cancellation on average (RawMoment), and the local identity breveGamma1_gamma2_eq_neg_alpha_G links sextic Gauss sums at primes to Hecke characters. A prover with the device should need far less of 023's dispersion machinery. The third arm (7/8 Hecke theorem available) tests theorem-level reuse: a zero-free half-plane for cubic Hecke L-functions is the kind of input DR needed GRH for.",
+   "with_item_arm": "Mathlib + OAI/NumberTheory/CubicGram + DirichletL device declarations + classical transfer files; CubicMoment removed entirely; theorem declarations removed.",
+   "without_item_arm": "Same minus the device declarations (keep cubic theta, Poisson, quadratic sieve).",
+   "baseline_formal_proof": "023: 11,245 decls / ~181k decl-lines in the comparator cone (text-level).",
+   "expected_speedup": "med",
+   "confidence": "low-medium (the device is about Mobius-weighted sums; Patterson's sum is over primes, so a Vaughan/Heath-Brown identity step is still needed)",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Comparator definitions (Eisenstein subalgebra of C, cubicSymbolAtPrime, gaussAtPrime, cStar, primeCutoffSum) over Mathlib.",
+    "missing": [],
+    "formal_proof_to_compare": "Yes: OAI 023 (CubicMoment), ~181k decl-lines in cone."
+   }
+  },
+  {
+   "id": "S2",
+   "title": "Heath-Brown 1986: one of 2, 3, 5 is a primitive root modulo infinitely many primes",
+   "statement": "At least one of a = 2, 3, 5 is a primitive root mod p for infinitely many primes p.",
+   "lean_statement": "theorem heathBrown_artin : ∃ a ∈ ({2, 3, 5} : Finset ℕ), Set.Infinite {p : ℕ | p.Prime ∧ orderOf (a : ZMod p) = p - 1}",
+   "reference": "Heath-Brown, Quart. J. Math. Oxford (2) 37 (1986) 27-38 (search summary); release family 029 claims every admissible base by a route that reuses the device.",
+   "status": "true (human).",
+   "current_proof_size": "about 12 pages on top of Chen / Fouvry-Iwaniec sieve input. No formalization known.",
+   "how_item_helps": "029's route: a common zero-free strip for Hecke L-functions over cyclotomic F containing mu_12 (built with sextic Kummer twists and cubic theta, i.e. the device ported from Q(sqrt-3) to F) gives a power-saving count of primes splitting in Kummer fields, which removes index divisors. With the device in L, a prover could aim at the strictly stronger single-base statement; the sieve route is the comparison arm.",
+   "with_item_arm": "Mathlib + DirichletL device declarations + classical transfer; theorem declarations removed (the Q(sqrt-3) theorem does not cover cyclotomic F anyway).",
+   "without_item_arm": "Same minus device declarations.",
+   "baseline_formal_proof": "none",
+   "expected_speedup": "low",
+   "confidence": "low (porting the device to cyclotomic F needs Kazhdan-Patterson theta over F, which OAI does not have)",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib Nat.Prime, ZMod, orderOf, Set.Infinite.",
+    "missing": [
+     "proof only: Hecke L-functions over cyclotomic fields with continuation, Kummer-field Chebotarev counting (major library)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "S3",
+   "title": "Positive proportion of nonvanishing central values for cubic Hecke L-functions over Q(omega)",
+   "statement": "A positive proportion of L(1/2, chi) are nonzero as chi runs over primitive cubic Hecke characters of Q(omega) ordered by conductor.",
+   "lean_statement": "liminf_{X→∞} #{χ ∈ cubicFamily X | OAI.SevenEighths.HeckeFamily.LFunction χ (1/2) ≠ 0} / #(cubicFamily X) > 0   -- cubicFamily X : Finset of HeckeFamily.Character with cubic residue and modulus norm ≤ X (new)",
+   "reference": "David, de Faveri, Dunn, Stucky, 'Non-vanishing for cubic Hecke L-functions', arXiv 2410.03048 (abstract via the novelty pass's search).",
+   "status": "true per DFDS (2024 preprint; not read).",
+   "current_proof_size": "long preprint; no formalization.",
+   "how_item_helps": "Mollified moments over a cubic family need Mobius-weighted sums twisted by cubic characters; the device converts Mobius x sextic Gauss sums to theta coefficients with square-root cancellation on average.",
+   "with_item_arm": "Mathlib + HeckeFamily comparator definitions (continuation) + device declarations + Eisenstein theta; theorem declarations removed.",
+   "without_item_arm": "Same minus device declarations.",
+   "baseline_formal_proof": "none",
+   "expected_speedup": "low",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "HeckeSevenEighths comparator definitions (HeckeFamily.Character, LFunction via theta-product WeakFEPair) give L(1/2, chi) for every finite-order Hecke character of Q(sqrt-3).",
+    "missing": [
+     "cubic, primitive, conductor-ordered family as a Finset (~80-150 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "S4",
+   "title": "Mean square of quadratic twists of the Mobius function (quadratic analogue)",
+   "statement": "Bound for sum over squarefree d <= D of |sum_{n <= N} mu(n) (d/n)|^2 (Gao-Zhao; exact exponents not verified, snippet only).",
+   "lean_statement": "∃ C, ∀ D N ≥ 1, ∑ d ∈ (Finset.Icc 1 D).filter Squarefree, ‖∑ n ∈ Finset.Icc 1 N, (ArithmeticFunction.moebius n : ℝ) * jacobiSym d n‖ ^ 2 ≤ C * (bound D N)   -- bound as in Gao-Zhao",
+   "reference": "Gao-Zhao, arXiv 2212.09241 (via the novelty pass).",
+   "status": "true per Gao-Zhao.",
+   "current_proof_size": "short paper; no formalization.",
+   "how_item_helps": "Same skeleton (family + Poisson in the twist + large sieve + recursion), but quadratic Gauss sums are trivial, so the automorphic dual that makes the device work is absent. Expected to measure whether the shared skeleton alone helps.",
+   "with_item_arm": "Mathlib + device declarations + QuadraticSieve.",
+   "without_item_arm": "Mathlib + QuadraticSieve.",
+   "baseline_formal_proof": "none",
+   "expected_speedup": "low",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib ArithmeticFunction.moebius, jacobiSym, Squarefree.",
+    "missing": [
+     "exact Gao-Zhao bound (not read)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "open_problems": [
+  {
+   "id": "O1",
+   "title": "Artin's primitive root conjecture (infinitude) for base 2",
+   "statement": "2 is a primitive root modulo infinitely many primes.",
+   "lean_statement": "theorem artin_two : Set.Infinite {p : ℕ | p.Prime ∧ orderOf (2 : ZMod p) = p - 1}",
+   "reference": "Artin 1927; Hooley 1967 (under GRH); Heath-Brown 1986; release family 029 (2026-10-04) claims all admissible bases via the device.",
+   "url": "https://en.wikipedia.org/wiki/Artin%27s_conjecture_on_primitive_roots",
+   "status": "open in the human literature; claimed by 029 (unreviewed, not formalized).",
+   "obstruction_match": "direct: 029's analytic engine is the device ported to cyclotomic F containing mu_12 (sextic Kummer twists, cubic theta via Kazhdan-Patterson, quadratic large sieve after reflection; 029 intro lines 97-130).",
+   "adaptation": "Formalize 029's Theorem 1.1 (zero-free Re s > 1 - 10^-6 for finite-order Hecke L over cyclotomic F containing mu_12) by porting OAI DirichletL from Q(sqrt-3) to F, then the Hooley-type sieve.",
+   "payoff": "very high (a classical open problem; also certifies 029)",
+   "confidence": "medium (029's claim) / low (that a prover finishes it)",
+   "difficulty": "very hard",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib ZMod, orderOf, Nat.Prime, Set.Infinite",
+    "missing": [
+     "proof: Hecke L over cyclotomic fields, Kummer theory counting (major library)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O2",
+   "title": "029's Hecke zero-free strip, tested on a Dedekind zeta function not covered by family 003",
+   "statement": "zeta_K has no zeros in Re s > 1 - 10^-6 (s != 1) for K = Q(zeta_12, 2^{1/4}). K/Q(zeta_12) is cyclic Kummer of degree 4 (covered by 029), while K/Q(sqrt-3) is non-abelian (i is not in Q(sqrt-3)), so zeta_K is not a product of Hecke L-functions of Q(sqrt-3) and is not a corollary of 003 (my reasoning).",
+   "lean_statement": "-- K : the splitting field of X^4 - 2 over CyclotomicField 12 ℚ, with a NumberField instance\ntheorem dedekindZeta_K_zero_free : ∃ f : ℂ → ℂ, DifferentiableOn ℂ f {s | (1 - 1/10^6 : ℝ) < s.re ∧ s ≠ 1} ∧ (∀ s : ℂ, 1 < s.re → f s = NumberField.dedekindZeta K s) ∧ ∀ s : ℂ, (1 - 1/10^6 : ℝ) < s.re → s ≠ 1 → f s ≠ 0",
+   "reference": "Release family 029, Theorem thm:hecke-zero-free (01-introduction.tex:38-45).",
+   "url": "https://github.com/openai/math (preprints/Primitive-roots-for-every-admissible-integer-base-October-4-2026)",
+   "status": "claimed by 029 (unreviewed, unformalized); open in the human literature beyond classical log-width regions.",
+   "obstruction_match": "direct (same device over a larger base field).",
+   "adaptation": "Port DirichletL's sextic-row and Gauss-conversion files to F = Q(zeta_12) (029 chooses generators with no supplementary sextic reciprocity factor).",
+   "payoff": "high",
+   "confidence": "medium",
+   "difficulty": "hard",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib NumberField.dedekindZeta (an LSeries; it is a junk tsum off its half-plane of convergence, so the statement must be phrased through an analytic continuation f as above), CyclotomicField, Polynomial.SplittingField.",
+    "missing": [
+     "NumberField instance for the splitting field over CyclotomicField 12 ℚ (~30-60 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O3",
+   "title": "Quasi-RH for Dedekind zeta functions beyond abelian base fields (S5 quintic field)",
+   "statement": "zeta_K for K = Q(alpha), alpha^5 - alpha - 1 = 0 (Galois group S5), has no zeros in Re s > 1 - delta for some absolute delta > 0.",
+   "lean_statement": "same existential-continuation form as O2 with K = AdjoinRoot (X^5 - X - 1 : ℚ[X]) and an unspecified ∃ δ > 0",
+   "reference": "Classical: only log-width regions (Stark 1974 type). My reasoning: 029's strip plus base change already covers every finite-order Hecke L-function over abelian number fields (base change to Q(mu_lcm(m,12)) factors into entire Hecke L-functions), so the first case beyond both releases is a non-solvable Galois closure.",
+   "url": "https://github.com/openai/math",
+   "status": "open",
+   "obstruction_match": "partial: the device needs a cubic theta over a field containing mu_3 and explicit sextic reciprocity; Artin L-functions of S5 representations are not monomial over such fields.",
+   "adaptation": "Brauer induction expresses zeta_K/zeta through Hecke L over non-abelian subfields; one would need the device over those fields (Kazhdan-Patterson theta exists over any field containing mu_3, so base change to K(mu_12) is the natural attempt).",
+   "payoff": "high",
+   "confidence": "low",
+   "difficulty": "very hard",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib dedekindZeta, AdjoinRoot, NumberField",
+    "missing": [
+     "irreducibility of X^5-X-1 and NumberField instance (~40-80 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O4",
+   "title": "Lower the half-plane: zeta(s) != 0 for Re s > 5/6",
+   "statement": "riemannZeta s ≠ 0 for 5/6 < Re s.",
+   "lean_statement": "theorem riemannZeta_ne_zero_of_five_sixths_lt_re {s : ℂ} (hs : (5 / 6 : ℝ) < s.re) : riemannZeta s ≠ 0",
+   "reference": "Q (7/8), A (11/12).",
+   "url": "https://github.com/openai/math",
+   "status": "open",
+   "obstruction_match": "direct: the exponent is set by the device's numerology (Y = H^{1/6} in A; the compensated probe C3 in Q).",
+   "adaptation": "Higher moments of the sextic-twisted Mobius family, or an n-th order analogue with explicit theta coefficients.",
+   "payoff": "very high",
+   "confidence": "low",
+   "difficulty": "very hard",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib riemannZeta",
+    "missing": [],
+    "formal_proof_to_compare": "OAI 7/8 cone, 18,626 decls / ~254k decl-lines"
+   }
+  },
+  {
+   "id": "O5",
+   "title": "Patterson's first moment with a power-saving error term",
+   "statement": "There is delta > 0 such that the error in 023's first-moment asymptotic is O(X^{5/6 - delta}).",
+   "lean_statement": "∃ δ > 0, (fun X : ℝ => OAI.CubicFirstMoment.primeCutoffSum OAI.CubicFirstMoment.gaussAtPrime X - ((((6 / 5 : ℝ) * OAI.CubicFirstMoment.cStar * OAI.CubicFirstMoment.firstMomentScale X : ℝ)) : ℂ)) =O[Filter.atTop] (fun X : ℝ => X ^ ((5 / 6 : ℝ) - δ))",
+   "reference": "DR 2024 (GRH); 023 (o(.) unconditionally).",
+   "url": "https://annals.math.princeton.edu/2024/200-3/p03",
+   "status": "open as far as I found (023 states o(X^{5/6}/log X)).",
+   "obstruction_match": "direct: the 7/8 strip for cubic Hecke L-functions over Q(sqrt-3) (theorem) plus the device's Mobius-Gauss mean square.",
+   "adaptation": "Rerun 023's prime-sum analysis with the 7/8 Hecke strip (theorem arm) and RawMoment (device arm).",
+   "payoff": "medium-high",
+   "confidence": "low-medium",
+   "difficulty": "moderate-hard",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "PattersonFirstMoment comparator definitions",
+    "missing": [],
+    "formal_proof_to_compare": "023 (o(.) version), ~181k decl-lines"
+   }
+  },
+  {
+   "id": "O6",
+   "title": "Zero-density for zeta in 3/4 <= sigma <= 7/8 beyond Guth-Maynard",
+   "statement": "N(sigma, T) << T^{A(1-sigma)+eps} with A < 30/13 near sigma = 3/4 (Guth-Maynard 2024 give 30/13).",
+   "lean_statement": "∃ A < (30 : ℝ) / 13, ∀ ε > 0, ∃ C, ∀ σ ∈ Set.Icc (3/4 : ℝ) (7/8), ∀ T ≥ 2, riemannZeta.N' σ T ≤ C * T ^ (A * (1 - σ) + ε)",
+   "reference": "Guth-Maynard 2024 (cited as background in Q).",
+   "url": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd (riemannZeta.N', IEANTN/ZetaDefinitions.lean:146)",
+   "status": "open",
+   "obstruction_match": "weak: the device gives mean squares of Mobius families twisted by sextic symbols, not large-value estimates for zeta's Dirichlet polynomials.",
+   "adaptation": "Use the sextic family as an amplifier for large values of mollified zeta polynomials.",
+   "payoff": "high",
+   "confidence": "low",
+   "difficulty": "very hard",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "PrimeNumberTheoremAnd riemannZeta.N' (a pinned dependency of the OAI lake manifest)",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "Siegel comparator: (1 - beta) log q >= (log 3)/8 for real zeros beta of real primitive chi (trivial from beta <= 7/8, q >= 3). Lean: statable now; the OAI proof is independent (2,616 decls).",
+  "Littlewood: M(x) = sum_{n<=x} mu(n) << x^{7/8+eps}. Lean: statable now, e.g. ∀ ε > 0, (fun x : ℝ => ∑ n ∈ Finset.Icc 1 ⌊x⌋₊, (ArithmeticFunction.moebius n : ℝ)) =O[atTop] (fun x => x ^ ((7/8 : ℝ) + ε)); proof needs Perron (PNT+ PerronFormula.lean).",
+  "PNT with error x^{7/8+eps}, and in arithmetic progressions for fixed q (A states x^{11/12} log x). Lean: statable now with ArithmeticFunction.vonMangoldt sums.",
+  "Linnik-type least prime in progressions with an explicit exponent; Vinogradov's least-nonresidue bound and the deterministic Miller test (Q:325-361); effective class numbers and Euler's 65 idoneal numbers (A:97-125). Lean: statable now (Nat.find on primes in progressions; legendreSym).",
+  "Dedekind zeta of Q(sqrt-3), Q(zeta_12) (products of Dirichlet L) and of the pure cubic field Q(2^{1/3}) (zeta * L(s, chi) with chi a cubic Hecke character of Q(sqrt-3)): zero-free for Re s > 7/8. Lean: statable with < 300 lines in the existential-continuation form of O2; proof needs the Artin/Hecke factorization (not in Mathlib).",
+  "Release families 142 (deterministic factorization over F_p) and 182 (intersective polynomial differences, prime arguments) consume the theorem; theorem-level reuse only. 142 has no Lean; 182's Lean does not import DirichletL (import scan of the OAI tree)."
+ ],
+ "release_reuse": {
+  "uses_of_device_in_release": "Family 029 (Primitive roots for every admissible integer base, 2026-10-04) reuses the device over every cyclotomic field F containing mu_12: cubic theta coefficients under sextic Kummer twists (Kazhdan-Patterson theta over F), sextic exponents 1 and -4 summing to 3 mod 6 so the reflected interaction is quadratic, quadratic large sieve (Goldmakher-Louvel), and a relative-norm formula identifying the cube of the cubic Gauss phase with minus a Hecke character value (029 01-introduction.tex:97-130). It cites Q Part I Sections 5-7. Not formalized (no lean/docs/029.md).",
+  "families_that_consume_the_theorem": [
+   "142 and 182 (theorem-level, per family.md).",
+   "My reasoning: 029's strip, by base change and factorization into entire Hecke L-functions, already covers every finite-order Hecke L-function over an abelian number field; see O3."
+  ],
+  "families_that_could_use_it": [
+   "023 (Patterson first moment; Lean): same toolbox (Patterson cubic theta, cubic large sieve); its Lean imports only DirichletL.CubicDyadicDecay (3 files) and none of the device. Natural speedup target S1.",
+   "'Equidistribution of primitive sextic torus packets' (2026-10-05) mentions sextic objects but is unrelated (torus orbits)."
+  ],
+  "lean_notes_2026_10_10": "Text-level only. Cones: zeta 18,626 / Dirichlet 18,625 / Hecke 18,606 decls (~254k decl-lines); Siegel 2,616 (~26k). Device sub-cones: raw_reference_moment 10,161 decls (~127k), moebius_mixed_gauss_conversion 213 (~2.5k), mobius_second_gauss_restore 321 (~4.0k)."
+ },
+ "negative_controls": [
+  {
+   "title": "Davenport-Heilbronn function (proved-false analogue)",
+   "statement": "f(s) = ((1 - i kappa)/2) L(s, chi) + ((1 + i kappa)/2) L(s, chi-bar), chi mod 5 with chi(2) = i, kappa = (sqrt(10 - 2 sqrt 5) - 2)/(sqrt 5 - 1) (about 0.284079), satisfies a Riemann-type functional equation but has infinitely many zeros in Re s > 1.",
+   "lean_statement": "theorem davenportHeilbronn_has_zero : ∃ χ : DirichletCharacter ℂ 5, χ 2 = Complex.I ∧ ∃ s : ℂ, 1 < s.re ∧ ((1 - Complex.I * κ) / 2) * DirichletCharacter.LFunction χ s + ((1 + Complex.I * κ) / 2) * DirichletCharacter.LFunction χ⁻¹ s = 0   -- κ : ℂ := ((Real.sqrt (10 - 2 * Real.sqrt 5) - 2) / (Real.sqrt 5 - 1) : ℝ)",
+   "why_device_must_fail": "No Euler product: 1/f has no multiplicative Mobius coefficients, so neither the Mobius family nor gamma_2^3 = mu alpha exists. A prover with the device must not prove 'f(s) != 0 for Re s > 7/8'.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib DirichletCharacter.LFunction, Real.sqrt",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Epstein zeta of x^2 + 5y^2 (class number 2) has zeros in Re s > 1",
+   "statement": "Davenport-Heilbronn 1936: the Epstein zeta function of a binary form of class number > 1 has infinitely many zeros with Re s > 1 (standard; not re-checked by web search in this session).",
+   "lean_statement": "∃ s : ℂ, 1 < s.re ∧ LSeries (fun n => (Nat.card {p : ℤ × ℤ // p.1 ^ 2 + 5 * p.2 ^ 2 = n} : ℂ)) s = 0",
+   "why_device_must_fail": "Same reason (no Euler product); also tests that the prover does not misuse genus-character decompositions.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib LSeries (inside the half-plane of convergence, so no continuation needed)",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Quasi-RH for a GL(2) L-function (Ramanujan Delta)",
+   "statement": "L(s, Delta) != 0 for Re s > 1 - delta (normalized), open.",
+   "why_device_must_fail": "The Mobius coefficients of 1/L(s, Delta) have no theta-coefficient dual; there is no sextic-Gauss identity for GL(2) coefficients. The device should give no help; this is a 'should not help' control, not a proved-false one.",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "Mathlib has modular forms but no continued L(s, Delta) with functional equation as of d13f23b (not checked exhaustively)",
+    "missing": [
+     "L-function of a cusp form with continuation (major)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "target": "S1: Patterson first moment (023 comparator), device vs no device vs theorem",
+   "lean_usable": true,
+   "argument": "Statable now (an existing release comparator) with a large formal baseline (023: 11,245-declaration cone, ~181k decl-lines) that uses none of the device. The three arms separate device reuse from theorem reuse. It is the closest released theorem that lives on the same objects (cubic Gauss sums = theta coefficients) yet was proved without the sextic-twist step, so any budget drop is attributable to the device."
+  },
+  {
+   "rank": 2,
+   "target": "O1: Artin for base 2",
+   "lean_usable": true,
+   "argument": "One-line Lean statement with Mathlib only. Family 029 claims it through a port of exactly this device, so it is the best evidence of reuse in the release, but the port needs Hecke L-functions over cyclotomic fields, which neither Mathlib nor OAI has. Expect a long-horizon target, useful as a 'device makes the impossible possible' probe rather than a budget comparison."
+  },
+  {
+   "rank": 3,
+   "target": "O2: zeta_K zero-free for K = Q(zeta_12, 2^{1/4}) at 1 - 10^-6",
+   "lean_usable": true,
+   "argument": "Statable with about 30-60 lines (NumberField instance) using an existential continuation, which avoids Mathlib's junk values of dedekindZeta. Covered by 029's device reuse and NOT a corollary of 003 (non-abelian over Q(sqrt-3)), so it isolates device reuse from theorem reuse."
+  },
+  {
+   "rank": 4,
+   "target": "O5: power-saving Patterson",
+   "lean_usable": true,
+   "argument": "Statable now from the 023 comparator definitions; the theorem (7/8 strip for cubic Hecke L over Q(sqrt-3)) and the device both plausibly help. Good for the three-arm design."
+  },
+  {
+   "rank": 5,
+   "target": "S2: Heath-Brown's 2/3/5 theorem",
+   "lean_usable": true,
+   "argument": "Statable now with Mathlib. Known, so it measures cost rather than novelty; the device route proves a stronger single-base statement, the sieve route is the control. No formal baseline."
+  }
+ ],
+ "precedent_check": {
+  "earlier_equivalent_found": false,
+  "verdict": "No earlier equivalent of the sextic-twist Mobius <-> cubic-theta duality found (snippet-level searches; consistent with the novelty pass). Closest: Dunn-Radziwill 2024 (same objects, prime sums, GRH-conditional dispersion; Heath-Brown's cubic large sieve is sharp under GRH), Heath-Brown 2000 / Hasse (identity only), Gao-Zhao (quadratic analogue without automorphic dual). No downgrade.",
+  "post_release_use": "Within the release: family 029 (device reuse, 2026-10-04). Outside: none found as of 2026-10-10; press coverage only (OfficeChai, pasqualepillitteri.it), with reported skepticism and no independent verification.",
+  "caveats": "WebFetch was not used (arxiv.org blocked in this environment); external claims rest on WebSearch summaries. DR's full text was not read, so a reverse-direction equivalent inside DR cannot be excluded (as in the novelty pass)."
+ },
+ "sources": [
+  "data/pilot/003/{family,novelty}.json/.md; data/eureka_shortlist.json (no 003 entry yet); data/lean_checks.json (no 003 entry yet)",
+  "scripts/extract_lean.py 003 and 023 (outputs in my scratchpad) + my per-target BFS",
+  "lean/ComparatorChallenges/{QuasiRiemannHypothesis, DirichletSevenEighths, HeckeSevenEighths, SiegelZeros, PattersonFirstMoment}.{json,lean}; lean/docs/023.md",
+  "lean/OAI/NumberTheory/DirichletL/{Nonvanishing.lean, Detector/FinalAssembly*.lean, Hecke/{Dyadic, InverseAmplificationRaw, DetectorPrimeFamily}.lean, Dictionary/InverseRawReference.lean, GaussSum/{SexticNormalization, MixedConversion, CubicTrace}.lean, CubicSieve/FirstPassage.lean, Eisenstein/CompactEnergyFamilies.lean, Arithmetic/EisensteinEmbedding.lean}",
+  ".lake/packages: mathlib (d13f23b) NumberTheory/{LSeries/Nonvanishing, NumberField/DedekindZeta, GaussSum, JacobiSum}; PrimeNumberTheoremAnd IEANTN/ZetaDefinitions.lean; StrongPNT PNT4_ZeroFreeRegion.lean",
+  "preprints/Primitive-roots-for-every-admissible-integer-base-October-4-2026/build/sections/01-introduction.tex; CONTENTS.md entries 023, 029, 142, 182",
+  "https://annals.math.princeton.edu/2024/200-3/p03 (Dunn-Radziwill)",
+  "https://en.wikipedia.org/wiki/Artin%27s_conjecture_on_primitive_roots",
+  "https://arxiv.org/pdf/1602.06328 and https://arxiv.org/pdf/2008.02570 (Davenport-Heilbronn function; tan theta = 0.284079)",
+  "https://www.mathnet.ru/eng/cheb850 (zeros of the DH function with Re s > 1)",
+  "https://officechai.com/ai/quasi-riemann-hypothesis-explanation/",
+  "https://pasqualepillitteri.it/en/news/21359/openai-millennium-problems-riemann-hodge"
+ ],
+ "search_log": [
+  "Local: brief, CLAUDE.md, PLAN.md speedup section, 003 family/novelty, 248 downstream.json (structure).",
+  "Local Lean (text level): comparators; Nonvanishing; final assembly (RawMomentInput is a hypothesis of the conditional assembly; the unconditional assembly goes through detector_certified_bands / terminal_certificate and still reaches RawMoment via ChosenMomentInput); device files listed in sources.",
+  "Ran python scripts/extract_lean.py 003 (93 s) and 023 (10 s) with --out in the scratchpad; computed cones and shortest paths.",
+  "Mathlib/PNT+/StrongPNT grep: riemannZeta_ne_zero_of_one_le_re and LFunction_ne_zero_of_one_le_re (Mathlib); de la Vallee Poussin region ZetaZeroFree_p (StrongPNT PNT4_ZeroFreeRegion.lean:6430, 6,620-line file); riemannZeta.classicalZeroFree and N' (PNT+); dedekindZeta is a bare LSeries; no Hecke characters in Mathlib.",
+  "Release grep: 'sextic' across preprints (003, 029 and unrelated hits); 029 introduction read (lines 30-130).",
+  "WebSearch 'OpenAI quasi-Riemann hypothesis 7/8 ... reaction' -> press only, skepticism, no independent verification.",
+  "WebSearch 'Dunn Radziwill bias in cubic Gauss sums ...' -> Annals 2024, GRH-conditional, cubic large sieve sharp under GRH.",
+  "WebSearch 'Heath-Brown Artin ... 2,3,5' -> confirmed (Quart. J. Math. 1986).",
+  "WebSearch 'Davenport-Heilbronn function zeros Re s > 1 ...' -> confirmed; tan theta = 0.284079; some disputing preprints noted.",
+  "WebFetch: not attempted (fails on arxiv.org in this environment per the task brief)."
+ ],
+ "lean_checked_at_text_level_only": true,
+ "analyst": "DOWNSTREAM-TARGET agent, 2026-10-10. No lake/lean/comparator run (concurrent build in the workspace)."
+}

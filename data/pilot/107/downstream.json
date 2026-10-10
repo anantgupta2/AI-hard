@@ -1,0 +1,602 @@
+{
+ "fid": "107",
+ "item": "Device cluster, two entries. C1: lossless separation of a shared tensor leg by an auxiliary Fourier/group tensor, retaining a dot product (M1 Prop 3.1 / Cor 3.2; M2 GROUP lemma in Behrend form); in character form lambda(T) >= e^{p_X H(q)} prod lambda(T_i)^{q_i} for every spectral point. C2: the symmetrized polynomial-multiplication profile P(a,b) = (prod_{pi in S3} lambda_pi(C(a,b)))^{1/(6t)} with its discrete growth (depends on C1).",
+ "item_type": "F3 (C1, construction/lemma) + F1 (C2, defined object); one device cluster",
+ "lean_status": "as in paper",
+ "lean_status_why": "Both entries are formalized line by line from M1 and sit inside the comparator cone of complex_omega_le_nine_quarters: finiteSeparation_bound and Character.sharedFirst_tag are the C1 statements (sharedFirst_tag is a cut vertex reached by both the concavity and tripling branches), and symmetrizedProfile/convolutionProfile/ScalarProfile are C2; the M2 Behrend form of C1 (exists_modular_separation) is separately in the alpha, rectangular and 2.267 cones. Text-level reading only; per the environment note the orchestrator's comparator run on the main MatrixMultiplication config passes, which I did not run myself.",
+ "lean_gaps": [
+  "The topological degeneration statement finiteSeparation_degeneratesTo (Separation/Basic.lean:306) is NOT in the 9/4 cone (text-level DAG). The cone uses the algebraic version value_separationTarget_le (explicit polynomial approximation plus interpolation). Same content, no loss of strength, but a prover library should export the character-level lemmas, not only the DegeneratesTo form.",
+  "Strassen duality is re-proved by M1's Appendix A route (exists_detecting_character; fixed point by finite approximation) and imports FixedPointTheorems.brouwer from the external harfe/fixed-point-theorems-lean4 package. exists_detecting_character is specialised to matrixClass d; asymptotic-rank targets need a version for an arbitrary tensor class (the Spectrum/* machinery is generic over TensorSemiring.rank, so this is an estimated 100-250 line generalisation).",
+  "Everything is over C. The Fourier step hard-codes IsPrimitiveRoot zeta (5*M), so a port to characteristic 5 cannot reuse it as is (no primitive (5M)-th root of unity exists in characteristic 5).",
+  "M1 form and M2 form are separate developments: the 9/4 cone uses only the M1 form (AuxiliarySeparation namespace); the alpha (0.465), rectangular (2.092) and 2.267 cones use only the M2 Behrend form (Foundation.Separation.exists_modular_separation via PrefixSeparationPolynomialStage); the all-field 2.371 cone (MatrixFields, M3) uses neither. M2's elementary CW_1 bound 9 log 3 / log 75 (about 2.29011) is not formalized (text grep finds no log 75).",
+  "C2: the growth lemma ScalarProfile.exponent_le_three_quarters is fully generic real analysis (sub-cone 44 decls / ~504 decl-lines); concavity and tripling are specific to C(a,b) (Clebsch-Gordan determinant filtration; three-sector degeneration). Porting C2 to another tensor family means re-proving those two inputs.",
+  "lean/docs/107.md links M2 and M3 but not M1, although the 9/4 development follows M1.",
+  "Sizes are text-level (scripts/extract_lean.py output data/items/107_lean.json; my own per-target BFS): 9/4 cone 836 decls / ~7,597 decl-lines / 108 files; sharedFirst_tag sub-cone 216 / ~1,937; finiteSeparation_bound sub-cone 155 / ~1,167; detecting-character sub-cone 238 / ~2,608. No lake/lean/comparator was run by this agent (another build was in progress)."
+ ],
+ "comparator_chain": [
+  "OAI.MatrixMultiplication.complex_omega_le_nine_quarters",
+  "OAI.MatrixMultiplication.AuxiliarySeparation.omega_le_nine_quarters",
+  "OAI.MatrixMultiplication.AuxiliarySeparation.exactRankExponent_le_nine_quarters",
+  "OAI.MatrixMultiplication.AuxiliarySeparation.Character.exponent_sum_le_nine_quarters",
+  "OAI.MatrixMultiplication.AuxiliarySeparation.Character.meanExponent_le_three_quarters",
+  "OAI.MatrixMultiplication.AuxiliarySeparation.Character.toScalarProfile",
+  "OAI.MatrixMultiplication.AuxiliarySeparation.Character.convolutionProfile_tripling",
+  "OAI.MatrixMultiplication.AuxiliarySeparation.Sector.convolution_tripling_tag",
+  "OAI.MatrixMultiplication.AuxiliarySeparation.Character.sharedFirst_tag",
+  "OAI.MatrixMultiplication.AuxiliarySeparation.Character.integral_type_comparison",
+  "OAI.MatrixMultiplication.AuxiliarySeparation.Character.finiteSeparation_bound",
+  "OAI.MatrixMultiplication.AuxiliarySeparation.Character.value_separationTarget_le"
+ ],
+ "comparator_chain_branches": {
+  "concavity": [
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.toScalarProfile",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.convolutionProfile_concave",
+   "OAI.Character.convolution_concavity_tag",
+   "OAI.Character.convolution_concavity_tag_dims",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.sharedFirst_tag"
+  ],
+  "profile_definition": [
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.toScalarProfile",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.convolutionProfile",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.symmetrizedProfile",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.sixfoldProduct"
+  ],
+  "growth_lemma": [
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.meanExponent_le_three_quarters",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.ScalarProfile.exponent_le_three_quarters"
+  ],
+  "duality": [
+   "OAI.MatrixMultiplication.complex_omega_le_nine_quarters",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.omega_le_nine_quarters",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.exactRankExponent_le_nine_quarters",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.exists_detecting_character"
+  ],
+  "alpha_target_to_M2_form": [
+   "OAI.MatrixMultiplication.complex_alpha_gt_93_div_200",
+   "OAI.MatrixMultiplication.DualExponentBound.alpha_gt",
+   "OAI.MatrixMultiplication.DualExponentBound.fixedAspect_actual_families",
+   "OAI.MatrixMultiplication.DualFiniteRealization.arbitrarily_close_families_of_exact_incident",
+   "OAI.MatrixMultiplication.DualFiniteRealization.actualFamily",
+   "OAI.MatrixMultiplication.DualFiniteRealization.witness",
+   "OAI.MatrixMultiplication.CompletionFiniteRealization.columns",
+   "OAI.MatrixMultiplication.CompletionExecution.realize",
+   "OAI.MatrixMultiplication.CompletionExecution.run",
+   "OAI.MatrixMultiplication.CompletionExecution.extend",
+   "OAI.MatrixMultiplication.CompletionExecution.extendXY",
+   "OAI.MatrixMultiplication.Foundation.ConditionalHierarchyStage.exists_actualPoolStage",
+   "OAI.MatrixMultiplication.Foundation.ConditionalHierarchyStage.exists_rawPoolStage",
+   "OAI.MatrixMultiplication.Foundation.PrefixSeparationPolynomialStage.exists_raw_pool_stage",
+   "OAI.MatrixMultiplication.Foundation.PrefixSeparationPolynomialStage.exists_prefix_stage",
+   "OAI.MatrixMultiplication.Foundation.PrefixSeparationPolynomialStage.exists_auxiliary_coordinates",
+   "OAI.MatrixMultiplication.Foundation.Separation.exists_modular_separation"
+  ],
+  "note": "Chains are shortest paths in the text-level DAG (data/items/107_lean.json). Comparator configs: lean/ComparatorChallenges/MatrixMultiplication.json (three targets) and MatrixFields.json (all-field 2.371054886)."
+ },
+ "lean_source": [
+  {
+   "name": "OAI.MatrixMultiplication.AuxiliarySeparation.Character",
+   "kind": "structure",
+   "file": "lean/OAI/LinearAlgebra/MatrixMultiplication/AuxiliarySeparation/Character/Basic.lean",
+   "line": 35,
+   "text": "/-- A normalized, additive, multiplicative, restriction-monotone tensor valuation.\n\nIndex types vary over all finite types in `Type`. No character-existence result is\nincluded among the fields or claimed by this definition.\n-/\nstructure Character where\n  value : {X Y Z : Type} → [Fintype X] → [Fintype Y] → [Fintype Z] →\n    Tensor ℂ X Y Z → ℝ\n  nonneg : ∀ {X Y Z : Type} [Fintype X] [Fintype Y] [Fintype Z]\n    (T : Tensor ℂ X Y Z), 0 ≤ value T\n  map_zero : ∀ {X Y Z : Type} [Fintype X] [Fintype Y] [Fintype Z],\n    value (0 : Tensor ℂ X Y Z) = 0\n  map_one : value unitTensor = 1\n  map_directSum : ∀ {ι X Y Z : Type} [Fintype ι] [DecidableEq ι]\n    [Fintype X] [Fintype Y] [Fintype Z] (T : ι → Tensor ℂ X Y Z),\n    value (Tensor.directSum T) = ∑ i, value (T i)\n  map_product : ∀ {X Y Z U V W : Type} [Fintype X] [Fintype Y] [Fintype Z]\n    [Fintype U] [Fintype V] [Fintype W]\n    (T : Tensor ℂ X Y Z) (S : Tensor ℂ U V W),\n    value (Tensor.product T S) = value T * value S\n  monotone : ∀ {X Y Z X' Y' Z' : Type}\n    [Fintype X] [Fintype Y] [Fintype Z]\n    [Fintype X'] [Fintype Y'] [Fintype Z']\n    (T : Tensor ℂ X Y Z) (A : X' → X → ℂ)\n    (B : Y' → Y → ℂ) (C : Z' → Z → ℂ),\n    value (Tensor.restrict A B C T) ≤ value T",
+   "note": "Spectral-point interface (Strassen's asymptotic spectrum, normalized/additive/multiplicative/restriction-monotone). Every C1/C2 statement quantifies over it."
+  },
+  {
+   "name": "OAI.MatrixMultiplication.AuxiliarySeparation.sharedFirstTensor",
+   "kind": "def",
+   "file": "lean/OAI/LinearAlgebra/MatrixMultiplication/AuxiliarySeparation/Separation/Basic.lean",
+   "line": 46,
+   "text": "/-- Branches sharing X, with matching and disjoint Y and Z sectors. -/\ndef sharedFirstTensor (B : Fin M → Tensor ℂ X Y Z) :\n    Tensor ℂ X (Fin M × Y) (Fin M × Z) :=\n  fun x y z => if y.1 = z.1 then B y.1 x y.2 z.2 else 0",
+   "note": "C1 input: branches B h sharing the X-leg, with matched disjoint Y/Z sectors."
+  },
+  {
+   "name": "OAI.MatrixMultiplication.AuxiliarySeparation.separationTarget",
+   "kind": "def",
+   "file": "lean/OAI/LinearAlgebra/MatrixMultiplication/AuxiliarySeparation/Separation/Basic.lean",
+   "line": 169,
+   "text": "/-- The surviving tensor: sector labels match on all three legs, while the\nadditional second/third coordinates form a dot product. -/\ndef separationTarget (B : Fin M → Tensor ℂ X Y Z) :\n    Tensor ℂ (X × Fin M) ((Fin M × Y) × Fin M) ((Fin M × Z) × Fin M) :=\n  fun x y z => if x.2 = y.1.1 ∧ y.1.1 = z.1.1 ∧ y.2 = z.2 then\n    B y.1.1 x.1 y.1.2 z.1.2 else 0",
+   "note": "C1 output: sector labels on all three legs plus an M-dimensional dot pairing (= direct sum of B h (x) dot pairing; separationTarget_eq_directSum, line 332)."
+  },
+  {
+   "name": "OAI.MatrixMultiplication.AuxiliarySeparation.finiteSeparation_degeneratesTo",
+   "kind": "theorem",
+   "file": "lean/OAI/LinearAlgebra/MatrixMultiplication/AuxiliarySeparation/Separation/Basic.lean",
+   "line": 306,
+   "text": "/-- Exact finite separation: `5M` source copies degenerate to all M branches,\neach retaining an M-dimensional dot-product factor. -/\ntheorem finiteSeparation_degeneratesTo [Fintype X] [Fintype Y] [Fintype Z]\n    (hM : 0 < M) (B : Fin M → Tensor ℂ X Y Z) :\n    Tensor.DegeneratesTo\n      (Tensor.directSum (fun _ : Fin (5 * M) => sharedFirstTensor B))\n      (separationTarget B)",
+   "note": "M1 Prop 3.1 in its topological (closure) form. NOT in the 9/4 comparator cone (text-level DAG); the cone uses the algebraic polynomial-approximation form below."
+  },
+  {
+   "name": "OAI.MatrixMultiplication.AuxiliarySeparation.Character.value_separationTarget_le",
+   "kind": "theorem",
+   "file": "lean/OAI/LinearAlgebra/MatrixMultiplication/AuxiliarySeparation/Character/FiniteSeparation.lean",
+   "line": 63,
+   "text": "/-- The separated constant tensor costs at most the character of the `5M`\nsource copies. This uses the explicit polynomial, not topological continuity. -/\ntheorem value_separationTarget_le (hM : 0 < M) (B : Fin M → Tensor ℂ X Y Z) :\n    χ.value (separationTarget B) ≤\n      5 * (M : ℝ) * χ.value (sharedFirstTensor B)",
+   "note": "Algebraic (interpolation) form of the 5M-copy degeneration; in the cone."
+  },
+  {
+   "name": "OAI.MatrixMultiplication.AuxiliarySeparation.Character.finiteSeparation_bound",
+   "kind": "theorem",
+   "file": "lean/OAI/LinearAlgebra/MatrixMultiplication/AuxiliarySeparation/Character/FiniteSeparation.lean",
+   "line": 90,
+   "text": "/-- Exact finite character separation: the common first coordinate can be\nseparated at a cost of `5M`, retaining an `M`-dimensional first-leg dot factor. -/\ntheorem finiteSeparation_bound (hM : 0 < M) (B : Fin M → Tensor ℂ X Y Z) :\n    (∑ h, χ.value (B h)) * (M : ℝ) ^ χ.pX ≤\n      5 * (M : ℝ) * χ.value (sharedFirstTensor B)",
+   "note": "C1 core inequality (M1 Prop 3.1 at character level). Sub-cone 155 decls / ~1,167 decl-lines."
+  },
+  {
+   "name": "OAI.MatrixMultiplication.AuxiliarySeparation.Character.sharedFirst_tag",
+   "kind": "theorem",
+   "file": "lean/OAI/LinearAlgebra/MatrixMultiplication/AuxiliarySeparation/Tensor/TagInequality.lean",
+   "line": 156,
+   "text": "/-- The actual shared-input tensor tag inequality, including probability laws\nwith zero coordinates. The branch labels are disjoint on the second and third\nlegs, while the first coordinate is shared. -/\ntheorem Character.sharedFirst_tag (χ : Character)\n    (q : FiniteLaw (Fin s)) (B : Fin s → Tensor ℂ X Y Z)\n    (hB : ∀ a, B a ≠ 0) :\n    Real.exp (χ.pX * finiteEntropy q.mass) *\n        ∏ a, χ.value (B a) ^ q.mass a ≤ χ.value (sharedFirstTensor B)",
+   "note": "C1 entropy form (M1 Cor 3.2): lambda(T) >= e^{p_X H(q)} prod lambda(T_i)^{q_i}. Cut vertex of the 9/4 cone; sub-cone 216 decls / ~1,937 decl-lines."
+  },
+  {
+   "name": "OAI.MatrixMultiplication.AuxiliarySeparation.Character.sixfoldProduct",
+   "kind": "def",
+   "file": "lean/OAI/LinearAlgebra/MatrixMultiplication/AuxiliarySeparation/Character/Symmetrization.lean",
+   "line": 30,
+   "text": "/-- The product of character values in the six orders of possibly different legs. -/\ndef sixfoldProduct (T : Tensor ℂ X Y Z) : ℝ :=\n  χ.value T *\n    χ.value (fun y z x => T x y z) *\n    χ.value (fun z x y => T x y z) *\n    χ.value (fun x z y => T x y z) *\n    χ.value (fun z y x => T x y z) *\n    χ.value (fun y x z => T x y z)",
+   "note": "C2 ingredient: product of the character over the six leg orders."
+  },
+  {
+   "name": "OAI.MatrixMultiplication.AuxiliarySeparation.Character.symmetrizedProfile",
+   "kind": "def",
+   "file": "lean/OAI/LinearAlgebra/MatrixMultiplication/AuxiliarySeparation/Character/Symmetrization.lean",
+   "line": 94,
+   "text": "/-- The Section 5 symmetrized value with mean singleton-leg exponent `t`. -/\ndef symmetrizedProfile (t : ℝ) (T : Tensor ℂ X Y Z) : ℝ :=\n  χ.sixfoldProduct T ^ (1 / (6 * t))",
+   "note": "C2: P = (prod_{pi in S3} lambda_pi)^{1/(6t)}."
+  },
+  {
+   "name": "OAI.MatrixMultiplication.AuxiliarySeparation.Character.convolutionProfile",
+   "kind": "def",
+   "file": "lean/OAI/LinearAlgebra/MatrixMultiplication/AuxiliarySeparation/Convolution/Symmetry.lean",
+   "line": 109,
+   "text": "/-- The polynomial profile `P(a,b)` normalized by the actual mean exponent. -/\ndef convolutionProfile (a b : ℕ) : ℝ :=\n  χ.symmetrizedProfile χ.meanExponent (convolution a b)",
+   "note": "C2 on the polynomial-multiplication tensors C(a,b), t = mean exponent."
+  },
+  {
+   "name": "OAI.MatrixMultiplication.AuxiliarySeparation.ScalarProfile",
+   "kind": "structure",
+   "file": "lean/OAI/LinearAlgebra/MatrixMultiplication/AuxiliarySeparation/Growth/Profile.lean",
+   "line": 23,
+   "text": "/-- The scalar profile hypotheses used in Section 6. Only positive indices\ncarry mathematical content; the values on either coordinate axis are unused. -/\nstructure ScalarProfile (t : ℝ) where\n  value : ℕ → ℕ → ℝ\n  positive : ∀ a b : ℕ, 1 ≤ a → 1 ≤ b → 0 < value a b\n  symmetric : ∀ a b : ℕ, 1 ≤ a → 1 ≤ b → value a b = value b a\n  boundary : ∀ b : ℕ, 1 ≤ b → value 1 b = (b : ℝ)\n  concave : ∀ a h : ℕ, 1 ≤ a → 2 ≤ h →\n    value a (h - 1) + value a (h + 1) ≤ 2 * value a h\n  tripling : ∀ a h : ℕ, 1 ≤ a → 1 ≤ h →\n    3 * value a h ≤ value a (3 * h + a - 1)\n  rank_bound : ∀ a b : ℕ, 1 ≤ a → 1 ≤ b →\n    value a b ≤ ((a : ℝ) + (b : ℝ) - 1) ^ (1 / t)",
+   "note": "C2 scalar abstraction: boundary, symmetry, concavity, shifted tripling, rank bound."
+  },
+  {
+   "name": "OAI.MatrixMultiplication.AuxiliarySeparation.ScalarProfile.exponent_le_three_quarters",
+   "kind": "theorem",
+   "file": "lean/OAI/LinearAlgebra/MatrixMultiplication/AuxiliarySeparation/Growth/Profile.lean",
+   "line": 108,
+   "text": "/-- Lemma 6.1: a positive symmetric profile satisfying the stated concavity,\ntripling, boundary, and rank bounds has exponent at most `3/4`. -/\ntheorem exponent_le_three_quarters {t : ℝ} (P : ScalarProfile t) (ht : 0 < t) :\n    t ≤ 3 / 4",
+   "note": "C2 growth lemma (M1 Lemma 6.1). Sub-cone 44 decls / ~504 decl-lines: pure real analysis, reusable for any profile."
+  },
+  {
+   "name": "OAI.MatrixMultiplication.AuxiliarySeparation.Character.exponent_sum_le_nine_quarters",
+   "kind": "theorem",
+   "file": "lean/OAI/LinearAlgebra/MatrixMultiplication/AuxiliarySeparation/Polynomial/Inequalities.lean",
+   "line": 117,
+   "text": "/-- The three dot-product exponents of an actual character sum to at most `9/4`. -/\ntheorem exponent_sum_le_nine_quarters : χ.pX + χ.pY + χ.pZ ≤ 9 / 4",
+   "note": "Per-character conclusion p_X+p_Y+p_Z <= 9/4."
+  },
+  {
+   "name": "OAI.MatrixMultiplication.AuxiliarySeparation.exists_detecting_character",
+   "kind": "theorem",
+   "file": "lean/OAI/LinearAlgebra/MatrixMultiplication/AuxiliarySeparation/Character/Existence.lean",
+   "line": 25,
+   "text": "/-- Lemma 3.1: normalized, additive, multiplicative, restriction-monotone\ncharacters detect every integer strictly below the exact-rank growth value. -/\ntheorem exists_detecting_character {d k : ℕ} (hd : 2 ≤ d)\n    (hk : (k : ℝ) < (d : ℝ) ^ exactRankExponent) :\n    ∃ χ : Character, (k : ℝ) ≤ χ.value (Tensor.matrixMultiplication d d d)",
+   "note": "Strassen duality (App. A fixed-point route; uses external FixedPointTheorems.brouwer). Specialised to matrixClass d; generalising to an arbitrary tensor class is needed for asymptotic-rank targets."
+  },
+  {
+   "name": "OAI.MatrixMultiplication.Foundation.Separation.exists_modular_separation",
+   "kind": "theorem",
+   "file": "lean/OAI/LinearAlgebra/MatrixMultiplication/Separation/ComplexModularSeparation.lean",
+   "line": 101,
+   "text": "theorem exists_modular_separation {d Q K m : ℕ}\n    (hK : (d * Q ^ 2 + 1) * K ≤ Q ^ d)\n    (hm : (d * Q ^ 2 + 1) * m ≤ Q ^ d) :\n    ∃ (tag : Fin K → AuxiliaryGroup d Q)\n      (point : Fin K → Fin m → AuxiliaryGroup d Q),\n      ∀ s s' i j,\n        point s i + (tag s - point s j) = tag s' ↔ s = s' ∧ i = j",
+   "note": "M2 GROUP lemma, Behrend-sphere form (tags/points in an auxiliary abelian group). In the alpha, rectangular and 2.267 cones; not in the 9/4 or all-field cones."
+  },
+  {
+   "name": "OAI.MatrixMultiplication.Foundation.finite_separation_identity",
+   "kind": "theorem",
+   "file": "lean/OAI/LinearAlgebra/MatrixMultiplication/Separation/ComplexFiniteSeparation.lean",
+   "line": 21,
+   "text": "theorem finite_separation_identity\n    (T : Tensor ℂ X Y Z) (lx : X → S) (ly : Y → S)\n    (tag : S → G) (point : S → U → G)\n    (hlabels : ∀ x y z, T x y z ≠ 0 → lx x = ly y)\n    (hcollision : ∀ s s' i j,\n      point s i + (tag s - point s j) = tag s' ↔ s = s' ∧ i = j) :\n    Tensor.pullback\n      (fun x : X × U => (x.1, point (lx x.1) x.2))\n      (fun y : Y × U => (y.1, tag (ly y.1) - point (ly y.1) y.2))\n      (fun z : Z × S => (z.1, tag z.2))\n      (Tensor.product T (groupTensor G)) = separatedTensor lx T",
+   "note": "M2 separation identity T (x) groupTensor G -> separatedTensor (restriction). Text-level DAG does not place it in any comparator cone (the cones reach the Behrend form via PrefixSeparationPolynomialStage)."
+  }
+ ],
+ "lean_library_arms_common": {
+  "always_remove_for_any_target_implied_by_the_headline": [
+   "OAI.MatrixMultiplication.complex_omega_le_nine_quarters",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.omega_le_nine_quarters",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.matrix_multiplication_cost_le",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.exactRankExponent_le_nine_quarters",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.exponent_sum_le_nine_quarters",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.meanExponent_le_three_quarters",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.toScalarProfile",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.convolutionProfile_concave",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.convolutionProfile_tripling"
+  ],
+  "spectral_infrastructure_kept_in_both_arms": [
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character (structure) and Character/{Basic,Degeneration,Dot,Permutation}.lean",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.exists_detecting_character (Strassen duality, App. A route)",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.exactRankExponent_le_nine_quarters_of_characters / exponent_le_of_detecting_characters (CharacterRounding.lean; generic in the exponent)",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.omega_le_exactRankExponent (Arithmetic/Exponent.lean:105)",
+   "Entropy/Tag.lean (method-of-types lemmas, generic)"
+  ],
+  "C1_declarations_with_item_arm": [
+   "OAI.MatrixMultiplication.AuxiliarySeparation.sharedFirstTensor",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.separationTarget",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.separationPolynomial",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.separationTarget_eq_directSum",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.finiteSeparation_degeneratesTo",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.finiteSeparation_directSum_degeneratesTo",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.separationPolynomialApproximation",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.value_separationTarget_le",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.value_separationTarget",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.finiteSeparation_bound",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.integral_type_comparison",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.sharedFirst_tag",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.log_sharedFirst_tag",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.sharedFirstDependent_tag",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.log_sharedFirstDependent_tag",
+   "(files) AuxiliarySeparation/Separation/*.lean, Character/FiniteSeparation.lean, Tensor/TagInequality.lean, Tensor/SharedPadding.lean"
+  ],
+  "C2_declarations": [
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.sixfoldProduct",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.symmetrizedProfile",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.convolutionProfile",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.ScalarProfile",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.ScalarProfile.exponent_le_three_quarters",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.profile_exponent_le_three_quarters",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.toScalarProfile",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.convolutionProfile_concave",
+   "OAI.MatrixMultiplication.AuxiliarySeparation.Character.convolutionProfile_tripling",
+   "(files) AuxiliarySeparation/Growth/*.lean, Character/Symmetrization.lean, Polynomial/Inequalities.lean"
+  ],
+  "M2_form_declarations": [
+   "OAI.MatrixMultiplication.Foundation.Separation.exists_modular_separation",
+   "OAI.MatrixMultiplication.Foundation.Separation.grid_sphere_slice_collision",
+   "OAI.MatrixMultiplication.Foundation.finite_separation_identity",
+   "OAI.MatrixMultiplication.Foundation.finite_separation_mem_restrictionOrbit",
+   "OAI.MatrixMultiplication.Foundation.finite_separation_degeneratesTo",
+   "... poolAuxiliaryTensor / poolAuxiliaryTensor_rankAtMost (Separation/ComplexLabelHierarchySeparation.lean:249-254)",
+   "(files) MatrixMultiplication/Separation/*.lean (18 files, 3,153 lines)"
+  ],
+  "other_omega_results_to_remove_when_they_imply_the_target": [
+   "OAI.MatrixMultiplication.SquareBound.complex_omega_lt_2267_div_1000 and ComplexBounds/*",
+   "OAI.LinearAlgebra.MatrixFields (all-field 2.371054886)",
+   "OAI.MatrixMultiplication.complex_rectangular_omega_lt_523_div_250 and CW75Reordered*",
+   "OAI.MatrixMultiplication.complex_alpha_gt_93_div_200 and Duality/*"
+  ],
+  "note": "Every omega upper bound weaker than 9/4 is a corollary of the headline. A speedup test on such a target is only meaningful if the headline and the profile conclusion (and the release's other omega results that imply the target) are removed from BOTH arms. The 'with' arm then differs from the 'without' arm only by the C1 (and optionally C2) declarations."
+ },
+ "speedup_targets": [
+  {
+   "id": "S1",
+   "title": "Coppersmith-Winograd-type square bound from CW_1 alone via the shared-leg character inequality",
+   "statement": "omega(C) < 2.376 (Coppersmith-Winograd 1990, laser method on CW_q). Stretch variant: omega(C) <= 9 log 3 / log 75 (about 2.29011), M2 Thm thm:elementary, which M2 obtains from CW_1 in about a page with the Behrend-form separator.",
+   "lean_statement": "theorem omega_lt_cw : OAI.MatrixMultiplication.Arithmetic.omega ℂ < (2376 : ℝ) / 1000   -- variant: < (22902 : ℝ) / 10000",
+   "reference": "Coppersmith-Winograd, J. Symbolic Comput. 9 (1990); Strassen 1987 (laser method); M2 = OpenAI 'Complex Matrix Multiplication Below 2.258 and Rectangular Bounds' (2026-09-24), thm:elementary.",
+   "status": "true (CW 1990). Implied by the headline 9/4, hence the removal rule.",
+   "current_proof_size": "CW 1990: about 20 pages (laser method + Salem-Spencer hashing). Formal: the only formal laser-method proof I know of is OAI MatrixFields (all fields, 2.371054886; cone 46,737 decls / ~144k decl-lines; directory 354 files / ~182k lines incl. ~18.4k kernel decide certificates). The OAI C-only 2.267 proof via the M2 Behrend form: cone 862 decls / ~7,295 decl-lines. Mathlib has no omega.",
+   "how_item_helps": "The laser method spends most of its length on blocks that share variables (hashing, zeroing out, combination loss). C1 removes that step: CW_1 (OAI CoppersmithWinograd.ComplexCoppersmithWinograd.tensor, borderRankAtMost 3) is a sum of blocks, and sharedFirst_tag gives a lower bound on every character of CW_1 in terms of p_X and the characters of its blocks. Combined with lambda(CW_1) <= 3 (border rank) and exists_detecting_character, this caps p_X+p_Y+p_Z and so omega. M2 reports the Behrend-form version as a one-page count. This is reuse on a different base tensor, not a corollary of the device's own theorem.",
+   "with_item_arm": "Mathlib + OAI MatrixMultiplication minus the 'always_remove' and 'other_omega_results' lists; keep the spectral infrastructure and the C1 declarations; drop C2 (it is specific to C(a,b)). Keep CoppersmithWinograd/ComplexCoppersmithWinograd.lean (CW_1 tensor + border rank 3).",
+   "without_item_arm": "Same library minus the C1 declarations (and minus the M2 form: Separation/*.lean), so the prover must hash or zero out.",
+   "baseline_formal_proof": "MatrixFields omega_lt_source_constant cone (46,737 decls / ~144k decl-lines) for the classical laser route; SquareBound.complex_omega_lt_2267_div_1000 cone (862 decls / ~7,295 decl-lines) for the M2-form route.",
+   "expected_speedup": "high",
+   "confidence": "medium (that the character form of C1 gives < 2.376 from CW_1 in a short argument: M2 does it with the Behrend form, not with sharedFirst_tag; I have not re-derived the CW_1 decomposition into a shared-leg sum)",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI.MatrixMultiplication.Arithmetic.omega (comparator model, Model.lean), OAI CW_1 tensor; Mathlib reals.",
+    "missing": [],
+    "formal_proof_to_compare": "Yes: MatrixFields (all-field 2.371054886; ~144k decl-lines in cone) and ComplexBounds 2.267 (~7.3k decl-lines in cone). Both are in the release; remove them from both arms."
+   }
+  },
+  {
+   "id": "S2",
+   "title": "Dual exponent alpha > 0.321334 via the Behrend-form separator (M2 route)",
+   "statement": "alpha > 0.321334, where alpha = sup{k : omega(1,k,1) = 2} (Vassilevska Williams-Xu-Xu-Zhou, SODA 2024; earlier 0.31389 Le Gall-Urrutia 2018, 0.172 Coppersmith 1982).",
+   "lean_statement": "theorem alpha_gt_vxxz : (321334 : ℝ) / 1000000 < OAI.MatrixMultiplication.Arithmetic.complexAlpha",
+   "reference": "VXXZ, 'New Bounds for Matrix Multiplication: from Alpha to Omega', arXiv 2307.07970 (search summary); Le Gall-Urrutia SODA 2018.",
+   "status": "true (human). The release claims alpha > 0.465 (M2, formalized: DualExponentBound.alpha_gt).",
+   "current_proof_size": "VXXZ: long laser-method paper (asymmetric hashing). Formal: OAI alpha_gt cone 1,239 decls / ~11,359 decl-lines (proves 0.465; includes the lower bound rectangularOmega >= 2 from Arithmetic/LowerBound.lean).",
+   "how_item_helps": "Rectangular laser analyses lose most in the shared-variable step; the M2 form of C1 separates labels known to two legs at no combination loss. Note alpha is NOT implied by omega <= 9/4, so the headline may stay in both arms; only alpha_gt and its Duality/Completion consumers must go.",
+   "with_item_arm": "Mathlib + OAI MatrixMultiplication minus Duality/ExponentBound.lean, Duality/ExponentConsumer.lean (alpha_gt and its family constructors) and the rectangular target; keep Separation/*.lean (M2 form), Arithmetic/LowerBound.lean, CoppersmithWinograd/*, Entropy/*.",
+   "without_item_arm": "Same minus Separation/*.lean (exists_modular_separation, finite_separation_*, poolAuxiliaryTensor*).",
+   "baseline_formal_proof": "OAI DualExponentBound.alpha_gt cone, 1,239 decls / ~11,359 decl-lines (text-level).",
+   "expected_speedup": "med",
+   "confidence": "medium (the release's own alpha route goes through the M2 form, so the device is demonstrably sufficient; whether it shortens a 0.3213-level proof relative to a laser proof is untested)",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "complexAlpha / rectangularOmega / RectangularAdmissibleExponent (comparator model); Arithmetic/LowerBound.lean for omega(1,k,1) >= 2.",
+    "missing": [],
+    "formal_proof_to_compare": "OAI alpha_gt (0.465), ~11.4k decl-lines in cone; no human-route formalization exists."
+   }
+  },
+  {
+   "id": "S3",
+   "title": "Asymptotic rank of the small Coppersmith-Winograd tensor cw_2 is below 3.931",
+   "statement": "R~(cw_2) < 3.931 (border rank is 4; R~(cw_2) = 3 would imply omega = 2).",
+   "lean_statement": "def smallCW (q : ℕ) : Tensor ℂ (Fin (q+1)) (Fin (q+1)) (Fin (q+1)) := fun x y z => if (x = 0 ∧ y ≠ 0 ∧ z = y) ∨ (y = 0 ∧ x ≠ 0 ∧ z = x) ∨ (z = 0 ∧ x ≠ 0 ∧ y = x) then 1 else 0\ntheorem cw2_asymptoticRank_lt : ∃ n : ℕ, 1 ≤ n ∧ (exactRank (Tensor.power (smallCW 2) n) : ℝ) < ((3931 : ℝ) / 1000) ^ n",
+   "reference": "Alman-Li, 'Asymptotic Rank Speedup Theorems, Revisited', CCC 2026 / arXiv 2605.21738 (search summary: 'Strassen calculus' turns degenerations with direct sums on both sides into asymptotic-rank bounds via the asymptotic spectrum).",
+   "status": "true per Alman-Li (peer-reviewed CCC 2026; not read in full).",
+   "current_proof_size": "conference paper; no formalization known.",
+   "how_item_helps": "C1 is exactly a degeneration with direct sums on both sides (5M copies of a shared-leg sum degenerate to a direct sum of branches times a dot pairing), i.e. the input type Strassen calculus consumes. In character form it constrains every spectral point of tensors that contain cw_2-type blocks with a shared leg. Caveat: Alman-Li's bound may also follow from their framework plus an omega bound; if omega <= 9/4 plus Alman-Li already implies it, it is a corollary, so remove the headline from both arms.",
+   "with_item_arm": "Spectral infrastructure + C1 declarations + a generalised exists_detecting_character for an arbitrary TensorClass (new, see missing) + Tensor.power, exactRank; headline removed.",
+   "without_item_arm": "Same minus C1 declarations.",
+   "baseline_formal_proof": "none",
+   "expected_speedup": "med",
+   "confidence": "low-medium (the device's direction of inequality must be checked: it lower-bounds characters of shared-leg sums, so an UPPER bound on lambda(cw_2) needs cw_2 as a branch of a tensor of known small rank)",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI Foundation.Tensor, Tensor.power, AuxiliarySeparation.exactRank (Arithmetic/RankExponent.lean:36). R~ < c is stated as 'exists n, R(T^n) < c^n' (equivalent by Fekete, since R~ = inf_n R(T^n)^{1/n}).",
+    "missing": [
+     "smallCW definition (~10-15 lines)",
+     "for the proof, not the statement: detecting characters for an arbitrary tensor class (~100-250 lines generalising Character/Existence.lean)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "S4",
+   "title": "Asymptotic rank of every d x d x d tensor below Strassen's d^{2 omega/3}",
+   "statement": "For every concise d x d x d tensor T, R~(T) <= d^{2 omega/3 - delta} for an explicit delta > 0 (Alman-Li 2026 improve Strassen's d^{2 omega/3}).",
+   "lean_statement": "∀ d ≥ 2, ∀ T : Tensor ℂ (Fin d) (Fin d) (Fin d), ∃ n ≥ 1, (exactRank (Tensor.power T n) : ℝ) < ((d : ℝ) ^ (c : ℝ)) ^ n   -- c an explicit constant below 3/2 if omega <= 9/4 is assumed; the exact Alman-Li exponent was not read (snippet only)",
+   "reference": "Alman-Li CCC 2026 (search summary); Strassen 1988 for d^{2 omega/3}.",
+   "status": "true per Alman-Li (exact constant not verified).",
+   "current_proof_size": "no formalization known.",
+   "how_item_helps": "Same mechanism as S3; the shared-leg inequality is a universal spectral constraint usable on any tensor decomposed along one leg.",
+   "with_item_arm": "as S3",
+   "without_item_arm": "as S3",
+   "baseline_formal_proof": "none",
+   "expected_speedup": "low",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "as S3",
+    "missing": [
+     "explicit constant from Alman-Li (not read)",
+     "generalised detecting characters (~100-250 lines, proof only)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "open_problems": [
+  {
+   "id": "O1",
+   "title": "omega_F <= 9/4 for every field F (positive characteristic)",
+   "statement": "For every field F, omega_F <= 9/4 (the headline is over C; by Schonhage omega depends only on the characteristic, so the open part is characteristic p, uniformly in p).",
+   "lean_statement": "theorem omega_le_nine_quarters_allFields (F : Type) [Field F] : OAI.MatrixAllFields.MatrixMultiplication.Arithmetic.omega F ≤ (9 : ℝ) / 4",
+   "reference": "M1 (C only); M3 / MatrixFields comparator (every field, 2.371054886).",
+   "url": "https://github.com/openai/math (release, pinned fd4aeeb)",
+   "status": "open as far as I can tell. My reasoning (not from a source): for each epsilon, a rank decomposition over Q-bar reduces mod p for all but finitely many p, so omega_p <= 9/4 + epsilon outside an epsilon-dependent finite set; a uniform statement for every p is not known to me.",
+   "obstruction_match": "direct: the device is algebraic at the character level (value_le_of_polynomialApproximation is characteristic-free in spirit) but hard-codes a primitive (5M)-th root of unity and C.",
+   "adaptation": "Generalise Character, Tensor, the separation polynomial and the Clebsch-Gordan filtration from C to an algebraically closed field of characteristic p; choose the Fourier modulus coprime to p (char 5 needs a modulus other than 5M); check the determinant filtration (binomial coefficients) in small characteristic.",
+   "payoff": "high (closes a gap the release itself leaves open between M1 and M3)",
+   "confidence": "medium",
+   "difficulty": "moderate to hard",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "MatrixFields comparator model (Arithmetic.omega F for any Field F).",
+    "missing": [
+     "proof only: field-generic rewrite of the 9/4 cone (~7.6k decl-lines today)"
+    ],
+    "formal_proof_to_compare": "OAI 9/4 cone over C (836 decls / ~7.6k decl-lines) as the template."
+   }
+  },
+  {
+   "id": "O2",
+   "title": "omega < 9/4",
+   "statement": "Improve the headline: omega(C) <= 9/4 - delta.",
+   "lean_statement": "theorem omega_lt_nine_quarters : OAI.MatrixMultiplication.Arithmetic.omega ℂ < (9 : ℝ) / 4",
+   "reference": "M1 (2026-10-02).",
+   "url": "https://github.com/openai/math",
+   "status": "open",
+   "obstruction_match": "direct: the profile method stops at 3/4 because of the specific concavity + shifted-tripling inputs of C(a,b).",
+   "adaptation": "Run C1+C2 on another rank-known family (multivariate polynomial multiplication, group-algebra tensors of non-cyclic groups) and look for a stronger growth inequality; ScalarProfile.exponent_le_three_quarters is the reusable endgame.",
+   "payoff": "very high",
+   "confidence": "low",
+   "difficulty": "hard",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "comparator model",
+    "missing": [],
+    "formal_proof_to_compare": "OAI 9/4 cone"
+   }
+  },
+  {
+   "id": "O3",
+   "title": "Larger dual exponent alpha via the profile method (and past the CW barrier)",
+   "statement": "Prove alpha > 0.465 (release) or alpha > 0.625; a 2025 result (Christandl-Le Gall-Lysikov-Zuiddam, per search summary) shows CW-based lower bounds on alpha cannot exceed 0.625.",
+   "lean_statement": "theorem alpha_gt_target : (5 : ℝ) / 8 < OAI.MatrixMultiplication.Arithmetic.complexAlpha",
+   "reference": "M2; VXXZ arXiv 2307.07970; CLLZ 2025 (barrier, search summary only).",
+   "url": "https://lacker.io/complexity/problems/alpha-dual-matmul-exponent.html",
+   "status": "open",
+   "obstruction_match": "partial: C2 controls only p_X+p_Y+p_Z; alpha needs a bound on p_X + k p_Y + p_Z, i.e. a per-leg constraint the profile does not give.",
+   "adaptation": "Asymmetric profile (no S3 symmetrisation; weight one leg by k) plus C1 along the Y-leg.",
+   "payoff": "high",
+   "confidence": "low",
+   "difficulty": "hard",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "complexAlpha (comparator)",
+    "missing": [],
+    "formal_proof_to_compare": "OAI alpha_gt (0.465), ~11.4k decl-lines"
+   }
+  },
+  {
+   "id": "O4",
+   "title": "Asymptotic rank of the small CW tensors (cw_2 below 3.9, toward q+1)",
+   "statement": "Improve R~(cw_2) < 3.931; the conjecture R~(cw_q) = q+1 implies omega = 2.",
+   "lean_statement": "as S3 with a smaller constant, e.g. ∃ n ≥ 1, (exactRank (Tensor.power (smallCW 2) n) : ℝ) < ((7 : ℝ) / 2) ^ n",
+   "reference": "Alman-Li CCC 2026 (arXiv 2605.21738).",
+   "url": "https://arxiv.org/pdf/2605.21738",
+   "status": "open",
+   "obstruction_match": "partial: needs upper bounds on spectral points; C1 gives lower bounds on shared-leg sums, usable only with a known-rank ambient tensor.",
+   "adaptation": "Embed cw_2 as a branch of a shared-leg tensor of small border rank; apply finiteSeparation_bound to cap lambda(cw_2).",
+   "payoff": "high",
+   "confidence": "low",
+   "difficulty": "hard",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "as S3",
+    "missing": [
+     "smallCW (~15 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O5",
+   "title": "Strassen's asymptotic rank conjecture for tight tensors (test cases)",
+   "statement": "Every concise tight d x d x d tensor has asymptotic rank d; open even for many small explicit tensors.",
+   "lean_statement": "for a fixed explicit tight tensor T on Fin d^3: ∀ c > (d : ℝ), ∃ n ≥ 1, (exactRank (Tensor.power T n) : ℝ) < c ^ n",
+   "reference": "Kaski-Michalek ITCS 2025; Christandl-Hoeberechts-Nieuwboer-Vrana-Zuiddam STOC 2025; 'Asymptotic rank bounds: a numerical census' arXiv 2601.08119 (all search summaries).",
+   "url": "https://arxiv.org/pdf/2601.08119",
+   "status": "open",
+   "obstruction_match": "weak: the device constrains spectral points but is not known to bound them above for general tight tensors.",
+   "adaptation": "Use the shared-leg inequality as a constraint in a numerical search over hypothetical spectral points (an LP-style certificate).",
+   "payoff": "very high",
+   "confidence": "low",
+   "difficulty": "very hard",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Tensor, Tensor.power, exactRank; tightness predicate (~40 lines)",
+    "missing": [
+     "tight-tensor predicate (~40 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "All omega(C) upper bounds above 9/4 (Strassen 2.81, CW 2.376, ..., Dupont et al. 2.371177). Lean: statable now; proof = one line from complex_omega_le_nine_quarters.",
+  "omega(F) <= 9/4 for every field of characteristic 0 (Schonhage: omega depends only on the characteristic). Lean: statable now via the MatrixFields model; needs a transfer lemma (not in OAI, ~300-800 lines estimate).",
+  "Rectangular: omega(1,k,1) <= k + omega - 1 <= k + 5/4 (block decomposition), e.g. omega(1,2,1) <= 3.25, below Le Gall-Urrutia's 3.2516. Lean: statable now (rectangularOmega ℂ 2 ≤ 13/4); needs the block-composition lemma (OAI Arithmetic/RecursiveBlockPrograms.lean may cover it; unchecked).",
+  "Strassen 1988: R~(T) <= d^{2 omega/3} <= d^{3/2} for every d x d x d tensor. Lean: statable with < 300 lines (as S4).",
+  "Matrix inversion, determinant, LUP in O(n^{9/4+eps}) arithmetic operations (Bunch-Hopcroft, Baur-Strassen). Lean: needs new program-model definitions (~200 lines).",
+  "For each epsilon > 0, omega_p <= 9/4 + epsilon for all but finitely many primes p (my reasoning: reduce a Q-bar decomposition mod p). Lean: statable now; proof needs algebraic-reduction library.",
+  "Universal shared-leg entropy inequality for the known spectral points (Strassen support functionals, CVZ quantum functionals): automatic, since they are spectral points. This is the device's own theorem specialised, not reuse."
+ ],
+ "release_reuse": {
+  "uses_of_device_in_release": "Within the family only. M2 (2026-09-24) states the GROUP lemma (Behrend form) and uses it for 2.290, 2.258, alpha and the rectangular bound; M1 (2026-10-02) uses the Fourier form. Lean: M2 form in the alpha, rectangular and 2.267 cones; M1 form in the 9/4 cone; M3 / MatrixFields uses neither.",
+  "families_that_consume_the_theorem": [
+   "None found. grep of all preprint .tex for 'laser method|asymptotic spectrum|asymptotic rank|border rank' hits only M1, M2, M3 (and an unrelated 'Sharp integral fillings in CAT(0) spaces' hit). No other OAI Lean dir imports OAI.LinearAlgebra.MatrixMultiplication (not checked exhaustively beyond the 107 extractor's import scan)."
+  ],
+  "families_that_could_use_it": [
+   "109 (integer multiplication below n log n): different model (Turing machines, FFT); no tensor-rank step, so no plausible use.",
+   "'A cubic lower bound for border determinantal complexity of the permanent' (2026-09-24): lower bounds, opposite direction; no use expected."
+  ],
+  "lean_notes_2026_10_10": "Text-level only. Cone sizes from my BFS over data/items/107_lean.json: 9/4 836 decls (~7,597 decl-lines), alpha 1,239 (~11,359), rectangular 884 (~7,379), all-field 46,737 (~144,251), 2.267 862 (~7,295)."
+ },
+ "negative_controls": [
+  {
+   "title": "Universal-method barrier for CW_q (Alman 2019): omega < 2.168 from CW_q alone",
+   "statement": "Restrict the library to CW_q tensors, unit/group tensors, the spectral infrastructure and C1 (no C(a,b), no profile, no headline), and ask for omega(C) < 2.168. Alman (CCC 2019, ToC 2021) shows the universal method applied to any CW_q cannot give omega below 2.16805.",
+   "why_device_must_fail": "C1 on CW_q is a degeneration from CW_q^{tensor n} times a group tensor; over C the group tensor is a unit tensor after Fourier, so the irreversibility/universal-method barrier still applies (M2's 2.290 and 2.258 respect it). A prover success here would indicate a library or barrier-scope error. M1 escapes only by switching to C(a,b), whose irreversibility tends to 1.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Arithmetic.omega ℂ < 2168/1000 with the restricted library",
+    "missing": [],
+    "formal_proof_to_compare": "none (the barrier itself is not formalized)"
+   }
+  },
+  {
+   "title": "Cap set upper bound (Ellenberg-Gijswijt)",
+   "statement": "A subset of F_3^n with no three distinct points summing to zero has size at most 3 * 2.756^n.",
+   "why_device_must_fail": "Slice-rank / subrank upper bounds need ONE small monotone (a spectral point or slice rank) to exist; C1 only lower-bounds every spectral point of shared-leg sums (it produces degenerations, i.e. constructions). It is also over C, and the cap-set tensor lives over F_3.",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib Finset (Fin n → ZMod 3); text grep of Mathlib d13f23b finds no cap-set file",
+    "missing": [
+     "cap-set predicate (~20 lines)"
+    ],
+    "formal_proof_to_compare": "Dahmen-Holzl-Lewis, Lean 3 (ITP 2019); not in Mathlib 4 as far as the grep shows"
+   }
+  },
+  {
+   "title": "Exact rank of 2x2 matrix multiplication is 7",
+   "statement": "R(<2,2,2>) = 7 (Hopcroft-Kerr 1971, Winograd 1971).",
+   "why_device_must_fail": "Characters only see asymptotic quantities (lambda(<2,2,2>) = 2^{p_X+p_Y+p_Z} <= 2^{9/4} < 7), so no exact-rank lower bound can come out of C1/C2.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "¬ Tensor.RankAtMost (Tensor.matrixMultiplication 2 2 2) 6 (OAI Foundation)",
+    "missing": [],
+    "formal_proof_to_compare": "none known to me"
+   }
+  }
+ ],
+ "negative_control_note": "The AFLG 2.3078 barrier is NOT a valid control: it covers zeroing-out laser analyses of CW powers, and C1 is outside that framework by design.",
+ "top5": [
+  {
+   "rank": 1,
+   "target": "S1: omega < 2.376 (or 9 log 3/log 75) from CW_1 via C1, headline removed",
+   "lean_usable": true,
+   "argument": "Statable now with the comparator's omega; both arms are easy to build by deleting declarations; two formal baselines exist in the release (MatrixFields laser proof, ~144k decl-lines in cone, and the 2.267 M2-form proof, ~7.3k). The measurement is the prover budget to reach a CW-level bound with only sharedFirst_tag/finiteSeparation_bound plus Strassen duality versus without them. This is the PHP-like signature claimed by the novelty pass (short device, large drop). Risk: the CW_1 shared-leg decomposition in character form has not been checked by me; M2 did it in the Behrend form."
+  },
+  {
+   "rank": 2,
+   "target": "S2: alpha > 0.321334 with the M2 separator",
+   "lean_usable": true,
+   "argument": "Statable now (complexAlpha is a comparator definition), and not a corollary of the 9/4 headline, so the headline may stay in L. The release's own alpha proof is the baseline (~11.4k decl-lines in cone). It tests the M2 (Behrend) entry of the cluster on a rectangular problem, a genuinely different target."
+  },
+  {
+   "rank": 3,
+   "target": "O1: omega_F <= 9/4 for every field",
+   "lean_usable": true,
+   "argument": "Statable now with the MatrixFields model. The device must port to characteristic p; the char-5 issue (IsPrimitiveRoot zeta (5*M)) is a concrete, checkable obstacle. Success would be a new theorem the release does not contain, using C1+C2 as the main library items."
+  },
+  {
+   "rank": 4,
+   "target": "S3: R~(cw_2) < 3.931 (Alman-Li 2026)",
+   "lean_usable": true,
+   "argument": "Needs only a 15-line smallCW definition to state. It is outside omega and uses the device as 'degeneration with direct sums on both sides', the input of Alman-Li's Strassen calculus. Requires generalising exists_detecting_character to arbitrary tensors (proof-side work). Corollary risk if Alman-Li plus omega <= 9/4 already gives it: remove the headline."
+  },
+  {
+   "rank": 5,
+   "target": "O2/O3: omega < 9/4 or alpha > 5/8 via a new profile",
+   "lean_usable": true,
+   "argument": "Statable now. Tests whether C2's growth lemma (generic, ~500 decl-lines) plus C1 transfers to other families; low prior, high payoff."
+  }
+ ],
+ "precedent_check": {
+  "earlier_equivalent_found": false,
+  "verdict": "No earlier equivalent of C1 or C2 found outside the family (snippet-level search; consistent with the novelty pass). Closest: Alman-Li 2026 'Strassen calculus' (spectral conversion of direct-sum degenerations; no shared-leg separator in the summaries) and the CW/laser hashing line (lossy). Within-family precedent: M2's GROUP lemma (2026-09-24). No downgrade.",
+  "post_release_use": "None found as of 2026-10-10. Coverage is press-level (OfficeChai; a community.openai.com post reporting that the C Lean proof and comparator pass on one machine).",
+  "caveats": "WebFetch was not used (arxiv.org blocked in this environment); every external statement rests on WebSearch summaries. The 2.16805 value is confirmed by the summary of Alman arXiv 1812.08731; the CW_1 irreversibility 2.168 figure in family.md is the family analyst's own computation."
+ },
+ "sources": [
+  "data/pilot/107/{family,novelty}.json/.md; data/eureka_shortlist.json (no 107 entry yet, so no lean_decls hint); data/lean_checks.json",
+  "data/items/107_lean.json (text-level DAG) and my per-target BFS (scratchpad scripts)",
+  "lean/ComparatorChallenges/MatrixMultiplication.{json,lean}, MatrixFields.{json,lean}",
+  "lean/OAI/LinearAlgebra/MatrixMultiplication/{Main.lean, AuxiliarySeparation/*, Separation/*, ComplexBounds/SquareBound.lean, CoppersmithWinograd/ComplexCoppersmithWinograd.lean, Tensor/ComplexTensor.lean}",
+  "https://arxiv.org/pdf/2605.21738 (Alman-Li, CCC 2026)",
+  "https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.CCC.2026.36",
+  "https://arxiv.org/abs/2307.07970v1 (VXXZ alpha >= 0.321334)",
+  "https://lacker.io/complexity/problems/alpha-dual-matmul-exponent.html (CLLZ 0.625 barrier mention)",
+  "https://www.arxiv.org/abs/1812.06952 (Christandl-Vrana-Zuiddam, irreversibility)",
+  "https://arxiv.org/pdf/1812.08731 (Alman, universal method, 2.16805)",
+  "https://arxiv.org/pdf/1411.5414 (Ambainis-Filmus-Le Gall)",
+  "https://arxiv.org/pdf/2601.08119 (asymptotic rank numerical census)",
+  "https://research.aalto.fi/en/publications/a-universal-sequence-of-tensors-for-the-asymptotic-rank-conjectur/",
+  "https://officechai.com/ai/openai-has-found-a-far-faster-way-to-multiply-matrices-the-math-that-underpins-all-of-modern-ai/",
+  "https://community.openai.com/t/first-look-at-mathematics-manuscripts-from-an-internal-frontier-model-at-openai/1403886",
+  "https://www.alphaxiv.org/abs/2608.16884 (Dupont et al., 2.371177)"
+ ],
+ "search_log": [
+  "Local: read docs/downstream_agent_prompt.md, CLAUDE.md, PLAN.md speedup section, 107 family/novelty, 248 downstream.json (key structure), lean_checks.json.",
+  "Local Lean (text level): comparators MatrixMultiplication/MatrixFields; Main.lean; AuxiliarySeparation {Character/Basic, FiniteSeparation, Existence, Symmetrization; Separation/Basic; Tensor/TagInequality; Growth/Profile; Polynomial/Inequalities; Arithmetic/RankBound, CharacterRounding, RankExponent}; Separation/{ComplexModularSeparation, ComplexFiniteSeparation}; ComplexBounds/SquareBound; CoppersmithWinograd/ComplexCoppersmithWinograd.",
+  "Local DAG: BFS cones per comparator target from data/items/107_lean.json; shortest paths to C1/C2 declarations; grep for 'log 75' (none: M2 elementary bound unformalized).",
+  "Local release grep: preprints for laser method / asymptotic spectrum / asymptotic rank / border rank (M1, M2, M3 only).",
+  "Mathlib d13f23b grep (in .lake/packages/mathlib): no cap-set file.",
+  "WebSearch 'Alman Li asymptotic rank speedup theorems revisited ...' -> arXiv 2605.21738, CCC 2026; cw_2 < 3.931; bound below d^{2omega/3}.",
+  "WebSearch 'dual matrix multiplication exponent alpha lower bound 0.3213 ...' -> VXXZ alpha >= 0.321334; CLLZ 2025 barrier 0.625 (summary).",
+  "WebSearch 'Christandl Vrana Zuiddam barriers ... 2.16805' -> CVZ paper confirmed; 2.16805 not in that summary.",
+  "WebSearch 'Ambainis Filmus Le Gall ... 2.3078' -> confirmed.",
+  "WebSearch 'asymptotic rank conjecture Strassen tight tensors 2025 ...' -> Kaski-Michalek, CHNVZ, numerical census 2601.08119.",
+  "WebSearch 'Alman Limits on the Universal Method ... 2.168' -> arXiv 1812.08731, 2.16805 confirmed.",
+  "WebSearch '\"9/4\" matrix multiplication exponent OpenAI October 2026' and '... verification expert reaction ...' -> press only; no post-release use of the device; a forum post reports the C Lean comparator passing.",
+  "WebFetch: not attempted (fails on arxiv.org in this environment per the task brief)."
+ ],
+ "lean_checked_at_text_level_only": true,
+ "analyst": "DOWNSTREAM-TARGET agent, 2026-10-10. No lake/lean/comparator run (concurrent build in the workspace)."
+}

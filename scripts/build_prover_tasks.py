@@ -118,14 +118,23 @@ def main():
     for c in checks.get("comparator", []):
         passed.setdefault(c["fid"], []).append(f"{c['config']}: {c['result']}")
     tasks = []
+    # A family with several shortlist entries (e.g. 107's C1 and C2) shares one downstream file: emit its tasks once,
+    # under the first entry, naming every item.
+    names = {}
+    for it in sl["items"]:
+        names.setdefault(it["fid"], []).append(it["item"])
+    done = set()
     for pos, it in enumerate(sl["items"]):
         fid = it["fid"]
+        if fid in done:
+            continue
+        done.add(fid)
         tier = it.get("tier")
         dd = load(PILOT / fid / "downstream.json") or {}
         with_lib = first(it.get("lean_decls"), "; ".join(
             f"{s.get('name')} ({s.get('file', '').split('lean/')[-1]}:{s.get('line')})"
             for s in dd.get("lean_source") or [] if isinstance(s, dict)))
-        base = {"fid": fid, "eureka_item": it["item"], "tier": tier, "item_pos": pos, "item_F": it.get("F"),
+        base = {"fid": fid, "eureka_item": " + ".join(names[fid]), "tier": tier, "item_pos": pos, "item_F": it.get("F"),
                 "item_confidence": it.get("novelty_conf"),
                 "lean_check": "; ".join(passed.get(fid, [])) or "not yet run",
                 "with_item_library": txt(with_lib),
@@ -146,12 +155,12 @@ def main():
             r = top_rank.get(i)
             tasks.append({**base, "kind": kind, "list_order": j, "top5_rank": r,
                           "top5_argument": txt(first(top5[r - 1].get("argument"), top5[r - 1].get("why"))) if r else "",
-                          "title": txt(first(t.get("title"), t.get("target"), t.get("theorem"), t.get("name"))),
+                          "title": txt(first(t.get("title"), t.get("target"), t.get("theorem"), t.get("name"), t.get("setting"))),
                           "statement": txt(first(t.get("statement"), t.get("argument"))),
                           "reference": txt(t.get("reference")), "status": txt(t.get("status")),
                           "how_item_helps": txt(first(t.get("how_item_helps"), t.get("adaptation"), t.get("adaptation_sketch"),
                                                       t.get("why_device_must_fail"), t.get("why"))),
-                          "expected": txt(first(t.get("expected_speedup"), t.get("payoff"))), "confidence": txt(t.get("confidence")),
+                          "expected": txt(first(t.get("expected_speedup"), t.get("payoff"), t.get("expected"))), "confidence": txt(t.get("confidence")),
                           "lean_score": txt(first(lf.get("score"), t.get("lean"))), "lean_statable_with": txt(lf.get("statable_with")),
                           "lean_missing": txt(lf.get("missing")), "baseline_formal_proof": txt(lf.get("formal_proof_to_compare")),
                           "current_proof_size": txt(t.get("current_proof_size")), "success_criterion": SUCCESS[kind]})

@@ -392,7 +392,11 @@ def main():
         shortlist.append(row)
     by_fid_sl = {r["fid"]: r for r in shortlist if r["tier"] != 9}
     # Downstream targets per shortlisted item (data/pilot/<fid>/downstream.json; Lean-usable related problems).
+    seen_ds = set()
     for it in sl_doc.get("items", []):
+        if it["fid"] in seen_ds:  # several entries for one family share one downstream file
+            continue
+        seen_ds.add(it["fid"])
         dd = load(PILOT / it["fid"] / "downstream.json")
         if not dd:
             continue

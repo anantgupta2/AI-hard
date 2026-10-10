@@ -315,6 +315,7 @@ This is an analogy, not yet a formal definition.
   - Supporting: wide cross-field resolvents (004 logic ↔ heights, 075 information theory ↔ Carleson, 158 spectral rigidity ↔ colouring, 107 representation tensors ↔ complexity). Analysts repeatedly find that "new" items are new combinations of precedented parts. For 103, the best downstream targets were corollaries, not reuse of the device.
   - Falsifier: any N3 device that passes the speedup test on a theorem other than its own. The prover queue (`data/prover_tasks.json`) is that experiment.
   - Weakening evidence to track: device reuse across the model's own manuscripts (e.g. 002's Heisenberg-commutator choice in all three BSD papers, 271's splice, 107's separation lemma). Count it release-wide.
+    - The strongest case so far (found 2026-10-10): 003's sextic-twist duality is reused by family 029 to claim Artin's primitive root conjecture for base 2. That is a different famous problem, so it is a device reused across problems, not a corollary. Whether 029 needs the device or only 003's theorem is the deciding check (its downstream target 2).
 - **Prediction (not a finding).** Had humans resolved this set of problems, over perhaps 100–150 years, they would very likely have produced reusable frameworks along the way, as Wiles's R = T, Gowers's higher-order Fourier analysis and Perelman's surgery did. Revisit in 12–24 months: does any model device enter the human literature or Mathlib as a named tool?
 
 ## Caveats
