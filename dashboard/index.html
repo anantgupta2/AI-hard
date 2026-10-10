@@ -894,7 +894,7 @@ dash.calc('summary', {
         s.append(S.el('span', 'ax-lvl', '#' + r.rank), S.el('span', null, r.fid + ' · ' + r.item),
           S.el('span', 'ax-badge', 'conf ' + d3.format('.2f')(r.novelty_conf)), S.el('span', 'ax-lvl', r.F || ''));
         const body = S.el('div', 'body');
-        [['Distance from known material', r.pivot_distance], ['For', r['for']], ['Against', r.against], ['Claude’s verdict', r.verdict],
+        [['Distance from known material', r.pivot_distance], ['For', r['for']], ['Against', r.against], ['Claude’s verdict', r.verdict], ['Downstream and Lean findings', r.downstream],
           ['Chance of a confirmed jump (rough judgement)', r.p_jump != null ? d3.format('.0%')(r.p_jump) : null], ['Next test', r.next_test],
           ['Why excluded', r.excluded_reason], ['Lean status', r.lean_status], ['Lean status, why', r.lean_status_why], ['Lean declarations', r.lean_decls],
           ['Comparator chain', r.comparator_chain], ['Gaps between paper and Lean', r.lean_gaps]]
@@ -915,9 +915,9 @@ dash.calc('summary', {
               const dd = S.el('details'); dd.dataset.rowKey = x.key;
               const ss = S.el('summary');
               ss.append(S.el('span', 'ax-lvl', '#' + x.order), S.el('span', null, x.title || '(untitled)'));
-              if (x.lean_score) ss.append(S.el('span', 'ax-badge' + (/now/i.test(x.lean_score) ? ' n3' : /300/.test(x.lean_score) ? ' n2' : ''), 'Lean: ' + x.lean_score));
+              if (x.lean_score) ss.append(S.el('span', 'ax-badge' + (/now/i.test(x.lean_score) ? ' n3' : /300/.test(x.lean_score) ? ' n2' : ''), 'Lean: ' + x.lean_score.slice(0, 60)));
               const b2 = S.el('div', 'body');
-              [['Statement', x.statement], ['Reference', x.reference], ['Status', x.status], ['How the item helps', x.how], ['Payoff or speedup', x.payoff],
+              [['Statement', x.statement], ['Reference', x.reference], ['Status', x.status], ['Which part of the obstruction matches', x.match], ['Current proof size', x.size], ['How the item helps (or why it must fail)', x.how], ['Payoff or speedup', x.payoff],
                 ['Confidence', x.confidence], ['Lean: what it needs', x.lean_needs], ['Formal proof to compare', x.lean_compare]]
                 .filter(([, v]) => v).forEach(([k, v]) => { const p = S.el('div'); p.append(S.el('b', null, k + ': '), document.createTextNode(v)); b2.append(p); });
               dd.append(ss, b2); inner.append(dd);

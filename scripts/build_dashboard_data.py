@@ -402,9 +402,10 @@ def main():
                            "title": txt(first(t.get("title"), t.get("target"), t.get("theorem"), t.get("candidate"), t.get("name"))),
                            "statement": txt(first(t.get("statement"), t.get("argument"), t.get("why"))),
                            "reference": txt(t.get("reference")), "status": txt(t.get("status")),
-                           "how": txt(first(t.get("how_item_helps"), t.get("adaptation"), t.get("argument") if t.get("statement") else None)),
+                           "how": txt(first(t.get("how_item_helps"), t.get("adaptation"), t.get("adaptation_sketch"), t.get("why_device_must_fail"), t.get("why"), t.get("argument") if t.get("statement") else None)),
+                           "size": txt(t.get("current_proof_size")), "match": txt(t.get("obstruction_match")),
                            "payoff": txt(first(t.get("expected_speedup"), t.get("payoff"))), "confidence": txt(t.get("confidence")),
-                           "lean_score": txt(lf.get("score")), "lean_needs": txt(first(lf.get("missing"), lf.get("statable_with"))),
+                           "lean_score": txt(first(lf.get("score"), t.get("lean_usable"), t.get("lean"))), "lean_needs": txt(first(lf.get("missing"), lf.get("statable_with"))),
                            "lean_compare": txt(lf.get("formal_proof_to_compare"))})
         row = by_fid_sl.get(it["fid"])
         if row is not None:

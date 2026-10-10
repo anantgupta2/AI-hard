@@ -1,0 +1,417 @@
+{
+ "fid": "297",
+ "date": "2026-10-09",
+ "analyst_role": "downstream",
+ "method_note": "Text-level only: Lean read, not compiled (no local toolchain). Dependency chain traced by hand with grep; scripts/extract_lean.py not rerun. Web search partly available (one rate-limit interruption); index appears stale for Sep-Oct 2026.",
+ "item": "Selective bridge: reduced HNN extension along matched peaking projections (paper Thm na:bridge, bridge.tex:11-39, with peak-transfer word decay I20, peaking expectation L09, trace-null supports L07)",
+ "item_statement": "A unital, faithful tracial tau, no finite-dimensional irreps; (p_n^i) decreasing projections, p_0^i = 1, peaking to inequivalent pure states f_1, f_2, with tau(p_n^1) = tau(p_n^2) = t_n strictly decreasing to 0. Adjoin a unitary v with v p_n^1 v* = p_n^2 as Ueda's reduced HNN extension over D_i = C*(p_n^i). Then every pure state of A extends uniquely, the extensions are pure, and h~ ~ k~ iff h ~ k or {[h],[k]} = {[f_1],[f_2]}; the trace extends faithfully; H(A) is simple if A is.",
+ "item_type": "F3 (auxiliary construction inside a witness construction; witness rules apply: reuse = the same design producing other witnesses)",
+ "lean_status": "formalized, different route",
+ "lean_status_why": "PeakingPairData plus hnn_unique, hnn_join, hnn_no_unintended_join and hnn_simple formalize the bridge's construction and all its pure-state conclusions, but on a scalar Fock-space model of the amalgamated free product with endpoint excision nets, and only for SIMPLE bases (the paper assumes only no finite-dimensional irreducible representations), which covers every use in the recursion.",
+ "lean_gaps": [
+  "Hypothesis strengthened: hnn_unique, hnn_join, hnn_no_unintended_join and hnn_simple all take hA : IsSimpleCStar A. The paper's Thm na:bridge needs only a faithful trace and no finite-dimensional irreps (simplicity only for the simplicity clause). Special case relative to the paper; every application in 297 has a simple base, so the comparator is unaffected. For downstream uses with non-simple bases (e.g. building algebras with several irreps from non-simple pieces) the Lean bridge would need generalizing.",
+  "Separated is stated for the M_2-amplified states (B.matrixState i on CStarMatrix Bool Bool A); the Lean derives it from inequivalence of the original states (Q.separated_of_inequivalent, used in Tracial.lean). Equivalent in substance.",
+  "Peaking data: peak_zero, atom_positive (strictly decreasing traces), trace_null, matched (exact equality of traces). Matches the paper's 1 = t_0 > t_1 > ... -> 0.",
+  "Model: the reduced amalgamated free product is built on a scalar l2 Fock space over atoms (AtomicCStar, atomicLeft), not on Hilbert C*-modules (Blanchard-Dykema). HNNAlgebra is the matrix corner, as in Ueda and the paper.",
+  "Word decay: Endpoint.word_decay / bridge_word_decay with excision nets, packaging the paper's peak transfer P^l b = b P^r and endpoint expectations. Same mathematics, different organisation.",
+  "The comparator OAI.NaimarkZFC.main matches the paper's Thm na:main verbatim; KOS homogeneity, cited in the paper, is re-proved in Lean (Operators.lean:927), so the bridge is not resting on a black box.",
+  "Not compiled; no formalization.yaml entry for 297 (catalog shows any_ms_formalized=False although the Lean is complete)."
+ ],
+ "comparator_chain": [
+  "OAI.NaimarkZFC.main (Naimark/Tracial.lean:243)",
+  "OAI.NaimarkZFC.ChronologicalStage.fullTower_pure_reference_unconditional (Tracial.lean:206)",
+  "OAI.NaimarkZFC.ChronologicalStage.recursiveTower_treated_unconditional (Tracial.lean:171) -> scheduledRule_treated_unconditional",
+  "OAI.NaimarkZFC.TracialStage.exists_joining_successor_unconditional (Tracial.lean:46/89; successor step)",
+  "OAI.NaimarkZFC.TracialStage.hnn (Stages.lean:129) and TracialStage.hnn_reference_join (Stages.lean:157)",
+  "OAI.NaimarkZFC.PeakingPairData.hnn_join (HNN.lean:1416) and PeakingPairData.hnn_unique (HNN.lean:1412)",
+  "OAI.NaimarkZFC.PeakingPairData.corner_unique (HNN.lean:22) -> corner_unique_of_matrix -> supported_matrix_unique",
+  "OAI.NaimarkZFC.PeakingPairData.Endpoint.unique_matrix_extension (Peaking.lean:1963) -> Endpoint.model_word_decay (1951) -> Endpoint.word_decay (1823) -> bridge_word_decay (1593)",
+  "Second branch (countable determination): main -> limit-stage pure-state treatment -> literal_countable_determination (Omission.lean:1699) -> dependency_closed_pureUEP (Omission.lean:1596) -> omitted_endpoint_bridge (Omission.lean:1528) -> AmbientPresentation.bridge / BridgeSuccessor.hnn -> hnn_unique, hnn_no_unintended_join (HNN.lean:1425)"
+ ],
+ "comparator_dependency_verdict": "The comparator depends on the bridge in both branches (successor step and closed-subiteration T21). Removing it disconnects main. Intermediate scheduling lemma names are abbreviated; all named declarations were checked by grep.",
+ "lean_source": [
+  {
+   "name": "OAI.NaimarkZFC.PeakingPairData",
+   "kind": "structure",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/Naimark/Peaking.lean",
+   "line": 1046,
+   "text": "structure PeakingPairData (A : Type) [CStarAlgebra A] [PartialOrder A] [StarOrderedRing A] where\n  trace : A →ₚ[ℂ] ℂ\n  tracial : IsTracialPositive trace\n  normalized : trace 1 = 1\n  faithful : ∀ a, trace (star a*a) = 0 → a = 0\n  peak : Bool → ℕ → A\n  state : Bool → A →L[ℂ] ℂ\n  peaks : ∀ i, Peaks (peak i) (state i)\n  peak_zero : ∀ i, peak i 0 = 1\n  atom_positive : ∀ i v, 0 < (trace (peakAtom (peak i) v)).re\n  trace_null : ∀ i, Tendsto (fun v => (trace (peak i v)).re) atTop (𝓝 0)\n  matched : ∀ i v, trace (peak i v) = trace (peak false v)"
+  },
+  {
+   "name": "OAI.NaimarkZFC.Peaks",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/Naimark/Basic.lean",
+   "line": 363,
+   "text": "def Peaks (p : ℕ → A) (f : A →L[ℂ] ℂ) : Prop :=\n  (∀ n, IsStarProjection (p n)) ∧ Antitone p ∧ IsState f ∧\n    (∀ n, f (p n) = 1) ∧\n    ∀ g : A →L[ℂ] ℂ, IsState g → (∀ n, g (p n) = 1) → g = f"
+  },
+  {
+   "name": "OAI.NaimarkZFC.PeakingPairData.Separated",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/Naimark/Peaking.lean",
+   "line": 1703,
+   "text": "def Separated : Prop := ∀ i j : Bool, i ≠ j →\n  ¬ UnitarilyEquivalent (pureGNS (B.matrixState i) (B.matrixPure i))\n    (pureGNS (B.matrixState j) (B.matrixPure j))"
+  },
+  {
+   "name": "OAI.NaimarkZFC.StateExtensionUnique",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/Naimark/Peaking.lean",
+   "line": 2156,
+   "text": "def StateExtensionUnique (φ : A →⋆ₐ[ℂ] C) (f : A →L[ℂ] ℂ) : Prop :=\n  ∀ g₁ g₂ : C →L[ℂ] ℂ, IsState g₁ → IsState g₂ →\n    restrictState φ g₁ = f → restrictState φ g₂ = f → g₁ = g₂"
+  },
+  {
+   "name": "OAI.NaimarkZFC.PureStateEquivalent",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/Naimark/HNN.lean",
+   "line": 1048,
+   "text": "def PureStateEquivalent (f : A →L[ℂ] ℂ) (hf : IsPureState f)\n    (g : A →L[ℂ] ℂ) (hg : IsPureState g) : Prop :=\n  UnitarilyEquivalent (pureGNS f hf) (pureGNS g hg)"
+  },
+  {
+   "name": "OAI.NaimarkZFC.PeakingPairData.Endpoint.word_decay",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/Naimark/Peaking.lean",
+   "line": 1823,
+   "text": "theorem Endpoint.word_decay (hs : B.Separated)\n    (hex : ∀ i, X.tag = some i → Y.tag ≠ some (!i))\n    (w : BridgeCore (CStarMatrix Bool Bool A))\n    (hw : w.Centered (fun a => B.expectation a = 0)) (a c : CStarMatrix Bool Bool A) :\n    Tendsto (fun k : ι × κ => B.base (X.net k.1)*B.base a*w.eval B.base B.letter*\n      B.base c*B.base (Y.net k.2)) atTop (𝓝 0)"
+  },
+  {
+   "name": "OAI.NaimarkZFC.PeakingPairData.hnnUnitary_conjugates",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/Naimark/HNN.lean",
+   "line": 1408,
+   "text": "theorem hnnUnitary_conjugates (n : ℕ) :\n    (B.hnnUnitary:B.HNNAlgebra)*B.hnnBase (B.peak false n)*star (B.hnnUnitary:B.HNNAlgebra) =\n      B.hnnBase (B.peak true n)"
+  },
+  {
+   "name": "OAI.NaimarkZFC.PeakingPairData.hnn_unique",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/Naimark/HNN.lean",
+   "line": 1412,
+   "text": "theorem hnn_unique (hs : B.Separated) (hA : IsSimpleCStar A)\n    (f : A →L[ℂ] ℂ) (hf : IsPureState f) : StateExtensionUnique B.hnnBase f"
+  },
+  {
+   "name": "OAI.NaimarkZFC.PeakingPairData.hnn_join",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/Naimark/HNN.lean",
+   "line": 1416,
+   "text": "theorem hnn_join (hs : B.Separated) (hA : IsSimpleCStar A)\n    (F G : B.HNNAlgebra →L[ℂ] ℂ) (hF : IsPureState F) (hG : IsPureState G)\n    (hrF : restrictState B.hnnBase F = B.state false)\n    (hrG : restrictState B.hnnBase G = B.state true) :\n    PureStateEquivalent F hF G hG"
+  },
+  {
+   "name": "OAI.NaimarkZFC.PeakingPairData.hnn_no_unintended_join",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/Naimark/HNN.lean",
+   "line": 1425,
+   "text": "theorem hnn_no_unintended_join (hs : B.Separated) (hA : IsSimpleCStar A)\n    (f g : A →L[ℂ] ℂ) (hf : IsPureState f) (hg : IsPureState g)\n    (hne : ¬ UnitarilyEquivalent (pureGNS f hf) (pureGNS g hg))\n    (hex : ∀ i, ¬ (UnitarilyEquivalent (pureGNS f hf)\n        (pureGNS (B.state i) (B.peaks i).isPureState) ∧\n      UnitarilyEquivalent (pureGNS g hg)\n        (pureGNS (B.state (!i)) (B.peaks (!i)).isPureState)))\n    (F G : B.HNNAlgebra →L[ℂ] ℂ) (hF : IsPureState F) (hG : IsPureState G)\n    (hrF : restrictState B.hnnBase F = f) (hrG : restrictState B.hnnBase G = g) :\n    ¬ PureStateEquivalent F hF G hG"
+  },
+  {
+   "name": "OAI.NaimarkZFC.PeakingPairData.hnn_simple",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/Naimark/HNN.lean",
+   "line": 1778,
+   "text": "theorem hnn_simple (hs : B.Separated) (hA : IsSimpleCStar A) : IsSimpleCStar B.HNNAlgebra"
+  },
+  {
+   "name": "OAI.NaimarkZFC.TracialStage.hnn",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/Naimark/Stages.lean",
+   "line": 129,
+   "text": "def hnn : TracialStage where\n  carrier := Q.HNNAlgebra\n  cstar := inferInstance\n  order := inferInstance\n  starOrder := inferInstance\n  simple := Q.hnn_simple hs X.simple\n  trace := Q.hnnTrace\n  traceState := Q.hnnTrace_isState\n  tracial := Q.hnnTrace_tracial\n  base := Q.hnnBase.comp X.base\n  base_injective := Q.hnnBase_injective.comp X.base_injective\n  baseUEP := X.baseUEP.comp (fun f hf => Q.hnn_unique hs X.simple f hf)"
+  },
+  {
+   "name": "OAI.NaimarkZFC.TracialStage.hnn_reference_join",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/Naimark/Stages.lean",
+   "line": 157,
+   "text": "theorem hnn_reference_join (f : X →L[ℂ] ℂ) (hf : IsPureState f)\n    (h0 : Q.state false = X.reference) (h1 : Q.state true = f) :\n    ∃ F : hnn X Q hs →L[ℂ] ℂ, ∃ hF : IsPureState F,\n      restrictState Q.hnnBase F = f ∧\n      PureStateEquivalent (hnn X Q hs).reference (hnn X Q hs).reference_spec.1 F hF"
+  },
+  {
+   "name": "OAI.NaimarkZFC.PeakingPairData.omitted_endpoint_bridge",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/Naimark/Omission.lean",
+   "line": 1528,
+   "text": "theorem omitted_endpoint_bridge\n    (htrace : ∀ k < δ, ∀ a, (Q j).trace a = (Q k).trace a) :\n    BridgeSuccessor (StarSubalgebra.inclusion\n      (omittedAlgebra_base_mono base v S δ (show j ≤ j+1 from le_self_add)))"
+  },
+  {
+   "name": "OAI.NaimarkZFC.main",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/Naimark/Tracial.lean",
+   "line": 243,
+   "text": "theorem main :\n    ∃ (A : Type u) (_ : CStarAlgebra A),\n      IsSimpleCStar A ∧ ¬ FiniteDimensional ℂ A ∧\n      (∃ τ : A →L[ℂ] ℂ, IsFaithfulTracialState τ) ∧\n      HasUniqueIrreducibleRepresentation.{u, v, w} A ∧\n      ∀ (H : Type v) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H],\n        ¬ IsIsomorphicToCompacts A H"
+  }
+ ],
+ "speedup_targets": [
+  {
+   "title": "AW04 Corollary 3, tracial case (two prescribed states joined, unique extension)",
+   "statement": "For a separable simple unital C*-algebra A with a faithful trace and inequivalent pure states f, g, there is a simple extension B in which f and g extend uniquely and their extensions are equivalent.",
+   "reference": "Akemann-Weaver, PNAS 101 (2004), arXiv:math/0312135, Cor. 3 (via a crossed product by a KOS automorphism)",
+   "status": "known",
+   "current_proof_size": "about 2 pages in AW04 (plus KOS); in the OAI Lean it is essentially exists_joining_successor_unconditional",
+   "how_item_helps": "Bridge + KOS (to obtain matched peaking sequences with tau = 2^-n) gives it at once, with the stronger conclusion that every pure state extends uniquely and no other pair joins.",
+   "expected_speedup": "high",
+   "confidence": 0.7,
+   "caveat": "The bridge was designed as exactly this successor step; a speedup here is near-tautological and should not count as a confirmed jump.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI Naimark: IsSimpleCStar, IsPureState, StateExtensionUnique, PureStateEquivalent, IsFaithfulTracialState; Mathlib SeparableSpace",
+    "missing": [],
+    "formal_proof_to_compare": "partial: OAI TracialStage.exists_joining_successor_unconditional (tracial, CAR-containing bases)"
+   }
+  },
+  {
+   "title": "CH implies a Naimark counterexample of norm density aleph_1",
+   "statement": "Assuming 2^aleph_0 = aleph_1, there is a counterexample to Naimark's problem generated (as a C*-algebra) by aleph_1 elements.",
+   "reference": "Tanaka arXiv:2609.26930 (CH iff such a counterexample exists); Calderon-Farah, JFA 285 (2023), arXiv:2006.06886, Prop. 8.3 (a bridge-type extension class plus CH gives a counterexample); AW04 under diamond",
+   "status": "known (Tanaka 2026, model-produced; trivially implied by his density-c ZFC example under CH)",
+   "current_proof_size": "Tanaka: 19 pages; 297's machinery with kappa = omega_1",
+   "how_item_helps": "Under L- (Tanaka excluded), CF22 Prop. 8.3 says precisely that a class of extensions with (U) for all pure states and a prescribed join suffices under CH; the bridge supplies that class. The proof is then a few lines plus closure under limits.",
+   "expected_speedup": "high (given CF22 Prop. 8.3 in L)",
+   "confidence": 0.6,
+   "caveat": "Reuse of the bridge inside the same problem (Naimark), not an independent theorem; and with Tanaka2026 in L it is a corollary of a known result.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib Cardinal.continuum, Cardinal.aleph 1; OAI NaimarkZFC.HasUniqueIrreducibleRepresentation; density as closure of StarAlgebra.adjoin of a set of cardinality aleph_1",
+    "missing": [
+     "norm-density/generation predicate (about 20 lines)"
+    ],
+    "formal_proof_to_compare": "OAI Naimark Lean (25.9k lines, ZFC, length c^+) as an upper bound; Tanaka's MathlibAnnex Lean (not inspected)"
+   }
+  },
+  {
+   "title": "Unique extension from C*_r(F_S) to C*_r(F_R)",
+   "statement": "For S subset R, every pure state of C*_r(F_S) has a unique state extension to C*_r(F_R).",
+   "reference": "Akemann-Wassermann-Weaver, Glasgow Math. J. 52 (2010), arXiv:0705.1182, Thm 0.6 / Lemma 0.2",
+   "status": "known",
+   "current_proof_size": "about 3 pages",
+   "how_item_helps": "The bridge's word-decay engine (unique_extension_of_dense_word_decay, excision nets, centered reduced words) generalizes AWW Lemma 0.2 from free groups to amalgamated/HNN words; the free-group case should follow by instantiating it with trivial amalgam data.",
+   "expected_speedup": "low-med",
+   "confidence": 0.4,
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI FreeGroupFactor.Operators (leftRegular, GroupOperator) + OAI Naimark state notions",
+    "missing": [
+     "reduced group C*-algebra as norm closure of span of lambda(g) (about 50-100 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Simplicity of reduced HNN extensions along peaking data",
+   "statement": "If A is simple and the peaking data are separated, the reduced HNN extension is simple.",
+   "reference": "Ueda, Illinois J. Math. 52 (2008) and arXiv:math/0601706 (general simplicity criteria for reduced HNN extensions); Dykema, 'Simplicity and stable rank one of reduced free products' (1999)",
+   "status": "known in general forms; the peaking case is proved in OAI (hnn_simple)",
+   "current_proof_size": "Ueda: several pages; OAI: part of HNN.lean (2.7k lines)",
+   "how_item_helps": "Already a clause of the bridge; little room for a speedup outside the peaking case.",
+   "expected_speedup": "low",
+   "confidence": 0.5,
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI PeakingPairData.HNNAlgebra",
+    "missing": [],
+    "formal_proof_to_compare": "yes: OAI hnn_simple (HNN.lean:1778)"
+   }
+  }
+ ],
+ "open_problems": [
+  {
+   "title": "ZFC: a simple C*-algebra with exactly m >= 2 inequivalent irreducible representations",
+   "statement": "In ZFC, for each 2 <= m (<= aleph_0?), is there a simple C*-algebra with exactly m unitary equivalence classes of irreducible representations?",
+   "reference": "Calderon-Farah, 'Can you take Akemann-Weaver's diamond away?', JFA 285 (2023), arXiv:2006.06886 (exactly two, separably represented, under diamond^Cohen; abstract also states general m)",
+   "url": "https://arxiv.org/abs/2006.06886",
+   "status": "open in ZFC as far as found (Tanaka2026's abstract claims only m = 1)",
+   "obstruction_match": "Exactly the bridge's selectivity. Join every pure state to one of m pairwise inequivalent reference classes and never merge two references. hnn_no_unintended_join is the successor-step guarantee; pure_inequivalent_ordinal_chain (HNN.lean:2242) carries inequivalence through limits; T21 (closed sub-iterations) must preserve m-fold inequivalence.",
+   "adaptation_sketch": "Start from a base with m inequivalent pure states (e.g. CAR with m product states); schedule pairs (state, reference r(state)) of length c^+; at each step build matched peaking sequences by KOS and apply the bridge; prove T21 with the extra invariant 'references pairwise inequivalent'. Separable representability (part of CF22's statement) is not expected.",
+   "payoff": "high (first ZFC failure of Glimm's dichotomy with m >= 2 classes)",
+   "confidence": 0.5,
+   "difficulty": "med",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI NaimarkZFC IsIrreducible, UnitarilyEquivalent, IsSimpleCStar: exists pi : Fin m -> irreducible reps, pairwise inequivalent, and every irreducible rho equivalent to some pi i",
+    "missing": [
+     "an 'exactly m classes' predicate (about 30 lines)"
+    ],
+    "formal_proof_to_compare": "the OAI 297 Lean is the m = 1 case (25.9k lines)"
+   }
+  },
+  {
+   "title": "Vaccaro's trace-simplex question in ZFC",
+   "statement": "For a metrizable Choquet simplex K, is there in ZFC a Naimark counterexample whose tracial state space is affinely homeomorphic to K? (Special cases: a unique trace; exactly k extreme traces.)",
+   "reference": "Vaccaro, 'Trace spaces of counterexamples to Naimark's problem', JFA (2018) + Corrigendum (2020) (under diamond)",
+   "url": "",
+   "status": "open in ZFC (297 and Tanaka give a faithful trace but no trace-space control)",
+   "obstruction_match": "The bridge preserves a faithful trace, but a trace on H(A) must restrict to a theta-compatible trace on A (tau'(p_n^1) = tau'(p_n^2)). Each step therefore prunes the trace space, and KOS supplies matching for one trace at a time.",
+   "adaptation_sketch": "Choose peaking sequences matched for every trace in a prescribed face (needs a multi-trace KOS); show that HNN extensions with theta trace-preserving for all traces in K keep T(H(A)) = T(A).",
+   "payoff": "med-high",
+   "confidence": 0.3,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI Naimark trace notions; the unique-trace and k-extreme-traces special cases are statable now",
+    "missing": [
+     "Choquet simplex and affine homeomorphism of state spaces (general case; about 200-400 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "A nuclear Naimark counterexample in ZFC",
+   "statement": "Is there in ZFC a nuclear C*-algebra with a unique irreducible representation up to equivalence that is not isomorphic to K(H)?",
+   "reference": "AW04 (diamond; their construction is an inductive limit of Z-crossed products over a CAR-type base, hence nuclear on our reading, not re-verified); Farah's survey 'Set theory and C*-algebras', arXiv:math/0604198",
+   "url": "https://arxiv.org/abs/math/0604198",
+   "status": "open in ZFC to our knowledge",
+   "obstruction_match": "Same Naimark recursion; but the bridge's reduced amalgamated free product over C(N u {infinity}) with centered diffuse parts is expected to be non-nuclear, so the device is expected to FAIL here (see negative_controls).",
+   "adaptation_sketch": "Would need a nuclear bridge (e.g. a partial crossed product by an amenable groupoid) with the same selectivity; 297's construction does not provide it.",
+   "payoff": "high",
+   "confidence": 0.1,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "",
+    "missing": [
+     "nuclearity / completely positive approximation property for C*-algebras (Mathlib lacks it; est. > 1k lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Calderon-Farah Question 8.2 (global automorphism moving every pure state off its class)",
+   "statement": "Roughly: is there an automorphism of a separable simple C*-algebra B such that crossed products give unique extensions for all pure states (no pure state equivalent to its translate)?",
+   "reference": "Calderon-Farah, arXiv:2006.06886, Sec. 8, Q8.2",
+   "url": "https://arxiv.org/abs/2006.06886",
+   "status": "open",
+   "obstruction_match": "The bridge sidesteps Q8.2 by replacing a global automorphism with a partial isomorphism between two copies of C(N u {infinity}); it does not answer it.",
+   "adaptation_sketch": "No strong candidate: the bridge's selectivity comes from the smallness of D_i, the opposite of a global automorphism.",
+   "payoff": "low for this item",
+   "confidence": 0.1,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib StarAlgEquiv; OAI Naimark state notions",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Group-theoretic analogue: finitely presented infinite groups with exactly two conjugacy classes",
+   "statement": "Is there a finitely presented infinite group with exactly two conjugacy classes?",
+   "reference": "Higman-Neumann-Neumann, J. London Math. Soc. 24 (1949) (countable examples via iterated HNN extensions); Osin, Ann. of Math. 172 (2010) (finitely generated examples)",
+   "url": "",
+   "status": "open to our knowledge (not re-verified in this session)",
+   "obstruction_match": "Same design: merge one pair of classes per HNN step with no other merges (Collins' lemma ~ hnn_no_unintended_join), iterate to one class.",
+   "adaptation_sketch": "None: the C*-bridge cannot transfer back (its content is analytic). Listed because it is the design's origin, not as a target.",
+   "payoff": "none for this item",
+   "confidence": 0.0,
+   "difficulty": "n/a",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib PresentedGroup, ConjClasses",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "Naimark's problem has a negative answer in ZFC (the comparator; already present in Tanaka2026).",
+  "Akemann-Weaver (diamond) and Calderon-Farah (diamond^Cohen + CH) counterexamples become consequences of the ZFC result, as existence statements.",
+  "The counterexample has a faithful tracial state (also in Tanaka2026)."
+ ],
+ "release_reuse": [
+  {
+   "where": "297 itself",
+   "what": "The bridge is used in every active successor step (TracialStage.hnn / exists_joining_successor_unconditional) and inside the closed-subiteration theorem T21 (omitted_endpoint_bridge).",
+   "counts_as_device_reuse": "in-family only"
+  },
+  {
+   "where": "rest of the release",
+   "what": "No other family uses it. CONTENTS.md has no other Naimark or pure-state family, and grep over lean/OAI finds no use of PeakingPairData or NaimarkZFC outside OAI/Analysis/Naimark.",
+   "counts_as_device_reuse": "none"
+  },
+  {
+   "where": "outside the release: Tanaka arXiv:2609.26930",
+   "what": "The same theorem by CAR shell sums and rank-one defects, with no HNN; it shares only the KOS-transported trace-2^-n projections (C5).",
+   "counts_as_device_reuse": "no (different design)"
+  }
+ ],
+ "negative_controls": [
+  {
+   "title": "Separable / separably-acting algebras",
+   "statement": "A C*-algebra whose unique irreducible representation acts on a separable Hilbert space is K(H) (Rosenberg; CF22 Prop. 7.2). A separable simple non-type-I algebra has 2^aleph_0 inequivalent irreducible representations (Glimm).",
+   "reference": "Rosenberg 1953; Glimm 1961; CF22 Prop. 7.2",
+   "why": "Proved-false analogue: a countable bridge iteration over a separable base cannot reach a single class."
+  },
+  {
+   "title": "Density aleph_1 under not-CH",
+   "statement": "The existence of a counterexample generated by aleph_1 elements is independent of ZFC; it is equivalent to CH.",
+   "reference": "AW04 Cor. 7; Tanaka arXiv:2609.26930",
+   "why": "Proved (consistently) false analogue: a length-omega_1 bridge recursion must fail when c > aleph_1, because countable determination cannot schedule the c pure states of a separable stage in aleph_1 steps. This explains the c^+ length."
+  },
+  {
+   "title": "Graph C*-algebras",
+   "statement": "Naimark's problem has a positive answer for graph C*-algebras.",
+   "reference": "Suri-Tomforde, arXiv:1708.04368",
+   "why": "The bridge cannot produce such algebras; a prover using it should not 'find' a graph counterexample."
+  },
+  {
+   "title": "Nuclear targets",
+   "statement": "FH17-type and nuclear Naimark constructions.",
+   "reference": "Farah-Hirshberg, PNAS 114 (2017), arXiv:1612.01170",
+   "why": "Expected failure, not proved: reduced amalgamated free products over abelian D with diffuse centered parts are typically non-nuclear, so the bridge should not help."
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "title": "ZFC simple C*-algebra with exactly m >= 2 irreducible representations",
+   "lean": "statable now",
+   "argument": "The strongest device-reuse test. It needs exactly what is new in the bridge (no-other-join for ALL old pure states) and nothing it lacks. It is known only under diamond^Cohen (CF22). The 297 Lean is the m = 1 instance, so the formal statement and most infrastructure exist. A successful run would be a genuinely new witness from the same design, which is what the witness-reuse rule asks for."
+  },
+  {
+   "rank": 2,
+   "title": "AW04 Cor. 3, tracial case",
+   "lean": "statable now",
+   "argument": "Most measurable: a short known theorem that the bridge (plus KOS) proves immediately. It is near-tautological because the bridge was built as this successor step, so use it to calibrate the harness, not as confirmation."
+  },
+  {
+   "rank": 3,
+   "title": "CH implies a density-aleph_1 counterexample",
+   "lean": "statable now",
+   "argument": "With CF22 Prop. 8.3 in L and Tanaka2026 excluded, the bridge closes the gap CF22 left open as Q8.1, giving a direct test of whether the posed amalgamation plus the bridge makes the CH case short. It is same-problem reuse."
+  },
+  {
+   "rank": 4,
+   "title": "Vaccaro's trace simplex in ZFC (unique-trace or k-extreme-traces special case)",
+   "lean": "special cases statable now; general case < 300 lines",
+   "argument": "Open in ZFC, and it tests a property the bridge only partly controls (traces). It is a likely place for the device to need a genuine extension (multi-trace matching), so it measures how far the design stretches."
+  },
+  {
+   "rank": 5,
+   "title": "AWW10 Thm 0.6 via the word-decay engine",
+   "lean": "< 300 lines (reduced group C*-algebra)",
+   "argument": "A known theorem outside Naimark recursions, where the bridge's analytic core (excision nets + centered reduced words) could replace AWW's free-group estimate. Expected speedup is low-med, but it is the cleanest test of the analytic core in isolation."
+  }
+ ],
+ "precedent_check": {
+  "same_theorem": "Tanaka arXiv:2609.26930 (2026-09-22, two days earlier; ChatGPT-developed per its AI statement): a ZFC counterexample with a faithful trace, of norm density 2^aleph_0, plus 'CH iff a density-aleph_1 counterexample exists'. Different route; no HNN.",
+  "design_level_earlier_equivalent": "Higman-Neumann-Neumann (1949) iterate HNN extensions, each conjugating one prescribed pair with no other new conjugacies (Britton's lemma / Collins' conjugacy theorem), to embed any countable group in one where all elements of the same order are conjugate. Osin (2010) has finitely generated groups with two conjugacy classes. The 297 recursion is the operator-algebraic transcription of this template: pure-state classes for conjugacy classes, matched peaking projections for cyclic subgroups, hnn_no_unintended_join for Collins' lemma, transfinite length for countable length. Ueda's reduced HNN is the transfer bridge, and Calderon-Farah Q8.1 had already asked for such an amalgamation. 297 does not cite HNN 1949 (references.bib checked).",
+  "downgrade": "Yes, at the level of the design: 'join one pair of classes per HNN step, with no other joins, and iterate' is transfer of a 1949 group-theoretic template (N0 under the strict rule). What may remain new is the analytic content that makes the template work for C*-algebras: unique extension of EVERY old pure state, via peak transfer, trace-null endpoints and the peaking expectation. Grade pressure on C1 is therefore toward N2, with any N3 claim restricted to that analytic core.",
+  "after_2026_10_06": "Nothing found (searches 2026-10-09; index appears stale)."
+ },
+ "sources": [
+  "data/pilot/297/family.json, family.md, novelty.json, novelty.md",
+  "data/raw/openai-math/lean/OAI/Analysis/Naimark/{Basic,Peaking,HNN,Stages,Tracial,Omission}.lean",
+  "data/raw/openai-math/lean/ComparatorChallenges/Naimark.{json,lean}; lean/docs/297.md",
+  "preprints/A-counterexample-to-Naimarks-problem-in-ZFC-September-24-2026/build/sections/{introduction,bridge,hnn}.tex and references.bib",
+  "https://arxiv.org/abs/2006.06886 (Calderon-Farah; abstract fetched 2026-10-09)",
+  "https://arxiv.org/abs/2609.26930 (Tanaka; abstract fetched 2026-10-09)",
+  "https://arxiv.org/abs/math/0312135 (Akemann-Weaver)",
+  "https://arxiv.org/abs/0705.1182 (Akemann-Wassermann-Weaver)",
+  "https://arxiv.org/abs/1708.04368 (Suri-Tomforde)",
+  "https://arxiv.org/abs/math/0604198 (Farah, Set theory and C*-algebras)",
+  "Higman-Neumann-Neumann, J. London Math. Soc. 24 (1949) 247-254; Osin, Ann. of Math. 172 (2010) (from memory)"
+ ],
+ "search_log": [
+  "grep Naimark Lean for hnn_unique / hnn_join / word_decay / TracialStage.hnn / main and chain intermediates",
+  "grep -rl lean/OAI for PeakingPairData|NaimarkZFC outside Naimark: no hits",
+  "grep CONTENTS.md for Naimark / pure state / HNN: only 297",
+  "grep 297 references.bib for Higman/Neumann: absent",
+  "WebSearch 'C*-algebra exactly n inequivalent irreducible representations diamond Naimark' -> CF22 (exactly m irreps under diamond^Cohen)",
+  "WebFetch arxiv abs 2006.06886 and 2609.26930 (abstracts)",
+  "WebSearch 'Naimark problem ZFC counterexample October 2026 HNN extension pure states' -> nothing post-release; no HNN link in the literature index"
+ ]
+}

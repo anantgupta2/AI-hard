@@ -1,0 +1,604 @@
+{
+ "fid": "257",
+ "item": "Doubled-Fano gadget with its all-CAT(0) finite obstruction (P03+P47), plus the uniform conditional test (P37), for a hyperbolic group without a geometric CAT(0) action",
+ "item_type": "F3 (gadget + finite obstruction, a witness design) / F5 (uniform conditional test, a lemma)",
+ "analyst_note": "Text-level work only. The Lean was not compiled (no local toolchain). Web tools hit their session quota early in this pass; every outside reference marked [unverified] comes from memory or from a subagent summary and must be checked before use.",
+ "lean_status": "formalized, different route",
+ "lean_status_why": "All three parts of the item are in the Lean and on the comparator's dependency path (template carrier `Field`/`Edge`, `no_finite_obstruction`, `SamplingSequence.conditional`). The conditional test follows the paper, but the finite obstruction is proved by a shorter algebraic tangent-cone route without the paper's CAT(1) local-geodesic and parallel-set theorems. The comparator is weaker than the paper's Thm 1.1 at the statement level only, and both omitted clauses are within a few dozen lines of what the Lean already proves.",
+ "lean_gaps": [
+  {
+   "gap": "Comparator omits '2-dimensional' (paper Thm 1.1: 'finite connected two-dimensional aspherical simplicial complex').",
+   "detail": "The Lean witness is `finalFiniteComplex m = elementaryFiniteComplex … = toFiniteComplex (elementaryPolygonData …).complex` (IndexedFillingValue.lean:5335, 2950). For the underlying polygon model the Lean already proves `FinitePolygonModel.Data.simplex_card_le_three` (FinitePolygonModel.lean:94): every face has at most 3 vertices, i.e. dimension at most 2. What is missing is only (a) transporting that bound through `toFiniteComplex`, which is a reindexing along `Fintype.equivFin` (IndexedFillingValue.lean:2887) and preserves face cardinalities, (b) one 3-vertex face to get dimension exactly 2 (any `collarFace` of a cell works), and (c) adding the clause to `MainStatement`. Text-level estimate: 20–40 new lines. So the omission is a statement-level choice, not a missing proof."
+  },
+  {
+   "gap": "Comparator omits the locally CAT(0) model clause. It excludes only compatible locally CAT(−1) metrics (`CompatibleLocallyCATNegOne`), which is strictly weaker because a locally CAT(−1) metric is locally CAT(0).",
+   "detail": "The CAT(−1) clause is proved by `homotopy_incompatibleLocalCATNegOne` → `incompatibleLocalCATNegOne_of_noAction` → `not_noGeometricCATZeroAction_of_compact_localCATNegOne` (CompactLocalCATGeometric.lean). The only place CAT(−1) is used is `uniformLocalCATZero_of_compact` (IndexedFillingValue.lean:7037). It applies a Lebesgue number and then `(hc y).catZero` (`CATNegOne.catZero`, IndexedFillingValue.lean:6978) to get `UniformLocalCATZero r`. Everything downstream (the development, deck action, properness and CAT(0)-ness of the developed cover in DevelopmentDeck/DevelopmentProper/DevelopmentGeometricAction/LocalGeodesic) takes only `UniformLocalCATZero r`. A `CompatibleLocallyCATZero L` with `CATZero (ball x r)` in place of `CATNegOne` can therefore be excluded by copying three lemmas and deleting the `.catZero` call: about 30–50 lines. With that, the comparator would imply the paper's statement, since the CAT(−1) exclusion follows from the CAT(0) one."
+  },
+  {
+   "gap": "Infinitude dropped from `MainStatement` (`exists_finite_aspherical_hyperbolic_noAction` proves `Infinite π₁`, and `main` discards it with `_`).",
+   "detail": "Harmless. A finite group acts geometrically on a one-point CAT(0) space, so `NoGeometricCATZeroAction` already forces π₁K to be infinite. This also rules out the trivial-group loophole in `WordHyperbolic`."
+  },
+  {
+   "gap": "Different route for the finite obstruction (P47).",
+   "detail": "Paper Sec 6 uses tangent cones, flat rigidity, antipodality via the CAT(1) local-geodesic theorem, and a splitting of the parallel set of the M_C/M_D axis. The Lean (`no_finite_obstruction`, CATZeroFurther.lean:212) builds the completed tangent cone (`TangentCone.coneData`) and then argues purely algebraically. It uses `fan_identity`, `exceptional_identity`, `ConeData.exceptional_antipodes` ('in an algebraic form that avoids a local-to-global theorem in the completed space of directions', CATZero.lean:463) and `five_line_fans_contradiction`. Same conclusion, shorter proof, no parallel-set theorem."
+  },
+  {
+   "gap": "Uniform conditional test: same statement, quantitative and limit forms are split.",
+   "detail": "Paper P37 (05-energy.tex:246-295) is a limsup statement uniform over actions chosen after the tables. The Lean splits it into the finite quantitative bound `ConeData.conditional_test` (FiniteLaw.lean:111), with explicit coupling errors B·√(1/(n+1)+2M²η)+2BMη, and the limit `SamplingSequence.conditional` (ConditionalStar.lean:147) via `conditional_test_eventually`. Uniformity is expressed structurally: `SamplingSequence` carries only combinatorial data, and `conditional` holds for every later sequence of `EnergyOrbit`s `O`. The displacement bound is M = 8 (paper: generic M). No weakening found."
+  },
+  {
+   "gap": "Non-effective, as in the paper.",
+   "detail": "`finalFinite_noAction` is an `∀ᶠ m in atTop` statement, and `main` uses `.exists`, so no explicit K is produced (the paper says the same, 01:15)."
+  },
+  {
+   "gap": "Other Lean route differences (not affecting the item).",
+   "detail": "Asphericity is proved by an explicit contraction of the universal cover (paper: Hurewicz + Whitehead). Infinitude is proved by a six-cell rank count (paper: Euler characteristic). The Lean also proves its own Cartan–Hadamard development and its own 'linear filling ⇒ four-point hyperbolic' (family.md)."
+  }
+ ],
+ "comparator": {
+  "name": "HyperbolicObstruction",
+  "solution_module": "OAI.Geometry.HyperbolicGroups.Main",
+  "theorem": "OAI.HyperbolicObstruction.main",
+  "statement_def": "OAI.HyperbolicObstruction.MainStatement (Basic.lean:145; identical text in ComparatorChallenges/HyperbolicObstruction.lean)"
+ },
+ "comparator_chain": [
+  "OAI.HyperbolicObstruction.main",
+  "OAI.HyperbolicObstruction.IncidenceTemplate.exists_finite_aspherical_hyperbolic_noAction",
+  "OAI.HyperbolicObstruction.IncidenceTemplate.finalFinite_noAction",
+  "OAI.HyperbolicObstruction.IncidenceTemplate.finalDiagramStage_noAction",
+  "OAI.HyperbolicObstruction.IncidenceTemplate.SamplingStage.eventually_noAction",
+  "OAI.HyperbolicObstruction.MasterGraph.eventually_noAction",
+  "OAI.HyperbolicObstruction.MasterGraph.exists_noAction",
+  "OAI.HyperbolicObstruction.MasterGraph.impossible_sequence",
+  "OAI.HyperbolicObstruction.CoreGeometry.MetricCore.impossible",
+  "OAI.HyperbolicObstruction.CoreGeometry.MetricCore.toObstruction",
+  "OAI.HyperbolicObstruction.no_finite_obstruction",
+  "OAI.HyperbolicObstruction.ConeData.exceptional_antipodes",
+  "OAI.HyperbolicObstruction.ConeData.five_line_fans_contradiction"
+ ],
+ "comparator_chain_branches": [
+  "Metric core via the conditional test: `MasterGraph.impossible_sequence` → `MasterGraph.metricCore` (GraphLimit.lean:109) → `MasterGraph.path_lower` → `SamplingSequence.limit_path` (OrbitLimit.lean) → `SamplingSequence.word_lower` (ConditionalStar.lean:300) → `SamplingSequence.conditional` (ConditionalStar.lean:147, call at :324) → `ConeData.conditional_test` (FiniteLaw.lean:111) + `conditional_test_eventually` (FiniteLaw.lean:195).",
+  "Exceptional ternary test via the conditional test: `MasterGraph.impossible_sequence` → `MasterGraph.exceptionalTest` (Exceptional.lean) → `SamplingSequence.limit_fractional` (OrbitLimit.lean:159) → `SamplingSequence.fractional_error` (ConditionalStar.lean:409) → `SamplingSequence.conditional` (call at :425).",
+  "Template carrier: the sampling labels are indexed by `IncidenceTemplate.Field = Edge ⊕ (TwoPath × Fin 2)` (Template.lean:36), with `Edge` = all Fano incidences on 11 representatives (A–D doubled) minus (10,4) = Y_D–CD (Template.lean:15). The same omission appears in `CoreGeometry.Adjacent` (MetricHexagon.lean:114), which `MetricCore` and `toObstruction` use. The novelty pass found Edge/Field to be dependencies of 42.7%/40.5% of the patched DAG.",
+  "CAT(−1) clause: `main` → `homotopy_incompatibleLocalCATNegOne` → `incompatibleLocalCATNegOne_of_noAction` → `not_noGeometricCATZeroAction_of_compact_localCATNegOne` → `uniformLocalCATZero_of_compact` + Cartan–Hadamard development. It reuses the no-action conclusion `hno` from the main path."
+ ],
+ "lean_source": [
+  {
+   "name": "OAI.HyperbolicObstruction.IncidenceTemplate.Edge",
+   "kind": "abbrev",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/Template.lean",
+   "line": 15,
+   "text": "/-- All incidences except Y_D--CD. Both sides have fixed named positions. -/\nabbrev Edge := {p : Fin 11 × Fin 7 // Incident (pointOfRepresentative p.1) p.2 ∧ p ≠ (10,4)}"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.IncidenceTemplate.isLoose",
+   "kind": "def",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/Template.lean",
+   "line": 17,
+   "text": "def isLoose (e : Edge) : Prop := e.val = (3,4)"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.IncidenceTemplate.fan",
+   "kind": "def",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/Template.lean",
+   "line": 21,
+   "text": "def fan (i : Fin 7) : Finset Edge :=\n  Finset.univ.filter (fun e => pointOfRepresentative e.val.1 = i ∧ ¬isLoose e)"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.IncidenceTemplate.card_fan",
+   "kind": "lemma",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/Template.lean",
+   "line": 26,
+   "text": "lemma card_fan : ∀ i : Fin 7, (fan i).card = ![6,6,6,4,3,3,3] i"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.IncidenceTemplate.TwoPath",
+   "kind": "abbrev",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/Template.lean",
+   "line": 31,
+   "text": "/-- One canonical orientation of each unoriented nonbacktracking two-edge path. -/\nabbrev TwoPath := {p : Edge × Edge // code p.1 < code p.2 ∧\n  (p.1.val.1 = p.2.val.1 ∨ p.1.val.2 = p.2.val.2)}"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.IncidenceTemplate.Field",
+   "kind": "abbrev",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/Template.lean",
+   "line": 36,
+   "text": "abbrev Field := Edge ⊕ (TwoPath × Fin 2)"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.IncidenceTemplate.card_fields",
+   "kind": "lemma",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/Template.lean",
+   "line": 40,
+   "text": "lemma card_fields : Fintype.card Field = 212"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.IncidenceTemplate.vector",
+   "kind": "def",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/MetricHexagon.lean",
+   "line": 96,
+   "text": "/-- Points A,B,C,D followed by the three remaining nonzero vectors. -/\ndef vector : Fin 7 → Fin 3 → ZMod 2 :=\n  ![![1,0,0], ![0,1,0], ![0,0,1], ![1,1,1], ![1,1,0], ![1,0,1], ![0,1,1]]"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.IncidenceTemplate.Incident",
+   "kind": "def",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/MetricHexagon.lean",
+   "line": 100,
+   "text": "/-- Lines are the kernels of the seven nonzero linear functionals. -/\ndef Incident (i l : Fin 7) : Prop := ∑ j, vector i j * vector l j = 0"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.CoreGeometry.Adjacent",
+   "kind": "def",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/MetricHexagon.lean",
+   "line": 114,
+   "text": "def Adjacent : Vertex → Vertex → Prop\n  | .inl r, .inr l => Incident (pointOfRepresentative r) l ∧ (r,l) ≠ (10,4)\n  | .inr l, .inl r => Incident (pointOfRepresentative r) l ∧ (r,l) ≠ (10,4)\n  | _, _ => False\ninstance (v w : Vertex) : Decidable (Adjacent v w) := by\n  cases v <;> cases w <;> unfold Adjacent <;> infer_instance"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.CoreGeometry.MetricCore",
+   "kind": "structure",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/MetricHexagon.lean",
+   "line": 238,
+   "text": "/-- Exactly the core path distances in Proposition `configuration` (i).\nThe third condition uses distinct fields and the actual fan quota; the\nexceptional loose edge is not charged to the D fan. -/\nstructure MetricCore {X : Type*} [MetricSpace X] (z : Vertex → X) : Prop where\n  side : ∀ a b, Adjacent a b → dist (z a) (z b) ^ 2 = 1\n  twoStep : ∀ a b c, Adjacent a b → Adjacent b c → a ≠ c →\n    dist (z a) (z c) ^ 2 = 2\n  threeStep : ∀ a b c d, Adjacent a b → Adjacent b c → Adjacent c d →\n    a ≠ c → b ≠ d → ThreeQuota a b c d → 3 ≤ dist (z a) (z d) ^ 2"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.CoreGeometry.ExceptionalTest",
+   "kind": "def",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/MetricHexagon.lean",
+   "line": 367,
+   "text": "/-- The three-field, two-fractional-geodesic inequality in the source's\nconfiguration proposition, at the exceptional missing incidence. -/\ndef ExceptionalTest {X : Type*} [MetricSpace X] (h : CATZero X) (z : Vertex → X) : Prop :=\n  ∀ t ∈ Set.Ioc (0 : ℝ) 1,\n    t ^ 2 * (1 / 2 + 1) ≤\n      dist (CATZero.segment h (z (.inr 4)) (CATZero.mid h (z (.inl 2)) (z (.inl 9))) t)\n        (CATZero.segment h (z (.inr 4)) (z (.inl 3)) t) ^ 2"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.CoreGeometry.MetricCore.impossible",
+   "kind": "theorem",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/MetricHexagon.lean",
+   "line": 409,
+   "text": "/-- No CAT(0) space contains the exact limiting core configuration of\nProposition `configuration`, including its exceptional fractional test. -/\ntheorem impossible (h : CATZero X) (he : ExceptionalTest h z) : False"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.fullLines",
+   "kind": "def",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/CATZeroFurther.lean",
+   "line": 182,
+   "text": "/-- Full incidences among the six lines AB, AC, AD, BC, BD, CD at A,B,C,D.\nThese are exactly the doubled fans of the source. -/\ndef fullLines : Fin 4 → Finset (Fin 6) :=\n  ![{0, 1, 2}, {0, 3, 4}, {1, 3, 5}, {2, 4}]"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.FiniteObstructionData",
+   "kind": "structure",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/CATZeroFurther.lean",
+   "line": 189,
+   "text": "/-- The specific subconfiguration used by the source obstruction. This is\nmetric input to a contradiction, not an assumed existence assertion. All its\nconditions are consequences asserted by source Proposition `configuration`;\nthe existence-from-actions direction remains a separate obligation. -/\nstructure FiniteObstructionData {X : Type*} [MetricSpace X] (h : CATZero X) where\n  c : X\n  x : Fin 4 → X\n  y : Fin 4 → X\n  line : Fin 6 → X\n  radiusX : ∀ i, dist c (x i) ^ 2 = 3 / 4\n  radiusY : ∀ i, dist c (y i) ^ 2 = 3 / 4\n  radiusLine : ∀ i, dist c (line i) ^ 2 = 3 / 4\n  lineDist : ∀ a b, a ≠ b → dist (line a) (line b) ^ 2 = 2\n  lineFlat : ∀ a b, a ≠ b → dist c (CATZero.mid h (line a) (line b)) ^ 2 = 1 / 4\n  square : ∀ i a b, a ∈ fullLines i → b ∈ fullLines i → a ≠ b →\n    MetricSquare (x i) (line a) (y i) (line b)\n  twoStepX : dist (x 2) (x 3) ^ 2 = 2\n  twoStepY : dist (y 2) (x 3) ^ 2 = 2\n  loose : dist (line 5) (x 3) ^ 2 = 1\n  missing : 3 ≤ dist (y 3) (line 5) ^ 2\n  fractional : ∀ t ∈ Set.Ioc (0 : ℝ) 1,\n    t ^ 2 * (1 / 2 + 1) ≤\n      dist (CATZero.segment h (line 5) (CATZero.mid h (x 2) (y 2)) t)\n        (CATZero.segment h (line 5) (x 3) t) ^ 2"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.no_finite_obstruction",
+   "kind": "theorem",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/CATZeroFurther.lean",
+   "line": 212,
+   "text": "/-- The complete finite CAT(0) metric obstruction from Section 6. The proof\nconstructs the completed tangent cone and all rigidity identities internally. -/\ntheorem no_finite_obstruction {X : Type*} [MetricSpace X] (h : CATZero X)\n    (D : FiniteObstructionData h) : False"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.TangentCone.fan_identity",
+   "kind": "theorem",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/CATZeroFurther.lean",
+   "line": 57,
+   "text": "/-- The fan midpoint identity, derived from a metric square and the central\nflatness of its line diagonal. -/\ntheorem fan_identity (c x y a b : X)\n    (hcx : dist c x ^ 2 = 3 / 4) (hcy : dist c y ^ 2 = 3 / 4)\n    (hca : dist c a ^ 2 = 3 / 4) (hcb : dist c b ^ 2 = 3 / 4)\n    (hxa : dist x a ^ 2 = 1) (hay : dist a y ^ 2 = 1)\n    (hyb : dist y b ^ 2 = 1) (hbx : dist b x ^ 2 = 1)\n    (hxy : dist x y ^ 2 = 2) (hab : dist a b ^ 2 = 2)\n    (hflat : dist c (CATZero.mid h a b) ^ 2 = 1 / 4) :\n    (coneData h c).pairing (log h c x) (log h c y) = -1 / 4 ∧\n    (coneData h c).add (catZero h c) (log h c x) (log h c y) =\n      (coneData h c).add (catZero h c) (log h c a) (log h c b)"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.TangentCone.exceptional_identity",
+   "kind": "theorem",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/CATZeroFurther.lean",
+   "line": 86,
+   "text": "/-- Source exceptional-incidence identity. Its hypotheses are entirely metric,\nincluding the fixed-fraction test; no flat triangle or cone identity is assumed. -/\ntheorem exceptional_identity (c p q z k : X)\n    (hcp : dist c p ^ 2 = 3 / 4) (hcq : dist c q ^ 2 = 3 / 4)\n    (hcz : dist c z ^ 2 = 3 / 4) (hck : dist c k ^ 2 = 3 / 4)\n    (hpq : dist p q ^ 2 = 2) (hpz : dist p z ^ 2 = 2) (hqz : dist q z ^ 2 = 2)\n    (hcj : dist c (CATZero.mid h p q) ^ 2 = 1 / 4)\n    (hkj : dist k (CATZero.mid h p q) ^ 2 = 1 / 2) (hkz : dist k z ^ 2 = 1)\n    (hfrac : ∀ t ∈ Set.Ioc (0 : ℝ) 1,\n      t ^ 2 * (1 / 2 + 1) ≤ dist (CATZero.segment h k (CATZero.mid h p q) t)\n        (CATZero.segment h k z t) ^ 2) :\n    log h c k = (coneData h c).add (catZero h c)\n      ((coneData h c).add (catZero h c) (log h c p) (log h c q)) (log h c z)"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.ConeData.exceptional_antipodes",
+   "kind": "theorem",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/CATZero.lean",
+   "line": 465,
+   "text": "/-- Source Lemma `geom:antipodal`, in an algebraic form that avoids a\nlocal-to-global theorem in the completed space of directions. -/\ntheorem exceptional_antipodes (h : CATZero X) {c d x y z : X}\n    (hc : T.normSq c = 1) (hd : T.normSq d = 1)\n    (hdy : T.pairing d y = 1 / 2) (hdx : T.pairing d x = 1 / 2)\n    (hyz : T.Opposite y z) (hz : z = T.add h c x) : T.Opposite c d"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.ConeData.five_line_fans_contradiction",
+   "kind": "theorem",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/CATZero.lean",
+   "line": 646,
+   "text": "/-- Final algebraic contradiction in Proposition `prop:no-configuration`.\nThe five line indices are AB, AC, AD, BC, BD, respectively. All geometric\ninput here is explicit; no Hilbert-space or associativity assumption is used. -/\ntheorem five_line_fans_contradiction (h : CATZero X) (ℓ : Fin 5 → X)\n    (hn : ∀ i, T.normSq (ℓ i) = 3 / 4)\n    (hp : ∀ i j, i ≠ j → T.pairing (ℓ i) (ℓ j) = -1 / 4)\n    (hA : T.add h (ℓ 0) (ℓ 1) = T.add h (ℓ 1) (ℓ 2))\n    (hB : T.add h (ℓ 0) (ℓ 3) = T.add h (ℓ 3) (ℓ 4))\n    (hop : T.Opposite (T.add h (ℓ 1) (ℓ 3)) (T.add h (ℓ 2) (ℓ 4))) : False"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.ConditionalStar",
+   "kind": "def",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/ConditionalStar.lean",
+   "line": 53,
+   "text": "/-- A conditional star: branches agree exactly on the named fields.\nThe finite law placed on it below need not be uniform. -/\ndef ConditionalStar {F L Ω : Type*} [DecidableEq F] (label : Ω → F → L)\n    (I : Finset F) (k : ℕ) :=\n  {b : Fin (k + 1) → Ω // ∀ j i, i ∈ I → label (b j) i = label (b 0) i}"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.SamplingSequence",
+   "kind": "structure",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/ConditionalStar.lean",
+   "line": 73,
+   "text": "/-- Only combinatorial sampling assertions occur here, independent of the action\nthat may be chosen after the random tables have been exposed. This is not a\nreplacement for the random-table producer. -/\nstructure SamplingSequence (F : Type*) [DecidableEq F] (Admissible : Finset F → Prop)\n    (L Ω : ℕ → Type*) [∀ n, Fintype (L n)] [∀ n, Nonempty (L n)]\n    [∀ n, DecidableEq (L n)] [∀ n, Fintype (Ω n)] [∀ n, Nonempty (Ω n)]\n    (label : ∀ n, Ω n → F → L n) where\n  singleton : ∀ e : F, Tendsto (fun n =>\n    ((FiniteLaw.uniform : FiniteLaw (Ω n)).map (fun a => label n a e)).totalVariation\n      FiniteLaw.uniform) atTop (𝓝 0)\n  star : ∀ (I : Finset F) (e : F), e ∉ I → Admissible (insert e I) → ∀ k : ℕ,\n    ∃ η : ℕ → ℝ, Tendsto η atTop (𝓝 0) ∧ ∀ᶠ n in atTop,\n      ∃ κ : FiniteLaw (ConditionalStar (label n) I k),\n        (∀ j, (κ.map (ConditionalStar.branch j)).totalVariation FiniteLaw.uniform ≤ η n) ∧\n        (κ.map (fun b j => label n (ConditionalStar.branch j b) e)).totalVariation\n          (FiniteLaw.uniform : FiniteLaw (Fin (k + 1) → L n)) ≤ η n"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.EnergyOrbit",
+   "kind": "structure",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/ConditionalStar.lean",
+   "line": 88,
+   "text": "/-- Actual normalized orbit points along a symmetric finite generator list. -/\nstructure EnergyOrbit (L X : Type*) [Fintype L] [MetricSpace X] (M : ℝ) where\n  cat : CATZero X\n  base : X\n  isom : L → X ≃ᵢ X\n  inverse : L ≃ L\n  symmetric : ∀ i, isom (inverse i) = (isom i).symm\n  minimum : ∀ y : X, (∑ i, dist base (isom i base) ^ 2) ≤ ∑ i, dist y (isom i y) ^ 2\n  energy : (𝔼 i, dist base (isom i base) ^ 2) = 1\n  bound : ∀ i, dist base (isom i base) ≤ M"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.SamplingSequence.conditional",
+   "kind": "theorem",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/ConditionalStar.lean",
+   "line": 147,
+   "text": "/-- The conditional test applies to arbitrary bounded action-dependent tests,\nincluding tests using inverses of any field labels. -/\ntheorem conditional {I : Finset F} {e : F} (he : e ∉ I) (hI : Admissible (insert e I))\n    (σ : ∀ n, L n ≃ L n) (test : ∀ n, Ω n → (O n).Cone)\n    (depends : ∀ n a b, (∀ i ∈ I, label n a i = label n b i) → test n a = test n b)\n    {B : ℝ} (hM : 0 ≤ M) (hB : 0 ≤ B)\n    (htest : ∀ n a, dist (O n).cone.vertex (test n a) ≤ B) :\n    ∀ ε : ℝ, 0 < ε → ∀ᶠ n in atTop,\n      (𝔼 a, (O n).cone.pairing (test n a) ((O n).vector (σ n (label n a e)))) < ε"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.ConeData.conditional_test",
+   "kind": "theorem",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/FiniteLaw.lean",
+   "line": 111,
+   "text": "/-- The manuscript's quantitative conditional test. The hypotheses describe\nan actual finite coupling, with all of its branch and leaf errors explicit.\nThe action-dependent function is not required to be independent of the law. -/\ntheorem conditional_test {α β ι : Type*} [Fintype α] [Fintype β]\n    [Fintype ι] [Nonempty ι] (h : CATZero X)\n    (μ : FiniteLaw α) (κ : FiniteLaw β) (v : ι → X)\n    (hbar : ∀ u, (𝔼 i, T.pairing u (v i)) ≤ 0)\n    (hen : (𝔼 i, T.normSq (v i)) = 1)\n    (test : α → X) (letter : α → ι) (n : ℕ)\n    (branch : Fin (n + 1) → β → α)\n    (agree : ∀ j b, test (branch j b) = test (branch 0 b))\n    {M B η : ℝ} (hM : 0 ≤ M) (hB : 0 ≤ B)\n    (hv : ∀ i, dist T.vertex (v i) ≤ M)\n    (htest : ∀ a, dist T.vertex (test a) ≤ B)\n    (hbranch : ∀ j, (κ.map (branch j)).totalVariation μ ≤ η)\n    (hleaf : (κ.map (fun b j => letter (branch j b))).totalVariation\n      (FiniteLaw.uniform : FiniteLaw (Fin (n + 1) → ι)) ≤ η) :\n    μ.expect (fun a => T.pairing (test a) (v (letter a))) ≤\n      B * Real.sqrt (1 / (n + 1 : ℝ) + 2 * M ^ 2 * η) + 2 * B * M * η"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.conditional_test_eventually",
+   "kind": "theorem",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/FiniteLaw.lean",
+   "line": 195,
+   "text": "/-- Passing to the limit in the quantitative conditional test, first with\nsample size fixed and then letting it tend to infinity. -/\ntheorem conditional_test_eventually {a : ℕ → ℝ} {B M : ℝ}\n    (hbound : ∀ n : ℕ, ∃ η : ℕ → ℝ, Tendsto η atTop (𝓝 0) ∧\n      ∀ᶠ ν in atTop, a ν ≤ B * Real.sqrt (1 / (n + 1 : ℝ) + 2 * M ^ 2 * η ν) +\n        2 * B * M * η ν) :\n    ∀ ε : ℝ, 0 < ε → ∀ᶠ ν in atTop, a ν < ε"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.IncidenceTemplate.exists_finite_aspherical_hyperbolic_noAction",
+   "kind": "theorem",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/IndexedFillingValue.lean",
+   "line": 6747,
+   "text": "/-- SAME-model complete construction and word-hyperbolicity. It deliberately\nomits, rather than assumes, the remaining Cartan-Hadamard/deck consequence. -/\ntheorem exists_finite_aspherical_hyperbolic_noAction :\n    ∃ K : FiniteComplex, ∃ x : K.Carrier, ∃ C : ℝ,\n    ConnectedSpace K.Carrier ∧ K.Aspherical x ∧ Infinite (FundamentalGroup K.Carrier x) ∧\n      0 ≤ C ∧ K.LinearDiskFilling C ∧\n      NoGeometricCATZeroAction.{u} (FundamentalGroup K.Carrier x) ∧\n      WordHyperbolic (FundamentalGroup K.Carrier x)"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.UniformLocalCATZero",
+   "kind": "def",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/IndexedFillingValue.lean",
+   "line": 7034,
+   "text": "/-- A uniform ambient neighborhood lies in a CAT(0) subspace. -/\ndef UniformLocalCATZero (r : ℝ) : Prop :=\n  ∀ x : X, ∃ U : Set X, ball x r ⊆ U ∧ CATZero U"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.uniformLocalCATZero_of_compact",
+   "kind": "lemma",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/IndexedFillingValue.lean",
+   "line": 7037,
+   "text": "lemma uniformLocalCATZero_of_compact [CompactSpace X]\n    (h : ∀ x : X, ∃ r : ℝ, 0 < r ∧ CATNegOne (ball x r)) :\n    ∃ r : ℝ, 0 < r ∧ UniformLocalCATZero (X:=X) r"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.FinitePolygonModel.Data.simplex_card_le_three",
+   "kind": "lemma",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/FinitePolygonModel.lean",
+   "line": 94,
+   "text": "lemma simplex_card_le_three {s : Finset P.Vertex} (hs : s ∈ P.complex.faces) : s.card ≤ 3"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.incompatibleLocalCATNegOne_of_noAction",
+   "kind": "lemma",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/CompactLocalCATGeometric.lean",
+   "line": 38,
+   "text": "lemma incompatibleLocalCATNegOne_of_noAction (L : FiniteComplex) (y : L.Carrier)\n    (h : NoGeometricCATZeroAction.{u} (FundamentalGroup L.Carrier y)) :\n    ¬ CompatibleLocallyCATNegOne L"
+  },
+  {
+   "name": "OAI.HyperbolicObstruction.MainStatement",
+   "kind": "def",
+   "file": "lean/OAI/Geometry/HyperbolicGroups/Basic.lean",
+   "line": 145,
+   "text": "/-- A finite aspherical complex with hyperbolic fundamental group, no geometric CAT(0)\naction, and no homotopy equivalent finite complex admitting a locally CAT(-1) metric. -/\ndef MainStatement : Prop :=\n  ∃ K : FiniteComplex, ∃ x : K.Carrier, ∃ C : ℝ,\n    ConnectedSpace K.Carrier ∧ K.Aspherical x ∧ 0 ≤ C ∧ K.LinearDiskFilling C ∧\n    NoGeometricCATZeroAction.{u} (FundamentalGroup K.Carrier x) ∧\n    WordHyperbolic (FundamentalGroup K.Carrier x) ∧\n    ∀ L : FiniteComplex, Nonempty (K.Carrier ≃ₕ L.Carrier) →\n      ¬ CompatibleLocallyCATNegOne L"
+  }
+ ],
+ "speedup_targets": [
+  {
+   "id": "S1",
+   "title": "Flat-triangle / CN-equality propagation in CAT(0) spaces (Bridson–Haefliger II.2.9 in CN form)",
+   "statement": "In a CAT(0) space, if equality holds in the CN (comparison) inequality for a point z and the segment [x,y] at one interior parameter t₀ ∈ (0,1), then it holds for every t ∈ [0,1]. Equivalently, the comparison triangle of (z,x,y) is flat (BH II.2.9, Flat Triangle Lemma).",
+   "reference": "Bridson–Haefliger, Metric Spaces of Non-positive Curvature (1999), Prop. II.2.9 (flat triangle lemma); BH II.2.11 for the flat quadrilateral version.",
+   "status": "known (textbook)",
+   "current_proof_size": "about 1 page in BH (via Alexandrov's lemma and angle comparison). No Mathlib formalization; Mathlib has no CAT(0) spaces. OAI has the cone-level ingredients: `TangentCone.cn_eq_of_log_dist` (CATZeroFurther.lean:44) and `log_dist_of_interior_equality` / `log_dist_of_midpoint_equality` (TangentCone/ConeData files).",
+   "how_item_helps": "The obstruction proof's toolkit (`exceptional_identity`, `fan_identity`) does exactly this kind of propagation. From one CN equality it derives that `log` is isometric on the pair, and then CN equality along the whole segment (`cn_eq_of_log_dist`). With these in the library the target is a few lines. Caveat: this reuses the P47 proof toolkit, not the doubled-Fano design.",
+   "expected_speedup": "med in Lean (≈10–30 lines instead of a from-scratch angle theory); low on paper",
+   "confidence": "medium (the OAI lemma statements match closely; not compiled)",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI `HyperbolicObstruction.CATZero`, `CATZero.segment`, `CATZero.mid`; Mathlib `dist`, `Set.Icc`",
+    "missing": "none",
+    "formal_proof_to_compare": "none in Mathlib; OAI's TangentCone lemmas are the nearest formal relatives"
+   }
+  },
+  {
+   "id": "S2",
+   "title": "Flat quadrilateral theorem, unit-square case (BH II.2.11)",
+   "statement": "If four points p,q,r,s of a CAT(0) space have squared sides 1 and squared diagonals 2, then the two diagonal midpoints coincide, and the geodesic quadrilateral spans an isometric copy of the Euclidean unit square (corner-preserving isometric embedding of [0,1]² extending the four points).",
+   "reference": "Bridson–Haefliger (1999), Thm II.2.11 (flat quadrilateral theorem).",
+   "status": "known (textbook)",
+   "current_proof_size": "about 1 page in BH, using II.2.9 twice. OAI already proves the midpoint part as `CATZero.square_mid` (CATZeroFurther.lean:28; about 10 lines from `CATZero.quadrilateral`).",
+   "how_item_helps": "`fan_identity` turns a metric square plus central flatness into cone-level identities (pairing −1/4, equal `add` sums). The cone `add`/`pairing` calculus (CATZero.lean:218-505) is what one needs to build the flat square from `log`-isometries. Again this is toolkit reuse.",
+   "expected_speedup": "low–med",
+   "confidence": "medium-low",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI `CATZero`, `MetricSquare` (CATZeroFurther.lean:168); Mathlib `EuclideanSpace ℝ (Fin 2)`, `Isometry`",
+    "missing": "none for the corner-isometry form; a geodesic-convex-hull definition (~40 lines) if one wants BH's exact 'convex hull is flat' form",
+    "formal_proof_to_compare": "OAI `CATZero.square_mid` (midpoint part only)"
+   }
+  },
+  {
+   "id": "S3",
+   "title": "Fixed points of graph-model random groups for one fixed cocompact CAT(0) target (Izeki–Kondo–Nayatani; Toyoda)",
+   "statement": "For a fixed proper geodesically complete CAT(0) space X admitting a proper cocompact isometric action (so δ(X) < 1 by Toyoda), Gromov's graph-model random groups (with suitable expander sequences) have the fixed-point property for isometric actions on X with high probability.",
+   "reference": "Izeki–Kondo–Nayatani, Groups Geom. Dyn. 6 (2012), via arXiv 1012.4147 Thm 2.2 (statement verified by subagent); Toyoda, arXiv 1102.0729 (δ<1 for cocompact geodesically complete X) [Kodai 2016 venue unverified]; Izeki–Nayatani, Geom. Dedicata 114 (2005) 147–188 [unverified page range].",
+   "status": "known (2005–2016)",
+   "current_proof_size": "Izeki–Nayatani ≈ 40 pp (combinatorial harmonic maps and the δ invariant), IKN ≈ 20–30 pp (random graph model), Toyoda ≈ 15 pp [page counts from memory, unverified]. No formalization anywhere.",
+   "how_item_helps": "The uniform conditional test replaces the target-dependent spectral constant (1−δ(X))μ₁ with a TV-coupling + Sturm inductive-mean argument whose constants do not depend on X. Caveat: P37 as formalized needs an `EnergyOrbit` with an exact energy minimizer and a uniform displacement bound M, which come from cocompactness. IKN conclude fixed points for all isometric actions on X. So the item reaches only the weaker 'no geometric action on X' form unless it is combined with Gromov–Schoen-type scaling limits (an adaptation, not reuse).",
+   "expected_speedup": "low–med (for the weak 'no geometric action' form only)",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "OAI `CATZero`, `GeometricAction`; Mathlib `PresentedGroup`, `SimpleGraph`",
+    "missing": "Gromov graph model of random groups (labelled expander sequences, ~300+ lines), Izeki–Nayatani invariant δ (~150 lines), probabilistic 'with high probability' framework (~100 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "S4",
+   "title": "Family 254: an Artin group (116 generators) with no geometric CAT(0) action",
+   "statement": "There is a finite-rank Artin group with no proper cocompact isometric action on a nonempty proper CAT(0) space (refutes Haettel's Conjecture 1.1 / Charney's problem).",
+   "reference": "openai/math release family 254, preprint 'An Artin group with no geometric CAT(0) action' (2026-09-23); comparator `ArtinCAT0`.",
+   "status": "known within the release (unrefereed)",
+   "current_proof_size": "OAI/GroupTheory/ArtinCAT0: 20 files, ≈ 9,400 Lean lines.",
+   "how_item_helps": "Probably not much. 254's obstruction is algebraic: stable translation lengths, braid subgroups, sectors. It uses no random presentation, tangent-cone configuration or energy minimizer. Only the shared CAT(0) basics (`CATZero`, segments, midpoints, geometric actions) would carry over. It is useful as a near-control on the same comparator style: a big speedup here would point to shared infrastructure, not to the gadget.",
+   "expected_speedup": "low",
+   "confidence": "medium",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "ComparatorChallenges/ArtinCAT0.lean (own `CAT0`, `GeometricAction` definitions)",
+    "missing": "none (a bridge between ArtinCAT0.CAT0 and HyperbolicObstruction.CATZero, ~30 lines, if the 257 library is to be used)",
+    "formal_proof_to_compare": "OAI/GroupTheory/ArtinCAT0 (≈ 9.4k lines)"
+   }
+  }
+ ],
+ "open_problems": [
+  {
+   "id": "O1",
+   "title": "Gromov's question: which finite metric spaces embed isometrically in a CAT(0) space? (≥ 6 points)",
+   "statement": "Give an intrinsic characterization of finite metric spaces that admit an isometric embedding into some CAT(0) space. Known: ≤ 5 points iff every 4-point subset satisfies Gromov's ⊠-inequalities (Toyoda). Open for ≥ 6 points.",
+   "reference": "Gromov, 'CAT(κ)-spaces: construction and concentration', Zap. Nauchn. Sem. POMI 280 (2001) [unverified]; Toyoda, 'An intrinsic characterization of five points in a CAT(0) space', Anal. Geom. Metr. Spaces 8 (2020), arXiv 1907.09074, https://arxiv.org/abs/1907.09074 [verified by subagent]; Lebedeva–Petrunin, '5-point CAT(0) spaces after Tetsu Toyoda', AGMS (2021), arXiv 2009.09522, https://arxiv.org/abs/2009.09522 [verified by subagent].",
+   "status": "open for ≥ 6 points (per Toyoda 2020 / Lebedeva–Petrunin 2021; not re-checked for 2022–2026 progress)",
+   "match": "The gadget is a finite configuration (points, plus midpoints and one fractional-geodesic inequality) that no CAT(0) space contains. `CoreGeometry.MetricCore` alone is a pure squared-distance pattern on 18 points: incidence = 1, two-step = 2, three-step ≥ 3. If the pure-distance core is already non-realizable, it is a new explicit obstruction certificate on 18 points.",
+   "how_item_helps": "Step 1 (Lean-checkable): ask whether `MetricCore z` alone (without `ExceptionalTest`) is contradictory in every CAT(0) space. `no_finite_obstruction` currently consumes `loose`, `missing` and `fractional` too. If it is contradictory, check every ≤ 5-point sub-configuration against the ⊠ / cycle conditions. If all pass, the doubled-Fano core is a ≥ 6-point space that the 5-point criterion misses, which is genuinely new data for Gromov's question. If `MetricCore` alone is realizable, the fractional test is essential, which is itself informative.",
+   "payoff": "med–high (new explicit data on a 20-year-old characterization problem)",
+   "confidence": "low–medium (the pure-metric core may well be realizable, e.g. in a cube complex)",
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI `CATZero`, `CoreGeometry.Vertex`, `CoreGeometry.MetricCore`; statement `¬ ∃ (X : Type) (_ : MetricSpace X) (h : CATZero X) (z : Vertex → X), MetricCore z`",
+    "missing": "none (the ⊠-inequality family needs ~30 lines if the 5-point comparison is also wanted)",
+    "formal_proof_to_compare": "OAI `no_finite_obstruction` (with the extra exceptional fields)"
+   }
+  },
+  {
+   "id": "O2",
+   "title": "Are Gromov density random groups at 1/6 < d < 1/2 CAT(0)? (in particular 1/3 < d < 1/2, where property (T) rules out cube complexes)",
+   "statement": "For Gromov's density model at density d ∈ (1/6, 1/2), does the random group act geometrically on a proper CAT(0) space with overwhelming probability, or not?",
+   "reference": "Ollivier, 'A January 2005 invitation to random groups', Ensaios Mat. 10 (2005), open-problems chapter [wording unverified]; Ollivier–Wise, Trans. AMS (2011), cubulation at d < 1/6 [memory]; Mackay–Przytycki (d < 5/24) and Montée, arXiv 2106.14931, https://arxiv.org/abs/2106.14931 (d < 3/14): non-trivial actions on CAT(0) cube complexes [subagent-verified]; Ashcroft, arXiv 2104.14986 and 2206.14616 (property (T) thresholds) [titles verified by subagent].",
+   "status": "open as far as found (only cube-complex actions are settled; general CAT(0) geometric actions are not) [status not re-verified on the web]",
+   "match": "The uniform conditional test exists exactly to make a random presentation fail to act on every CAT(0) space at once. 257 uses a tailored nested model (fans at N^{2−α}, tops over selected fans, decorations just below 1/2) in which the template configuration is forced in the limit.",
+   "how_item_helps": "Adaptation: (a) in the density model, find a sub-presentation pattern whose limit configuration after `conditional` + ultralimit contains a CAT(0)-impossible gadget; (b) reuse `SamplingSequence.conditional` verbatim, which only needs the `singleton` and `star` TV-coupling axioms of `SamplingSequence`; (c) verify those axioms for the density model at the given d. The hard part is (a): plain density-model presentations have no fan/top nesting.",
+   "payoff": "high",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI `NoGeometricCATZeroAction`; Mathlib `FreeGroup`, `PresentedGroup`, `PMF`/finite uniform laws",
+    "missing": "density model: uniform random sets of (2m−1)^{dℓ} cyclically reduced words of length ℓ and 'with overwhelming probability' (~120–200 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O3",
+   "title": "Expanders with respect to all Hadamard spaces / a finitely generated group with fixed points for every CAT(0) space via Gromov's graph model",
+   "statement": "Is there a bounded-degree expander sequence that is an expander with respect to every Hadamard space (a uniform nonlinear spectral gap)? Equivalently, through Gromov's graphical random groups: is there a f.g. group with fixed points for isometric actions on all CAT(0) spaces built this way?",
+   "reference": "Mendel–Naor, 'Expanders with respect to Hadamard spaces and random graphs', Duke Math. J. 164 (2015) [memory; question wording unverified]; Kondo, 'CAT(0) spaces and expanders', Math. Z. 271 (2012) (CAT(0) spaces with δ = 1) [memory]; Naor–Silberman, Compositio 147 (2011) [memory].",
+   "status": "believed open [unverified; web quota exhausted]",
+   "match": "The quantifier swap 'one object, all CAT(0) targets' is exactly what P37 delivers: a barycentric (Sturm inductive-mean) control whose constants do not depend on X. IKN/Kondo show that the δ-route must fail for some targets.",
+   "how_item_helps": "Adaptation: the conditional test gives E⟨h_I, v_e⟩ ≤ o(1) for tests depending on 'past' labels. A nonlinear-spectral-gap statement needs a Poincaré inequality for all maps into X, not only energy-minimizing orbit maps. One would replace `EnergyOrbit.minimum` by an almost-minimizer from a Gromov–Schoen scaling limit and drop the uniform displacement bound `bound : … ≤ M`. The second step is the main obstacle.",
+   "payoff": "high",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI `CATZero` + Mathlib `CompleteSpace`, `SimpleGraph`",
+    "missing": "nonlinear Poincaré constant γ(G, X) of a finite graph w.r.t. a metric space (~60 lines); expander sequence as a family (~40 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O4",
+   "title": "Does every hyperbolic group act geometrically on a Busemann-convex space (or a space with a strongly convex bicombing)?",
+   "statement": "Between CAT(0) (now refuted for hyperbolic groups by 257) and injective/Helly spaces (proved for all hyperbolic groups by Lang and by Chalopin–Chepoi–Genevois–Hirai–Osajda) sits Busemann convexity. Does every hyperbolic group act properly and cocompactly on a proper Busemann-convex geodesic space?",
+   "reference": "Lang, 'Injective hulls of certain discrete metric spaces and groups', J. Topol. Anal. 5 (2013) [memory]; Descombes–Lang, convex geodesic bicombings (2015) [memory]; Chalopin–Chepoi–Genevois–Hirai–Osajda, 'Helly groups', arXiv 2002.06895 [memory]. I did not find a problem-list citation for the Busemann version in this pass.",
+   "status": "believed open [unverified]",
+   "match": "This is the natural boundary of the device. The conditional test needs CAT(0)-specific structure: inner-product-like tangent-cone pairings (`ConeData.pairing`), Sturm's variance inequality for inductive means, and CN-equality rigidity. All of these fail in general Busemann spaces.",
+   "how_item_helps": "Adaptation sketch: replace barycenters by Busemann barycenters (Es-Sahib–Heinich / Navas) and the cone pairing by a first-variation inequality. The finite gadget would have to be re-derived from Busemann rigidity (strictly convex norms on tangent cones). The likely outcome is failure, which is still informative; see negative control N1.",
+   "payoff": "high if it works; also a sharp test of the device's limits",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI `GeometricAction`, `WordHyperbolic`",
+    "missing": "Busemann convexity (~20 lines); a library of convex bicombings (~150 lines) if the proof route is pursued",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O5",
+   "title": "Proper (not necessarily cocompact) actions: does every hyperbolic group act properly on some complete CAT(0) space?",
+   "statement": "Is there a hyperbolic group admitting no proper isometric action on any complete (possibly infinite-dimensional, non-proper) CAT(0) space?",
+   "reference": "Status context: Duchesne–Simon, arXiv 2603.03863 (2026), cited by 257 for its 'Question W' (wording not read in this pass); Monod–Py on actions on infinite-dimensional hyperbolic space [memory]. Property (T) hyperbolic groups have no proper action on Hilbert space or on H^∞ [memory].",
+   "status": "status unverified; possibly open in the CAT(0) generality",
+   "match": "The uniform test kills geometric actions. Cocompactness enters through the energy minimizer and the displacement bound M (P35), and properness of X through the ultralimit.",
+   "how_item_helps": "Adaptation: an almost-minimizer version of `EnergyOrbit` without `bound`, with rescaled ultralimits of non-proper spaces (OAI `OrbitLimit` already handles a sequence of spaces). The contradiction would then forbid all fixed-point-free actions, which would give a hyperbolic group with fixed points on every complete CAT(0) space. That is stronger than needed and may be false, so a 'proper but not cocompact' variant needs a different end-game.",
+   "payoff": "high",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI `CATZero`, Mathlib `CompleteSpace`",
+    "missing": "proper isometric action without cocompactness (~20 lines, adapting `GeometricAction`)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O6",
+   "title": "Quantitative/effective version: an explicit hyperbolic group (explicit finite presentation) with no geometric CAT(0) action",
+   "statement": "Exhibit a concrete finite presentation of a hyperbolic group with no geometric CAT(0) action, ideally with a checkable certificate.",
+   "reference": "257 itself: 'The proof is an existence argument and does not give an effective size for K' (01-introduction.tex:15).",
+   "status": "open (new problem raised by the paper)",
+   "match": "The gadget is finite and explicit. Only the sampling and ultralimit layers are non-effective.",
+   "how_item_helps": "Make `SamplingSequence.conditional` quantitative: `ConeData.conditional_test` is already quantitative (explicit B√(1/(n+1)+2M²η)+2BMη). What is missing is a quantitative replacement for the ultralimit, i.e. a robust (ε-perturbed) version of `no_finite_obstruction`: all equalities replaced by ±ε, contradiction for ε < ε₀. That robust gadget lemma is a natural, Lean-statable sub-target.",
+   "payoff": "med",
+   "confidence": "medium (a robust version of a finite algebraic contradiction usually exists; the work is in the constants)",
+   "difficulty": "medium for the robust gadget; high for a full explicit presentation",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI `FiniteObstructionData` with each `=` relaxed to `|· − ·| ≤ ε` (robust gadget)",
+    "missing": "none for the robust-gadget sub-target",
+    "formal_proof_to_compare": "OAI `no_finite_obstruction` (exact version)"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  {
+   "title": "Gromov's realization question, CAT(0) and CAT(−1) versions (BMS Problem H11; Stark 2025 OP 2.15)",
+   "note": "Answered negatively by the headline itself."
+  },
+  {
+   "title": "Full paper Thm 1.1 with '2-dimensional' and 'no locally CAT(0) finite model'",
+   "note": "A strengthening of the comparator reachable from the existing Lean in about 50–90 lines total (see lean_gaps). A good, cheap Lean exercise and a calibration task for the prover, but not reuse."
+  },
+  {
+   "title": "Infinite CAT(0)- and CAT(−1)-dimension for a hyperbolic group of geometric dimension 2",
+   "note": "Pushes Brady–Crisp (Comment. Math. Helv. 82, 2007 [memory]: geometric dimension 2 vs CAT(0) dimension 3) to the extreme. This is a corollary."
+  },
+  {
+   "title": "No finite-index subgroup of π₁K acts geometrically on a proper CAT(0) space",
+   "note": "Standard induction: a geometric action of a finite-index H on X induces one of G on X^{[G:H]}. A corollary, not in the Lean."
+  },
+  {
+   "title": "Single-target fixed-point statements (Toyoda/IKN type: for each X some hyperbolic group fails to act geometrically on X)",
+   "note": "Trivial from the headline."
+  },
+  {
+   "title": "Linear isoperimetric inequality does not imply a nonpositively curved finite model",
+   "note": "Already stated by the paper as a consequence."
+  }
+ ],
+ "release_reuse": [
+  {
+   "family": "254 (Artin group with no geometric CAT(0) action, 2026-09-23)",
+   "finding": "Same headline type, different design: stable translation lengths, braid subgroups and sectors (introduction.tex). Grep of its build for Fano, tangent cone, barycent, Sturm, ultralimit, uniform conditional and energy found nothing. No reuse of the gadget or of the conditional test."
+  },
+  {
+   "family": "246 (Cannon's conjecture), 252 (non-residually-finite hyperbolic group)",
+   "finding": "Per the novelty pass, no shared machinery: no Fano template, Sturm means, ultralimits or Ollivier counting."
+  },
+  {
+   "family": "CAT0Fillings / IntegralFillings (sharp integral fillings in CAT(0) spaces)",
+   "finding": "Use their own CAT(0) definitions (`CAT0Fillings.IsCAT0`). Isoperimetry in CAT(0) spaces, unrelated to the gadget."
+  },
+  {
+   "family": "PolycyclicRecognition",
+   "finding": "Has a `WordBallSamplingSequence`. This is a name collision only (Lie-group chart sampling), not the 257 `SamplingSequence`."
+  },
+  {
+   "family": "Verdict",
+   "finding": "No family in the release reuses the doubled-Fano design or the uniform conditional test. The device is single-use inside the release."
+  }
+ ],
+ "negative_controls": [
+  {
+   "id": "N1",
+   "setting": "Replace CAT(0) by injective metric spaces / Helly graphs (spaces with convex geodesic bicombings)",
+   "expected": "fails (proved-false analogue)",
+   "why": "Every hyperbolic group acts geometrically on a proper injective metric space (Lang 2013) and is Helly (Chalopin–Chepoi–Genevois–Hirai–Osajda) [memory]. So no version of the device can rule out geometric actions on these targets. The conditional test breaks there because tangent cones have no inner-product pairing and inductive means lack Sturm's variance bound. A prover that 'proves' no-action for injective targets has a bug."
+  },
+  {
+   "id": "N2",
+   "setting": "Gromov density random groups at d < 1/6",
+   "expected": "fails (proved-false analogue)",
+   "why": "These are cubulated, hence act geometrically on CAT(0) cube complexes (Ollivier–Wise 2011) [memory]. Any transfer of the sampling/conditional-test pipeline must lose at low density. In 257 the decoration tables sit just below density 1/2, and the template only emerges there."
+  },
+  {
+   "id": "N3",
+   "setting": "Gadget with the exceptional data removed: `FiniteObstructionData` without `loose`, `missing`, `fractional` (equivalently, the undoubled template with all Fano incidences present)",
+   "expected": "the contradiction should not be derivable",
+   "why": "In `no_finite_obstruction` the only route to `False` is `five_line_fans_contradiction`. Its antipodality hypothesis `hop` comes from `exceptional_antipodes`, which needs `hop` from `missing` (via `hmid`) and `hex` from `exceptional_identity` (needs `loose` and `fractional`). Without them the proof has no handle. Note that the residual data is NOT Euclidean-realizable: 5 or 6 line vectors with norm² 3/4 and pairwise pairing −1/4 have a Gram matrix I − J/4 that is not PSD. So realizability needs a genuinely non-Euclidean CAT(0) space (the novelty pass suggests cube-complex realizations). This is to be checked, not assumed."
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "id": "O1",
+   "title": "Pure-metric doubled-Fano core vs Gromov's CAT(0)-subset question",
+   "argument": "Statable now with existing OAI definitions (`MetricCore` + `CATZero`). It tests the gadget's design directly rather than its proof toolkit. One run decides whether the metric core alone is CAT(0)-impossible. If it is, and its ≤5-point subsets pass Toyoda's criterion, the gadget gives new data on an open 2001 question. This is the cleanest witness-reuse experiment available."
+  },
+  {
+   "rank": 2,
+   "id": "O6",
+   "title": "Robust (ε-perturbed) doubled-Fano obstruction",
+   "argument": "Statable now by relaxing each field of `FiniteObstructionData` by ±ε. It is the first step toward an effective hyperbolic group and a natural test of whether a prover holding `no_finite_obstruction` reaches the robust version much faster than one without it. That makes it a measurable within-device speedup."
+  },
+  {
+   "rank": 3,
+   "id": "S1",
+   "title": "Flat-triangle / CN-equality propagation",
+   "argument": "A textbook theorem (BH II.2.9) that is statable now. The OAI tangent-cone lemmas used by the obstruction proof are nearly the statement. It measures toolkit reuse, not the gadget, so a speedup here supports the infrastructure, not an N3 jump. It is still a clean, cheap Lean A/B test."
+  },
+  {
+   "rank": 4,
+   "id": "S2",
+   "title": "Flat quadrilateral theorem (unit square)",
+   "argument": "Statable now, with the midpoint half already in OAI (`CATZero.square_mid`). Same caveat as S1. Expected speedup low–med."
+  },
+  {
+   "rank": 5,
+   "id": "O2",
+   "title": "CAT(0)-ness of density random groups at 1/3 < d < 1/2",
+   "argument": "The only target where the uniform conditional test (P37) is the decisive ingredient, and the highest payoff. The statement needs about 150 lines of random-group definitions, and the adaptation (forcing a CAT(0)-impossible limit configuration in the plain density model) is the hard, uncertain part. Use it as a stretch target, not for the speedup measurement."
+  }
+ ],
+ "precedent_check": {
+  "earlier_equivalent": "none found",
+  "summary": "No earlier construction of a finite configuration that is impossible in every CAT(0) space and built from a doubled Fano incidence graph was found. The Fano/Heawood graph usually appears in the opposite role, as the CAT(1) link of Ã₂ buildings. For the conditional test, the closest neighbours are target-dependent: IKN 2012 and Toyoda (constants through δ(X)), and Naor–Silberman / Mendel–Naor (nonlinear spectral gaps for classes of targets). An 'all CAT(0) targets' obstruction of a different kind exists: Eskenazis–Mendel–Naor, Invent. Math. 217 (2019), 'Nonpositive curvature is not coarsely universal' [memory], via metric cotype. It concerns coarse embeddings, not geometric actions, and does not downgrade the item. Nothing after 2026-10-06 using the device was found. The web search was cut short by a tool quota: two searches for a 2026 follow-up of 257 found none, and one 2026 search summary still called the realization question open, consistent with 257 not yet being absorbed.",
+  "items": [
+   "IKN 2012 / Toyoda: same purpose (random hyperbolic groups vs cocompact CAT(0) targets); target-dependent constants. Not equivalent.",
+   "Eskenazis–Mendel–Naor 2019: uniform over all CAT(0) spaces, but for coarse embeddings via metric cotype. Not equivalent.",
+   "Family 254 (Artin, 2026-09-23): the same 'no geometric CAT(0) action' conclusion by a different, algebraic mechanism. Not equivalent and not a downgrade.",
+   "Post-2026-10-06: nothing found (search incomplete)."
+  ]
+ },
+ "sources": [
+  "data/pilot/257/family.md, family.json, novelty.md, novelty.json; data/eureka_shortlist.json (rank 8 entry)",
+  "data/raw/openai-math/lean/OAI/Geometry/HyperbolicGroups/{Main,Basic,Template,MetricHexagon,CATZero,CATZeroFurther,ConditionalStar,FiniteLaw,Exceptional,GraphLimit,OrbitLimit,Selection,SelectedPresentation,IndexedFillingValue,CompactLocalCATGeometric,FinitePolygonModel}.lean (read at text level)",
+  "data/raw/openai-math/lean/ComparatorChallenges/HyperbolicObstruction.{json,lean}; lean/docs/257.md",
+  "preprint A-hyperbolic-group-with-no-geometric-CAT0-action-September-25-2026/build/sections/01-introduction.tex, 07-completion.tex",
+  "preprint An-Artin-group-with-no-geometric-CAT-0-action-September-23-2026/build/sections/introduction.tex; lean/ComparatorChallenges/ArtinCAT0.lean",
+  "data/raw/openai-math/CONTENTS.md (release scan for CAT(0), hyperbolic, Fano)",
+  "https://arxiv.org/abs/1907.09074 (Toyoda 2020) [via subagent]",
+  "https://arxiv.org/abs/2009.09522 (Lebedeva–Petrunin) [via subagent]",
+  "https://arxiv.org/abs/2106.14931 (Montée) [via subagent]",
+  "https://arxiv.org/abs/1102.0729 (Toyoda) [via subagent]",
+  "https://arxiv.org/abs/1012.4147 (IKN statement as quoted there) [via subagent]",
+  "https://arxiv.org/abs/2603.03863 (Duchesne–Simon, abstract only) [via subagent]",
+  "Memory-only, unverified: Ollivier 2005 survey; Ollivier–Wise 2011; Mendel–Naor 2015; Kondo 2012; Naor–Silberman 2011; Lang 2013; CCGHO Helly groups; Eskenazis–Mendel–Naor 2019; Brady–Crisp 2007; Bridson–Haefliger 1999"
+ ],
+ "search_log": [
+  "Local: grep of the Lean dir for the comparator chain (main → … → impossible_sequence → MetricCore.impossible → no_finite_obstruction; word_lower/fractional_error → conditional).",
+  "Local: located `simplex_card_le_three` (2-dim bound) and `uniformLocalCATZero_of_compact` (the only CAT(−1)-specific step) to pin down the comparator gap.",
+  "Local: CONTENTS.md scan; grep of family 254's preprint for Fano/tangent cone/Sturm/ultralimit/energy (no hits); grep of OAI for other uses of HyperbolicObstruction/SamplingSequence (only a PolycyclicRecognition name collision).",
+  "Web (subagent, ~8 searches before quota): 'hyperbolic group not CAT(0) 2026 random presentation Fano' (no follow-up found); Toyoda five points CAT(0); Lebedeva–Petrunin; random groups density cubulation / property (T) (Montée, Ashcroft); IKN / Toyoda δ invariant; Duchesne–Simon abstract.",
+  "Web (own): one search on Mendel–Naor 'Expanders with respect to Hadamard spaces' failed with the session quota; no further web checks were possible.",
+  "Lean: not compiled; all Lean claims are text-level."
+ ]
+}

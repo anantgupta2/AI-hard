@@ -1,0 +1,560 @@
+{
+ "fid": "330",
+ "item": "Operator-adapted opposing edge tests with exceptional discard sets, plus incidence averaging (paper I32+I33, using the records lemma I30/I31), for Lipschitz-free spaces over uniformly discrete blocks",
+ "item_type": "F3 (lemma-level device inside a witness construction)",
+ "analyst_note": "Text-level work only. The Lean was not compiled (no local toolchain). Web tools hit their session quota; outside references come from a subagent that used the arXiv API/full texts where marked [subagent-verified]. Others are marked [unverified].",
+ "lean_status": "as in paper",
+ "lean_status_why": "`MetricBlock.edge_test` (ScalarTests.lean:119) is the paper's Lemma edge-test almost verbatim: a 1-Lipschitz f into [−L,L] equal to b_x off E_e and −b_y off E_ē, built by McShane extension and clipping from the record/exceptional-direction lemma. The averaging is `signed_incidence_obstruction` (SignedTests.lean:207), with the paper's constants (3L/2, 2L, 1/(20V), L = 10p). It sits on the comparator path of both DiscreteLipschitzFree and RealL1Renorming. Only the graph supply around the item takes a different route (deterministic, below).",
+ "lean_gaps": [
+  {
+   "gap": "Different graph supply (outside the item).",
+   "detail": "Paper: Δ-regular k-coloured multigraphs from the permutation model whose coloured local statistics converge to the iid-coloured regular tree (local-limit lemma, Friedman / Benjamini–Schramm), then a first-moment bound for rare matched walks. Lean: Cayley quotients of free groups crossed with *all* colourings (`GraphProducer.sequenceGraph`, `allColoringsGraph`), and an exact colouring count `GraphProducer.exists_rare_component` (GraphSequence.lean:17) for the bad-vertex fraction 20·V·|bad| < |X|. The edge test and averaging do not depend on this choice: they are stated for an arbitrary `PortGraph`."
+  },
+  {
+   "gap": "The paper's Remark abstract-obstruction (tests.tex:143-174) is not a standalone Lean theorem.",
+   "detail": "Its generic content is spread over `PortGraph`-generic lemmas (`matched_exceptional_endpoint`, `exceptional_endpoint`, `edge_test`, `opposing_pairing_lower`, `signed_incidence_obstruction`). The assembly `finite_support_impossible` is specialised to `BlockConstruction.Block p`. Packaging the remark as a reusable theorem over abstract (N, A, G_m, h) data would cost roughly 60–120 lines. That would make design-reuse tests cleaner."
+  },
+  {
+   "gap": "Nonlinear corollary not formalized.",
+   "detail": "'F(M) is separable and not approximable' (Kalton 2012 Problem 1, via Kalton's Thm 4.4) is not in the Lean or the comparators (family.md)."
+  },
+  {
+   "gap": "Comparator wording: 'countably infinite' becomes `Countable`.",
+   "detail": "In `BlockStatement` (DiscreteLipschitzFree.lean). Infinitude is proved separately (`BlockConstruction.infinite_block`) and is also forced by the obstruction, since F of a finite space is finite-dimensional and has 1-BAP."
+  },
+  {
+   "gap": "Exceptional sets at bad vertices.",
+   "detail": "As in the paper: `exceptionSet` puts every state into E_e when x is not `Good` (ScalarTests.lean:59). The Lean compatibility threshold `K+2L+1` (`Compatible`) matches the paper's strict bound '< 1+K+2L' up to the ≤/< convention."
+  }
+ ],
+ "comparator": {
+  "names": [
+   "DiscreteLipschitzFree (OAI.DiscreteFree.source_endpoints : BlockStatement ∧ MainStatement)",
+   "RealL1Renorming (OAI.DiscreteFree.real_l1_quantitative_renorming)"
+  ],
+  "solution_modules": [
+   "OAI.Analysis.LipschitzFree.Main",
+   "OAI.Analysis.LipschitzFree.Renorming"
+  ]
+ },
+ "comparator_chain": [
+  "OAI.DiscreteFree.source_endpoints",
+  "OAI.DiscreteFree.blocks_proved",
+  "OAI.DiscreteFree.BlockConstruction.obstruction",
+  "OAI.DiscreteFree.BlockConstruction.finite_support_impossible",
+  "OAI.DiscreteFree.MetricBlock.edge_test",
+  "OAI.DiscreteFree.MetricBlock.exceptional_endpoint",
+  "OAI.DiscreteFree.PortGraph.matched_exceptional_endpoint",
+  "OAI.DiscreteFree.exceptional_of_extensions"
+ ],
+ "comparator_chain_branches": [
+  "Averaging: `finite_support_impossible` → `signed_incidence_obstruction` (SignedTests.lean:207), fed by `opposing_pairing_lower` (:72), `bump_mass` (BlockObstruction.lean:76), `affine_difference_bound`, and `exceptional_unique_good` → `exceptional_unique` (SignedTests.lean:21).",
+  "Scalar extension: `edge_test` → `opposing_scalar_extension` (SignedTests.lean:117) → `bounded_scalar_extension` (McShane plus clipping).",
+  "Graph supply: `finite_support_impossible` → `GraphProducer.exists_rare_component` (GraphSequence.lean:17). This is the deterministic all-colourings count that replaces the paper's local-limit lemma.",
+  "MainStatement half: `source_endpoints` → `main_proved` → `MainConstruction.noBAP` → `BlockConstruction.noBAP` (BlockBAP.lean:33) → `not_hasBAP_of_finite_obstruction` (BlockBAP.lean:15) → `BlockConstruction.obstruction` → … (as above).",
+  "RealL1Renorming: `real_l1_quantitative_renorming` (Renorming.lean:41) → `BlockConstruction.noBAP p hp p le_rfl` → `obstruction` → `finite_support_impossible` → `edge_test`.",
+  "The novelty pass gave dominator shares 0.37–0.39 for the obstruction subtree."
+ ],
+ "lean_source": [
+  {
+   "name": "OAI.DiscreteFree.PortGraph",
+   "kind": "structure",
+   "file": "lean/OAI/Analysis/LipschitzFree/PortGraphs.lean",
+   "line": 17,
+   "text": "structure PortGraph (X D : Type*) where\n  reverse : D → D\n  reverse_involutive : Function.Involutive reverse\n  move : X → D → X\n  move_reverse : ∀ x e, move (move x e) (reverse e) = x"
+  },
+  {
+   "name": "OAI.DiscreteFree.PortGraph.Matched",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LipschitzFree/GraphWalks.lean",
+   "line": 20,
+   "text": "def Matched : X → S → List D → Prop\n  | x, j, [] => compatible x j\n  | x, j, e::w => compatible x j ∧ ∃ k, trans j k ∧ Matched (G.move x e) k w"
+  },
+  {
+   "name": "OAI.DiscreteFree.PortGraph.Good",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LipschitzFree/GraphWalks.lean",
+   "line": 42,
+   "text": "def Good (n : ℕ) (x : X) : Prop :=\n  ∀ j w, w.length = n → G.Reduced w → ¬ G.Matched compatible trans x j w"
+  },
+  {
+   "name": "OAI.DiscreteFree.PortGraph.RecordLength",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LipschitzFree/GraphWalks.lean",
+   "line": 54,
+   "text": "def RecordLength (x : X) (e : D) (j : S) (t : ℕ) : Prop :=\n  t = 0 ∨ ∃ w : List D, (e::w).length = t ∧ G.Reduced (e::w) ∧\n    G.Matched compatible trans x j (e::w)"
+  },
+  {
+   "name": "OAI.DiscreteFree.PortGraph.record",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LipschitzFree/GraphWalks.lean",
+   "line": 58,
+   "text": "def record (n : ℕ) (x : X) (e : D) (j : S) : ℕ :=\n  Nat.findGreatest (G.RecordLength compatible trans x e j) n"
+  },
+  {
+   "name": "OAI.DiscreteFree.Exceptional",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LipschitzFree/SignedTests.lean",
+   "line": 18,
+   "text": "def Exceptional (r : D → S → ℕ) (e : D) (j : S) : Prop :=\n  ∀ g : D, g ≠ e → r g j < r e j"
+  },
+  {
+   "name": "OAI.DiscreteFree.exceptional_unique",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LipschitzFree/SignedTests.lean",
+   "line": 21,
+   "text": "theorem exceptional_unique {r : D → S → ℕ} {e f : D} {j : S}\n    (he : Exceptional r e j) (hf : Exceptional r f j) : e = f"
+  },
+  {
+   "name": "OAI.DiscreteFree.PortGraph.matched_exceptional_endpoint",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LipschitzFree/GraphWalks.lean",
+   "line": 88,
+   "text": "theorem matched_exceptional_endpoint {n : ℕ} {x : X} {e : D} {j k : S}\n    (hx : G.Good compatible trans n x) (hy : G.Good compatible trans n (G.move x e))\n    (hc : compatible x j) (hd : compatible (G.move x e) k)\n    (ht : trans j k) (ht' : trans k j) :\n    Exceptional (G.record compatible trans n x) e j ∨\n      Exceptional (G.record compatible trans n (G.move x e)) (G.reverse e) k"
+  },
+  {
+   "name": "OAI.DiscreteFree.MetricBlock.Compatible",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LipschitzFree/ScalarTests.lean",
+   "line": 20,
+   "text": "def Compatible (x : X) (j : Point G color cap R) : Prop :=\n  dist (originalLabel G color cap x) (label G color cap R j) ≤ (K+2*L+1 : ℕ)"
+  },
+  {
+   "name": "OAI.DiscreteFree.MetricBlock.Transition",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LipschitzFree/ScalarTests.lean",
+   "line": 23,
+   "text": "def Transition (j k : Point G color cap R) : Prop := dist j k ≤ (2*L : ℕ)"
+  },
+  {
+   "name": "OAI.DiscreteFree.MetricBlock.exceptionSet",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LipschitzFree/ScalarTests.lean",
+   "line": 59,
+   "text": "def exceptionSet (S : Finset (Point G color cap R)) (n : ℕ) (x : X) (e : E) : Set S :=\n  {j | ¬ G.Good (fun x (j : S) => Compatible G color cap R L K x j.val)\n      (fun j k : S => Transition G color cap R L j.val k.val) n x ∨\n    Exceptional (G.record (fun x (j : S) => Compatible G color cap R L K x j.val)\n      (fun j k : S => Transition G color cap R L j.val k.val) n x) e j}"
+  },
+  {
+   "name": "OAI.DiscreteFree.MetricBlock.exceptional_endpoint",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LipschitzFree/ScalarTests.lean",
+   "line": 74,
+   "text": "theorem exceptional_endpoint (S : Finset (Point G color cap R)) (n : ℕ) (x : X) (e : E)\n    (j k : S) (hj : Compatible G color cap R L K x j.val)\n    (hk : Compatible G color cap R L K (G.move x e) k.val)\n    (ht : Transition G color cap R L j.val k.val) :\n    j ∈ exceptionSet G color cap R L K S n x e ∨\n      k ∈ exceptionSet G color cap R L K S n (G.move x e) (G.reverse e)"
+  },
+  {
+   "name": "OAI.DiscreteFree.labelBump",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LipschitzFree/LabelBumps.lean",
+   "line": 17,
+   "text": "def labelBump (h : M → N) (a : N) (L K : ℝ) (t : M) : ℝ :=\n  L * max (1 - dist a (h t) / K) 0"
+  },
+  {
+   "name": "OAI.DiscreteFree.opposing_scalar_extension",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LipschitzFree/SignedTests.lean",
+   "line": 117,
+   "text": "theorem opposing_scalar_extension (P Q : Set N) (b c : N → ℝ) (L : ℝ)\n    (hL : 0 ≤ L) (hbLip : LipschitzWith 1 b) (hcLip : LipschitzWith 1 c)\n    (hb : ∀ j, 0 ≤ b j ∧ b j ≤ L) (hc : ∀ j, 0 ≤ c j ∧ c j ≤ L)\n    (hcross : ∀ j ∈ P, ∀ k ∈ Q, dist j k < 2 * L → b j = 0 ∧ c k = 0) :\n    ∃ f : N → ℝ, LipschitzWith 1 f ∧ (∀ z, |f z| ≤ L) ∧\n      Set.EqOn f b P ∧ Set.EqOn f (fun z => -c z) Q"
+  },
+  {
+   "name": "OAI.DiscreteFree.MetricBlock.edge_test",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LipschitzFree/ScalarTests.lean",
+   "line": 119,
+   "text": "theorem edge_test (hL : 0 < L) (hK : 0 < K) (hLK : L ≤ K)\n    (S : Finset (Point G color cap R)) (n : ℕ) (x : X) (e : E) :\n    ∃ f : Point G color cap R → ℝ, LipschitzWith 1 f ∧ (∀ z, |f z| ≤ L) ∧\n      (∀ j : S, j ∉ exceptionSet G color cap R L K S n x e →\n        f j.val = labelBump (label G color cap R) (originalLabel G color cap x) L K j.val) ∧\n      (∀ j : S, j ∉ exceptionSet G color cap R L K S n (G.move x e) (G.reverse e) →\n        f j.val = -labelBump (label G color cap R) (originalLabel G color cap (G.move x e)) L K j.val)"
+  },
+  {
+   "name": "OAI.DiscreteFree.opposing_pairing_lower",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LipschitzFree/SignedTests.lean",
+   "line": 72,
+   "text": "theorem opposing_pairing_lower (μ ν f b c : S → ℝ) (E F : Set S) (L : ℝ)\n    (hf : ∀ j, |f j| ≤ L)\n    (hb : ∀ j, 0 ≤ b j ∧ b j ≤ L) (hc : ∀ j, 0 ≤ c j ∧ c j ≤ L)\n    (he : ∀ j, j ∉ E → f j = b j)\n    (hF : ∀ j, j ∉ F → f j = -c j) :\n    pairing μ b + pairing ν c - 2 * L * (variationOn μ E + variationOn ν F) ≤\n      pairing μ f - pairing ν f"
+  },
+  {
+   "name": "OAI.DiscreteFree.signed_incidence_obstruction",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LipschitzFree/SignedTests.lean",
+   "line": 207,
+   "text": "theorem signed_incidence_obstruction [Nonempty X] [Nonempty D]\n    (μ : X → S → ℝ) (E : X → D → Set S) (bad : Finset X)\n    (rev : (X × D) ≃ (X × D)) (p V : ℝ)\n    (hp : 0 < p) (hV : 0 ≤ V)\n    (hTV : ∀ x, totalVariation (μ x) ≤ V)\n    (hgood : ∀ x, x ∉ bad → ∀ j e f, j ∈ E x e → j ∈ E x f → e = f)\n    (hdegree : 20 * V < (Fintype.card D : ℝ))\n    (hbad : 20 * V * (bad.card : ℝ) < (Fintype.card X : ℝ))\n    (hedge : ∀ e : X × D,\n      3 * (10 * p) / 2 - 2 * (10 * p) *\n        (variationOn (μ e.1) (E e.1 e.2) +\n         variationOn (μ (rev e).1) (E (rev e).1 (rev e).2)) ≤ 2 * p) : False"
+  },
+  {
+   "name": "OAI.DiscreteFree.GraphProducer.exists_rare_component",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LipschitzFree/GraphSequence.lean",
+   "line": 17,
+   "text": "theorem exists_rare_component (Q H V : ℕ) (hQpos : 0 < Q) (hHpos : 0 < H)\n    (hDpos : 0 < Nat.card (A × Bool))\n    (hk : 2 * Nat.card (A × Bool) * Q * H < Nat.card C)\n    (compatible : Vertex A C → S → Prop) (trans : S → S → Prop) (P : S → Finset C)\n    (hP : ∀ j, (P j).card ≤ H)\n    (hcolor : ∀ z j, compatible z j → sequenceColor A C z ∈ P j)\n    (hQ : ∀ j, Fintype.card {k : S // trans j k} ≤ Q) :\n    ∃ n : ℕ, 2 ≤ n ∧\n      20 * V * Nat.card {z : (Cayley A n → C) × Cayley A n //\n        ¬ (sequenceGraph A C).Good compatible trans n (intoSequence A C n z)} <\n      Nat.card ((Cayley A n → C) × Cayley A n)"
+  },
+  {
+   "name": "OAI.DiscreteFree.BlockConstruction.finite_support_impossible",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LipschitzFree/BlockObstruction.lean",
+   "line": 102,
+   "text": "theorem finite_support_impossible (hp : 1 ≤ p) (S : Finset (Block p)) (ho : base p ∈ S)\n    (T : FreeSpace (base p) →L[ℝ] FreeSpace (base p))\n    (hn : ‖T‖ ≤ 2*(p : ℝ))\n    (hfixed : ∀ u, supportProjection (base p) (separation p) S (T u) = T u)\n    (he : ∀ a ∈ anchors p, ‖T (delta (base p) a) - delta (base p) a‖ < 1) : False"
+  },
+  {
+   "name": "OAI.DiscreteFree.BlockConstruction.obstruction",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LipschitzFree/BlockObstruction.lean",
+   "line": 176,
+   "text": "theorem obstruction (hp : 1 ≤ p)\n    (T : FreeSpace (base p) →L[ℝ] FreeSpace (base p))\n    (hfin : Module.Finite ℝ (LinearMap.range T.toLinearMap)) (hn : ‖T‖ ≤ (p : ℝ)) :\n    ∃ a ∈ anchors p, (1/2 : ℝ) ≤ ‖T (delta (base p) a) - delta (base p) a‖"
+  },
+  {
+   "name": "OAI.DiscreteFree.not_hasBAP_of_finite_obstruction",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LipschitzFree/BlockBAP.lean",
+   "line": 15,
+   "text": "theorem not_hasBAP_of_finite_obstruction {M : Type*} [MetricSpace M] (o : M)\n    (A : Finset M) (p ε : ℝ) (hε : 0 < ε)\n    (hobs : ∀ T : FreeSpace o →L[ℝ] FreeSpace o,\n      Module.Finite ℝ (LinearMap.range T.toLinearMap) → ‖T‖ ≤ p →\n        ∃ a ∈ A, ε ≤ ‖T (delta o a) - delta o a‖)\n    (Λ : ℝ) (hΛ : Λ ≤ p) : ¬ HasBAP (FreeSpace o) Λ"
+  },
+  {
+   "name": "OAI.DiscreteFree.BlockStatement (comparator)",
+   "kind": "def",
+   "file": "lean/ComparatorChallenges/DiscreteLipschitzFree.lean",
+   "line": 139,
+   "text": "def BlockStatement : Prop :=\n  ∀ p : ℕ, 1 ≤ p → ∃ (M : Type) (d : MetricSpace M) (o : M),\n    letI := d\n    Countable M ∧ (∀ x y : M, x ≠ y → 1 ≤ dist x y) ∧\n      (∀ x y : M, dist x y ≤ blockBound p) ∧\n      ∃ A : Finset M, o ∈ A ∧ ∀ T : FreeSpace o →L[ℝ] FreeSpace o,\n        Module.Finite ℝ (LinearMap.range T.toLinearMap) → ‖T‖ ≤ (p : ℝ) →\n          ∃ a ∈ A, (1 / 2 : ℝ) ≤ ‖T (delta o a) - delta o a‖"
+  },
+  {
+   "name": "OAI.DiscreteFree.MainStatement (comparator)",
+   "kind": "def",
+   "file": "lean/ComparatorChallenges/DiscreteLipschitzFree.lean",
+   "line": 148,
+   "text": "def MainStatement : Prop :=\n  ∃ (M : Type) (d : MetricSpace M) (o : M),\n    letI := d\n    Countable M ∧ (∀ x y : M, x ≠ y → 1 ≤ dist x y) ∧\n      (¬ Bornology.IsBounded (Set.univ : Set M)) ∧\n      (¬ ProperSpace M) ∧ HasAP (FreeSpace o) ∧\n      ∀ Λ : ℝ, 1 ≤ Λ → ¬ HasBAP (FreeSpace o) Λ"
+  },
+  {
+   "name": "OAI.DiscreteFree.RealL1RenormingStatement (comparator)",
+   "kind": "def",
+   "file": "lean/ComparatorChallenges/RealL1Renorming.lean",
+   "line": 36,
+   "text": "def RealL1RenormingStatement : Prop :=\n  ∀ p : ℕ, 1 ≤ p → ∃ N : AddGroupNorm RealL1,\n    (∀ (r : ℝ) (c : RealL1), N (r • c) = |r| * N c) ∧\n    (∀ c : RealL1, (1 / 2 : ℝ) * ‖c‖ ≤ N c ∧ N c ≤ blockBound p * ‖c‖) ∧\n    (let m : Module ℝ RealL1 := inferInstance\n     letI : NormedAddCommGroup RealL1 := N.toNormedAddCommGroup\n     ∃ s : NormedSpace ℝ RealL1, s.toModule = m ∧\n       letI := s\n       CompleteSpace RealL1 ∧\n       HasBAP RealL1 (2 * blockBound p) ∧ ¬ HasBAP RealL1 (p : ℝ) ∧\n         (p = 1 → ¬ HasBAP RealL1 1))"
+  }
+ ],
+ "speedup_targets": [
+  {
+   "id": "S1",
+   "title": "Thm blocks via the paper's own random-graph route (design reuse of the abstract obstruction)",
+   "statement": "For each p ≥ 1 there is a bounded, 1-separated, countably infinite pointed metric space with a finite anchor set A such that every finite-rank T on F(M) with ‖T‖ ≤ p moves some δ_a by ≥ 1/2, where the graphs are random permutation-model Δ-regular graphs with iid colours (paper's Lemma local-limit + rare-walks), not Cayley quotients.",
+   "reference": "330 preprint, blocks.tex, walks.tex:50-110, tests.tex Remark abstract-obstruction.",
+   "status": "known (the paper's own proof route; unrefereed)",
+   "current_proof_size": "Paper: about 4 pages for walks + local limit. Lean: the deterministic route `GraphProducer`/`ColorCounting`/`GraphSequence` is about 300 lines. The item part (`ScalarTests` + `SignedTests` + `GraphWalks`) is about 570 lines.",
+   "how_item_helps": "`edge_test`, `exceptional_endpoint`, `matched_exceptional_endpoint`, `opposing_pairing_lower` and `signed_incidence_obstruction` are generic in the `PortGraph`, so only the bad-fraction bound has to be re-proved for the new graph family. This measures how portable the device is. Caveat: it is the same theorem by a sibling route, not a different theorem.",
+   "expected_speedup": "high for the Lean (the item part is reused verbatim); not a jump signal on its own",
+   "confidence": "medium",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "`BlockStatement` (comparator) + Mathlib `Equiv.Perm` for the permutation model",
+    "missing": "permutation-model random graphs and their coloured local statistics (~200–300 lines, proof side only)",
+    "formal_proof_to_compare": "the OAI deterministic route (BlockObstruction/GraphSequence)"
+   }
+  },
+  {
+   "id": "S2",
+   "title": "Free spaces over diamond / Laakso graphs are not uniformly isomorphic to ℓ1ⁿ; projection constants of Lip0 over these graphs grow",
+   "statement": "d_BM(F(D_n), ℓ1^{N_n}) → ∞ for diamond graphs D_n, and the relative projection constants of Lip0(Laakso graphs) are unbounded.",
+   "reference": "Dilworth–Kutzarova–Ostrovskii, Canad. J. Math. 72(3) (2020) 774–804, arXiv 1807.03814, https://arxiv.org/abs/1807.03814; Positivity 25 (2021), arXiv 2007.07949 [subagent-verified bibliographic data].",
+   "status": "known",
+   "current_proof_size": "about 30 pp (CJM) + about 15 pp (Positivity). No formalization.",
+   "how_item_helps": "Same shape of argument: one operator-norm bound, then averaging over a symmetric family. DKO average over cycle-preserving bijections (Grünbaum–Rudin), while 330 averages per-edge opposing tests over oriented incidences. An edge-test-style lower bound could replace the symmetrisation where the graphs lack a large automorphism group. Diamonds are not locally tree-like, though, so the records lemma has nothing to bite on. The analogy is loose.",
+   "expected_speedup": "low",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI `DiscreteFree.FreeSpace`, `delta`, `HasAP`, `HasBAP` (ComparatorChallenges/DiscreteLipschitzFree.lean); Mathlib `SimpleGraph`, `lp`",
+    "missing": "diamond/Laakso graph sequences as metric spaces (~80 lines), Banach–Mazur distance or projection constant (~60 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "S3",
+   "title": "Lower estimates for the L1-distortion of transportation-cost spaces (planar grids, diamonds)",
+   "statement": "The transportation-cost (free) space over the m×m planar grid has L1-distortion Ω(log m); similar sharp bounds hold for diamond graphs and for {1..m}^d uniformly in d.",
+   "reference": "Gartland–Ostrovskii, 'Lower estimates for L1-distortion of transportation cost spaces', arXiv 2602.14852 (STOC 2026), https://arxiv.org/abs/2602.14852; Gartland–Ostrovskii–Rabani–Young, arXiv 2602.19434, https://arxiv.org/abs/2602.19434 [both subagent-verified].",
+   "status": "known (2026)",
+   "current_proof_size": "≈ 20–30 pp; ≈ 15 pp. No formalization.",
+   "how_item_helps": "Structurally the closest known method: systems of transportation problems on oriented edges (e⁺, e⁻) with ±1 sign matrices, averaged to force distortion for any linear map into ℓ1^m. The 330 edge test is also a signed per-oriented-edge test averaged over incidences, but adapted to the operator via discard sets. If the device helps anywhere outside BAP, this is the most plausible place. But planar grids are not locally tree-like and have no large degree to dilute over, so the records + degree-dilution part probably does not transfer.",
+   "expected_speedup": "low–med",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI `DiscreteFree.FreeSpace`, `delta`, `HasAP`, `HasBAP` (ComparatorChallenges/DiscreteLipschitzFree.lean) (finite M); Mathlib `lp`",
+    "missing": "L1-distortion of a normed space (inf over linear embeddings into L1 / ℓ1^m; ~60–100 lines), grid metric (~30 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "S4",
+   "title": "Earthmover distance is not in L1 (planar; hypercube)",
+   "statement": "Planar EMD over {0..n}² has L1-distortion Ω(√log n) (Naor–Schechtman); EMD over {0,1}^d has L1-distortion Ω(d) (Khot–Naor).",
+   "reference": "Naor–Schechtman, SIAM J. Comput. 37 (2007) 804–826, arXiv cs/0509074; Khot–Naor, Math. Ann. 334 (2006) 821–852 [subagent-reported].",
+   "status": "known",
+   "current_proof_size": "≈ 23 pp; ≈ 32 pp. No formalization.",
+   "how_item_helps": "Weak. These are Fourier/Poincaré arguments about embeddings, not about finite-rank near-identity operators. Included because a prover holding the edge-test lemmas could try to recast them. Expect no gain; it doubles as a soft control.",
+   "expected_speedup": "low",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI `DiscreteFree.FreeSpace`, `delta`, `HasAP`, `HasBAP` (ComparatorChallenges/DiscreteLipschitzFree.lean) (finite M)",
+    "missing": "L1-distortion (~60–100 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "open_problems": [
+  {
+   "id": "O1",
+   "title": "Kalton's question for proper / bounded-geometry uniformly discrete spaces",
+   "statement": "Does F(M) have the BAP for every uniformly discrete M that is proper (closed balls finite), e.g. every locally finite graph of bounded degree, or every finitely generated group with a word metric?",
+   "reference": "Kalton, Collect. Math. 55 (2004) 171–217, p. 185 (general question); Godefroy survey, Comment. Math. 55(2) (2015) 89–118, Problem 6.2, https://bibliotekanauki.pl/articles/746348.pdf; Hájek–Medina, arXiv 2112.03095, https://arxiv.org/abs/2112.03095 (reduction to nets; Schauder bases for nets in some spaces) [subagent-verified]. I found no explicit listing of the proper/bounded-geometry special case.",
+   "status": "not found as a listed problem. 330 answers the general question with a non-proper space (the Lean proves `¬ ProperSpace M`), so the proper case becomes the natural residual question [status unverified].",
+   "match": "Operator-adapted edge tests on locally tree-like coloured graphs of large degree; the records lemma; degree dilution.",
+   "how_item_helps": "Direct transfer fails. The anchors attach infinitely many vertices at distance R, so each block is bounded but not proper. In a proper space a bounded block is finite, and then F is finite-dimensional with 1-BAP. Adaptation: replace one anchor per label by a finite hub tree of depth ~log, and let blocks be unbounded but uniformly locally finite. The averaging is already independent of |S|, but `bump_mass` uses d(x, a(x)) ≤ R with a fixed finite anchor set, so the 3L/4 bump bound breaks once anchors move to distance ~log|G|. This is a genuine obstacle. If it can be overcome, the payoff is large.",
+   "payoff": "high",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI `DiscreteFree.FreeSpace`, `delta`, `HasAP`, `HasBAP` (ComparatorChallenges/DiscreteLipschitzFree.lean); Mathlib `ProperSpace`, `Countable`",
+    "missing": "none",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O2",
+   "title": "Godefroy–Ozawa Question 3 (generating compact convex Lipschitz retracts) and its 'mild form'",
+   "statement": "Does every separable Banach space X contain a generating (closed span = X) compact convex Lipschitz retract? Hájek–Medina show that a mild form of this forces BAP.",
+   "reference": "Godefroy–Ozawa, Proc. AMS 142(5) (2014) 1681–1687, arXiv 1201.0847, https://arxiv.org/abs/1201.0847; Hájek–Medina, arXiv 2202.08085, https://arxiv.org/abs/2202.08085 [subagent-verified; the exact 'mild form' not re-read here].",
+   "status": "open (as of the subagent's reading)",
+   "match": "330 supplies a separable space failing BAP with AP (F(M), and the ℓ1 renormings at the isometric level).",
+   "how_item_helps": "If the Hájek–Medina implication is '(mild form for X) ⇒ X has BAP', then X = F(M) from 330 violates the mild form, a possible negative answer as a corollary of the theorem rather than reuse of the device. To be checked against the exact HM statement. Recorded here because it is open and may fall immediately.",
+   "payoff": "med–high",
+   "confidence": "low–medium (depends on the exact HM statement)",
+   "difficulty": "low if the implication is as summarised",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI `DiscreteFree.FreeSpace`, `delta`, `HasAP`, `HasBAP` (ComparatorChallenges/DiscreteLipschitzFree.lean); Mathlib `IsCompact`, `Convex`, `LipschitzWith`, `Submodule.span`",
+    "missing": "Lipschitz retract definition (~20 lines); 'generating' (~10 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O3",
+   "title": "Godefroy survey Problem 6.3: does Lipschitz approximability imply BAP?",
+   "statement": "If a separable Banach space admits λ-Lipschitz maps with relatively compact range converging to the identity uniformly on compacts, must it have the BAP?",
+   "reference": "Godefroy survey, Comment. Math. 55(2) (2015), Problem 6.3, https://bibliotekanauki.pl/articles/746348.pdf; Godefroy, CMUC 61 (2020) 187–193 may address it [subagent: not verified].",
+   "status": "open in 2015; the 2020 status is unverified",
+   "match": "The obstruction is linear (finite-rank operators of norm ≤ p against anchors). 330's F(M) fails BAP and, via Kalton 2012, is also not approximable, so it does not answer 6.3.",
+   "how_item_helps": "Adaptation: a nonlinear edge test. For a Lipschitz map Φ: F(M) → F(M) with relatively compact range, compose with the per-edge 1-Lipschitz tests f_e. The measure representation μ_x (affine weights) is linear-specific, so one would need a barycentric replacement. Unclear.",
+   "payoff": "high",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI `DiscreteFree.FreeSpace`, `delta`, `HasAP`, `HasBAP` (ComparatorChallenges/DiscreteLipschitzFree.lean); Mathlib `LipschitzWith`, `IsCompact`",
+    "missing": "Lipschitz approximability property (~25 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O4",
+   "title": "Does every Banach space with the BAP admit an equivalent norm with the MAP?",
+   "statement": "Casazza's handbook problem (as cited by Godefroy–Ozawa, Problems 3.8/3.12): BAP ⇒ MAP after renorming?",
+   "reference": "Casazza, 'Approximation properties', Handbook of the Geometry of Banach Spaces Vol. 1 (2001) [problem numbers via Godefroy–Ozawa 2014; wording unverified]; Godefroy–Lancien–Zizler, Rocky Mountain J. Math. 44 (2014), arXiv 1207.2958, Problem 18 [subagent-verified].",
+   "status": "open as far as found [unverified]",
+   "match": "330's RealL1Renorming produces norms on ℓ1 failing MAP, i.e. the opposite direction (ℓ1 already has MAP in its usual norm).",
+   "how_item_helps": "Mostly not. A counterexample needs an obstruction invariant under all renormings, but the anchor obstruction is p-quantitative and degrades by the renorming constant. Recorded as a direction where the device is expected not to help.",
+   "payoff": "high",
+   "confidence": "very low",
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI `DiscreteFree.FreeSpace`, `delta`, `HasAP`, `HasBAP` (ComparatorChallenges/DiscreteLipschitzFree.lean) + the renorming encoding of RealL1Renorming (AddGroupNorm + compatible NormedSpace)",
+    "missing": "general 'equivalent norm' quantifier over a Banach space (~40 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O5",
+   "title": "Godefroy survey Problem 6.4: is the MAP (or a dimension-free BAP constant) available for F(M), M ⊂ ℝⁿ?",
+   "statement": "For M ⊂ ℝⁿ, does F(M) have the MAP? Known: λ-BAP with λ ≤ C√n (Lancien–Pernecká). Is a bound independent of n possible?",
+   "reference": "Godefroy survey (2015), Problem 6.4; Lancien–Pernecká, J. Funct. Anal. 264 (2013) [memory]; still called open in Hájek–Medina 2021 [subagent].",
+   "status": "open",
+   "match": "Opposite regime. The device needs exponentially growing locally tree-like structure at bounded scale, which doubling subsets of ℝⁿ cannot host. A lower bound λ_n → ∞ would need families in growing dimension.",
+   "how_item_helps": "Probably not. Embedding the 330 blocks into ℝⁿ costs distortion that grows with the block size, and a bounded infinite 1-separated set cannot sit in ℝⁿ at all. Listed so the experiment can confirm the device's limits.",
+   "payoff": "high",
+   "confidence": "very low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI `DiscreteFree.FreeSpace`, `delta`, `HasAP`, `HasBAP` (ComparatorChallenges/DiscreteLipschitzFree.lean); Mathlib `EuclideanSpace ℝ (Fin n)`",
+    "missing": "none",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O6",
+   "title": "Does F(N) have a Schauder basis whenever it has the BAP (N a net in a Banach space)?",
+   "statement": "For nets N in separable Banach spaces, does BAP of F(N) imply a Schauder basis? Known for nets in finite-dimensional spaces, in spaces with a basis containing c0, and in separable L∞-spaces.",
+   "reference": "Hájek–Medina, arXiv 2112.03095 and 2202.08032; Hájek–Novotný, arXiv 1606.03926; Aliaga–Medina, arXiv 2601.03131 (F(N_X) ≅ its ℓ1-sum) [subagent-verified]. No explicit problem listing found.",
+   "status": "appears open (no explicit listing found)",
+   "match": "Weak. The device obstructs BAP, not bases.",
+   "how_item_helps": "Only indirectly: the wedge-of-blocks structure plus edge tests gives quantitative lower bounds on the norms of finite-rank near-identities on anchors, which bound basis constants from below. Expect no direct use.",
+   "payoff": "med",
+   "confidence": "very low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI `DiscreteFree.FreeSpace`, `delta`, `HasAP`, `HasBAP` (ComparatorChallenges/DiscreteLipschitzFree.lean); Mathlib Schauder basis API (subagent reports `Mathlib/Analysis/Normed/Module/Bases.lean`; presence at d13f23b not checked)",
+    "missing": "net definition (~20 lines); Schauder basis, if absent at d13f23b (~80 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O7",
+   "title": "L1-distortion of transportation-cost spaces vs stochastic tree-embedding distortion",
+   "statement": "Is c₁(TC(X)) always comparable to the stochastic tree-embedding distortion of X? Related: Indyk's problem on the L1-distortion of EMD over n-point subsets of ℝ² (Matoušek–Naor open problems list, Problem 2.17).",
+   "reference": "Gartland–Ostrovskii–Rabani–Young, arXiv 2602.19434 ('the most important question'); Gartland–Ostrovskii, arXiv 2602.14852 [subagent-verified]; Matoušek–Naor open problems list [memory].",
+   "status": "open",
+   "match": "Signed per-oriented-edge tests averaged over incidences (shared with S3); the operator-adapted discard part has no counterpart.",
+   "how_item_helps": "A lower bound on distortion is a lower bound on norms of a linear map and its inverse. One could try opposing per-edge tests adapted to a given embedding T: F(X) → ℓ1^m, with records-based discard sets, on locally tree-like X. This is speculative.",
+   "payoff": "high",
+   "confidence": "very low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI `DiscreteFree.FreeSpace`, `delta`, `HasAP`, `HasBAP` (ComparatorChallenges/DiscreteLipschitzFree.lean) (finite M)",
+    "missing": "L1-distortion (~60–100 lines); stochastic tree embeddings (~150 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  {
+   "title": "Kalton's question (uniformly discrete ⇒ BAP?) answered negatively",
+   "note": "Headline; formalized (DiscreteLipschitzFree)."
+  },
+  {
+   "title": "Real ℓ1 has equivalent norms with 2B_p-BAP but not p-BAP; for p = 1 a renorming failing MAP",
+   "note": "Formalized (RealL1Renorming)."
+  },
+  {
+   "title": "ℓ∞ with the dual norm is a dual space with BAP but not MAP (Godefroy–Lancien–Zizler Problem 18)",
+   "note": "Via duality, per GLZ 2014 [subagent-verified that GLZ state this consequence]. Not in the Lean."
+  },
+  {
+   "title": "Any Banach space X ≅ ℓ1 ⊕ Y (e.g. L1[0,1]) has an equivalent norm failing MAP",
+   "note": "Renorm as (ℓ1, N₁) ⊕₁ Y. A 1-complemented subspace of a MAP space has MAP. Standard; my own remark, not in the paper or the Lean."
+  },
+  {
+   "title": "A uniformly discrete subset of c0 whose free space fails BAP",
+   "note": "Embed 330's M bi-Lipschitzly into c0 (Aharoni; Kalton–Lancien give distortion 2 [memory]); free spaces of bi-Lipschitz equivalent spaces are isomorphic. Corollary, not reuse."
+  },
+  {
+   "title": "A separable space with AP but not BAP (Figiel–Johnson 1973 phenomenon)",
+   "note": "A one-line corollary of MainStatement. The same holds for F(M) explicitly."
+  },
+  {
+   "title": "F(M) is not approximable (Kalton 2012 Problem 1)",
+   "note": "Paper's nonlinear corollary via Kalton's Thm 4.4; not formalized."
+  }
+ ],
+ "release_reuse": [
+  {
+   "family": "Whole release (preprint grep)",
+   "finding": "Phrases 'continuation record', 'matched walk', 'exceptional direction', 'opposing bump/test' occur outside 330 only generically: Falconer (an unrelated 'Exceptional directions' lemma), random 3-SAT ('pathwise continuation records' in a cascade argument), ball packings, Kuga–Satake, a projective fourfold, a random-environment zero-one law. No reuse of the edge-test design."
+  },
+  {
+   "family": "324/325 (Lipschitz equivalence; bi-Lipschitz absorption of c0), 332 (Markov cotype of ℓ1), PlanarL1, BoundedTreewidthL1, 098 (doubling Hilbert subset)",
+   "finding": "Same broad area (nonlinear Banach geometry, L1 embeddings). Their summaries show positive embedding/extension results or bi-Lipschitz constructions. None mentions finite-rank operator obstructions; not checked line by line."
+  },
+  {
+   "family": "OAI Lean",
+   "finding": "A repo-wide grep of lean/OAI for `DiscreteFree` / `LipschitzFree` outside Analysis/LipschitzFree found no other file. Single-use device inside the release."
+  }
+ ],
+ "negative_controls": [
+  {
+   "id": "N1",
+   "setting": "Doubling (e.g. Euclidean) uniformly discrete spaces, and nets in finite-dimensional spaces",
+   "expected": "fails (proved-false analogue)",
+   "why": "F(M) has the BAP for doubling M (Lancien–Pernecká 2013 [memory]), and nets in ℝⁿ even give Schauder bases (Hájek–Pernecká; Hájek–Medina [subagent]). The device needs large-degree locally tree-like graphs at bounded scale (degree Δ > 20V with V = 1+4pB). Doubling spaces cannot host them, so any claimed obstruction there signals a bug."
+  },
+  {
+   "id": "N2",
+   "setting": "Renormings of ℓ_p (1 < p < ∞) and of c0",
+   "expected": "fails (proved-false analogue)",
+   "why": "Every equivalent norm on these spaces has MAP: AP is an isomorphism invariant, and a space with AP that is reflexive, or whose dual is separable with AP, has MAP (Grothendieck; standard, e.g. Casazza's handbook chapter [memory]). So the RealL1Renorming pattern cannot transfer from ℓ1 to these spaces."
+  },
+  {
+   "id": "N3",
+   "setting": "Drop the operator-norm bound, or raise it to ≥ 2B_p on a single block",
+   "expected": "fails (proved false inside the release)",
+   "why": "The same space has AP (`MainConstruction.hasAP`), and each bounded block has 2B_p-BAP (`bounded_separated_hasBAP`, used in Renorming.lean). So the edge-test contradiction (2p > 11p, which uses ‖T‖ ≤ 2p) cannot extend to unbounded or ≥ 2B_p-norm finite-rank operators. Good for checking that a prover does not over-apply `signed_incidence_obstruction`."
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "id": "S1",
+   "title": "Thm blocks via the random permutation-model graphs",
+   "argument": "Statable now (the comparator's `BlockStatement`). Everything item-specific is `PortGraph`-generic, so with the item in the library only the bad-fraction bound needs proving. It cleanly measures the item's portability across graph supplies, with a formal baseline (the OAI deterministic route). Not a different theorem, so a speedup here supports reusability, not a jump."
+  },
+  {
+   "rank": 2,
+   "id": "O1",
+   "title": "Kalton's question for proper / bounded-geometry spaces",
+   "argument": "Statable now with the comparator's definitions. It is the residual open case after 330, and the place where the device's essential ingredients (degree dilution, locally tree-like coloured graphs) still make sense. The known obstacle (finite anchors at bounded distance) is precise, so a prover run will show quickly whether the device adapts."
+  },
+  {
+   "rank": 3,
+   "id": "O2",
+   "title": "Godefroy–Ozawa Q3 via Hájek–Medina",
+   "argument": "Statable with < 50 new lines. It may fall as a corollary of 330's theorem (not of the device), so it is useful to check reach. Rank it above harder targets only because it is cheap."
+  },
+  {
+   "rank": 4,
+   "id": "S3",
+   "title": "Gartland–Ostrovskii L1-distortion lower bounds",
+   "argument": "The structurally closest known method (signed per-oriented-edge transport tests), statable with ~100 lines. Expected speedup low–med. A hit would show that the opposing-test part of the device is the transferable kernel."
+  },
+  {
+   "rank": 5,
+   "id": "O5",
+   "title": "Godefroy 6.4 (M ⊂ ℝⁿ) as a calibrated non-target",
+   "argument": "Statable now. The device is expected not to help (doubling geometry). Pairing it with N1 checks that the prover's use of the item is discriminating rather than blanket."
+  }
+ ],
+ "precedent_check": {
+  "earlier_equivalent": "partial (the records sub-lemma only)",
+  "summary": "The records / exceptional-direction lemma (I31) is a close variant of Ben-David–Childs–Gilyén–Kretschmer–Podder–Wang (arXiv 2006.12760, Lemma 58; checked in the novelty pass). This caps the sub-lemma at N2 but does not cover the operator-adapted opposing tests with discard sets or the incidence averaging. The structurally nearest 2026 work is Gartland–Ostrovskii (arXiv 2602.14852, STOC 2026): signed systems of transportation problems on oriented edges, averaged, to lower-bound L1-distortion. It is fixed (not operator-adapted), has no discard sets, and lives on grids and diamonds, so it is not an earlier equivalent. Its relation to I32/I33 deserves an expert look. Smith (arXiv 2509.00722) is a prior result, not a prior device: complete discrete, not uniformly discrete, via descriptive set theory. No Sept–Oct 2026 paper citing 330 or using an edge-test argument was found, but arXiv keyword search does not catch citations and the web quota cut the search short.",
+  "items": [
+   "Ben-David et al. 2020, Lemma 58: close variant of the records lemma (N2), already in L.",
+   "Gartland–Ostrovskii 2026: closest technique in Banach/metric geometry. Signed oriented-edge tests, but not operator-adapted. Not an equivalent; flag for expert check.",
+   "Dilworth–Kutzarova–Ostrovskii 2020: 'average over symmetries, then one operator norm bound'. Generic pattern, not equivalent.",
+   "Smith 2025: prior partial answer to Kalton by a different method.",
+   "Post-2026-10-06: nothing found (search incomplete)."
+  ]
+ },
+ "sources": [
+  "data/pilot/330/family.md, family.json, novelty.md, novelty.json; data/eureka_shortlist.json (rank 11 entry)",
+  "data/raw/openai-math/lean/OAI/Analysis/LipschitzFree/{Main,BlockObstruction,BlockBAP,ScalarTests,SignedTests,GraphWalks,GraphSequence,LabelBumps,MetricBlock,PortGraphs,Renorming}.lean (text level)",
+  "data/raw/openai-math/lean/ComparatorChallenges/{DiscreteLipschitzFree,RealL1Renorming}.{json,lean}; lean/docs/330.md",
+  "preprint Failure-of-Bounded-Approximation-…-September-26-2026/build/sections/tests.tex, introduction.tex",
+  "data/raw/openai-math/CONTENTS.md (release scan)",
+  "https://arxiv.org/abs/1201.0847 (Godefroy–Ozawa) [subagent]",
+  "https://arxiv.org/abs/1207.2958 (Godefroy–Lancien–Zizler) [subagent]",
+  "https://arxiv.org/abs/2509.00722 (Smith) [subagent]",
+  "https://arxiv.org/abs/2604.01875 (Cúth–Kalenda) [subagent]",
+  "https://arxiv.org/abs/2112.03095, https://arxiv.org/abs/2202.08032, https://arxiv.org/abs/2202.08085 (Hájek–Medina) [subagent]",
+  "https://arxiv.org/abs/2601.03131 (Aliaga–Medina) [subagent]",
+  "https://arxiv.org/abs/2602.14852 (Gartland–Ostrovskii) [subagent]",
+  "https://arxiv.org/abs/2602.19434 (Gartland–Ostrovskii–Rabani–Young) [subagent]",
+  "https://arxiv.org/abs/1807.03814 (Dilworth–Kutzarova–Ostrovskii) [subagent]",
+  "https://arxiv.org/abs/2305.07591 (Talimdjioski; answers Godefroy 6.6) [subagent]",
+  "https://arxiv.org/abs/cs/0509074 (Naor–Schechtman) [subagent]",
+  "https://bibliotekanauki.pl/articles/746348.pdf (Godefroy 2015 survey) [subagent]",
+  "Memory-only, unverified: Lancien–Pernecká 2013; Aharoni / Kalton–Lancien c0 embeddings; Casazza handbook chapter; Grothendieck AP ⇒ MAP for reflexive/separable duals; Matoušek–Naor open problems list"
+ ],
+ "search_log": [
+  "Local: traced `source_endpoints` → `blocks_proved` → `obstruction` → `finite_support_impossible` → `edge_test` / `signed_incidence_obstruction`; and `real_l1_quantitative_renorming` → `BlockConstruction.noBAP`.",
+  "Local: compared `edge_test` against tests.tex Lemma edge-test and the averaging proof (constants 3L/2, 2L, V/Δ + Vβ < 1/10, 11p > 2p).",
+  "Local: preprint-wide grep for 'continuation record | matched walk | exceptional direction | opposing bump/test' (only generic hits outside 330).",
+  "Web (subagent, arXiv API + full texts after the WebSearch quota): Kalton question status (Cúth–Kalenda 2604.01875), Smith 2509.00722, Godefroy survey problems 6.1–6.7, Godefroy–Ozawa Q1–Q4, Hájek–Medina nets/bases/retracts, Aliaga–Medina 2601.03131, Gartland–Ostrovskii(-Rabani–Young) 2026, DKO 2020/2021, Talimdjioski 2305.07591; arXiv date-sorted searches for BAP/MAP/Kalton 2026 (no 330 follow-ups found).",
+  "Lean: not compiled; all Lean claims are text-level."
+ ]
+}

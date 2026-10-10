@@ -1,0 +1,529 @@
+{
+ "fid": "287",
+ "date": "2026-10-09",
+ "analyst_role": "downstream",
+ "method_note": "Text-level only: the Lean was read, not compiled (no local toolchain). Dependency chains were traced by hand with grep over lean/OAI; scripts/extract_lean.py was not rerun. Web search was available for part of the session (one rate-limit interruption); the search index appears stale for Sep-Oct 2026 (it does not index 287 itself), so post-release precedent checks are inconclusive.",
+ "item": "Small cocycle with a prescribed word value (paper lem:small-cocycle, cocycle.tex:31-46; Lean OAI.FreeGroupFactorMain.smallCocycle)",
+ "item_statement": "For n>=3 and eta>0 there are a word w in F_n and a finitely supported real h with ||h||_2 < eta such that the 1-cocycle D into l2(F_n) (left regular action) with D_{x_1}=h, D_{x_j}=0 (j>=2) satisfies ||D_w - delta_e||_2 < eta.",
+ "item_type": "lemma (F3, auxiliary construction)",
+ "lean_status": "formalized, different route",
+ "lean_status_why": "smallCocycle states exactly lem:small-cocycle (n>=3, one word, coefficients on the first generator only, both l2 bounds < eta) and uses the paper's prefix words p_j = (a b_1)...(a b_j), b_j = x_2^j x_3 x_2^-j, but it solves the inverse problem T_m h ~ delta_e by an explicit alternating, Cesaro-averaged radial series on F_m (Radial.averagedInverse) instead of the paper's Catalan-moment / free-Poisson spectral limit and cutoff inverse.",
+ "lean_gaps": [
+  "Proof route of the analytic core differs. Paper: lem:cocycle-spectrum (mu_m -> density (1/2pi)sqrt((4-x)/x) on (0,4), no atom at 0) plus a spectral cutoff inverse. Lean: Radial.partialInverse (alternating sum of normalized odd shells), Radial.averagedInverse (Cesaro mean), with exact identities sqNorm_partialInverse = N/m and sqNorm_averagedInverse_residual = (m-1)/(m(N+1)); then m >> N. No spectral theory, no free probability.",
+  "Freeness of the prefixes: paper uses a reduced-word argument plus the Nielsen pair phi/psi; Lean uses a semidirect-product witness FreeGroup Z x| Z and a telescoping left inverse (PrefixSeparation.prefixHom_injective). Same conclusion.",
+  "Statement: identical up to 0-indexing (generator 0 = x_1) and Coeff G = G ->0 R (finitely supported reals, as in the paper). No hypothesis added or dropped.",
+  "IMPORTANT for the tests: in Lean the headline instance L(F_2) = L(F_3) does NOT use smallCocycle. finiteRank_to_two 3 uses rankTwo = rank_step_ge_two 2, which goes through one_step_two -> smallCocycleTwo (RankTwoCoefficients.lean:543), a Lean-only rank-two variant (~1.8k lines, RankTwoCoefficients/Words/Counting) that reuses the Radial shells with approximately free prefixes. smallCocycle (n>=3) is used by rankStep (L(F_n)=L(F_n+1), n>=3) and by rankThreeInfinite (via FiniteActive.one_step), and hence by the infinite and non-integer models of the comparator. The paper instead has n>=3 only and gets n=2 from Dykema's formula. Any hide-the-item experiment must hide smallCocycle, smallCocycleTwo and the Radial file together.",
+  "Interface: Lean factors the absorption step as one_step_of_coefficient_estimate (FiniteRank.lean:15), which takes the small-cocycle property as a hypothesis hc for any n. This gives a clean device -> consequence boundary for a speedup test.",
+  "Comparator is stronger than the paper's headline (all r,s in (1,infinity]), but non-integer L(F_r) is DEFINED by Dykema's corner formula (trusted definition); the fundamental-group claim is proved (allInterpolatedFundamentalGroups) but not compared; family 287 has no formalization.yaml entry.",
+  "Generation step (not part of this item) uses Baire category in Lean versus an explicit adaptive iteration in the paper."
+ ],
+ "version_for_speedup_test": {
+  "decision": "Use the Lean version.",
+  "argument": [
+   "The item as a library STATEMENT is route-independent: smallCocycle is verbatim lem:small-cocycle, so adding the statement to L is the same under either route.",
+   "If the device's INTERNALS are added (the arm that tests reuse of the construction, not just the lemma), only the Lean route is usable: Radial.exists_small_prefix_inverse is a self-contained, group-only statement about l2(F_m) ('delta_e has an approximate preimage of norm sqrt((N+1)/m) under 1 + sum_i lambda(x_i)'), with explicit vectors (shells) that other proofs can reuse. The paper's route needs weak convergence of spectral measures of non-normal operators, the free CLT / Marchenko-Pastur law and Borel functional calculus cutoffs, none of which exist in Mathlib d13f23b (needs a major new library).",
+   "The Lean route shows that once the problem is posed, solving it is elementary (about 800 lines of combinatorics on spheres of F_m). So the eureka content sits in posing the coupled problem (small generator coefficient, prescribed word value, fed to the absorption flow), and the speedup test should give the prover the statement plus the one_step_of_coefficient_estimate interface, not the paper's spectral proof.",
+   "Use three arms: (A) baseline L; (B) L + smallCocycle statement; (C) L + smallCocycle + Radial.exists_small_prefix_inverse + PrefixSeparation.prefixHom_injective + cocycle_push_prefix_inverse. Arm C measures reuse of the construction; arm B measures reuse of the lemma.",
+   "The paper version remains the reference for discoverability (test 4) judging: a model output matching either proof counts as a hit."
+  ]
+ },
+ "comparator_chain": [
+  "OAI.FreeGroupFactorMain.Interpolation.allInterpolatedIsomorphic (InterpolatedFactors/Interpolation.lean:101)",
+  "OAI.FreeGroupFactorMain.Interpolation.Model.allIsomorphic",
+  "OAI.FreeGroupFactorMain.Interpolation.Model.toRankTwo (integer n | continuous r | infinity)",
+  "[integer n>=4] OAI.FreeGroupFactorMain.finiteRank_to_two (InterpolatedFactors/NormalTransport.lean:39)",
+  "OAI.FreeGroupFactorMain.rankStep (FreeGroupFactor/FiniteRank.lean:150)",
+  "OAI.FreeGroupFactorMain.rank_step (FreeGroupFactor/Generation.lean:348) -> rank_step_option -> generating_haar_tuple -> Generation.baire_local_approximation + orbit_local_approximation (Generation.lean:178)",
+  "OAI.FreeGroupFactorMain.Generation.orbit_step (Generation.lean:140)",
+  "OAI.FreeGroupFactorMain.one_step (FreeGroupFactor/LocalAutomorphism.lean:257)",
+  "OAI.FreeGroupFactorMain.smallCocycle (FreeGroupFactor/SmallCocycle.lean:213)",
+  "OAI.FreeGroupFactorMain.cocycle_push_prefix_inverse + PrefixSeparation.prefixHom_injective (SmallCocycle.lean:197, 157)",
+  "OAI.FreeGroupFactorMain.Radial.exists_small_prefix_inverse (FreeGroupFactor/RadialCoefficients.lean:547) -> Radial.averagedInverse (473) -> Radial.partialInverse (429) -> Radial.sumShift_shell_succ (320)",
+  "[infinity and continuous r] Model.toRankTwo -> rankTwo.trans rankThreeInfinite (FreeGroupFactor/Main.lean:56) -> InfiniteGeneration.rank_three_to_index -> one_step_none -> FiniteActive.one_step (FreeGroupFactor/FiniteActive.lean:388) -> smallCocycle; continuous r also via rankTwo_allPositiveScaling (InterpolatedFactors/Positive.lean:122), which uses rankTwo.trans rankThreeInfinite",
+  "[n=2,3 only] rankTwo (FiniteRank.lean:147) -> rank_step_ge_two -> one_step_ge_two (FiniteRank.lean:42) -> one_step_two -> smallCocycleTwo (RankTwoCoefficients.lean:543), bypassing smallCocycle"
+ ],
+ "comparator_dependency_verdict": "The comparator theorem depends on smallCocycle (knockout breaks rankStep, rankThreeInfinite, hence integer models n>=4, the infinite model and every non-integer model). The specific instance L(F_2)=L(F_3) does not depend on it in Lean (it uses smallCocycleTwo).",
+ "lean_source": [
+  {
+   "name": "OAI.FreeGroupFactorMain.smallCocycle",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/SmallCocycle.lean",
+   "line": 213,
+   "text": "theorem smallCocycle (n : ℕ) (hn : 3 ≤ n) (η : ℝ) (hη : 0 < η) :\n    ∃ (w : FreeGroup (Fin n)) (h : Coeff (FreeGroup (Fin n))),\n      coefficientNorm h < η ∧\n        coefficientNorm (freeCocycle (firstCoefficients h) w - Finsupp.single 1 1) < η"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.coefficientNorm",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/SmallCocycle.lean",
+   "line": 14,
+   "text": "def coefficientNorm {G : Type uG} (h : Coeff G) : ℝ :=\n  Real.sqrt (h.sum (fun _ r => r ^ 2))"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.firstCoefficients",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/SmallCocycle.lean",
+   "line": 24,
+   "text": "def firstCoefficients {n : ℕ} (h : Coeff (FreeGroup (Fin n))) :\n    Fin n → Coeff (FreeGroup (Fin n)) := fun i => if i.val = 0 then h else 0"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.sourceB",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/SmallCocycle.lean",
+   "line": 30,
+   "text": "def sourceB (n : ℕ) (hn : 3 ≤ n) (j : ℕ) : FreeGroup (Fin n) :=\n  (FreeGroup.of ⟨1, by omega⟩) ^ j * FreeGroup.of ⟨2, by omega⟩ *\n    ((FreeGroup.of ⟨1, by omega⟩) ^ j)⁻¹"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.sourcePrefix",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/SmallCocycle.lean",
+   "line": 34,
+   "text": "def sourcePrefix (n : ℕ) (hn : 3 ≤ n) : ℕ → FreeGroup (Fin n)\n  | 0 => 1\n  | k + 1 => sourcePrefix n hn k * (sourceA n hn * sourceB n hn (k + 1))"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.sourceWord",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/SmallCocycle.lean",
+   "line": 38,
+   "text": "def sourceWord (n : ℕ) (hn : 3 ≤ n) (m : ℕ) : FreeGroup (Fin n) :=\n  sourcePrefix n hn m * sourceA n hn"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.Coeff",
+   "kind": "abbrev",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/Cocycles.lean",
+   "line": 14,
+   "text": "abbrev Coeff (G : Type uG) := G →₀ ℝ"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.freeCocycle",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/Cocycles.lean",
+   "line": 55,
+   "text": "def freeCocycle {ι : Type uι} (h : ι → Coeff (FreeGroup ι)) (g : FreeGroup ι) :\n    Coeff (FreeGroup ι) := (cocycleGraph h g).left.toAdd"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.freeCocycle_mul",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/Cocycles.lean",
+   "line": 65,
+   "text": "theorem freeCocycle_mul {ι : Type uι} (h : ι → Coeff (FreeGroup ι)) (g b : FreeGroup ι) :\n    freeCocycle h (g * b) = freeCocycle h g + coefficientShift g (freeCocycle h b)"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.PrefixSeparation.prefixHom_injective",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/SmallCocycle.lean",
+   "line": 157,
+   "text": "theorem prefixHom_injective (n : ℕ) (hn : 3 ≤ n) (m : ℕ) :\n    Function.Injective (prefixHom n hn m)"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.PrefixSeparation.prefixHom",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/SmallCocycle.lean",
+   "line": 119,
+   "text": "def prefixHom (n : ℕ) (hn : 3 ≤ n) (m : ℕ) : FreeGroup (Fin m) →* FreeGroup (Fin n) :=\n  FreeGroup.lift (fun i => sourcePrefix n hn (i.val + 1))"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.cocycle_push_prefix_inverse",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/SmallCocycle.lean",
+   "line": 197,
+   "text": "theorem cocycle_push_prefix_inverse (n : ℕ) (hn : 3 ≤ n) (m : ℕ)\n    (h : FreeGroup (Fin m) →₀ ℝ) :\n    freeCocycle (firstCoefficients (pushCoefficients (PrefixSeparation.prefixHom n hn m) h))\n        (sourceWord n hn m) =\n      pushCoefficients (PrefixSeparation.prefixHom n hn m) (Radial.prefixSumOperator m h)"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.Radial.sumShift",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/RadialCoefficients.lean",
+   "line": 261,
+   "text": "def sumShift : (FreeGroup ι →₀ ℝ) →ₗ[ℝ] (FreeGroup ι →₀ ℝ) :=\n  ∑ i : ι, shift (FreeGroup.of i)"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.Radial.sumShift_shell_succ",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/RadialCoefficients.lean",
+   "line": 320,
+   "text": "theorem sumShift_shell_succ [Nonempty ι] (k : ℕ) :\n    sumShift (shell (ι := ι) false (k + 2)) =\n      ((Fintype.card ι - 1 : ℕ) : ℝ) • shell (ι := ι) true (k + 1) +\n        shell (ι := ι) true (k + 3)"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.Radial.rightShell",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/RadialCoefficients.lean",
+   "line": 362,
+   "text": "def rightShell (m k : ℕ) : FreeGroup (Fin m) →₀ ℝ :=\n  (1 / ((m : ℝ) * ((m : ℝ) - 1) ^ k)) • shell false (2 * k + 1)"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.Radial.partialInverse",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/RadialCoefficients.lean",
+   "line": 429,
+   "text": "def partialInverse (m N : ℕ) : FreeGroup (Fin m) →₀ ℝ :=\n  ∑ k ∈ Finset.range N, (-1 : ℝ) ^ k • rightShell m k"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.Radial.averagedInverse",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/RadialCoefficients.lean",
+   "line": 473,
+   "text": "def averagedInverse (m N : ℕ) : FreeGroup (Fin m) →₀ ℝ :=\n  (1 / (N + 1 : ℝ)) • ∑ k ∈ Finset.range (N + 1), partialInverse m (k + 1)"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.Radial.sqNorm_averagedInverse_residual",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/RadialCoefficients.lean",
+   "line": 510,
+   "text": "theorem sqNorm_averagedInverse_residual (m N : ℕ) (hm : 2 ≤ m) :\n    coefficientSqNorm (sumShift (averagedInverse m N) - Finsupp.single 1 1) =\n      ((m : ℝ) - 1) / ((m : ℝ) * (N + 1 : ℝ))"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.Radial.prefixSumOperator",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/RadialCoefficients.lean",
+   "line": 535,
+   "text": "def prefixSumOperator (m : ℕ) (h : FreeGroup (Fin m) →₀ ℝ) : FreeGroup (Fin m) →₀ ℝ :=\n  h + sumShift h"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.Radial.exists_small_prefix_inverse",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/RadialCoefficients.lean",
+   "line": 547,
+   "text": "theorem exists_small_prefix_inverse (ε : ℝ) (hε : 0 < ε) :\n    ∃ m : ℕ, 2 ≤ m ∧ ∃ h : FreeGroup (Fin m) →₀ ℝ,\n      coefficientSqNorm h < ε ∧\n        coefficientSqNorm (prefixSumOperator m h - Finsupp.single 1 1) < ε"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.one_step_of_coefficient_estimate",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/FiniteRank.lean",
+   "line": 15,
+   "text": "theorem one_step_of_coefficient_estimate (n : ℕ)\n    (hc : ∀ η : ℝ, 0 < η → ∃ (w : FreeGroup (Fin n)) (h : Coeff (FreeGroup (Fin n))),\n      coefficientNorm h < η ∧\n        coefficientNorm (freeCocycle (firstCoefficients h) w-Finsupp.single 1 1) < η) {ε : ℝ} (hε : 0 < ε) :\n    ∃ α : groupVonNeumann (FreeGroup (Option (Fin n))) ≃⋆ₐ[ℂ] groupVonNeumann (FreeGroup (Option (Fin n))),\n      (∀ T, canonicalTrace (α T) = canonicalTrace T) ∧\n      @Continuous _ _ (groupUltraweakTopology (FreeGroup (Option (Fin n))))\n        (groupUltraweakTopology (FreeGroup (Option (Fin n)))) α ∧\n      ∃ w : FreeGroup (Fin n),\n        (∀ j : Fin n, ‖α (groupUnitary (FreeGroup.of (some j))) - groupUnitary (FreeGroup.of (some j))‖ < ε) ∧\n        twoNorm (α (groupUnitary (FreeGroup.map Option.some w)) - groupUnitary (FreeGroup.of none)) < ε"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.one_step",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/LocalAutomorphism.lean",
+   "line": 257,
+   "text": "theorem one_step (n : ℕ) (hn : 3 ≤ n) {ε : ℝ} (hε : 0 < ε) :\n    ∃ α : groupVonNeumann (FreeGroup (Option (Fin n))) ≃⋆ₐ[ℂ] groupVonNeumann (FreeGroup (Option (Fin n))),\n      (∀ T, canonicalTrace (α T) = canonicalTrace T) ∧\n      @Continuous _ _ (groupUltraweakTopology (FreeGroup (Option (Fin n))))\n        (groupUltraweakTopology (FreeGroup (Option (Fin n)))) α ∧\n      ∃ w : FreeGroup (Fin n),\n        (∀ j : Fin n, ‖α (groupUnitary (FreeGroup.of (some j))) - groupUnitary (FreeGroup.of (some j))‖ < ε) ∧\n        twoNorm (α (groupUnitary (FreeGroup.map Option.some w)) - groupUnitary (FreeGroup.of none)) < ε"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.smallCocycleTwo",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/RankTwoCoefficients.lean",
+   "line": 543,
+   "text": "theorem smallCocycleTwo (η : ℝ) (hη : 0 < η) :\n    ∃ (w : FreeGroup (Fin 2)) (h : Coeff (FreeGroup (Fin 2))),\n      coefficientNorm h < η ∧\n        coefficientNorm (freeCocycle (firstCoefficients h) w-Finsupp.single 1 1) < η"
+  },
+  {
+   "name": "OAI.FreeGroupFactorMain.Interpolation.allInterpolatedIsomorphic",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/InterpolatedFactors/Interpolation.lean",
+   "line": 101,
+   "text": "theorem allInterpolatedIsomorphic (r s : ℝ≥0∞) (hr : 1<r) (hs : 1<s) :\n    Nonempty (NormalTracialEquiv (interpolatedTrace r) (interpolatedTrace s)\n      (interpolatedTopology r) (interpolatedTopology s))"
+  }
+ ],
+ "speedup_targets": [
+  {
+   "title": "Rank-two small cocycle (smallCocycleTwo)",
+   "statement": "For every eta>0 there are w in F_2 and finitely supported real h with ||h||_2<eta and ||D_w - delta_e||_2 < eta, where D_{x_1}=h, D_{x_2}=0.",
+   "reference": "OAI Lean, FreeGroupFactor/RankTwoCoefficients.lean:543 (Lean-only; not in the paper, which assumes n>=3)",
+   "status": "proved in the release Lean",
+   "current_proof_size": "Lean: RankTwoCoefficients 577 + RankTwoWords 489 + RankTwoCounting 742 = 1,808 lines (on top of the shared Radial file, 571 lines). Paper: none (n=2 obtained via Dykema).",
+   "how_item_helps": "The n>=3 proof cannot be transported directly: with only two generators, D vanishes only on <x_2> = Z and the obvious prefixes x_1 x_2^j are not free (u_1 u_2^-1 u_3 = u_2). The rank-two proof pushes the same Radial shells through an almost-injective prefix map (prefixHom B m) and bounds overlap errors. With smallCocycle, exists_small_prefix_inverse and the push lemmas in L, the remaining work is the near-freeness counting; a prover should find the shell-pushing plan much faster.",
+   "expected_speedup": "med",
+   "confidence": 0.6,
+   "caveat": "In-family sibling, not an independent theorem: useful to calibrate the speedup harness, weak as confirmation of a jump.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI FreeGroupFactor (freeCocycle, firstCoefficients, coefficientNorm) + Mathlib FreeGroup",
+    "missing": [],
+    "formal_proof_to_compare": "yes: RankTwoCoefficients/Words/Counting, 1,808 lines"
+   }
+  },
+  {
+   "title": "Free absorption over a base containing a free pair (device reuse beyond the theorem)",
+   "statement": "If a countable group Gamma contains two elements s,t generating a free subgroup, then L(Gamma * Z) = L(Gamma * F_2) (normal, trace-preserving), e.g. Gamma = SL(3,Z).",
+   "reference": "New (suggested here). Related: Dykema 1993 (Duke Math. J. 69) and Dykema-Radulescu 2000 (Math. Ann.) on free products Q * L(F_r); status of the r=1 case for non-free-product Q not verified.",
+   "status": "not known to us; treat as new until checked against Dykema-Radulescu",
+   "current_proof_size": "none",
+   "how_item_helps": "This is NOT a corollary of L(F_2)=L(F_3) (functoriality of free products gives Q*L(F_2)=Q*L(F_3), not Q*L(Z)=Q*L(F_2)). The device seems to run unchanged: let u generate Z, take b_j = s^j t s^-j in Gamma, prefixes p_j = (u b_1)...(u b_j) free in Gamma*Z; the cocycle with D_u = h, D|Gamma = 0 is well defined on the free product; T_m h ~ delta_e is exactly exists_small_prefix_inverse pushed along p; the flow moves u only and fixes L(Gamma) (as FiniteActive.one_step fixes its kappa generators); the Nielsen correction C -> C u_w fixes Gamma; Baire generation then gives W*(L(Gamma), u') = L(Gamma * Z * Z_C) with u' Haar and free from L(Gamma).",
+   "expected_speedup": "high (if true, the proof is a re-parametrization of the 287 Lean; without the item a prover has no route)",
+   "confidence": 0.4,
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib Monoid.Coprod (free product of groups), Matrix.SpecialLinearGroup (Fin 3) Z, FreeGroup; OAI HasNormalTracialIso, groupVonNeumann",
+    "missing": [
+     "freeCocycle generalized from FreeGroup to a free product Gamma * FreeGroup (about 100 lines)",
+     "FiniteActive-style one_step with a fixed group factor instead of fixed free generators (generalization of existing proofs, est. 300-800 lines; the flow and displacement lemmas are partly stated for an arbitrary [Group G], e.g. one_step_generator_estimate)"
+    ],
+    "formal_proof_to_compare": "no external; the 287 FiniteActive/InfiniteGeneration files (about 404 + InfiniteGeneration lines) are the template"
+   }
+  },
+  {
+   "title": "Akemann-Ostrand lower bound via radial shells (sub-device control)",
+   "statement": "For the m free generators x_i of F_m, ||sum_{i=1}^m lambda(x_i)|| >= 2 sqrt(m-1) on l2(F_m) (equality is Akemann-Ostrand).",
+   "reference": "C. A. Akemann, P. A. Ostrand, 'Computing norms in group C*-algebras', Amer. J. Math. 98 (1976) 1015-1047",
+   "status": "known",
+   "current_proof_size": "about 2-4 pages for the norm formula; no Lean formalization found (Mathlib has none).",
+   "how_item_helps": "Radial.sumShift_shell_succ gives S r_{k+1} = sqrt(m-1)(l_k + l_{k+1}) on normalized odd/even shells (from sumShift_rightShell_succ and the shell norms), a bidiagonal Jacobi matrix whose norm tends to 2 sqrt(m-1). The lower bound is then a short computation with test vectors sum_k c_k r_k.",
+   "expected_speedup": "med for the lower bound; none for the upper bound",
+   "confidence": 0.6,
+   "caveat": "Measures the classical radial-shell sub-device (Haagerup/Pytlik-type, N0), not the small-cocycle statement. Use it as a control that separates infrastructure reuse from item reuse.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI Radial.sumShift, coefficientSqNorm on FreeGroup (Fin m) ->0 R: for all eps>0 exists h != 0 with coefficientSqNorm (sumShift h) >= (4(m-1)-eps) coefficientSqNorm h",
+    "missing": [],
+    "formal_proof_to_compare": "none known"
+   }
+  },
+  {
+   "title": "Generator problem perturbation (family 296, Prop. 'perturbation with uniform correlation')",
+   "statement": "For an irreducible inclusion P in M of II_1 factors, unitaries u,z in M, xi in M, 0<alpha<1/2 and every l>=1, there are u~ with ||u~-u||_2 <= alpha/sqrt(2l)+1/l and t_0..t_l in U(P) such that the word W = t_0 prod (u~ t_k) has |tau(xi* W) - (alpha/2) tau(xi* z)| <= ||xi||_2 4alpha^2/(1-2alpha) + 1/l.",
+   "reference": "openai/math family 296, preprints/Relative-generation-and-the-generator-problem-for-finite-factors-September-23-2026, sections/perturbation.tex:51",
+   "status": "proved in the release (unrefereed); Lean in OAI/Analysis/FactorGeneration (33.1k lines in total)",
+   "current_proof_size": "paper about 4 pages; Lean perturbation layer (PerturbationBounds, WordCorrelation, Convolution, Exponential and related files) is a few thousand lines inside FactorGeneration",
+   "how_item_helps": "The first-order term of the perturbed word is a Fox-cocycle value along free prefixes, the same structure as D_w = T_m h. 287's lemma would give a prescribed VALUE where 296 only needs a positive correlation, so the linear part is easier in 296, not harder. The hard parts of 296 (nonlinear remainder via Haagerup's length-one inequality; Popa's free independence in ultrapowers) are untouched.",
+   "expected_speedup": "low",
+   "confidence": 0.5,
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "296's own Lean statement (FactorGeneration)",
+    "missing": [],
+    "formal_proof_to_compare": "yes: OAI FactorGeneration Lean"
+   }
+  },
+  {
+   "title": "Surface-group factors (Shlyakhtenko 2026, Thm 3/4)",
+   "statement": "L(pi_1 Sigma_g) = L(F_{2g-1}) for g>=2; technical form: for every eta there is a Haar unitary v with ||v-A||_2<eta and L(F_2) = W*([A,B]) * W*(v).",
+   "reference": "D. Shlyakhtenko, 'On the II_1 factors of Fuchsian groups', arXiv:2609.11074v1 (2026-09-10; declared ChatGPT Pro 6.0-assisted), https://arxiv.org/abs/2609.11074",
+   "status": "claimed (unrefereed preprint)",
+   "current_proof_size": "about 20 pages; no formalization",
+   "how_item_helps": "Weakly. 287 absorbs an extra generator that is FREE from the moved tuple; here the target B is not free from (A,[A,B]), and a relation-compatible cocycle (one that vanishes on the relator) is needed. The prefix-sum inverse could supply the amplification step that Shlyakhtenko's Lemma 9 does with exp(i sqrt(t/2m)(z+zbar)) multipliers.",
+   "expected_speedup": "low",
+   "confidence": 0.3,
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib PresentedGroup (surface relator), FreeGroup; OAI HasNormalTracialIso",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Non-vanishing of l2 first cohomology of F_n (ceiling check)",
+   "statement": "There is no C with ||b(g)|| <= C max_j ||b(x_j)|| for all l2(F_n)-valued 1-cocycles b and all g; equivalently (F_n non-amenable) H^1(F_n, l2 F_n) != 0, beta_1^(2)(F_n) > 0, F_n lacks property (T).",
+   "reference": "standard (e.g. Bekka-de la Harpe-Valette, Kazhdan's Property (T), 2008; Peterson-Thom, Invent. Math. 185 (2011))",
+   "status": "known",
+   "current_proof_size": "a few lines via the tree cocycle (b(x_1^k) has norm sqrt(k))",
+   "how_item_helps": "smallCocycle implies it in two lines, but so does the standard tree cocycle. Expect no speedup; include to check that the harness does not reward trivial implications.",
+   "expected_speedup": "low (near zero)",
+   "confidence": 0.8,
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI freeCocycle, coefficientNorm on FreeGroup (Fin n)",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "open_problems": [
+  {
+   "title": "Free absorption L(Gamma*Z) = L(Gamma*F_2) for groups containing F_2",
+   "statement": "See speedup target 2. More generally: for which ICC groups Gamma is L(Gamma) = L(Gamma * Z)?",
+   "reference": "Posed here as a device test. Background: Dykema, Duke Math. J. 69 (1993); Dykema-Radulescu, Math. Ann. (2000); Popa (property (T) obstruction).",
+   "url": "",
+   "status": "open as far as found (not checked against the Dykema-Radulescu literature)",
+   "obstruction_match": "Exactly the 287 obstruction: absorb one extra free Haar generator by small automorphisms. The ingredients the device needs (a free prefix family for the moved generator, a cocycle vanishing off that generator) exist whenever Gamma contains a free pair.",
+   "adaptation_sketch": "Replace x_2, x_3 by s, t in Gamma; define the cocycle on Gamma * <u>; run one_step with Gamma fixed; Baire-generate. Known failures bound the scope: if L(Gamma) has property (T) then L(Gamma) != L(Gamma*Z) (free products are never (T)), so the question is about Gamma*Z versus Gamma*F_2, not Gamma versus Gamma*Z.",
+   "payoff": "med-high (a free absorption theorem for arbitrary bases, beyond what the isomorphism theorem gives)",
+   "confidence": 0.4,
+   "difficulty": "med",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib Monoid.Coprod, Matrix.SpecialLinearGroup; OAI groupVonNeumann, HasNormalTracialIso",
+    "missing": [
+     "free-product cocycle and fixed-factor one_step (est. 400-900 lines of generalization)"
+    ],
+    "formal_proof_to_compare": "template: OAI FreeGroupFactor FiniteActive / InfiniteGeneration"
+   }
+  },
+  {
+   "title": "de la Harpe-Voiculescu conjecture for Fuchsian groups with torsion",
+   "statement": "For a cocompact Fuchsian group Gamma with torsion (e.g. hyperbolic triangle groups Delta(p,q,r)), is L(Gamma) an interpolated free group factor (now: is L(Gamma) = L(F_2))?",
+   "reference": "Shlyakhtenko, arXiv:2609.11074 Sec. 1 (settles the torsion-free case; states the torsion cases are not all settled); conjecture attributed there to de la Harpe and Voiculescu",
+   "url": "https://arxiv.org/abs/2609.11074",
+   "status": "open in the torsion cases not covered by Shlyakhtenko's Theorem 1 (as reported by the summariser; verify)",
+   "obstruction_match": "beta_1^(2)(Gamma) = -chi(Gamma) > 0 supplies l2 cocycles, as for F_n; but generators of finite order are not Haar and relators force the cocycle to vanish on them, so 287's 'coefficients on one generator' choice fails.",
+   "adaptation_sketch": "Work in Gamma * Z or in a finite-index free/surface subgroup; build a relation-compatible prescribed-value cocycle; combine with Shlyakhtenko's free-complement theorem and 287's full fundamental group to pass to finite-index overgroups.",
+   "payoff": "high",
+   "confidence": 0.25,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib PresentedGroup (triangle-group presentation); OAI HasNormalTracialIso to FreeGroupRank 2",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Is L-infinity(U_N^+) (free unitary quantum group, N>=3) a free group factor?",
+   "statement": "Is the von Neumann algebra of Wang's free unitary quantum group U_N^+ isomorphic to L(F_2)?",
+   "reference": "Brannan-Vergnioux, 'Orthogonal free quantum group factors are strongly 1-bounded', Adv. Math. (2018), arXiv:1703.08134 (settles O_N^+ negatively, leaves U_N^+); Kyed-Raum-Vaes-Valvekens, Anal. PDE 10 (2017) (beta_1^(2) of the dual of U_N^+ equals 1)",
+   "url": "https://arxiv.org/abs/1703.08134",
+   "status": "open as far as found (search 2026-10-09; index stale for 2026)",
+   "obstruction_match": "Positive first L2-Betti number (the precondition for small cocycles) holds, unlike O_N^+; Banica's free complexification puts L-infinity(U_N^+) inside L(Z) * L-infinity(O_N^+), which supplies a Haar unitary free from a large subalgebra.",
+   "adaptation_sketch": "Quantum analogue of the prefix family and the prescribed-value cocycle in the quantum Cayley tree; drive a flow by it; absorb a free Haar generator; then use 287's isomorphism theorem.",
+   "payoff": "high",
+   "confidence": 0.15,
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "",
+    "missing": [
+     "compact quantum groups, Haar state, free quantum group C*-algebras (thousands of lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "q-Gaussian factors versus free group factors for large |q|",
+   "statement": "Is Gamma_q(R^N) = L(F_N) (equivalently, after 287, = L(F_2)) for all q in (-1,1)?",
+   "reference": "Guionnet-Shlyakhtenko, 'Free monotone transport', Invent. Math. 197 (2014) (proves it for |q| < q(N))",
+   "url": "https://arxiv.org/abs/1204.2182",
+   "status": "open for large |q| (to our knowledge)",
+   "obstruction_match": "Fox derivative = free difference quotient; Gamma_q has closable derivations with good regularity (conjugate variables), the noncommutative replacement for l2 cocycles.",
+   "adaptation_sketch": "Replace the group cocycle by a derivation into the coarse bimodule with a prescribed value; drive 287's flow by it; needs a free Haar extra generator, which Gamma_q does not provide directly.",
+   "payoff": "med (the small-|q| case is known; large |q| would be new)",
+   "confidence": 0.15,
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "",
+    "missing": [
+     "Fock space with q-deformed inner product, q-Gaussian algebra (est. 1-3k lines; OAI FreeEntropy has some free Fock tooling)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Free Araki-Woods factors: multiplicity of the continuous part",
+   "statement": "Is the free Araki-Woods factor Gamma(mu) determined by the measure class of mu alone, i.e. is Gamma(mu) = Gamma(mu + mu') when mu' is absolutely continuous with respect to mu (type III analogue of absorbing a free generator)?",
+   "reference": "Shlyakhtenko, 'Free quasi-free states', Pacific J. Math. 177 (1997); Houdayer's structural papers on free Araki-Woods factors (2007-2010)",
+   "url": "",
+   "status": "open as far as we know (not re-verified in this session)",
+   "obstruction_match": "Same as 287's (multiplicity versus isomorphism), but for non-atomic mu the centralizer is trivial, so there are no Haar unitaries in the centralizer for the tracial flow to move.",
+   "adaptation_sketch": "Replace the trace by the free quasi-free state, the cocycle by a modular-covariant one, and the flow by a state-preserving one. The trivial centralizer is a likely blocker.",
+   "payoff": "med-high",
+   "confidence": 0.1,
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "",
+    "missing": [
+     "free quasi-free states, modular theory (OAI ModularTheory exists but no free Araki-Woods)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "All interpolated free group factors L(F_r), 1<r<=infinity, are isomorphic (the comparator).",
+  "Fundamental group of L(F_2) is R_{>0} (Lean allInterpolatedFundamentalGroups; not compared).",
+  "Free entropy dimensions (delta_0, delta*, ...) and beta_1^(2) are not W*-invariants: each integer value n>=2 is attained on generating tuples of L(F_2) (287 Cor. 7.1, cited by family 296).",
+  "Every Shlyakhtenko identification L(Gamma) = L(F_r) (torsion-free Fuchsian groups) collapses to L(Gamma) = L(F_2).",
+  "Dykema's free products of hyperfinite / finite-dimensional algebras with free dimension > 1 (e.g. L(PSL_2(Z)) = L(F_{7/6})) are all = L(F_2).",
+  "Single generation of L(F_n) for all n (also proved independently, for all II_1 factors, by family 296).",
+  "L(F_3) = L(F_infinity): classically equivalent to the full isomorphism via the Dykema-Radulescu dichotomy; Lean proves it directly with the device (FiniteActive.one_step -> smallCocycle), which is in-family reuse, not independent evidence."
+ ],
+ "release_reuse": [
+  {
+   "where": "287 itself",
+   "what": "smallCocycle is used twice (LocalAutomorphism.one_step for rankStep; FiniteActive.one_step for rankThreeInfinite). The Radial shells are reused by smallCocycleTwo (RankTwoCoefficients.lean), with an almost-injective prefix map and explicit overlap constants.",
+   "counts_as_device_reuse": "in-family only"
+  },
+  {
+   "where": "family 296 (generator problem, also dated 2026-09-23)",
+   "what": "Independent design sibling: a perturbation of u of size alpha/sqrt(l) spread over l occurrences in a long word with free coefficients, giving an O(alpha) first-order effect (correlation with a target z), plus Baire genericity. Same amplification-along-free-prefixes design, in correlation form rather than prescribed value. 296's Lean imports FreeGroupFactor.Operators (infrastructure) but not Cocycles/Radial/SmallCocycle (grep over lean/OAI: no file outside FreeGroupFactor uses freeCocycle or exists_small_prefix_inverse).",
+   "counts_as_device_reuse": "design-level sibling, not reuse of the lemma"
+  },
+  {
+   "where": "outside the release: Shlyakhtenko arXiv:2609.11074 Lemma 9",
+   "what": "sqrt(t/m)-per-step perturbations accumulating to an O(t) effect along BA^-m; same scaling, no cocycle formulation (per novelty.json).",
+   "counts_as_device_reuse": "precedent of the principle"
+  }
+ ],
+ "negative_controls": [
+  {
+   "title": "Reduced group C*-algebras",
+   "statement": "C*_r(F_2) and C*_r(F_3) are not isomorphic (K_1 = Z^n).",
+   "reference": "Pimsner-Voiculescu, J. Operator Theory 8 (1982)",
+   "why": "Proved-false analogue. The device must leave the C*-world (S = Arg(C) is a Borel, not continuous, logarithm). Any norm-continuous version of the flow would contradict K-theory; a prover using the item should not 'prove' the C*-version."
+  },
+  {
+   "title": "Orbit equivalence / Cartan pairs",
+   "statement": "Free p.m.p. actions of F_2 and F_3 are never orbit equivalent; the Cartan pairs (L-inf(X) x| F_n, L-inf(X)) are pairwise non-isomorphic.",
+   "reference": "Gaboriau, Invent. Math. 139 (2000) (cost)",
+   "why": "Proved-false analogue: the device's automorphisms do not preserve a Cartan subalgebra; cost is an invariant."
+  },
+  {
+   "title": "Groups with vanishing first L2-Betti number",
+   "statement": "For finitely presented sofic Gamma with beta_1^(2)(Gamma)=0 (e.g. F_2 x F_2, BS(2,3), SL(3,Z)), L(Gamma) is strongly 1-bounded, hence not = L(F_2).",
+   "reference": "Shlyakhtenko, 'Von Neumann algebras of sofic groups with beta_1^(2)=0 are strongly 1-bounded', J. Operator Theory (2021); Jung's strong 1-boundedness",
+   "why": "The small-cocycle property fails there: for non-amenable Gamma with H^1(Gamma, l2 Gamma)=0 every l2 cocycle is a coboundary with a uniform constant, so ||b(w)|| <= C max_s ||b(s)||. It also fails for Z (Dirichlet kernel zeros)."
+  },
+  {
+   "title": "Free orthogonal quantum groups",
+   "statement": "L-infinity(O_N^+), N>=3, is strongly 1-bounded and not a free group factor.",
+   "reference": "Brannan-Vergnioux, Adv. Math. (2018), arXiv:1703.08134; Vergnioux (beta_1^(2)=0), Adv. Math. 229 (2012)",
+   "why": "Quantum analogue with vanishing first L2-Betti number: the device must not apply."
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "title": "Free absorption L(Gamma*Z) = L(Gamma*F_2) for Gamma containing F_2",
+   "lean": "statable now",
+   "argument": "The only target found where the device does work the theorem cannot do: free products are functorial, so L(F_2)=L(F_3) yields Q*L(F_2)=Q*L(F_3) but not Q*L(Z)=Q*L(F_2). Every ingredient (free prefix family, a cocycle supported on the moved generator, a flow fixing a free factor, Nielsen correction, Baire generation) seems to transfer verbatim, and the Lean already has the fixed-generator variant (FiniteActive). Without the item a prover has no visible route; with it the proof is a re-parametrization. This is the cleanest jump test, but first check Dykema-Radulescu (2000) to make sure it is not already known."
+  },
+  {
+   "rank": 2,
+   "title": "smallCocycleTwo (rank-two small cocycle)",
+   "lean": "statable now; 1,808-line formal proof to compare",
+   "argument": "Most measurable: an existing Lean proof of a different statement that reuses the Radial shells. A prover given smallCocycle plus exists_small_prefix_inverse should need only the near-freeness counting. It is in-family, so it calibrates the harness rather than confirming a jump."
+  },
+  {
+   "rank": 3,
+   "title": "Akemann-Ostrand lower bound via shells",
+   "lean": "statable now",
+   "argument": "A clean classical theorem (1976) whose lower bound follows from the Lean's shell recursion. It tests infrastructure reuse (the N0 radial calculus). Running it beside target 1 separates 'the item helped' from 'the shell library helped'."
+  },
+  {
+   "rank": 4,
+   "title": "Fuchsian groups with torsion (de la Harpe-Voiculescu)",
+   "lean": "statable now",
+   "argument": "A genuine open problem with the same obstruction (beta_1^(2)>0, absorb generators) but relations break the one-generator cocycle. High payoff, low confidence; a good stretch target for the open-problem arm."
+  },
+  {
+   "rank": 5,
+   "title": "296's perturbation proposition",
+   "lean": "statable now; formal proof exists (FactorGeneration)",
+   "argument": "Release sibling with the same first-order structure. Expected speedup is low because the hard part is the nonlinear remainder, but it directly measures whether the cocycle viewpoint transfers within the release."
+  }
+ ],
+ "precedent_check": {
+  "earlier_equivalents": "None found for the statement (prescribed-value small cocycle). Design-level neighbours: Shlyakhtenko 2609.11074 (2026-09-10, model-assisted) shares the outer architecture and the 1/sqrt(m) amplification but has no cocycle and no prescribed value; family 296 (same release, 2026-09-23) uses the same amplification along free prefixes in correlation form. The principle appeared at least three times in model-produced work within two weeks, which weakens the case that it is hard to find, though not the novelty of the exact statement.",
+  "after_2026_10_06": "Nothing found. Searches on 2026-10-09 returned no post-release work using the device; the index did not even return 287 or 2609.11074 for generic queries, so this check is inconclusive.",
+  "downgrade": "No downgrade from an exact earlier equivalent. The C2 grade in novelty.json (provisional N3, conf 0.4) stands; the 296 sibling adds pressure toward N2 at the level of the design."
+ },
+ "sources": [
+  "data/pilot/287/novelty.json, lean.md, lean.json",
+  "data/raw/openai-math/lean/OAI/Analysis/FreeGroupFactor/{SmallCocycle,RadialCoefficients,Cocycles,FiniteRank,LocalAutomorphism,FiniteActive,Generation,Main,RankTwoCoefficients}.lean",
+  "data/raw/openai-math/lean/OAI/Analysis/InterpolatedFactors/{Interpolation,NormalTransport,Positive}.lean",
+  "data/raw/openai-math/lean/ComparatorChallenges/InterpolatedFactors.json; lean/docs/287.md",
+  "preprints/An-isomorphism-of-the-free-group-factors-September-23-2026/build/sections/cocycle.tex",
+  "preprints/Relative-generation-and-the-generator-problem-for-finite-factors-September-23-2026/build/sections/{introduction,perturbation,consequences}.tex (family 296)",
+  "data/raw/openai-math/CONTENTS.md (families 285-300)",
+  "https://arxiv.org/abs/2609.11074 (via novelty.json)",
+  "https://arxiv.org/abs/1703.08134 (Brannan-Vergnioux)",
+  "https://arxiv.org/abs/1204.2182 (Guionnet-Shlyakhtenko; arXiv id from memory, not re-verified)",
+  "https://arxiv.org/abs/2506.10902 (Nuclear C*-algebras: 99 problems; search hit, lists L(F_2) vs L(F_3) as open as of April 2026)"
+ ],
+ "search_log": [
+  "grep lean/OAI for smallCocycle / one_step / rankStep / rankTwo / allInterpolatedIsomorphic call sites (FreeGroupFactor, InterpolatedFactors)",
+  "grep -rl lean/OAI for freeCocycle|exists_small_prefix_inverse outside FreeGroupFactor: no hits",
+  "grep CONTENTS.md for free group factor / cocycle / free entropy / generator: families 287, 296, 298 relevant; 296 read",
+  "WebSearch 'free unitary quantum group U_N^+ ... free group factor ... first L2-Betti number' -> Brannan-Vergnioux (O_N^+ only); U_N^+ open",
+  "WebSearch 'free group factors isomorphism problem solved 2026 ...' -> no post-release hits; survey 2506.10902 says open as of April 2026; index stale",
+  "First batch of searches failed on a session rate limit; repeated after the resume"
+ ]
+}

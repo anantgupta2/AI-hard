@@ -1,0 +1,425 @@
+{
+ "fid": "197",
+ "item": "Incidence criterion (CT thm:criterion): a finite ℓ+1-regular incidence system of girth ≥ 12 plus vectors x_v with Σ_V x_v x_v^T = -I_m, Σ_{v∈f} x_v x_v^T = 0 and m < t ≤ mℓ^2 over a char-2 field yields a finitely presented G and a, b ∈ K[G] with ab = 1, ba ≠ 1",
+ "item_type": "F5 (change of representation; F3 flavour) — a lemma-type certificate",
+ "lean_status": "as in paper",
+ "lean_status_why": "ChosenCriterion.products (ChosenCriterion.lean:42) proves the criterion's conclusion from its hypotheses by the paper's own route (subgroup averages, rectangular identity, HNN character twist, packing, finite block), and it is on the comparator path of KaplanskyDirectFiniteness and KaplanskyFinitelyPresented; the statement is split and Skolemized, and finite presentation is proved only for the prescribed instance.",
+ "lean_gaps": [
+  "No single Lean declaration states thm:criterion. It is split into a characteristic-free algebraic core, CharacterTwist.matrix_products (CharacterFormulas.lean:25), and a char-2 instantiation, ChosenCriterion.products (ChosenCriterion.lean:42).",
+  "'Every v lies in exactly ℓ+1 members of F' is replaced by an explicit bijection assign : {f // v ∈ Inc f} ≃ Option (ZMod ℓ), matching faces to the ℓ+1 lines of F_ℓ^2. These are equivalent up to a choice.",
+  "'t ≤ mκ' is replaced by a supplied slot map slot : V → m and forms α : V → (F_ℓ^2 →* Z/ℓ) with distinct (slot, α) pairs (hα). These are equivalent, since there are κ forms.",
+  "The conclusion for general data gives only a finitely generated group (instance groupFG). Finite presentation and an element of order ℓ are proved only for the prescribed data (PrescribedPresentation.prescribed_finitelyPresented, OddTorsion.prescribed_odd_prime_order).",
+  "CharacterTwist.square_witnesses (AlgebraicCriterion.lean:63), the target the novelty analysis proposed for P-C1, is NOT on the comparator proof path according to the text-level extractor. The live route is matrix_products → PackingFormulas.prescribed_packing_products, so use ChosenCriterion.products or matrix_products as the discoverability target.",
+  "The comparators are weaker than the family headline. TF (torsion-free, over F_2) is not formalized. CT's comparators keep torsion and do not assert K = F_2. Nonsoficity and the CT cellular-automaton statement are not formalized.",
+  "Not compiled here. All checks are text-level."
+ ],
+ "comparator_chain": {
+  "KaplanskyDirectFiniteness": [
+   "OAI.KaplanskyCounterexample.main_theorem := Prescription.Output.prescribed_main",
+   "Prescription.Output.prescribed_main -> Prescription.Output.prescribed_products",
+   "prescribed_products -> ChosenCriterion.products (with data: Prescription.X_global, X_local, sizes, girth_Inc, forms_distinct, assignment)",
+   "ChosenCriterion.products -> AssignedDevelopment.subgroup_decomposition, AssignedDevelopment.point_injective (-> GluedGroup.theta_injective, Planar diagram lemmas), CharacterTwist.matrix_products, FiniteBlock.output_products",
+   "CharacterTwist.matrix_products -> Rectangular.identities, PackingFormulas.prescribed_packing_products, CharacterTwist.defect_ne_zero -> AlgebraicPacking.transpose_mul_ne_one",
+   "data side: Prescription.X_global/X_local -> Pairing.sum_complement_gram / complementMatrix_local; girth_Inc -> PrescribedIncidence.succeeds_217 -> hypergraph files (Slab*, Trade*, Hole*, Direction*, Frame*)"
+  ],
+  "KaplanskyFinitelyPresented": [
+   "finitelyPresented_counterexample := thm_main.1",
+   "thm_main -> Output.prescribed_finitelyPresented (PrescribedPresentation; CurrentMain.characterTwist_finitelyPresented, finitelyPresented_prod), Output.prescribed_odd_prime_order (OddTorsion), Output.prescribed_products (as above)"
+  ],
+  "GroupRingDeterminant": [
+   "GroupRingDeterminant.main := main_of_companion_input companion_input",
+   "companion_input -> KaplanskyCounterexample.main_theorem (existential only: some finite char-2 field, some FG group, some a,b)",
+   "So DT depends on the criterion only through the theorem; any char-2 DF counterexample would do (theorem corollary, not device reuse)"
+  ],
+  "OddKaplansky": [
+   "OddKaplansky.main_theorem -> Prescribed.products -> Construction.scalar_products (LocalDatum idempotent with annihilations, Rectangular fit, SourceGluing) — does NOT use the incidence criterion",
+   "Only cross-import from DirectFiniteness: OAI.RingTheory.DirectFiniteness.ReducedWalks (in Algebra/OddKaplansky/Diagrams.lean), a free-group walk-reduction lemma"
+  ],
+  "extractor_note": "scripts/extract_lean.py 197 (text-level, run into scratchpad): 247 files, 2,825 decls, combined target DAG 2,222. In DAG: ChosenCriterion.products (dominated share 0.028), CharacterTwist.matrix_products (0.010), Rectangular.identities, subgroup_decomposition, point_injective (0.078), prescribed_products (0.041). NOT in DAG: CharacterTwist.square_witnesses and AlgebraicPacking.square_of_projections."
+ },
+ "lean_source": [
+  {
+   "name": "OAI.KaplanskyCounterexample.ChosenCriterion (variables, Extension, Group)",
+   "kind": "variable/abbrev block (the criterion's hypotheses: char 2, ℓ prime, incidence Inc, ℓ+1 faces per point via assign, girth ≥ 12)",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/DirectFiniteness/ChosenCriterion.lean",
+   "line": 9,
+   "text": "variable {K V F m : Type} [Field K] [CharP K 2]\nvariable [Fintype V] [Fintype F] [Fintype m]\nvariable (ℓ : ℕ) [Fact ℓ.Prime]\n\nlocal instance modulusNeZero : NeZero ℓ := inferInstance\n\nvariable (Inc : F → Finset V)\nvariable (assign : ∀ v, {f : F // v ∈ Inc f} ≃ Option (ZMod ℓ))\nvariable (hInc : ∀ f, (Inc f).Nonempty)\nvariable (hg : 12 ≤ (Planar.incidenceGraph (fun v f => v ∈ Inc f)).egirth)\nvariable (v₀ : V) (α : V → GluedGroup.PointGroup ℓ →* Multiplicative (ZMod ℓ))\n\nabbrev inclusion := point Inc ℓ assign\nabbrev inclusion_injective := point_injective Inc ℓ assign hInc hg\nabbrev Extension := CharacterTwist.L (inclusion ℓ Inc assign)\n  (inclusion_injective ℓ Inc assign hInc hg) v₀ α\nabbrev Group := Extension ℓ Inc assign hInc hg v₀ α ×\n  FiniteBlock.Auxiliary m (Multiplicative (ZMod ℓ))\n\nvariable {ζ : K} (hζ : IsPrimitiveRoot ζ ℓ) (X : Matrix m V K)\nvariable (i₀ : m) (slot : V → m)"
+  },
+  {
+   "name": "OAI.KaplanskyCounterexample.ChosenCriterion.aOut / bOut",
+   "kind": "def (the output sums)",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/DirectFiniteness/ChosenCriterion.lean",
+   "line": 31,
+   "text": "def aOut : MonoidAlgebra K (Group (m := m) ℓ Inc assign hInc hg v₀ α) :=\n  FiniteBlock.output (CoordinateCharacters.cyclicCharacter ℓ hζ) i₀\n    (CharacterTwist.aMatrix (inclusion ℓ Inc assign) (inclusion_injective ℓ Inc assign hInc hg)\n      v₀ α (CoordinateCharacters.cyclicCharacter ℓ hζ) X slot)\n\ndef bOut : MonoidAlgebra K (Group (m := m) ℓ Inc assign hInc hg v₀ α) :=\n  FiniteBlock.output (CoordinateCharacters.cyclicCharacter ℓ hζ) i₀\n    (CharacterTwist.bMatrix (inclusion ℓ Inc assign) (inclusion_injective ℓ Inc assign hInc hg)\n      v₀ α (CoordinateCharacters.cyclicCharacter ℓ hζ) X slot)"
+  },
+  {
+   "name": "OAI.KaplanskyCounterexample.ChosenCriterion.products",
+   "kind": "lemma (THE incidence criterion as formalized: hypotheses of thm:criterion ⇒ a·b = 1, b·a ≠ 1)",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/DirectFiniteness/ChosenCriterion.lean",
+   "line": 41,
+   "text": "include hζ in\nlemma products (hodd : Odd ℓ)\n    (hlt : Fintype.card m < Fintype.card V)\n    (hglobal : X * X.transpose = -1)\n    (hlocal : ∀ f i j, ∑ v ∈ Inc f, X i v * X j v = 0)\n    (hα : ∀ v w, v ≠ w → slot v = slot w → α v ≠ α w) :\n    aOut ℓ Inc assign hInc hg v₀ α hζ X i₀ slot *\n      bOut ℓ Inc assign hInc hg v₀ α hζ X i₀ slot=1 ∧\n    bOut ℓ Inc assign hInc hg v₀ α hζ X i₀ slot *\n      aOut ℓ Inc assign hInc hg v₀ α hζ X i₀ slot≠1 := by"
+  },
+  {
+   "name": "OAI.KaplanskyCounterexample.CharacterTwist.matrix_products",
+   "kind": "theorem (characteristic-free algebraic core; on the comparator path)",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/DirectFiniteness/CharacterFormulas.lean",
+   "line": 25,
+   "text": "theorem matrix_products {F : Type u_7} [Fintype F]\n    (X : Matrix m V K) (Inc : F → Finset V)\n    (lineSum : F → MonoidAlgebra K (L ι hi v₀ α))\n    (hdec : ∀ v, P (K := K) ι hi v₀ α v =\n      1 + ∑ f : {f : F // v ∈ Inc f}, (lineSum f.val - 1))\n    (hglobal : X * X.transpose = 1)\n    (hlocal : ∀ f i j, ∑ v ∈ Inc f, X i v * X j v = 0)\n    (hlt : Fintype.card m < Fintype.card V)\n    (hA : (Fintype.card A : K) ≠ 0) (hC : (Fintype.card C : K) ≠ 0)\n    (slot : V → m) (hξ : Function.Injective ξ)\n    (hα : ∀ v w, v ≠ w → slot v = slot w → α v ≠ α w) :\n    aMatrix ι hi v₀ α ξ X slot * bMatrix ι hi v₀ α ξ X slot=1 ∧\n    bMatrix ι hi v₀ α ξ X slot * aMatrix ι hi v₀ α ξ X slot≠1 := by"
+  },
+  {
+   "name": "OAI.KaplanskyCounterexample.CharacterTwist.square_witnesses",
+   "kind": "theorem (existential twin of matrix_products; NOT on the comparator proof path per extractor)",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/DirectFiniteness/AlgebraicCriterion.lean",
+   "line": 63,
+   "text": "theorem square_witnesses {F : Type u_9} [Fintype F]\n    (X : Matrix m V K) (Inc : F → Finset V)\n    (lineSum : F → MonoidAlgebra K (L ι hi v₀ α))\n    (hdec : ∀ v, P (K := K) ι hi v₀ α v =\n      1 + ∑ f : {f : F // v ∈ Inc f}, (lineSum f.val - 1))\n    (hglobal : X * X.transpose = 1)\n    (hlocal : ∀ f i j, ∑ v ∈ Inc f, X i v * X j v = 0)\n    (hlt : Fintype.card m < Fintype.card V)\n    (hA : (Fintype.card A : K) ≠ 0) (hC : (Fintype.card C : K) ≠ 0)\n    (slot : V → m) (hξ : Function.Injective ξ)\n    (hα : ∀ v w, v ≠ w → slot v = slot w → α v ≠ α w) :\n    ∃ a b : Matrix m m (MonoidAlgebra K (L ι hi v₀ α)), a * b = 1 ∧ b * a ≠ 1 := by"
+  },
+  {
+   "name": "OAI.KaplanskyCounterexample.Rectangular.U / T / identities",
+   "kind": "def + theorem (glued subgroup averages give UP = U, PT = T, UT = 1)",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/DirectFiniteness/Rectangular.lean",
+   "line": 13,
+   "text": "def U (X : Matrix m V K) (P : V → R) : Matrix m V R := fun i v => X i v • P v\ndef T (X : Matrix m V K) (P : V → R) : Matrix V m R := fun v i => X i v • P v\n\nomit [Fintype m] in\ntheorem identities (X : Matrix m V K) (P : V → R) (L : F → R)\n    (Inc : F → Finset V)\n    (hP : ∀ v, P v * P v = P v)\n    (hdec : ∀ v, P v = 1 + ∑ f : {f : F // v ∈ Inc f}, (L f - 1))\n    (hglobal : X * X.transpose = 1)\n    (hlocal : ∀ f i j, ∑ v ∈ Inc f, X i v * X j v = 0) :\n    U X P * Matrix.diagonal P = U X P ∧\n      Matrix.diagonal P * T X P = T X P ∧ U X P * T X P = 1 := by"
+  },
+  {
+   "name": "OAI.KaplanskyCounterexample.AssignedDevelopment.subgroup_decomposition",
+   "kind": "lemma (Σ_{K_v} u = 1 + Σ_{f∋v}(Σ_{L_f} u - 1))",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/DirectFiniteness/AssignedDevelopment.lean",
+   "line": 83,
+   "text": "lemma subgroup_decomposition {K : Type u_3} [CommRing K] (v : V) :\n    ∑ a : PointGroup ℓ, MonoidAlgebra.single (point Inc ℓ assign v a) (1 : K) =\n      1 + ∑ f : {f : F // v ∈ Inc f},\n        ((∑ c : Multiplicative (ZMod ℓ), MonoidAlgebra.single (line Inc ℓ assign hInc f.val c) (1 : K)) - 1) := by"
+  },
+  {
+   "name": "OAI.KaplanskyCounterexample.AssignedDevelopment.point_injective",
+   "kind": "lemma (girth ≥ 12 ⇒ each K_v = F_ℓ^2 embeds in the glued group)",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/DirectFiniteness/AssignedDevelopment.lean",
+   "line": 49,
+   "text": "lemma point_injective\n    (hg : 12 ≤ (Planar.incidenceGraph (fun v f => v ∈ Inc f)).egirth) (v : V) :\n    Function.Injective (point Inc ℓ assign v) := by"
+  },
+  {
+   "name": "OAI.KaplanskyCounterexample.AlgebraicPacking.transpose_mul_ne_one",
+   "kind": "theorem (m < t detects the reverse defect by rank)",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/DirectFiniteness/AlgebraicPacking.lean",
+   "line": 70,
+   "text": "theorem transpose_mul_ne_one {K : Type u_4} {m : Type u_5} {t : Type u_6} [Field K] [Fintype m] [Fintype t]\n    (X : Matrix m t K) (hlt : Fintype.card m < Fintype.card t) :\n    X.transpose * X ≠ 1 := by"
+  },
+  {
+   "name": "OAI.KaplanskyCounterexample...sum_complement_gram",
+   "kind": "theorem (punctured polynomial pairing: Σ_{V} x_v x_v^T = -1, any finite field)",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/DirectFiniteness/Pairing.lean",
+   "line": 236,
+   "text": "/-- The precise global identity on V, with no characteristic simplification. -/\ntheorem sum_complement_gram (a : Fin q ≃ Q) (hq : q = Fintype.card Q) (hn : 0 < n)\n    (O : Finset (Fin n → Q)) (hO : O ⊆ simplexPoints a n ((q - 2) / 2)) :\n    ∑ v ∈ Finset.univ \\ O, gramColumn a ((q - 2) / 2) O v = -1 := by"
+  },
+  {
+   "name": "OAI.KaplanskyCounterexample.Prescription X / X_global",
+   "kind": "def + lemma (the prescribed data meet the criterion)",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/DirectFiniteness/PrescribedData.lean",
+   "line": 85,
+   "text": "def X : Matrix Slots V Coeff := complementMatrix (enumeration h) holes\nlemma X_global : X * X.transpose = -1 :="
+  },
+  {
+   "name": "OAI.KaplanskyCounterexample.Prescription.X_local",
+   "kind": "lemma",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/DirectFiniteness/PrescribedData.lean",
+   "line": 88,
+   "text": "lemma X_local (f : F) (i j : Slots) : ∑ v ∈ Inc f, X i v * X j v=0 :="
+  },
+  {
+   "name": "OAI.KaplanskyCounterexample.Prescription.Output.prescribed_products",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/DirectFiniteness/PrescribedOutputs.lean",
+   "line": 23,
+   "text": "/-- The two product assertions are for the specified first successful data and\nspecified sums, not merely for some field, some group or some pair of inverses. -/\ntheorem prescribed_products : a*b=1 ∧ b*a≠1 :="
+  },
+  {
+   "name": "OAI.KaplanskyCounterexample.main_theorem",
+   "kind": "theorem (comparator KaplanskyDirectFiniteness)",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/DirectFiniteness/Main.lean",
+   "line": 7,
+   "text": "/-- A finite field of characteristic two and a finitely generated group admit\nfinite group-algebra sums with a right inverse that is not a left inverse. -/\ntheorem main_theorem : MainClaim := Prescription.Output.prescribed_main"
+  },
+  {
+   "name": "OAI.KaplanskyCounterexample.finitelyPresented_counterexample",
+   "kind": "theorem (comparator KaplanskyFinitelyPresented)",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/DirectFiniteness/FinitelyPresented.lean",
+   "line": 33,
+   "text": "/-- The existential main result of the characteristic-two paper, separated from\nthe certificates for its prescribed construction. -/\ntheorem finitelyPresented_counterexample :\n    ∃ (K : Type) (_ : Field K) (_ : Fintype K) (_ : CharP K 2),\n      ∃ (G : Type) (_ : Group G) (_ : Group.IsFinitelyPresented G),\n        (∃ (ℓ : ℕ) (_ : ℓ.Prime) (_ : Odd ℓ) (g : G), orderOf g = ℓ) ∧\n        ∃ a_out b_out : MonoidAlgebra K G, a_out * b_out = 1 ∧ b_out * a_out ≠ 1 :="
+  },
+  {
+   "name": "OAI.GroupRingDeterminant.companion_input",
+   "kind": "theorem (DT uses only the existential main_theorem; first proof lines shown to exhibit the dependency)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/GroupDeterminants/Main.lean",
+   "line": 8,
+   "text": "theorem companion_input : CompanionInput := by\n  obtain ⟨K, hK, hKfin, hKchar, H, hH, hHfg, a, b, hab, hba⟩ :=\n    KaplanskyCounterexample.main_theorem"
+  },
+  {
+   "name": "OAI.GroupRingDeterminant.main",
+   "kind": "theorem (comparator GroupRingDeterminant)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/GroupDeterminants/Main.lean",
+   "line": 13,
+   "text": "theorem main : MainStatement := main_of_companion_input companion_input"
+  }
+ ],
+ "speedup_targets": [
+  {
+   "title": "Kaplansky DF counterexample in some odd characteristic (weakened OddKaplansky)",
+   "statement": "∃ odd prime p, a finite field K of characteristic p, a finitely generated group G and a, b ∈ K[G] with ab = 1, ba ≠ 1.",
+   "reference": "OpenAI release, family 197 OD manuscript (2026-09-26); comparator lean/ComparatorChallenges/OddKaplansky.lean (which fixes p = minFac((C(1200,600)!)^2+1) and |K| = p^4)",
+   "status": "claimed proved in the release (OD), by a different mechanism",
+   "current_proof_size": "OD paper ~6 sections; Lean OAI/Algebra/OddKaplansky: 87 files, 13,061 lines",
+   "how_item_helps": "If the incidence criterion extends to characteristic p (see open problem O1), the weakened statement follows from: the characteristic-free core CharacterTwist.matrix_products (already in Lean), a char-p variant of ChosenCriterion.products (~100 lines: replace 'ℓ = 1, -1 = 1 in K' by 'ℓ ≡ -1 mod p ⇒ κ = ℓ^2 = 1 in K'), Pairing.sum_complement_gram (already characteristic-free: 'with no characteristic simplification'), and the hypergraph theorem with q = p^h (its Lean files assume CharP Q 2 in ~5 places, apparently only to pick a quadratic extension). The exact OD comparator is NOT reachable this way: the criterion needs ζ_ℓ ∈ K with ℓ ≥ q^100 - 1, incompatible with |K| = p^4.",
+   "expected_speedup": "medium (contingent on O1); none for the exact OD comparator",
+   "confidence": 0.35,
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "copy of KaplanskyDirectFiniteness.MainClaim with CharP K p, Odd p (Mathlib MonoidAlgebra, CharP, Group.FG)",
+    "missing": "none to state; to prove via the criterion: char-p ChosenCriterion (~100 lines), generalization of ~5 hypergraph files from CharP Q 2 to q = p^h (size unknown, possibly a few hundred lines)",
+    "formal_proof_to_compare": "yes: OD Lean (13,061 lines) for the stronger fixed-prime statement"
+   },
+   "counts_as": "device reuse (same criterion, different characteristic) — would be the cleanest one"
+  },
+  {
+   "title": "Existence of a (finitely presented) nonsofic group",
+   "statement": "There is a finitely presented group that is not sofic.",
+   "reference": "OpenAI 'Nonsofic groups exist' (circulated 2026-07-31; https://thenextweb.com/news/openai-astra-model-ten-math-proofs-non-sofic-groups); Fournier-Facio, A torsion-free non-sofic group, arXiv:2608.02025",
+   "status": "known (Aug 2026), model-produced and human-produced proofs",
+   "current_proof_size": "Fournier-Facio: one arXiv paper; OpenAI: unreleased manuscript; no Lean",
+   "how_item_helps": "Criterion data + Elek–Szabó (sofic ⇒ K[G] stably finite) gives nonsoficity of CT's group in one line; even more directly, a Sylvester rank function normalized on finite subgroups would force t ≥ mκ while the data have t < mκ (analyst's derivation, novelty §3). So with the criterion in the library, nonsoficity is short — but it is then a corollary of the criterion, not new reuse.",
+   "expected_speedup": "high relative to independent proofs; but classed as corollary-like",
+   "confidence": 0.6,
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "Mathlib has no sofic groups",
+    "missing": "sofic groups (~200 lines) + Elek–Szabó stable finiteness (~2,000+ lines)",
+    "formal_proof_to_compare": "none"
+   },
+   "counts_as": "corollary of the criterion's data (kept here because it is a different known theorem)"
+  },
+  {
+   "title": "Torsion-free DF counterexample over F_2 (TF headline) — expected NO speedup",
+   "statement": "A finitely presented torsion-free G with F_2[G] not directly finite.",
+   "reference": "OpenAI release, family 197 TF manuscript (2026-10-04), built on family 196's parity mechanism",
+   "status": "claimed in the release; not formalized",
+   "current_proof_size": "TF paper; no Lean",
+   "how_item_helps": "It does not: the criterion's idempotents are averages over finite subgroups K_v ≅ F_ℓ^2, impossible in a torsion-free group. TF uses ZD's parity/cone construction instead. Listed as a measured zero to calibrate the harness.",
+   "expected_speedup": "none (negative control)",
+   "confidence": 0.85,
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib Monoid.IsTorsionFree, MonoidAlgebra, Group.IsFinitelyPresented",
+    "missing": "none",
+    "formal_proof_to_compare": "none (TF not formalized)"
+   },
+   "counts_as": "negative control"
+  }
+ ],
+ "speedup_note": "No strong known-theorem speedup target found outside the release. The criterion is a construction device for counterexamples; known positive theorems (Elek–Szabó, Ara–O'Meara–Perera, Kaplansky in char 0) are exactly where it cannot help.",
+ "open_problems": [
+  {
+   "title": "O1. Kaplansky direct finiteness in every odd characteristic p (e.g. p = 3)",
+   "statement": "For a given odd prime p, is there a finite field K of characteristic p and a group G with K[G] not directly finite?",
+   "reference": "Kaplansky 1972 (Fields and Rings, pp. 122–123); Elek–Szabó arXiv:math/0305440; the release settles p = 2 (CT) and one specific huge prime (OD) only",
+   "url": "https://arxiv.org/abs/math/0305440",
+   "status": "open for every odd prime other than OD's p (as of 2026-10-09; web check found no other odd-characteristic result)",
+   "obstruction_match": "exact: the only use of characteristic 2 in CT is that the regular degree D = ℓ+1 must vanish in K (summing the line identities gives D·Σ_V W_v = 0 while Σ_V W_v = -I) — CT 03-pairing.tex:103-106 and 05-prescription.tex:64. In characteristic p this is supplied by choosing ℓ ≡ -1 mod q^100 with q = p^h (CT already picks ℓ ≡ -1 mod q^100 with q = 2^h), which also gives κ = ℓ^2 ≡ 1 in K.",
+   "adaptation_sketch": "Keep thm:criterion and §§2–3 verbatim (Lean core CharacterTwist.matrix_products is characteristic-free: it needs only |A|, |C| ≠ 0 in K and the abstract decomposition hypothesis). Pairing: use d0 = ⌊(q-2)/2⌋ (Lean Pairing uses Nat division and is stated 'with no characteristic simplification'). Hypergraph: rerun the LLL/slab construction with q = p^h; it uses q | D and q-element lines, not parity (paper §4 text); Lean's CharP Q 2 assumptions appear in PlaneOperators/FrameTransport/SlabAssembly/PrescribedIncidence and look incidental (used to pick a quadratic extension). Risks: hole-size estimates for odd q; the OD paper's remark that the two methods 'retain distinct coefficient hypotheses' suggests the producer did not believe or did not try this extension.",
+   "payoff": "high (with Kaplansky's char-0 theorem, would settle DF in every characteristic; best possible device-reuse evidence: same certificate, new conjecture instance)",
+   "confidence": 0.35,
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "∃ (K : Type) (_ : Field K) (_ : Fintype K) (_ : CharP K 3), ∃ (G : Type) (_ : Group G) (_ : Group.FG G), ∃ a b : MonoidAlgebra K G, a * b = 1 ∧ b * a ≠ 1",
+    "missing": "none to state",
+    "formal_proof_to_compare": "CT Lean (13,310 lines) for p = 2; OD Lean (13,061) for its prime"
+   }
+  },
+  {
+   "title": "O2. A small, machine-checkable incidence certificate",
+   "statement": "Find explicit (V, F, x_v) satisfying thm:criterion (ℓ+1-regular, incidence girth ≥ 12, Σ_V x_v x_v^T = -I_m, Σ_{v∈f} x_v x_v^T = 0, m < t ≤ mℓ^2) of feasible size, giving an explicit and checkable DF counterexample.",
+   "reference": "CT 01-introduction.tex:18 ('The prescription need not be computationally practical and has not been executed'); methodological precedent Gardam's SAT-found unit, arXiv:2102.11818; SATURN project (CORDIS 101076148) aims at a DF counterexample by search",
+   "url": "https://cordis.europa.eu/project/id/101076148",
+   "status": "open (CT's data come from an unexecuted search with ℓ ≥ q^100)",
+   "obstruction_match": "same certificate; only the data change",
+   "adaptation_sketch": "Search over small ℓ (3, 5, 7) and structured incidence geometries with incidence girth 12 (e.g. generalized hexagons have incidence girth exactly 12 and point degree q+1 = ℓ+1 when q = ℓ) for line-balanced rank-one Gram decompositions over F_{2^k}. Caveat: generalized hexagons live over F_ℓ (odd characteristic) while the pairing must vanish in characteristic 2, so the polynomial pairing does not apply directly; an LP/SAT search for X over F_2 extensions is needed. Also consider replacing F_ℓ^2 with ℓ+1 lines by F_ℓ^{2k} with a spread of ℓ^k+1 subspaces (degree ℓ^k+1).",
+   "payoff": "medium–high (explicit counterexample; independent check of CT)",
+   "confidence": 0.25,
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "the hypotheses of ChosenCriterion.products on concrete Fintype data (Finset incidence, SimpleGraph.egirth, Matrix over a GaloisField 2 k); checkable by decide/norm_num on small instances",
+    "missing": "none",
+    "formal_proof_to_compare": "ChosenCriterion.products then gives the counterexample for free"
+   }
+  },
+  {
+   "title": "O3. Is every word-hyperbolic group sofic? (Ozawa, in Pestov's survey, Q 9.2)",
+   "statement": "Is every word-hyperbolic group sofic (hyperlinear)?",
+   "reference": "V. Pestov, Hyperlinear and sofic groups: a brief guide, Bull. Symb. Logic (2008), arXiv:0804.3968, Open question 9.2",
+   "url": "https://arxiv.org/abs/0804.3968",
+   "status": "open (no resolution found; the Aug 2026 nonsofic groups are not reported as hyperbolic)",
+   "obstruction_match": "partial: CT's glued group N is a colimit of copies of F_ℓ^2 along F_ℓ-lines over an incidence system of girth ≥ 12, i.e. a polygon-of-finite-groups-type object; if CT is right, N is nonsofic (rank bound t ≥ mκ violated). If N (or a variant with larger girth) is hyperbolic, the answer is no.",
+   "adaptation_sketch": "Check nonpositive curvature of the development (Gersten–Stallings angles in the vertex groups F_ℓ^2: two lines generate, coset graph K_{ℓ,ℓ}, angle π/2) together with incidence girth; raise girth (the hypergraph theorem's slab events) until a CAT(-1)/small-cancellation criterion holds. The CT trace raised Wise's polygons of finite groups and left it unexplored.",
+   "payoff": "very high",
+   "confidence": 0.1,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "Mathlib lacks Gromov hyperbolic groups and sofic groups",
+    "missing": "hyperbolic groups (~1,000+ lines), sofic groups (~200 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "O4. Normalized Sylvester rank functions on positive-characteristic group algebras",
+   "statement": "Does every group algebra K[G] (char K = p > 0) admit a Sylvester matrix rank function rk with rk(e_H) = 1/|H| for every finite p'-subgroup H, where e_H is the normalized average (the property sofic groups provide)?",
+   "reference": "formulated here; context: Jaikin-Zapirain's programme on Sylvester rank functions and mod-p Lück approximation (e.g. Jaikin-Zapirain–López-Álvarez, arXiv:2012.15844); Elek–Szabó arXiv:math/0305440",
+   "url": "https://arxiv.org/abs/2012.15844",
+   "status": "not found posed in this form; the CT data would answer it negatively for N in characteristic 2 (analyst derivation: UT = I_m, UP = U ⇒ m ≤ Σ rk(P_v) = t/κ, but t < mκ)",
+   "obstruction_match": "exact: this is the rank bound the criterion is built to defeat",
+   "adaptation_sketch": "Write out the two-line rank argument from Rectangular.identities; the only needed input is the data inequality t < mℓ^2 (strict in CT: t/m ≤ D^2/2 - 1 < ℓ^2).",
+   "payoff": "medium (clarifies what the certificate refutes; theorem-corollary-like)",
+   "confidence": 0.5,
+   "difficulty": "low",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Matrix, MonoidAlgebra",
+    "missing": "Sylvester matrix rank function structure (~80–150 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "O5. Test candidate groups for embedded criterion configurations (Thompson's V, Ã2-lattices, Kac–Moody lattices)",
+   "statement": "Does a given group of unknown soficity (e.g. Thompson's group V, cocompact lattices in Ã2-buildings) contain finite subgroups F_ℓ^2 glued along lines over a girth ≥ 12 incidence system carrying a pairing with t < mℓ^2? Such a configuration would make the group nonsofic.",
+   "reference": "Pestov arXiv:0804.3968 (soficity of specific groups open); OpenAI's August nonsofic result used the unit group of the Leavitt algebra and Thompson's V (press: https://thenextweb.com/news/openai-astra-model-ten-math-proofs-non-sofic-groups)",
+   "url": "https://arxiv.org/abs/0804.3968",
+   "status": "open",
+   "obstruction_match": "the criterion as a nonsoficity test (finite certificate against rank functions)",
+   "adaptation_sketch": "Groups with rich elementary-abelian finite subgroup lattices (Ã2 lattices: vertex stabilizers contain (F_q)^2-type subgroups; incidence girth 6 in the building, so girth 12 needs passing to suitable configurations). Low prior: the criterion needs injectivity of the whole colimit into the target group.",
+   "payoff": "high",
+   "confidence": 0.05,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "Thompson's V / buildings not in Mathlib",
+    "missing": "the groups and soficity",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  {
+   "title": "Group-ring Determinant Conjecture fails (DT manuscript)",
+   "formalized": "yes — GroupRingDeterminant.main uses only the existential KaplanskyCounterexample.main_theorem",
+   "note": "theorem corollary; DT's own new step (DF failure in char 2 ⇒ det_FK < 1) is a separate item (novelty D1)"
+  },
+  {
+   "title": "Gottschalk surjunctivity fails: an injective, non-surjective K-linear cellular automaton on K^G (CT §6)",
+   "formalized": "not for CT (OD's comparator includes the cellular statement for OD's own construction)",
+   "note": "corollary via Elek–Szabó / Ceccherini-Silberstein–Coornaert transfer"
+  },
+  {
+   "title": "CT's group G (and the glued group N) is nonsofic",
+   "formalized": "no",
+   "note": "corollary of DF failure + Elek–Szabó; precedent: OpenAI Aug 2026 and Fournier-Facio arXiv:2608.02025 already give nonsofic groups"
+  },
+  {
+   "title": "Stable finiteness fails for K[G] and, by restriction of scalars, for matrices over F_2[G]",
+   "formalized": "no",
+   "note": "trivial corollary"
+  }
+ ],
+ "release_reuse": {
+  "summary": "No in-release reuse of the incidence criterion as a device.",
+  "OD (odd characteristic, Sep 26)": "Sibling SCHEMA, not reuse. Same architecture type (local finite-group idempotents glued along a combinatorial structure, a rectangular/low-rank identity, a size ratio beating the rank bound), but a different local mechanism (annihilated high-degree subspace of a modular translation representation; low-rank fit of a triangle-free graph). The OD paper says 'The characteristic-two theorem is not an input to this odd-prime argument' (OD 01-introduction.tex:57-58). Lean: OddKaplansky imports only DirectFiniteness.ReducedWalks.",
+  "DT (Determinant Conjecture, Sep 23)": "Theorem corollary: Lean uses only the existential main_theorem.",
+  "TF (torsion-free headline, Oct 4)": "No reuse: TF cites CT only for context ('a finitely presented group with odd-order torsion', TF introduction.tex:48) and builds on family 196's parity mechanism.",
+  "Family 285 (Baum–Connes / Kadison–Kaplansky)": "Checked text of the three manuscripts: voltage covers, LPS expanders, lamplighter spectral methods; no incidence criterion.",
+  "Family 294 (Kaplansky quasitrace; OAI/Analysis/Kaplansky)": "C*-algebraic; imports Cuntz/Quasitrace/BundleTests, not DirectFiniteness."
+ },
+ "family_196_precedent": {
+  "question": "Is the 'reported model-produced precedent from family 196' a precedent for the incidence criterion?",
+  "finding": "No. Family 196's paper (ZD, 'A Torsion-Free Group Algebra with Zero Divisors', dated 2026-09-23, the same day as CT) builds a zero product αβ = 0 from two labelled graphs coned off in a 2-complex: odd-degree product graphs have even components, which cancel in characteristic 2. It contains no subgroup averages, no rectangular identity UT = I_m, no character packing and no rank-violating size inequality. The shortlist's 'against' note refers to the family's HEADLINE manuscript TF (Oct 4), which adapts ZD ('develops the graph and cone construction of [ZD]'); TF is not the source of the criterion and is not formalized.",
+  "shared_themes": [
+   "characteristic 2 used to make an even incidence count vanish (ZD: even component sizes; CT: D = ℓ+1 even)",
+   "finite-geometry incidence data (ZD: lines of a projective plane as label types; CT: affine lines and the ℓ+1 lines of F_ℓ^2)"
+  ],
+  "verdict": "Thematic overlap only; same-day, model-produced; not an earlier equivalent. No downgrade of the criterion from 196."
+ },
+ "negative_controls": [
+  {
+   "title": "Characteristic 0 (Kaplansky: K[G] is stably finite)",
+   "why": "Proved-false analogue: the criterion's hypotheses are unsatisfiable when char K ∤ ℓ+1, since summing the line identities gives (ℓ+1)·Σ_V x_v x_v^T = 0 while Σ_V x_v x_v^T = -I. In char 0 this is a contradiction. A prover with the criterion must not 'find' data over ℚ."
+  },
+  {
+   "title": "Sofic groups (Elek–Szabó) and residually amenable groups (Ara–O'Meara–Perera)",
+   "why": "Direct finiteness is a theorem there; no criterion configuration can embed in a sofic group."
+  },
+  {
+   "title": "Torsion-free groups (TF / Kaplansky zero-divisor setting)",
+   "why": "The criterion needs finite subgroups for its averaging idempotents; it cannot produce the torsion-free headline. TF needed family 196's different mechanism."
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "target": "O1: DF in odd characteristic p (e.g. p = 3)",
+   "lean_usable": true,
+   "argument": "The decisive device-reuse test. The criterion's only use of characteristic 2 is to make the degree ℓ+1 vanish, which ℓ ≡ -1 mod p^{100h} supplies in characteristic p; the Lean core (CharacterTwist.matrix_products, Rectangular.identities, Pairing.sum_complement_gram) is already characteristic-free. Statable now. If a prover with the criterion in its library proves the p = 3 statement much faster than without it, that is a downstream speedup on a theorem the release does not contain."
+  },
+  {
+   "rank": 2,
+   "target": "Weakened OddKaplansky (∃ odd p) — speedup target",
+   "lean_usable": true,
+   "argument": "The same experiment measured against an existing formal proof: OD's 13,061-line Lean for a stronger fixed-prime statement. Note that the exact OD comparator (|K| = p^4) is out of reach of the criterion, so compare on the weakened statement."
+  },
+  {
+   "rank": 3,
+   "target": "O2: small machine-checkable certificate",
+   "lean_usable": true,
+   "argument": "Same certificate, new witnesses: decidable hypotheses on finite data, so a found instance plus ChosenCriterion.products yields a checked counterexample. Tests whether the design generates other witnesses."
+  },
+  {
+   "rank": 4,
+   "target": "O4: normalized Sylvester rank functions in positive characteristic",
+   "lean_usable": true,
+   "argument": "Under 300 lines to define rank functions; the criterion data refute the existence of a normalized rank function on K[N] in two lines. Corollary-like, so it scores reach rather than a jump."
+  },
+  {
+   "rank": 5,
+   "target": "O3: hyperbolic nonsofic group via the glued group N",
+   "lean_usable": false,
+   "argument": "Highest payoff, lowest confidence, not Lean-usable. Worth an expert check on whether N's development is nonpositively curved."
+  }
+ ],
+ "precedent_check": {
+  "after_2026_10_06": "None found. A web search on 2026-10-09 ('Kaplansky direct finiteness conjecture counterexample 2026 odd characteristic') returned only the release coverage, CORDIS SATURN, and Dykema–Heister–Juschenko. No odd-characteristic or criterion-based follow-up.",
+  "earlier_equivalent": "None found (agrees with novelty.md: no finite 'local cancellation / global identity' certificate against rank functions in the literature searched). Family 196 is not an equivalent (see family_196_precedent).",
+  "limits": "Web search was rate-limited for part of the session. zbMATH and MathSciNet were not queried. Expert check still recommended (Jaikin-Zapirain, Thom, Elek)."
+ },
+ "sources": [
+  "data/raw/openai-math/lean/ComparatorChallenges/{KaplanskyDirectFiniteness,KaplanskyFinitelyPresented,OddKaplansky,GroupRingDeterminant}.{json,lean}; lean/docs/197.md, 196.md",
+  "data/raw/openai-math/lean/OAI/RingTheory/DirectFiniteness (126 files, 13,310 lines); OAI/Algebra/OddKaplansky (87 files, 13,061 lines); OAI/Analysis/GroupDeterminants (34 files, 3,327 lines)",
+  "CT preprint: preprints/A-Counterexample-to-Kaplanskys-Direct-Finiteness-Conjecture-in-Characteristic-Two-September-23-2026/build/sections/02-criterion.tex, 03-pairing.tex, 04-hypergraph.tex, 05-prescription.tex",
+  "OD preprint 01-introduction.tex; TF preprint introduction.tex and references.bib; ZD (family 196) paper.tex",
+  "scripts/extract_lean.py 197 (output in session scratchpad, not in data/items)",
+  "data/pilot/197/novelty.json, novelty.md, trace.md",
+  "https://arxiv.org/abs/math/0305440",
+  "https://arxiv.org/abs/0804.3968",
+  "https://arxiv.org/abs/2608.02025",
+  "https://arxiv.org/abs/2102.11818",
+  "https://arxiv.org/abs/2012.15844",
+  "https://cordis.europa.eu/project/id/101076148",
+  "https://thenextweb.com/news/openai-astra-model-ten-math-proofs-non-sofic-groups"
+ ],
+ "search_log": [
+  "Read the brief, PLAN.md, the shortlist entry, novelty.md and trace.md (K11/K12, PV3).",
+  "Read the four comparators and lean/docs/197.md.",
+  "Read the CT criterion, pairing, hypergraph and prescription sections.",
+  "Read the Lean: ChosenCriterion, AlgebraicCriterion, CharacterFormulas, Rectangular, AlgebraicPacking, AssignedDevelopment, PrescribedOutputs, PrescribedData, Pairing, FinitelyPresented, Main, GroupDeterminants/Main and CompanionTransfer, OddKaplansky/Main and Construction.",
+  "Checked cross-imports between the three Lean dirs: DT imports DirectFiniteness.Main; OD imports only ReducedWalks.",
+  "Ran extract_lean.py 197 into the scratchpad and checked DAG membership of the criterion declarations.",
+  "Grepped for CharP/CharTwo in DirectFiniteness. Char-2 assumptions sit in ChosenCriterion, PrescribedFields, FrameTransport, PlaneOperators, SlabAssembly and PrescribedIncidence. Pairing.lean is characteristic-free.",
+  "Grepped all preprints for CT citations: TF, DT and OD only. Checked the family 285 and 294 texts.",
+  "Read the ZD (family 196) introduction for the precedent check.",
+  "WebSearch on 2026-10-09: 'Kaplansky direct finiteness conjecture counterexample 2026 odd characteristic'; 'is every hyperbolic group sofic open problem'; 'Jaikin-Zapirain Sylvester matrix rank function positive characteristic'. Earlier queries failed on a session rate limit."
+ ],
+ "notes": "All Lean work is text-level; nothing was compiled. The odd-characteristic extension (O1) is the analyst's own reading of the CT paper and Lean, not a claim in the release."
+}

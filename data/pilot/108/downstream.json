@@ -1,0 +1,410 @@
+{
+ "fid": "108",
+ "item": "Characteristic-2 spectral-curve bridge (paper I29+I32+I35): over F2-bar, with D = diag(theta) distinct and G_D(X) = [s^q t^q] per_k(X+sI+tD) = [s^q t^q] det(X+sI+tD), grad G_D(X) = 0 forces the adjugate zero scheme Z of the spectral curve C_X = V(det(sI+tD+uX)) to have length >= T = C(q+2,2); conductor gives delta(C_X) >= T; a Severi count plus a fibre count give dim{grad G_D = 0} <= k^2 + k - T. Result: quadratic codimension of the critical locus of a linear-degree permanent projection.",
+ "item_type": "F5 (change of representation: permanent coefficient -> determinantal pencil mod 2 -> plane spectral curve)",
+ "lean_status": "formalized, different route",
+ "lean_status_why": "The first half of the bridge (grad G_D = 0 implies normalization defect >= C(q+2,2)) is formalized as in the paper (gradient_forces_normalization_defect / critical_normalization_defect via vanishing adjugate coefficients). The second half replaces the cited CHT2023 Severi dimension and the Hilbert-scheme fibre bound by a char-2 Frobenius square-form delta bound plus a transcendence-degree parameter count, giving a weaker codimension (>= floor(C(q+2,2)/18) instead of >= T - k) that still yields the paper's final constant.",
+ "lean_gaps": [
+  "Different route for the dimension count: spectral_effective_bound uses exists_squareForm (f = a^2 + x b^2 + y c^2 + xy d^2 in char 2), Conductor.normalization_length_le_half and CurveFamily.half_curve_parameter_bound (18 n + T <= 9 (k+1)(k+2)). The paper uses the CHT2023 char-2 Severi dimension theorem (cited, unproved) plus dim Hilb^N(C) <= N via the row-adjugate subscheme. The Lean therefore does not depend on CHT2023.",
+  "Weaker intermediate statement: Lean bounds ringKrullDim(K[X_ij]/gradientIdeal) <= (k+1)^2 - floor(C(q+2,2)/18) for matrix size k+1; the paper gives dim <= k^2 + k - T for size k. Codimension >= floor(T/18) (about k^2/324) instead of >= T - k (about k^2/18). The Lean section dimension is sectionSize = floor(C(q+2,2)/18) instead of the paper's floor(k^2/100). explicit_constant still reaches m^3/(5529600 e), the same constant as the paper. We did not trace how the slack is absorbed.",
+  "Algebraic rather than geometric formulation: Krull dimension of a quotient of MvPolynomial over any infinite perfect field of characteristic 2 (more general than F2-bar). The spectral curve is the affine monic charpoly of the pencil X.diag(theta) + A, and delta is normalizationDefect := length of (integral closure of AdjoinRoot) / image. The paper uses the projective plane curve C_X and its delta-invariant. Monicity plus separability (distinct_slope_pencil_separable) replace the paper's 'finite flat projection with a distinct-root fibre' lemma.",
+  "Char-2 to C transfer: the Lean consumer HasBorderDeterminant.selector_lower_of_critical_dimension accepts the dimension bound over any field K and transfers through the integer family Selector.integralCoefficientFamily (integralCoefficientFamily_specialize, SliceParameters.nonzero_of_gradientDimension). The paper uses a proper family over Spec Z[theta]. Not traced line by line.",
+  "Only the PermanentCubic comparator depends on the bridge. BFS from OAI.PermanentBorder.smooth_initial_form_lower_bound (SmoothInitialForm comparator) does NOT reach critical_dimension_effective or spectral_effective_bound: that comparator is the smooth-form (Sheshadri-architecture) branch.",
+  "Dominated shares of the 1258-decl proof DAG (data/items/108_lean.json): critical_dimension_effective 0.485, spectral_effective_bound 0.192, gradient_forces_normalization_defect 0.079, critical_normalization_defect 0.056.",
+  "No docstrings in the Lean. Text-level analysis only; nothing compiled here. Guo (arXiv:2609.29568v2) reports rebuilding 12 declarations at openai/math commit adc7f12, not fd4aeeb."
+ ],
+ "comparator_chain": [
+  "OAI.PermanentBorder.permanent_cubic_lower_bounds",
+  "OAI.PermanentBorder.permanent_border_cubic_lower_bound",
+  "OAI.PermanentBorder.exists_effective_critical_bound",
+  "OAI.PermanentBorder.SpectralDimension.critical_dimension_effective",
+  "OAI.PermanentBorder.Selector.gradient_forces_normalization_defect",
+  "OAI.PermanentBorder.AdjugateAlgebra.critical_normalization_defect",
+  "OAI.PermanentBorder.SpectralDimension.spectral_effective_bound"
+ ],
+ "comparator_chain_note": "PermanentCubic.json: solution_module OAI.Algebra.Determinantal.Main, theorem OAI.PermanentBorder.permanent_cubic_lower_bounds. critical_dimension_effective calls both gradient_forces_normalization_defect (first half of the bridge) and spectral_effective_bound (second half); the list gives both branches. Consumer: permanent_border_cubic_lower_bound feeds the bound into HasBorderDeterminant.selector_lower_of_critical_dimension (ConditionalBound.lean:393). SmoothInitialForm.json (OAI.PermanentBorder.smooth_initial_form_lower_bound) does not depend on the bridge. Paths from BFS over data/items/108_lean.json.",
+ "lean_source": [
+  {
+   "name": "OAI.PermanentBorder.SpectralDimension.critical_dimension_effective",
+   "kind": "theorem",
+   "file": "lean/OAI/Algebra/Determinantal/Main.lean",
+   "line": 214,
+   "text": "theorem critical_dimension_effective {K : Type u} [Field K] [Infinite K]\n    [CharP K 2] [PerfectRing K 2] {k q : ℕ} (hk : 4 ≤ k+1) (hq : 3*q ≤ k)\n    (θ : Fin (k+1) → K) (hθ : Function.Injective θ) :\n    ringKrullDim (MvPolynomial (Fin (k+1) × Fin (k+1)) K ⧸ gradientIdeal K θ q) ≤\n      (((k+1)^2-(q+2).choose 2/18 : ℕ) : WithBot ℕ∞) := by"
+  },
+  {
+   "name": "OAI.PermanentBorder.SpectralDimension.spectral_effective_bound (with its section variable line 129)",
+   "kind": "theorem",
+   "file": "lean/OAI/Algebra/Determinantal/Main.lean",
+   "line": 129,
+   "text": "variable [CharP K 2] [CharP L 2] [PerfectRing K 2] [Infinite K] [IsAlgClosed L]\n\ntheorem spectral_effective_bound {k : ℕ} (hk : 4 ≤ k+1)\n    (θ : Fin (k+1) → K) (hθ : Function.Injective θ)\n    (A : Matrix (Fin (k+1)) (Fin (k+1)) L) (T : ℕ)\n    (hT : (T : ℕ∞) ≤ normalizationDefect (fun i => algebraMap K L (θ i)) A) :\n    ∃ n : ℕ, Algebra.trdeg K (curveCoefficientField (K := K)\n      (pencilMatrix (pencilBase (fun i => algebraMap K L (θ i)) A)).det) ≤ (n : Cardinal) ∧\n      18*n+T ≤ 9*((k+1)*(k+2)) := by"
+  },
+  {
+   "name": "OAI.PermanentBorder.Selector.gradient_forces_normalization_defect",
+   "kind": "theorem",
+   "file": "lean/OAI/Algebra/Determinantal/Centralizers.lean",
+   "line": 19,
+   "text": "theorem gradient_forces_normalization_defect {K : Type*}\n    [Field K] [Infinite K] [CharP K 2] {k q : ℕ} (hq : 3*q ≤ k)\n    (θ : Fin (k+1) → K) (hθ : Function.Injective θ)\n    (A : Matrix (Fin (k+1)) (Fin (k+1)) K)\n    (hcrit : ∀ ij : Fin (k+1) × Fin (k+1), MvPolynomial.eval\n      (fun ab : Fin (k+1) × Fin (k+1) => A ab.1 ab.2)\n      (pderiv ij (diagonalCoefficient\n        (Matrix.of fun a b => (MvPolynomial.X (a,b) :\n          MvPolynomial (Fin (k+1) × Fin (k+1)) K)) (fun i => MvPolynomial.C (θ i)) q)) = 0) :\n    let T := -(pencilBase θ A)\n    let Q := FractionRing K[X]\n    let R := integralClosure K[X] (AdjoinRoot (T.charpoly.map (algebraMap K[X] Q)))\n    ((q+2).choose 2 : ℕ∞) ≤ Module.length K (R ⧸ LinearMap.range\n      (normalizationInclusion (Q := Q) T.charpoly T.charpoly_monic).toLinearMap) := by"
+  },
+  {
+   "name": "OAI.PermanentBorder.AdjugateAlgebra.critical_normalization_defect",
+   "kind": "theorem",
+   "file": "lean/OAI/Algebra/Determinantal/PencilSeparability.lean",
+   "line": 182,
+   "text": "theorem critical_normalization_defect\n    (θ : Fin (k+1) → K) (hθ : Function.Injective θ)\n    (A : Matrix (Fin (k+1)) (Fin (k+1)) K) (q : ℕ) (hq : 3*q ≤ k)\n    (hcrit : ∀ i j, (((pencilMatrix (pencilBase θ A)).adjugate i j).coeff q).coeff q = 0) :\n    let T := -(pencilBase θ A)\n    let Q := FractionRing K[X]\n    let R := integralClosure K[X] (AdjoinRoot (T.charpoly.map (algebraMap K[X] Q)))\n    ((q+2).choose 2 : ℕ∞) ≤ Module.length K (R ⧸ LinearMap.range\n      (normalizationInclusion (Q := Q) T.charpoly T.charpoly_monic).toLinearMap) := by"
+  },
+  {
+   "name": "OAI.PermanentBorder.Selector.diagonalCoefficient",
+   "kind": "def",
+   "file": "lean/OAI/Algebra/Determinantal/Gates.lean",
+   "line": 343,
+   "text": "noncomputable def diagonalCoefficient (M : Matrix I I R) (θ : I → R) (q : ℕ) : R :=\n  ((Matrix.of fun i j => C (M i j) : Matrix I I (MvPolynomial (Fin 2) R)) +\n    (Matrix.diagonal (fun i => X (0 : Fin 2) + C (θ i)*X 1) : Matrix I I (MvPolynomial (Fin 2) R))).permanent.coeff\n    (countIndex q)"
+  },
+  {
+   "name": "OAI.PermanentBorder.SpectralDimension.normalizationDefect",
+   "kind": "def",
+   "file": "lean/OAI/Algebra/Determinantal/FiberDimension.lean",
+   "line": 203,
+   "text": "noncomputable def normalizationDefect {L : Type u} [Field L] {k : ℕ}\n    (θ : Fin (k+1) → L) (A : Matrix (Fin (k+1)) (Fin (k+1)) L) : ℕ∞ :=\n  let T := -(pencilBase θ A)\n  let Q := FractionRing L[X]\n  let R := integralClosure L[X] (AdjoinRoot (T.charpoly.map (algebraMap L[X] Q)))\n  Module.length L (R ⧸ LinearMap.range\n    (normalizationInclusion (Q := Q) T.charpoly T.charpoly_monic).toLinearMap)"
+  },
+  {
+   "name": "OAI.PermanentBorder.SpectralDimension.gradientIdeal",
+   "kind": "def",
+   "file": "lean/OAI/Algebra/Determinantal/FiberDimension.lean",
+   "line": 213,
+   "text": "noncomputable def gradientIdeal {k : ℕ} (θ : Fin (k+1) → K) (q : ℕ) :\n    Ideal (MvPolynomial (Fin (k+1) × Fin (k+1)) K) :=\n  Ideal.span (Set.range (fun ij => pderiv ij (Selector.diagonalCoefficient\n    (Matrix.of fun a b => (MvPolynomial.X (a,b) :\n      MvPolynomial (Fin (k+1) × Fin (k+1)) K)) (fun i => MvPolynomial.C (θ i)) q)))"
+  },
+  {
+   "name": "OAI.PermanentBorder.pencilBase",
+   "kind": "def",
+   "file": "lean/OAI/Algebra/Determinantal/AdjugateNormalForm.lean",
+   "line": 125,
+   "text": "noncomputable def pencilBase (θ : Fin (k+1) → K)\n    (A : Matrix (Fin (k+1)) (Fin (k+1)) K) :\n    Matrix (Fin (k+1)) (Fin (k+1)) K[X] :=\n  (X : K[X]) • (Matrix.diagonal θ).map C + A.map C"
+  },
+  {
+   "name": "OAI.PermanentBorder.exists_effective_critical_bound",
+   "kind": "theorem",
+   "file": "lean/OAI/Algebra/Determinantal/Main.lean",
+   "line": 344,
+   "text": "theorem exists_effective_critical_bound {K : Type} [Field K] [Infinite K]\n    [CharP K 2] [PerfectRing K 2] {d : ℕ} (hd : 128 ≤ d) :\n    ∃ θ : Fin d → K,\n      ringKrullDim (MvPolynomial (Variables d) K ⧸\n        Ideal.span (Set.range (fun i => pderiv i\n          (Selector.diagonalCoefficient\n            (Matrix.of fun a b => (X (a,b) : MvPolynomial (Variables d) K))\n            (fun i => C (θ i)) (selectorIndex d))))) ≤\n        ((d^2-sectionSize d : ℕ) : WithBot ℕ∞) := by"
+  },
+  {
+   "name": "OAI.PermanentBorder.HasBorderDeterminant.selector_lower_of_critical_dimension",
+   "kind": "theorem",
+   "file": "lean/OAI/Algebra/Determinantal/ConditionalBound.lean",
+   "line": 393,
+   "text": "theorem HasBorderDeterminant.selector_lower_of_critical_dimension\n    {K : Type} [Field K] {m n k q d B : ℕ}\n    (h : HasBorderDeterminant n (permanentPolynomial m))\n    (hk : 0 < k) (hq : q ≤ k) (hr : 2 ≤ k-2*q) (hd : 2 ≤ d)\n    (hm : 11*k-2*q ≤ m) (θ : Fin k → K)\n    (hdim : ringKrullDim (MvPolynomial (Variables k) K ⧸\n      Ideal.span (Set.range (fun i => pderiv i\n        (Selector.diagonalCoefficient\n          (Matrix.of fun a b => (X (a,b) : MvPolynomial (Variables k) K))\n          (fun i => C (θ i)) q)))) ≤ B)\n    (hB : B+(d-1) < k^2) :\n    (((k-2*q-1 : ℕ) : ℝ) * ((d-1 : ℕ) : ℝ)) / (4*Real.exp 1) ≤ n := by"
+  },
+  {
+   "name": "OAI.PermanentBorder.exists_selector_affine_projection",
+   "kind": "theorem",
+   "file": "lean/OAI/Algebra/Determinantal/AffineSelectors.lean",
+   "line": 382,
+   "text": " theorem exists_selector_affine_projection (k q m : ℕ) (hq : q ≤ k)\n    (hm : 11*k-2*q ≤ m) (θ : Fin k → ℂ) :\n    ∃ (b : Variables m → ℂ) (B : Variables m → Variables k → ℂ),\n      affineSubstitution b B (permanentPolynomial m) =\n        selectorScalar k q • coefficientPolynomial k q θ := by"
+  },
+  {
+   "name": "OAI.PermanentBorder.permanent_cubic_lower_bounds",
+   "kind": "theorem",
+   "file": "lean/OAI/Algebra/Determinantal/Main.lean",
+   "line": 384,
+   "text": "theorem permanent_cubic_lower_bounds :\n    (∀ (m n : ℕ), 1408 ≤ m → HasBorderDeterminant n (permanentPolynomial m) →\n      (m : ℝ)^3 / (5529600 * Real.exp 1) ≤ (n : ℝ)) ∧\n    (∀ (m n : ℕ), 1408 ≤ m → HasExactDeterminant n (permanentPolynomial m) →\n      (m : ℝ)^3 / (5529600 * Real.exp 1) ≤ (n : ℝ)) :="
+  },
+  {
+   "name": "OAI.PermanentBorder.EffectiveParameters.sectionSize",
+   "kind": "def",
+   "file": "lean/OAI/Algebra/Determinantal/Main.lean",
+   "line": 259,
+   "text": "def sectionSize (k : ℕ) : ℕ := (selectorIndex k+2).choose 2 / 18"
+  }
+ ],
+ "speedup_targets": [
+  {
+   "title": "Ten Advances Ch. 5: circuit lower bound for the permanent (and its n^2 log n strengthening)",
+   "statement": "Division-free arithmetic circuits computing per_n over C need Omega(n^2 log log n) gates (Ten Advances). Strengthening via the bridge (Guo v2): L_div(per_n) >= (n^2/119790) log2(n/44) for n >= 1936.",
+   "reference": "OpenAI, 'Ten Advances in Mathematics and Theoretical Computer Science' (1 Aug 2026), Ch. 5 'Circuit and Formula Lower Bounds for the Permanent', https://cdn.openai.com/pdf/ten-proofs-oai.pdf; Lean: github.com/openai/ten-proofs Permanent.lean; J. Guo, arXiv:2609.29568v2 (8 Oct 2026).",
+   "status": "n^2 log log n: known (model-produced, Lean-certified). n^2 log n: Guo v2, written deduction from 12 machine-checked 108 declarations, not formalized end to end.",
+   "current_proof_size": "Ch. 5 is about 40 pages (pp. 114-153, incl. the formula bound). ten-proofs Permanent.lean has 27,563 lines; the minor-sum critical-locus block (minorSum..., roughly lines 11,284-19,250) is about 8k lines.",
+   "how_item_helps": "Ten Advances Stage 2 needs a degree-d permanent specialization with critical codimension k = Theta(n^2). Its Stage 3 gets that only at bounded degree, via minor sums M_{t,s,d}, power sums and Möbius inclusion-exclusion; the chapter names 'd growing with n' as the next target. The bridge's output exists_effective_critical_bound plus exists_selector_affine_projection gives degree about k/3 with codimension >= floor(C(q+2,2)/18). Feeding it into the slicing lemma (exists_slicedGradient_of_criticalLocus_codimension in ten-proofs) and the Bezout/Baur-Strassen count gives k log(d-1)/3 = Theta(n^2 log n). This replaces the about 8k-line minor-sum block and strengthens the bound.",
+   "expected_speedup": "high (n^2 log n has no other known route; for the original n^2 log log n, medium)",
+   "confidence": "medium-high (Guo v2 did it in writing)",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib MvPolynomial, ringKrullDim; OAI 108: exists_effective_critical_bound, exists_selector_affine_projection, char-2 -> C transfer inside ConditionalBound. Circuit model: copy ten-proofs ArithmeticCircuit (Permanent.lean:93-110). ten-proofs is not in OAI's lake-manifest.",
+    "missing": [
+     "ArithmeticCircuit / FreeAffineCircuit + size (~60-120 lines, port from ten-proofs)",
+     "statement of L(per_n) lower bound (~20 lines)"
+    ],
+    "formal_proof_to_compare": "openai/ten-proofs Permanent.lean (27,563 lines; division-free n^2 log log n)"
+   }
+  },
+  {
+   "title": "Quadratic determinantal lower bound for the permanent (Mignon-Ressayre; LMR border version)",
+   "statement": "dc(per_m) >= m^2/2 over C (Mignon-Ressayre 2004); bdc(per_m) >= m^2/2 (Landsberg-Manivel-Ressayre 2013).",
+   "reference": "T. Mignon, N. Ressayre, IMRN 2004 no. 79; J.M. Landsberg, L. Manivel, N. Ressayre, 'Hypersurfaces with degenerate duals and the Geometric Complexity Theory Program', Comment. Math. Helv. 88 (2013).",
+   "status": "known",
+   "current_proof_size": "MR about 10 pages (Hessian rank); no formalization known.",
+   "how_item_helps": "The bridge gives a polynomial (G_D) with singular codimension Theta(k^2) inside per_{O(k)}. A singular-locus-codimension argument (von zur Gathen 1987; Alper-Bogart-Velasco 2017) applied to G_D would reprove Omega(m^2), but with a far worse constant and a far longer proof than MR's Hessian argument. 108's cubic theorem implies m^2/2 only for m above about 1.5e7.",
+   "expected_speedup": "low (calibration: shows reach, not compression)",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI 108 Model: HasExactDeterminant, HasBorderDeterminant, permanentPolynomial",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Ten Advances Stage 3 target: a degree-d permanent specialization with d growing and critical codimension Theta(n^2)",
+   "statement": "Construct an affine specialization of per_n of degree d -> infinity with dim Crit <= m - Theta(n^2) (stated as the next target in Ten Advances Ch. 5 §2).",
+   "reference": "Ten Advances Ch. 5 §2, p. 117 ('construct a degree-d specialization with d growing with n and with k = Theta(n^2)').",
+   "status": "achieved by 108 (it is literally exists_effective_critical_bound + the selector). Listed to record that the bridge is the mechanism that achieves it; counts as a corollary of the item, not as reuse.",
+   "current_proof_size": "108 Lean branch about 52% of a 21,183-line library",
+   "how_item_helps": "It is the item's direct output.",
+   "expected_speedup": "n/a (corollary)",
+   "confidence": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib ringKrullDim, MvPolynomial.pderiv; OAI 108 Selector",
+    "missing": [],
+    "formal_proof_to_compare": "108 itself"
+   }
+  }
+ ],
+ "speedup_summary": "One strong target: Ten Advances' permanent circuit bound, which the bridge both shortens (it replaces the minor-sum critical-locus block) and strengthens to n^2 log n. Guo v2 has done this in writing. Note that this is still about the permanent, in a different complexity measure. No known theorem about other polynomials was found that the bridge shortens.",
+ "open_problems": [
+  {
+   "title": "Symmetric determinantal complexity of the permanent: cubic lower bound",
+   "statement": "Prove sdc(per_m) (and its border version) >= c m^3, where representations use symmetric matrices of affine forms.",
+   "reference": "Grenet-Kaltofen-Koiran-Portier, 'Symmetric determinantal representation of polynomials', (c. 2011-12; upper bounds; venue not re-checked); Sheshadri, ECCC TR26-097 (June 2026) and arXiv:2606.13628 Thm (symmetric model sdc(sum x_i^n) >= (n-1)^2/(2e)).",
+   "url": "https://arxiv.org/abs/2606.13628",
+   "status": "Open as far as found: 108 treats only the general model (no 'symmetric' in its sources). Best known lower bound believed quadratic (not re-verified).",
+   "obstruction_match": "Exact on the permanent side. The bridge plus selector produce a smooth linear section of a permanent projection; affine projections preserve symmetric representations. Missing: a symmetric-model version of the smooth-form polar bound for arbitrary smooth forms. Sheshadri proves it only for the Fermat form.",
+   "adaptation_sketch": "Re-prove Thm 2.3 / InitialForm for symmetric pencils (kernel lines coincide; the polar-point count halves the Bezout number, cf. Sheshadri's 1/(2e)), then combine unchanged with exists_effective_critical_bound.",
+   "payoff": "medium-high (first super-quadratic sdc bound)",
+   "confidence": "medium",
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI 108 Model (copy HasExactDeterminant with a Matrix.IsSymm constraint)",
+    "missing": [
+     "HasSymmetricExact/BorderDeterminant (~40 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Hafnian vs Pfaffian: Pfaffian/determinantal complexity lower bounds for the hafnian",
+   "statement": "Prove super-quadratic lower bounds on the (border) determinantal or Pfaffian complexity of haf_{2m}.",
+   "reference": "Hafnian is VNP-complete in char != 2; haf = Pf mod 2 (same terms up to sign). No specific open-problem list reference found.",
+   "url": null,
+   "status": "No super-quadratic bound known to us (not verified).",
+   "obstruction_match": "The bridge's engine is per = det in char 2. The hafnian/Pfaffian pair has the same collapse, and Pfaffian pencils of skew matrices have spectral curves (det = Pf^2). The analogous mixed coefficient [s^q t^q] haf(X + sJ + tD_J) mod 2 is a Pfaffian-pencil coefficient.",
+   "adaptation_sketch": "Replace the adjugate by the Pfaffian adjugate; spectral curve V(Pf(sJ + tD + uX)) of degree k; redo the length/conductor/count; a hafnian selector gadget (matching gadgets exist).",
+   "payoff": "medium",
+   "confidence": "low-medium",
+   "difficulty": "medium-high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib Matrix, MvPolynomial",
+    "missing": [
+     "hafnian and Pfaffian definitions (~100-200 lines; Mathlib has neither, as far as known)",
+     "Pfaffian representation predicate"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Super-cubic bdc(per_m) / VP_ws vs VNP",
+   "statement": "Prove bdc(per_m) >= m^{3+eps} (ultimately superpolynomial; Mulmuley-Sohoni GCT program).",
+   "reference": "Mulmuley-Sohoni 2001; survey Bürgisser-Ikenmeyer et al.; Ten Advances Ch. 5 §12.",
+   "url": null,
+   "status": "open",
+   "obstruction_match": "Device saturates. The polar bound gives (r-1)(d-1)/(4e) with r <= degree of G_D = O(k) and d <= number of section variables <= k^2, so k^3 = Theta(m^3) is the ceiling of selector + smooth slice. A higher exponent needs a different invariant.",
+   "adaptation_sketch": "None credible within this method; record as an expected failure of the device.",
+   "payoff": "very high",
+   "confidence": "very low",
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI 108 Model",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "General arithmetic circuits beyond the Baur-Strassen barrier",
+   "statement": "Prove an Omega(N log d) lower bound with a superconstant extra factor, or any omega(n^2 log n) bound, for per_n (N = n^2 variables, degree n).",
+   "reference": "Baur-Strassen 1983; Ten Advances Ch. 5; Guo arXiv:2609.29568v2 (concluding remarks: a larger order needs higher degree or a different invariant).",
+   "url": "https://arxiv.org/abs/2609.29568",
+   "status": "open",
+   "obstruction_match": "Device output (Theta(n^2) codimension at degree Theta(n)) already hits k log d = Theta(N log d), the Baur-Strassen ceiling.",
+   "adaptation_sketch": "None within the critical-locus + Bezout framework; expected failure.",
+   "payoff": "very high",
+   "confidence": "very low",
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "port ten-proofs circuit model",
+    "missing": [
+     "circuit model (~100 lines)"
+    ],
+    "formal_proof_to_compare": "ten-proofs Permanent.lean (for the weaker bound)"
+   }
+  },
+  {
+   "title": "Determinantal complexity of the permanent in odd characteristic",
+   "statement": "Cubic (or any super-quadratic) lower bound for dc(per_m) over F_p-bar, p odd.",
+   "reference": "Valiant 1979 (completeness in char != 2); 108 works over C only.",
+   "url": null,
+   "status": "open as far as found (not verified)",
+   "obstruction_match": "The bridge holds over the generic point of the Z[theta]-family, so the critical-codimension bound transfers to all but finitely many p by semicontinuity. The smooth-form polar count (IFT persistence, Bezout simple points) is a char-0 argument.",
+   "adaptation_sketch": "Transfer exists_effective_critical_bound to char p via the integral family. Replace the IFT step with a separability/etale argument valid for p > deg.",
+   "payoff": "low-medium",
+   "confidence": "low",
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI 108 Model is over C; needs a field-generic copy",
+    "missing": [
+     "field-generic HasExactDeterminant (~40 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Severi-type dimension bounds for plane curves with delta >= T in characteristic 2 (non-nodal)",
+   "statement": "Bound the dimension of the locus of degree-k plane curves over F2-bar with delta-invariant >= T, for arbitrary (non-nodal) singularities, sharply (k(k+3)/2 - T).",
+   "reference": "K. Christ, X. He, I. Tyomkin, 'On the Severi problem in arbitrary characteristic', Publ. Math. IHES 137 (2023), cited by 108 as CHT2023; the 108 novelty pass flags its char-2 non-nodal applicability as unverified.",
+   "url": null,
+   "status": "Sharp version: unclear/needs expert check. Lean's elementary Frobenius bound gives an 18x weaker version.",
+   "obstruction_match": "This is the second half of the bridge itself; the Lean's square-form route is a new elementary proof of a weak version.",
+   "adaptation_sketch": "Sharpen the square-form delta bound (5 dim K[x,y]/(a,b,c,d) + #ordinary singular points) and the transcendence-degree count.",
+   "payoff": "low-medium (algebraic geometry)",
+   "confidence": "low",
+   "difficulty": "medium",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib MvPolynomial, integralClosure, Module.length; OAI 108 normalizationDefect, CurveFamily",
+    "missing": [
+     "parameter space of plane curves + delta as a function on it (~150 lines)"
+    ],
+    "formal_proof_to_compare": "OAI 108 spectral_effective_bound (weak version)"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "Exact determinantal complexity: dc(per_m) >= m^3/(5529600 e) (Lean: permanent_exact_cubic_lower_bound).",
+  "Cubic lower bounds for vertex and edge counts of affine ABPs, including fixed-budget limits (paper consequences.tex:60; not formalized).",
+  "The determinant coefficient [s^q t^q] det(X+sI+tD) inherits dc >= c k^3, since it agrees with G_D mod 2 (consistent with its trivial O(k^3) upper bound; sanity check from family.md).",
+  "Ten Advances' Stage-3 target (a degree-growing specialization with Theta(n^2) codimension) is the item's direct output."
+ ],
+ "release_reuse": {
+  "lean": "None inside the release: no OAI directory outside OAI/Algebra/Determinantal imports it.",
+  "families": [
+   {
+    "fid": "other permanent families",
+    "relation": "CONTENTS.md has 'A strict four-row permanent inequality and permutation moments' and a char-p noncommutative-formula PIT family; neither uses critical loci or spectral curves (abstract-level check)."
+   }
+  ],
+  "external_after_release": "Guo, arXiv:2609.29568v2 (8 Oct 2026; v1 26 Aug 2026): 'Twelve machine-checked declarations of the Lean development accompanying OpenAI's manuscript on border determinantal complexity of the permanent (September 24, 2026) imply, by a short written argument, the existence of a geometric slice'. This gives L_div(per_n) >= (n^2/119790) log2(n/44) for n >= 1936. It reuses the bridge's output in a different complexity measure, so it is the first downstream use. Caveats: same polynomial (the permanent), written rather than formal deduction, and the author is reported (search snippet, not checked on the page) to use Codex GPT-5.6-Sol."
+ },
+ "negative_controls": [
+  {
+   "title": "Determinantal complexity of the permanent over F2-bar",
+   "why_should_fail": "Proved-false analogue: in characteristic 2, per_m = det_m, so dc(per_m) = m and any cubic bound is false. The bridge lives in char 2, but its conclusion only becomes a lower bound after transfer to char 0 plus the char-0 polar count. A prover that 'applies the bridge' in char 2 must fail.",
+   "lean": "statable now (field-generic HasExactDeterminant; per = det over ZMod 2 is a short Mathlib fact)"
+  },
+  {
+   "title": "The plain determinant det_k (q = 0)",
+   "why_should_fail": "For q = 0, T = 1 and G_D = det(X+sI+tD) up to normalisation. The critical locus of det is {rank <= k-2}, of codimension 4, so the bridge gives only a trivial bound, consistent with dc(det_k) = k. Proved fact.",
+   "lean": "statable now"
+  },
+  {
+   "title": "Ten Advances formula lower bound Omega(n^4/log n)",
+   "why_should_fail": "Proved by transcendence degree of coefficients over matchings, not by critical loci. No speedup expected from the bridge.",
+   "lean": "ten-proofs Permanent.lean has it; statable with < 300 lines (formula model)"
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "title": "Permanent circuit lower bound (Ten Advances Ch. 5), and the n^2 log n strengthening",
+   "lean_usable": true,
+   "argument": "The bridge's output (exists_effective_critical_bound with the selector projection) is exactly the input Ten Advances' Stage 2 asks for, at growing degree. A prover with the 108 library should replace the about 8k-line minor-sum critical-locus block and reach Theta(n^2 log n). Guo v2 did this on paper within days. There is a formal baseline to compare against (ten-proofs Permanent.lean), and stating it needs only a ported circuit model. Caveat: same polynomial, different measure. This is evidence of device reuse but not cross-problem generality."
+  },
+  {
+   "rank": 2,
+   "title": "Cubic symmetric determinantal complexity of the permanent",
+   "lean_usable": true,
+   "argument": "Exact obstruction match on the permanent side, and the only open problem where the bridge can be used unchanged. What is missing is the symmetric smooth-form bound, a Sheshadri-style variant. Statable with about 40 lines of definitions. Success would be a new theorem obtained by device reuse, still on the permanent."
+  },
+  {
+   "rank": 3,
+   "title": "Hafnian/Pfaffian analogue of the bridge",
+   "lean_usable": true,
+   "argument": "This is the strongest test of whether the device generalises beyond the permanent: haf = Pf mod 2 plays the role of per = det mod 2, and Pfaffian pencils have spectral curves. It needs about 100-200 lines of Pfaffian/hafnian definitions. A positive result would be genuine cross-problem reuse of the mechanism. Low-medium confidence."
+  },
+  {
+   "rank": 4,
+   "title": "Sharp char-2 Severi-type bound for determinantal plane curves",
+   "lean_usable": true,
+   "argument": "Targets the bridge's own second half. The Lean already contains an elementary 18x-weak version (spectral_effective_bound). Sharpening it would remove the paper's reliance on CHT2023. Statable with OAI's normalizationDefect. Payoff is mostly internal."
+  },
+  {
+   "rank": 5,
+   "title": "Mignon-Ressayre quadratic bound via the bridge (calibration)",
+   "lean_usable": true,
+   "argument": "Statable now with OAI's Model. The bridge route should be longer and weaker than MR's Hessian proof, so this is a calibration target where we expect no compression. If a prover nonetheless finds it shorter, that is a red flag for the measurement."
+  }
+ ],
+ "precedent_check": {
+  "sheshadri_2606_13628": "VERIFIED AT SOURCE (arXiv abs page + v2 PDF, 37 pp, extracted with pypdf). Title: 'A near-quadratic lower bound on the border determinantal complexity of sum_i x_i^n via conormal specialization', K. Sheshadri, v1 11 Jun 2026, v2 7 Oct 2026. The v2 PDF's Acknowledgments say: 'The author used the assistance of large language models in all stages of the effort.' The abs page does not disclose this. v1 text was not checked. Content: polar/conormal degree for the Fermat power sum; it states 'No permanent claim'; no characteristic 2, spectral curves or critical loci. Verdict: the 'builds on an LLM-assisted paper' claim is TRUE for 108's smooth-form branch (C3 / SmoothInitialForm comparator) and IRRELEVANT to the char-2 bridge.",
+  "ten_advances_aug_2026": "VERIFIED AT SOURCE (cdn.openai.com/pdf/ten-proofs-oai.pdf, 253 pp; openai.com page returned 403, ten-proofs repo README read). Abstract: 'results obtained by an internal OpenAI model'. Ch. 5 'Circuit and Formula Lower Bounds for the Permanent' (pp. 114-151): affine specialization of per_n, small critical locus of codimension k, generic linear slice, Bezout/Baur-Strassen count. Stage 3 controls Crit(M_{t,s,d}) through power sums p_B and Möbius inclusion-exclusion, giving dim Crit <= 2^t - 1 + s(d-2). It names the target 'construct a degree-d specialization with d growing with n and with k = Theta(n^2)'. Characteristic two appears only as background ('In characteristic two, the determinant and permanent coincide', §12.1 and the depth-3 discussion); there are no spectral curves, delta-invariants, conductors or Severi varieties. Verdict: the 'same method' claim is TRUE at the architecture level (critical-locus codimension of a permanent specialization + slice), which pre-announces C1 (G_D). It is FALSE for the char-2 spectral-curve bridge (C2), which Ten Advances does not contain. 108 does not cite Ten Advances.",
+  "guo_2609_29568": "Verified abs page (v2, 8 Oct 2026): reuses 12 machine-checked 108 declarations. Post-release use of the device output (see release_reuse).",
+  "earlier_equivalent_of_bridge": "None found in this pass. Ingredients are N0 (Beauville/AHH spectral correspondence, conductor bounds, Galazka catalecticants, CHT2023 Severi). Limits: WebSearch/WebFetch hit a session limit mid-run, so zbMATH and MathOverflow were not queried. C2's N3 grade (conf 0.40) is unchanged by these checks. The provenance flag stays 'yes (partial)', applying to C1/C3, not C2.",
+  "after_2026_10_06": "Guo v2 (8 Oct 2026) is the only post-release use found."
+ },
+ "sources": [
+  {
+   "what": "Brief",
+   "where": "docs/downstream_agent_prompt.md"
+  },
+  {
+   "what": "Family and novelty analyses",
+   "where": "data/pilot/108/family.md, novelty.md, novelty.json; data/eureka_shortlist.json"
+  },
+  {
+   "what": "Lean (text level)",
+   "where": "lean/OAI/Algebra/Determinantal/{Main,Centralizers,PencilSeparability,FiberDimension,Gates,AdjugateNormalForm,ConditionalBound,AffineSelectors,Model,InitialForm}.lean; lean/ComparatorChallenges/{PermanentCubic,SmoothInitialForm}.json; lean/docs/108.md"
+  },
+  {
+   "what": "Extractor DAG",
+   "where": "data/items/108_lean.json (BFS over uses edges)"
+  },
+  {
+   "what": "Paper",
+   "where": "preprints/A-cubic-lower-bound-...-September-24-2026/build/source/sections/{dimension,adjugate,conductor,transfer}.tex"
+  },
+  {
+   "what": "Sheshadri",
+   "where": "https://arxiv.org/abs/2606.13628 (v2 PDF)"
+  },
+  {
+   "what": "Ten Advances",
+   "where": "https://cdn.openai.com/pdf/ten-proofs-oai.pdf; https://github.com/openai/ten-proofs (Permanent.lean)"
+  },
+  {
+   "what": "Guo",
+   "where": "https://arxiv.org/abs/2609.29568v2"
+  }
+ ],
+ "search_log": [
+  "BFS from permanent_cubic_lower_bounds to critical_dimension_effective, spectral_effective_bound, gradient_forces_normalization_defect and critical_normalization_defect: all reachable. From smooth_initial_form_lower_bound: unreachable.",
+  "WebFetch arxiv.org/abs/2606.13628: metadata, no AI disclosure on the abs page. PDF v2 extracted: acknowledgement found at text line 1895-1896; 'No permanent claim' at line 1756.",
+  "WebSearch 'Ten Advances' gave the OpenAI announcement (1 Aug 2026); the openai.com page returned 403. ten-proofs README gave the PDF URL; PDF downloaded to scratchpad and extracted (253 pp). Grep for characteristic two/spectral/Severi/conductor/adjugate: background mentions only. Ch. 5 Stage 2-3 read.",
+  "ten-proofs Permanent.lean downloaded (27,563 lines); located the slicing interface (line 2757) and the minor-sum block.",
+  "curl arxiv.org/abs/2609.29568v2: abstract, comments and submission history read.",
+  "Grep of OAI for imports of OAI.Algebra.Determinantal outside its own directory: none.",
+  "WebSearch/WebFetch session limit reached; later checks (hafnian/sdc literature status) not verified online."
+ ],
+ "notes": "Text-level only; Lean not compiled. Files downloaded this session (Sheshadri PDF, Ten Advances PDF, ten-proofs Permanent.lean, arXiv pages) were saved in the session scratchpad and treated as data."
+}
