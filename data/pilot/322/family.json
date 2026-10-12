@@ -1,0 +1,1219 @@
+{
+ "family": 322,
+ "title": "Tingley's sphere-isometry problem",
+ "manuscripts": [
+  {
+   "id": "322",
+   "title": "A positive solution to Tingley's problem",
+   "manuscript_dir": "preprints/A-positive-solution-to-Tingleys-problem-September-23-2026",
+   "source_root": "data/raw/openai-math/preprints/A-positive-solution-to-Tingleys-problem-September-23-2026/build",
+   "tex_files": [
+    "main.tex",
+    "references.tex"
+   ],
+   "lines": 695,
+   "date": "September 23, 2026",
+   "author": "OpenAI"
+  }
+ ],
+ "file_line_convention": "main.tex:N = preprints/A-positive-solution-to-Tingleys-problem-September-23-2026/build/main.tex line N; Lean paths relative to lean/OAI/Analysis/SphereIsometry/ (openai-math fd4aeeb)",
+ "commit": "fd4aeeb",
+ "analyst_role": "FAMILY analyst (paper + Lean, text level; Lean NOT built by this agent - shared checkout, orchestrator compiles the comparator)",
+ "base_library_L": "Mathlib d13f23b + the paper's 24-entry bibliography (Banach1929, Banakh2022, ChengDong2011, DacunhaCastelle1972, Darbo1955, Ding2003, Fakhoury2025, FernandezPoloPeralta2018VN, HuangZhu2026Haagerup, HuangZhu2026Schatten, Kuratowski1930, Mankiewicz1972, MazurUlam1932, Mori2018, MoriOzawa2020, Nica2012, Schauder1930, Sperner1928, Tan2012Lp, Tanaka2014, Tingley1987, Vaisala2003, Vogt1973, Wang1994)",
+ "main_statement": {
+  "file_line": "main.tex:51-57 (thm:main)",
+  "latex": "Let $X,Y$ be nonzero real Banach spaces and let $f:S_X\\to S_Y$ be a surjective isometry. Then $T(0)=0,\\ T(x)=\\norm{x}f(x/\\norm{x})\\ (x\\ne0)$ is a surjective real-linear isometry. It is the unique linear extension of $f$.",
+  "paraphrase": "Tingley's problem (1987) has a positive answer in full generality: the metric of the unit sphere determines a real Banach space up to linear isometry, and every onto sphere isometry is the restriction of a unique onto linear isometry (the radial map). Equivalently every real Banach space has the Mazur-Ulam property. No dimension, separability, reflexivity, smoothness or strict convexity assumptions.",
+  "comparator": {
+   "file": "lean/ComparatorChallenges/TingleySphereIsometry.lean",
+   "json": "lean/ComparatorChallenges/TingleySphereIsometry.json",
+   "theorem": "OAI.Tingley.tingley_sphere_isometry_full",
+   "solution_module": "OAI.Analysis.SphereIsometry.Main",
+   "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+   ],
+   "model": "X Y : real NormedAddCommGroup+NormedSpace ℝ+CompleteSpace+Nontrivial; UnitSphere X := {x // ‖x‖ = 1} (subtype metric); f : UnitSphere X → UnitSphere Y with Isometry f and Function.Surjective f. Conclusion: ∃ T : X ≃ₗᵢ[ℝ] Y, T extends f on the sphere ∧ T 0 = 0 ∧ ∀ x ≠ 0, T x = ‖x‖ • f(normalize x) ∧ Surjective T ∧ every ℝ-linear map L : X →ₗ[ℝ] Y agreeing with f on the sphere equals T. Challenge file defines only UnitSphere and normalize (textually identical to Model.lean); definition_names is empty."
+  },
+  "match_check": "EXACT. Nonzero <-> Nontrivial; Banach <-> CompleteSpace; sphere metric = subtype of ambient metric (Subtype.dist_eq); surjective isometry <-> Isometry ∧ Surjective; conclusion includes radial formula, T(0)=0, surjectivity (also implied by ≃), linear isometry (≃ₗᵢ), and uniqueness among ALL real-linear maps (not assumed continuous) - at least as strong as the paper's 'unique linear extension'. Comparator definitions UnitSphere/normalize are textually identical to Model.lean:12-19.",
+  "formalized_vs_claimed": "Everything in thm:main is formalized. The remark that complex spaces get only real linearity (main.tex:59) is a non-claim. Lean imports Mathlib's Hahn-Banach (exists_dual_vector'') and Mazur-Ulam (IsometryEquiv.toRealLinearIsometryEquivOfMapZero) instead of re-proving them as the paper does; it re-proves ultrapowers, Kuratowski measure, Darbo, Schauder, Brouwer-for-simplex and Sperner (absent from Mathlib d13f23b).",
+  "note_for_comparator": "Single comparator target = headline. No sibling headline theorem; tingley_sphere_isometry (∃! form) in Extension.lean is the same result."
+ },
+ "trust_surface": {
+  "lean": "67 files, 9,273 lines in lean/OAI/Analysis/SphereIsometry; imports only Mathlib + Lean.Elab.Tactic.Omega + own files (no other OAI dir, no external libraries)",
+  "grep_scope": "all 67 .lean files, word-boundary grep",
+  "counts": {
+   "sorry": 0,
+   "admit": 0,
+   "axiom": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque (keyword)": 0,
+   "ofReduceBool/skipKernelTC": 0,
+   "partial def": 0,
+   "decide (Bool/Prop decisions, incl. `by decide` on small numerals)": 0,
+   "set_option maxHeartbeats": 0,
+   "set_option synthInstance.maxSize": 0,
+   "set_option (any)": 0
+  },
+  "note": "Only hit: the English word 'admit' in a docstring (KuratowskiTotalBounded.lean:15). Zero set_option, zero decide: an unusually clean trust surface. Comparator permits only the three standard axioms. Not compiled by this agent (shared checkout); compile verdict pending from orchestrator."
+ },
+ "labels": {
+  "A": {
+   "label": "A1",
+   "secondary": {
+    "hard_direction_form": "n/a (not a characterization; uniqueness clause is trivial)",
+    "explicit_rate": false,
+    "note_existential": "Formally ∀X,Y,f ∃!T, but T is the explicitly given radial map, so the content is a universal property of a named object (the radial map is linear isometric)."
+   },
+   "evidence": {
+    "quote": "Then T(0)=0, T(x)=||x|| f(x/||x||) (x≠0) is a surjective real-linear isometry. It is the unique linear extension of f.",
+    "file_line": "main.tex:52-56"
+   },
+   "confidence": "0.75",
+   "note": "Could be read as A2 (existence of extension) but the witness is fixed in the statement; the proof is a ∀-statement 'M=0' about all pairs and radii."
+  },
+  "B": {
+   "label": "B1",
+   "flags": {
+    "full_only_with_prior": false,
+    "adds_corollaries_for_other_conjectures": true,
+    "corollaries": [
+     "Every real Banach space has the Mazur-Ulam property (Cheng-Dong 2011 question; Mori-Ozawa program)",
+     "subsumes all class-specific Tingley results (ℓp, Lp, C0, C*-/von Neumann algebras, preduals, 2-dimensional (Banakh), polyhedral (Kadets-Martin), Schreier, Schatten, Haagerup Lp)",
+     "real-linear version of Tingley for complex spaces"
+    ],
+    "posed_by": "D. Tingley, Geom. Dedicata 22 (1987); open for all dimensions >=3 as of the 2018 Peralta survey (arXiv:1801.02473) and later sources"
+   },
+   "evidence": {
+    "quote": "Tingley's problem asks whether every surjective isometry f:S_X->S_Y extends to a real-linear isometry ... We prove the full assertion.",
+    "file_line": "main.tex:49"
+   },
+   "confidence": "0.85 (label); correctness conditional (see audit)",
+   "note": "Full positive solution, no special-case restriction. Uses only classical prior results (Mazur-Ulam, Hahn-Banach, Darbo, ultrapowers), none of the class-specific Tingley literature."
+  },
+  "C": {
+   "primary": "C3",
+   "primary_evidence": {
+    "quote": "If the defect of the original sphere map were positive, Lemma attainment and Proposition no-defect would contradict one another. Thus M=0.",
+    "file_line": "main.tex:455"
+   },
+   "secondaries": [
+    "C1 (inside the contradiction: construction of the return map, invariant convex set and aligned chords via a fixed point)",
+    "C4 (estimation chains: return-map contraction estimate eq:contraction; secant estimate lem:secant; convexity bounds)",
+    "C2 (finite-hull growth induction conv{v_0..v_n}⊂E; Darbo iteration C_{n+1}=clco g(C_n); Sperner parity induction)",
+    "C5 (weak: Darbo/Schauder/Sperner/ultrapowers/Mazur-Ulam are all re-proved in the paper; in Lean Mazur-Ulam and Hahn-Banach are invoked from Mathlib without re-proof)"
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "0 decide / native_decide / set_option in 67 files",
+    "file_line": "lean/OAI/Analysis/SphereIsometry/*.lean"
+   },
+   "ih_strengthened": true,
+   "ih_template": "strengthen to all subsets/substructures: the induction carries the whole convex hull conv{v_0..v_n}⊂E (a face of the ball) rather than just v_n∈E, so that a strictly positive combination can be fed to g and a single common support certifies the next hull",
+   "ih_evidence": {
+    "quote": "Suppose co{v_0,...,v_n}⊂E. Choose a strictly positive convex combination a_n of these vectors, and set v_{n+1}=g(a_n).",
+    "file_line": "main.tex:259"
+   },
+   "ih_note": "Strengthening is genuine and essential (without hull-tracking one cannot get a convex invariant set for Darbo) but matches the 'strengthen to all substructures' template; capped at N2 for that aspect. The extremal-counterexample structure (maximal defect M, attained) is a minimal-counterexample analogue: C3 with no descent.",
+   "confidence": "C3 0.85; secondaries 0.7"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "I10+I15 (+I11,I12 -> I16): the opposite-endpoint return map on extremal directions whose Kuratowski contraction factor (1-M/U)^2 is supplied by the hypothetical defect itself, turned into aligned chords by Darbo",
+   "evidence": {
+    "quote": "On this set an opposite-endpoint return map contracts the Kuratowski measure of noncompactness. Darbo's fixed-point theorem then supplies an aligned direction. The proof-specific work is the construction of this invariant set and the quantitative return-map estimate",
+    "file_line": "main.tex:110"
+   },
+   "confidence": "0.5",
+   "caveats": [
+    "Grades conditional on correctness of an unrefereed solution to a 39-year-old problem (hand-check below found no gap)",
+    "Quick literature checks only (WebSearch snippets); full novelty grading pending",
+    "Each ingredient (Darbo, facial/common-support propagation, ultrapower attainment, radial contact) is classical; the N3 claim rests on the composite device (return map + self-supplied contraction), which may be judged N2 if a fixed-point/return-map argument exists in the Tingley or Mankiewicz literature"
+   ],
+   "flag_builds_on_prior_model_produced_result": false,
+   "flag_note": "No cited work self-identifies as model-produced. HuangZhu2026Haagerup (arXiv:2608.30131) and HuangZhu2026Schatten (arXiv:2607.11244) are 2026 preprints, background-cited only; not checked for model provenance. No other OAI family imported."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Functional analysis",
+    "msc2020": "46B04 (isometric theory of Banach spaces), 46B20 (geometry of normed spaces); also 47H10/47H08, 46B08",
+    "lean_dir": "Analysis",
+    "note": ""
+   },
+   "lean_dir_field": "Analysis (OAI/Analysis/SphereIsometry)",
+   "method_fields": [
+    {
+     "field": "convex geometry of normed spaces (supporting functionals, Hahn-Banach, faces, radial functions)",
+     "tag": "essential"
+    },
+    {
+     "field": "nonlinear functional analysis / fixed-point theory (Kuratowski measure of noncompactness, Darbo, Schauder; MSC 47H08/47H10)",
+     "tag": "essential (cross-field)"
+    },
+    {
+     "field": "combinatorial topology (Sperner's lemma, Brouwer fixed point for the simplex; MSC 55M20/05)",
+     "tag": "essential (background, re-proved as Schauder's base)"
+    },
+    {
+     "field": "Banach-space ultrapowers / ultrafilters (local theory, 46B08; set theory 03E for free ultrafilters)",
+     "tag": "essential (attainment)"
+    },
+    {
+     "field": "isometric theory (Mazur-Ulam theorem)",
+     "tag": "essential (final step), same field"
+    },
+    {
+     "field": "one-variable convex analysis (secant slopes)",
+     "tag": "essential, trivial"
+    },
+    {
+     "field": "operator algebras (facial structure, Fernandez-Polo-Peralta, Mori, Mori-Ozawa)",
+     "tag": "background-cited (no theorem invoked)"
+    },
+    {
+     "field": "class-specific Tingley results (Wang, Ding, Tan, Tanaka, Banakh, Fakhoury, Huang-Zhu, Cheng-Dong, Mankiewicz)",
+     "tag": "background-cited (no theorem invoked)"
+    }
+   ],
+   "cross_field_count": 2,
+   "share_invoked_from_other_fields": "~0.4: of 7 invoked classical results (Hahn-Banach, ultrapower, Mazur-Ulam, Kuratowski/Darbo, Schauder, Sperner/Brouwer, free-ultrafilter existence), 3 are from other fields (fixed-point theory x2, combinatorial topology); ultrafilter existence is logic/set theory if counted (then 4/7)",
+   "confidence": "0.7"
+  }
+ },
+ "items": [
+  {
+   "id": "I01",
+   "kind": "definition (inline)",
+   "name": "Unit sphere S_X with inherited metric; surjective sphere isometry",
+   "file_line": "main.tex:49",
+   "statement": "S_X={x: ||x||=1} with the distance of X; f:S_X->S_Y a surjective isometry.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'For a real normed space X, write S_X=...'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential (vocabulary)",
+    "why": "goal vocabulary"
+   },
+   "analytic_check": "analytic: occurs in the goal statement (comparator UnitSphere)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Tingley 1987 setting"
+   },
+   "provisional_F": null,
+   "lean": "Model.lean:12 UnitSphere (abbrev, in target-signature closure), Model.lean:18 normalize"
+  },
+  {
+   "id": "I02",
+   "kind": "definition (in theorem)",
+   "name": "Radial (natural positive-homogeneous) extension T",
+   "file_line": "main.tex:51-57",
+   "statement": "T(0)=0, T(x)=||x|| f(x/||x||).",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'Any such extension must be the radial map below' (main.tex:49)"
+   },
+   "uses_items": [
+    "I01"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "the object proved linear"
+   },
+   "analytic_check": "analytic: literally in the goal",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "The 'natural homogeneous extension' F(x)=||x||Δ(x/||x||) is the standard object of the Tingley literature (Peralta survey arXiv:1801.02473; Kadets-Martin 2012)."
+   },
+   "provisional_F": null,
+   "lean": "RadialExtension.lean:27 radialExtension"
+  },
+  {
+   "id": "I03",
+   "kind": "definition (inline \\emph)",
+   "name": "Mazur-Ulam property",
+   "file_line": "main.tex:76-78",
+   "statement": "Every surjective sphere isometry from the given space onto the sphere of an arbitrary real Banach space extends linearly.",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'Cheng and Dong formulated this property explicitly [ChengDong2011]'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "background",
+    "why": "context only; the theorem implies every real Banach space has it"
+   },
+   "analytic_check": "n/a",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Cheng-Dong 2011"
+   },
+   "provisional_F": null,
+   "lean": null
+  },
+  {
+   "id": "I04",
+   "kind": "definition (inline \\emph)",
+   "name": "Support at a vector",
+   "file_line": "main.tex:116",
+   "statement": "A linear functional φ with ||φ||<=1 and φ(a)=||a|| (on a finite-dimensional span).",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'A \\emph{support} at a vector a ...'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "used in every geometric step (common supports, secant lemma, sign arguments)"
+   },
+   "analytic_check": "in L (norming functional; Mathlib exists_dual_vector)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "norming/supporting functional, textbook"
+   },
+   "provisional_F": null,
+   "lean": "Supports.lean:24 SupportAt"
+  },
+  {
+   "id": "I05",
+   "kind": "lemma",
+   "name": "Supports exist, extend; common support for norm-additive pairs (lem:support)",
+   "file_line": "main.tex:118-133",
+   "statement": "Finite-dim Hahn-Banach with norm bound; if ||αv+βw||=α+β (α,β>0, v,w unit) then v,w have a common support.",
+   "cited_or_new": {
+    "status": "cited, re-proved",
+    "cue": "'finite-dimensional Hahn--Banach extension argument [Banach1929]; we include its elementary proof'"
+   },
+   "uses_items": [
+    "I04"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "every common-support propagation step"
+   },
+   "analytic_check": "in L (Mathlib HahnBanach; Lean uses exists_dual_vector'')",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Hahn-Banach + trivial consequence"
+   },
+   "provisional_F": null,
+   "lean": "Supports.lean:28 exists_support, :110 supportAt_finite_enlargement; PositiveConvexFace.lean:53 support_eq_one_of_positive_sum"
+  },
+  {
+   "id": "I06",
+   "kind": "lemma",
+   "name": "Radial contact from an interior point (lem:radial)",
+   "file_line": "main.tex:135-143",
+   "statement": "If ||c||<1 each ray c+R_+v meets S_X at a unique c+ρ(v)v; ρ continuous, 1-||c||<=ρ<=1+||c||.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "no cue; elementary"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential (plumbing)",
+    "why": "defines p(v), u(v) of the return map"
+   },
+   "analytic_check": "near-analytic: Minkowski-gauge style radial function from L",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "radial function of a convex body w.r.t. an interior point (gauge function); classical"
+   },
+   "provisional_F": null,
+   "lean": "RadialContact.lean:97 existsUnique_radialContact, :124 radialRadius, :184 lipschitz_radialRadius (Lean proves Lipschitz, stronger than paper's continuity)"
+  },
+  {
+   "id": "I07",
+   "kind": "definition (display)",
+   "name": "Cross-radius defect D_q(x,y)=||f(x)-q f(y)||-||x-qy||, M=sup|D_q|",
+   "file_line": "main.tex:147-151 (eq:defect)",
+   "statement": "Signed defect over q in [0,1] and its absolute supremum M.",
+   "cited_or_new": {
+    "status": "new (as a named quantity)",
+    "cue": "'For a surjective sphere isometry define'"
+   },
+   "uses_items": [
+    "I01"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "the whole proof is 'M=0'; every later estimate is in terms of D_q and M"
+   },
+   "analytic_check": "ANALYTIC: unfold 'T is an isometry' at points αx, βy: ||T(αx)-T(βy)||=||αx-βy|| is equivalent to D_{β/α}(x,y)=0; D_q is the difference of the two sides of the goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "Difference of the two sides of the goal after unfolding T; the equivalence 'Tingley <=> natural homogeneous extension is isometric' is standard. Taking the sup is the obvious quantitative relaxation."
+   },
+   "provisional_F": null,
+   "lean": "Basic.lean:50 signedDefect, :54 HasDefectBound, :62 maxDefect"
+  },
+  {
+   "id": "I08",
+   "kind": "lemma (inline)",
+   "name": "Inverse-defect antisymmetry and 2-Lipschitz bound (eq:inverse-defect, eq:defectbound)",
+   "file_line": "main.tex:152-160",
+   "statement": "D^{f^{-1}}_q(f x,f y)=-D_q(x,y); |D_q|<=2min(q,1-q); 0<=M<=1.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "none"
+   },
+   "uses_items": [
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "fixes t in [M/2,1-M/2], and the f<->f^{-1} symmetry used for orientation and inverse configuration"
+   },
+   "analytic_check": "analytic (one-line triangle inequalities)",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "routine"
+   },
+   "provisional_F": null,
+   "lean": "Basic.lean:79 signedDefect_symm, :104 signedDefect_lipschitz, :121 signedDefect_le_endpoints"
+  },
+  {
+   "id": "I09",
+   "kind": "lemma",
+   "name": "Attainment of the maximal defect in completed ultrapowers (lem:attainment)",
+   "file_line": "main.tex:164-197",
+   "statement": "If M>0 for some f, there are Banach spaces, a surjective sphere isometry with |D_q|<=M everywhere, and x0,y,t in (0,1) with D_t(x0,y)=M exactly.",
+   "cited_or_new": {
+    "status": "cited technique, re-proved",
+    "cue": "'uses the standard Banach-space ultrapower construction [DacunhaCastelle1972]. We give the construction ...'"
+   },
+   "uses_items": [
+    "I07",
+    "I08",
+    "I26",
+    "I27"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "turns sup into max so the extremal configuration exists; Lean: 14% of whole DAG dominated"
+   },
+   "analytic_check": "not a subterm of the goal; uses L-ultrapowers (Mathlib has Ultrafilter, SeparationQuotient, Completion)",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "Standard 'pass to an ultrapower to attain an extremum' device of local Banach-space theory (Heinrich 1980, Dacunha-Castelle-Krivine). New only in being applied to sphere-isometry defects; analytic transfer."
+   },
+   "provisional_F": null,
+   "lean": "DefectAttainment.lean:51 positive_maxDefect_attained_or_inverse; UltraNormed.lean, UltraSphere.lean, SphereCompletion.lean, DefectSequence.lean:67"
+  },
+  {
+   "id": "I10",
+   "kind": "construction (display)",
+   "name": "Opposite-endpoint return map g (eq:return) with radii p,s,u,r and points x(v), z(v)",
+   "file_line": "main.tex:233-241",
+   "statement": "v -> x(v)=ty+p v in S_X -> f(x)=tb+s w -> opposite contact f(z)=tb-u w -> z -> g(v)=(ty-z)/r, r=||z-ty||.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'Starting from a direction at ty, we map its sphere contact to S_Y and take the opposite sphere contact ... A fixed direction for this return map will align the two chords.'"
+   },
+   "uses_items": [
+    "I06",
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (core)",
+    "why": "its fixed point IS the aligned configuration; ReturnMap.lean is the largest core file (52 DAG decls)"
+   },
+   "analytic_check": "NON-analytic: no 'return map' / opposite-contact composition occurs in the goal or in L (Mathlib) or in the cited Tingley literature as far as checked; it is built from f, f^{-1} and two radial contacts",
+   "provisional_N": {
+    "grade": "N3 (candidate, jointly with I11-I15)",
+    "why": "Novel auxiliary dynamical system on directions; nearest neighbours (facial/antipodal arguments, Tingley's own antipodality proof) do not use a fixed-point map. See eureka_candidates rank 1."
+   },
+   "provisional_F": "F3 (auxiliary construction) + F5 (recasting chord alignment as a fixed-point problem)",
+   "lean": "ReturnMap.lean:71-104 pRadius,xPoint,sRadius,wDirection,uRadius,zPoint,rRadius,returnSphere"
+  },
+  {
+   "id": "I11",
+   "kind": "definition + lemma",
+   "name": "Extremal direction set E={v: s(v)-p(v)=M} and the common-support propagation rule",
+   "file_line": "main.tex:243-256 (eq:equality)",
+   "statement": "E closed, nonempty; for v in E: r=u+M and ||pv+r g(v)||=p+r (so v,g(v) share a support); every unit l sharing a support with g(v) lies in E; g(E)⊂E.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'Moreover, every unit direction l sharing a support with g(v) belongs to E'"
+   },
+   "uses_items": [
+    "I05",
+    "I07",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (core)",
+    "why": "the propagation rule is what makes a convex invariant set possible; extremality forces equality in two triangle inequalities"
+   },
+   "analytic_check": "non-analytic (extremal set of an auxiliary map); the mechanism 'equality in triangle inequality => common support => face' is standard convexity",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Extremality propagating along faces of the ball is close to the facial method (Cheng-Dong 2011; Tanaka 2014 maximal convex sets preserved; Mori 2018); paper itself notes 'geometric affinity with facial methods'."
+   },
+   "provisional_F": null,
+   "lean": "ExtremalPropagation.lean:30 extremalSphere, :122 extremal_radius_identities, :153 extremal_common_support, :161 mem_extremal_of_common_support_return, :199 returnSphere_mem_extremal"
+  },
+  {
+   "id": "I12",
+   "kind": "construction",
+   "name": "Invariant closed convex set C by finite-hull growth with strictly positive combinations",
+   "file_line": "main.tex:258-267",
+   "statement": "v_{n+1}=g(a_n), a_n strictly positive convex combination of v_0..v_n; induction conv{v_0..v_n}⊂E via a common support φ that is 1 on all v_i; a_n chosen dense; C=closed conv{v_i}⊂E, g(C)⊂C.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'An invariant convex set.' ... 'Only this constructed set is separable; the ambient spaces are unrestricted.'"
+   },
+   "uses_items": [
+    "I05",
+    "I10",
+    "I11",
+    "I28"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (core)",
+    "why": "supplies the closed bounded convex domain Darbo needs, inside the sphere; Lean exists_return_invariant_convex dominates 29% of core"
+   },
+   "analytic_check": "non-analytic",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Iteratively building a face of the unit ball containing an orbit; the IH strengthening (track the whole convex hull) is templated ('strengthen to all substructures'), so capped at N2 per codebook. Device is clever but a variant of face-generation arguments."
+   },
+   "provisional_F": null,
+   "lean": "PositiveConvexFace.lean:28-152, InvariantConvexSet.lean:22-148, PositiveScheduling.lean, AlignmentSet.lean:21 exists_return_invariant_convex"
+  },
+  {
+   "id": "I13",
+   "kind": "definition",
+   "name": "Kuratowski measure of noncompactness χ",
+   "file_line": "main.tex:203-206",
+   "statement": "inf{δ>0: H covered by finitely many sets of diameter <=δ}.",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "[Kuratowski1930]"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "metric for the contraction"
+   },
+   "analytic_check": "not in Mathlib d13f23b (to our knowledge) but classical",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Kuratowski 1930"
+   },
+   "provisional_F": null,
+   "lean": "KuratowskiBasic.lean:20 FiniteDiameterCover, :71 coverRadii / chi"
+  },
+  {
+   "id": "I14",
+   "kind": "theorem",
+   "name": "Darbo fixed-point theorem, uniform strict-contraction form (thm:condensing)",
+   "file_line": "main.tex:209-215; proof main.tex:535-541",
+   "statement": "C nonempty closed bounded convex in a Banach space, g:C->C continuous with χ(gH)<=γχ(H), γ<1 => fixed point.",
+   "cited_or_new": {
+    "status": "cited, re-proved",
+    "cue": "'We use the uniform strict-contraction form of Darbo's fixed-point theorem [Darbo1955], proved in Appendix'"
+   },
+   "uses_items": [
+    "I13",
+    "I23",
+    "I25"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "Lean exists_fixedPoint_of_kuratowski_contraction dominates 37% of whole DAG (all background)"
+   },
+   "analytic_check": "in the literature (nonlinear analysis), not in Mathlib",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Transfer from nonlinear functional analysis (fixed-point theory, 47H10) into isometric Banach geometry. Cross-field TRANSFER, not a jump."
+   },
+   "provisional_F": null,
+   "lean": "CondensingFixedPoint.lean:26, CondensingIteration.lean"
+  },
+  {
+   "id": "I15",
+   "kind": "lemma (inline)",
+   "name": "Return-map two-point estimate and Kuratowski contraction χ(g(H))<=γχ(H), γ=(1-M/U)^2 (eq:contraction)",
+   "file_line": "main.tex:269-291",
+   "statement": "For v,v' in E: ||g(v)-g(v')||<=(up/rs)||v-v'||+2|u-u'|/r+2u|p-p'|/(rs); up/rs=(1-M/r)(1-M/s)<=γ<1; scalar terms killed by binning p,u.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'A strict decrease of noncompactness.'; intro: 'the quantitative return-map estimate'"
+   },
+   "uses_items": [
+    "I10",
+    "I11",
+    "I13"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (core)",
+    "why": "the positive defect M itself is what produces the contraction factor: the hypothetical counterexample supplies its own contraction"
+   },
+   "analytic_check": "non-analytic: the identities r=u+M, s=p+M (from extremality) convert two triangle inequalities into a strict contraction; nothing like it in L",
+   "provisional_N": {
+    "grade": "N3 (candidate, with I10)",
+    "why": "The key twist: the defect M>0 being ruled out is exactly the contraction margin; only the Lipschitz part contracts and the radial scalars are 'compact' (finite-dimensional) so χ ignores them. Uses the standard Darbo pattern 'contraction + compact perturbation'."
+   },
+   "provisional_F": "F3",
+   "lean": "ReturnMapEstimate.lean:82 returnSphere_pair_estimate, ReturnMapBounds.lean, ReturnMapNoncompactness.lean:60 chi_return_image_le, ReturnMapFixedPoint.lean:22"
+  },
+  {
+   "id": "I16",
+   "kind": "proposition",
+   "name": "Alignment of extremal chords (prop:alignment)",
+   "file_line": "main.tex:218-294",
+   "statement": "Under the attained configuration there are x=ty+pv, z=ty-rv, f(x)=tb+sw, f(z)=tb-uw with s-p=r-u=M, d=p+r=s+u=||x-z||<=2.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'Its central geometric step turns a hypothetical positive error into two aligned chords.'"
+   },
+   "uses_items": [
+    "I10",
+    "I11",
+    "I12",
+    "I14",
+    "I15"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (core)",
+    "why": "Lean exists_alignedConfiguration dominates 66% of whole DAG / 55% of core"
+   },
+   "analytic_check": "non-analytic",
+   "provisional_N": {
+    "grade": "N3 (candidate; composite of I10-I15)",
+    "why": "See rank 1 candidate."
+   },
+   "provisional_F": "F3/F5",
+   "lean": "Alignment.lean:61 exists_alignedConfiguration; AlignedConfiguration.lean:23 structure"
+  },
+  {
+   "id": "I17",
+   "kind": "definition (display)",
+   "name": "Chord ratios A=p/d, B=u/d, ε=1-t (eq:AB)",
+   "file_line": "main.tex:321-325",
+   "statement": "A,B>0, A+B=1-M/d<1.",
+   "cited_or_new": {
+    "status": "new (bookkeeping)",
+    "cue": "'set'"
+   },
+   "uses_items": [
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "guess": "plumbing",
+    "why": "parametrizes the case split"
+   },
+   "analytic_check": "analytic",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "abbreviation"
+   },
+   "provisional_F": null,
+   "lean": "AlignedConfiguration.lean:90-94 d, A, B"
+  },
+  {
+   "id": "I18",
+   "kind": "lemma",
+   "name": "Secant estimate (lem:secant)",
+   "file_line": "main.tex:330-374",
+   "statement": "With h=min(t/s,ε/u), θ=hs/p, K=secant slope of λ->||λv+hy|| on [p/s,r/u]: ε/p<=φ(v)<=K<=(1-B if B<=ε, B if B>ε) for every support φ at v+θy.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'We first derive a secant estimate from the defect bound.'"
+   },
+   "uses_items": [
+    "I07",
+    "I16",
+    "I17",
+    "I04"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (core)",
+    "why": "the weighted sum uΔ_x+sΔ_z cancels the unknown target norm ||w+hb|| exactly (since sr-up=Md) and h is chosen so one defect sits at a radius endpoint (0 or 1) where it vanishes"
+   },
+   "analytic_check": "non-analytic but elementary (convex secant slopes, support inequalities)",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Clever choice of two radii t-sh and t+uh so that the target-side norm cancels; ingredients are standard one-variable convexity. Not a reusable device beyond this configuration."
+   },
+   "provisional_F": null,
+   "lean": "ChordSecant.lean:22 support_direction_lower, :67-69 secantStep/secantTheta/secantSlope, :125/:142 secant_defect_first/opposite, :221 secant_bounds"
+  },
+  {
+   "id": "I19",
+   "kind": "lemma",
+   "name": "Large-ratio exclusion (lem:large) incl. strict support signs and radial perturbation",
+   "file_line": "main.tex:376-415",
+   "statement": "Neither A>ε nor B>ε: B>ε forces every support at v negative on y and A>ε; inverse config gives every support at w positive on b; then ||sw+ηb||>s and ||pv+ηy||<p contradict the defect bound at radius t-η.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'If either A or B exceeds ε, this estimate leads to a radial perturbation that increases the maximal defect.'"
+   },
+   "uses_items": [
+    "I18",
+    "I20",
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (core)",
+    "why": "one of the two regimes"
+   },
+   "analytic_check": "non-analytic, elementary",
+   "provisional_N": {
+    "grade": "N1-N2",
+    "why": "first-variation (perturb radius) argument at an extremum plus compactness of finite-dim dual ball; standard extremal-principle reasoning"
+   },
+   "provisional_F": null,
+   "lean": "LargeChord.lean:28-164 (largeB_impossible, small_ratios), RadialPerturbation.lean:87"
+  },
+  {
+   "id": "I20",
+   "kind": "lemma (display)",
+   "name": "Inverse configuration symmetry (eq:inverse)",
+   "file_line": "main.tex:395-400",
+   "statement": "(p',s',r',u')=(u,r,s,p), (v',w',y',b')=(-w,-v,b,y); (A',B')=(B,A).",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "'We record the inverse configuration explicitly.'"
+   },
+   "uses_items": [
+    "I08",
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "halves the case analysis"
+   },
+   "analytic_check": "analytic (relabeling)",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "symmetry bookkeeping"
+   },
+   "provisional_F": null,
+   "lean": "AlignedConfiguration.lean (inverse, inverse_A, inverse_B, inverse_d)"
+  },
+  {
+   "id": "I21",
+   "kind": "proposition",
+   "name": "No attained positive defect (prop:no-defect), small regime via convex functions F,G",
+   "file_line": "main.tex:417-450",
+   "statement": "A,B<=ε gives ε<=dA(1-B), ε<=dB(1-A) => ε<1/2 => p/t<r/ε, s/t>=u/ε; F(λ)=||y+λv||, G(λ)=||b+λw|| convex with F(p/t)=G(s/t)=1/t; then εF(r/ε)>1 >= ... contradicts ||y-z||=||b-f(z)||.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'the remaining regime contradicts a preserved sphere distance by convexity'"
+   },
+   "uses_items": [
+    "I18",
+    "I19",
+    "I20"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (core)",
+    "why": "closes the contradiction; Lean alignedConfiguration_impossible dominates 23% of core"
+   },
+   "analytic_check": "non-analytic, elementary",
+   "provisional_N": {
+    "grade": "N1-N2",
+    "why": "one-variable convexity comparison; Lean replaces it by two exact vector identities + triangle inequality (SmallChord.lean:80-131), showing it is shallow"
+   },
+   "provisional_F": null,
+   "lean": "ChordContradiction.lean:18 alignedConfiguration_impossible; SmallChord.lean:21-134"
+  },
+  {
+   "id": "I22",
+   "kind": "theorem (re-proved)",
+   "name": "Mazur-Ulam theorem (midpoint reflection, Nica/Vaisala/Vogt)",
+   "file_line": "main.tex:463-474",
+   "statement": "Onto isometries of real normed spaces are affine; with T(0)=0, T is linear.",
+   "cited_or_new": {
+    "status": "cited, re-proved",
+    "cue": "'For completeness we prove the affine step of Mazur--Ulam [MazurUlam1932] in the short reflection presentation of Nica'"
+   },
+   "uses_items": [
+    "I02"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "final step M=0 => linear"
+   },
+   "analytic_check": "in L: Mathlib Analysis.Normed.Affine.MazurUlam (Lean uses toRealLinearIsometryEquivOfMapZero)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Mazur-Ulam 1932"
+   },
+   "provisional_F": null,
+   "lean": "RadialExtension.lean:157-159 radialLinearIsometryEquiv via Mathlib"
+  },
+  {
+   "id": "I23",
+   "kind": "lemma",
+   "name": "χ invariant under closure and closed convex hull; nested sets with χ->0 have nonempty compact intersection (lem:chi)",
+   "file_line": "main.tex:482-499",
+   "statement": "Darbo's ingredients.",
+   "cited_or_new": {
+    "status": "cited, re-proved",
+    "cue": "'classical mechanism of Darbo'"
+   },
+   "uses_items": [
+    "I13"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (background)",
+    "why": "Darbo"
+   },
+   "analytic_check": "in literature",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Darbo 1955 / Kuratowski"
+   },
+   "provisional_F": null,
+   "lean": "KuratowskiConvexHull.lean, KuratowskiNested.lean, KuratowskiTotalBounded.lean, ConvexCoverRegroup.lean, CoefficientBins.lean"
+  },
+  {
+   "id": "I24",
+   "kind": "lemma",
+   "name": "Brouwer for the simplex via Sperner (lem:simplex)",
+   "file_line": "main.tex:502-515",
+   "statement": "Continuous self-map of a probability simplex has a fixed point; Sperner parity proved.",
+   "cited_or_new": {
+    "status": "cited, re-proved",
+    "cue": "'obtained below from the simplex argument using Sperner's labeling lemma [Sperner1928]'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential (background)",
+    "why": "needed for Schauder; Mathlib d13f23b has no Brouwer"
+   },
+   "analytic_check": "in literature; not in Mathlib",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Sperner 1928 / Brouwer"
+   },
+   "provisional_F": null,
+   "lean": "Sperner*.lean, Barycentric*.lean, Subdivision*.lean, FiniteComplex.lean, IteratedPoints.lean, SimplexFixedPoint.lean, SimplexLimit.lean (~2.9k lines with I23/I25)"
+  },
+  {
+   "id": "I25",
+   "kind": "lemma",
+   "name": "Schauder for compact convex sets via finite nets (lem:compactfixed)",
+   "file_line": "main.tex:517-533",
+   "statement": "Continuous self-map of nonempty compact convex K has a fixed point.",
+   "cited_or_new": {
+    "status": "cited, re-proved",
+    "cue": "[Schauder1930]"
+   },
+   "uses_items": [
+    "I24"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (background)",
+    "why": "Darbo reduces to it"
+   },
+   "analytic_check": "in literature",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Schauder 1930"
+   },
+   "provisional_F": null,
+   "lean": "CompactApproximation.lean, CompactConvexFixedPoint.lean:39"
+  },
+  {
+   "id": "I26",
+   "kind": "definition (inline)",
+   "name": "Free ultrafilter and ultralimit of bounded real sequences",
+   "file_line": "main.tex:176",
+   "statement": "Existence by maximal principle; unique limit along U.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'Choose a free ultrafilter U on N'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential (background)",
+    "why": "for I09"
+   },
+   "analytic_check": "in L (Mathlib Ultrafilter)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "textbook"
+   },
+   "provisional_F": null,
+   "lean": "UltraRealLimit.lean (realULim)"
+  },
+  {
+   "id": "I27",
+   "kind": "construction (inline)",
+   "name": "Banach ultrapower Q_X, unit representatives, induced sphere map F, completion",
+   "file_line": "main.tex:178-196",
+   "statement": "Seminorm lim_U||a_n||, quotient by kernel; termwise f; complete; spheres of completion = completion of spheres.",
+   "cited_or_new": {
+    "status": "cited, re-proved",
+    "cue": "[DacunhaCastelle1972]"
+   },
+   "uses_items": [
+    "I26"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (background)",
+    "why": "for I09"
+   },
+   "analytic_check": "in literature; Lean builds it from Mathlib SeparationQuotient + Completion",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Banach-space ultrapowers"
+   },
+   "provisional_F": null,
+   "lean": "UltraNormed.lean:41 UltraSequence, :146 UltraQuotient, :205 UltraCompletion; UltraSphere.lean:108 ultraSphereEquiv; SphereCompletion.lean:112,145"
+  },
+  {
+   "id": "I28",
+   "kind": "construction (inline)",
+   "name": "Dense positive coefficient schedule",
+   "file_line": "main.tex:265-267",
+   "statement": "Enumerate rational probability vectors, mix with uniform weights λ_n->0 so a_n strictly positive and dense in C.",
+   "cited_or_new": {
+    "status": "new (plumbing)",
+    "cue": "'Explicitly, enumerate all finite rational probability vectors'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "plumbing",
+    "why": "density bookkeeping"
+   },
+   "analytic_check": "analytic/plumbing",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "routine diagonal scheduling"
+   },
+   "provisional_F": null,
+   "lean": "PositiveScheduling.lean (RationalPrefix, baseStageWeights, stageMixing, positiveStageWeights, stageMean)"
+  },
+  {
+   "id": "I29",
+   "kind": "definition (Lean only)",
+   "name": "AlignedConfiguration record",
+   "file_line": "Lean OAI/Analysis/SphereIsometry/AlignedConfiguration.lean:23",
+   "statement": "Structure bundling x,z,v,w,p,r,s,u with the four endpoint equations and radius identities.",
+   "cited_or_new": {
+    "status": "new (packaging)",
+    "cue": "docstring 'The record retains the four actual endpoint equations'"
+   },
+   "uses_items": [
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "guess": "interface",
+    "why": "interface between alignment and contradiction halves"
+   },
+   "analytic_check": "analytic packaging of eq:chords/eq:radii",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "record type"
+   },
+   "provisional_F": null,
+   "lean": "AlignedConfiguration.lean:23"
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Finite-dimensional Hahn-Banach (norm-preserving extension)",
+   "bib_key": "Banach1929",
+   "locator": "lem:support",
+   "field": "functional analysis",
+   "used_at": "main.tex:116-133; all support arguments",
+   "status": "re-proved (paper); Mathlib exists_dual_vector'' (Lean)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Banach-space ultrapower construction",
+   "bib_key": "DacunhaCastelle1972",
+   "locator": "lem:attainment",
+   "field": "Banach space theory (local theory, 46B08)",
+   "used_at": "main.tex:162-197",
+   "status": "re-proved (paper and Lean)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Existence of free ultrafilters (Zorn)",
+   "bib_key": null,
+   "locator": "main.tex:176",
+   "field": "set theory / logic",
+   "used_at": "main.tex:176",
+   "status": "re-proved (paper); Mathlib (Lean)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Kuratowski measure of noncompactness (definition + properties)",
+   "bib_key": "Kuratowski1930",
+   "locator": "main.tex:203-206, lem:chi",
+   "field": "general topology / nonlinear analysis",
+   "used_at": "main.tex:269-291, 482-499",
+   "status": "re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Darbo fixed-point theorem (strict-contraction form)",
+   "bib_key": "Darbo1955",
+   "locator": "thm:condensing",
+   "field": "nonlinear functional analysis (47H10)",
+   "used_at": "main.tex:293",
+   "status": "re-proved (Appendix; Lean CondensingFixedPoint.lean)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Schauder fixed-point theorem (compact convex)",
+   "bib_key": "Schauder1930",
+   "locator": "lem:compactfixed",
+   "field": "nonlinear functional analysis / topology",
+   "used_at": "main.tex:540",
+   "status": "re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Sperner's lemma -> Brouwer for the simplex",
+   "bib_key": "Sperner1928",
+   "locator": "lem:simplex",
+   "field": "combinatorial topology",
+   "used_at": "main.tex:502-515",
+   "status": "re-proved (Lean: ~2k lines of barycentric subdivision)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Mazur-Ulam theorem (onto isometries are affine)",
+   "bib_key": "MazurUlam1932 / Nica2012 / Vaisala2003 / Vogt1973",
+   "locator": "main.tex:463-474",
+   "field": "isometric theory of normed spaces",
+   "used_at": "proof of thm:main",
+   "status": "re-proved (paper); Mathlib toRealLinearIsometryEquivOfMapZero (Lean)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Mankiewicz extension theorem",
+   "bib_key": "Mankiewicz1972",
+   "locator": "main.tex:63-66",
+   "field": "isometric theory",
+   "used_at": "intro only",
+   "status": "background-cited (explicitly not applicable)",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Tanaka: sphere isometries preserve maximal convex subsets",
+   "bib_key": "Tanaka2014",
+   "locator": "Lemma 3.5",
+   "field": "isometric theory",
+   "used_at": "intro (main.tex:84-95)",
+   "status": "background-cited ('geometric affinity')",
+   "essential_for_headline": false
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Reduce to M=0: define cross-radius defect D_q, M=sup|D_q|; D_0=D_1=0, 2-Lipschitz in q, antisymmetric under f<->f^{-1}.",
+   "items": [
+    "I07",
+    "I08"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "If M>0, pass to completed ultrapowers to get a surjective sphere isometry with global bound |D_q|<=M and an exact attainment D_t(x0,y)=M, 0<t<1.",
+   "items": [
+    "I09",
+    "I26",
+    "I27"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "Fix y,t; build the opposite-endpoint return map g on directions at ty; the extremal set E={s-p=M} is closed, nonempty, g-invariant, and closed under 'shares a support with g(v)'.",
+   "items": [
+    "I06",
+    "I10",
+    "I11",
+    "I05"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "Grow conv{v_0..v_n}⊂E by v_{n+1}=g(a_n) with strictly positive a_n; closure C is a nonempty closed bounded convex g-invariant subset of E⊂S_X.",
+   "items": [
+    "I12",
+    "I28"
+   ]
+  },
+  {
+   "step": 5,
+   "claim": "On E, ||g(v)-g(v')||<=γ||v-v'||+scalar terms with γ=(1-M/(1+t))^2<1 (because r=u+M, s=p+M); binning the scalars gives χ(gH)<=γχ(H).",
+   "items": [
+    "I15",
+    "I13"
+   ]
+  },
+  {
+   "step": 6,
+   "claim": "Darbo (re-proved via Schauder via Sperner/Brouwer) gives a fixed point: aligned chords x=ty+pv, z=ty-rv, f(x)=tb+sw, f(z)=tb-uw, s-p=r-u=M, d=p+r=s+u<=2.",
+   "items": [
+    "I14",
+    "I16",
+    "I23",
+    "I24",
+    "I25"
+   ]
+  },
+  {
+   "step": 7,
+   "claim": "Secant estimate: weighted defects at radii t-sh and t+uh cancel the target norm; gives ε/p<=φ(v)<=K<=1-B or B.",
+   "items": [
+    "I17",
+    "I18"
+   ]
+  },
+  {
+   "step": 8,
+   "claim": "Large regime (A>ε or B>ε): strict support signs on both sides (via inverse configuration) + small radial perturbation strictly beat the bound M. Small regime: ε<1/2 and ratio inequalities; convexity of ||y+λv||, ||b+λw|| contradicts ||y-z||=||f(y)-f(z)||.",
+   "items": [
+    "I19",
+    "I20",
+    "I21"
+   ]
+  },
+  {
+   "step": 9,
+   "claim": "Hence M=0, so the radial map T is an onto isometry fixing 0; Mazur-Ulam gives linearity; uniqueness by homogeneity.",
+   "items": [
+    "I02",
+    "I22"
+   ]
+  }
+ ],
+ "lean_structure": {
+  "files": 67,
+  "lines": 9273,
+  "declarations": 747,
+  "kind_counts": {
+   "theorem": 600,
+   "def": 122,
+   "instance": 12,
+   "abbrev": 8,
+   "structure": 5
+  },
+  "proof_dag_size": 579,
+  "core_vs_implementation": "Layer split of the 579-decl target DAG (by file): core Tingley argument 247 (43%: Basic, ReturnMap*, ExtremalPropagation, PositiveConvexFace, PositiveScheduling, InvariantConvexSet, Alignment*, AlignedConfiguration, ChordSecant, LargeChord, SmallChord, RadialPerturbation, ChordContradiction, Defect*, RadialExtension, Extension); re-proved fixed-point background 227 (39%: Sperner, barycentric subdivision, simplex Brouwer, Schauder, Kuratowski, Darbo); ultrapower/completion background 73 (13%); supports+radial contact 32 (6%). Lines: fixed-point background 2,941 vs core 2,706.",
+  "key_items_dag": {
+   "exists_alignedConfiguration (Alignment.lean:61)": "upstream 69% of whole DAG / 59% of core; dominated 66% whole / 55% core (includes all of Darbo/Schauder/Sperner)",
+   "exists_return_invariant_convex (AlignmentSet.lean:21)": "upstream 25% whole / 47% core; dominated 14% / 29% core",
+   "alignedConfiguration_impossible (ChordContradiction.lean:18)": "upstream 13% / 26% core; dominated 11% / 23% core",
+   "positive_maxDefect_attained_or_inverse (DefectAttainment.lean:51)": "dominated 14% whole (mostly ultrapower background) / 3% core",
+   "exists_fixedPoint_of_kuratowski_contraction (CondensingFixedPoint.lean:26)": "dominated 37% whole / 0% core (pure background)",
+   "returnSphere / pRadius / xPoint (ReturnMap.lean)": "definitions: 28-31% of core decls depend on pRadius/xPoint; returnSphere upstream 5% of core",
+   "signedDefect (Basic.lean:50)": "26% of core decls depend on it (signature vocabulary)"
+  },
+  "route_differences_from_paper": [
+   "Small-chord contradiction: Lean (SmallChord.lean:80-131) uses two exact vector identities r(ty+pv)=pV+(rt-pε)y and sW=u(tb+sw)+(sε-ut)b plus the triangle inequality instead of the paper's convex functions F,G - simpler, same inequalities.",
+   "Mathlib Hahn-Banach and Mazur-Ulam are imported rather than re-proved; radial contact is proved Lipschitz via IVT (paper: continuity via compactness).",
+   "Lean works with ambient totalized versions (returnAmbient etc.) of the sphere maps for the Darbo step; otherwise follows the paper section by section."
+  ],
+  "extractor_caveat": "extract_lean.py v3; its top candidate-def ranking (unitClass, iterData, UltraSequence) is background plumbing; the meaningful load-bearing signal is the lemma dominated shares above, recomputed relative to the core layer by this agent."
+ },
+ "eureka_candidates_ranked": [
+  "I10+I15 return map with self-supplied Kuratowski contraction",
+  "I11+I12 extremal common-support propagation / invariant face",
+  "I18 secant cancellation lemma",
+  "I07+I09 cross-radius defect with ultrapower attainment",
+  "I19/I21 chord contradiction"
+ ],
+ "eureka_candidates": [
+  {
+   "rank": 1,
+   "item": "I10+I15 (-> I16): opposite-endpoint return map g on extremal directions, contracting χ by γ=(1-M/U)^2, fixed point via Darbo = aligned chords",
+   "provisional_N": "N3",
+   "provisional_F": "F3 (auxiliary construction) / F5 (reformulate 'find aligned chords' as a fixed-point problem in noncompactness metric)",
+   "for": "Turns the vague hope 'extremality propagates' into a concrete dynamical system whose contraction margin is exactly the hypothetical defect M (r=u+M, s=p+M make up/rs<1). No dimension restriction - this is precisely what all prior work lacked (Tingley's antipodality and Banakh's 2D proof rely on compactness / finite dimension). Not a subterm of the goal or of L. Lean: the alignment lemma dominates 55% of the core DAG; the return-map/invariant-set layer is the largest core component. Elegant: the counterexample manufactures its own contraction.",
+   "against": "Every component is classical: Darbo's theorem, radial contact, triangle-inequality estimates. 'Iterate a geometrically defined map and take a fixed point' is a common analyst's move; the contraction estimate is two triangle inequalities. Might be judged N2 if a similar return/folding map exists in the Tingley or Mankiewicz literature (not found in quick search). Its reuse outside this problem is unclear (one-off device risk for the downstream test).",
+   "nearest_neighbour": "Tingley 1987 antipodality proof (finite-dim, uses compactness/extremal pairs); facial-structure method (Cheng-Dong 2011, Tanaka 2014, Mori 2018, Mori-Ozawa 2020); Darbo-Sadovskii fixed-point applications in nonlinear analysis (unrelated domain).",
+   "lit_check": "WebSearch (3 queries: Darbo/noncompactness + Mazur-Ulam/Tingley; Tingley ultrapower; positive homogeneous extension): no source links Darbo/measure-of-noncompactness arguments with sphere isometries; snippet-level only."
+  },
+  {
+   "rank": 2,
+   "item": "I11+I12: extremal set E closed under 'shares a support with g(v)', grown into a closed convex invariant face via strictly positive combinations",
+   "provisional_N": "N2",
+   "provisional_F": "F2 (strengthened invariant: hull-tracking) if promoted",
+   "for": "Gives a convex domain inside the sphere on which g acts - without it Darbo is unusable since S_X is not convex. Clever use of strict positivity so that one common support certifies the whole hull.",
+   "against": "Paper itself notes 'geometric affinity with facial methods'; common support = face of unit ball, the bread and butter of Cheng-Dong/Tanaka/Mori facial technology; IH strengthening is templated ('strengthen to all substructures') -> capped N2.",
+   "nearest_neighbour": "Tanaka 2014 Lemma 3.5 (maximal convex subsets preserved); Cheng-Dong 2011.",
+   "lit_check": "Not separately searched beyond the paper's own precedent remark."
+  },
+  {
+   "rank": 3,
+   "item": "I18: secant estimate - weighted defect sum at radii t-sh and t+uh cancels the unknown target norm (sr-up=Md)",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "Non-obvious radius choice making one defect vanish at an endpoint radius and the target side cancel exactly; drives both regimes.",
+   "against": "Elementary one-variable convexity; configuration-specific; Lean proves it in ~270 lines of algebra.",
+   "nearest_neighbour": "Standard support/secant-slope inequalities for convex functions.",
+   "lit_check": "none (elementary)"
+  },
+  {
+   "rank": 4,
+   "item": "I07+I09: cross-radius defect D_q with maximum attained in completed ultrapowers",
+   "provisional_N": "N1",
+   "provisional_F": null,
+   "for": "Recasts the problem as an extremal problem with an attained worst case, enabling first-variation (radial perturbation) arguments.",
+   "against": "D_q is the difference of the goal's two sides (analytic); ultrapower attainment is a textbook device of local Banach space theory.",
+   "nearest_neighbour": "Natural homogeneous extension F(x)=||x||Δ(x/||x||) of the Tingley literature; Heinrich/Dacunha-Castelle ultrapowers.",
+   "lit_check": "WebSearch confirms the homogeneous-extension formulation is standard (Peralta survey arXiv:1801.02473)."
+  },
+  {
+   "rank": 5,
+   "item": "I19+I21: chord contradiction (large regime via strict support signs + radial perturbation; small regime via convexity / Lean's two vector identities)",
+   "provisional_N": "N1-N2",
+   "provisional_F": null,
+   "for": "Closes a 39-year-old problem once alignment is available.",
+   "against": "Elementary; Lean's simpler small-chord route shows it is shallow; first-variation at an extremum is standard.",
+   "nearest_neighbour": "Extremal-principle perturbation arguments.",
+   "lit_check": "none"
+  }
+ ],
+ "correctness_audit": {
+  "verdict": "Extraordinary claim (full positive solution of Tingley's problem, open since 1987; quick search finds the general and dim>=3 cases described as open in all accessible sources). The paper is short (544 lines) and I re-derived every step of Sections 3-5 by hand: defect identities, attainment, the return-map equalities r=u+M and ||pv+rg(v)||=p+r, the propagation rule, hull growth, the contraction estimate (exact constants), the secant identity uΔ_x+sΔ_z=MdK (sr-up=Md), the large-ratio sign argument, the inverse relabeling (p',s',r',u')=(u,r,s,p), the small-regime inequalities, and the final convexity contradiction. I found no gap. Trust also rests on a 9.3k-line, sorry/axiom/decide-free Lean development whose comparator statement exactly matches the paper; compile verdict pending from orchestrator.",
+  "checked": [
+   "eq:defectbound (2-Lipschitz, D_0=D_1=0)",
+   "ultrapower: well-definedness of F, surjectivity via f^{-1}, defect bound and attainment pass to the completion",
+   "eq:equality and propagation rule (two triangle inequalities forced to equality)",
+   "hull growth: φ(a_n)=1 with strictly positive weights forces φ(v_i)=1",
+   "eq:contraction constants and γ=(1-M/U)^2",
+   "lem:secant algebra: Δ_x, Δ_z formulas, weighted cancellation, case B<=ε <=> t/s<=ε/u, φ(v)>=ε/p via two-support comparison",
+   "lem:large: strictness via reusing L at v+θy, r<1, A>ε; inverse configuration; perturbation compactness argument",
+   "prop:no-defect: ε<1/2, ratio inequalities, convexity bounds, ||y-z||=εF(r/ε), ||b-f(z)||=εG(u/ε)",
+   "comparator vs paper statement; comparator defs textually equal Model.lean",
+   "trust-surface grep"
+  ],
+  "concerns": [
+   "Unreviewed; no public expert reaction found (2026-10-12). The magnitude of the claim warrants independent expert review even though the hand-check passed.",
+   "Lean not compiled by this agent; if the comparator fails or needs extra axioms, the claim falls back to the (short, checkable) paper.",
+   "Subtle point to re-verify: g must be continuous on C as a map into X for Darbo (Lean handles via 'returnAmbient' totalization restricted to the extremal set; continuity of f^{-1} and radial contacts suffices).",
+   "Completeness of the ultrapower quotient is obtained by completing; the defect bound and attainment survive by continuity - fine, but the Lean SphereCompletion layer (sphere of completion = completion of sphere) is where an error would hide.",
+   "Paper re-proves Brouwer/Schauder/Darbo compactly (Appendix) - standard, but the Sperner sketch (main.tex:510) is terse; Lean covers it fully."
+  ],
+  "consistency_checks": [
+   "Extension.lean:27-49 no_attained_positive_defect = exists_alignedConfiguration + alignedConfiguration_impossible, mirroring Prop alignment + Prop no-defect",
+   "lean/docs/322.md scope statement matches comparator and paper (real linearity only for complex spaces)"
+  ]
+ },
+ "extraction_friction": [
+  "2 TeX files only (main.tex + references.tex thebibliography); no \\input of sections; 12 theorem-like environments + many inline display-level constructions (return map, E, invariant set, contraction) that a naive environment extractor would miss.",
+  "Key items are unnamed inline constructions inside the proof of prop:alignment (main.tex:233-294); the extractor must split one proof into four items.",
+  "Lean names are descriptive (returnSphere, extremalSphere, AlignedConfiguration), so paper-Lean joins are easy - unlike 103.",
+  "extract_lean.py candidate-def ranking is dominated by ultrapower/subdivision plumbing (unitClass, iterData, UltraSequence); 39% of the DAG is re-proved fixed-point background, 13% ultrapower background: core-relative shares had to be recomputed by file layer.",
+  "No reasoning trace for this family.",
+  "Lean not built (shared checkout); all Lean statements are text-level."
+ ]
+}
