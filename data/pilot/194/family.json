@@ -1,0 +1,1864 @@
+{
+ "family": 194,
+ "title": "Lech's multiplicity conjecture",
+ "manuscripts": [
+  {
+   "id": "194",
+   "title": "Lech's multiplicity conjecture",
+   "manuscript_dir": "preprints/Lechs-multiplicity-conjecture-September-23-2026",
+   "source_root": "preprints/Lechs-multiplicity-conjecture-September-23-2026/build",
+   "tex_files": [
+    "main.tex",
+    "sections/complex.tex",
+    "sections/lengths.tex",
+    "sections/reductions.tex",
+    "sections/charp.tex",
+    "sections/mixed.tex",
+    "sections/charzero.tex",
+    "references.tex"
+   ],
+   "lines": 3220,
+   "date": "September 23, 2026",
+   "author": "OpenAI"
+  }
+ ],
+ "file_line_convention": "paths relative to <manuscript_dir>/build; Lean paths relative to lean/ (openai-math fd4aeeb)",
+ "commit": "fd4aeeb",
+ "analyst_role": "FAMILY analyst (paper + Lean, text level; Lean not built by this agent - shared checkout, orchestrator compiles the comparator)",
+ "base_library_L": "Mathlib d13f23b + the paper's 29-entry bibliography (Lech60/64, Ma17 'Lech in dim 3', MaUlrich (Invent. 2023), IMW2022/2023/2025, Meng, Yhee, Hanes, Dutta83, Roberts89, Monsky83, Huneke HK survey, Polstra-Tucker, Kurano-Shimomoto, Faltings, Shimomoto, CLMST (Invent. 2026), Bhatt-Scholze, Heitmann97, Heitmann-Ma, Eisenbud-Schreyer (JAMS 2009), Eisenbud-Erman (JEMS 2017), AFH94, Artin69, BhattHochsterMa, Stacks, OpenAI SmallCM preprint)",
+ "main_statement": {
+  "file_line": "main.tex:80-88",
+  "latex": "Let $(R,\\mathfrak m)\\longrightarrow(S,\\mathfrak n)$ be a flat local homomorphism of nonzero Noetherian local rings. Then $e(R)\\leq e(S)$. There is no restriction on the dimensions, the residue fields, or the characteristics of the rings.",
+  "paraphrase": "Hilbert-Samuel multiplicity never decreases along a flat local map of Noetherian local rings (Lech 1960 conjecture), in full generality. Proof: reduce to complete, equidimensional, domain source, algebraically closed target residue field; build R -> T -> S=T/J with e(T)=e(R) and the complex F = P (x) K(x;T) (IMW2022); a new uniform lower bound for H_0 of complexes with deep entries over any ring with an abstract length (Thm 2.1, blowup + Eisenbud-Schreyer supernatural bundle with roots at critical points of prod(x+i)) gives e_HK(J+(x),T) >= e(T) in char p (then Ma's identity gives e(S)), a normalized-perfectoid-length version in mixed char (Heitmann BS replaces Frobenius, prime-filtration upper bound), and char 0 by Artin approximation + specialization.",
+  "comparator": {
+   "file": "lean/ComparatorChallenges/DuttaDomain.lean",
+   "json": "lean/ComparatorChallenges/DuttaDomain.json",
+   "theorem": "OAI.Lech.dutta_domain : DuttaDomainClaim",
+   "solution_module": "OAI.RingTheory.Multiplicity.Main",
+   "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+   ],
+   "statement": "for every complete (IsAdicComplete m) Noetherian local domain D of char p and every IsShortComplex F (cochain complex of finite free D-modules in degrees -dim D..0, finite-length homology, H^0 != 0): all Frobenius-twisted homology has finite length, duttaSequence converges to duttaMultiplicity, and multiplicity D <= duttaMultiplicity D p F.",
+   "model": "multiplicity = limUnder of d! l(A/m^N)/N^d; dimension = ringKrullDim.toNat; Frobenius complex via ModuleCat.extendScalars (iterateFrobenius); cochain indexing (homological degree i = cochain degree -i)"
+  },
+  "match_check": "Comparator = paper's Corollary 4.4 (cor:dutta-domain, sections/charp.tex:193-201) plus existence of the Dutta limit (which the paper cites from IMW2022 4.17). Definitions match Def 4.3 (charp.tex:148-169) up to cochain sign convention; shortEuler sums over the d+1 nonzero degrees, which is all of them by `bounded`. Tendsto clause prevents vacuity from limUnder junk values. No loophole found at text level.",
+  "formalized_vs_claimed": "Formalized: the Dutta corollary (and in fact for all complete char-p local rings, dutta_complete_charp drops IsDomain), hence the full uniform complex estimate Thm 2.1 in the generality of an abstract TorsionLength (complex_estimate_basis), the char-p normalized length on the perfection, Roberts' Frobenius homology theorem, coefficient fields, minimal reductions, residue extension, prime filtrations. NOT formalized: Lech's conjecture itself in any characteristic (no Cohen factorization, no Ma HK identity, no mixed-char perfectoid lengths/Heitmann, no char-0 Artin approximation). lean/docs/194.md: 'The paper's full flat-local result in arbitrary characteristic is outside it.'",
+  "note_for_comparator": "Headline != comparator target (pilot lesson 1). The comparator certifies the key new device (I08) in the char-p perfection instance only; the mixed-char and char-0 legs and the char-p Lech assembly (I32-I34) rest on the paper."
+ },
+ "trust_surface": {
+  "lean": "278 files, 53,953 lines in lean/OAI/RingTheory/Multiplicity; every file imports only Mathlib and its own directory (277 `import Mathlib`); no other OAI dirs",
+  "grep_scope": "all 278 .lean files, word-boundary grep",
+  "counts": {
+   "sorry": 0,
+   "admit": 0,
+   "axiom": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque (keyword)": 0,
+   "ofReduceBool/skipKernelTC": 0,
+   "partial def": 0,
+   "decide (Bool/Prop decisions, incl. `by decide` on small numerals)": 12,
+   "set_option maxHeartbeats": 0,
+   "set_option synthInstance.maxSize": 0,
+   "set_option autoImplicit true": "none (no set_option at all)"
+  },
+  "note": "12 `decide` occurrences: ComplexShape side conditions (`by decide`) and Bool-valued `decide (m i < e i)` in PrincipalCoverRegularRegularMap.lean - definitional, not search. 153 uses of Classical (choose etc.), permitted. No docstrings anywhere, so paper-Lean joins rely on file and namespace names. Compile status: pending (orchestrator)."
+ },
+ "labels": {
+  "A": {
+   "label": "A1",
+   "secondary": {
+    "hard_direction_form": "N/A",
+    "explicit_rate": false
+   },
+   "evidence": {
+    "quote": "Let $(R,\\mathfrak m)\\longrightarrow(S,\\mathfrak n)$ be a flat local homomorphism of nonzero Noetherian local rings. Then $e(R)\\leq e(S)$.",
+    "file_line": "main.tex:80-88"
+   },
+   "confidence": "0.85",
+   "note": "Universal inequality over all flat local maps. Not A3: the constant 1 is the conjectured one but no sharpness/rate is claimed. The key lemma Thm 2.1 is A3-style (explicit O_h(1/s) error, uniform constant A_h)."
+  },
+  "B": {
+   "label": "B1",
+   "flags": {
+    "full_only_with_prior_results": false,
+    "adds_corollaries_for_other_conjectures": true
+   },
+   "evidence": {
+    "quote": "We prove Lech's multiplicity conjecture ... The result holds in arbitrary dimension, with no restrictions on the residue fields or characteristics.",
+    "file_line": "main.tex:59-64"
+   },
+   "confidence": "0.8 (as a claim; correctness unreviewed)",
+   "note": "Resolves Lech 1960 fully. Corollary: IMW2022 Conjecture 8.1 (Dutta multiplicity >= e(R)) for complete char-p local domains (paper) / all complete char-p local rings (Lean). Uses Ma's reductions and HK identity and IMW's complex construction, but those are tools, not partial cases of the conjecture."
+  },
+  "C": {
+   "primary": "C4",
+   "primary_evidence": {
+    "quote": "Tensoring the resulting complex with a suitable vector bundle places its global hyperhomology in degree zero, modulo length zero, and hence gives a nonnegative Euler characteristic.",
+    "file_line": "main.tex:213-225; sections/complex.tex:530-643"
+   },
+   "secondaries": [
+    "C5 (Cohen factorization AFH, Ma's HK identity, CLMST perfectoid lengths, Heitmann Briancon-Skoda, Roberts, Eisenbud-Schreyer, Artin approximation - invoked without re-proof in the paper)",
+    "C1 (auxiliary constructions: T and F=P(x)K; twisted complex G on the blowup; supernatural bundle V with tuned roots; deep finite extensions D)",
+    "C3 (char 0: a strict counterexample is encoded and specialized to char p, contradiction)"
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "12 `decide` uses, all ComplexShape side conditions or Bool-valued definitions",
+    "file_line": "lean/OAI/RingTheory/Multiplicity/{CechIndexing,PrincipalCoverRegularRegularMap,RootOverlap,...}.lean"
+   },
+   "ih_strengthened": false,
+   "ih_template": "N/A",
+   "ih_evidence": {
+    "quote": "no induction drives the proof; limits q -> infinity (Frobenius / roots) and N -> infinity replace induction",
+    "file_line": "sections/charp.tex:94-107; sections/mixed.tex:398-420"
+   },
+   "ih_note": "Generalization appears instead as an abstraction of the length function (I05), not as an induction hypothesis.",
+   "confidence": "C4 primary 0.6 (C5 is a defensible primary: the proof is a chain of reductions into one estimate); secondaries 0.7"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "I08 uniform complex estimate (Thm 2.1), with its device I13+I16+I17+I18 (blowup twist G paired with a supernatural bundle whose roots sit at s*critical points of prod(x+i))",
+   "evidence": {
+    "quote": "The main technical ingredient is Theorem~\\ref{thm:complex}. ... The constant does not depend on the ring, the length theory, or any auxiliary finite extension.",
+    "file_line": "main.tex:183-196"
+   },
+   "confidence": "0.5",
+   "caveats": [
+    "Unreviewed claim of a 66-year-old conjecture; grade conditional on correctness of the non-formalized legs (mixed char, char 0, char-p assembly).",
+    "Each component of I08 has a neighbour (Eisenbud-Schreyer pairing, supernatural bundles, blowup twisting, normalized lengths); the N3 case is the assembled local/non-graded inequality, not any single component.",
+    "The root tuning I17 is forced once equal layer sums are demanded (low pivot distance) - see eureka_candidates.",
+    "Quick literature checks only; full grading in novelty phase."
+   ],
+   "flag_builds_on_prior_model_produced_result": false,
+   "flag_note": "Cites one OpenAI release preprint ([SmallCM], 'A Complete Local Domain without a Small Cohen-Macaulay Module') only as motivation in the introduction (main.tex:147-153); no theorem from it is invoked. All load-bearing citations are human-authored."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Algebra",
+    "msc2020": "13H15 (multiplicity theory), 13A35 (characteristic p methods), 13D22 (homological conjectures), 13B40/13D02",
+    "lean_dir": "RingTheory",
+    "note": "commutative algebra / local algebra"
+   },
+   "lean_dir_field": "RingTheory (OAI/RingTheory/Multiplicity)",
+   "method_fields": [
+    {
+     "field": "algebraic geometry (blowup Proj, sheaf/Cech cohomology on P^n, vector bundles, finite flat pushforward (P^1)^n -> P^n)",
+     "tag": "essential"
+    },
+    {
+     "field": "Boij-Soderberg theory (Eisenbud-Schreyer supernatural bundles and pairing positivity)",
+     "tag": "essential"
+    },
+    {
+     "field": "positive characteristic commutative algebra (Frobenius, Hilbert-Kunz, perfection, Roberts' theorem, Dutta multiplicity)",
+     "tag": "essential"
+    },
+    {
+     "field": "perfectoid / p-adic geometry (Bhatt-Scholze perfectoidization, CLMST perfectoid HK, Faltings normalized length)",
+     "tag": "essential (mixed char only)"
+    },
+    {
+     "field": "integral closure / plus closure (Heitmann Briancon-Skoda in mixed char)",
+     "tag": "essential (mixed char only)"
+    },
+    {
+     "field": "Artin approximation / reduction to characteristic p (model-theoretic flavour)",
+     "tag": "essential (char 0 only)"
+    },
+    {
+     "field": "homological algebra (Koszul complexes, spectral sequences, Serre quotients, mapping cones)",
+     "tag": "essential"
+    },
+    {
+     "field": "field theory (trace-dual bases, separability, linear disjointness)",
+     "tag": "essential (conductor bound)"
+    },
+    {
+     "field": "real analysis (Rolle's theorem, Riemann-sum error estimate)",
+     "tag": "essential, elementary"
+    },
+    {
+     "field": "Ulrich modules / lim Ulrich sequences (Hanes, Ma, Yhee, IMW)",
+     "tag": "background-cited (approach superseded)"
+    }
+   ],
+   "cross_field_count": 5,
+   "share_invoked_from_other_fields": "~0.35: of ~20 invoked external results, outside commutative algebra are Eisenbud-Schreyer Thm 6.1 (AG/Boij-Soderberg), Bhatt-Scholze perfectoidization, Faltings normalized length, Artin approximation, Stacks AG tags (flatness criteria, global dimension), Rolle; the rest (Ma, IMW, AFH, CLMST lengths, Heitmann, Monsky, Roberts, Polstra-Tucker, Nagata, Kurano-Shimomoto, Huneke HK associativity) are commutative algebra"
+  }
+ },
+ "items": [
+  {
+   "id": "I01",
+   "kind": "definition",
+   "name": "Hilbert-Samuel multiplicity e(A), e(H,A)",
+   "file_line": "main.tex:68-74,321-322",
+   "statement": "e(A)=lim d! l(A/a^N)/N^d; e(H,A) for an ideal of definition H.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'its Hilbert--Samuel multiplicity is'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "high (goal vocabulary)",
+    "why": "appears in the goal"
+   },
+   "analytic_check": "subterm of goal (Lean: OAI.Lech.multiplicity in target signature closure)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "textbook; Mathlib lacks it, comparator defines it via limUnder"
+   },
+   "provisional_F": null,
+   "lean": "ComparatorChallenges/DuttaDomain.lean:7-20 (dimension, colength, normalizedColength, multiplicity)"
+  },
+  {
+   "id": "I02",
+   "kind": "definition (inline)",
+   "name": "reduction / minimal reduction of an ideal",
+   "file_line": "main.tex:323-328",
+   "statement": "Q subset I with I^{n+1}=QI^n for n>>0; minimal if inclusion-minimal; e(Q,A)=e(I,A).",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'A \\emph{reduction} of an ideal $I$ is a subideal'"
+   },
+   "uses_items": [
+    "I01"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "used to pick parameters with e((x))=e(S), e((z))=e(D)"
+   },
+   "analytic_check": "in L (Northcott-Rees)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Northcott-Rees 1954"
+   },
+   "provisional_F": null,
+   "lean": "ReductionMultiplicity.lean:51 MinimalReduction.exists_minimal_reduction (infinite residue field)"
+  },
+  {
+   "id": "I03",
+   "kind": "definition",
+   "name": "short complex",
+   "file_line": "main.tex:156-158; sections/charp.tex:148-156",
+   "statement": "finite free complex in degrees 0..d with finite-length homology and H_0 != 0.",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'We use the following terminology of Iyengar--Ma--Walker'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "high for the Dutta corollary",
+    "why": "in hypothesis of comparator"
+   },
+   "analytic_check": "subterm of comparator statement (IsShortComplex)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "IMW2022 Sections 2.5-2.6"
+   },
+   "provisional_F": null,
+   "lean": "ComparatorChallenges/DuttaDomain.lean:34-39 IsShortComplex (cochain indexing, degrees -d..0)"
+  },
+  {
+   "id": "I04",
+   "kind": "definition",
+   "name": "Dutta multiplicity chi_infty(F)",
+   "file_line": "main.tex:232-243; sections/charp.tex:157-171",
+   "statement": "lim_n p^{-nd} sum (-1)^i l H_i(Phi^n F), Phi^n = Frobenius scalar extension.",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'its Dutta multiplicity~\\cite{Dutta} is'"
+   },
+   "uses_items": [
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "guess": "high for corollary",
+    "why": "comparator conclusion"
+   },
+   "analytic_check": "subterm of comparator (duttaSequence/duttaMultiplicity)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Dutta 1983; IMW2022 4.17"
+   },
+   "provisional_F": null,
+   "lean": "ComparatorChallenges/DuttaDomain.lean:43-58"
+  },
+  {
+   "id": "I05",
+   "kind": "definition (setup/axiom system)",
+   "name": "additive length lambda on T_I with zero-stability and parameter hypotheses",
+   "file_line": "sections/complex.tex:16-35, eq. (complex-length-hypotheses)",
+   "statement": "lambda: I-power-torsion C-modules -> [0,inf], additive, lambda(0)=0, direct sums and filtered colimits of length-zero modules killed by a common I^a have length 0; mu=lambda(C/I) in (0,inf); lambda(C/(z^a))=a^h mu; lambda H_i(z^a;C)=0 for i>0. C need not be Noetherian.",
+   "cited_or_new": {
+    "status": "new (packaging)",
+    "cue": "'Suppose that ... is additive ... We assume, in addition, that direct sums and filtered colimits of length-zero modules ...'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "every use of the estimate (char p perfection, perfectoid, Dutta) passes through this interface"
+   },
+   "analytic_check": "not in goal; abstraction of Faltings/CLMST normalized length axioms and of 'parameter ideal behaves like regular sequence modulo length zero'",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "close neighbour: normalized length of Faltings/Shimomoto/CLMST (Def 2.2.1) and the Serre-quotient 'almost' formalism; the axiom list is chosen exactly to run the blowup argument over non-Noetherian C. Interface, not a new idea."
+   },
+   "provisional_F": null,
+   "lean": "FiniteComplexTopInclusion.lean:296 TorsionLength; LechTorsionOf.lean:123 AllModuleLength; ComplexTheorem.lean:163-169 FilteredColimitZero/ZeroStability (Lean core estimate needs only DirectSumZero)"
+  },
+  {
+   "id": "I06",
+   "kind": "definition (inline)",
+   "name": "isomorphism modulo length zero (Serre quotient)",
+   "file_line": "sections/complex.tex:37-44",
+   "statement": "map with length-zero kernel and cokernel; length-zero objects form a Serre subcategory.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'We say that a map ... is an \\emph{isomorphism modulo length zero}'"
+   },
+   "uses_items": [
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium (plumbing)",
+    "why": "used in all comparisons"
+   },
+   "analytic_check": "in L (Serre quotient categories; Mathlib has IsSerreClass)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard"
+   },
+   "provisional_F": null,
+   "lean": "ObjectProperty.IsSerreClass used throughout (e.g. ReesRootPositivity.lean:27)"
+  },
+  {
+   "id": "I07",
+   "kind": "lemma (inline observation)",
+   "name": "filtered-complex nilpotence observation",
+   "file_line": "sections/complex.tex:46-53",
+   "statement": "a filtration-preserving map that is zero on E_1 lowers homology filtration; a composite of (#steps) such maps is zero on homology (mod length zero).",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'elementary observation'"
+   },
+   "uses_items": [
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "drives twist-map vanishing and Koszul tower"
+   },
+   "analytic_check": "in L",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard spectral-sequence fact"
+   },
+   "provisional_F": null,
+   "lean": "ReesRootNilpotence.lean, IdealFilteredHomotopy.lean"
+  },
+  {
+   "id": "I08",
+   "kind": "theorem",
+   "name": "Uniform complex estimate (Thm 2.1, thm:complex)",
+   "file_line": "sections/complex.tex:55-80 (proof 530-643)",
+   "statement": "Under I05, a finite free complex F in degrees 0..h, contractible off V(I), with alternating rank 0 and all differential entries in I^s satisfies lambda H_i(F)=0 (i>0) and lambda H_0(F) >= mu s^h (b_0 - (A_h/s) sum b_i), with A_h depending only on h (uniform in C, I, lambda, F).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The main technical ingredient is Theorem~\\ref{thm:complex}' (main.tex:183); 'The constant does not depend on the ring, the length theory, or any auxiliary finite extension'"
+   },
+   "uses_items": [
+    "I05",
+    "I09",
+    "I10",
+    "I11",
+    "I13",
+    "I14",
+    "I15",
+    "I16",
+    "I17",
+    "I18",
+    "I19"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (the whole new content)",
+    "why": "positive char: gives e_HK(J+(x)) >= e(T) which Ma (2017) identified as the missing control; mixed char: lower bound for normalized length; Dutta corollary. Lean: complex_estimate_basis upstream closure = 2679/3499 = 76.6% of the comparator DAG, dominated share 0.70."
+   },
+   "analytic_check": "non-analytic: neither the statement nor anything equivalent occurs in the goal (Lech's inequality / Dutta bound) or in L. It is an intermediate inequality for a much larger class (arbitrary length theories, arbitrary rings, arbitrary complexes with deep entries).",
+   "provisional_N": {
+    "grade": "N3",
+    "why": "eureka candidate: a new intermediate theorem that converts 'depth of differential entries' into a lower bound of exact leading order s^h*b_0 with coefficient 1. Nearest neighbours: Eisenbud-Schreyer pairing positivity (graded, polynomial ring), Eisenbud-Erman categorified duality, IMW2022/2023/2025 short-complex inequalities via (lim) Ulrich modules, Roberts/Dutta Frobenius limits. None gives a coefficient-1 local bound for arbitrary complexes."
+   },
+   "provisional_F": "F5 (change of representation: local complex -> twisted complex on the blowup paired with a supernatural bundle) with F3 (auxiliary bundle with tuned roots)",
+   "lean": "ComplexEstimate.lean:88 complex_estimate_basis; ComplexEstimateAllModule.lean:13; ComplexTheorem.lean:174 complex_theorem (full Theorem 2.1 interface)"
+  },
+  {
+   "id": "I09",
+   "kind": "lemma",
+   "name": "Koszul acyclicity modulo length zero (lem:acyclicity)",
+   "file_line": "sections/complex.tex:87-125",
+   "statement": "contractible off V(I) => H_i(F) killed by a fixed I-power, finite length, lambda H_i=0 for i>0 (via F (x) K_a ~ sum_T F[|T|]).",
+   "cited_or_new": {
+    "status": "new (standard technique)",
+    "cue": "'We first prove the homology assertion'"
+   },
+   "uses_items": [
+    "I05",
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "homology assertions of I08; also used in mixed char (power rule)"
+   },
+   "analytic_check": "near-analytic: Koszul splitting by null-homotopic multiplication is standard",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "standard (cf. Koszul/null-homotopy arguments, e.g. Roberts' book)"
+   },
+   "provisional_F": null,
+   "lean": "TorsionAcyclicity.lean:16 SourceGraded.acyclicity_finite_torsion (closure 91 decls, 2.6%)"
+  },
+  {
+   "id": "I10",
+   "kind": "definition",
+   "name": "blowup Y=Proj(sum I^n), L=IO_Y=O_Y(1), exceptional divisor E, closed immersion Y->P^{h-1}_C",
+   "file_line": "sections/complex.tex:131-146",
+   "statement": "Rees-algebra Proj; L invertible even for non-Noetherian C; E=Proj(gr_I C) -> P^{h-1}_{C/I}.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'we pass to a space on which $I$ becomes invertible'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "stage for the whole argument"
+   },
+   "analytic_check": "in L (Stacks; Mathlib has Proj but not used: Lean works with explicit Cech charts)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard blowup"
+   },
+   "provisional_F": null,
+   "lean": "Lean implements via chart rings C[I/z_i] and Cech complexes: ReesCoordinate.lean, ReesExceptionalRing.lean, FilteredCech*.lean, AlternatingCech*.lean"
+  },
+  {
+   "id": "I11",
+   "kind": "lemma",
+   "name": "graded comparison on the exceptional divisor (lem:complex-graded-comparison)",
+   "file_line": "sections/complex.tex:148-214",
+   "statement": "(C/I)[Z] -> gr_I C has length-zero kernel in each degree; H^v(P^{h-1}_{C/I},V(t)) -> H^v(E,V(t)) iso mod length zero; gr^t_I C ~ H^0(E,O(t)); lambda(C/I^M)=mu binom(M+h-1,h).",
+   "cited_or_new": {
+    "status": "new (standard technique)",
+    "cue": "'The graded surjection ... has length-zero kernel'"
+   },
+   "uses_items": [
+    "I05",
+    "I06",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "identifies all E-layer cohomology with that of projective space"
+   },
+   "analytic_check": "near-analytic: 'parameters behave like a regular sequence modulo length zero' is the standard Rees/Koszul argument",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "variant of the classical fact that a regular sequence has polynomial associated graded ring; here modulo length zero, using the colimit-stability axiom"
+   },
+   "provisional_F": null,
+   "lean": "IdealGradedRing.lean, IdealGradedLengthPiece.lean, SourceGradedCechHomology.lean, SourceGradedThickeningNat.lean (SourceGraded.* ~73 DAG decls)"
+  },
+  {
+   "id": "I12",
+   "kind": "definition",
+   "name": "chi_lambda (hyperhomology Euler characteristic on Y)",
+   "file_line": "sections/complex.tex:223-233",
+   "statement": "chi_lambda(D)=sum (-1)^k lambda H_k(Y,D) via finite Cech cover.",
+   "cited_or_new": {
+    "status": "new (notation)",
+    "cue": "'put'"
+   },
+   "uses_items": [
+    "I05",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "bookkeeping"
+   },
+   "analytic_check": "N/A notation",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "standard Euler characteristic w.r.t. an additive function"
+   },
+   "provisional_F": null,
+   "lean": "finiteHomologyEuler (ReesRootEulerPositivity.lean:12 etc.)"
+  },
+  {
+   "id": "I13",
+   "kind": "definition (construction)",
+   "name": "twisted complex G with G_i = L^{-is} (x) F_i = O_Y(-is)^{b_i}",
+   "file_line": "sections/complex.tex:235-253, eq. (complex-G)",
+   "statement": "on the blowup, divide the i-th differential by z_j^s (entries in L^s); F_Y subset G with quotient layers O_E(l)^{b_i}, l=-is..-1.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'If the differential entries belong to $I^s$, define a complex $G$ by'"
+   },
+   "uses_items": [
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "turns entry-depth s into a pure degree sequence (0,s,2s,...,hs) on Y; layers carry the whole error term"
+   },
+   "analytic_check": "not in goal; one step from 'entries in I^s' on a blowup (strict transform / dividing by the exceptional equation)",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "close to standard 'divide by the exceptional divisor' / deformation-to-normal-cone moves and to IMW2025 (Ulrich modules via blowup); in Boij-Soderberg language it makes F look like a pure complex of type (0,s,...,hs)"
+   },
+   "provisional_F": null,
+   "lean": "ReesRootG.lean (enlargedOn, cechZ, enlargedBicomplex), ReesRootInclusion.lean, ReesRootLayers.lean"
+  },
+  {
+   "id": "I14",
+   "kind": "lemma",
+   "name": "twist maps vanish on hyperhomology (lem:complex-twist-maps)",
+   "file_line": "sections/complex.tex:255-299",
+   "statement": "for D=F_Y(x)V or G(x)V: D(j+M)->D(j) is 0 on H for M>=M_D; hyperhomology I-power torsion of finite length.",
+   "cited_or_new": {
+    "status": "new (standard technique)",
+    "cue": "'There is an integer $M_D$ such that'"
+   },
+   "uses_items": [
+    "I07",
+    "I10",
+    "I11"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "gives eventual-image arguments and finiteness"
+   },
+   "analytic_check": "near-analytic",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "Cech + null-homotopy bookkeeping"
+   },
+   "provisional_F": null,
+   "lean": "ReesRootNilpotence.lean, ReesRootPowerPath.lean, ReesRootIteration.lean"
+  },
+  {
+   "id": "I15",
+   "kind": "lemma",
+   "name": "Euler comparison chi_lambda(F_Y)=lambda H_0(F) and chi(F_Y (x) V)=rank(V) chi(F_Y) (lem:complex-euler-comparison)",
+   "file_line": "sections/complex.tex:314-458",
+   "statement": "compare eventual images of the Koszul tower F/J_aF, the ordinary-power tower F/I^MF and the geometric tower RGamma(F_Y/L^M) modulo length zero; twist invariance from alternating rank 0; vector-bundle rank formula via a resolution by twists.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'Instead, we compare the images of homology maps from a sufficiently large thickening to a fixed smaller one'; intro: 'proved using finite filtrations and stabilized images of truncation maps. This comparison is needed because the ring $C$ need not be Noetherian.'"
+   },
+   "uses_items": [
+    "I09",
+    "I11",
+    "I12",
+    "I14"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "links the algebraic H_0 to geometric Euler characteristic; ~30% of Lean DAG upstream of scalarEuler_value, 55% upstream of unfilteredEuler_rank"
+   },
+   "analytic_check": "not in goal; formal-functions/theorem-on-formal-functions style comparison done without Noetherian hypotheses",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "neighbour: Grothendieck comparison / Mittag-Leffler eventual-image arguments, Eisenbud-Erman's comparison for graded complexes; the non-Noetherian stabilized-image version is a technical variant"
+   },
+   "provisional_F": null,
+   "lean": "ScalarCechEuler.lean:65 scalarEuler_value; ReesRootEulerRank.lean:37 unfilteredEuler_rank; ReesRootThickeningEuler.lean; KoszulPowerGrowth.lean"
+  },
+  {
+   "id": "I16",
+   "kind": "lemma",
+   "name": "bundle with prescribed cohomological roots (supernatural bundle) over Z (lem:complex-root-bundle)",
+   "file_line": "sections/complex.tex:468-526",
+   "statement": "for integers r_1>...>r_{h-1}, V=f_*O(-1-r_1,...,-1-r_n) for f:(P^1)^n -> P^n (multiplication of binary forms), rank (h-1)!; V(a) has cohomology in the single degree #{j: r_j>a}, Euler char prod(a-r_j), any base ring.",
+   "cited_or_new": {
+    "status": "cited (re-proved over Z)",
+    "cue": "'We use the product-of-projective-lines construction of Eisenbud--Schreyer \\cite[Theorem~6.1]{EisenbudSchreyer}, verifying its integral and base-change properties'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "the positivity device"
+   },
+   "analytic_check": "N/A (imported object)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Eisenbud-Schreyer 2009 Thm 6.1 (supernatural bundles); transfer from Boij-Soderberg theory"
+   },
+   "provisional_F": null,
+   "lean": "ProductSourceCover*.lean (246 DAG decls), RootUlrich*.lean, ProjectiveRoot (110), RootInvariants (124), RootCoaction, UniversalFactorMap: Cech-chart implementation of f_* via symmetric/ordered roots (RootUlrichModule.lean:93 exists_consecutive_basis)"
+  },
+  {
+   "id": "I17",
+   "kind": "definition (key choice)",
+   "name": "root positions r_j = round(s*rho_j), rho_j = roots of H'(x), H(x)=prod_{i=1}^h (x+i)",
+   "file_line": "sections/complex.tex:537-550, eq. (complex-root-positions)",
+   "statement": "Rolle: -(j+1)<rho_j<-j; for large s choose integers r_j with -(j+1)s<r_j<-js and |r_j - s rho_j|<=1. Interlacing forces cohomology of layers into the right degrees; the limiting positions make every layer sum s^{-h} sum_{l=-is}^{-1} prod(l-r_j) -> (H(0)-H(-i))/h = (h-1)! for all i=1..h.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The derivative of the following polynomial provides exactly these roots'"
+   },
+   "uses_items": [
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (tiny)",
+    "why": "without equal layer sums the alternating-rank identity would not isolate b_0 with coefficient 1; in Lean NumericalSupport (H, rho, roundedRoot, layer, uniform_from_sum_estimate) is only 36-38 decls (~1.1% of DAG)"
+   },
+   "analytic_check": "non-analytic w.r.t. goal; but once the layer-sum formula (I19) and the wish 'all layer sums equal' are written down, the choice is forced: Q(0)-Q(-i) constant for i=1..h with deg Q=h forces Q = c*prod(x+i)+const, so P=Q' has roots at critical points of H. Pivot distance ~1 from the ES interlacing condition.",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "interlacing roots between consecutive degrees (here -(j+1)s, -js) is exactly the Eisenbud-Schreyer choice that makes the pairing with a pure complex nonnegative; the extra tuning to critical points of prod(x+i) is a one-variable calculus step forced by the target. Syntactically tiny, Cook-like in size, but derivable. Graded N2, kept as candidate component of I08."
+   },
+   "provisional_F": null,
+   "lean": "NumericalSupport.lean:8-110 (H, derivative_root_exists, rho, roundedRoot, roundedRoot_positions), 117 integral_P, 500 uniform_from_sum_estimate"
+  },
+  {
+   "id": "I18",
+   "kind": "lemma (in proof)",
+   "name": "positivity chi_lambda(G (x) V) = lambda H_0 >= 0",
+   "file_line": "sections/complex.tex:554-596",
+   "statement": "with the root positions, E-layers of twists of D=G(x)V have cohomology forcing H_k(Y,D) to have length 0 for k != 0, so chi(D) = lambda H_0(Y,D) >= 0.",
+   "cited_or_new": {
+    "status": "new (local analogue)",
+    "cue": "'We claim that ... chi_lambda(D) >= 0'"
+   },
+   "uses_items": [
+    "I13",
+    "I14",
+    "I16",
+    "I17"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "the sign"
+   },
+   "analytic_check": "not in goal; local/non-graded analogue of the Eisenbud-Schreyer positivity of <beta(F), gamma(E)>",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Eisenbud-Schreyer 2009 Thm 0.2/0.3 positivity of the pairing for graded complexes with finite-length homology; Eisenbud-Erman categorified pairing. New is doing it on a blowup of a non-Noetherian local situation modulo length zero."
+   },
+   "provisional_F": null,
+   "lean": "ReesRootPositivity.lean:104,120 rootTotal_positive/negative_degree; ReesRootEulerPositivity.lean:55 rootTotal_euler_nonnegative (closure 1738 decls, 49.7%)"
+  },
+  {
+   "id": "I19",
+   "kind": "lemma (in proof)",
+   "name": "sum estimate and Riemann-sum error",
+   "file_line": "sections/complex.tex:598-643, eq. (complex-sum-estimate)",
+   "statement": "0 <= (h-1)! lambda H_0(F) + mu sum_i (-1)^i b_i sum_{l=-is}^{-1} prod_j (l-r_j); layer sums = (h-1)! s^h + O(s^{h-1}); alternating rank identity gives the bound.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "'We make the error in these sums explicit'"
+   },
+   "uses_items": [
+    "I15",
+    "I17",
+    "I18"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "final numerics"
+   },
+   "analytic_check": "analytic once I15-I18 are in place",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "left-endpoint Riemann sum with Lipschitz error"
+   },
+   "provisional_F": null,
+   "lean": "SumEstimate.lean:70 ReesRoot.sum_estimate; NumericalSupport.lean:253 riemann_error, 391 root_layer_estimates, 428 from_sum_estimate"
+  },
+  {
+   "id": "I20",
+   "kind": "definition",
+   "name": "Hilbert-Kunz multiplicity e_HK(H,D)",
+   "file_line": "sections/lengths.tex:10-20",
+   "statement": "lim l(D/H^[q])/q^dim D (Monsky).",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'The existence of this limit is Monsky's theorem'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "high (char p)",
+    "why": "target quantity in char p"
+   },
+   "analytic_check": "in L (literature)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Monsky 1983"
+   },
+   "provisional_F": null,
+   "lean": "implicit: exists_length_with_module_limit second clause (CharPModuleLength.lean:24-28)"
+  },
+  {
+   "id": "I21",
+   "kind": "theorem",
+   "name": "length inputs (thm:length-inputs)",
+   "file_line": "sections/lengths.tex:22-53",
+   "statement": "complete local domain D, perfect residue field: there are C and lambda with the stability axioms, lambda(C/(z^a))=a^h e((z),D), positive Koszul homology length 0, and lambda(C/HC)=e_HK(H,D) (char p) or <= e(H,D) (mixed char).",
+   "cited_or_new": {
+    "status": "new (assembly of cited)",
+    "cue": "'The mixed-characteristic input uses the perfectoid results of Cai--Lee--Ma--Schwede--Tucker'"
+   },
+   "uses_items": [
+    "I05",
+    "I20",
+    "I22",
+    "I23",
+    "I24",
+    "I25",
+    "I26",
+    "I27",
+    "I29"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "supplies hypotheses of I08"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "char p: Faltings normalized length on D_perf (CLMST Sec 3); mixed: CLMST Sec 4 perfectoid HK. Packaging of known results."
+   },
+   "provisional_F": null,
+   "lean": "CharPModuleLength.lean:18 CharP.exists_length_with_module_limit (char p only; closure 687 decls, 19.6%)"
+  },
+  {
+   "id": "I22",
+   "kind": "definition",
+   "name": "Faltings normalized length lambda_infty on Lambda-modules",
+   "file_line": "sections/lengths.tex:63-110",
+   "statement": "lambda_infty(M_n (x) Lambda)=p^{-nh} l_{A_n}(M_n) for finitely presented, inf over surjections for f.g., sup over f.g. submodules in general.",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'We use Faltings' normalized length~\\cite[Appendix~2]{Faltings}'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "the length theory"
+   },
+   "analytic_check": "in L (CLMST Def 2.2.1)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Faltings 2002, Shimomoto 2007, CLMST"
+   },
+   "provisional_F": null,
+   "lean": "NormalizedLength.* (70 DAG decls), NormalizedLengthTrivialRelation.lean, LechTorsionOf.lean"
+  },
+  {
+   "id": "I23",
+   "kind": "lemma",
+   "name": "normalized length limits (lem:normalized-limit)",
+   "file_line": "sections/lengths.tex:115-153",
+   "statement": "zero-length stability under sums/colimits; sup over increasing unions; colimit with lengths -> 0 has length 0.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "'We record explicitly the consequences for infinite modules'"
+   },
+   "uses_items": [
+    "I22"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "verifies I05 axioms"
+   },
+   "analytic_check": "analytic consequence of the definition",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "direct from definition"
+   },
+   "provisional_F": null,
+   "lean": "NormalizedLength namespace"
+  },
+  {
+   "id": "I24",
+   "kind": "construction",
+   "name": "finite stages B_q = A' (x)_{A^{1/q}} D^{1/q} exhausting C = D_perf",
+   "file_line": "sections/lengths.tex:157-192",
+   "statement": "Cohen-Gabber normalization A=k[[t]] subset D generically separable; B_q injects into C via linear disjointness.",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'The Cohen--Gabber normalization theorem~\\cite[Theorem~1.1]{KuranoShimomoto}'; 'this is also the setup of \\cite[Section~3]{CLMST}'"
+   },
+   "uses_items": [
+    "I22"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "computes lambda_infty on C"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "CLMST Section 3; Kurano-Shimomoto"
+   },
+   "provisional_F": null,
+   "lean": "Lean route differs: no Cohen-Gabber; SeparableOrder.order (FrobeniusIntermediatePowerMap.lean:153-273) uses the subring of elements separable over K and a purely-inseparable exponent; PerfectDomainStages.*, RootTower.*"
+  },
+  {
+   "id": "I25",
+   "kind": "lemma",
+   "name": "perfection conductor g^{1/q} C subset B_q (lem:perfection-conductor)",
+   "file_line": "sections/lengths.tex:201-233",
+   "statement": "trace-dual basis argument.",
+   "cited_or_new": {
+    "status": "cited (re-proved)",
+    "cue": "'a trace-dual proof of the conductor bound from \\cite[Lemma~2.3]{PolstraTucker}'"
+   },
+   "uses_items": [
+    "I24"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "kernel control"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Polstra-Tucker 2018 Lemma 2.3"
+   },
+   "provisional_F": null,
+   "lean": "TraceConductorPerfectOrder.lean, ComplexConductor.lean, TensorConductor.lean"
+  },
+  {
+   "id": "I26",
+   "kind": "lemma (in text)",
+   "name": "lambda_infty(C/HC)=e_HK(H,D); Koszul vanishing; e_HK((z))=e((z))",
+   "file_line": "sections/lengths.tex:235-346",
+   "statement": "stagewise q^{-h} l(D/H^[q]) up to O(1/q) error; Roberts' Frobenius homology theorem gives Koszul vanishing in the limit; Koszul Euler char = e.",
+   "cited_or_new": {
+    "status": "cited/re-derived",
+    "cue": "'We give a self-contained form of the finite-stage comparison in \\cite[Section~3 and Theorem~3.0.7]{CLMST}'"
+   },
+   "uses_items": [
+    "I22",
+    "I23",
+    "I24",
+    "I25"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "parameter hypotheses of I05 in char p"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "CLMST Thm 3.0.7; Roberts 1989 / Ma Thm 2.4; e_HK=e for parameter ideals is classical (Lech/Kunz)"
+   },
+   "provisional_F": null,
+   "lean": "NormalizationModuleLimit.lean:31; RobertsNormalization.lean:28 and RobertsPerfectResidue.lean:17 frobenius_homology_tendsto_zero (Roberts' theorem RE-PROVED in Lean via a conductor bound, RobertsSeparable.lean:50,117)"
+  },
+  {
+   "id": "I27",
+   "kind": "lemma",
+   "name": "finite-length module comparison lambda_infty(C (x) M)=lim q^{-h} l(Phi^n M) (lem:perfection-finite-length)",
+   "file_line": "sections/lengths.tex:359-414",
+   "statement": "same conductor argument for non-cyclic finite-length M.",
+   "cited_or_new": {
+    "status": "new (routine variant)",
+    "cue": "'we also need the same comparison for a finite-length module, since zeroth homology need not be cyclic'"
+   },
+   "uses_items": [
+    "I25",
+    "I26"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential for Dutta corollary",
+    "why": "links chi_infty to lambda"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "immediate variant of I26"
+   },
+   "provisional_F": null,
+   "lean": "CharPModuleLength.lean:18 first clause; DuttaPerfectionValue.lean:15"
+  },
+  {
+   "id": "I28",
+   "kind": "construction",
+   "name": "mixed-char length algebra C=(D (x)_A A_infty)_perfd and its normalized length",
+   "file_line": "sections/lengths.tex:416-472",
+   "statement": "Bhatt-Scholze perfectoidization; CLMST Cor 4.0.4 (Koszul homology almost zero), Prop 4.0.10 (almost isos same length), Def 4.0.8/Cor 4.0.18 (e_perfd(H) <= e(H), equality for parameter ideals).",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'For clarity, the exact perfectoid consequences used here are as follows'"
+   },
+   "uses_items": [
+    "I22"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (mixed char)",
+    "why": "length inputs in mixed char"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "CLMST 2026 Invent. Math.; Bhatt-Scholze 2022"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I29",
+   "kind": "lemma",
+   "name": "residue-field extension preserving e (lem:residue-extension)",
+   "file_line": "sections/reductions.tex:25-87",
+   "statement": "complete B -> B' flat, mB'=m_{B'}, residue field algebraic closure, e(B')=e(B); mixed case via unramified DVR tower V->V'.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'For every complete Noetherian local ring'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "reduction step and Dutta corollary"
+   },
+   "analytic_check": "in L",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard (gonflement / Bourbaki); also Ma Lemma 2.2"
+   },
+   "provisional_F": null,
+   "lean": "ResidueExtension.lean:31 residueExtension (char p only; uses ArbitraryCoefficientField.localSection)"
+  },
+  {
+   "id": "I30",
+   "kind": "lemma",
+   "name": "flat-local reductions (lem:reduction)",
+   "file_line": "sections/reductions.tex:89-135",
+   "statement": "reduce to complete, R domain, dim R = dim S > 0, residue field of S algebraically closed (Nagata localization, prime filtration additivity).",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'The argument also appears in \\cite[Lemma~2.2]{Ma}'"
+   },
+   "uses_items": [
+    "I29"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (routine)",
+    "why": "entry"
+   },
+   "analytic_check": "in L",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Ma 2017 Lemma 2.2; Nagata"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I31",
+   "kind": "definition (inline)",
+   "name": "perfect ideal",
+   "file_line": "sections/reductions.tex:144-148",
+   "statement": "pd_T(T/J)=grade J.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'A \\emph{perfect ideal} $J$'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "hypothesis of Ma's identity"
+   },
+   "analytic_check": "in L",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I32",
+   "kind": "proposition",
+   "name": "factorization R -> T -> S=T/J with perfect kernel and the complex F = P (x) K(x;T) (prop:setup)",
+   "file_line": "sections/reductions.tex:150-357",
+   "statement": "T=R(x)_A U from Cohen factorization of A->S (AFH); e(T)=e(R); J perfect of grade b; F has length h, F_0=T, contractible off t, entries in t, alternating rank 0; generic local rings complete intersections (regular in mixed char), each minimal prime over J on a unique component in mixed char.",
+   "cited_or_new": {
+    "status": "cited/adapted",
+    "cue": "'The passage from a flat local map to a short free complex follows the construction used by Iyengar--Ma--Walker \\cite[Proposition~8.3]{IMW2022}'"
+   },
+   "uses_items": [
+    "I30",
+    "I31"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "produces the complex to which I08 applies"
+   },
+   "analytic_check": "in L up to bookkeeping",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "IMW2022 Prop 8.3 + Ma 2017 Thm 3.1 + AFH 1994; part (iv) generic bookkeeping is new but routine"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I33",
+   "kind": "lemma",
+   "name": "Ma's Hilbert-Kunz identity e_HK(J+(x),T)=e((x),S) (lem:ma-hk)",
+   "file_line": "sections/charp.tex:9-37",
+   "statement": "for perfect J with complete-intersection T_Q at minimal primes.",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'The first assertion is \\cite[Lemma~4.2]{Ma}'"
+   },
+   "uses_items": [
+    "I31"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (char p)",
+    "why": "converts the I08 bound into e(S)"
+   },
+   "analytic_check": "in L",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Ma 2017 Lemma 4.2 and Sec 2.3"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I34",
+   "kind": "theorem",
+   "name": "Lech in characteristic p (thm:positive-characteristic)",
+   "file_line": "sections/charp.tex:39-137",
+   "statement": "apply I08 to F^(q) (x) D_perf on each component D=T/P with s=q-c; get e_HK(HD,D) >= e(D); HK associativity gives e_HK(H,T) >= e(T)=e(R); I33 gives e(S) >= e(R).",
+   "cited_or_new": {
+    "status": "new (assembly)",
+    "cue": "'Frobenius makes the differential entries of the complex ... arbitrarily deep'"
+   },
+   "uses_items": [
+    "I08",
+    "I21",
+    "I32",
+    "I33"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "case of main theorem"
+   },
+   "analytic_check": "not analytic as a whole but each step is one application",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "given I08 this is a short assembly; the strategy (Ma: e(S)=e_HK(J+(x),T), need lower bound) is in Ma 2017"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I35",
+   "kind": "corollary",
+   "name": "Dutta multiplicity >= e(R) for short complexes over complete char-p local domains (cor:dutta-domain) = IMW Conjecture 8.1 for complete char-p domains",
+   "file_line": "sections/charp.tex:193-313",
+   "statement": "alg. closed residue field: apply I08 to C (x) Phi^n F with C=R_perf, s=q-c; general residue field: base change + prime filtration + Hochster-Huneke/BHM Frobenius homology growth for small components.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'Iyengar, Ma, and Walker conjectured the lower bound in the next corollary for short complexes over all complete local rings'"
+   },
+   "uses_items": [
+    "I03",
+    "I04",
+    "I08",
+    "I21",
+    "I27",
+    "I29"
+   ],
+   "load_bearing_guess": {
+    "guess": "the comparator target",
+    "why": "Lean target dutta_domain"
+   },
+   "analytic_check": "this is the formalized statement",
+   "provisional_N": {
+    "grade": "N/A (theorem)",
+    "why": "corollary of I08; its own reuse would be a corollary, not device reuse"
+   },
+   "provisional_F": null,
+   "lean": "DuttaDomain.lean:46 dutta_domain via dutta_complete_charp (DuttaDomain.lean:22), which drops IsDomain; DuttaAlgClosed.lean:15; CyclicDutta.lean; DuttaInfinitePerfect.lean:19; DuttaMinimalEstimate.lean:22"
+  },
+  {
+   "id": "I36",
+   "kind": "lemma",
+   "name": "multiplicity can only increase when cutting by a dimension-lowering element of H (lem:mixed-quotient)",
+   "file_line": "sections/mixed.tex:11-31",
+   "statement": "f in H, dim A/(f)=t-1 => e(H,A) <= e(H,A/(f)).",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "(no citation)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "upper bounds"
+   },
+   "analytic_check": "in L",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "textbook (e.g. Matsumura 14.x)"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I37",
+   "kind": "lemma",
+   "name": "asymptotic upper bound for e(L+(x^N),B) (lem:mixed-asymptotic)",
+   "file_line": "sections/mixed.tex:33-169",
+   "statement": "dim B/L<d => O(N^{d-1}); L=q prime with B_q regular => <= N^d e((x),B/q) + O(N^{d-1}); via prime avoidance chosen to generate qB_q.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "'The following two multiplicity estimates supply that upper bound'"
+   },
+   "uses_items": [
+    "I36"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (mixed)",
+    "why": "coefficient-one component count"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "standard prime-avoidance + associativity; regularity gives coefficient 1"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I38",
+   "kind": "construction",
+   "name": "deep finite extensions via roots of parameters and Heitmann's integral-extension Briancon-Skoda",
+   "file_line": "sections/mixed.tex:201-238",
+   "statement": "z_i = u_i^{1/q}; Heitmann/HeitmannMa Prop 2.8 puts b D inside (z)^{q-h} D for a finite normal domain D; rank r cancels: q^h e((z),D)=r e(B).",
+   "cited_or_new": {
+    "status": "cited tools, new combination",
+    "cue": "'In mixed characteristic, roots of parameters and Heitmann's integral-extension Brian\\c{c}on--Skoda theorem ... replace Frobenius'"
+   },
+   "uses_items": [
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (mixed)",
+    "why": "substitute for Frobenius depth"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "replacing Frobenius by p-power roots/absolute integral closure is the standard mixed-char move (Heitmann, Andre, Bhatt); combination with rank normalization is a natural variant"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I39",
+   "kind": "lemma (in proof)",
+   "name": "power rule lambda(C/(J,x^N)C)=N^d lambda(C/(J,x)C) via mapping cones",
+   "file_line": "sections/mixed.tex:288-329",
+   "statement": "Euler characteristic linear in each exponent using I09 for all cones.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "'To check the power rule without any finiteness assumption on partial Koszul complexes'"
+   },
+   "uses_items": [
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "guess": "high (mixed)",
+    "why": "allows the N-limit"
+   },
+   "analytic_check": "analytic",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "standard Koszul linearity"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I40",
+   "kind": "lemma (in proof)",
+   "name": "prime-filtration upper bound and two-limit argument (N then q)",
+   "file_line": "sections/mixed.tex:331-443",
+   "statement": "lambda(C/(J,x^N)C)/r <= sum_j e(H_{j,N},B); N->inf gives a bound independent of D,C,lambda; combine with I08 lower bound, then q->inf; sum over components with coefficient 1 (generic regularity).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'Only after this limit do we let the depth of the differential entries tend to infinity' (main.tex:289-290)"
+   },
+   "uses_items": [
+    "I08",
+    "I21",
+    "I32",
+    "I37",
+    "I38",
+    "I39"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (mixed)",
+    "why": "replaces Ma's HK identity, unavailable in mixed char"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "replaces I33 by a one-sided bound; 'separate limits so constants depending on auxiliary extensions drop out' is a standard analytic hygiene step; the reason coefficient one is retained is generic regularity of T (I32 iv)"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I41",
+   "kind": "theorem",
+   "name": "Lech in mixed characteristic (thm:mixed-characteristic)",
+   "file_line": "sections/mixed.tex:171-443",
+   "statement": "e(S) >= e(T) = e(R) when R has mixed characteristic.",
+   "cited_or_new": {
+    "status": "new (assembly)",
+    "cue": ""
+   },
+   "uses_items": [
+    "I32",
+    "I38",
+    "I40",
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "case of main theorem"
+   },
+   "analytic_check": "",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "assembly given I08, I38, I40"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I42",
+   "kind": "lemma",
+   "name": "finite free reduction with common coefficient field (lem:charzero-finite-free)",
+   "file_line": "sections/charzero.tex:15-78",
+   "statement": "R -> R'=L[[X]]/I L[[X]] -> S finite free, e(R')=e(R).",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'beginning with the finite free reduction of \\cite[Lemma~5.1]{Ma}'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential (char 0)",
+    "why": ""
+   },
+   "analytic_check": "in L",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Ma 2017 Lemma 5.1"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I43",
+   "kind": "lemma",
+   "name": "polynomial certificate of a strict counterexample (lem:charzero-certificate)",
+   "file_line": "sections/charzero.tex:82-316",
+   "statement": "finite system over Z[t] encoding algebra structures, freeness, locality, e(R)>=r via vanishing (u-r+1)-minors + reduction relation, e(S)<=e(S_0) via monic initial relations of gr S_0.",
+   "cited_or_new": {
+    "status": "adapted",
+    "cue": "'We follow the reduction-and-approximation strategy of \\cite[Section~5]{Ma}'; 'it is enough to preserve a lower bound for the source multiplicity and an upper bound for the target'"
+   },
+   "uses_items": [
+    "I42"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (char 0)",
+    "why": "transfer to char p"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "variant of Ma Sec 5 (and of standard reduction-mod-p encodings); new detail: one-sided bounds via minors and initial ideals instead of tracking resolutions"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I44",
+   "kind": "lemma",
+   "name": "Artin approximation + specialization to an algebraically closed field of char p (lem:charzero-specialization)",
+   "file_line": "sections/charzero.tex:324-390",
+   "statement": "",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'Artin approximation \\cite[Theorem~1.10]{Artin} gives a solution'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential (char 0)",
+    "why": ""
+   },
+   "analytic_check": "in L",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Artin 1969 + spreading out (Zariski's lemma)"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I45",
+   "kind": "theorem",
+   "name": "Lech in residue characteristic zero (thm:charzero)",
+   "file_line": "sections/charzero.tex:392-419",
+   "statement": "contradiction with I34 via I42-I44.",
+   "cited_or_new": {
+    "status": "new (assembly)",
+    "cue": "'A strict counterexample would therefore contradict the characteristic-$p$ case'"
+   },
+   "uses_items": [
+    "I34",
+    "I42",
+    "I43",
+    "I44"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "case of main theorem"
+   },
+   "analytic_check": "",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "assembly"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I46",
+   "kind": "theorem",
+   "name": "Main theorem assembly (sec:assembly)",
+   "file_line": "main.tex:344-357",
+   "statement": "reductions + three characteristic cases.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": ""
+   },
+   "uses_items": [
+    "I30",
+    "I34",
+    "I41",
+    "I45"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": ""
+   },
+   "analytic_check": "",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "case split"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "L01",
+   "kind": "Lean device (route difference)",
+   "name": "SeparableOrder: subring of D separable over Frac(A) used instead of Cohen-Gabber",
+   "file_line": "lean/OAI/RingTheory/Multiplicity/FrobeniusIntermediatePowerMap.lean:153-273; NormalizationModuleLimit.lean:9-99",
+   "statement": "order A D K L = {x in D : x separable over K}; every x^{p^e} lies in it (purely inseparable exponent), so Frobenius-normalized limits can be computed over a generically separable order.",
+   "cited_or_new": {
+    "status": "new in Lean (not in paper)",
+    "cue": "no docstring; the paper instead cites Kurano-Shimomoto"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "replaces a cited theorem in the char-p length construction (closure of exists_normalization_frobenius_module_limit 324 decls, 9.3%)"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "standard trick (separable closure + purely inseparable exponent); avoids formalizing Cohen-Gabber"
+   },
+   "provisional_F": null,
+   "lean": ""
+  },
+  {
+   "id": "L02",
+   "kind": "Lean result (stronger than comparator)",
+   "name": "dutta_complete_charp: Dutta bound for ALL complete Noetherian local rings of char p (no domain hypothesis)",
+   "file_line": "lean/OAI/RingTheory/Multiplicity/DuttaDomain.lean:22-43; DuttaAlgClosed.lean:15-38",
+   "statement": "IMW Conjecture 8.1 in characteristic p for every complete local ring, via prime filtration (cyclicDutta) exactly as in the paper's residue-extension step.",
+   "cited_or_new": {
+    "status": "new (implicit in paper's proof)",
+    "cue": "comparator restricts to IsDomain; the solution lemma does not need it"
+   },
+   "uses_items": [
+    "I35"
+   ],
+   "load_bearing_guess": {
+    "guess": "target",
+    "why": "dominated share 0.997"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N/A",
+    "why": "corollary of I08; worth recording as a formalized statement stronger than the paper's stated corollary"
+   },
+   "provisional_F": null,
+   "lean": ""
+  },
+  {
+   "id": "L03",
+   "kind": "Lean re-proof of cited theorem",
+   "name": "Roberts' Frobenius homology theorem (positive homology of Phi^n F is o(p^{nd}))",
+   "file_line": "lean/OAI/RingTheory/Multiplicity/RobertsNormalization.lean:28; RobertsPerfectResidue.lean:17; RobertsSeparable.lean:50-155; FrobeniusHomologySmall.lean:61",
+   "statement": "proved via a conductor bound on finite separable stages rather than cited.",
+   "cited_or_new": {
+    "status": "cited in paper, re-proved in Lean",
+    "cue": "paper: 'The Frobenius homology estimate of Roberts~\\cite{Roberts}, in the form \\cite[Theorem~2.4]{Ma}'"
+   },
+   "uses_items": [
+    "I26"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "Koszul vanishing and existence of Dutta limit"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Roberts 1989 (re-proved)"
+   },
+   "provisional_F": null,
+   "lean": ""
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Supernatural vector bundles via (P^1)^n -> P^n",
+   "bib_key": "EisenbudSchreyer",
+   "locator": "Thm 6.1",
+   "field": "algebraic geometry / Boij-Soderberg",
+   "used_at": "sections/complex.tex:462-526",
+   "status": "re-proved over Z (paper); formalized from scratch in Lean (ProductSourceCover/RootUlrich)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Cohen factorization of local homomorphisms",
+   "bib_key": "AFH",
+   "locator": "via Ma Thm 3.1",
+   "field": "commutative algebra",
+   "used_at": "sections/reductions.tex:208-217",
+   "status": "cited",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Construction F = P (x) K(x;T) for Lech",
+   "bib_key": "IMW2022",
+   "locator": "Prop 8.3",
+   "field": "commutative algebra",
+   "used_at": "sections/reductions.tex:139-143",
+   "status": "cited/adapted",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Ma's Hilbert-Kunz identity e_HK(J+(x),T)",
+   "bib_key": "Ma",
+   "locator": "Lemma 4.2, Sec 2.3",
+   "field": "commutative algebra (char p)",
+   "used_at": "sections/charp.tex:9-37",
+   "status": "cited",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Reductions to complete domain, equal dimension",
+   "bib_key": "Ma",
+   "locator": "Lemma 2.2, Thm 2.1 (Nagata)",
+   "field": "commutative algebra",
+   "used_at": "sections/reductions.tex:14-135",
+   "status": "re-proved briefly",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Finite free reduction and char-0 strategy",
+   "bib_key": "Ma",
+   "locator": "Lemma 5.1, Section 5",
+   "field": "commutative algebra",
+   "used_at": "sections/charzero.tex:3-78",
+   "status": "re-proved/adapted",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Hilbert-Kunz associativity",
+   "bib_key": "HunekeHK",
+   "locator": "Thm 3.14",
+   "field": "commutative algebra (char p)",
+   "used_at": "sections/charp.tex:109-122",
+   "status": "cited",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Existence of Hilbert-Kunz limit",
+   "bib_key": "Monsky",
+   "locator": "",
+   "field": "commutative algebra",
+   "used_at": "sections/lengths.tex:19",
+   "status": "cited",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Frobenius homology o(p^{nd}) for complexes of length dim",
+   "bib_key": "Roberts",
+   "locator": "via Ma Thm 2.4",
+   "field": "commutative algebra (char p)",
+   "used_at": "sections/lengths.tex:304-313; charp.tex:171-186",
+   "status": "cited (paper); re-proved in Lean",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Hochster-Huneke Frobenius homology growth on small components",
+   "bib_key": "BhattHochsterMa",
+   "locator": "Thm 5.2",
+   "field": "commutative algebra",
+   "used_at": "sections/charp.tex:279-290",
+   "status": "cited (Dutta corollary only); Lean has its own FrobeniusHomologySmall",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Faltings normalized length",
+   "bib_key": "Faltings; Shimomoto; CLMST",
+   "locator": "Faltings App. 2; CLMST Def 2.2.1, Props 2.2.3, 2.2.6(a)",
+   "field": "p-adic geometry / commutative algebra",
+   "used_at": "sections/lengths.tex:63-110",
+   "status": "cited; Lean builds its own char-p normalized length",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Cohen-Gabber normalization",
+   "bib_key": "KuranoShimomoto",
+   "locator": "Thm 1.1",
+   "field": "commutative algebra",
+   "used_at": "sections/lengths.tex:158-165",
+   "status": "cited; Lean avoids it (SeparableOrder)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Conductor bound",
+   "bib_key": "PolstraTucker",
+   "locator": "Lemma 2.3",
+   "field": "commutative algebra",
+   "used_at": "sections/lengths.tex:196-233",
+   "status": "re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Perfectoid HK: Koszul homology almost zero, almost-iso invariance, e_perfd <= e with equality for parameter ideals",
+   "bib_key": "CLMST",
+   "locator": "Cor 4.0.4, Prop 4.0.10, Def 4.0.8, Cor 4.0.18, Prop 4.0.14",
+   "field": "perfectoid commutative algebra",
+   "used_at": "sections/lengths.tex:443-472",
+   "status": "cited",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Perfectoidization",
+   "bib_key": "BhattScholze",
+   "locator": "Sec 8, Thm 10.11",
+   "field": "p-adic geometry",
+   "used_at": "sections/lengths.tex:428-433",
+   "status": "cited",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Integral-extension Briancon-Skoda in mixed characteristic",
+   "bib_key": "Heitmann; HeitmannMa",
+   "locator": "HeitmannMa Prop 2.8",
+   "field": "commutative algebra (closure operations)",
+   "used_at": "sections/mixed.tex:211-232",
+   "status": "cited",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Artin approximation",
+   "bib_key": "Artin",
+   "locator": "Thm 1.10, Cor 2.1",
+   "field": "algebraic geometry / commutative algebra",
+   "used_at": "sections/charzero.tex:331-338",
+   "status": "cited",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Nagata localization of multiplicity",
+   "bib_key": "Ma",
+   "locator": "Thm 2.1",
+   "field": "commutative algebra",
+   "used_at": "sections/reductions.tex:14-23",
+   "status": "cited",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Stacks tags: global dimension of polynomial rings, flatness criteria (00R4, 039D, 00ML, 00MG), Koszul Euler characteristic (0AZZ), Cohen structure (032A)",
+   "bib_key": "Stacks",
+   "locator": "various",
+   "field": "commutative algebra / AG",
+   "used_at": "complex.tex:203, 500-503; lengths.tex:331; reductions.tex:49,216,260-268",
+   "status": "cited",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Rolle's theorem; Riemann sum error",
+   "bib_key": "",
+   "locator": "",
+   "field": "real analysis",
+   "used_at": "sections/complex.tex:542-626",
+   "status": "folklore (proved in Lean NumericalSupport)",
+   "essential_for_headline": true
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Reductions: complete, dim R = dim S > 0, R a domain, residue field of S algebraically closed (Nagata localization at a fibre prime, prime filtration additivity, residue extension).",
+   "items": [
+    "I29",
+    "I30"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Uniform complex estimate (Thm 2.1) for any ring C and abstract length lambda: blowup Y of I, twisted complex G = O(-is)^{b_i}, supernatural bundle V with roots ~ s*(critical points of prod(x+i)); chi(G(x)V) >= 0, Euler comparison chi(F_Y)=lambda H_0(F), equal layer sums (h-1)! s^h isolate b_0.",
+   "items": [
+    "I05",
+    "I08",
+    "I09",
+    "I10",
+    "I11",
+    "I13",
+    "I14",
+    "I15",
+    "I16",
+    "I17",
+    "I18",
+    "I19"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "Length inputs: char p - Faltings normalized length on D_perf computes e_HK and makes parameter Koszul homology negligible (Roberts); mixed char - CLMST perfectoid length gives lambda(C/HC) <= e(H,D) with equality on parameter ideals.",
+   "items": [
+    "I20",
+    "I21",
+    "I22",
+    "I23",
+    "I24",
+    "I25",
+    "I26",
+    "I27",
+    "I28"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "Factorization R -> T -> S=T/J (Cohen factorization of A -> S, T=R(x)_A U), e(T)=e(R), J perfect, F = P (x) K(x;T) of length h, rank-0 alternating, contractible off the closed point.",
+   "items": [
+    "I31",
+    "I32"
+   ]
+  },
+  {
+   "step": 5,
+   "claim": "Char p: Frobenius makes entries deep (s=q-c); per component e_HK(HD,D) >= e(D); HK associativity e_HK(J+(x),T) >= e(T); Ma's identity e_HK(J+(x),T)=e(S).",
+   "items": [
+    "I33",
+    "I34"
+   ]
+  },
+  {
+   "step": 6,
+   "claim": "Corollary: Dutta multiplicity >= e(R) for short complexes over complete char-p domains (IMW Conj 8.1 case) - the Lean comparator.",
+   "items": [
+    "I35",
+    "L02"
+   ]
+  },
+  {
+   "step": 7,
+   "claim": "Mixed char: p-power roots of parameters + Heitmann BS give deep entries in finite normal D of rank r; lower bound lambda/r >= e(B)(1-h/q)^h(1-K/(q-h)); prime-filtration upper bound after N-limit; q-limit; sum over components with coefficient 1 by generic regularity.",
+   "items": [
+    "I36",
+    "I37",
+    "I38",
+    "I39",
+    "I40",
+    "I41"
+   ]
+  },
+  {
+   "step": 8,
+   "claim": "Residue char 0: finite free reduction, polynomial certificate of e(R)>e(S) (minors + reduction relation; monic initial relations), Artin approximation + specialization to char p, contradiction with step 5.",
+   "items": [
+    "I42",
+    "I43",
+    "I44",
+    "I45"
+   ]
+  },
+  {
+   "step": 9,
+   "claim": "Assembly.",
+   "items": [
+    "I46"
+   ]
+  }
+ ],
+ "lean_structure": {
+  "files": 278,
+  "lines": 53953,
+  "declarations": 4617,
+  "kind_counts": {
+   "theorem": 2766,
+   "def": 1172,
+   "abbrev": 171,
+   "structure": 14,
+   "inductive": 2,
+   "instance": 492,
+   "class": 0
+  },
+  "proof_dag_size": 3499,
+  "core_vs_implementation": "Extractor v3 (data/items/194_lean.json). 688/3499 DAG decls flagged plumbing. Upstream closure of complex_estimate_basis = 2679 (76.6%; dominated share 0.70): the blowup/supernatural-bundle machinery implemented with explicit Cech complexes on chart rings (ReesRoot 286, ProductSourceCover 246, RootInvariants 124, ProjectiveRoot 110, AlternatingCech 103, FiniteModuleCech 77, SourceGraded 73, ...). The char-p normalized length construction (exists_length_with_module_limit) is 687 decls (19.6%), including Roberts' theorem and the SeparableOrder route. The numerical root choice (NumericalSupport: H, rho, roundedRoot, Riemann error) is only ~38 decls (1.1%). Reductions/Dutta assembly (prime filtration, residue extension, minimal complexes, minimal reductions) are each < 5%. Nearly all of the 'mathematical core' is the I08 package; within it, Eisenbud-Schreyer bundle re-implementation (transfer) is the largest block.",
+  "key_items_dag": {
+   "complex_estimate_basis (ComplexEstimate.lean:88)": "closure 2679 (76.6%), dominated 0.697",
+   "ReesRoot.sum_estimate (SumEstimate.lean:70)": "closure 2641 (75.5%), dominated 0.680",
+   "ReesRoot.rootTotal_euler_nonnegative (ReesRootEulerPositivity.lean:55)": "closure 1738 (49.7%)",
+   "ReesRoot.unfilteredEuler_rank (ReesRootEulerRank.lean:37)": "closure 1936 (55.3%)",
+   "ReesRoot.scalarEuler_value (ScalarCechEuler.lean:65)": "closure 1046 (29.9%), dominated 0.151",
+   "CharP.exists_length_with_module_limit (CharPModuleLength.lean:18)": "closure 687 (19.6%)",
+   "SeparableOrder.exists_normalization_frobenius_module_limit (NormalizationModuleLimit.lean:31)": "closure 324 (9.3%)",
+   "Numerical.uniform_from_sum_estimate (NumericalSupport.lean:500)": "closure 38 (1.1%)",
+   "CharP.dutta_minimal_estimate (DuttaMinimalEstimate.lean:22)": "closure 3347 (95.7%), dominated 0.718",
+   "dutta_complete_charp (DuttaDomain.lean:22)": "closure 3497, dominated 0.997"
+  },
+  "route_differences_from_paper": [
+   "Lean proves the Dutta bound for every complete Noetherian local ring of char p (dutta_complete_charp, no IsDomain); the comparator only asks for domains. The paper's own proof (charp.tex:255-311) already handles non-domains via prime filtration, so this is the IMW Conj 8.1 in char p in full, not just the domain case.",
+   "No Cohen-Gabber: the char-p length is built over the separable order {x in D separable over K} (FrobeniusIntermediatePowerMap.lean:153-273) instead of a generically separable normalization (Kurano-Shimomoto).",
+   "Roberts' Frobenius homology theorem is re-proved in Lean via a conductor bound (RobertsSeparable.lean:50-155), not imported.",
+   "Blowup and the Eisenbud-Schreyer bundle are encoded as explicit Cech complexes over chart rings and ordered-root (RootUlrich) bases, not as schemes/sheaves; the core estimate needs only DirectSumZero, not the filtered-colimit axiom (ComplexEstimate.lean:92).",
+   "Lean's char-p setup requires perfect and infinite residue field at the domain stage (DuttaMinimalEstimate.lean:17-18), reached via residueExtension to an algebraically closed residue field."
+  ],
+  "extractor_caveat": "No docstrings in the 278 files; joins use file names and namespaces. Load-bearing ranking of defs over-weights Cech plumbing (candidate_defs topped by RootTower.regularTower, RootChartAtlas.chartToGridD), so the lemma-level shares above are used instead."
+ },
+ "eureka_candidates_ranked": [
+  "I08 uniform complex estimate (assembled device)",
+  "I17 root tuning at critical points of prod(x+i)",
+  "I13+I18 blowup twist G paired with supernatural bundle (local Boij-Soderberg positivity)",
+  "I40+I38 mixed-char two-limit scheme with Heitmann depth",
+  "I05 abstract stable length interface"
+ ],
+ "eureka_candidates": [
+  {
+   "rank": 1,
+   "item": "I08: uniform complex estimate lambda H_0(F) >= mu s^h (b_0 - A_h sum b_i / s)",
+   "provisional_N": "N3",
+   "provisional_F": "F5 (local complex -> twisted complex on the blowup paired with a vector bundle), F3 secondary",
+   "for": "The missing step identified by Ma (2017): e(S)=e_HK(J+(x),T) was known, but no lower bound by e(T) was available; Ulrich/lim-Ulrich routes are blocked in general (Yhee; SmallCM). I08 supplies exactly that bound with coefficient 1 in all dimensions, for arbitrary length theories, and is load-bearing for all three characteristics and the Dutta corollary. Lean: 76.6% of the comparator DAG upstream, dominated share 0.70. Not a subterm of the goal or of L. Plausible downstream reuse: IMW Conjecture 8.1 in other settings, Betti/multiplicity inequalities for short complexes (IMW2022 programme), Dutta/Serre intersection positivity questions, length-theory versions of Boij-Soderberg for local rings.",
+   "against": "Built entirely from existing parts: Eisenbud-Schreyer supernatural bundles and pairing positivity (graded), blowup/Rees twisting, normalized lengths (CLMST), Koszul/Serre-quotient bookkeeping. Could be seen as a 'local Boij-Soderberg pairing' - a cross-field transfer of the Eisenbud-Schreyer functional to the blowup of a parameter ideal. The paper itself names Eisenbud-Schreyer and Eisenbud-Erman as the relevant precedents (main.tex:205-211).",
+   "nearest_neighbour": "Eisenbud-Schreyer, JAMS 2009 (positivity of <beta(F), gamma(E)>, multiplicity-type consequences for graded resolutions); Eisenbud-Erman JEMS 2017 (categorified pairing for free complexes, including non-polynomial rings); IMW2022 (short-complex inequalities under lim Ulrich hypotheses); Berkesch-Erman-Kummini-Sam 'Shapes of free resolutions over a local ring'.",
+   "lit_check": "WebSearch (2026-10-12): no source found stating a local, coefficient-1 lower bound for H_0 of complexes with entries in I^s via blowup + supernatural bundles; searches for a 2026 proof of Lech returned only the partial results (Ma dim 3, Ma graded, Meng). Snippet level only."
+  },
+  {
+   "rank": 2,
+   "item": "I17: roots r_j = round(s*rho_j), rho_j the critical points of H(x)=prod_{i=1}^h (x+i)",
+   "provisional_N": "N2",
+   "provisional_F": "F3",
+   "for": "Syntactically tiny (~38 Lean decls, 1.1% of DAG) yet it is what makes every layer sum equal to (h-1)! s^h, so the alternating-rank identity isolates b_0 with coefficient 1 - the Cook-Reckhow shape (small definition, decisive effect). Without it the method yields only weaker constants (cf. Ma's d!/2^d bound).",
+   "against": "Forced: demanding equal layer sums for i=1..h forces the antiderivative to be c*prod(x+i)+const, a one-line calculus derivation; the interval constraint -(j+1)s<r_j<-js is the standard Eisenbud-Schreyer interlacing between consecutive degrees 0,s,...,hs. Pivot distance ~1 once the pairing formula is written.",
+   "nearest_neighbour": "Eisenbud-Schreyer root/degree interlacing for pure diagrams and facet functionals of the Boij-Soderberg cone; Herzog-Kuhl equations.",
+   "lit_check": "WebSearch: no use of critical points of prod(x+i) as supernatural roots found (snippet level)."
+  },
+  {
+   "rank": 3,
+   "item": "I13+I18: twisted complex G = O_Y(-is)^{b_i} on the blowup and chi(G (x) V) >= 0 modulo length zero",
+   "provisional_N": "N2",
+   "provisional_F": "F5",
+   "for": "Converts the purely local hypothesis 'entries in I^s' into a pure degree sequence (0,s,...,hs) on the blowup, where Boij-Soderberg positivity becomes available without any grading on the ring; works over non-Noetherian C.",
+   "against": "Dividing by the exceptional equation is standard (strict transforms, deformation to the normal cone); IMW2025 already pass to the blowup exceptional fibre for Ulrich questions; the positivity is Eisenbud-Schreyer's.",
+   "nearest_neighbour": "Iyengar-Ma-Walker 2025 (Ulrich modules via extensions of sheaves from the exceptional fibre of a blowup); Eisenbud-Schreyer pairing.",
+   "lit_check": "not separately searched beyond rank 1 queries."
+  },
+  {
+   "rank": 4,
+   "item": "I38+I40: mixed-char scheme - Heitmann depth in finite extensions of rank r, rank cancelled, prime-filtration upper bound independent of the extension, N-limit before q-limit",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "Replaces Ma's HK identity (unavailable in mixed char) by a one-sided bound and keeps coefficient one through generic regularity of T; extends the char-p method to mixed characteristic where Lech was open in all dimensions >= 3.",
+   "against": "Each move is standard mixed-char practice (absolute integral closure / extended plus closure replacing Frobenius, normalizing by generic rank, separate limits); the perfectoid length theory is CLMST's.",
+   "nearest_neighbour": "Heitmann-Ma 2018/2021; CLMST 2026 perfectoid HK multiplicity; Ma-Schwede perfectoid methods.",
+   "lit_check": "Heitmann-Ma abstract confirmed (colon-capturing, Briancon-Skoda via epf closure); exact form of Prop 2.8 not verified from full text."
+  },
+  {
+   "rank": 5,
+   "item": "I05: abstract stable additive length interface (non-Noetherian C)",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "Lets one theorem serve char p perfection, perfectoid lengths and Dutta, with constants independent of the auxiliary ring - the stated reason the method works uniformly.",
+   "against": "Axiomatizes properties CLMST already prove for normalized length; packaging rather than a new idea.",
+   "nearest_neighbour": "CLMST Section 2.2; Faltings normalized length.",
+   "lit_check": "none beyond bibliography."
+  }
+ ],
+ "correctness_audit": {
+  "verdict": "Extraordinary claim (Lech 1960, open in dim >= 4 even in equal characteristic until this release). The core Section 2 argument was checked line by line at the level of signs, degrees and root-position inequalities and is internally consistent; it is also machine-checked (pending compile) in its char-p instance via the Dutta comparator, which contains the full Theorem 2.1 for an abstract TorsionLength. The char-p Lech assembly (Cohen factorization + Ma HK identity) is short and follows Ma 2017's own reduction, so it is credible given Theorem 2.1. The mixed-char and char-0 legs are unformalized and rest on precise forms of cited results (Heitmann-Ma Prop 2.8, CLMST Cor 4.0.18, Ma Sec 5) that were not verified from full texts.",
+  "checked": [
+   "Layer-sum identity: int_{-i}^0 H'(x)/h dx = (H(0)-H(-i))/h = h!/h = (h-1)! for i=1..h (H(-i)=0); Rolle interlacing -(j+1)<rho_j<-j",
+   "Cohomological-degree bounds in the positivity proof: l>=0 gives #{r_j > l-is} <= i-1; l<0 gives >= i-1; hence H_k(Y,D) of length 0 for k != 0",
+   "Sign bookkeeping in eq. (complex-sum-estimate) and use of sum_{i>=1}(-1)^i b_i = -b_0",
+   "Alternating rank of F = P (x) K(x;T) is (sum (-1)^i rank P_i)(1-1)^d = 0 for d>0",
+   "Char-p chain: entries of F^(q) in t^[q]C subset d^q C subset I^{q-c}; e_HK((HD)^[q]) = q^h e_HK(HD); division and limit",
+   "Mixed-char normalization q^h e((z),D) = e((u),D) = r e(B) and the two-limit order",
+   "Char-0 certificate: (t)-adic tails of initial-relation coefficients land in b^{a+1}; Hilbert function domination gives e(S) <= e(S_0); rank bound gives e(R) >= r",
+   "Comparator definitions vs paper Def 4.3; Tendsto clause guards against limUnder junk",
+   "Lean trust-surface grep (0 sorry/axiom/native_decide; no set_option)",
+   "Lean dutta_complete_charp has no IsDomain hypothesis (stronger than comparator)"
+  ],
+  "concerns": [
+   "Unreviewed; no public reaction found (WebSearch 2026-10-12 returns only pre-2026 partial results).",
+   "Mixed characteristic relies on HeitmannMa Prop 2.8 giving genuine membership b D subset (z)^{q-h} D in a finite extension. Heitmann-Ma's main results are phrased for extended plus closure (c^{1/p^e} x in (I,p^n)R^+), which is an 'almost' statement; if Prop 2.8 is only of that form, eq. (mixed-deep-entries) needs an almost-version of Theorem 2.1 (plausibly repairable via CLMST Prop 4.0.10 almost-invariance, but not done in the paper). Highest-priority check.",
+   "Mixed characteristic also needs lambda_infty(C/HC) <= e(H,D) for all d-primary H (CLMST Def 4.0.8 / Cor 4.0.18) and Koszul almost-vanishing for every s.o.p. of D (Cor 4.0.4 with n=0); stated precisely but not verified from the full text.",
+   "Char-0 leg follows Ma Section 5; the one-sided certificate is new detail. Point to check: Theorem charzero applies Lemma reduction then Lemma finite-free, which needs equal dimensions (provided), and the specialized map must be flat local of char-p rings (finite free + local: yes).",
+   "Section 2 Euler comparison (lem:complex-euler-comparison) is intricate (three towers, eventual images modulo length zero, non-Noetherian C); only spot-checked by hand. The Lean char-p instance covers it if the build succeeds.",
+   "Only the Dutta corollary is formalized; Lech's conjecture itself (even char p) has no Lean statement. If the comparator build fails, everything reduces to a 3.2k-line unrefereed paper whose key section is nonetheless short and checkable."
+  ],
+  "consistency_checks": [
+   "lean/docs/194.md scope statement matches the comparator (complete-domain Dutta comparison; full Lech outside scope)",
+   "DuttaMinimalEstimate.lean:22-29 is exactly the paper's displayed inequality charp.tex:247-251 (s = p^n - c, constant A from complex_estimate_allModule)",
+   "NumericalSupport.lean encodes H, rho_j, rounding with |r_j - s rho_j| <= 1 and positions -(j+2)s < r_j < -(j+1)s (0-indexed), matching complex.tex:539-550"
+  ]
+ },
+ "extraction_friction": [
+  "8 TeX files (main + 6 sections + references), 3,220 lines; all \\input resolved. Theorem numbering is per section (theorem counter [section]).",
+  "Comparator target is a corollary (Dutta), not the headline (Lech) - pilot lesson 1 again.",
+  "278 Lean files with no docstrings at all; namespaces (ReesRoot, ProductSourceCover, RootUlrich, SeparableOrder, PerfectDomainStages) are the only join keys.",
+  "Extractor candidate_defs ranking is dominated by Cech plumbing (regularTower, chartToGridD); lemma-level closure shares are more informative.",
+  "Lean solution proves a stronger statement (no domain hypothesis) than the comparator asks; the downstream test should use dutta_complete_charp.",
+  "Several cited results enter in precise numbered forms (CLMST 4.0.4/4.0.10/4.0.18, HeitmannMa 2.8, Ma 2.4/4.2/5.1); verifying them needs full texts (no WebFetch used)."
+ ]
+}
