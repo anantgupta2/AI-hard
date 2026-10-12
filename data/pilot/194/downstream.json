@@ -1,0 +1,489 @@
+{
+ "fid": "194",
+ "date": "2026-10-12",
+ "analyst_role": "DOWNSTREAM analyst (text level; Lean read, not built)",
+ "method_note": "Text-level only, per the orchestrator instruction and the 2026-10-12 trust rule: no lake build, no comparator run (other agents share the checkout). Dependency chain traced by grep over lean/OAI/RingTheory/Multiplicity and cross-checked against data/items/194_lean.json (extractor v3: 4,617 decls, 3,499-node target DAG). Closure sizes computed from the 'uses' graph in 194_lean.json. Paper read: main.tex:96-330, sections/complex.tex:1-140 and 527-560, sections/charp.tex:1-313; release grep over CONTENTS.md, preprints of families 193, 195, 200 and every lean/ import. Web: about 14 WebSearch queries (snippet level). WebFetch failed with DNS errors on researchseminars.org and par.nsf.gov; arxiv.org is blocked. Everything external is UNVERIFIED unless the release itself is the source.",
+ "item": "C1 of data/pilot/194/novelty.json: Thm 2.1 (complex.tex:55-82), the uniform estimate for free complexes with deep differential entries under an abstract additive length: lambda H_0(F) >= mu s^h (b_0 - A_h/s * sum_i b_i).",
+ "item_statement": "C a commutative ring (not necessarily Noetherian), I = (z_1..z_h), lambda an additive [0,inf]-valued length on I-power-torsion modules, with lambda(0)=0 and zero-stability (direct sums and filtered colimits of length-zero modules killed by a common I^a have length zero). Assume 0 < mu = lambda(C/I) < inf, lambda(C/(z^a)) = a^h mu, and lambda H_i(z^a; C) = 0 for i > 0. Let F be a complex of finite free modules in degrees 0..h, contractible locally off V(I), with b_i = rank F_i. Then H_i(F) is I-power torsion, lambda H_i(F) = 0 for i>0 and lambda H_0(F) < inf. If moreover sum (-1)^i b_i = 0 and every differential entry lies in I^s (s >= 1), then lambda H_0(F) >= mu s^h (b_0 - A_h/s * sum b_i), with A_h depending only on h. Proof: pass to the blowup Y of I (Rees charts), divide the differentials by L^s to get G_i = O(-is)^{b_i}, tensor with an Eisenbud-Schreyer-type bundle whose roots sit at rounded s*rho_j (rho_j the roots of H'(x), H = prod_{i=1}^h (x+i)), force the hyperhomology into degree 0 modulo length zero (chi >= 0), compare chi with lambda H_0(F), and isolate b_0 using equal leading layer sums plus alternating rank 0.",
+ "item_type": "F5/F3 (a uniform estimate, produced by a construction: blowup twist plus supernatural-bundle pairing with tuned roots). The ES bundle itself is N0 transfer; the device is the estimate and its mechanism.",
+ "lean_status": "as in paper",
+ "lean_status_why": "OAI.Lech.complex_theorem (ComplexTheorem.lean:26) is Thm 2.1 with the same hypotheses (h = n+1 parameters, ZeroStability, 0 < mu < inf, parameter scaling and Koszul length-zero hypotheses, LocallyContractibleOff I F, alternating rank 0, entries in I^s, constant A depending only on n), proved along the paper's route (Rees-chart Cech model of the blowup, an Eisenbud-Schreyer-type root bundle via ProductSourceCover, roots floor(s*rho_j) of H'); the on-chain variant complex_estimate_basis (ComplexEstimate.lean:22) is the same estimate under slightly weaker hypotheses.",
+ "lean_gaps": [
+  "Line reference: novelty.json cites ComplexEstimate.lean:88; the declaration is at line 22 (the file has 82 lines). 194_lean.json also gives line 22.",
+  "Indexing: Lean uses cochain complexes in degrees -(n+1)..0 with n+1 generators z : Fin (n+1) -> R; the paper uses homological degrees 0..h with h generators (h = n+1). Same content.",
+  "Hypotheses in the on-chain form: complex_estimate_basis needs only DirectSumZero (no filtered-colimit stability), drops 0 < mu, requires Nontrivial R and an explicit basis per term, and replaces 'contractible locally off V(I)' by 'acyclic after inverting each z_k' (equivalent for bounded finite free complexes; complex_theorem bridges via LocallyContractibleOff.acyclicAway). So the Lean on the chain is marginally STRONGER than the paper's statement.",
+  "The comparator only exercises the item through complex_estimate_allModule (AllModuleLength: a length on all C-modules with direct-sum, iSup and direct-limit stability), instantiated in char p with the normalized length on the perfection (exists_length_with_module_limit). The general TorsionLength version is proved, but the mixed-characteristic use (CLMST perfectoid lengths, mixed.tex:270) is not formalized.",
+  "No scheme-theoretic blowup: Y, L = O(1) and the exceptional divisor E are modelled by Cech complexes on the Rees-algebra charts (Chart n), filtered Rees denominators and an explicit exceptional fibre (ExceptionalFibre*, ReesRoot*, about 2.8k lines). The supernatural bundle is rebuilt over Z through the cover (P^1)^n -> P^n (ProductSourceCover*, 6 files, about 2.8k lines). Route-equivalent to the paper, not a different proof.",
+  "Size: the upstream closure of complex_estimate_basis is 2,679 declarations, about 20,900 lines in 163 files, i.e. 77% of the 3,499-declaration and about 32,000-line comparator DAG. The numerical root step (uniform_from_sum_estimate) is only 38 declarations / about 470 lines; the acyclicity half (SourceGraded.acyclicity_finite_torsion) is 91 declarations / about 880 lines. Almost all of the device's weight is the blowup-pairing positivity (sum_estimate closure: 2,641 declarations).",
+  "The constant A is existential (exists A >= 0), as in the paper; A absorbs the threshold on s, so the Lean bound holds for every s >= 1.",
+  "Comparator weaker than headline: the comparator is OAI.Lech.dutta_domain (IMW2022 Conj 8.1 for complete local DOMAINS of char p plus convergence of the Dutta sequence). Lech's conjecture itself is not stated in Lean. Conversely the chain theorem dutta_complete_charp (DuttaDomain.lean:22) has NO IsDomain hypothesis: Lean proves multiplicity R <= duttaMultiplicity R p F for every complete Noetherian local ring of char p (prime filtration in CyclicDutta.lean), which is more than the comparator asks."
+ ],
+ "version_for_speedup_test": {
+  "decision": "Use the Lean statement complex_estimate_basis (or complex_theorem for readability) as the library item.",
+  "argument": [
+   "Statement and route coincide with the paper, so no route choice is needed for the statement arm.",
+   "Arms: (A) baseline L = Mathlib d13f23b + OAI library minus ComplexEstimate*, ComplexTheorem, SumEstimate, ReesRoot*, ProductSourceCover*, NumericalSupport and everything downstream; (B) L + the statement of complex_estimate_basis / complex_estimate_allModule; (C) L + statement + the internal interfaces ReesRoot.sum_estimate, rootTotal_euler_nonnegative and Numerical.uniform_from_sum_estimate (tests reuse of the mechanism, needed for the non-uniform-step target O1).",
+   "Hide both complex_estimate_basis and complex_estimate_allModule: the latter is the form the char-p chain uses."
+  ]
+ },
+ "comparator_chain": [
+  "OAI.Lech.dutta_domain",
+  "OAI.Lech.dutta_complete_charp",
+  "OAI.Lech.dutta_algClosed",
+  "OAI.Lech.cyclicDuttaContribution_lower",
+  "OAI.Lech.CharP.dutta_lower_bound_infinite_perfect",
+  "OAI.Lech.CharP.dutta_minimal_estimate",
+  "OAI.Lech.complex_estimate_allModule",
+  "OAI.Lech.complex_estimate_basis",
+  "OAI.Lech.ReesRoot.sum_estimate",
+  "OAI.Lech.ReesRoot.rootTotal_euler_nonnegative",
+  "OAI.Lech.Numerical.uniform_from_sum_estimate"
+ ],
+ "comparator_chain_locations": "ComparatorChallenges/DuttaDomain.json (solution_module OAI.RingTheory.Multiplicity.Main, which imports DuttaDomain) -> DuttaDomain.lean:46 dutta_domain -> DuttaDomain.lean:22 dutta_complete_charp (calls dutta_algClosed at line 40) -> DuttaAlgClosed.lean:15 (calls line 38) -> CyclicDutta.lean:111 (calls line 129) -> DuttaInfinitePerfect.lean:19 (calls dutta_minimal_estimate at line 24) -> DuttaMinimalEstimate.lean:22 (calls complex_estimate_allModule at line 33) -> ComplexEstimateAllModule.lean:13 (calls complex_estimate_basis) -> ComplexEstimate.lean:22 (calls ReesRoot.sum_estimate and Numerical.uniform_from_sum_estimate) -> SumEstimate.lean:70 -> ReesRootEulerPositivity.lean:55; NumericalSupport.lean:500.",
+ "comparator_dependency_verdict": "The comparator depends on the item: every positive-dimensional case of dutta_domain passes through dutta_minimal_estimate, whose only lower-bound input is complex_estimate_allModule -> complex_estimate_basis. Knockout of complex_estimate_basis breaks the comparator (only the dimension-0 case, dutta_dimension_zero, survives). complex_theorem (the exact paper form) has 0 dependents in the DAG; it is compiled because ComplexEstimateAllModule imports ComplexTheorem.",
+ "lean_source": [
+  {
+   "name": "OAI.Lech.complex_estimate_basis",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/Multiplicity/ComplexEstimate.lean",
+   "line": 22,
+   "text": "theorem complex_estimate_basis (n : ℕ) [LinearOrder (Chart n)] :\n    ∃ A : ℝ,0≤A ∧ ∀ {R : Type u} [CommRing R] [Nontrivial R]\n      (I : Ideal R) (z : Fin (n+1) → R)\n      (_hgen : Ideal.span (Set.range z)=I)\n      (ell : TorsionLength I) (_hds : ell.DirectSumZero)\n      (_hmu : ell.value (ModuleCat.of R (R ⧸ I))≠⊤)\n      (_ha : ∀ a : ℕ,0<a → ell.value (ModuleCat.of R\n        (R ⧸ Ideal.span (Set.range (fun j => z j^a))))=\n          a^(n+1) • ell.value (ModuleCat.of R (R ⧸ I)))\n      (_hK : ∀ a : ℕ,1≤a → ∀ i : ℤ,i<0 →\n        ell.value ((Koszul.unit (List.ofFn (fun j => z j^a))).homology i)=0)\n      (F : CochainComplex (ModuleCat.{u} R) ℤ)\n      (b : ℤ → ℕ) (_B : ∀ p,Module.Basis (Fin (b p)) R (F.X p))\n      (_hb : ∀ p,p < -(n+1:ℤ) ∨ 0<p → IsZero (F.X p))\n      (_hac : ∀ k,((baseChangeFunctor R (Localization.Away (z k))).mapHomologicalComplex _ |>.obj F).Acyclic),\n        (∀ i,powerTorsion I (F.homology i) ∧ ell.value (F.homology i)≠⊤) ∧\n        (∀ i : ℤ,i≠0 → ell.value (F.homology i)=0) ∧\n        ∀ s : ℕ,0<s →\n          (∀ p : ℤ,(F.d p (p+1)).hom.range ≤ I^s • (⊤ : Submodule R (F.X (p+1)))) →\n          (∑ i∈Finset.range (n+2),(-1:ℝ)^i*(b (-(i:ℤ)):ℝ)=0) →\n          ell.realValue (ModuleCat.of R (R ⧸ I))*(s:ℝ)^(n+1)*\n            ((b 0:ℝ)-A/s*∑ i∈Finset.range (n+2),(b (-(i:ℤ)):ℝ))≤\n              ell.realValue (F.homology 0)",
+   "role": "item, on the comparator chain (Thm 2.1, basis form, DirectSumZero only)"
+  },
+  {
+   "name": "OAI.Lech.complex_theorem",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/Multiplicity/ComplexTheorem.lean",
+   "line": 26,
+   "text": "theorem complex_theorem (n : ℕ) :\n    ∃ A : ℝ,0≤A ∧ ∀ {R : Type u} [CommRing R]\n      (I : Ideal R) (z : Fin (n+1) → R)\n      (_hgen : Ideal.span (Set.range z)=I)\n      (ell : TorsionLength I) (_hst : ell.ZeroStability)\n      (_hmupos : 0<ell.value (ModuleCat.of R (R ⧸ I)))\n      (_hmu : ell.value (ModuleCat.of R (R ⧸ I))≠⊤)\n      (_ha : ∀ a : ℕ,1≤a → ell.value (ModuleCat.of R\n        (R ⧸ Ideal.span (Set.range (fun j => z j^a))))=\n          a^(n+1) • ell.value (ModuleCat.of R (R ⧸ I)))\n      (_hK : ∀ a : ℕ,1≤a → ∀ i : ℤ,i<0 →\n        ell.value ((Koszul.unit (List.ofFn (fun j => z j^a))).homology i)=0)\n      (F : CochainComplex (ModuleCat.{u} R) ℤ)\n      (_hf : ∀ p,Module.Free R (F.X p)) (_hfin : ∀ p,Module.Finite R (F.X p))\n      (_hb : ∀ p,p < -(n+1:ℤ) ∨ 0<p → IsZero (F.X p))\n      (_hloc : LocallyContractibleOff I F),\n        (∀ i,powerTorsion I (F.homology i) ∧ ell.value (F.homology i)≠⊤) ∧\n        (∀ i : ℤ,i≠0 → ell.value (F.homology i)=0) ∧\n        ∀ s : ℕ, 1 ≤ s →\n          (∀ p : ℤ,(F.d p (p+1)).hom.range ≤ I^s • (⊤ : Submodule R (F.X (p+1)))) →\n          (∑ i∈Finset.range (n+2),(-1:ℝ)^i*(Module.finrank R (F.X (-(i:ℤ))):ℝ)=0) →\n          ell.realValue (ModuleCat.of R (R ⧸ I))*(s:ℝ)^(n+1)*\n            ((Module.finrank R (F.X 0):ℝ)-A/s*\n              ∑ i∈Finset.range (n+2),(Module.finrank R (F.X (-(i:ℤ))):ℝ))≤\n              ell.realValue (F.homology 0)",
+   "role": "item, exact paper form of Thm 2.1 (ZeroStability, LocallyContractibleOff, mu>0); wrapper of complex_estimate_basis; not itself on the comparator DAG but compiled (imported by ComplexEstimateAllModule)"
+  },
+  {
+   "name": "OAI.Lech.complex_estimate_allModule",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/Multiplicity/ComplexEstimateAllModule.lean",
+   "line": 13,
+   "text": "theorem complex_estimate_allModule (d : ℕ) (hd : 0<d) :\n    ∃ A : ℝ,0≤A ∧ ∀ {C : Type u} [CommRing C] [Nontrivial C]\n      (z : Fin d → C) (ell : AllModuleLength C) (e : ℝ) (_he : 0≤e)\n      (_hmu : ell.value (ModuleCat.of C (C ⧸ Ideal.span (Set.range z))) = ENNReal.ofReal e)\n      (_ha : ∀ a : ℕ,0<a → ell.value (ModuleCat.of C\n        (C ⧸ Ideal.span (Set.range (fun j => z j^a)))) = (a:ℝ≥0∞)^d*ENNReal.ofReal e)\n      (_hK : ∀ a : ℕ,1≤a → ∀ i : ℤ,i < 0 →\n        ell.value ((Koszul.unit (List.ofFn (fun j => z j^a))).homology i)=0)\n      (F : CochainComplex (ModuleCat.{u} C) ℤ)\n      (_hf : ∀ i,Module.Free C (F.X i)) (_hfin : ∀ i,Module.Finite C (F.X i))\n      (_hb : ∀ i,i < -(d:ℤ) ∨ 0 < i → IsZero (F.X i))\n      (_hac : ∀ j,(((baseChangeFunctor C (Localization.Away (z j))).mapHomologicalComplex _).obj F).Acyclic)\n      (s : ℕ) (_hs : 0<s)\n      (_hδ : ∀ i : ℤ,(F.d i (i+1)).hom.range ≤\n        (Ideal.span (Set.range z))^s • (⊤ : Submodule C (F.X (i+1))))\n      (_halt : ∑ i∈Finset.range (d+1),(-1:ℝ)^i*(Module.finrank C (F.X (-(i:ℤ))):ℝ)=0),\n      e*(s:ℝ)^d*((Module.finrank C (F.X 0):ℝ)-A/s*\n        ∑ i∈Finset.range (d+1),(Module.finrank C (F.X (-(i:ℤ))):ℝ)) ≤\n          (ell.value (F.homology 0)).toReal",
+   "role": "item as consumed by the comparator (AllModuleLength, I = span z); on the chain"
+  },
+  {
+   "name": "OAI.Lech.TorsionLength",
+   "kind": "structure",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/Multiplicity/FiniteComplexTopInclusion.lean",
+   "line": 296,
+   "text": "structure TorsionLength (I : Ideal R) where\n  value : ModuleCat.{u} R → ℝ≥0∞\n  zero : ∀ {M}, IsZero M → value M = 0\n  additive : ∀ {S : ShortComplex (ModuleCat.{u} R)}, S.ShortExact →\n    powerTorsion I S.X₂ → value S.X₂ = value S.X₁ + value S.X₃",
+   "role": "defining structure: additive length on I-power-torsion modules"
+  },
+  {
+   "name": "OAI.Lech.powerTorsion",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/Multiplicity/FiniteComplexTopInclusion.lean",
+   "line": 253,
+   "text": "def powerTorsion (I : Ideal R) : ObjectProperty (ModuleCat.{u} R) :=\n  fun M => ∃ n : ℕ, I ^ n ≤ Module.annihilator R M",
+   "role": "the category T_I"
+  },
+  {
+   "name": "OAI.Lech.TorsionLength.DirectSumZero",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/Multiplicity/TorsionZeroStability.lean",
+   "line": 14,
+   "text": "def TorsionLength.DirectSumZero (ell : TorsionLength I) : Prop :=\n  ∀ {ι : Type u} (M : ι → Type u) [∀ i, AddCommGroup (M i)] [∀ i, Module R (M i)]\n    (a : ℕ), (∀ i, I^a ≤ Module.annihilator R (M i)) →\n      (∀ i, ell.value (ModuleCat.of R (M i))=0) → ell.value (ModuleCat.of R (⨁ i, M i))=0",
+   "role": "zero-stability for direct sums (the only stability hypothesis complex_estimate_basis needs)"
+  },
+  {
+   "name": "OAI.Lech.TorsionLength.FilteredColimitZero",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/Multiplicity/ComplexTheorem.lean",
+   "line": 15,
+   "text": "def TorsionLength.FilteredColimitZero (ell : TorsionLength I) : Prop :=\n  ∀ {J : Type u} [SmallCategory J] [IsFiltered J] (D : J ⥤ ModuleCat.{u} R)\n    (a : ℕ), (∀ j,I^a ≤ Module.annihilator R (D.obj j)) →\n      (∀ j,ell.value (D.obj j)=0) → ell.value (colimit D)=0",
+   "role": "zero-stability for filtered colimits (paper hypothesis; not needed by complex_estimate_basis)"
+  },
+  {
+   "name": "OAI.Lech.TorsionLength.ZeroStability",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/Multiplicity/ComplexTheorem.lean",
+   "line": 20,
+   "text": "def TorsionLength.ZeroStability (ell : TorsionLength I) : Prop :=\n  ell.DirectSumZero ∧ ell.FilteredColimitZero",
+   "role": "paper hypothesis = DirectSumZero and FilteredColimitZero"
+  },
+  {
+   "name": "OAI.Lech.LocallyContractibleOff",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/Multiplicity/LocalContractibility.lean",
+   "line": 97,
+   "text": "def LocallyContractibleOff (I : Ideal R) (F : CochainComplex (ModuleCat.{u} R) ℤ) : Prop :=\n  ∀ p : PrimeSpectrum R, ¬ I≤p.asIdeal → ∃ f : R,f∉p.asIdeal ∧ Nonempty (Homotopy\n    (𝟙 (((baseChangeFunctor R (Localization.Away f)).mapHomologicalComplex _).obj F)) 0)",
+   "role": "paper hypothesis: contractible locally on Spec C minus V(I)"
+  },
+  {
+   "name": "OAI.Lech.AllModuleLength",
+   "kind": "structure",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/Multiplicity/LechTorsionOf.lean",
+   "line": 123,
+   "text": "structure AllModuleLength (C : Type u) [CommRing C] where\n  value : ModuleCat.{u} C → ℝ≥0∞\n  zero : ∀ {M}, IsZero M → value M = 0\n  additive : ∀ {S : ShortComplex (ModuleCat.{u} C)}, S.ShortExact →\n    value S.X₂ = value S.X₁ + value S.X₃\n  directSum_zero : ∀ {ι : Type u} (G : ι → Type u) [∀ i, AddCommGroup (G i)]\n    [∀ i, Module C (G i)],\n    (∀ i, value (ModuleCat.of C (G i)) = 0) → value (ModuleCat.of C (⨁ i, G i)) = 0\n  iSup_zero : ∀ {ι M : Type u} [AddCommGroup M] [Module C M]\n    (U : ι → Submodule C M),\n    (∀ i, value (ModuleCat.of C (U i)) = 0) →\n      value (ModuleCat.of C (⨆ i, U i : Submodule C M)) = 0\n  directLimit_zero : ∀ {ι : Type u} [Preorder ι] [Nonempty ι] [IsDirectedOrder ι]\n    (G : ι → Type u) [∀ i, AddCommGroup (G i)] [∀ i, Module C (G i)]\n    (g : ∀ i j, i ≤ j → G i →ₗ[C] G j),\n    (∀ i, value (ModuleCat.of C (G i)) = 0) →\n      value (ModuleCat.of C (Module.DirectLimit G g)) = 0",
+   "role": "length on all modules (used by the comparator wrapper; normalized perfection length in char p)"
+  },
+  {
+   "name": "OAI.Lech.ReesRoot.rootTotal_euler_nonnegative",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/Multiplicity/ReesRootEulerPositivity.lean",
+   "line": 55,
+   "text": "theorem rootTotal_euler_nonnegative (r : Fin n → ℤ) (hr : RootPositions n s r)\n    (N : ℕ) (hN : n+1≤N) :\n    let D := (enlargedAt I z hz F (n+1) s hd (rootAmbient s r 0)).total (.up ℤ)\n    (∀ i,ell.finiteClass (D.homology i)) ∧\n      (-1:ℝ)^(n+1)*finiteHomologyEuler ell D (-(n+1:ℤ)) N=ell.realValue (D.homology 0) ∧\n      0≤(-1:ℝ)^(n+1)*finiteHomologyEuler ell D (-(n+1:ℤ)) N",
+   "role": "key lemma: hyperhomology of G (x) V concentrated in degree 0 modulo length zero, so chi >= 0 (complex.tex eq complex-positive-chi)"
+  },
+  {
+   "name": "OAI.Lech.ReesRoot.sum_estimate",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/Multiplicity/SumEstimate.lean",
+   "line": 70,
+   "text": "theorem sum_estimate (r : Fin n → ℤ) (hr : RootPositions n s r) :\n    0≤(n.factorial:ℝ)*ell.realValue (F.homology 0)+\n      ell.realValue (ModuleCat.of R (R ⧸ I))*\n        ∑ i∈Finset.range (n+2),(-1:ℝ)^i*(b (-(i:ℤ)):ℝ)*rootStripPolynomial n r i s",
+   "role": "key lemma: the pairing inequality 0 <= h! * lambda H_0 + mu * sum (-1)^i b_i layer_i (complex.tex eq complex-sum-estimate), with h-1 = n roots"
+  },
+  {
+   "name": "OAI.Lech.ProductSourceCover.RootPositions",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/Multiplicity/ProductSourceCoverCechNat.lean",
+   "line": 182,
+   "text": "def RootPositions (s : ℕ) (r : Fin n → ℤ) : Prop :=\n  ∀ j, -((j.val:ℤ)+2)*(s:ℤ) < r j ∧ r j < -((j.val:ℤ)+1)*(s:ℤ)",
+   "role": "root interlacing condition -(j+2)s < r_j < -(j+1)s (Rolle positions)"
+  },
+  {
+   "name": "OAI.Lech.Numerical.roundedRoot",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/Multiplicity/NumericalSupport.lean",
+   "line": 79,
+   "text": "noncomputable def roundedRoot (n s : ℕ) (j : Fin n) : ℤ :=\n  ⌊(s : ℝ) * ρ n j⌋",
+   "role": "roots r_j = floor(s * rho_j), rho_j the roots of H'(x), H = prod(x+i)"
+  },
+  {
+   "name": "OAI.Lech.Numerical.uniform_from_sum_estimate",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/Multiplicity/NumericalSupport.lean",
+   "line": 500,
+   "text": "theorem uniform_from_sum_estimate (n : ℕ) :\n    ∃ A : ℝ, 0 ≤ A ∧ ∀ (s : ℕ), 0 < s → ∀ (b : Fin (n+2) → ℝ),\n      (∀ i, 0 ≤ b i) → ∀ (μ L : ℝ), 0 ≤ μ → 0 ≤ L →\n      (∑ i, (-1:ℝ)^i.val*b i=0) →\n      (GoodRoots n s → 0 ≤ (n.factorial:ℝ)*L+\n        μ*∑ i, (-1:ℝ)^i.val*b i*layer n i.val s) →\n      μ*(s:ℝ)^(n+1)*(b 0-A/s*∑ i,b i) ≤ L",
+   "role": "numerical step: equal layer sums isolate b_0 with coefficient 1 and O(1/s) error"
+  },
+  {
+   "name": "OAI.Lech.CharP.dutta_minimal_estimate",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/Multiplicity/DuttaMinimalEstimate.lean",
+   "line": 22,
+   "text": "theorem dutta_minimal_estimate (hd : 0 < dimension D)\n    (F : CochainComplex (ModuleCat.{u} D) ℤ) (hF : IsFiniteHomologyComplex D F)\n    (hm : IsMinimalComplex F) :\n    ∃ (A : ℝ) (c : ℕ),0≤A ∧ ∀ n : ℕ,c < p^n →\n      multiplicity D*((p^n-c:ℕ):ℝ)^dimension D*\n        ((Module.finrank D (F.X 0):ℝ)-A/((p^n-c:ℕ):ℝ)*\n          ∑ i∈Finset.range (dimension D+1),(Module.finrank D (F.X (-(i:ℤ))):ℝ)) ≤\n            ((p:ℝ)^n)^dimension D*duttaMultiplicity D p F",
+   "role": "first consumer on the comparator chain (Frobenius, s = p^n - c)"
+  },
+  {
+   "name": "OAI.Lech.dutta_complete_charp",
+   "kind": "lemma",
+   "file": "data/raw/openai-math/lean/OAI/RingTheory/Multiplicity/DuttaDomain.lean",
+   "line": 22,
+   "text": "lemma dutta_complete_charp (R : Type u) [CommRing R] [IsNoetherianRing R]\n    [IsLocalRing R] [IsAdicComplete (maximalIdeal R) R]\n    (p : ℕ) [Fact p.Prime] [CharP R p]\n    (F : CochainComplex (ModuleCat.{u} R) ℤ) (hF : IsShortComplex R F) :\n    (∀ n i,IsFiniteLength R ((frobeniusComplex R p n F).homology i)) ∧\n      Tendsto (duttaSequence R p F) atTop (𝓝 (duttaMultiplicity R p F)) ∧\n      multiplicity R ≤ duttaMultiplicity R p F",
+   "role": "comparator-chain theorem; NOTE no IsDomain hypothesis (Lean proves the Dutta bound for every complete Noetherian local ring of char p)"
+  }
+ ],
+ "speedup_targets": [
+  {
+   "title": "IMW 2022: Dutta multiplicity >= e(R) for localized standard graded algebras in char p",
+   "statement": "Let R be the localization at the homogeneous maximal ideal of a standard graded algebra over a field of characteristic p > 0 (perfect residue field as in IMW). For every short complex F over R (finite free, length <= dim R, finite-length homology, H_0 != 0), chi_infty(F) >= e(R).",
+   "reference": "Iyengar-Ma-Walker, 'Multiplicities and Betti numbers in local algebra via lim Ulrich points', Algebra Number Theory 16 (2022) 1213-1257, arXiv:2104.10140 (main Dutta-multiplicity theorem; exact theorem number unverified, abstract read via search snippet only)",
+   "status": "known (proved via lim Ulrich sequences built from sheaves on Proj)",
+   "current_proof_size": "IMW 2022 is about 45 pages; the Dutta part needs the lim Ulrich construction on the projective variety (several sections). No formalization anywhere.",
+   "how_item_helps": "Completion is a flat local map with mS = n, preserving dimension, e and chi_infty (DuttaBaseChange.lean / multiplicity_eq_of_map_maximalIdeal already do this for residue extensions). Then dutta_complete_charp (no domain hypothesis) gives the bound. With the item in L the proof is glue (completion is complete Noetherian local of char p); without it there is no short route (the lim-Ulrich proof is long and uses graded geometry absent from Mathlib).",
+   "expected_speedup": "high",
+   "counts_as_device_reuse": "no: corollary of the comparator theorem (IMW Conj 8.1 in char p), hence a theorem corollary. Use only to calibrate the harness and to show that the device subsumes the lim-Ulrich route.",
+   "confidence": 0.7,
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI Lech.IsShortComplex, Lech.duttaMultiplicity, Lech.multiplicity; Mathlib Localization.AtPrime, MvPolynomial / GradedAlgebra, AdicCompletion",
+    "missing": [
+     "standard graded algebra localized at the irrelevant ideal, as a type with IsLocalRing/IsNoetherianRing instances (about 80-150 lines)",
+     "completion base change for duttaSequence and multiplicity (exists for residue-field extensions; about 100-200 lines to adapt to AdicCompletion)"
+    ],
+    "formal_proof_to_compare": "none; compare against the IMW page count only"
+   }
+  },
+  {
+   "title": "IMW length bound l(M) >= e(R) over complete intersections in char p",
+   "statement": "Let R be a complete intersection local ring of characteristic p > 0 and M a nonzero finite-length R-module of finite projective dimension. Then l(M) >= e(R) (indeed >= beta_0(M) e(R)).",
+   "reference": "IMW 2022 prove l(M) >= e(R) for STRICT complete intersections (arXiv:2104.10140, snippet); Dutta 1983 (Compositio) / Kurano 2004 (arXiv:math/0304220): chi_infty = chi on complete intersections, more generally exactly on numerically Roberts rings",
+   "status": "strict-CI case known; the general char-p complete-intersection case may be new (UNVERIFIED: not checked against KC-Soto Levins 2024 or later work)",
+   "current_proof_size": "IMW strict-CI argument: Ulrich modules over strict CIs, a few pages on top of their framework. No formalization.",
+   "how_item_helps": "Minimal resolution F of M is short (Auslander-Buchsbaum: length = depth = dim). On a CI, chi_infty(F) = chi(F) = l(M). The item's Dutta consequence (with the b_0 factor kept: chi_infty >= b_0 e(R), charp.tex:244-253) gives l(M) >= beta_0(M) e(R) at once.",
+   "expected_speedup": "med (the chi_infty = chi step for CIs is itself a nontrivial missing library)",
+   "counts_as_device_reuse": "no: corollary of the Dutta corollary plus Dutta/Kurano's chi_infty = chi. Record as reach.",
+   "confidence": 0.55,
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "Mathlib Module.length, CategoryTheory projectiveDimension / HasProjectiveDimensionLE, RingTheory.Regular.RegularSequence (to define CI as regular-local-ring quotient by a regular sequence); OAI Lech.multiplicity",
+    "missing": [
+     "complete-intersection predicate (about 50 lines; statement then statable)",
+     "chi_infty = chi for complete intersections (Dutta 1983): needs Frobenius on Tor / Peskine-Szpiro acyclicity and the CI Frobenius length formula, est. 1-3k lines"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Release family 193 (Serre positivity): the degree-zero-only evaluation lemma",
+   "statement": "Lemma pos:positive-evaluation of 'Positivity of Serre's Intersection Multiplicity' (openai/math, Sept 23 2026): for the truncated bounded free complexes F'_{n,gamma} over E', the lambda_E Euler evaluation equals its degree-zero coefficient b_0 and b_0 >= nu_sigma eta_E > 0.",
+   "reference": "data/raw/openai-math/preprints/Positivity-of-Serres-Intersection-Multiplicity-September-23-2026/build/sections/positivity.tex:510-565; cites the Lech paper (OpenAILech2026, Thm 3.1) for the normalized-length construction (lengths.tex:221)",
+   "status": "claimed in the release (unreviewed); not Lean-formalized (no lean/docs/193.md)",
+   "current_proof_size": "one paragraph (about 30 lines of TeX)",
+   "how_item_helps": "193 repeats the ACYCLICITY half of the item (Lemma 2.2: take Koszul homology first; positive Koszul rows have length zero; only degree 0 survives), then uses the trivial lower bound b_0 >= (number of generators) * eta from minimality (entries in m). It does NOT use deep entries, the blowup, the bundle pairing or coefficient 1. So the reusable part is the 883-line SourceGraded.acyclicity_finite_torsion, not the estimate.",
+   "expected_speedup": "low",
+   "counts_as_device_reuse": "component only (the routine Lemma 2.2 half, N1); not the N3 device",
+   "confidence": 0.8,
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "OAI TorsionLength and Koszul.unit for the abstract lemma; 193's tower lengths, Galois twists and rank-quotient categories are absent",
+    "missing": [
+     "193's normalized tower length and rank-negligible quotient category (several thousand lines; 193 has no Lean)"
+    ],
+    "formal_proof_to_compare": "no"
+   }
+  }
+ ],
+ "speedup_verdict": "No strong device-reuse speedup target found. Every KNOWN theorem that the estimate shortens a lot is reached through the Dutta bound chi_infty >= e(R) (IMW Conj 8.1 in char p), i.e. it is a theorem corollary. The coefficient 1 is what makes the estimate matter, and coefficient 1 is needed only for e(R)-sharp statements (Lech, Dutta >= e, length >= e). Weaker known statements (New Intersection Theorem, positivity of Dutta multiplicity) do not need the device at all (see negative_controls). The one release family that touches the machinery (193) reuses only the routine acyclicity half.",
+ "open_problems": [
+  {
+   "id": "O1",
+   "title": "Local pure-type estimate with non-uniform depths (local Herzog-Kuhl / HHS lower bound)",
+   "statement": "Same setting as Thm 2.1 but the i-th differential has entries in I^{s_i} (s_i >= 1 not all equal). Put d_i = s_1+...+s_i. Is lambda H_0(F) >= mu b_0 prod_{i=1}^h d_i / h! * (1 - o(1)) as min s_i -> infinity, uniformly in C, lambda, F? For s_i = s this is exactly Thm 2.1 (prod(is)/h! = s^h). The graded analogue for pure resolutions is the Herzog-Kuhl / Huneke-Miller formula l(M) = b_0 prod d_i / h!, and its non-pure form is the HHS lower bound proved by Eisenbud-Schreyer.",
+   "reference": "Posed here as a device test. Background: Eisenbud-Schreyer, JAMS 22 (2009) (HHS lower bound via pairing); Herzog-Kuhl 1984; Herzog-Srinivasan, Trans. AMS 350 (1998) (multiplicity conjecture); BEKS, 'Shapes of free resolutions over a local ring', Math. Ann. (2012), arXiv:1105.2244",
+   "url": "https://arxiv.org/abs/1105.2244",
+   "status": "open as far as found: searches for a local HHS-type bound in terms of m-adic depth of the differentials returned only graded results (snippet level; UNVERIFIED)",
+   "obstruction_match": "Exactly the item's obstruction: a coefficient-sharp lower bound on H_0 of a local, ungraded complex from the depth of its differentials, where passing to associated graded rings loses exactness (MaUlrich Remark 3.9).",
+   "adaptation_sketch": "On the blowup, divide d_i by L^{s_i} so G_i = O(-d_i)^{b_i}; pair with a bundle whose roots are chosen as in Eisenbud-Schreyer for the pure degree sequence (0, d_1, ..., d_h) instead of the uniform one; the layer-sum computation (NumericalSupport) must be redone for the new layer polynomial. The positivity half (rootTotal_euler_nonnegative) should transfer once RootPositions is generalized.",
+   "payoff": "med (a new local Boij-Soderberg-type inequality; also a clean test of reusing the DESIGN rather than the statement)",
+   "confidence": 0.45,
+   "difficulty": "med (numerics of roots for unequal steps; the interlacing positions may fail for very unequal s_i)",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Statement of complex_estimate_basis with s replaced by s : Fin (n+1) -> Nat and the range condition per degree; OAI TorsionLength, Koszul.unit, baseChangeFunctor; Mathlib Ideal.pow",
+    "missing": [],
+    "formal_proof_to_compare": "the uniform case (complex_estimate_basis, about 20.9k-line closure); no formal proof of the graded HHS bound exists"
+   }
+  },
+  {
+   "id": "O2",
+   "title": "The IMW Length Conjecture: l(M) >= e(R) for modules of finite projective dimension",
+   "statement": "For a Cohen-Macaulay local ring R and every nonzero finite-length R-module M of finite projective dimension, l(M) >= e(R). It implies Lech's conjecture for CM rings (search summaries).",
+   "reference": "Iyengar-Ma-Walker, ANT 16 (2022), arXiv:2104.10140; Walker, talk 'How short can a module of finite projective dimension be?' (researchseminars.org/talk/FOTR/40); KC-Soto Levins, 'On liftings of modules of finite projective dimension', IMRN 2024, arXiv:2404.17572",
+   "url": "https://arxiv.org/abs/2404.17572",
+   "status": "open (partial: rings with Ulrich modules or lim Ulrich sequences; strict complete intersections; Serre-liftable modules)",
+   "obstruction_match": "Partial. The item bounds lambda H_0 of a complex with DEEP entries; a minimal resolution of M has entries only in m. In char p Frobenius makes them deep, but then the item controls chi_infty(F), not l(M); the two agree exactly on numerically Roberts rings (Kurano). Non-Roberts CM rings exist in char p (dim 3 CM, dim 5 Gorenstein), so this is precisely where the device stops.",
+   "adaptation_sketch": "(i) char p, numerically Roberts R (complete intersections, dim <= 2): corollary, see speedup target 2 and theorem_corollaries. (ii) General CM R: need a length lambda on an auxiliary algebra C with lambda(H_0(F (x) C)) = l(M) and depth-amplification of the entries without Frobenius, e.g. via the paper's mixed-char root extensions. No concrete route found.",
+   "payoff": "high (the conjecture strengthens Lech for CM rings)",
+   "confidence": 0.2,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib Module.length, IsLocalRing, CategoryTheory.projectiveDimension (or HasProjectiveDimensionLE in ModuleCat), Regular.Depth for CM (depth = dim) or a short CM predicate; OAI Lech.multiplicity",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O3",
+   "title": "Positivity and the e(R) bound for Dutta multiplicity outside characteristic p (Kurano-Roberts; IMW Conj 8.1)",
+   "statement": "For a short complex F over a local ring R of mixed or equal-zero characteristic, with Dutta multiplicity defined through local Chern characters (Roberts, Kurano), show chi_infty(F) > 0 (Kurano-Roberts) and chi_infty(F) >= e(R) (IMW Conj 8.1).",
+   "reference": "IMW 2022 Conj 8.1; Kurano, 'Numerical equivalence defined on Chow groups of Noetherian local rings', Invent. Math. 157 (2004), arXiv:math/0304220; KC-Soto Levins 2024 (states the positivity conjecture is open in mixed characteristic, snippet)",
+   "url": "https://arxiv.org/abs/2104.10140",
+   "status": "open in mixed characteristic (per arXiv:2404.17572 snippet; UNVERIFIED in full)",
+   "obstruction_match": "Strong. It is the same inequality the item proves in char p, with Frobenius unavailable; the paper already replaces Frobenius in its Lech proof by roots of parameters, Heitmann's Briancon-Skoda and CLMST perfectoid lengths (mixed.tex:270 applies Thm 2.1 there).",
+   "adaptation_sketch": "Run the char-p argument of charp.tex:193-313 with the mixed-char length of Section 4: apply Thm 2.1 to F (x) C over a root extension with entries pushed into (z)^{q-h} by Briancon-Skoda, divide by the extension rank. The missing piece is an identity between the normalized lambda-limit of H_0 and the local-Chern-character Dutta multiplicity (in char p this is eq. dutta-h0 plus Frobenius scaling). Adams operations psi^k (Gillet-Soule, Kurano) scale the top local Chern character by k^d and may play Frobenius's role.",
+   "payoff": "high (would settle the Kurano-Roberts positivity conjecture and IMW Conj 8.1 in mixed characteristic; genuine device reuse outside the comparator's characteristic)",
+   "confidence": 0.3,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "nothing in Mathlib d13f23b or OAI defines local Chern characters or mixed-char Dutta multiplicity",
+    "missing": [
+     "local Chern characters / localized Chern classes with supports (very large, 10k+ lines)",
+     "perfectoid / CLMST normalized length (not in the OAI library: the 194 Lean covers char p only)"
+    ],
+    "formal_proof_to_compare": "char-p analogue: dutta_complete_charp (about 32k-line DAG)"
+   }
+  },
+  {
+   "id": "O4",
+   "title": "Boij-Soderberg cones over local rings without lim Ulrich sequences",
+   "statement": "IMW 2023 compare the cone of Betti tables of finite-length, finite-projective-dimension modules over R with the cone over a (linear) Noether normalization, using lim Ulrich sequences. Do the same comparison inequalities hold over every complete local domain (where Yhee showed weakly lim Ulrich sequences can fail to exist)?",
+   "reference": "Iyengar-Ma-Walker, 'Lim Ulrich sequences and Boij-Soderberg cones', Forum Math. Sigma 11 (2023), arXiv:2209.03498; Yhee 2023 (non-existence of weakly lim Ulrich sequences); BEKS 2012",
+   "url": "https://arxiv.org/abs/2209.03498",
+   "status": "open beyond rings with lim Ulrich sequences (as described in the 194 paper, main.tex:159-171; UNVERIFIED in the source)",
+   "obstruction_match": "Medium. The item replaces lim Ulrich sequences by a blowup pairing exactly for the H_0-length functional; Betti-cone inequalities need the whole family of Boij-Soderberg functionals, of which the item gives only the 'pure, equal-step' one.",
+   "adaptation_sketch": "Combine O1 (non-uniform steps) with Frobenius depth amplification to obtain local analogues of the Eisenbud-Schreyer facet functionals for each degree sequence; check whether they cut out the IMW comparison cone.",
+   "payoff": "med",
+   "confidence": 0.2,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "Betti tables over local rings (Tor dimensions) are expressible, but cones of Betti tables and Noether normalizations are not in Mathlib or OAI",
+    "missing": [
+     "Betti table / rational cone definitions (about 200 lines)",
+     "Noether normalization for complete local rings and lim Ulrich comparison (large)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O5",
+   "title": "Asymptotic Lech inequality in all characteristics (Huneke-Ma-Quy-Smirnov)",
+   "statement": "HMQS prove optimal Lech-type bounds e(I) vs l(R/I) for sufficiently deep m-primary ideals I (I contained in a high power of m) in characteristic p and conjecture them in all characteristics.",
+   "reference": "Huneke-Ma-Quy-Smirnov, 'Asymptotic Lech's inequality', Adv. Math. (2020), arXiv:1907.08344; related: Klein-Ma-Quy-Smirnov-Yao, arXiv:1808.01051 (Stuckrad-Vogel)",
+   "url": "https://arxiv.org/abs/1907.08344",
+   "status": "open outside char p (snippet level; UNVERIFIED)",
+   "obstruction_match": "Weak. Same 'deep ideal' regime and same char-p normalized-length tools, but HMQS bound e(I) from above by colength for arbitrary I; the item bounds colength from below for ideals with deep finite FREE resolutions. Only for perfect ideals all of whose differentials are deep does the item say anything (l(R/I) >= e(R) s^d (1 - O(1/s))).",
+   "adaptation_sketch": "For perfect deep ideals, compare the item's lower bound with HMQS's optimal constant; for general I no route seen.",
+   "payoff": "low",
+   "confidence": 0.1,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib Module.length, Ideal.pow, IsLocalRing; OAI Lech.multiplicity (for e(R)); e(I) for an m-primary ideal needs a small generalization of Lech.multiplicity",
+    "missing": [
+     "Hilbert-Samuel multiplicity e(I) of an m-primary ideal I (about 30-60 lines, mirror Lech.multiplicity)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "Lech's conjecture e(R) <= e(S) for flat local maps, all characteristics (the paper's headline; not stated in Lean).",
+  "IMW 2022 Conj 8.1 for complete local domains of char p plus convergence of the Dutta sequence (the comparator OAI.Lech.dutta_domain).",
+  "Lean-only strengthening: dutta_complete_charp (DuttaDomain.lean:22) has no domain hypothesis, so the Lean proves chi_infty(F) >= e(R) for short complexes over EVERY complete Noetherian local ring of char p (the paper's Cor. is stated for domains; the prime-filtration step at charp.tex:269-310, which the paper uses after a residue-field extension, handles non-domains in the same way; Lean does exactly this in CyclicDutta.lean). Since chi_infty and e are unchanged by completion, this should extend to all char-p local rings (not stated in Lean).",
+  "The proof keeps the b_0 factor: chi_infty(F) >= rank(F_0) e(R) (charp.tex:244-253 before using b_0 >= 1).",
+  "IMW 2022's char-p Dutta bound for localized standard graded algebras, proved there via lim Ulrich sequences (speedup target 1).",
+  "IMW Length Conjecture l(M) >= beta_0(M) e(R) for char-p numerically Roberts rings, including all complete intersections (Dutta/Kurano chi_infty = chi). Whether the non-strict-CI case was known before is UNVERIFIED (speedup target 2).",
+  "Hilbert-Kunz consequence: e_HK(J) >= e(R) for every m-primary ideal J of finite projective dimension in a char-p local ring (Peskine-Szpiro gives H_i(Phi^n F) = 0 for i > 0, so chi_infty = e_HK(J)). Prior status UNVERIFIED.",
+  "Positivity of Dutta multiplicity in char p (Kurano-Roberts in char p) and the New Intersection Theorem in char p, as trivial weakenings; both have elementary proofs that do not need the device (negative_controls).",
+  "Ma 2017's bound e(R) <= max(1, d!/2^d) e(S), Lech in dimension 3 (equal char), Lech for standard graded sources (Ma 2023; Meng 2025): all subsumed by the headline.",
+  "Direct instances of Thm 2.1 with lambda = ordinary length over a Cohen-Macaulay local ring and I a minimal reduction: a local, asymptotic HHS-type bound l(M) >= e(R) s^d (beta_0 - A_d/s * sum beta_i) for finite-length modules of finite projective dimension whose whole minimal resolution has entries in m^{s+c}; equivalently a Betti-length trade-off (sum beta_i >= (s/A) beta_0 unless l(M) is within a factor (1-o(1)) of e(R) s^d beta_0). The graded analogue follows from Eisenbud-Schreyer; the local form appears new (UNVERIFIED). These are instances of the item, not reuse."
+ ],
+ "release_reuse": [
+  {
+   "where": "family 193, 'Positivity of Serre's Intersection Multiplicity' (same date)",
+   "what": "Cites the Lech paper's Thm 3.1 for normalized lengths (lengths.tex:221). Its Lemma pos:positive-evaluation (positivity.tex:510-565) repeats the item's Lemma 2.2 argument (Koszul homology first, positive Koszul rows have length zero, so only degree 0 survives) and then uses the trivial bound degree-0 length >= (number of generators) * eta. No deep entries, no blowup, no supernatural bundle, no coefficient 1.",
+   "counts_as_device_reuse": "no (component reuse of the routine acyclicity half only); 193 has no Lean"
+  },
+  {
+   "where": "family 195, SmallCM (same date)",
+   "what": "Cited by 194 as motivation only. Grep of its sources finds no supernatural bundle, blowup pairing or complex estimate; its Lean (SurfaceConeCandidateSupport) imports no Multiplicity module.",
+   "counts_as_device_reuse": "no"
+  },
+  {
+   "where": "family 200, Eisenbud-Green-Harris / lex-plus-powers (graded Betti numbers)",
+   "what": "grep for Lech, Dutta, supernatural, Boij, blowup, Eisenbud-Schreyer: 0 hits in every section.",
+   "counts_as_device_reuse": "no"
+  },
+  {
+   "where": "whole Lean library",
+   "what": "No .lean file outside OAI/RingTheory/Multiplicity imports any OAI.RingTheory.Multiplicity module (only the aggregator OAI.lean does), and no file mentions complex_estimate_basis / complex_estimate_allModule / complex_theorem outside ComplexEstimate*.lean, ComplexTheorem.lean and DuttaMinimalEstimate.lean.",
+   "counts_as_device_reuse": "no"
+  },
+  {
+   "where": "194 itself",
+   "what": "Thm 2.1 is applied four times: char-p Lech (charp.tex:67, 94), the Dutta corollary (charp.tex:244), mixed-char Lech (mixed.tex:270, with CLMST perfectoid lengths and root extensions). Only the Dutta use is in Lean.",
+   "counts_as_device_reuse": "in-family only"
+  }
+ ],
+ "negative_controls": [
+  {
+   "title": "Ordinary Euler characteristic of short complexes over non-Roberts rings",
+   "statement": "There are short complexes with chi(F) < 0 (Roberts) and modules with chi(M,N) = -1 over a non-regular ring (Dutta-Hochster-McLaughlin 1985).",
+   "reference": "Dutta-Hochster-McLaughlin, Invent. Math. 79 (1985); Roberts' example as cited in arXiv:2404.17572",
+   "why": "Proved-false analogue. The device must not give chi(F) >= e(R) for the ORDINARY Euler characteristic. In Lean, instantiating complex_estimate_basis with ordinary Module.length on such a ring must fail at the hypothesis _hK (positive Koszul homology of length zero) or _ha (exact a^h scaling), which hold for ordinary length only over CM rings. This also tests that the prover respects the length hypotheses rather than the shape of the conclusion."
+  },
+  {
+   "title": "Total rank / Generalized Total Rank Conjecture",
+   "statement": "Sum of Betti numbers of a nonzero finite-length module of finite projective dimension is >= 2^d (Walker 2017 for char != 2; VandeBogert-Walker for char 2); the Generalized Total Rank Conjecture for complexes is FALSE in odd characteristic (Walker).",
+   "reference": "Walker, Ann. Math. 186 (2017), arXiv:1702.02560; VandeBogert-Walker, arXiv:2305.09771",
+   "why": "The ranks b_i enter the item only through the O(1/s) error and disappear in the Frobenius limit, so the item gives no Betti lower bound. A prover with the item should show no speedup on Walker's theorem; a claimed 'proof' of the false generalized version via the item would expose a misuse."
+  },
+  {
+   "title": "New Intersection Theorem and Dutta positivity in char p",
+   "statement": "A finite free complex of length k < dim R with finite-length homology has H_0 = 0; chi_infty(F) > 0 for short complexes.",
+   "reference": "Peskine-Szpiro 1973; Hochster; Roberts 1987; Dutta 1983",
+   "why": "Coefficient 1 is not needed: H_0(Phi^n F) surjects onto (R/m^[q])^{b_0}, so l >= c q^d, while Roberts' Frobenius homology bound (in OAI: frobenius_quotient_homology_bound, FrobeniusHomologyGrowth.lean:46) gives O(q^k). With or without the item the Lean proof is short glue, so the expected speedup is about zero. Statable now; a cheap check that the harness does not credit the device for easy consequences."
+  },
+  {
+   "title": "Hilbert-Kunz Lech (Kunz) and Watanabe-Yoshida",
+   "statement": "e_HK(R) <= e_HK(S) for flat local maps in char p (Kunz 1976, classical); Watanabe-Yoshida lower bound e_HK(R) >= e_HK(R_{p,d}) for non-regular R (open in general).",
+   "reference": "Kunz, Amer. J. Math. 98 (1976); Enescu-Shimomoto, arXiv:math/0502289",
+   "why": "No complex with deep entries is involved: Kunz's inequality is elementary, and the Watanabe-Yoshida bound concerns e_HK of the ring itself. The device should not help either."
+  },
+  {
+   "title": "Tightness control (not a negative control): Koszul complexes",
+   "statement": "F = K(z_1^s, ..., z_h^s; C): b_0 = 1, sum b_i = 2^h, lambda H_0 = mu s^h exactly.",
+   "reference": "hypotheses of Thm 2.1",
+   "why": "The bound mu s^h (1 - A 2^h/s) matches to leading order, so coefficient 1 cannot be improved. Use it to sanity-check any proposed generalization (O1) or rediscovery."
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "title": "O1: local pure-type estimate with non-uniform depths s_1..s_h",
+   "lean": "statable now",
+   "argument": "The only Lean-statable target found where the device's DESIGN, not just its statement, must be reused. The graded analogue is the Herzog-Kuhl formula / HHS lower bound, but no local version in terms of m-adic depth of the differentials was found. Arm C (statement plus sum_estimate, rootTotal_euler_nonnegative and the root numerics) should make it a re-parametrization (new twists O(-d_i), new root rule, new layer polynomial), while arm A has no visible route: the associated-graded passage loses exactness. Caveat: it is a generalization of the item itself, so a success is weaker evidence than reuse on an independent famous problem."
+  },
+  {
+   "rank": 2,
+   "title": "Speedup 1: IMW 2022 standard-graded Dutta bound (calibration)",
+   "lean": "statable with < 300 lines of new definitions",
+   "argument": "A known 45-page lim-Ulrich theorem that becomes completion glue plus dutta_complete_charp. It does not count as device reuse (it is a corollary of the comparator theorem), but it is the cleanest measurable before/after pair for the harness and shows that the device subsumes the lim-Ulrich route on its own home ground."
+  },
+  {
+   "rank": 3,
+   "title": "O2: IMW Length Conjecture l(M) >= e(R)",
+   "lean": "statable now",
+   "argument": "Statable now with Mathlib (Module.length, projective dimension, depth) and OAI multiplicity. The char-p numerically Roberts case is a corollary, so the informative experiment is the general case: whether a prover with the item finds any non-Frobenius depth amplification. Expect failure; a failure is informative about the device's scope (it controls Dutta multiplicity, not length)."
+  },
+  {
+   "rank": 4,
+   "title": "Negative control: New Intersection Theorem in char p",
+   "lean": "statable now",
+   "argument": "Statable now with IsShortComplex-style hypotheses; the elementary proof (Frobenius surjection onto (R/m^[q])^{b_0} plus the OAI Frobenius growth bound) does not need coefficient 1. A harness that reports a large speedup here is miscalibrated."
+  },
+  {
+   "rank": 5,
+   "title": "O3: Kurano-Roberts positivity and IMW Conj 8.1 in mixed characteristic",
+   "lean": "needs major new library",
+   "argument": "The strongest genuine reuse candidate mathematically: the same inequality where Frobenius is unavailable, and the paper already runs Thm 2.1 with perfectoid lengths for Lech. Not Lean-usable (no local Chern characters, no perfectoid lengths in the OAI library), so it can only be tested informally."
+  }
+ ],
+ "precedent_check": {
+  "earlier_equivalents": "None found for the estimate. Closest: Eisenbud-Schreyer 2009 / Eisenbud-Erman 2017 (graded pairing positivity; the HHS lower bound for degree sequence (0,s,..,hs) equals s^h b_0, so the item is the local, ungraded, abstract-length analogue), IMW2025 and IMW-Zhuang 2024 (blowup / exceptional fibre for Ulrich questions, no pairing). Same verdict as novelty.json; no new precedent found. A source applying a Boij-Soderberg pairing on the blowup of a local ring would downgrade C1 to N2 (none found; snippet-level search only).",
+  "after_2026_10_06": "Searches on 2026-10-12 found only catalogue listings of the release (sites.pitt.edu OpenAI Math catalogue, kingy.ai write-up): the Lech entry is listed with the Lean scope note. No expert reaction (Ma, Iyengar, Walker), no error report, no reuse of the estimate. The index may lag; snippet level only.",
+  "model_produced": "Family 193 (same release, same date) is the only model-produced work touching the machinery, and it reuses only the acyclicity half (release_reuse)."
+ },
+ "sources": [
+  "local: data/raw/openai-math (fd4aeeb): lean/OAI/RingTheory/Multiplicity/{ComplexEstimate,ComplexTheorem,ComplexEstimateAllModule,SumEstimate,ReesRootEulerPositivity,NumericalSupport,FiniteComplexTopInclusion,TorsionZeroStability,LechTorsionOf,LocalContractibility,DuttaDomain,DuttaAlgClosed,CyclicDutta,DuttaInfinitePerfect,DuttaMinimalEstimate,FrobeniusHomologyGrowth,Main}.lean; lean/ComparatorChallenges/DuttaDomain.{json,lean}; lean/docs/194.md, 195.md",
+  "local: preprints/Lechs-multiplicity-conjecture-September-23-2026/build/{main.tex,sections/complex.tex,sections/charp.tex}",
+  "local: preprints/Positivity-of-Serres-Intersection-Multiplicity-September-23-2026/build/sections/{introduction,lengths,positivity}.tex (family 193)",
+  "local: data/items/194_lean.json; data/pilot/194/{novelty,family}.json",
+  "https://arxiv.org/abs/2104.10140 (IMW 2022; search summary only)",
+  "https://arxiv.org/abs/2209.03498 (IMW 2023; search summary)",
+  "https://arxiv.org/abs/2404.17572 (KC-Soto Levins; search summary)",
+  "https://researchseminars.org/talk/FOTR/40 (Walker talk; search summary, fetch failed)",
+  "https://arxiv.org/abs/math/0304220 (Kurano, numerically Roberts; search summary)",
+  "https://arxiv.org/abs/1702.02560 (Walker, total Betti numbers; search summary)",
+  "https://arxiv.org/abs/2305.09771 (VandeBogert-Walker; search summary)",
+  "https://arxiv.org/abs/1105.2244 (BEKS; search summary)",
+  "https://arxiv.org/abs/1001.0585 (Eisenbud-Erman-Schreyer, Filtering free resolutions; search summary)",
+  "https://arxiv.org/abs/1907.08344 (HMQS; search summary)",
+  "https://arxiv.org/abs/1808.01051 (KMQSY; search summary)",
+  "https://arxiv.org/abs/math/0502289 (Enescu-Shimomoto; search summary)",
+  "https://sites.pitt.edu/~hajlasz/OpenAI_Math_Catalogue.html (post-release catalogue; search summary)",
+  "https://kingy.ai/blog/openai-math-722-manuscripts-results-proofs-compute-costs/ (post-release write-up; search summary)"
+ ],
+ "search_log": [
+  "grep lean/ for imports of OAI.RingTheory.Multiplicity outside the folder: only OAI.lean",
+  "grep lean/ for complex_estimate_basis|complex_estimate_allModule|ComplexTheorem outside the folder: none",
+  "grep -n call sites of dutta_minimal_estimate, dutta_lower_bound_infinite_perfect, cyclicDuttaContribution_lower, dutta_algClosed, complex_estimate_*",
+  "python over data/items/194_lean.json: closure sizes (complex_estimate_basis 2,679 decls / ~20.9k lines; dutta_domain 3,499 / ~32.1k; sum_estimate 2,641; uniform_from_sum_estimate 38; acyclicity_finite_torsion 91) and dependents of the item (allModule, complex_theorem, dutta_minimal_estimate)",
+  "grep CONTENTS.md for multiplicity/local ring/Betti/Serre/Cohen-Macaulay families: 193 (Serre), 195 (SmallCM), 200 (EGH), 059 (Zariski, unrelated)",
+  "grep 193, 195, 200 sources for Lech|supernatural|Boij|blowup|Dutta|Eisenbud-Schreyer; read 193 introduction, lengths.tex:200-240, positivity.tex:500-566",
+  "grep paper for thm:complex uses (charp 67/94/244, mixed 270) and for Roberts/Kurano/length conjecture/Betti/HHS (none beyond IMW mentions)",
+  "Mathlib d13f23b (.lake/packages/mathlib): IsRegularLocalRing, Regular/Depth, RegularSequence, ReesAlgebra, projectiveDimension present; no Koszul complex, no Hilbert-Samuel multiplicity, no local Chern characters",
+  "WebSearch: IMW 2022 abstract; IMW length conjecture status; 'How short can a module of finite projective dimension be'; IMW Betti/length conjecture (exact form NOT found); Lech 2026 OpenAI reactions (two queries, one extended); Eisenbud-Erman-Schreyer filtering / local Boij-Soderberg; local HHS bound with entries in m^s (only graded hits); Dutta multiplicity positivity / Roberts rings; Kurano conjecture mixed char; HK Lech-type (Kunz classical); HMQS asymptotic Lech; Walker / VandeBogert-Walker total rank",
+  "WebFetch researchseminars.org and par.nsf.gov: DNS failure (ENOTFOUND); arxiv.org blocked by policy"
+ ]
+}
