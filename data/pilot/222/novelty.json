@@ -1,0 +1,619 @@
+{
+ "family": 222,
+ "title": "Perceptron free energies and microscopic jamming exponents (4 manuscripts: Ising I, spherical S, bi-orthogonal B, jamming J)",
+ "analyst_role": "novelty",
+ "date": "2026-10-12",
+ "inputs": [
+  "docs/PLAN.md",
+  "docs/novelty_agent_prompt.md",
+  "data/pilot/287/novelty.json (key template)",
+  "data/pilot/322/novelty.json (newer key template)",
+  "data/pilot/222/family.json + family.md (no trace, no f1_* files for this family)",
+  "S: preprints/The-free-energy-of-the-spherical-random-perceptron-September-24-2026/build/paper.tex (intro 140-215, Section 'Bulk covariances and the spherical identity' 1075-1300 read in full) + references.bib",
+  "I: build/sections/introduction.tex (read 30-135), bulk.tex (grep), references.bib",
+  "B: build/paper.tex intro (line 68) + inline bibliography",
+  "J: build/main.tex intro (60-200), 2105-2135 (two-row deletion), 7530-7550 (selection), bibliography 9520-9670",
+  "lean/OAI/Probability/Perceptron/Cavity/BulkMarkedTangentLimit.lean (bulkMarkedArray_identification statement) and file list of Cavity/ (text level; Lean trusted as published per PLAN 2026-10-12, not built, lake/comparator not run)"
+ ],
+ "base_library_L": "Mathlib d13f23b (incl. Mathlib.Probability.BrownianMotion) + the four bibliographies listed in family.json base_library_L. Note L contains talagrand2000halfspaces / talagrand2002 (Ising bib), ShcherbinaTirozzi2003, Talagrand2006Spherical, PanchenkoTalagrand2007Cascades, Panchenko2015Multispecies, Mourrat2021Nonconvex, ChenMourrat2025Critical. L- for contamination control = L minus the OpenAI companion S (cited by I and B as 'spherical'/'scalar') and minus 2026 preprints (shmalo2026capacity, chenissamourrat2026, ho2026concavity, ParisiZamponi2026); none of these contains a candidate, but two are AI-assisted.",
+ "precedent_checks": [
+  {
+   "work": "OpenAI, 'The free energy of the spherical random perceptron' (release companion S, 2026-09-24)",
+   "fetched": true,
+   "ai_disclosure": "model-produced (author 'OpenAI', same release)",
+   "contains_candidates": "same: C1 two-pattern restoration and C3 density-as-time contact comparison originate here; I says S 'develops the corresponding scalar enrichment and two-pattern cavity strategy' (I introduction.tex:121-123); B says S '[Sections 5-7] gives the corresponding scalar comparison and cavity approach; no theorem from it is needed below' (B paper.tex:68)",
+   "role_in_paper": "architecture source for I and B (within-release); not cited by J although J uses the same two-row deletion device (J main.tex:2116-2118)"
+  },
+  {
+   "work": "Shmalo, 'The storage capacity of the Ising perceptron: verification of the outstanding numerical conditions', arXiv:2607.11010v1 (13 Jul 2026)",
+   "fetched": false,
+   "ai_disclosure": "YES per search summary of the acknowledgments: most of the work was done by two AI systems, Fable 5 (Anthropic) and Codex (OpenAI), supervised and reviewed by the author (wording unverified: abstract page unreachable)",
+   "contains_candidates": "absent: computer-assisted closure of the Ding-Sun / Huang numerical conditions for the zero-temperature capacity; no free-energy formula, no cavity covariance identification",
+   "role_in_paper": "background-cited in I introduction.tex:54 (capacity history)"
+  },
+  {
+   "work": "Parisi-Zamponi, 'A proof of an identity for the critical exponents of jamming', arXiv:2606.03300 (2 Jun 2026), JSTAT (2026) 073301",
+   "fetched": false,
+   "ai_disclosure": "YES per press coverage (Live Science, letsdatascience, KSCN blog): Zamponi says Claude 'came up with an initial idea that was essentially correct'; the arXiv text itself was not read",
+   "contains_candidates": "close for the exponent RELATION only (a+b=1, i.e. gamma=1/(2+theta), proven within the physics scaling equations assuming existence/convergence of the fullRSB profile); absent for C5 (selection of the microscopic limit by contraction) and for the interval certificate",
+   "role_in_paper": "background in J main.tex:90-94 ('Their argument assumes the existence of the full RSB profile ... Constructing and selecting the microscopic limit is a separate problem')"
+  },
+  {
+   "work": "Chen-Issa-Mourrat, 'Free energy of non-convex multi-species spin glasses with centered Ising spins', arXiv:2606.16636 (2026)",
+   "fetched": false,
+   "ai_disclosure": "none mentioned in search summaries (unverified)",
+   "contains_candidates": "close variant for C6 (critical-point bounds, Section 6; centered-Ising path convexity Prop 2.2 used by I); absent for C1-C3",
+   "role_in_paper": "I cites for concavity (re-proved) and critical-point identification"
+  },
+  {
+   "work": "Ho, 'A Concavity Theorem for the Parisi PDE', arXiv:2606.15432 (2026)",
+   "fetched": false,
+   "ai_disclosure": "none in search snippets (acknowledges V. Issa for the problem; unverified)",
+   "contains_candidates": "ingredient for C6 (concavity, Thm 1.8), not the candidate",
+   "role_in_paper": "I cites as alternative proof of the concavity it re-proves"
+  },
+  {
+   "work": "Chen-Issa-Mourrat, 'The convex structure of the Parisi formula for multi-species spin glasses', arXiv:2508.06397 (2025)",
+   "fetched": false,
+   "ai_disclosure": "none in search summaries (unverified)",
+   "contains_candidates": "close for J08 (martingale representation/uniqueness), J says 'methodological precedent'; absent for C5",
+   "role_in_paper": "J main.tex:164-170"
+  },
+  {
+   "work": "Chen-Mourrat, 'On the free energy of vector spin glasses with non-convex interactions', arXiv:2311.08980, PMP 6 (2025)",
+   "fetched": false,
+   "ai_disclosure": "none (2023 human work)",
+   "contains_candidates": "close variant (conceptual) for C1/C2/C6: subsequential overlap laws are critical points, identified via cavity identities for overlap observables (Sections 6-7, per S paper.tex:191-196). Gaussian vector-spin Hamiltonians only, so the covariance is given, not identified",
+   "role_in_paper": "named precedent in S, I and B for the critical-point identification"
+  },
+  {
+   "work": "Nakajima, 'Uniqueness of Replica-symmetric Saddle Point for Ising Perceptron', arXiv:2512.23195 (29 Dec 2025) [NOT cited]",
+   "fetched": false,
+   "ai_disclosure": "YES per search summary: GPT-5 used to help develop intermediate proof steps and sanity-check computations (unverified wording)",
+   "contains_candidates": "absent (RS saddle-point uniqueness for zero-temperature capacity; no cavity, no RSB)",
+   "role_in_paper": "uncited; relevant only as model-assisted prior work on the same model"
+  }
+ ],
+ "candidates": [
+  {
+   "id": "C1",
+   "name": "Two-pattern removal and restoration: cavity-field covariance B = a(R) deterministic (plus IBP balance c + a_d = ∫ r a dμ)",
+   "paper_items": [
+    "S09 prop:bulk (S paper.tex:1119-1260, eq:bulk-moments)",
+    "I28 (I sections/bulk.tex:1-320)",
+    "B07 (B paper.tex:68)",
+    "J two-row deletion in the lower bound (J main.tex:2116-2118; not in family.json items)"
+   ],
+   "trace": "no trace for family 222",
+   "lean_backed": true,
+   "lean": "S only: Cavity/BulkMarkedTangentLimit.lean:110 bulkMarkedArray_identification (exists monotone a with Q_ij.2 = a(Q_ij.1) a.s.), BulkFreshRestore.lean, BulkRestorationLimit.lean, BulkMarkedMoments.lean, BulkPairLaw.lean; on the single path to expectedPressure_lower_smooth. I's version has no Lean in any comparator DAG; B and J have no Lean.",
+   "statement": "Delete the last two patterns; under GG-good perturbations the omitted system's overlap array is ultrametric/RPC. Restoring the two patterns reweights by e^{f(b1*)+f(b2*)} with fresh marks evaluated on cascades. Pattern exchangeability gives E[B_12 psi(R_12)] = ∫ a psi dμ (one designated pattern) and E[B_12^2] = ∫ a^2 dμ (two independent designated patterns, factorized means), hence E[(B_12 - a(R_12))^2] = 0, with a = alpha E[M_i^2] monotone (martingale of conditional means); same for diagonal a_d and c; Gaussian IBP on a pattern gives c + a_d = ∫ r a dμ.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Talagrand, 'Intersecting random half-spaces: toward the Gardner-Derrida formula' (AoP 2000; in L as talagrand2000halfspaces) and Mean Field Models vol. I ch. 2-3 (perceptron, Shcherbina-Tirozzi), 'cavity in M' (from analyst memory; book text unreachable here)",
+      "relation": "RS regime: symmetry among patterns plus a cavity on the last pattern(s) shows the pattern-side overlap (1/N) sum_k u'(S_k^1)u'(S_k^2) concentrates on a constant r; the 'second moment via two distinct designated indices' step is Talagrand's standard symmetry-plus-cavity template (as for E(R12-q)^2 in SK)",
+      "verdict": "close variant (RS ancestor; S replaces 'constant r' by 'function a(R) on an RPC array' and the one-step cavity by cascade restoration). Not cited by S or I for this step."
+     },
+     {
+      "ref": "Panchenko, 'The free energy in a multi-species SK model' (AoP 2015; Panchenko2015Multispecies in L), synchronization Lemma 2",
+      "relation": "conclusion of the same form: under joint GG, the overlap of a second species is a deterministic nondecreasing function of the first. Here the 'second species' is the pattern-side vector (f'(b_a(x)))_a, whose overlap is B_N",
+      "verdict": "close variant of the conclusion; route differs (Panchenko needs GG for each species via perturbation; S obtains it without perturbing the pattern side, by restoration)"
+     },
+     {
+      "ref": "Chen-Mourrat 2025 (PMP, arXiv:2311.08980) Sections 6-7; Chen-Issa-Mourrat 2026 Section 6",
+      "relation": "identify cavity parameters through overlap observables at critical points; the paper names it as related",
+      "verdict": "close variant (framework), Gaussian Hamiltonians, covariance given"
+     },
+     {
+      "ref": "Panchenko-Talagrand 2007 marked cascades; Panchenko diluted-model invariance (AoP 2013 'spin distributions'), Franz-Leone / Panchenko-Talagrand 2004 Poisson clause cavity",
+      "relation": "re-inserting removed constraints as fresh marks on the limiting Gibbs measure",
+      "verdict": "ingredient (N0)"
+     },
+     {
+      "ref": "Leave-one/two-out arguments in high-dimensional M-estimation (El Karoui; Sur-Candes) and Barbier-Panchenko-Saenz 2022 (strong replica symmetry, log-concave, cavity/leave-one-out)",
+      "relation": "remove samples/constraints to decouple a row from the estimator",
+      "verdict": "genuinely different (RS/convex, no overlap-function identification)"
+     },
+     {
+      "ref": "Bolthausen-Nakajima-Sun-Xu 2022; Ding-Sun 2025; Huang 2024; Nakajima-Sun 2023; Brennecke-Xu-Yau; Stojnic; Abbe-Li-Sly; Aubin-Perkins-Zdeborova; Barbier-Krzakala-Macris-Miolane-Zdeborova adaptive interpolation",
+      "relation": "perceptron free energy/capacity via AMP-conditioned moments, second-moment method, Gordon comparison, Nishimori/adaptive interpolation",
+      "verdict": "genuinely different (none identifies a full-RSB cavity covariance)"
+     }
+    ],
+    "searches": "WebSearch 2026-10-12: Talagrand perceptron cavity u'(S_k) pattern overlap concentration; 'cavity in M' Gardner formula; Shcherbina-Tirozzi Talagrand cavity r; Barbier-Panchenko strong replica symmetry perceptron cavity; synchronization multi-species bipartite Hopfield perceptron second-species overlap; Parisi formula spherical perceptron positive temperature fullRSB rigorous 2025-2026; Ising/spherical perceptron free energy all densities 2026; Chen-Mourrat critical point Sections 6-7. Family analyst's earlier search ('two patterns removed restored cavity covariance deterministic function of overlap perceptron') also found no identical construction. WebFetch failed with DNS errors on every host tried (arxiv.org, ar5iv.labs.arxiv.org, proceedings.mlr.press, michel.talagrand.net, en.wikipedia.org); curl to arxiv.org / export.arxiv.org / michel.talagrand.net got proxy 403. All literature claims rest on WebSearch summaries plus analyst domain knowledge; no quote is verified and no precedent full text was read.",
+    "verdict": "close variant exists: the RS pattern-side-overlap concentration of Talagrand (symmetry + cavity on patterns, second moment from two indices) and Panchenko's synchronization conclusion. No identical full-RSB restoration found."
+   },
+   "test2": {
+    "verdict": "borderline pass",
+    "evidence": "The goal (PerceptronFreeEnergy: E p_N -> inf_m {alpha V(m) + S(m)}) mentions no bulk covariance B_N, no omitted system and no restoration. However the identity B = a(R) is an instance of the synchronization conclusion schema in L (Panchenko 2015) applied to the pattern-side overlap, and the RS version (B ~ r) is in L via Talagrand 2000. So the *statement* is near-analytic relative to L; the *construction* (two-pattern restoration that replaces a missing perturbation) is not a subterm of anything in L."
+   },
+   "test3": {
+    "verdict": "pass (single-path) with low dominated share",
+    "evidence": "family.json: bulkMarkedArray_identification subtree 43.1% / dominated 3.6%; bulk_marked_self_consistency subtree 50.4% / dominated 6.7% of the 4213-decl spherical DAG; the lower bound (dominated 48%) passes through it on a single path. Used in all four manuscripts (I, S, B, J)."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "no trace. Estimated 1 from L once the cavity-in-N lower bound is chosen and the need 'identify the covariance of the field on new coordinates' is posed (S states it as the obstacle, paper.tex:1077); the RS template in L (Talagrand) points straight at 'second moment via two patterns'.",
+    "chain_depth": "2 (needs GG-good parameters for the omitted system and the marked-cascade calculus first; feeds C2 and the cavity increment)",
+    "protocol": "P-C1"
+   },
+   "final": {
+    "N": "N2",
+    "F": "F3 if ever upgraded (auxiliary construction)",
+    "confidence": 0.7,
+    "justification": "Stays N2, not N3. The device is the full-RSB lift of Talagrand's RS symmetry-plus-pattern-cavity concentration of the pattern-side overlap, with Panchenko-style synchronization as its conclusion schema and Chen-Mourrat's critical-point identification as its named framework. What is genuinely new is the technical move that gets synchronization of the pattern-side overlap without a pattern-side perturbation (restoring two removed patterns as independent cascade marks and closing by first/second moments). That is a non-trivial adaptation, not a new concept: its Test-2 status is borderline (the target identity has the form of an L statement) and its dominated share is small (3.6-6.7%). Reuse across I, S, B, J is reuse within one problem type (perceptron lower bounds) by the same model, not cross-problem reuse; record it in the release-wide reuse count. Upgrade path: P-C1 arm B shows contamination-controlled models rarely find it, AND a perceptron-expert check shows Talagrand's cavity-in-M does not already compute the second moment via two patterns."
+   }
+  },
+  {
+   "id": "C2",
+   "name": "Tangential divergence identity on S_N + GG/ultrametric conditioning => a(r)D_q(r) = U(r), solved by a measure Wronskian => a = A_q = ∫_0^r D_q^{-2} and supp μ ≤ B_* < 1",
+   "paper_items": [
+    "S10 (S paper.tex:1262-1330, eq:tangent-limit, eq:self-consistency)"
+   ],
+   "trace": "no trace for family 222",
+   "lean_backed": true,
+   "lean": "Cavity/BulkMarkedSelfConsistency.lean:39 bulk_marked_self_consistency; tangent_sphere_self_consistency / tangent_wronskian_ae (TangentConsistency.lean:34,73 per family.json); subtree 63/25 decls, dominated 1.1%/0.4%",
+   "statement": "Integrate div of u = x^2 - R_12 x^1 on S_N against G(R_12): (N-1)E<R G> = E<G'(1-R^2) + G u.grad H>; Gaussian IBP over patterns and C1's identification give r = a(r)(1-r^2) - 2E[a(R_13)(R_23 - r R_13) | R_12 = r]; GG + ultrametric conditional laws turn this into a(r)D_q(r) = U(r); a Wronskian (U'D - UD')' = 0 solve gives a = A_q, the Crisanti-Sommers stationary field, and a support bound.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Talagrand 2006 (Free energy of the spherical mean field model; in L) and Crisanti-Sommers 1992",
+      "relation": "the target equation 2h = A_q(q) is the CS stationarity condition",
+      "verdict": "target already in L"
+     },
+     {
+      "ref": "Panchenko-Talagrand 2007 multiple spherical SK; Chen 2013 spherical ASS; Bates-Sohn arXiv:2109.14791 (CS multi-species; IBP in stationarity analysis); Ko arXiv:1911.04355; arXiv:2007.06019 (vector spherical critical-point identity)",
+      "relation": "spherical integration-by-parts / critical-point identities on the support of the Parisi measure",
+      "verdict": "close variant (technique), different object (Gaussian Hamiltonian, functional side not Gibbs side)"
+     },
+     {
+      "ref": "Chen-Mourrat 2025 critical points",
+      "relation": "Gibbs-side derivation that limits are critical points",
+      "verdict": "close variant (framework)"
+     }
+    ],
+    "searches": "WebSearch 2026-10-12: 'spherical spin glass integration by parts on the sphere tangent vector Gibbs measure identity Crisanti-Sommers optimality condition Parisi measure ODE'; family analyst's 'spherical integration by parts overlap identity Crisanti-Sommers stationarity cavity'. WebFetch failed with DNS errors on every host tried (arxiv.org, ar5iv.labs.arxiv.org, proceedings.mlr.press, michel.talagrand.net, en.wikipedia.org); curl to arxiv.org / export.arxiv.org / michel.talagrand.net got proxy 403. All literature claims rest on WebSearch summaries plus analyst domain knowledge; no quote is verified and no precedent full text was read.",
+    "verdict": "no identical Gibbs-side tangential identity for a perceptron covariance found; technique and target both have close neighbours"
+   },
+   "test2": {
+    "verdict": "fail (borderline)",
+    "evidence": "The conclusion a = A_q is the stationarity equation of the entropy dual already in L (Talagrand 2006 eq. 1.11, S06). Spherical divergence/IBP identities are standard tools in L. The non-analytic part is only the choice of tangent field u = x^2 - R x^1 and the Wronskian solve, both routine once the target is known."
+   },
+   "test3": {
+    "verdict": "pass (small)",
+    "evidence": "On the single bulk-identification path, but dominated 0.4-1.1% of the spherical DAG; supplies the support bound B_* < 1 needed for uniformity."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "estimated 1 given C1 and the CS dual",
+    "chain_depth": "1 (consumes C1)",
+    "protocol": "P-C2"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "A clean bridge between the perceptron's empirical gradient covariance and the CS stationary field, but the target is in L and spherical IBP is a standard spin-glass tool; it is model-specific craft, not a new concept. Small Lean footprint."
+   }
+  },
+  {
+   "id": "C3",
+   "name": "Upper bound by contact comparison with Poissonized pattern density as Hamilton-Jacobi time, plus tail-integral order of the one-pattern value",
+   "paper_items": [
+    "S08 + S05 (S paper.tex:169-183, Section 'upper' ~900-1075)",
+    "I21, I24, I26 + I07 (I introduction.tex:95-107, upper.tex)",
+    "B's scalar-to-matrix analogue"
+   ],
+   "trace": "no trace for family 222",
+   "lean_backed": true,
+   "lean": "S: Variational/LevelTrialApprox.lean:155 expectedPressure_upper_variational (subtree 50.5%, dominated 11.2%); Control/QuantileControlTail.lean:63 sourceQuantile_control_tail_order (dominated 2.6%); source_global_contact_limit_tail_order_along (dominated 2.5%). I's Lean upper-bound formalization is an orphan outside every comparator DAG.",
+   "statement": "Enrich by a cascade label, hierarchical Gaussian field and Poisson(Nt) pattern count; assume the variational bound fails, take a penalized deterministic contact minimizer, derive joint GG + synchronization; the field first-order condition gives tail(p) >= tail(q), the tail order (∫_s^1 p >= ∫_s^1 q => V(p) <= V(q), by summation by parts) gives V(p) <= V(q), and the time derivative (one added nonlinear pattern) tends to -V(p)+V(q)+delta > 0: contradiction.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Mourrat 2021 'Nonconvex interactions in mean-field spin glasses' (PMP; arXiv:2004.01679) Section 4, proof of Thm 4.1; Mourrat 2023 vector spins (AIHP) Thm 3.4/Sec 5",
+      "relation": "contact-point supersolution argument; named and followed explicitly by S and I ('adapts', 'implements')",
+      "verdict": "close variant (same argument, new Hamiltonian)"
+     },
+     {
+      "ref": "Mourrat-Panchenko 2020 enrichment; Mourrat 2018/2021 HJ (arXiv:1811.01432 names the perceptron as a target)",
+      "relation": "cascade-field enrichment",
+      "verdict": "equivalent ingredient"
+     },
+     {
+      "ref": "Franz-Leone 2003; Panchenko-Talagrand 2004 (diluted models), Poisson number of clauses differentiated in density",
+      "relation": "Poissonized constraint count as the interpolation/time variable",
+      "verdict": "close variant (classical in diluted models)"
+     },
+     {
+      "ref": "Guerra 2003 / Talagrand monotonicity lemmas / Chen's derivative formula; Auffinger-Chen 2015",
+      "relation": "monotonicity of Parisi-type functionals in the overlap law",
+      "verdict": "close variant for the tail order"
+     }
+    ],
+    "searches": "WebSearch 2026-10-12: 'Hamilton-Jacobi approach perceptron free energy Mourrat enrichment Poisson number of constraints upper bound' (found Mourrat framework, no perceptron application). WebFetch failed with DNS errors on every host tried (arxiv.org, ar5iv.labs.arxiv.org, proceedings.mlr.press, michel.talagrand.net, en.wikipedia.org); curl to arxiv.org / export.arxiv.org / michel.talagrand.net got proxy 403. All literature claims rest on WebSearch summaries plus analyst domain knowledge; no quote is verified and no precedent full text was read.",
+    "verdict": "close variant: Mourrat's named argument; the model-specific twist (density-time + tail order) has classical neighbours"
+   },
+   "test2": {
+    "verdict": "fail (borderline)",
+    "evidence": "The architecture is a statement-level instance of Mourrat 2021 Sec. 4 (in L) with the time variable reinterpreted; the tail order is one summation-by-parts step from the derivative formula."
+   },
+   "test3": {
+    "verdict": "pass",
+    "evidence": "Heads ~50% subtree of the spherical DAG (upper bound), dominated 11.2%."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "estimated 1 given Mourrat 2021 in L",
+    "chain_depth": "2",
+    "protocol": "P-C3"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.75,
+    "justification": "An announced adaptation of Mourrat's contact-point method (the papers say 'adapts'/'implements'), with the natural perceptron choice of time variable (density) and a one-step monotonicity lemma. N2 by the 'precedent the paper names itself' rule; reused in I, S, B."
+   }
+  },
+  {
+   "id": "C4",
+   "name": "B: theta-powered witness integral over Stiefel columns + projection witnesses to a Haar flag + weighted Haar-shell majorization",
+   "paper_items": [
+    "B03",
+    "B08",
+    "B09",
+    "(B04, B05 folded in)"
+   ],
+   "trace": "no trace for family 222",
+   "lean_backed": false,
+   "lean": "none (B has no Lean)",
+   "statement": "Z_{M,theta} = [∫(∫ e^H dμ_in)^theta dμ_out]^{1/theta} with theta>0 fixed, then theta->0 after N->inf; one-sided distance tests to a nested Haar flag; redistribution of block mass toward earlier blocks cannot increase the limiting weighted shell volume (HLP allocation + random Haar subdivision).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Monasson 1995 real replicas; Franz-Parisi potential; 1RSB Parisi parameter m",
+      "relation": "theta-power of a constrained inner partition function",
+      "verdict": "close variant (physics device made rigorous)"
+     },
+     {
+      "ref": "Kabashima 2008; Shinzato-Kabashima 2008 (arXiv:0809.1978) replica analyses of perceptrons with U D V^T patterns",
+      "relation": "same model class, non-rigorous",
+      "verdict": "different (method)"
+     },
+     {
+      "ref": "Hardy-Littlewood-Polya; vom Ende-Dirr 2022 relative majorization; Mezzadri 2007 Haar frames; Ko 2019 matrix spherical entropy",
+      "relation": "majorization and Haar/Stiefel tools",
+      "verdict": "ingredients (N0), credited"
+     }
+    ],
+    "searches": "WebSearch 2026-10-12: 'rigorous free energy perceptron rotationally invariant data matrix bi-orthogonally invariant Kabashima Shinzato ... Barbier Maillard' (only replica/RS or iid-rigorous results). WebFetch failed with DNS errors on every host tried (arxiv.org, ar5iv.labs.arxiv.org, proceedings.mlr.press, michel.talagrand.net, en.wikipedia.org); curl to arxiv.org / export.arxiv.org / michel.talagrand.net got proxy 403. All literature claims rest on WebSearch summaries plus analyst domain knowledge; no quote is verified and no precedent full text was read.",
+    "verdict": "no rigorous predecessor for the model; devices have close physics/majorization neighbours"
+   },
+   "test2": {
+    "verdict": "pass (weak)",
+    "evidence": "Not in the goal; theta-powered integrals and HLP are in L as general devices."
+   },
+   "test3": {
+    "verdict": "pass (text level)",
+    "evidence": "B's reduction of dependent-entry disorder to Gaussian Stiefel computations rests on it; B Sections 3-7 read at sketch level by the family analyst."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "estimated 1-2",
+    "chain_depth": "2",
+    "protocol": "informal (LLM judge only; no Lean)"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Rigorous use of the Monasson/Franz-Parisi theta device plus credited majorization; the random-Haar-subdivision transfer is new technique but not a new concept. No Lean, so informal list only even if upgraded."
+   }
+  },
+  {
+   "id": "C5",
+   "name": "J: rigidity of logarithmic-time entire limits by strict contraction, selecting the susceptibility power a_* (lambda(a)=a) with an interval certificate",
+   "paper_items": [
+    "J10",
+    "J12",
+    "J13 (J main.tex Section 'Selection of the critical similarity profile', 7533ff; certificate 9670-10355)"
+   ],
+   "trace": "no trace for family 222",
+   "lean_backed": false,
+   "lean": "none (J has no Lean; floating-point certificate, source file not in release)",
+   "statement": "Every limit obtained by translating the critical layer in logarithmic time is confined by barriers and then forced by a strict contraction to slope a_*, the root of lambda(a)=a; gamma = 1/(2+theta) with certified enclosures.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Charbonneau-Kurchan-Parisi-Urbani-Zamponi 2014 (Sec. IX); Franz-Parisi-Sevelev-Urbani-Zamponi 2017 (Sec. V); Franz-Parisi 2016",
+      "relation": "stationary scaling equations, spectral characterization and numerical exponents",
+      "verdict": "close variant (physics)"
+     },
+     {
+      "ref": "Parisi-Zamponi arXiv:2606.03300 (2026; Claude-assisted per press)",
+      "relation": "analytic proof of a+b=1 within the scaling equations, via IBP identities and maximum principles",
+      "verdict": "close variant for the relation; different for selection of the microscopic limit"
+     },
+     {
+      "ref": "Liouville/contraction rigidity for entire solutions (standard PDE)",
+      "relation": "template",
+      "verdict": "template-level"
+     }
+    ],
+    "searches": "WebSearch 2026-10-12: 'rigorous proof jamming critical exponents negative spherical perceptron gap force distribution' (only physics + Parisi-Zamponi + capacity bounds). WebFetch failed with DNS errors on every host tried (arxiv.org, ar5iv.labs.arxiv.org, proceedings.mlr.press, michel.talagrand.net, en.wikipedia.org); curl to arxiv.org / export.arxiv.org / michel.talagrand.net got proxy 403. All literature claims rest on WebSearch summaries plus analyst domain knowledge; no quote is verified and no precedent full text was read.",
+    "verdict": "no rigorous predecessor for the selection; scaling equations and values are physics N0"
+   },
+   "test2": {
+    "verdict": "pass (weak)",
+    "evidence": "Contraction on entire limits not in the goal; the scaling equation itself is in L (CKPUZ, FPSUZ)."
+   },
+   "test3": {
+    "verdict": "pass",
+    "evidence": "The exponent clause of J's theorem rests on it."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "estimated 1-2",
+    "chain_depth": "3+",
+    "protocol": "informal (LLM judge; no Lean)"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Rigorous selection is new as a result, but the equations, values and relation come from physics (one AI-assisted) and the rigidity argument is a standard contraction pattern; computer-assisted with an unreleased certificate file."
+   }
+  },
+  {
+   "id": "C6",
+   "name": "I: Ising entropy dual and attainment of the dual by coordinate exchangeability (cavity-spin overlap = bulk overlap)",
+   "paper_items": [
+    "I04",
+    "I31"
+   ],
+   "trace": "no trace for family 222",
+   "lean_backed": false,
+   "lean": "none in any comparator DAG (IsingFiniteness covers only the finiteness clause)",
+   "statement": "S_I(q) = sup_h {l(h) + (1/2)∫hq}; coordinate exchangeability identifies the cavity-field overlap with p, which via concavity of l (Chen-Issa-Mourrat Prop 2.2 / Ho Thm 1.8, re-proved) gives attainment S_I(p) = l(h) + (1/2)∫ph.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Mourrat 2025 'Un-inverting the Parisi formula' (AIHP); Chen-Issa-Mourrat arXiv:2606.16636 Section 6 / Thm 6.1; Chen-Mourrat 2025",
+      "relation": "entropy as dual of the one-spin Parisi functional; critical-point bounds",
+      "verdict": "close variant"
+     }
+    ],
+    "searches": "family analyst's checks + WebSearch for Chen-Issa-Mourrat 2606.16636 and Ho 2606.15432 (2026-10-12). WebFetch failed with DNS errors on every host tried (arxiv.org, ar5iv.labs.arxiv.org, proceedings.mlr.press, michel.talagrand.net, en.wikipedia.org); curl to arxiv.org / export.arxiv.org / michel.talagrand.net got proxy 403. All literature claims rest on WebSearch summaries plus analyst domain knowledge; no quote is verified and no precedent full text was read.",
+    "verdict": "close variant"
+   },
+   "test2": {
+    "verdict": "fail (borderline)",
+    "evidence": "Duality form is in L (Mourrat 2025, Chen-Issa-Mourrat)."
+   },
+   "test3": {
+    "verdict": "pass (text level)",
+    "evidence": "Needed for the Ising lower bound; no Lean."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": "1",
+    "protocol": "none (no Lean, N2)"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "Direct instance of the 2025-26 Mourrat school's duality; the sigma(p)-measurability detail is technique."
+   }
+  },
+  {
+   "id": "C7",
+   "name": "J analytic devices: row concavity, Gaussian-scale-mixture universality with localized slices, deletion-and-repair sharp threshold, convex nonnegative Brownian-martingale critical problem",
+   "paper_items": [
+    "J03",
+    "J05",
+    "J06",
+    "J08",
+    "J09"
+   ],
+   "trace": "no trace for family 222",
+   "lean_backed": false,
+   "lean": "none",
+   "statement": "See family.json items J03-J09.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Auffinger-Chen 2015 (strict convexity); Chatterjee 2006 Lindeberg; Talagrand / Nakajima-Sun 2023 sharp-threshold arguments; Mourrat 2025 un-inverting; Chen-Issa-Mourrat arXiv:2508.06397",
+      "relation": "each device's named precedent",
+      "verdict": "close variants"
+     }
+    ],
+    "searches": "family analyst quick checks; J's own precedent remarks (main.tex:146-170). WebFetch failed with DNS errors on every host tried (arxiv.org, ar5iv.labs.arxiv.org, proceedings.mlr.press, michel.talagrand.net, en.wikipedia.org); curl to arxiv.org / export.arxiv.org / michel.talagrand.net got proxy 403. All literature claims rest on WebSearch summaries plus analyst domain knowledge; no quote is verified and no precedent full text was read.",
+    "verdict": "close variants"
+   },
+   "test2": {
+    "verdict": "fail/borderline",
+    "evidence": "Each is a model-specific instance of an L schema."
+   },
+   "test3": {
+    "verdict": "pass (text level)",
+    "evidence": "J's threshold and critical-limit construction rest on them."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "1",
+    "chain_depth": "1-2",
+    "protocol": "none (no Lean, N2)"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.65,
+    "justification": "Precedented technique adapted to an unbounded quadratic-penalty spherical model."
+   }
+  }
+ ],
+ "excluded_from_candidates": [
+  {
+   "paper": "I01-I03, S01-S04, S07, S11-S12, J01-J02, J04, J07, J11, J13, B01-B02, B06, B10-B11, L01-L03",
+   "reason": "definitions/recursions/statements or routine assembly; N0-N1 in family.json"
+  },
+  {
+   "paper": "GG/ultrametricity (incl. the Lean re-proof gg_ultrametric, TripleIndex.lean:200), RPC and marked transform, synchronization (Panchenko 2015), ASS, Boue-Dupuis/Auffinger-Chen control representation, Lindeberg, Crisanti-Sommers entropy, HLP, Marchenko-Pastur",
+   "reason": "N0 transfer; the Lean re-proof of Panchenko ultrametricity is formalization effort, not novelty"
+  },
+  {
+   "paper": "S06 uniform spherical dual (SphericalField comparator)",
+   "reason": "N1-N2 explicit computation of a known Crisanti-Sommers dual; folded into C2 as its target"
+  },
+  {
+   "paper": "B04, B05, B07",
+   "reason": "matrix analogues of S items; B07 folded into C1, B04/B05 into C4"
+  },
+  {
+   "paper": "I21, I24",
+   "reason": "folded into C3 (enrichment + contact objective)"
+  }
+ ],
+ "family_D": {
+  "label": "D2",
+  "confidence": 0.7,
+  "rests_on": "C1 (two-pattern restoration) as the best item, N2; C2, C3 (Lean-backed) also N2; C4-C7 N2 without Lean. No N3 item, so nothing enters the Lean shortlist and no downstream file is needed.",
+  "falls_to": "Not lower than D2 (C1-C3 are genuine adaptations, not abbreviations). Rises to D3 only if (a) a perceptron expert or the book text shows Talagrand's cavity-in-M does NOT already obtain the pattern-side second moment from two patterns, AND (b) P-C1 arm B shows contamination-controlled models with L- rarely propose restoration-based identification (rate below the calibrated threshold), AND (c) the device is shown to transfer beyond perceptron variants (e.g. to a Hopfield or GLM free energy).",
+  "not_transfer": "Spin-glass toolkit (GG, Panchenko ultrametricity, RPC, synchronization, ASS), stochastic control, HJ, RMT and majorization are N0 transfer; the candidates are their model-specific couplings, all with named or close precedents.",
+  "correctness_caveat": "S is the best-certified claim (faithful full-headline comparator, 54k-line DAG, no sorry/axiom; trusted as published per PLAN 2026-10-12, not built here). I's headline rests on the paper only; B is a triple nested limit read at sketch level; J has no Lean and an unreleased floating-point certificate.",
+  "reuse_note": "Within-release device reuse: C1 appears in all four manuscripts (I, S, B and, uncited, J); C3 in I, S, B. This is reuse across variants of one problem type by the same model (closer to a corollary/template than cross-problem reuse); count it in the release-wide reuse tally with that label."
+ },
+ "provenance_flag": {
+  "applies": "partial",
+  "builds_on_prior_model_result_strict": false,
+  "model_produced_precedent": true,
+  "explanation": "Within the release: I and B take their architecture (two-pattern cavity, density-field contact comparison) from the OpenAI companion S (same date, 2026-09-24), explicitly stating that no theorem from it is used (I introduction.tex:121-124; B paper.tex:68); J reuses the two-row deletion without citing S. So for I and B the closest precedent of C1/C3 is model-produced (the family analyst records this as 'yes'); for S, the only Lean-backed headline, no model-produced precedent was found. Externally, two cited 2026 works are AI-assisted but contain no candidate: Shmalo arXiv:2607.11010 (acknowledges Fable 5 and Codex; background in I) and Parisi-Zamponi arXiv:2606.03300 (Claude-assisted per press; background in J, close only for the exponent relation gamma = 1/(2+theta)). Uncited: Nakajima arXiv:2512.23195 (GPT-5-assisted RS saddle uniqueness; absent). Searches for perceptron free energy + ChatGPT/GPT-5/OpenAI/AI-assisted found no model-produced precedent for any candidate. All disclosures are from search summaries; arXiv pages were unreachable."
+ },
+ "bridge_novelty": [
+  {
+   "import": "Spin-glass RSB toolkit (GG, ultrametricity, RPC, synchronization, ASS) -> perceptron",
+   "status": "known route",
+   "evidence": "Talagrand 2000/2011, Bolthausen-Nakajima-Sun-Xu, Montanari-Zhong-Zhou; physics since Gardner 1988"
+  },
+  {
+   "import": "Hamilton-Jacobi / contact-point method (Mourrat) -> perceptron",
+   "status": "known route (framework), first perceptron instance not found",
+   "evidence": "Mourrat arXiv:1811.01432 names the perceptron as a target; no prior perceptron application in searches"
+  },
+  {
+   "import": "Stochastic control (Boue-Dupuis, Auffinger-Chen) -> one-pattern value V",
+   "status": "known route",
+   "evidence": "Auffinger-Chen 2015 control form of the Parisi PDE"
+  },
+  {
+   "import": "Sphere geometry (tangential divergence) + ODE Wronskian -> covariance identification",
+   "status": "known route (in-field), new instance",
+   "evidence": "spherical IBP identities in Panchenko-Talagrand 2007, Chen 2013, Bates-Sohn 2021"
+  },
+  {
+   "import": "Random matrix theory (Haar/Stiefel frames, Marchenko-Pastur) -> structured-disorder perceptron",
+   "status": "known route",
+   "evidence": "Kabashima 2008, Shinzato-Kabashima 2008 (replica); orthogonally invariant GLM literature"
+  },
+  {
+   "import": "Majorization (HLP, relative majorization) -> Haar-shell volume comparison",
+   "status": "possibly new bridge (no precedent found; low confidence)",
+   "evidence": "no hit in searches for majorization in perceptron/spin-glass free energies; summary-level only. Per CLAUDE.md a new bridge is recorded separately and is not a jump."
+  },
+  {
+   "import": "Validated numerics -> jamming exponents",
+   "status": "known route",
+   "evidence": "computer-assisted proofs are standard in math physics; Shmalo 2607.11010 did the same for perceptron capacity constants (AI-assisted)"
+  },
+  {
+   "import": "Physics scaling theory (CKPUZ, FPSUZ, Franz-Parisi) -> rigorous critical limit",
+   "status": "known route (predictions cited)",
+   "evidence": "J main.tex:74-94"
+  }
+ ],
+ "discoverability_protocols": {
+  "common": {
+   "models": "Training cutoff strictly before 2026-09-24 (manuscript date of S, the earliest source of C1/C3; release 2026-10-06). Canary probe: ask for the free energy of the spherical perceptron with a bounded continuous potential at all densities and for the 'two-pattern removal' lemma; exclude any model that reproduces S. No browsing/retrieval. Exclude the OpenAI model(s) that produced the release (uncontrolled upper-reference arm only). Judge differs from proposer.",
+   "context_L_minus": "Mathlib d13f23b digest (BrownianMotion, ProbabilityMeasure weak convergence, Gaussian IBP) + S's 24-entry bibliography as abstracts plus invoked statements. For I-based variants: I's bib minus 'spherical' (OAI companion), shmalo2026capacity, chenissamourrat2026, ho2026concavity.",
+   "sampling": "n = 256 per arm, temperature 1.0, fixed reasoning budget (e.g. 32k tokens); unbiased pass@k for k in {1,2,4,8,16,32,64,128,256}.",
+   "judging": "Two independent LLM judges whose prompt includes S's precedent remarks (paper.tex:169-196, 1077-1080) and this file's neighbour lists; a spin-glass probabilist checks all hits and 10% of misses; Lean equivalence against bulkMarkedArray_identification / bulk_marked_self_consistency where a formal statement is proposed.",
+   "controls": "Positive: Cook-Reckhow extension variables for PHP. Negative: C3 (named Mourrat adaptation) and S06 (CS dual computation) in the same format; threshold calibrated as in PLAN step 4."
+  },
+  "P-C1": {
+   "item": "C1 two-pattern removal and restoration",
+   "hide": "S Section 'The bulk limit and two-pattern removal' (paper.tex:1119-1260) and everything downstream: spherical self-consistency (1262ff), cavity section, completion; Lean Cavity/Bulk* (BulkFreshRestore, BulkRestorationLimit, BulkMarkedMoments, BulkPairLaw, BulkMarkedTangentLimit, BulkMarkedSelfConsistency) and dependants.",
+   "arm_A_pivot": "Give the cascade calculus, GG-good parameters for an omitted system, and the target statement 'B_N(x^1,x^2) converges to a deterministic nondecreasing function of R_12'. Ask for a proof.",
+   "arm_B_decisive": "Give the problem, L-, the upper bound and the cavity-in-N plan, and state only the obstacle: 'the field on new coordinates has covariance B_N, which is not a Gaussian-process covariance; identify it.' Do not mention removing patterns.",
+   "arm_C_open": "Problem statement + L- only.",
+   "equivalence": "Hit = (i) single out two (or more) patterns by exchangeability, (ii) evaluate them as fresh patterns on the limiting Gibbs/RPC structure of the reduced system, (iii) first moment defines a(R) = E[B|R], second moment via two independent restored patterns gives zero variance. Separate tally: alternative route via a pattern-side perturbation + Panchenko synchronization (counts as 'alternative hit', evidence against N3). Partial: one-pattern cavity giving only E[B|R].",
+   "k": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32,
+    64,
+    128,
+    256
+   ]
+  },
+  "P-C2": {
+   "item": "C2 tangential divergence + Wronskian",
+   "hide": "S 'Spherical self-consistency' (paper.tex:1262-1330) and downstream; Lean tangent_sphere_self_consistency, tangent_wronskian_ae.",
+   "context": "L- + C1's statement (B = a(R), c + a_d = ∫ r a dμ) + the CS dual S06.",
+   "task": "Show a = A_q on supp μ and bound sup supp μ < 1.",
+   "equivalence": "Hit = a sphere-tangent integration-by-parts identity in one replica producing a(r)D_q(r) = U(r) (any equivalent form) and an ODE/Wronskian solve. Expected high hit rate (N2 control).",
+   "k": [
+    1,
+    4,
+    16,
+    64,
+    256
+   ]
+  },
+  "P-C3": {
+   "item": "C3 density-as-time contact comparison",
+   "hide": "S Section 'upper' and S05 tail order; Lean expectedPressure_upper_variational subtree.",
+   "context": "L- including Mourrat 2021 Sec. 4 and Mourrat-Panchenko 2020.",
+   "equivalence": "Hit = Mourrat contact-point argument with Poissonized pattern density as the time variable plus a convex/tail-order monotonicity of V. Serves as a negative control (named precedent).",
+   "k": [
+    1,
+    4,
+    16,
+    64,
+    256
+   ]
+  },
+  "informal_C4_C5": "No Lean: if ever upgraded, LLM-judge-only protocols with B Sections 3-7 / J Section 'Selection' hidden; never counted as confirmed."
+ },
+ "open_questions": [
+  "Read Talagrand Mean Field Models vol. I ch. 2-3 and Talagrand AoP 2000 ('Intersecting random half-spaces'): does the RS proof already compute E[((1/N) sum_k u'(S_k^1)u'(S_k^2) - r)^2] via two designated patterns? If yes, C1 is firmly N2; if no, C1 moves toward borderline N3. The text was unreachable here (WebFetch DNS failure, proxy 403).",
+  "Neither S nor I cites Talagrand's perceptron cavity for the two-pattern step; their named precedent is Chen-Mourrat. Ask an expert (Panchenko, Mourrat, Chen, Sun) whether restoration-based synchronization of the pattern-side overlap is folklore.",
+  "Verify AI-disclosure wording of Shmalo arXiv:2607.11010 and Parisi-Zamponi arXiv:2606.03300 against the PDFs (search summaries only).",
+  "J reuses the two-row deletion without citing S: was J written independently or from the same run? Only OpenAI can answer.",
+  "J's certificate source (certificate/original_certificate.py) and reproducibility record are not in the release; J also records a driver run on October 4, 2026, after its stated date of September 24.",
+  "Does Mourrat's HJ program already contain an unpublished perceptron instance (his 2018 paper names it as a target)?"
+ ],
+ "sources": [
+  "https://arxiv.org/abs/2607.11010 (Shmalo; search result only, AI acknowledgment per summary)",
+  "https://arxiv.org/pdf/2606.03300 (Parisi-Zamponi; search result only)",
+  "https://livescience.com/physics-mathematics/mathematics/nobel-prize-winning-physicist-and-team-use-claude-ai-to-solve-decades-old-math-puzzle (search result only)",
+  "https://kscn.discourse.group/t/jammings-missing-identity-how-parisi-and-an-ai-found-the-proof/394 (search result only)",
+  "https://arxiv.org/pdf/2606.16636 ; https://perso.ens-lyon.fr/jean-christophe.mourrat/centered.pdf (Chen-Issa-Mourrat; search results only)",
+  "https://arxiv.org/pdf/2606.15432 (Ho; search result only)",
+  "https://arxiv.org/pdf/2508.06397 (Chen-Issa-Mourrat 2025; search result only)",
+  "https://arxiv.org/pdf/2311.08980 (Chen-Mourrat; search result only)",
+  "https://arxiv.org/abs/2512.23195v1 (Nakajima, GPT-5-assisted; search result only)",
+  "https://arxiv.org/pdf/2009.12939 (Barbier-Panchenko-Saenz; search result only)",
+  "https://proceedings.mlr.press/v178/bolthausen22a/bolthausen22a.pdf (Bolthausen-Nakajima-Sun-Xu; search result only)",
+  "https://arxiv.org/pdf/1811.01432 ; https://arxiv.org/pdf/2004.01679 (Mourrat HJ / nonconvex; search results only)",
+  "https://arxiv.org/pdf/2109.14791 ; https://arxiv.org/pdf/1911.04355 ; https://arxiv.org/pdf/2007.06019 (spherical CS / critical-point identities; search results only)",
+  "https://arxiv.org/pdf/2103.05945 ; https://web3.arxiv.org/pdf/0809.1978 (rotationally invariant perceptron replica analyses; search results only)",
+  "https://arxiv.org/pdf/1501.03397 ; https://arxiv.org/pdf/1902.08243 (Franz-Parisi jamming; search results only)",
+  "https://michel.talagrand.net/challenge/volume1.pdf (Talagrand vol. I; located by search, not readable: DNS/proxy failure)"
+ ]
+}
