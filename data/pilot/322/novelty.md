@@ -1,5 +1,38 @@
 # Family 322: novelty pass (Tingley's sphere-isometry problem)
 
+## Full-text re-check (2026-10-12)
+arXiv was reachable via curl. I searched 15 full texts for fixed-point|Darbo|Schauder|Brouwer|Kuratowski|noncompact|Sadovskii|invariance of domain|condensing|contraction and read the relevant sections. Per-paper entries and quotes are in `novelty.json` → `verified_checks`. I also ran abstract searches through the arXiv API, e.g. Darbo with isometr*, and "fixed point" with Tingley or Mazur-Ulam. None returned anything relevant.
+
+**What the full texts show**
+- **No prior Tingley or Mazur-Ulam work uses a fixed-point theorem.** None uses Darbo, Schauder, Brouwer or a Kuratowski χ. This covers:
+  - Kadets-Martín 1206.4839, whose method is differentiability of f and F plus Tingley's Mankiewicz-on-facet-cones step;
+  - Peralta's survey 1801.02473;
+  - Mori 1712.09192 and Mori-Ozawa 1804.10674;
+  - Cueto-Avellaneda-Peralta 1803.00604 and 1903.11917;
+  - Banakh 2103.09268 and Banakh-Cabello Sánchez 2103.09266;
+  - Cabello Sánchez 1810.02461;
+  - Fakhoury 2412.00891;
+  - Huang-Zhu 2607.11244 and 2608.30131;
+  - Nakamura-Tanaka 2609.31096.
+- **"Fixed points" appear only as fixed-point *sets*.** In Cabello Sánchez Thm 3.11 and in Ma, the set {τ(x) = x} is shown to be clopen. That is a different argument.
+- **New nearest neighbour, not cited by 322: Ma, arXiv:2609.25065 (15 Sep 2026).** It treats 3-dim Tingley, partially.
+  - It uses chord-direction maps (x−a)/N(x−a), common supports, invariance of domain, and a clopen fixed set of L⁻¹f.
+  - It has no f-driven self-map of directions, no defect-supplied contraction and no Darbo. It works in finite dimension only.
+  - It has no AI disclosure, but its "ongoing proof search" status note suggests machine assistance.
+- **AI disclosure.**
+  - Nakamura-Tanaka 2609.31096 declares **explicitly** that it used OpenAI ChatGPT (GPT-5.6 Sol and GPT-6 Astra) for proof strategies and Lean. It postdates 322 and shares no device.
+  - Huang-Zhu ×2 and Fakhoury carry funding acknowledgments only.
+- **Still unread:** Tingley 1987 and Ding's 2009 survey. Neither is on arXiv. Every description of Tingley 1987 attributes to it only antipodality and facet-cone linearity.
+
+**Effect on the grades**
+- **C1 stays N3 (provisional).** Confidence rises from 0.45 to 0.50, because downgrade risk (ii) is largely discharged. Test 4 and the expert query are still open.
+- **family_D stays D3 (provisional).** Confidence rises from 0.45 to 0.50.
+- **Provenance flag stays "no".**
+- **Contamination cutoff:** prefer models whose cutoff is before 2026-09-15, and exclude GPT-5.6 Sol and GPT-6 Astra from the controlled arms.
+- **C4:** ultraproducts already appear in the Tingley literature (Fernández-Polo-Peralta 1709.08529). C4 stays N1.
+
+*The original pass follows. Where it says that arXiv was unreachable, that is superseded by this section.*
+
 Date: 2026-10-12. Inputs: `family.json`/`.md`, `main.tex` (Sections 1-5 read in full), `references.tex`, and the Lean declaration names in `lean/OAI/Analysis/SphereIsometry`. This family has no trace and no F1 files. Per PLAN (2026-10-12), the Lean is trusted as published; it was not built here.
 
 **How the evidence was gathered**
@@ -19,14 +52,14 @@ Date: 2026-10-12. Inputs: `family.json`/`.md`, `main.tex` (Sections 1-5 read in 
 ## Final grades
 | ID | Candidate | N | F | Conf. |
 |---|---|---|---|---|
-| C1 | Opposite-endpoint return map with self-supplied Kuratowski contraction, giving aligned chords (I10+I15→I16) | **N3** (provisional) | F3 + F5 | 0.45 |
+| C1 | Opposite-endpoint return map with self-supplied Kuratowski contraction, giving aligned chords (I10+I15→I16) | **N3** (provisional) | F3 + F5 | 0.50 (was 0.45) |
 | C2 | Extremal common-support propagation and the invariant convex face (I11, I12, I28) | N2 | – | 0.6 |
 | C3 | Secant cancellation lemma (I18) | N2 | – | 0.5 |
 | C4 | Cross-radius defect with ultrapower attainment (I07-I09) | N1 | – | 0.65 |
 | C5 | Chord contradiction: large regime by signs and perturbation, small by convexity (I19-I21) | N2 | – | 0.5 |
 | C6 | Re-proved stack: χ, Darbo, Schauder, Sperner/Brouwer, Hahn-Banach, Mazur-Ulam | N0 (transfer) | – | 0.95 |
 
-**family_D = D3 (provisional), confidence 0.45, resting on C1 alone.**
+**family_D = D3 (provisional), confidence 0.50 (was 0.45), resting on C1 alone.**
 
 It falls to D2 in any of these cases:
 - P-C1 arm B shows that pre-cutoff models find the device;

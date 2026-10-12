@@ -142,3 +142,8 @@ All live in `lean/OAI/Analysis/SphereIsometry/`.
   - The nearest work is Nakamura–Tanaka, which uses Plücker contraction bodies and has no return map or Darbo.
   - Other neighbours are the facial methods (close to C2) and affine-diameter arguments (template only).
 - **Verdict: no downgrade.** The caveat is that the full texts of Tingley 1987, Kadets–Martín 2012 and Cabello Sánchez 2019 are still unread.
+- **Full-text re-check (2026-10-12):** arXiv was reachable for this check.
+  - Read: Kadets–Martín, Cabello Sánchez, Peralta's survey, Mori–Ozawa, Banakh, both Huang–Zhu papers, Nakamura–Tanaka, and a newly found uncited paper, Ma (arXiv:2609.25065).
+  - None of them uses a fixed-point theorem or a return map, so there is still no downgrade.
+  - Tingley 1987 and Ding 2009 are not on arXiv and remain unread.
+  - Details are in `novelty.json` under `verified_checks`.
