@@ -1,0 +1,1094 @@
+{
+ "family": 94,
+ "title": "Subpolynomial dimension reduction in Lp",
+ "manuscripts": [
+  {
+   "id": "094",
+   "title": "Subpolynomial dimension reduction in Lp",
+   "manuscript_dir": "preprints/Subpolynomial-dimension-reduction-in-Lp-September-23-2026",
+   "source_root": "preprints/Subpolynomial-dimension-reduction-in-Lp-September-23-2026/build",
+   "tex_files": [
+    "paper.tex",
+    "figures/truncation-ramp.tex"
+   ],
+   "lines": 1467,
+   "date": "September 23, 2026",
+   "author": "OpenAI"
+  }
+ ],
+ "file_line_convention": "paper paths relative to <manuscript_dir>/build; Lean paths relative to lean/OAI/Analysis/LpDimension (openai-math fd4aeeb)",
+ "commit": "fd4aeeb",
+ "analyst_role": "FAMILY analyst (paper + Lean, text level; Lean not built by this agent - orchestrator compiles the comparator)",
+ "base_library_L": "Mathlib d13f23b + the paper's thebibliography (25 entries; no references.bib file). Two cited items are model-related: GGNS arXiv:2605.24130 (initial proofs by ChatGPT 5.5 Pro per its listing; ESSENTIAL, re-proved in App. A and in Lean) and OpenAI2026DoublingHilbert (family 098; background only).",
+ "main_statement": {
+  "file_line": "paper.tex:75-102",
+  "latex": "\\begin{theorem} Fix $1<p<\\infty$, $p\\ne2$, and put $\\gamma(p)=2-p$ for $1<p<2$, $1-2/p$ for $2<p<\\infty$. For every $D>1$ there is a constant $C_{p,D}<\\infty$ such that, for every integer $n\\ge2$, $\\frac{\\log n}{\\log(1+2D)} \\le d_p(n,D) \\le \\exp(C_{p,D}(\\log n)^{\\gamma(p)})$. For exact embeddings, $\\lfloor\\frac{n-1}{4}\\rfloor^2 \\le d_p(n,1)\\le\\binom n2$ $(n\\ge9)$. Consequently, $\\lim_{n\\to\\infty}\\frac{\\log d_p(n,D)}{\\log n}=0$ for $D>1$ and $2$ for $D=1$. \\end{theorem}",
+  "paraphrase": "For fixed 1<p<inf, p != 2, and any distortion D>1, every n-point subset of any L_p space embeds (nonlinearly) into l_p^d with distortion D and d <= exp(C_{p,D}(log n)^{gamma(p)}) = n^{o(1)}, gamma = 2-p below 2 and 1-2/p above 2; trivially d >= log n/log(1+2D). Exact (D=1) embeddings need Theta(n^2) coordinates in the worst case. This answers the long-open nonlinear sublinear-dimension question for L_p (Johnson-Lindenstrauss Problem 3 / Naor's survey) affirmatively for all p in (1,inf)\\{2}; previously best was O(n) (p<2, Schechtman) and n^{p/2} log n (p>2).",
+  "comparator": {
+   "file": "lean/ComparatorChallenges/SubpolynomialLp.lean",
+   "json": "lean/ComparatorChallenges/SubpolynomialLp.json",
+   "theorem": "OAI.SubpolynomialLp.source_main",
+   "solution_module": "OAI.Analysis.LpDimension.Main",
+   "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+   ],
+   "model": "coordinateDistance p x y = (sum_a |x a - y a|^p)^(1/p); GoodDimension p n D d := for all (Omega : Type u) measure mu and injective x : Fin n -> Lp R (ofReal p) mu, exists y : Fin n -> Fin d -> R and s>0 with s||xi-xj|| <= coordDist(yi,yj) <= D s ||xi-xj||; dimension = sInf {d | GoodDimension}; gamma p = if p<2 then 2-p else 1-2/p. Statement (1<p, p!=2): (forall D>1, exists C, forall n>=2, GoodDimension(dimension) and log n/log(1+2D) <= dimension <= exp(C (log n)^gamma)) and (forall n>=9, GoodDimension(dimension at D=1) and ((n-1)/4)^2 <= dimension <= n.choose 2) and (forall D>=1, log dimension / log n -> if 1<D then 0 else 2)."
+  },
+  "match_check": "Exact match with Thm 1.1 at text level: same d_p(n,D) (universal over all measure spaces in universe u, injective point families, nonlinear maps, scale s), same bounds, natural-number division (n-1)/4 = floor, n.choose 2, same limits. The comparator additionally asserts that the infimum is attained (GoodDimension of dimension), which the paper implies via Lemma exact-upper. Comparator definitions are textually identical to Model.lean.",
+  "formalized_vs_claimed": "Everything in Thm 1.1 is formalized. Differences are in the ROUTE, not the claim: (i) localization (Lemma 3.1) is proved in Lean only for graphs in which every pair of vertices is adjacent (complete graph), which is all the proof uses; (ii) the Brouwer fixed-point reweighting is replaced by a minimax selection over the convex set of retractions; (iii) Poisson sampling is replaced by m-fold convolution powers and the p<2 marginal by an explicit sum of iid p-stable variables; (iv) H = 4 log n instead of 4 log(2n). Not formalized: nothing beyond the theorem is claimed (no algorithm).",
+  "note_for_comparator": "Comparator not compiled by this agent (shared checkout). Text-level: no sorry/axiom; only standard axioms permitted."
+ },
+ "trust_surface": {
+  "lean": "45 files, 7,918 lines in lean/OAI/Analysis/LpDimension; imports only Mathlib and own files (no other OAI dirs).",
+  "grep_scope": "all 45 .lean files, word-boundary grep",
+  "counts": {
+   "sorry": 0,
+   "admit": 0,
+   "axiom": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque (keyword)": 0,
+   "ofReduceBool/skipKernelTC": 0,
+   "partial def": 0,
+   "decide": 0,
+   "set_option maxHeartbeats": 0,
+   "set_option synthInstance.maxSize": 0,
+   "set_option autoImplicit true": 0
+  },
+  "note": "Completely clean at text level: not even decide or raised heartbeats. Identifiers are descriptive (no code names), so the paper-Lean join is easy. Compile status pending from the orchestrator."
+ },
+ "labels": {
+  "A": {
+   "label": "A3",
+   "secondary": {
+    "hard_direction_form": null,
+    "explicit_rate": true,
+    "also": "A1 shape underneath (for every n-point set there exists an embedding); exact part is a matching-order (Theta(n^2)) bound"
+   },
+   "evidence": {
+    "quote": "\\frac{\\log n}{\\log(1+2D)} \\le d_p(n,D) \\le \\exp\\!\\bigl(C_{p,D}(\\log n)^{\\gamma(p)}\\bigr)",
+    "file_line": "paper.tex:86-90"
+   },
+   "confidence": "0.85",
+   "note": "Innermost conclusion is a two-sided quantitative bound on d_p(n,D) with explicit exponent gamma(p); the qualitative n^{o(1)} is a consequence."
+  },
+  "B": {
+   "label": "B1",
+   "flags": {
+    "full_only_with_prior_results": false,
+    "adds_corollaries_for_other_conjectures": false,
+    "also_B4": "exact-embedding Theta(n^2) for all p != 2 extends Ball 1990 (p<2)",
+    "depends_on_model_produced_prior": "GGNS O(log n) localization (essential, but re-proved in App. A and in Lean)"
+   },
+   "evidence": {
+    "quote": "Johnson and Lindenstrauss also asked what analogues of their lemma hold in other Banach spaces~\\cite[Problem~3]{JohnsonLindenstrauss1984}",
+    "file_line": "paper.tex:50-52"
+   },
+   "confidence": "0.8",
+   "note": "Answers affirmatively the n^{o(1)} (sublinear) nonlinear dimension-reduction question for L_p, 1<p<inf, p!=2 (the catalogue calls it Naor's question). Does not claim optimal exponents; compatible with Naor-Ren 2026 lower bound for p>2 and Brinkman-Charikar at p=1."
+  },
+  "C": {
+   "primary": "C3",
+   "primary_evidence": {
+    "quote": "Convex separation produces one distribution working for all pairs; independent sampling then supplies the coordinates of a finite embedding.",
+    "file_line": "paper.tex:166-169"
+   },
+   "secondaries": [
+    "C1 (explicit random gradients per test probability: clipped stable vector / projected ramp + Poisson sum)",
+    "C4 (dominant volume: moment and tail estimation chains, dyadic interpolation, Rosenthal-type bounds)"
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "0 decide / native_decide; no search",
+    "file_line": "lean/OAI/Analysis/LpDimension/*.lean"
+   },
+   "ih_strengthened": false,
+   "ih_template": null,
+   "ih_evidence": {
+    "quote": "no induction in the paper; Lean near_additive_recurrence (SymmetricMoments.lean:305) is a routine induction over the number of convolution summands",
+    "file_line": "SymmetricMoments.lean:305"
+   },
+   "ih_note": "C2 absent.",
+   "confidence": "C3 primary 0.55 (alternative reading: C1, since a random witness is explicitly built for each lambda; the final embedding exists only via separation + probabilistic method); secondaries 0.8"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "I13 ramp of overlapping dyadic truncations (weak N3 candidate, F3); next I12 critical-moment amplification (N2), I06 reweighted localization projection (N2)",
+   "evidence": {
+    "quote": "The overlapping truncations below create a triangular multiplicity profile of height $\\ell$. We will show that its $p$-energy is of order $\\ell^{p+1}$, whereas the $p$th power of the projection error is at most $C_pH^{p-2}\\ell$.",
+    "file_line": "paper.tex:722-726"
+   },
+   "confidence": "0.4",
+   "caveats": [
+    "The N3 grade for the ramp is weak; a de la Vallee Poussin-type precedent could cap it at N2, giving D2.",
+    "The central bridge (electrical-flow localization -> dimension reduction) is transfer plus an N2 reweighting; bridges are measured separately and do not make D3.",
+    "Quick literature checks only."
+   ],
+   "flag_builds_on_prior_model_produced_result": true,
+   "flag_note": "GGNS 'A Tight Bound on Localization of Electrical Flows' (arXiv:2605.24130, May 2026): its listing states the initial proofs were generated by ChatGPT 5.5 Pro and then verified/rewritten by the human authors. Its 2 log n bound is essential: with the prior O(log^2 n) bound (SRS18) the method gives subpolynomial dimension only for 3/2<p<4. Mitigation: the paper re-proves it (App. A) and Lean formalizes it. Also cites OpenAI2026DoublingHilbert (family 098), background only."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Convex and metric geometry",
+    "msc2020": "46B85 (embeddings of discrete metric spaces into Banach spaces), 51F30, 46E30, 68R12",
+    "lean_dir": "Analysis",
+    "note": "Banach-space / metric-embedding problem (Ribe program)"
+   },
+   "lean_dir_field": "Analysis (OAI/Analysis/LpDimension)",
+   "method_fields": [
+    {
+     "field": "spectral graph theory / electrical networks (transfer-current localization, graph heat kernel + entropy; GGNS, SRS)",
+     "tag": "essential"
+    },
+    {
+     "field": "probability: stable laws, Levy measures, compound Poisson, characteristic functions, Levy continuity",
+     "tag": "essential"
+    },
+    {
+     "field": "probability: moment inequalities (Rosenthal/Pinelis-type with leading 1+eps), Hoeffding, Chebyshev",
+     "tag": "essential"
+    },
+    {
+     "field": "convex analysis (Hahn-Banach separation, Caratheodory, compact convex hulls)",
+     "tag": "essential"
+    },
+    {
+     "field": "Banach space theory (Maurey empirical method; Ball discretization; Lamperti isometry criterion)",
+     "tag": "essential"
+    },
+    {
+     "field": "algebraic topology (Brouwer fixed point)",
+     "tag": "essential (paper); replaced by minimax in Lean"
+    },
+    {
+     "field": "harmonic/real analysis (dyadic interpolation between L_inf and L_2 bounds)",
+     "tag": "essential"
+    },
+    {
+     "field": "discrete/convex geometry (volumetric packing)",
+     "tag": "essential (trivial lower bound)"
+    },
+    {
+     "field": "TCS dimension-reduction literature (JL, Brinkman-Charikar, Lee-Naor, Naor-Ren, Indyk, Eskenazis, BLM, Talagrand, Schechtman, Bourgain)",
+     "tag": "background-cited"
+    }
+   ],
+   "cross_field_count": 4,
+   "share_invoked_from_other_fields": "~0.6: of ~13 invoked external results, outside Banach/metric geometry are GGNS/SRS localization (graph theory), Brouwer (topology), Rockafellar separation/Caratheodory (convex analysis), Hoeffding, Rosenthal/Pinelis, Durrett char. functions (probability); inside: Ball, Lamperti, Maurey/Pisier."
+  }
+ },
+ "items": [
+  {
+   "id": "I01",
+   "kind": "definition",
+   "name": "d_p(n,D): least universal coordinate dimension",
+   "file_line": "paper.tex:60-73",
+   "statement": "d_p(n,D) = least d such that every n-point subset of any L_p space has images in l_p^d and a scale s>0 with s||xi-xj|| <= ||yi-yj|| <= D s ||xi-xj||. Maps unrestricted (nonlinear).",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'let $d_p(n,D)$ be the least integer $d$ such that every $n$-point subset'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "statement-level",
+    "why": "defines the goal"
+   },
+   "analytic_check": "In goal (target_signature_closure: GoodDimension, dimension, coordinateDistance). Analytic by definition.",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard metric-dimension-reduction quantity (Naor 2018 survey; Johnson-Lindenstrauss Problem 3)"
+   },
+   "provisional_F": null,
+   "lean": "Model.lean:12-29 coordinateDistance, GoodDimension, dimension, gamma"
+  },
+  {
+   "id": "I02",
+   "kind": "lemma",
+   "name": "Exact discretization (Ball): n points of L_p embed isometrically in l_p^{n choose 2}",
+   "file_line": "paper.tex:218-264",
+   "statement": "Every n-point subset of real L_p, 1<=p<inf, embeds isometrically into l_p^{binom n 2}. Proof: normalized pairwise p-th power vectors q(t)/s(t) lie in a compact set K on the simplex hyperplane; barycenter in conv(K); Caratheodory gives <=N atoms; y_i = ((S theta_a)^{1/p} z_i^(a))_a.",
+   "cited_or_new": {
+    "status": "cited (re-proved)",
+    "cue": "'Ball proved the exact-coordinate upper bound $\\binom n2$ ... Lemma~\\ref{lem:exact-upper} recalls the distance-cone and Carath\\'eodory argument'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "reduces arbitrary L_p input to finite l_p^m (Lean applies it first in both ranges); also supplies d_p(n,1)<=binom n 2 and small-n cases"
+   },
+   "analytic_check": "Occurs as the upper half of eq:exact-bounds (subterm of goal) - analytic.",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Ball 1990, Eur. J. Comb. 11; cited and re-proved"
+   },
+   "provisional_F": null,
+   "lean": "Discretization.lean:146 exact_discretization_ge_one, :224 exact_discretization; ExactDiscretization.lean (sibling corollaries)"
+  },
+  {
+   "id": "I03",
+   "kind": "definition (inline)",
+   "name": "normalized gradients V",
+   "file_line": "paper.tex:265-276",
+   "statement": "V = {((z_i - z_j)/delta_e)_{e=ij} : z in R^n} subset R^E, delta_e = ||x_i-x_j||_p. Any family of normalized gradients gives scalar labels, i.e. coordinates of one map.",
+   "cited_or_new": {
+    "status": "new name, standard object",
+    "cue": "'We call elements of $V$ \\emph{normalized gradients}'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "high (vocabulary)",
+    "why": "every random coordinate is a random element of V"
+   },
+   "analytic_check": "Image of the weighted incidence matrix diag(1/delta)B (cut/potential space of the complete graph). In L as image of a matrix; not in the goal.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "renaming of the (conductance-weighted) cut space / gradient space of a graph; standard in electrical-network theory"
+   },
+   "provisional_F": null,
+   "lean": "Retractions.lean:134 normalizedGradient (= diag(1/delta) * incidence)"
+  },
+  {
+   "id": "I04",
+   "kind": "lemma",
+   "name": "Weighted moment criterion (minimax reduction + Maurey sampling)",
+   "file_line": "paper.tex:295-383",
+   "statement": "If for every strictly positive probability lambda on pairs there is a random F in V with ||F||_inf<=K a.s. and sum_e lambda_e |E|F_e|^p - b| <= eta b (b,K uniform in lambda), then the points embed into l_p^d with distortion ((1+3eta)/(1-3eta))^{1/p}, d <= C max{1, K^{2p}/(eta^2 b^2)} log(2n).",
+   "cited_or_new": {
+    "status": "new statement; standard ingredients",
+    "cue": "'This sampling step belongs to Maurey's empirical method ... A close distance-matrix antecedent is Eskenazis's use of that method'"
+   },
+   "uses_items": [
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "the contract both constructions feed; Lean: weighted_gradient_samples / weighted_gradient_measure_samples / weighted_error_to_uniform"
+   },
+   "analytic_check": "Not a subterm of the goal; it is minimax (Hahn-Banach separation) + Hoeffding + union bound; the uniform-over-lambda b,K requirement is the only non-generic feature.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "minimax/convex-duality reduction ('for every mixed test there is a strategy' => one strategy for all) + Maurey empirical method (Pisier 1981) + Eskenazis 2024 (paper names it). Close to N2 because the paper's precedent (Eskenazis) is additive, this is relative."
+   },
+   "provisional_F": null,
+   "lean": "ConvexSelection.lean:59 weighted_error_to_uniform; GradientSampling.lean:83 weighted_gradient_samples; GradientLaws.lean:12; Sampling.lean:12-140; GradientSampling.lean:171 sampled_labels_embedding"
+  },
+  {
+   "id": "I05",
+   "kind": "lemma",
+   "name": "Electrical-flow localization ||  |Q|  ||_{2->2} <= 2 log n (GGNS)",
+   "file_line": "paper.tex:392-400; proof App. A paper.tex:1132-1227",
+   "statement": "For a connected graph with positive conductances, the Euclidean projection Q onto im(C^{1/2}B) (transfer-current matrix) satisfies || |Q| ||_{2->2} <= 2 log n. Proof: heat-kernel integral representation of Q, entropy dissipation int I(h_s) ds = log(1/mu_v), log-mean Cauchy-Schwarz.",
+   "cited_or_new": {
+    "status": "cited (re-proved in appendix)",
+    "cue": "'follows the heat-kernel and entropy argument of Gurel-Gurevich, Nachmias, and Sachdeva~\\cite[Sections~2--4]{GGNS}'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "high (essential)",
+    "why": "H = O(log n) is what makes exp(C (log n)^gamma) subpolynomial for ALL p; with Schild-Rao-Srivastava's O(log^2 n) the method gives only 3/2<p<4"
+   },
+   "analytic_check": "Not in goal; in the cited L (GGNS). Analytic relative to L.",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "GGNS arXiv:2605.24130 (May 2026) - per its arXiv listing, initial proofs generated by ChatGPT 5.5 Pro and rewritten by the authors (model-produced provenance). Improves SRS18 O(log^2 n)."
+   },
+   "provisional_F": null,
+   "lean": "ElectricalProjection.lean:266 electrical_localization_complete (stated only for graphs where every pair is adjacent, i.e. the complete graph used); Entropy.lean, HeatKernel.lean, HeatLocalization.lean, SpectralProjection.lean (~1.35k lines, 88 DAG decls = 21% of DAG)"
+  },
+  {
+   "id": "I06",
+   "kind": "lemma",
+   "name": "Weighted projection with controlled row sums (fixed-point reweighting)",
+   "file_line": "paper.tex:410-463",
+   "statement": "For every strictly positive probability lambda on E there is sigma >= lambda/2 such that the l2(sigma)-orthogonal projection P onto V has max_e sum_f |P_ef| <= H = 4 log(2n). Proof: sum_e sigma_e R_e(sigma)^2 <= (2 log n)^2 from I05; Brouwer fixed point of Phi_e(sigma) = u_e + (1-sum u) lambda_e with u_e = sigma_e R_e^2 / (2(2 log n)^2).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'We obtain the latter property by a fixed-point reweighting of the electrical-flow localization estimate'"
+   },
+   "uses_items": [
+    "I03",
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "guess": "high (central geometric input)",
+    "why": "supplies P with ||P||_{inf->inf}<=H and l2(sigma)-contraction; used by both ranges to correct clipped/truncated vectors back into V"
+   },
+   "analytic_check": "Not in goal or L as a statement. The average-to-uniform step (reweight so that heavy rows get more mass) is a standard Lewis-weights / multiplicative-weights move.",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Nearest: reweighted electrical oblivious routing (Goranci-Henzinger-Raecke-Sachdeva-Sricharan 2023, 'Electrical flows for polylogarithmic competitive oblivious routing', reweights edges so electrical routing is polylog competitive, i.e. bounds |Pi| row sums) and Lewis' change-of-density fixed point. Average-row-sum -> max-row-sum by reweighting is precedented."
+   },
+   "provisional_F": null,
+   "lean": "Lean replaces Brouwer by minimax: Retractions.lean:184 controlled_retraction (convex set of retractions P with P A = A, range in im A; convex_cost_selection) and :150 weightedProjection_rows; Sampling.lean:142 controlled_retraction_bounds (dominated_share 0.25)"
+  },
+  {
+   "id": "I07",
+   "kind": "lemma (Lean only)",
+   "name": "Retraction minimax substitute for the Brouwer reweighting",
+   "file_line": "Retractions.lean:181-260; ConvexSelection.lean:160-236",
+   "statement": "There is P in the convex set {P : P A = A, P = A B} with all row sums <= 4 log|V| and, simultaneously, finitely many weighted Hilbert-valued energy bounds sum_e lam_e ||(P x_j)_e||^2 <= 4. Proof: each test w gives the weighted projection at sigma=(lam+w)/2; convex separation (weighted_error_to_uniform) upgrades averaged to uniform bounds.",
+   "cited_or_new": {
+    "status": "new (formalization device)",
+    "cue": "doc: 'A simultaneous retraction substitute for the fixed-point reweighting'; 'Convex separation replaces fixed-point reweighting.'"
+   },
+   "uses_items": [
+    "I04",
+    "I05",
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "guess": "high (Lean)",
+    "why": "dominated_share 0.246; all of below/above constructions go through it"
+   },
+   "analytic_check": "Not in goal. Reuses the same minimax lemma as I04 a second time; loses orthogonality but keeps exactly the finitely many energy bounds needed.",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "variant of I06 via von Neumann/Sion minimax over a convex set of operators (standard in oblivious-routing LPs, Raecke 2008 style). Notable as an elementary, fixed-point-free route."
+   },
+   "provisional_F": null,
+   "lean": "Retractions.lean:20 retractions, :97 matrixRowNorm, :184 controlled_retraction; ConvexSelection.lean:160,187"
+  },
+  {
+   "id": "I08",
+   "kind": "definition",
+   "name": "Homogeneous increments: power-law intensity nu on (0,inf) x {1..m}, v_e(r,t) = r g_e(t)",
+   "file_line": "paper.tex:477-504",
+   "statement": "d nu(r,t) = p r^{-p-1} dr on each copy t; g_e(t) = (x_i(t)-x_j(t))/delta_e; then nu(|v_e|>a) = a^{-p} for every edge e (identical magnitude law for all pairs, since sum_t |g_e(t)|^p = 1).",
+   "cited_or_new": {
+    "status": "standard (Levy measure of p-stable laws)",
+    "cue": "'The following measure gives every normalized increment the same magnitude distribution.'"
+   },
+   "uses_items": [
+    "I02",
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "source of identical marginals for both ranges"
+   },
+   "analytic_check": "Not in goal; it is the Levy measure of the symmetric p-stable law pushed through the l_p^m coordinates (LePage representation).",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "LePage series / Levy-Khintchine: classical (stable embedding of l_p^m into L_p)"
+   },
+   "provisional_F": null,
+   "lean": "StableIntensity.lean:12 powerIntensity; Pareto.lean:39 pareto (restricted to r>1, probability); RampLaws.lean:14 paretoVectorLaw (average over t of Pareto r * g_t)"
+  },
+  {
+   "id": "I09",
+   "kind": "definition (inline)",
+   "name": "signed Poisson sampling",
+   "file_line": "paper.tex:505-518",
+   "statement": "W = sum_{j<=N} eps_j h(omega_j), N ~ Poisson(M), omega_j ~ nu/M on a finite-mass region, eps_j uniform signs; independent on disjoint regions.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'\\emph{signed Poisson sampling} of a vector function $h$ means'"
+   },
+   "uses_items": [
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "sampling device for both ranges (paper); Lean uses N-fold convolution powers instead"
+   },
+   "analytic_check": "Symmetrized compound Poisson process; in L (Mathlib has Poisson; compound Poisson classical).",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "symmetric compound Poisson / Poissonization"
+   },
+   "provisional_F": null,
+   "lean": "CompoundPoisson.lean:25 compoundPoisson (defined, but p>2 route uses convolutionPower (fixed N=m summands)); SymmetricLaws.lean:44 symmetricLaw"
+  },
+  {
+   "id": "I10",
+   "kind": "lemma",
+   "name": "Signed Poisson formulas (cf, mgf, variance)",
+   "file_line": "paper.tex:520-540",
+   "statement": "E e^{itS} = exp(int (cos(th)-1) d nu); E e^{tS} = exp(int (cosh(th)-1) d nu); E S = 0, E S^2 = int h^2 d nu.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'Conditioning on the Poisson count proves the first two formulas'"
+   },
+   "uses_items": [
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "guess": "low-medium",
+    "why": "routine"
+   },
+   "analytic_check": "Classical compound-Poisson identities.",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "textbook"
+   },
+   "provisional_F": null,
+   "lean": "CompoundPoisson.lean:68 charFun_compoundPoisson, :110 exp_convolutionPower"
+  },
+  {
+   "id": "I11",
+   "kind": "construction",
+   "name": "Common heavy-tailed marginal Y (p<2): Poisson sum of v against nu, all Y_e identically p-stable-like",
+   "file_line": "paper.tex:547-617",
+   "statement": "Y in V a.s.; E e^{i theta Y_e} = exp(p int (cos(theta u)-1) u^{-p-1} du), independent of e; tail c_p a^{-p} <= P(|Y_e|>a) <= C_p a^{-p} (a>=1).",
+   "cited_or_new": {
+    "status": "standard object, proofs given",
+    "cue": "'Stable projections and truncated heavy-tail moments have earlier geometric uses, including Indyk's work ... the required marginal construction and tail bounds are proved here.'"
+   },
+   "uses_items": [
+    "I08",
+    "I09",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "guess": "high (p<2)",
+    "why": "the random gradient to be clipped and projected"
+   },
+   "analytic_check": "Y_e = sum_t g_e(t) X_t with iid symmetric p-stable X_t is the classical stable embedding; not new.",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "p-stable projection (Indyk 2006; classical Levy/Kolmogorov); Lean literally uses Y = sum_a X_a g_a"
+   },
+   "provisional_F": null,
+   "lean": "StableLaw.lean:160 exists_stable_law_full (via Levy continuity from compound-Poisson approximants); StableRetractions.lean:159 stable_linear_sum_identical, :176 stable_joint_gradient; FourierTails.lean:90,284 stable tails"
+  },
+  {
+   "id": "I12",
+   "kind": "construction + estimate",
+   "name": "Clip-and-project for p<2: F = P[Y]_T with critical capped moment b = E min(|Y_e|, T/H)^p ~ log(T/H)",
+   "file_line": "paper.tex:619-706",
+   "statement": "E|Y_e - F_e| <= C_p H T^{1-p}; sum sigma_e E|F_e|^2 <= C_p T^{2-p}; with a = T/H the Lipschitz part and quadratic tail each cost C_p H^{2-p} (additive), while b >= c_p log a. Choose T = exp(A H^{2-p}): relative error <= eta, K = HT, log K = O((log n)^{2-p}).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'Balancing these gives $a=T/H$.' ... 'Choose $T=\\exp(A_{p,\\eta}H^{2-p})$'"
+   },
+   "uses_items": [
+    "I04",
+    "I06",
+    "I11"
+   ],
+   "load_bearing_guess": {
+    "guess": "high (p<2 core)",
+    "why": "entire p<2 upper bound; Lean stable_retraction_moments dominated_share 0.03, stable_gradient_weighted 0.042, below_main_upper 0.157"
+   },
+   "analytic_check": "Not in goal or L. Key trick: the p-th moment of a p-stable law diverges logarithmically, so the capped common moment b can be made as large as needed while the projection error stays additive O(H^{2-p}); scale invariance of distortion absorbs it.",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "borderline N2/N3. Neighbours: truncated stable moments in Indyk 2006 / Schechtman 1987 and 2011 (finite-set L_p, p<2, via stable + truncation), the general 'absorb additive error by growing scale' idea. The combination with an l_inf-bounded projection back into V seems new; quick search found no identical device."
+   },
+   "provisional_F": null,
+   "lean": "StableRetractions.lean:200 stable_retraction_moments; ClippedMoments.lean:26-288 (capped_moment_lower_log, matrix_clip_bounds); GradientSampling.lean:30 stable_gradient_weighted; BelowTwo.lean:12"
+  },
+  {
+   "id": "I13",
+   "kind": "definition",
+   "name": "Ramp of overlapping dyadic truncations u = sum_{k<l} (v_{<=2^{k+l}} - v_{<=2^k}) (p>2)",
+   "file_line": "paper.tex:720-800; fig. figures/truncation-ramp.tex",
+   "statement": "u_e = m_l(|v_e|) v_e where the multiplicity on dyadic bins is 1,2,...,l,...,2,1. Its p-energy b = p log2 (l^p + 2 sum_{j<l} j^p) ~ l^{p+1}, identical for all edges; L2 norm O_p(1); sup <= 2^{2l}.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The overlapping truncations below create a triangular multiplicity profile of height $\\ell$. ... its $p$-energy is of order $\\ell^{p+1}$, whereas the $p$th power of the projection error is at most $C_pH^{p-2}\\ell$. This gain determines the choice of $\\ell$.'"
+   },
+   "uses_items": [
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "guess": "high (p>2 core)",
+    "why": "the gain l^{p+1} vs l is exactly what yields gamma = 1-2/p; Lean ramp_sum_bounded_law dom 0.28, ramp_jump_law 0.157, ramp_retraction 0.085"
+   },
+   "analytic_check": "Not a subterm of goal or L; its defining sum of band-truncations appears nowhere in Mathlib. A single truncation band gives energy ~ l and no gain; superadditivity of t^p (p>1) on the overlapping windows is the mechanism.",
+   "provisional_N": {
+    "grade": "N3",
+    "why": "eureka candidate (weak). Neighbours: Fejer / de la Vallee Poussin (Cesaro-averaged truncations to beat Lebesgue constants), smooth Littlewood-Paley windows, Rosenthal truncation levels. None found with the energy-l^{p+1} vs error-l bookkeeping (quick search). May drop to N2 under full grading."
+   },
+   "provisional_F": "F3 (auxiliary construction: a test vector built only to amplify energy relative to projection error)",
+   "lean": "DyadicRamps.lean:18 dyadicRamp (+ bandPart, tailPart, cutPart), :175 pareto_dyadicRamp_energy_lower, :219 pareto_dyadicRamp_variance; RampError.lean, RampRetraction.lean:22, ProjectedRamps.lean:89, RampSum.lean:12"
+  },
+  {
+   "id": "I14",
+   "kind": "lemma",
+   "name": "Ramp projection error ||Z-u||_{L_p(rho)}^p <= C_p H^{p-2}(l+1)",
+   "file_line": "paper.tex:802-872",
+   "statement": "A_k = (P-I)v_{<=2^k} = -(P-I)v_{>2^k} in L2; Z-u = sum_{k=l}^{2l-1} A_k - sum_{k<l} A_k; split at 2^k ~ tau/16H, sup bound for small k, L2 bound + Chebyshev for large k; integrate tail. Then relative error ||Z-u||_p / b^{1/p} <= C_p H^gamma / l; choose l = ceil(L H^gamma).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'We claim that'"
+   },
+   "uses_items": [
+    "I06",
+    "I13"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "the error side of the l^{p+1} vs l trade"
+   },
+   "analytic_check": "Not in goal; dyadic interpolation between L_inf (row sums H) and L2 (contraction) bounds - a Marcinkiewicz-type interpolation standard in harmonic analysis.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "standard real-interpolation estimate given I06 and I13"
+   },
+   "provisional_F": null,
+   "lean": "RampError.lean:34 ramp_projection_error; DyadicInterpolation.lean:44 dyadic_interpolation; RetractionIntegrals.lean:80-103"
+  },
+  {
+   "id": "I15",
+   "kind": "lemma",
+   "name": "Nearly additive Poisson moments: int|h|^q <= E|S|^q <= (1+eps) int|h|^q + C (int h^2)^{q/2}",
+   "file_line": "paper.tex:880-890; proof App. B paper.tex:1229-1286",
+   "statement": "Rosenthal-type inequality with leading coefficient 1+eps (needed for distortion close to 1); proved for symmetric independent sums via scalar inequality (|a+b|^q+|a-b|^q)/2 <= |a|^q + (1+eps')|b|^q + C|a|^{q-2}b^2, then Poissonized by binomial approximation.",
+   "cited_or_new": {
+    "status": "cited-type, re-proved",
+    "cue": "'The moment comparison is of Rosenthal type \\cite{Rosenthal70,Pinelis15}; Appendix~\\ref{app:poisson} proves the specific leading coefficient $1+\\epsilon$'"
+   },
+   "uses_items": [
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "guess": "high (p>2)",
+    "why": "sampling Z by a Poisson sum must keep p-th moments near int|Z|^p"
+   },
+   "analytic_check": "Variant of Rosenthal; in L (cited).",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Rosenthal 1970 / Pinelis 2015 exact Rosenthal bounds; the (1+eps) leading constant is a mild variant (Pinelis-type sharp constants exist)"
+   },
+   "provisional_F": null,
+   "lean": "SymmetricMoments.lean:127 symmetric_power_upper, :213 symmetric_conv_moment, :305 near_additive_recurrence, :352 convolutionPower_near_moment; ConvolutionError.lean:51"
+  },
+  {
+   "id": "I16",
+   "kind": "construction",
+   "name": "Bounded random gradient for p>2: W = signed Poisson sum of Z = Pu, F = W 1{max_e|W_e|<=K}, K = 8J log(2n), J = C H 2^{2l}",
+   "file_line": "paper.tex:938-1001",
+   "statement": "Exponential moment bound P(|W_e|>Jz) <= 2e^{C0-z}; discarding the whole vector on the bad event keeps F in V; truncation error C_p J^p n^{-3} = o(1); log K = O((log n)^{1-2/p}).",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "'Discarding the entire vector on a bad event preserves membership in $V$'"
+   },
+   "uses_items": [
+    "I06",
+    "I13",
+    "I14",
+    "I15"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "closes the p>2 contract"
+   },
+   "analytic_check": "Routine global truncation; analytic.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "standard exponential-moment truncation"
+   },
+   "provisional_F": null,
+   "lean": "GlobalCutoff.lean:59 globalCut, :93 globalCut_moments; GradientLaws.lean:58 globalCutLaw; RampSum.lean:12 ramp_sum_bounded_law"
+  },
+  {
+   "id": "I17",
+   "kind": "table/contract",
+   "name": "Weighted-moment contract table (b, K per range)",
+   "file_line": "paper.tex:1005-1025",
+   "statement": "p<2: b = E min{|Y_e|,T/H}^p, K = HT; p>2: b = p log2(l^p + 2 sum j^p), K = 8J log(2n); all independent of the points and pair weights.",
+   "cited_or_new": {
+    "status": "new (summary)",
+    "cue": "'Table~\\ref{tab:moment-contract} summarizes the common parameters'"
+   },
+   "uses_items": [
+    "I04",
+    "I12",
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "guess": "low",
+    "why": "summary"
+   },
+   "analytic_check": "Bookkeeping.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "bookkeeping"
+   },
+   "provisional_F": null,
+   "lean": "AboveParameters.lean:31 above_numeric_parameters; SamplingBounds.lean:20 sampling_dimension_estimate"
+  },
+  {
+   "id": "I18",
+   "kind": "lemma",
+   "name": "Packing lower bound d_p(n,D) >= log n / log(1+2D)",
+   "file_line": "paper.tex:1047-1059",
+   "statement": "Equilateral set e_1..e_n in l_p^n; distortion-D image is 1-separated in a D-ball; volume comparison n <= (1+2D)^d.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'Comparing $d$-dimensional Lebesgue volumes'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "low (lower half)",
+    "why": "lower bound of eq:main-bounds"
+   },
+   "analytic_check": "Subterm of goal (lower bound); volume argument in L.",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "textbook volumetric packing"
+   },
+   "provisional_F": null,
+   "lean": "Packing.lean:14 packing_card_bound, :82 equilateral_lp, :108 packing_lower_of_goodDimension"
+  },
+  {
+   "id": "I19",
+   "kind": "lemma",
+   "name": "p-parallelogram defect sign / disjointness criterion",
+   "file_line": "paper.tex:1061-1096",
+   "statement": "Delta_p(a,b) = |a+b|^p + |a-b|^p - 2|a|^p - 2|b|^p is zero iff ab=0, else has sign of p-2; hence ||u+v||^p+||u-v||^p = 2||u||^p+2||v||^p iff disjoint supports (p != 2).",
+   "cited_or_new": {
+    "status": "cited (re-proved)",
+    "cue": "'Its disjoint-support test is the classical equality criterion for the $p$-parallelogram defect~\\cite[Corollary~2.1]{Lamperti1958}'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "medium (exact lower bound)",
+    "why": "drives the grid obstruction"
+   },
+   "analytic_check": "In L (Lamperti 1958).",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Lamperti 1958 Cor. 2.1 / Clarkson"
+   },
+   "provisional_F": null,
+   "lean": "Parallelogram.lean:12 powerDefect, :82 powerDefect_eq_zero_iff, :95 lpPower_disjointness"
+  },
+  {
+   "id": "I20",
+   "kind": "construction + lemma",
+   "name": "Antipodal row-and-column grid configuration X_k forces d >= k^2 for exact embeddings",
+   "file_line": "paper.tex:1097-1129",
+   "statement": "X_k = {0} U {+-r_i} U {+-c_j} in l_p^{k^2}; an isometry fixes antipodes (strict convexity), rows have pairwise disjoint image supports, columns too, every row meets every column (defect 2^p-4 != 0), so d >= k^2; n>=9, k = floor((n-1)/4).",
+   "cited_or_new": {
+    "status": "new (variant of Ball)",
+    "cue": "'The lower bound in \\eqref{eq:exact-bounds} uses an antipodal row-and-column configuration'"
+   },
+   "uses_items": [
+    "I19"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "gives d_p(n,1) >= floor((n-1)/4)^2 and the limit 2 for D=1, all p != 2 incl. even integers"
+   },
+   "analytic_check": "Not in goal; Ball 1990 proved quadratic sharpness for 1<=p<2 by a different configuration.",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "close variant of Ball 1990 (quadratic sharpness, p<2) extended to p>2 via Lamperti; rows/columns incidence counting is elementary"
+   },
+   "provisional_F": null,
+   "lean": "GridObstruction.lean:15-98 rowVector/colVector/gridVector/grid_dimension_obstruction, :175 exact_lower_of_goodDimension; Parallelogram.lean:183 antipodes_of_lpPower, :193 disjoint_rows_columns_card"
+  },
+  {
+   "id": "I21",
+   "kind": "lemma",
+   "name": "Hoeffding-type bounded-sum estimate (re-proved, weaker constants)",
+   "file_line": "paper.tex:349-366",
+   "statement": "If 0<=X<=K^p, E e^{t(X-EX)} <= e^{t^2 K^{2p}/2}; tail 2exp(-d eta^2 b^2/(2K^{2p})).",
+   "cited_or_new": {
+    "status": "cited (re-proved)",
+    "cue": "'For completeness, we prove a Hoeffding-type bounded-sum estimate'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "sampling step"
+   },
+   "analytic_check": "In L (Hoeffding).",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Hoeffding 1963"
+   },
+   "provisional_F": null,
+   "lean": "Sampling.lean:12 bounded_sample_exists, :84 sample_convexHull"
+  },
+  {
+   "id": "I22",
+   "kind": "definition (Lean only)",
+   "name": "dyadicRamp / bandPart / tailPart / cutPart, paretoVectorLaw, projectedRampLaw, convolutionPower, globalCut, clip",
+   "file_line": "DyadicRamps.lean:12-19; RampLaws.lean:14; ProjectedRamps.lean:34; CompoundPoisson.lean:15; GlobalCutoff.lean:59; ClippedMoments.lean:207",
+   "statement": "Lean encodings of I13, I08, I16; the Poisson sum of the paper is replaced by an m-fold convolution power of a probability law (pick a coordinate uniformly, Pareto(p) radius on (1,inf), apply ramp, project by P, symmetrize).",
+   "cited_or_new": {
+    "status": "new (encoding)",
+    "cue": "n/a"
+   },
+   "uses_items": [
+    "I08",
+    "I13",
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "guess": "plumbing-to-medium",
+    "why": "encodings"
+   },
+   "analytic_check": "Plumbing / encodings of paper items.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "encodings"
+   },
+   "provisional_F": null,
+   "lean": "see file_line"
+  },
+  {
+   "id": "I23",
+   "kind": "lemma",
+   "name": "Log-limit corollaries",
+   "file_line": "paper.tex:1124-1129",
+   "statement": "0<gamma(p)<1 implies log d_p(n,D)/log n -> 0 for D>1 and -> 2 for D=1.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'Finally, $0<\\gamma(p)<1$, so the logarithmic limits ... follow'"
+   },
+   "uses_items": [
+    "I18",
+    "I20"
+   ],
+   "load_bearing_guess": {
+    "guess": "low",
+    "why": "corollary"
+   },
+   "analytic_check": "Subterm of goal (third conjunct).",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "calculus"
+   },
+   "provisional_F": null,
+   "lean": "LogLimits.lean:12 subpower_log_limit; Packing.lean:183 quadratic_growth_log_limit, :225 exact_dimension_log_limit"
+  },
+  {
+   "id": "I24",
+   "kind": "definition (inline, background)",
+   "name": "doubling metric space",
+   "file_line": "paper.tex:152-158",
+   "statement": "A metric space is doubling if every ball is covered by a fixed number of balls of half the radius.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'A metric space is \\emph{doubling} if'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "none",
+    "why": "context only (cites OpenAI2026DoublingHilbert, family 098; 'not an input to our proof')"
+   },
+   "analytic_check": "Background.",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard"
+   },
+   "provisional_F": null,
+   "lean": null
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Electrical-flow localization || |Q| ||_{2->2} <= 2 log n",
+   "bib_key": "GGNS",
+   "locator": "Thm 1.3; Secs 2-4",
+   "field": "spectral graph theory / TCS",
+   "used_at": "paper.tex:392-400, 425-436",
+   "status": "cited AND re-proved (App. A; Lean)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Localization O(log^2 n) (superseded)",
+   "bib_key": "SRS18",
+   "locator": "Thm 1.5",
+   "field": "TCS",
+   "used_at": "paper.tex:180-182",
+   "status": "background-cited",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Separation theorem; Caratheodory",
+   "bib_key": "Rockafellar1970",
+   "locator": "Thms 11.3, 17.1, 17.2",
+   "field": "convex analysis",
+   "used_at": "paper.tex:251-257, 327-331",
+   "status": "cited (Mathlib geometric_hahn_banach_open, convexHull in Lean)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Brouwer fixed-point theorem",
+   "bib_key": "Hatcher2002",
+   "locator": "Cor 2.15",
+   "field": "algebraic topology",
+   "used_at": "paper.tex:455-457",
+   "status": "cited (paper); avoided in Lean (minimax)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Hoeffding inequality",
+   "bib_key": "Hoeffding1963",
+   "locator": "Thm 2 eq 2.6",
+   "field": "probability",
+   "used_at": "paper.tex:349-366",
+   "status": "re-proved (weaker constants)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Uniqueness of characteristic functions; weak convergence / UI",
+   "bib_key": "Durrett2019",
+   "locator": "Thm 3.3.11; Secs 3.2, 4.6",
+   "field": "probability",
+   "used_at": "paper.tex:582-584, 1279-1283",
+   "status": "cited (Mathlib Measure.ext_of_charFun in Lean)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Rosenthal / exact Rosenthal-type bounds",
+   "bib_key": "Rosenthal70; Pinelis15",
+   "locator": "-",
+   "field": "probability",
+   "used_at": "paper.tex:197-200, 880-890",
+   "status": "precedent; specific (1+eps) version re-proved (App. B)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Isometric embedding into l_p^{binom n 2}; quadratic sharpness p<2",
+   "bib_key": "Ball1990",
+   "locator": "-",
+   "field": "Banach space theory",
+   "used_at": "paper.tex:112-114, 218-264",
+   "status": "re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "p-parallelogram equality criterion",
+   "bib_key": "Lamperti1958",
+   "locator": "Cor 2.1",
+   "field": "functional analysis",
+   "used_at": "paper.tex:115-117, 1061-1096",
+   "status": "re-proved",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Maurey empirical method",
+   "bib_key": "Pisier1981",
+   "locator": "-",
+   "field": "Banach space theory",
+   "used_at": "paper.tex:170-172",
+   "status": "method precedent (proof self-contained)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Eskenazis incompressible-set dimension reduction",
+   "bib_key": "Eskenazis2024",
+   "locator": "Secs 1.3, 2.1",
+   "field": "metric geometry",
+   "used_at": "paper.tex:172-176",
+   "status": "precedent named, not invoked",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Naor-Ren lower bound for p>2; Brinkman-Charikar; Lee-Naor; Lee-Mendel-Naor; BLM; Talagrand; Schechtman; Bourgain; Indyk; JL",
+   "bib_key": "various",
+   "locator": "-",
+   "field": "metric geometry / TCS",
+   "used_at": "paper.tex:47-150",
+   "status": "background-cited",
+   "essential_for_headline": false
+  },
+  {
+   "name": "A doubling Hilbert subset with no finite-dimensional bi-Lipschitz embedding (family 098)",
+   "bib_key": "OpenAI2026DoublingHilbert",
+   "locator": "-",
+   "field": "metric geometry",
+   "used_at": "paper.tex:152-158",
+   "status": "background-cited ('not an input to our proof')",
+   "essential_for_headline": false
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Reduce to finitely many coordinates (Ball/Caratheodory), so x_i in l_p^m, m <= binom n 2; normalized gradients V = image of diag(1/delta) * incidence.",
+   "items": [
+    "I02",
+    "I03"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Weighted moment criterion: it suffices, for each strictly positive test probability lambda on pairs, to give a random F in V with ||F||_inf <= K and lambda-weighted relative p-th moment error <= eta, with b,K uniform; minimax gives one distribution; Hoeffding + union bound sample d ~ K^{2p}/(eta b)^2 log n coordinates.",
+   "items": [
+    "I04",
+    "I21"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "Geometric input: for each lambda, a reweighting sigma >= lambda/2 such that the l2(sigma) projection P onto V has all l_inf row sums <= H = O(log n) (GGNS localization on average + Brouwer reweighting; Lean: minimax over retractions).",
+   "items": [
+    "I05",
+    "I06",
+    "I07"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "Homogeneous increments: Levy-type intensity p r^{-p-1} on (0,inf) x coordinates makes every edge's increment magnitude law identical; signed Poisson sampling realizes random vectors in V.",
+   "items": [
+    "I08",
+    "I09",
+    "I10"
+   ]
+  },
+  {
+   "step": 5,
+   "claim": "p<2: p-stable-like Y in V, clip at T, project back with P; additive error O(H^{2-p}) vs capped common moment b ~ log(T/H); T = exp(A H^{2-p}) gives log K = O((log n)^{2-p}).",
+   "items": [
+    "I11",
+    "I12"
+   ]
+  },
+  {
+   "step": 6,
+   "claim": "p>2: ramp u of l overlapping dyadic truncations (energy ~ l^{p+1}), Z = Pu with error O(H^{p-2} l) by dyadic interpolation; l ~ H^{1-2/p}; Poisson-sample Z with near-additive moments; discard on a rare bad event; log K = O((log n)^{1-2/p}).",
+   "items": [
+    "I13",
+    "I14",
+    "I15",
+    "I16"
+   ]
+  },
+  {
+   "step": 7,
+   "claim": "Combine: d <= exp(C (log n)^{gamma(p)}); small n by Ball. Lower bound by packing. Exact case: grid obstruction via Lamperti defect gives >= floor((n-1)/4)^2; limits follow.",
+   "items": [
+    "I17",
+    "I18",
+    "I19",
+    "I20",
+    "I23"
+   ]
+  }
+ ],
+ "lean_structure": {
+  "files": 45,
+  "lines": 7918,
+  "declarations": 443,
+  "kind_counts": {
+   "theorem": 376,
+   "def": 56,
+   "instance": 10,
+   "abbrev": 1
+  },
+  "proof_dag_size": 426,
+  "core_vs_implementation": "Grouping of the 426 DAG declarations by file role: GGNS localization (ElectricalProjection, Entropy, HeatKernel, HeatLocalization, SpectralProjection) 88 (21%, 1.35k lines); stable-law background (StableLaw, StableIntensity, FourierTails, CoordinateLaws, SymmetricLaws) 62 (15%); Poisson/Rosenthal background (CompoundPoisson, SymmetricMoments, ConvolutionError, PowerEstimates, GlobalCutoff, CutoffEnvelope) 47 (11%); exact/packing lower bounds + discretization 75 (18%); Model/Main 5. Mathematical core of the upper bound = reweighting/retraction (Retractions, ConvexSelection) 25 + p<2 clip-project (StableRetractions, ClippedMoments, GradientSampling, BelowTwo) 36 + p>2 ramp (DyadicRamps, DyadicInterpolation, Ramp*, ProjectedRamps, RetractionIntegrals, Pareto, AboveParameters, AboveTwo) 71 + sampling 17 = 149 (35%). Within the core: ramp branch 48%, reweighting 17%, p<2 branch 24%.",
+  "key_items_dag": {
+   "controlled_retraction (Retractions.lean:184)": "dominated_share 0.246 (controlled_retraction_bounds 0.249)",
+   "ramp_sum_bounded_law (RampSum.lean:12)": "dominated_share 0.282",
+   "ramp_jump_law (ProjectedRamps.lean:89)": "0.157",
+   "electrical_localization_complete (ElectricalProjection.lean:266)": "0.178",
+   "above_main_upper / below_main_upper": "0.329 / 0.157",
+   "exact_lower_of_goodDimension (GridObstruction.lean:175)": "0.070",
+   "dyadicRamp (def)": "frac_dag_dependents 0.06 (definitions get dominated_share ~0 because the target also reaches them via sibling paths)"
+  },
+  "route_differences_from_paper": [
+   "Brouwer fixed point (paper.tex:445-462) replaced by convex separation over the convex set of retractions {P : P A = A, P = A B} (controlled_retraction); P is not an orthogonal projection, but satisfies the row-sum bound and the finitely many weighted energy bounds actually used.",
+   "p<2 marginal: Y = sum_a X_a g_a with iid symmetric p-stable X_a (stable_joint_gradient), the stable law built by Levy continuity from compound-Poisson approximants, instead of Poisson sampling against nu.",
+   "p>2: probability law = average over coordinates of Pareto(p) radius on (1,inf) times g_a (paretoVectorLaw), ramp, retraction P, symmetrization, then the m-fold convolution power (fixed number of summands) instead of a Poisson count; near-additive moments by induction over summands (near_additive_recurrence).",
+   "Localization lemma proved only under the hypothesis that every pair of vertices is joined by an edge (complete graph), sufficient for the application.",
+   "Constants: H = 4 log n (n = #points), row bound 4 log n instead of 2 sqrt 2 log n."
+  ],
+  "extractor_caveat": "extract_lean.py v3 text-level DAG; dominated_share of definitions is ~0 for widely shared defs; lemma rankings above are reliable enough to locate the core. No OAI imports, so no cross-dir effects."
+ },
+ "eureka_candidates_ranked": [
+  "I13 ramp of overlapping truncations (N3 weak, F3)",
+  "I12 critical-moment amplification p<2 (N2)",
+  "I05+I06/I07 reweighted l_inf-bounded projection onto gradient space (N2; bridge)",
+  "I04 weighted moment criterion (N1)",
+  "I20 grid obstruction (N2)"
+ ],
+ "eureka_candidates": [
+  {
+   "rank": 1,
+   "item": "I13 (+I14): ramp of overlapping dyadic truncations for p>2",
+   "provisional_N": "N3",
+   "provisional_F": "F3 (auxiliary construction)",
+   "for": "Tiny definition (a sum of l band-truncations) that is nowhere in the goal or L, and changes the bookkeeping qualitatively: p-energy ~ l^{p+1} (superadditivity of t^p over overlapping windows) while the projection error only grows like H^{p-2} l. Without it a single truncation gives energy ~ l and no gain, so no subpolynomial bound for p>2. Lean: ramp_sum_bounded_law dominates 28% of the whole DAG; the p>2 branch is ~48% of the mathematical core (71/149 core DAG decls).",
+   "against": "Precedented shape: Cesaro/de la Vallee Poussin averaging of truncations (classical device to beat Lebesgue constants), Littlewood-Paley windows, Rosenthal truncation levels. The paper itself explains the motivation in two lines, suggesting it is reachable by propagation once the energy/error mismatch is identified (low pivot distance). It is a one-off device for this theorem unless reused.",
+   "nearest_neighbour": "de la Vallee Poussin / Fejer means (overlapping partial-sum windows); 'smooth truncation' in Rosenthal-type and Burkholder inequalities.",
+   "lit_check": "WebSearch ('overlapping truncations', de la Vallee Poussin + Rosenthal + l_p dimension reduction): no matching construction found (snippet-level)."
+  },
+  {
+   "rank": 2,
+   "item": "I12: critical-moment amplification for p<2 (clip a p-stable vector at T, project back, use b = E min(|Y|,T/H)^p ~ log(T/H), T = exp(A H^{2-p}))",
+   "provisional_N": "N2",
+   "provisional_F": "(F4 if promoted: b acts as a potential that grows while the error stays additive)",
+   "for": "Exploits the logarithmic divergence of the p-th moment of a p-stable law exactly at the critical exponent: the additive error O(H^{2-p}) is fixed, b grows like log T, so relative error -> 0 at cost K = exp(O((log n)^{2-p})). Not in goal or L. The same 'grow the common moment to absorb an additive error' principle (paper.tex:287-293) is the shared engine of both ranges.",
+   "against": "Stable variables with truncation and Maurey sampling are the standard toolkit for L_p, p<2 (Schechtman 1987/2011, Indyk 2006, Johnson-Schechtman); 'absorb additive error by rescaling' is generic. Probably N2.",
+   "nearest_neighbour": "Schechtman 1987 'More on embedding subspaces of L_p in l_r^n' and 2011 'Dimension reduction in L_p, 0<p<2' (stable + truncation + empirical method); Indyk 2006.",
+   "lit_check": "Snippet-level only; Schechtman's finite-set bound is O(n), no clip-and-project-into-gradient-space step found."
+  },
+  {
+   "rank": 3,
+   "item": "I05+I06 (+Lean I07): truncate-then-correct via an O(log n) l_inf-bounded, l2(sigma)-contractive reweighted projection onto the gradient space",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "The structural insight that the gradient space of the complete graph (weights 1/delta_e) is O(log n)-complemented in l_inf uniformly over metrics, with simultaneous l2(sigma) contraction, so coordinatewise clipping/truncation can be undone. This is the cross-field bridge (electrical flows / spectral graph theory -> metric embeddings) on which both ranges rest; dominated share 0.25 in Lean.",
+   "against": "Ingredients exist: GGNS/SRS localization (row sums on average) and reweighting to make electrical routing competitive (Goranci et al. 2023, Lewis weights). The bridge counts as transfer (N0 for localization itself) plus an N2 reweighting variant; a 'new bridge' is measured separately, not a jump. Also: GGNS is itself model-produced (May 2026).",
+   "nearest_neighbour": "Goranci-Henzinger-Raecke-Sachdeva-Sricharan 2023 'Electrical flows for polylogarithmic competitive oblivious routing' (arXiv:2303.02491); Schild-Rao-Srivastava SODA'18; GGNS arXiv:2605.24130.",
+   "lit_check": "WebSearch: GGNS listing confirms the 2 log n bound and that initial proofs were generated by ChatGPT 5.5 Pro; reweighted electrical routing precedent found; no prior use in dimension reduction found."
+  },
+  {
+   "rank": 4,
+   "item": "I04: weighted moment criterion (uniform b, K over all test probabilities)",
+   "provisional_N": "N1",
+   "provisional_F": null,
+   "for": "Clean reduction of a simultaneous (all pairs) moment-matching problem to one weighted test at a time; it is what lets the projection depend on lambda.",
+   "against": "Minimax / Hahn-Banach plus Maurey empirical method; paper cites Eskenazis 2024 as close antecedent.",
+   "nearest_neighbour": "Eskenazis 2024 (DCG 71) Sections 1.3, 2.1; Pisier 1981 (Maurey).",
+   "lit_check": "Eskenazis 2024 abstract confirmed via search results (incompressible subsets, additive error)."
+  },
+  {
+   "rank": 5,
+   "item": "I20: antipodal row-and-column grid obstruction, all p != 2",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "Gives Theta(n^2) for exact embeddings for every p != 2 including even integers p > 2, with an elementary incidence argument.",
+   "against": "Ball 1990 already had quadratic sharpness for p<2; Lamperti's criterion is classical; corollary-level, not load-bearing for the headline n^{o(1)}.",
+   "nearest_neighbour": "Ball 1990 'Isometric embedding in l_p-spaces'.",
+   "lit_check": "not searched beyond the paper's own attribution."
+  }
+ ],
+ "correctness_audit": {
+  "verdict": "Major claim (first n^{o(1)} nonlinear dimension reduction in L_p, p != 2). The paper is short (1.5k lines) and every step I checked by hand is correct; the Lean formalizes the full Thm 1.1 with no sorry/axiom and only standard axioms, along a route that avoids Brouwer and Poisson processes. Trust is high, conditional on the orchestrator's comparator compile. The essential external input (GGNS 2 log n localization, itself model-originated) is re-proved in the paper and in Lean.",
+  "checked": [
+   "Lemma weighted: separation direction (sup over the open box gives a.(m-b) >= 2 eta b), lambda = 3/4|a| + 1/(4|E|) gives contradiction 4/3 eta b < 2 eta b; Hoeffding + union bound; distortion ratio",
+   "Lemma projection: Q = D P D^{-1}, sqrt(sigma_e) R_e = (|Q| sqrt sigma)_e, so sum sigma R^2 <= (2 log n)^2; Phi maps Sigma to itself (sum = 1, Phi >= lambda/2); fixed point gives R_e <= 2 sqrt2 log n",
+   "p<2: E|Y-F| <= H C T^{1-p} uses PY=Y; Lipschitz part p a^{p-1} H C T^{1-p} = C H^{2-p} at a=T/H; quadratic tail a^{p-2} T^{2-p} = H^{2-p}; b >= c log a; T = exp(A H^{2-p})",
+   "p>2: ramp energy p log2 (l^p + 2 sum j^p) ~ l^{p+1}; A_k = -(P-I)v_{>2^k} in L2; tail split at tau ~ 16H and integration give C H^{p-2}(l+1); relative error H^gamma/l; variance term H^{p-2}/b <= L^{-(p+1)} H^{-gamma}",
+   "dimension: log d <= C + 2p log K + log log n = O((log n)^gamma)",
+   "grid obstruction: antipodes forced by strict convexity; row/column disjointness via Lamperti defect; each coordinate serves at most one (row, column) pair",
+   "comparator statement vs Thm 1.1 (bounds, floor, choose, limits, universes)",
+   "trust-surface grep (all zero)"
+  ],
+  "concerns": [
+   "Provenance: the O(log n) localization (GGNS) is a May 2026 arXiv preprint whose initial proofs were generated by ChatGPT 5.5 Pro; the result is essential for all p (with O(log^2 n) only 3/2<p<4 follow). The appendix and the Lean re-prove it, so correctness does not depend on trusting GGNS.",
+   "Lean localization is proved only for complete graphs (hconn: every pair adjacent); the paper states it for all connected graphs. Harmless for the theorem, but the general Lemma 3.1 is unformalized.",
+   "Constants C_{p,D} blow up as p -> 1, 2 or infinity and D -> 1; no uniformity claimed (stated explicitly).",
+   "Paper uses H = 4 log(2n) and the localization bound 2 log n with n vertices; fine. The paper's Brouwer step needs continuity of P(sigma) on Sigma (Gram inverse), asserted not proved; the Lean route avoids it.",
+   "Poisson-sum measurability and convergence of the infinite small-jump sum in L2 (p<2) are handled briefly; the Lean avoids them by using iid stable sums.",
+   "No optimality claims: gap between the lower bound (log n, and Naor-Ren's (log n/(log log n)^2)^{p/2} for p>2) and exp(C(log n)^gamma) remains."
+  ],
+  "consistency_checks": [
+   "As p -> 1, gamma -> 1 and the bound degenerates to n^{C}, consistent with Brinkman-Charikar (p=1 needs n^{Omega(1/D^2)}).",
+   "For p>2 the upper bound exp(C(log n)^{1-2/p}) exceeds Naor-Ren's lower bound (log n/(log log n)^2)^{p/2}, so no contradiction; linear maps are not used, consistent with Lee-Mendel-Naor's linear lower bound."
+  ]
+ },
+ "extraction_friction": [
+  "Single paper.tex (1,467 lines) + one TikZ figure; no \\input of sections; bibliography is inline (\\thebibliography), no references.bib, so catalog 'bib' is empty.",
+  "Lean route differs substantively from the paper (minimax retractions instead of Brouwer; convolution powers instead of Poisson; stable sums instead of Levy-measure Poisson construction); the paper-Lean join is by role, not by name, for I06-I16.",
+  "Two inline \\emph definitions only (normalized gradients, signed Poisson sampling) plus background 'doubling'; the key ramp (I13) is defined by a displayed equation, not \\emph, so an \\emph-based extractor misses it.",
+  "extract_lean.py: definitions get dominated_share ~0.002 (shared via many paths), so the candidate-def ranking (weightedHeatKernel, gramProjection first) over-weights GGNS plumbing; lemma ranking (ramp_sum_bounded_law, controlled_retraction) matches the mathematical core.",
+  "GGNS provenance had to be established by web search (WebFetch to arxiv.org unavailable); snippet-level evidence only.",
+  "Lean not compiled by this agent (shared checkout)."
+ ]
+}
