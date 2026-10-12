@@ -1,0 +1,453 @@
+{
+ "fid": 143,
+ "item": "E1: quadratic-fit coordinates for Lienard half-arcs (143b): model midpoint H(lambda,kappa,r) of the profile lambda*u+kappa*u^2/2 and P,Q,R,S,G; global fit (lambda,kappa,r)->(H,H_r,r) a diffeomorphism onto {|M|<r,|v|<1} (Thm 3.6); transport law P lambda_r+Q kappa_r=0, D kappa=-(R/G)(lambda-k(h)), D lambda-kappa=(S/G)(lambda-k(h)) (Lemma 3.7)",
+ "item_type": "F5 (change of representation: arc endpoint data (M,M_r) -> fitted model parameters), F1 flavour (new defined objects H,P,Q,R,S,G)",
+ "provisional_grade_from_novelty": "N3 borderline N2, confidence 0.4 (data/pilot/143/novelty.json E1)",
+ "analysis_mode": "Text level only. No lake build or comparator run (shared checkout, per orchestrator). Dependency chains computed from data/items/143_lean.json (extract_lean.py v3) by BFS/closure over `uses` edges.",
+ "lean_status": "as in paper",
+ "lean_status_why": "H,P,Q,R,S,G are defined verbatim (QuadraticCoordinates.lean:20-26), the global fit is formalized in full generality as existence + uniqueness + analyticity of (fitD,fitK) on {r>0,|M|<r,|v|<1} (GlobalFit.lean:82-110) with P,G>0, and the transport law is proved verbatim (ActualFitTransport.lean:105) by the paper's subtract-and-solve argument; the only restriction is that the transport law is instantiated for the quintic profile family rather than a general smooth phi.",
+ "lean_gaps": [
+  "Transport law is stated only for QuinticProfile.profile a (a : Fin 6 -> R), i.e. phi(u)=F(sqrt(2u)) with deg F<=5, at positive base height (hh : 0<h). The paper's Lemma 3.7 is for any phi in C^inf(0,inf). The proof uses only generic lemmas (PositiveTransport.transport_midpoint/transport_v are generic in an analytic parametrized profile Phi), so a general-Phi version is a mechanical refactor (~150 lines), but it is NOT in the release. Same for the shape comparisons (QuinticFit.kappa_width_pos, axisKappa_lower/upper): Fin 6-specific.",
+  "Lean requires analytic profiles (ContDiffAt R omega Phi on u>0, plus a local_flow hypothesis); the paper works with C^inf profiles. Irrelevant for polynomial F, relevant for reuse on piecewise or merely smooth F.",
+  "Theorem 3.6's 'diffeomorphism' is not packaged as a single Lean object (no OpenPartialHomeomorph / Diffeomorph); it is spread over fit_spec, fit_unique, fitK_analytic, fitD_analytic plus H_abs_lt / Hr_abs_lt. Mathematically equivalent.",
+  "Height-zero (axis) fit is a separate layer (AxisFit.lean: axisKappa/axisLambda via QuadraticFit.fitK applied to axis data; joint_limits), matching the paper's Lemma axis-extension + continuity of the inverse.",
+  "Comparator is exact for the headline (encard <= 2 and = 2; family.json match_check). Comparator does not mention E1 (test 2 pass)."
+ ],
+ "comparator_chain": [
+  "OAI.QuinticLienard.main",
+  "OAI.QuinticLienard.upper_bound",
+  "OAI.QuinticLienard.upper_nonnegative",
+  "OAI.QuinticLienard.AxisFlow.matching_isolated_case2",
+  "OAI.QuinticLienard.AxisFlow.matchingDelta_zero_bound_of_third",
+  "OAI.QuinticLienard.AxisFlow.axisKappa_monotone",
+  "OAI.QuinticLienard.AxisFlow.kappa_monotone_height",
+  "OAI.QuinticLienard.QuinticFit.kappa_width_pos",
+  "OAI.QuinticLienard.ActualCharacteristic.w_pos",
+  "OAI.QuinticLienard.ActualCharacteristic.w_deriv",
+  "OAI.QuinticLienard.QuinticFit.w_transport",
+  "OAI.QuinticLienard.QuinticFit.fit_transport",
+  "OAI.QuinticLienard.QuinticFit.spec",
+  "OAI.QuinticLienard.QuadraticFit.fit_spec",
+  "OAI.QuinticLienard.QuadraticCoordinates.H"
+ ],
+ "comparator_chain_notes": [
+  "Every consecutive pair is a direct `uses` edge in data/items/143_lean.json (checked). Files: Main.lean:20, UpperAssembly.lean:67/42, AxisCases.lean:21, CurvaturePositive.lean:75, ActualFitTransport.lean:55/105, GlobalFit.lean:92, QuadraticCoordinates.lean:20. fit_transport also uses QuadraticCoordinates.transport_H/transport_Hr (QuadraticSlices.lean:82,152) and G_pos.",
+  "Shortest chain main -> H (BFS): main -> upper_bound -> upper_nonnegative -> AxisFlow.matching_isolated_case2 -> matchingDelta_zero_bound_of_third -> secant_identity -> axisV_conditional -> axisFit_spec -> QuadraticCoordinates.H.",
+  "Case 3 and case 4 also reach H and fitK_spec (matching_zeros_case3 -> matchingDelta_zero_bound -> matchingDelta_crossing -> axisV_conditional -> axisFit_spec -> H; matching_case3_gap -> axisKappa_lower -> joint_limits -> fitK_analytic -> fitK_spec). Case 4 reaches fit_transport via axisLambda_lt -> intercept_height_deriv. Case 1 (no_periodic_case1) and sharpness do not use E1.",
+  "Extractor numbers: H has 311 transitive dependents in the 1274-decl DAG (frac 0.317, ~52% of the Secs 3-7 core); fitK_spec 98 (0.10, dominated 0.04); fit_transport 23 (0.024). Dominated shares are ~0 because the target is also reached through case 1 / sharpness branches; knocking out E1 disconnects cases 2-4."
+ ],
+ "lean_source": [
+  {
+   "name": "QuinticLienard.QuadraticCoordinates.H/P/Q/Hr/R/S/G",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LienardCycles/QuadraticCoordinates.lean",
+   "line": 20,
+   "text": "noncomputable def H (q : (ℝ × ℝ) × ℝ) : ℝ := midpointAtWidth profile ((q.1,0),q.2)\nnoncomputable def P : (ℝ × ℝ) × ℝ → ℝ := direction ((1,0),0) H\nnoncomputable def Q : (ℝ × ℝ) × ℝ → ℝ := direction ((0,1),0) H\nnoncomputable def Hr : (ℝ × ℝ) × ℝ → ℝ := direction ((0,0),1) H\nnoncomputable def R : (ℝ × ℝ) × ℝ → ℝ := direction ((0,0),1) P\nnoncomputable def S : (ℝ × ℝ) × ℝ → ℝ := direction ((0,0),1) Q\nnoncomputable def G (q : (ℝ × ℝ) × ℝ) : ℝ := P q*S q-Q q*R q"
+  },
+  {
+   "name": "QuinticLienard.QuadraticVariation.P_pos",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LienardCycles/QuadraticVariation.lean",
+   "line": 74,
+   "text": "theorem P_pos {d k r : ℝ} (hr : 0 < r) : 0 < P ((d,k),r) := by ..."
+  },
+  {
+   "name": "QuinticLienard.QuadraticCoordinates.G_pos",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LienardCycles/RadiusSigns.lean",
+   "line": 25,
+   "text": "theorem G_pos {d k r : ℝ} (hr : 0 < r) : 0 < G ((d,k),r) := by ..."
+  },
+  {
+   "name": "QuinticLienard.QuadraticCoordinates.transport_H",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LienardCycles/QuadraticSlices.lean",
+   "line": 82,
+   "text": "lemma transport_H {d k r : ℝ} (hr : 0 < r) :\n    k*P ((d,k),r)-alpha ((d,k),r)*Hr ((d,k),r) = H ((d,k),r)/gap ((d,k),r)-d := by ..."
+  },
+  {
+   "name": "QuinticLienard.QuadraticCoordinates.transport_Hr",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LienardCycles/QuadraticSlices.lean",
+   "line": 152,
+   "text": "lemma transport_Hr {d k r : ℝ} (hr : 0 < r) :\n    k*R ((d,k),r)-alpha ((d,k),r)*Hrr ((d,k),r) =\n      -2*H ((d,k),r)*r*(1-(Hr ((d,k),r))^2)/(gap ((d,k),r))^2 := by ..."
+  },
+  {
+   "name": "QuinticLienard.QuadraticFit.conditionalV",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LienardCycles/ConditionalFit.lean",
+   "line": 40,
+   "text": "noncomputable def conditionalV (q : (ℝ × ℝ) × ℝ) : ℝ := Hr ((slope q,q.1.1),q.1.2)"
+  },
+  {
+   "name": "QuinticLienard.QuadraticFit.fitK/fitD",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LienardCycles/GlobalFit.lean",
+   "line": 82,
+   "text": "noncomputable def fitK (q : (ℝ × ℝ) × ℝ) : ℝ := by\n  classical\n  exact if h : ∃ k, conditionalV ((k,q.1.1),q.1.2)=q.2 then h.choose else 0\nnoncomputable def fitD (q : (ℝ × ℝ) × ℝ) : ℝ := slope ((fitK q,q.1.1),q.1.2)"
+  },
+  {
+   "name": "QuinticLienard.QuadraticFit.fit_spec",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LienardCycles/GlobalFit.lean",
+   "line": 92,
+   "text": "lemma fit_spec {r M v : ℝ} (hr : 0 < r) (hM : |M|<r) (hv : |v|<1) :\n    H ((fitD ((r,M),v),fitK ((r,M),v)),r)=M ∧\n    Hr ((fitD ((r,M),v),fitK ((r,M),v)),r)=v := ..."
+  },
+  {
+   "name": "QuinticLienard.QuadraticFit.fit_unique",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LienardCycles/GlobalFit.lean",
+   "line": 99,
+   "text": "lemma fit_unique {r M v d k : ℝ} (hr : 0 < r) (hM : |M|<r) (hv : |v|<1)\n    (hd : H ((d,k),r)=M) (hk : Hr ((d,k),r)=v) :\n    fitD ((r,M),v)=d ∧ fitK ((r,M),v)=k := by ..."
+  },
+  {
+   "name": "QuinticLienard.QuadraticFit.fitK_analytic",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LienardCycles/GlobalFit.lean",
+   "line": 109,
+   "text": "lemma fitK_analytic {r M v : ℝ} (hr : 0 < r) (hM : |M|<r) (hv : |v|<1) :\n    ContDiffAt ℝ ω fitK ((r,M),v) := by ..."
+  },
+  {
+   "name": "QuinticLienard.QuinticFit.fit",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LienardCycles/ActualFitTransport.lean",
+   "line": 54,
+   "text": "noncomputable def fit (a : Fin 6 → ℝ) (q : ℝ × ℝ) : (ℝ × ℝ) × ℝ := ((lambda a q,kappa a q),q.2)"
+  },
+  {
+   "name": "QuinticLienard.QuinticFit.α/D",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LienardCycles/ActualFitTransport.lean",
+   "line": 103,
+   "text": "noncomputable def α (a : Fin 6 → ℝ) (q : ℝ × ℝ) : ℝ := q.2/(q.2^2-M a q^2)\nnoncomputable def D (a : Fin 6 → ℝ) (f : ℝ × ℝ → ℝ) (q : ℝ × ℝ) : ℝ := first f q-α a q*second f q"
+  },
+  {
+   "name": "QuinticLienard.QuinticFit.fit_transport",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LienardCycles/ActualFitTransport.lean",
+   "line": 105,
+   "text": "lemma fit_transport (a : Fin 6 → ℝ) {h r : ℝ} (hh : 0<h) (hr : 0<r) :\n    P (fit a (h,r))*second (lambda a) (h,r)+Q (fit a (h,r))*second (kappa a) (h,r)=0 ∧\n    D a (kappa a) (h,r)= -R (fit a (h,r))/G (fit a (h,r))*(lambda a (h,r)-slope a h) ∧\n    D a (lambda a) (h,r)-kappa a (h,r)= S (fit a (h,r))/G (fit a (h,r))*(lambda a (h,r)-slope a h) := by ..."
+  },
+  {
+   "name": "QuinticLienard.AxisFlow.axisKappa",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LienardCycles/AxisFit.lean",
+   "line": 24,
+   "text": "noncomputable def axisKappa (a : Fin 6 → ℝ) (r : ℝ) : ℝ := QuadraticFit.fitK ((r,axisM a r),axisV a r)"
+  },
+  {
+   "name": "QuinticLienard.AxisFlow.matchingDelta_zero_bound",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LienardCycles/AxisZeros.lean",
+   "line": 45,
+   "text": "lemma matchingDelta_zero_bound {a b : Fin 6 → ℝ}\n    (hk : ∀ r ∈ matchingDomain a b, matchingDelta a b r=0 → axisKappa b r<axisKappa a r) :\n    {r ∈ matchingDomain a b | matchingDelta a b r=0}.encard≤1 := ..."
+  },
+  {
+   "name": "QuinticLienard.AxisFlow.kappa_range_height",
+   "kind": "theorem",
+   "file": "lean/OAI/Analysis/LienardCycles/AxisComparison.lean",
+   "line": 59,
+   "text": "lemma kappa_range_height {a : Fin 6 → ℝ} {h r T C D : ℝ} (hh : 0<h) (hr : 0<r)\n    (ht : peakAtWidth (QuinticProfile.profile a) ((0,h),r)<T)\n    (hc : ∀ u ∈ Ioo 0 T, C≤curvature a u ∧ curvature a u≤D) :\n    C≤QuinticFit.kappa a (h,r) ∧ QuinticFit.kappa a (h,r)≤D := by ..."
+  }
+ ],
+ "speedup_targets": [
+  {
+   "rank": 1,
+   "title": "Lins-de Melo-Pugh bound for degree <= 4: at most ONE limit cycle (Li-Llibre 2012 for n=4; LMP 1977 for n=3)",
+   "statement": "For every real polynomial F with deg F <= 4, x'=y-F(x), y'=-x has at most one limit cycle. (Li-Llibre also prove hyperbolicity; not part of this target.)",
+   "reference": "C. Li, J. Llibre, Uniqueness of limit cycles for Lienard differential equations of degree four, J. Differential Equations 252 (2012) 3142-3162 (21 pp); A. Lins, W. de Melo, C. Pugh, On Lienard's equation, LNM 597 (1977) for n=3.",
+   "status": "known theorem (proved 2012 / 1977)",
+   "current_proof_size": "Li-Llibre 21 journal pages (method not read: full text unreachable); no Lean formalization anywhere (none found).",
+   "how_item_helps": "NOT a corollary of Theorem 1.1 (which gives only <=2 for deg<=4), but falls out of the family's own case lemmas in a few lines. With a5=0 the reflection F->-F (limitCycle_encard_neg) lets one assume a3>=0 instead of a5>=0, which removes case 2 entirely: a1>=0 gives case 1 (no periodic orbit, or the even/centre case with no isolated zeros), a1<0 gives case 3, where matching_zeros_case3 already bounds ALL zeros of the matching function by 1. Case 3 uses E1 decisively: axisKappa is fitK of the axis data, kappa_range_height/axisKappa_lower bound the fitted curvature by the actual curvature (curvature comparison), and matchingDelta_zero_bound converts kappa_+ > kappa_- at zeros into Delta'>0 via v_kappa = G/P > 0. The proof does NOT use fit_transport or the model inequality (E2): transitive closure of {matching_zeros_case3, no_periodic_case1, limitCycle_encard_le_matching, limitCycle_encard_neg, no_isolated_matching_even} = 827 decls / 7,746 DAG lines (65% of main's 11,947), of which 165 decls / 1,438 lines depend on H; model_inequality and fit_transport are outside it. 143b does not mention that it re-proves Li-Llibre.",
+   "expected_speedup": "high (21-page paper -> ~40-80 Lean lines of glue given the library). Caveat: this measures the global-fit half of E1 (fit + curvature comparison + crossing lemma), not the transport law; it is near-in-distribution (same system class g=x, lower degree).",
+   "confidence": "0.8 that the glue proof goes through as sketched (text-level check of hypotheses: matching_zeros_case3 needs a1<0, 0<=a3, 0<=a5, satisfied with a5=0; no_periodic_case1 needs some odd coefficient nonzero, else no_isolated_matching_even).",
+   "ablation_design": "Arm A: full OAI library. Arm B: library minus AxisCases/UpperAssembly (prover must rebuild case 3 from E1 + kappa_range_height). Arm C: library minus QuadraticCoordinates/GlobalFit/ConditionalFit/AxisFit and dependents (no E1). Speedup = budget(C)/budget(B).",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Model.lean defs (OAI.QuinticLienard.IsLimitCycle, Plane, vectorField), Polynomial.degree, Set.encard: `∀ F : Polynomial ℝ, F.degree ≤ 4 → {C : Set Plane | IsLimitCycle F C}.encard ≤ 1`",
+    "missing": "nothing for the statement; proof glue ~40-80 lines (coefficient case split + quintic_representation + limitCycle_encard_neg). The existence half (some quartic with exactly one cycle) needs a SharpCycles-style perturbation (~150-300 lines).",
+    "formal_proof_to_compare": "none (no Lean/Isabelle/Coq formalization of LMP n=3,4 found); compare against the 21-page paper and against arm C."
+   }
+  },
+  {
+   "rank": 2,
+   "title": "Zhang Zhifen uniqueness theorem, restoring force g(x)=x",
+   "statement": "If F is smooth (polynomial for the Lean version), F(0)=0, and F'(x)/x is nondecreasing on (0,inf) and on (-inf,0) (not constant near 0), then x'=y-F(x), y'=-x has at most one limit cycle (hyperbolic if it exists).",
+   "reference": "Zhang Zhifen, Acta Math. Sinica 1958 (Chinese); Zhang Zhifen et al., Qualitative Theory of Differential Equations, AMS Transl. Math. Monographs 101 (1992), Ch. 4; Coppel 1989 survey. Exact theorem numbers unverified (search snippet / domain knowledge; full text not read: arxiv.org and ddd.uab.cat unreachable).",
+   "status": "known theorem",
+   "current_proof_size": "~4-8 pages (divergence-integral comparison of two orbits) unverified (search snippet / domain knowledge; full text not read: arxiv.org and ddd.uab.cat unreachable); no Lean formalization found.",
+   "how_item_helps": "In Filippov coordinates u=x^2/2, phi_+'(u)=F'(x)/x for x>0 and phi_-'(u)=F'(x)/x for x<0 (u decreasing in x), so the hypothesis is exactly phi_+''>=0>=phi_-''. The fitted-curvature range lemma then gives kappa_+(0,r) > kappa_-(0,r) and matchingDelta_zero_bound gives Delta'>0 at every zero: <=1 cycle. This is the paper's case-3 template with the coefficient sign test replaced by the Zhang hypothesis. Needs a strict separation at the axis (paper used delta>0 from p''->inf); with only weak monotonicity a nonconstancy argument is needed.",
+   "expected_speedup": "med (a few lines on top of E1 + curvature range + matching versus a multi-page divergence argument), but the matching layer for general F is not in Lean",
+   "confidence": "0.6 (the reduction is clean; the boundary/axis strictness needs checking)",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Model.lean defs + Polynomial.derivative, MonotoneOn on Set.Ioi 0 / Set.Iio 0 of x ↦ F'.eval x / x",
+    "missing": "for deg F <= 5: curvature-bound lemmas from the monotonicity hypothesis instead of coefficient signs (~100-200 lines). For arbitrary degree: de-quinticize the library (46 files / 4,421 lines mention Fin 6; generic Phi layer already exists in 15 files / 2,086 lines) - large but mechanical.",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "rank": 3,
+   "title": "Two-cycle criteria of Rychkov type for general smooth F (Zhang Zhifen's generalization of Rychkov; Holst-Sundberg class)",
+   "statement": "Smooth Lienard systems x'=y-F(x), y'=-x (odd or general F) satisfying third-derivative-type conditions have at most two limit cycles.",
+   "reference": "Zhang Zhifen's two-cycle theorem as quoted in arXiv:1802.06601 ('Zhang [33, Theorem 1] generalized Rychkov's result to a general smooth Lienard system ... at most two limit cycles'); Holst-Sundberg extension of Rychkov (per search snippet). Hypotheses unverified (search snippet / domain knowledge; full text not read: arxiv.org and ddd.uab.cat unreachable).",
+   "status": "known theorems (precise hypotheses not read)",
+   "current_proof_size": "unknown (not read)",
+   "how_item_helps": "This is the only target that exercises the FULL device (transport law + model inequality E2): 143b's Proposition 'strict third derivative' (phi_+'''>0>phi_-''' => kappa_+-kappa_- nondecreasing in width) plus the case-2 integrating-factor argument gives a general criterion 'phi_+'''>0>phi_-''' => <=2 cycles' for any smooth F. If Zhang/Holst-Sundberg hypotheses imply phi_+'''>0>phi_-''', their theorems become ~1-page corollaries; if not, the comparison of hypotheses is itself informative.",
+   "expected_speedup": "med if hypotheses match, else low",
+   "confidence": "0.35",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Model.lean defs for polynomial F of any degree; the hypothesis via iteratedDeriv 3 of u ↦ F.eval (Real.sqrt (2*u)) on Set.Ioi 0",
+    "missing": "general-Phi versions of fit_transport, w_transport, kappa_width_pos and the axis limits (~300-600 lines refactor), plus degree generalization of matching plumbing",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "rank": 4,
+   "title": "Uniqueness of the van der Pol limit cycle for all mu>0 (Lienard 1928)",
+   "statement": "x''+mu(x^2-1)x'+x=0 has exactly one limit cycle for every mu>0.",
+   "reference": "A. Lienard 1928; Perko, Differential Equations and Dynamical Systems, Sec. 3.8 (Lienard's theorem).",
+   "status": "known theorem",
+   "current_proof_size": "~2-4 textbook pages (energy-function argument); no Lean formalization found (WebSearch, unverified).",
+   "how_item_helps": "Upper bound <=1 is an instance of target 1 (F=mu(x^3/3-x), a1<0<a3: case 3). Existence for small mu follows from a SharpCycles-style first-order energy displacement. Existence for all mu needs Poincare-Bendixson (not in Mathlib).",
+   "expected_speedup": "low (classical proof already short; the gain is only that the Lean library exists)",
+   "confidence": "0.8 for upper bound; existence-for-all-mu not feasible now",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Model.lean defs with F = C mu * (X^3/3 - X)",
+    "missing": "upper bound: ~10 lines given target 1; exactness for small mu: ~150-300 lines adapting SharpCycles.lean; for all mu: Poincare-Bendixson (major new library)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "rank": 5,
+   "title": "Generalized Lienard x'=y-F(x), y'=-g(x): Zhang Zhifen's theorem with general g and small-type H(m,n) values (e.g. H(2,2)=1, Dumortier-Li)",
+   "statement": "Zhang: if xg(x)>0 and f(x)/g(x) nondecreasing on each side of 0, at most one limit cycle. Dumortier-Li 1996/97: quadratic F and g give at most one limit cycle (cycles around one singularity).",
+   "reference": "Zhang Zhifen 1958/1986; F. Dumortier, C. Li, Nonlinearity 9 (1996) and J. Differential Equations (1997); Llibre-Valls survey snippets. unverified (search snippet / domain knowledge; full text not read: arxiv.org and ddd.uab.cat unreachable)",
+   "status": "known theorems",
+   "current_proof_size": "Zhang ~5-8 pp; Dumortier-Li ~20-40 pp each (unverified)",
+   "how_item_helps": "With u=G(x)=int_0^x g, the half-orbit equation is again du/dy=phi_pm(u)-y with phi_pm=F(G_pm^{-1}(u)), so H, the fit, the transport law and the model inequality transfer verbatim (they only concern the model family); only the matching plumbing and the shape checks on phi_pm change. Zhang's general-g hypothesis is again phi_+''>=0>=phi_-''. For Dumortier-Li the extra singular point breaks the global half-plane picture.",
+   "expected_speedup": "med for Zhang general g; low for Dumortier-Li",
+   "confidence": "0.5 (Zhang), 0.2 (Dumortier-Li)",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib Polynomial; copy of Model.lean with vectorField (y - F.eval x, -g.eval x)",
+    "missing": "~25 lines of statement defs; proof needs the arc/matching plumbing (~52% of current DAG lines, g=x-specific) generalized: effectively a major refactor",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "open_problems": [
+  {
+   "title": "Odd-F Lins-de Melo-Pugh for degree 2k+1>=7 (at most k cycles; first case: odd septic F, <=3)",
+   "statement": "If F is odd of degree 2k+1, x'=y-F(x), y'=-x has at most k limit cycles.",
+   "reference": "LMP 1977; Rychkov 1975 (k=2); claimed proof for odd F by 'Chen and Chen' reported in Palit-Datta arXiv:1008.2372 (unverified, not accepted in surveys found); Llibre-Zhang survey.",
+   "url": "https://arxiv.org/abs/1008.2372",
+   "status": "open or contested (status not verified; DPR/DMD counterexamples use non-odd F per standard accounts, unverified)",
+   "obstruction_match": "For odd F the two profiles are p and -p, Delta=2M_+, so cycles are zeros of one midpoint function; E1 turns the zero count into sign changes of fitted parameters. The 2-parameter fit yields <=2 under p'''>0; k cycles need a k-parameter analogue.",
+   "adaptation_sketch": "Polynomial-fit coordinates of degree k: fit (M, M_r, ..., d^{k-1}M/dr^{k-1}) by a degree-(k) polynomial profile in u, derive the k x k transport system (determinant generalizing G), and look for a Chebyshev-type sign condition on p^{(k+1)}.",
+   "payoff": "high",
+   "confidence": "0.15",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Model.lean defs; odd polynomial via Polynomial.coeff (2i)=0",
+    "missing": "proof needs higher-order fit library (major)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Exact maximum H(6) for classical Lienard degree 6 (and H(n), n>=6)",
+   "statement": "Determine max number of limit cycles of x'=y-F(x), y'=-x with deg F=6; known >=4.",
+   "reference": "De Maesschalck-Dumortier, JDE 2011 (4 cycles, degree 6); Dumortier-Panazzolo-Roussarie, Proc. AMS 135 (2007); De Maesschalck-Huzak (>= n-2); CLZZ arXiv:2608.19542 (max unknown for n>=5 as of Aug 2026).",
+   "url": "https://www.ams.org/proc/2007-135-06/S0002-9939-07-08688-1/",
+   "status": "open (no upper bound known)",
+   "obstruction_match": "Same comparison of two non-symmetric half-arcs. But the common even part becomes d0 u+b0 u^2+g0 u^3, so the quadratic model family no longer absorbs it; case 2's monotone-q argument caps at 2, below the known 4.",
+   "adaptation_sketch": "Cubic-fit coordinates (3 parameters, data (M,M_r,M_rr)) absorbing the even part; sign partition of the odd part into regions each giving a Rolle-type bound; expect bounds like 4 or 5 only in subclasses.",
+   "payoff": "high",
+   "confidence": "0.1",
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Model.lean defs, F.degree ≤ 6, encard ≤ N",
+    "missing": "cubic-fit library (major)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Smale's 13th problem / finiteness and polynomial growth of H(n) for classical Lienard",
+   "statement": "Is H(n) finite, and bounded by n^d for a universal d?",
+   "reference": "S. Smale, Mathematical problems for the next century (1998), Problem 13; arXiv:1202.3540 (Gaiko claims, not accepted).",
+   "url": "https://arxiv.org/abs/1202.3540",
+   "status": "open (finiteness would follow from family 143a if correct; 143a is unformalized and unrefereed)",
+   "obstruction_match": "E1 gives bounds only when phi''' or ((phi'-d)/u)' has a global sign on (0,inf); a counting version would need arcs crossing sign-change heights.",
+   "adaptation_sketch": "Partition heights by sign changes of p''' (at most ~n), apply the fit on arcs whose span avoids sign changes and control crossing arcs by a separate argument; a bound linear in the number of sign changes would give polynomial growth.",
+   "payoff": "very high",
+   "confidence": "0.05",
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Model.lean defs: ∀ n, ∃ N, ∀ F, F.degree ≤ n → encard ≤ N",
+    "missing": "everything for the proof",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Generalized Lienard Hilbert numbers H(m,n) beyond the solved small cases (e.g. cubic restoring force g(x)=x+bx^3 with quintic F)",
+   "statement": "Max number of limit cycles of x'=y-F(x), y'=-g(x), deg F=m, deg g=n.",
+   "reference": "Llibre-Valls survey snippets (ddd.uab.cat LliVal2012c/f): exact values known only for (1,1),(1,2),(2,1),(3,1),(2,2),(1,3); Huzak-De Maesschalck 2014 lower bound 2[(n-2)/2]+[m/2] unverified (search snippet / domain knowledge; full text not read: arxiv.org and ddd.uab.cat unreachable)",
+   "url": "https://ddd.uab.cat/pub/artpub/2013/gsduab_3432/LliVal2012c.pdf",
+   "status": "open for all other (m,n)",
+   "obstruction_match": "Filippov u=G(x) gives the same arc equation, so the fit and transport law apply; the problem-specific part is that phi_pm=F(G_pm^{-1}(u)) no longer share a quadratic even part.",
+   "adaptation_sketch": "Choose the model family to absorb the common part of phi_+ and phi_- (e.g. q(u)=lambda u+kappa u^2/2 composed with the known even structure of G^{-1}); re-prove the global fit (Thm 3.6) for that family; rerun the sign partition.",
+   "payoff": "med",
+   "confidence": "0.2",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Model.lean copy with g",
+    "missing": "~25 lines statement; proof needs generalized plumbing (major)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Hyperbolicity / multiplicity companion to the quintic bound",
+   "statement": "In quintic classical Lienard systems, is the total multiplicity of limit cycles <= 2, and is a unique limit cycle hyperbolic in the one-cycle sign cases (analogue of Li-Llibre's hyperbolicity for n=4)?",
+   "reference": "Li-Llibre 2012 (hyperbolicity for n=4); 143b counts cycles geometrically and does not address multiplicity (introduction.tex:7-11).",
+   "url": "https://github.com/openai/math (preprints/two-limit-cycles-for-quintic-lienard-systems-September-24-2026)",
+   "status": "not addressed in the sources found (may be routine via unfolding arguments)",
+   "obstruction_match": "Delta'=A Delta+B q with q nondecreasing (case 2) and Delta'>0 at zeros (cases 3,4) directly control the order of zeros of Delta; strict monotonicity of q would give multiplicity bounds.",
+   "adaptation_sketch": "Show q strictly increasing where phi''' is not identically zero (strict version of kappa_width_pos), then bound the order of zeros of Delta; relate order of zeros of Delta to cycle multiplicity via the return map.",
+   "payoff": "low-med",
+   "confidence": "0.4",
+   "difficulty": "med",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "multiplicity as order of zero of matchingDelta is statable now inside the library; a comparator-grade statement needs a Poincare return map definition (~150-300 lines)",
+    "missing": "return-map / multiplicity defs",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Piecewise-linear (and piecewise-smooth) classical Lienard systems with n>=5 pieces",
+   "statement": "Max number of limit cycles of x'=y-F(x), y'=-x with F continuous piecewise linear with n pieces.",
+   "reference": "H. Chen, Z. Li, R. Zhang, X. Zhang, arXiv:2608.19542 (Aug 2026): maximum unknown for n>=5 (search snippet; unverified (search snippet / domain knowledge; full text not read: arxiv.org and ddd.uab.cat unreachable))",
+   "url": "https://arxiv.org/abs/2608.19542",
+   "status": "open per CLZZ",
+   "obstruction_match": "Same two-half-arc matching; profiles phi_pm are piecewise of the form alpha sqrt(u)+beta u ... The fit is profile-independent; the transport law holds piecewise; the curvature comparison needs phi'' which becomes a measure at kinks.",
+   "adaptation_sketch": "Prove a measure-valued curvature-range lemma (fitted curvature lies between essential inf/sup of the distributional phi''), then rerun case analysis on breakpoint sign patterns.",
+   "payoff": "med",
+   "confidence": "0.15",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "statement needs piecewise-linear F and Filippov-free continuity only (~50 lines)",
+    "missing": "Lean arc layer requires analytic profiles (ContDiffAt omega); non-analytic flows not supported",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "Uniqueness criteria for Gause-type predator-prey systems with general functional response",
+   "statement": "Weakest conditions on prey isocline / functional response ensuring a unique limit cycle (Freedman-type conjectures; Kuang-Freedman criteria).",
+   "reference": "Kuang-Freedman, Math. Biosci. 1988; Zegeling-Wang-Zhu 2023 (sigmoid response, three versions of Zhang's theorem); Freedman conjecture disproved 1988 (search snippets; unverified (search snippet / domain knowledge; full text not read: arxiv.org and ddd.uab.cat unreachable))",
+   "url": "https://global-sci.com/jnma/article/view/13717",
+   "status": "partially open (case-by-case)",
+   "obstruction_match": "These are proved by reduction to generalized Lienard and Zhang's pointwise f/g monotonicity. E1 needs only kappa_+ > kappa_- at matching widths (an averaged curvature comparison), a potentially weaker hypothesis than pointwise monotonicity.",
+   "adaptation_sketch": "State a 'fitted-curvature separation' criterion and test it on responses where Zhang's hypothesis fails but the averaged comparison holds.",
+   "payoff": "med",
+   "confidence": "0.2",
+   "difficulty": "med-high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "no population-model or generalized-Lienard library",
+    "missing": "model defs (~100 lines) plus all plumbing",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "Rychkov 1975: odd quintic F has <=2 limit cycles (special case of Theorem 1.1).",
+  "Degree <=4 has <=2 limit cycles (weaker than the known <=1; the sharp <=1 is NOT a corollary of the theorem, see speedup target 1).",
+  "Refutation of Hernandez Rosales' proposed 4-cycle quintic example (Aug 2026 preprint), done in 143b introduction.",
+  "Upper-bound halves of Odani 1996 Example 3 and Gasull-Giacomini-Grau 2017 counts for Rychkov's family.",
+  "Li-Lu 2014 (slow-fast cyclicity <=2 in degree 5) is implied by the global bound.",
+  "Within-paper generalizations (not other-theorem reuse): Propositions 'strict third derivative' and 'fitted slope intercept' for general smooth profiles (transport.tex:122-131, 294-306)."
+ ],
+ "release_reuse": "None. CONTENTS.md has no other Lienard / limit-cycle / planar-vector-field family besides 143; no Lean file outside OAI/Analysis/LienardCycles imports LienardCycles or defines midpointAtWidth-type objects (grep, fd4aeeb).",
+ "negative_controls": [
+  {
+   "setting": "Classical Lienard degree 6 and 7 (LMP false: De Maesschalck-Dumortier 2011, 4 cycles in degree 6; Dumortier-Panazzolo-Roussarie 2007, degree 7)",
+   "expected": "the device must NOT give <=2 (deg 6) or <=3 (deg 7). Check that the shape hypotheses (phi_+'''>0>phi_-''', intercept monotonicity, sign-definite p'') fail for the explicit DPR/DMD F; the common even part u^3 term is not absorbed by the quadratic model.",
+   "lean": "false statement is statable now; refuting it needs slow-fast existence theory (not formalizable soon)."
+  },
+  {
+   "setting": "Abel equations x'=A(t)x^3+B(t)x^2+C(t)x with trigonometric coefficients (Lins Neto 1980: unboundedly many periodic solutions) and rigid systems",
+   "expected": "device inapplicable: no two-half-arc matching with transverse widths and no model family with exact transport; no strong candidate found.",
+   "lean": "not attempted"
+  },
+  {
+   "setting": "Generalized Lienard with nonlinear g where the known lower bounds 2[(n-2)/2]+[m/2] (Huzak-De Maesschalck 2014) exceed 1-2",
+   "expected": "any E1-based bound must stay above these; failure of the common-quadratic structure is where the device should break.",
+   "lean": "needs new defs"
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "target": "LMP degree <=4 (<=1 cycle; Li-Llibre 2012, LMP 1977 n=3)",
+   "lean": "statable now",
+   "argument": "The cleanest measurable speedup: a 21-page known theorem becomes ~40-80 lines of Lean glue over the release library (flip F->-F to make the x^3 coefficient nonnegative, then case 1 or case 3). The decisive step is E1's crossing lemma (matchingDelta_zero_bound: kappa_+>kappa_- at zeros => Delta'>0) and the fitted-curvature range. 143b does not note this consequence. Caveats for grading: it reuses only the global-fit half of E1 (no transport law, no E2), it stays in the same system class, and an ablation (arms B/C) is needed to attribute the speedup to E1 rather than to the matching plumbing."
+  },
+  {
+   "rank": 2,
+   "target": "Zhang Zhifen uniqueness theorem (g=x; polynomial F)",
+   "lean": "statable now (deg<=5 version provable with ~100-200 lines; any degree needs de-quinticizing)",
+   "argument": "A classical OTHER theorem whose hypothesis (F'(x)/x monotone on each side) becomes exactly phi_+''>=0>=phi_-'' in Filippov coordinates, which E1 + curvature range turns into <=1 cycle in a few lines. A real cross-theorem reuse of the device's comparison principle; risk: strictness at the axis."
+  },
+  {
+   "rank": 3,
+   "target": "Rychkov-type two-cycle criteria (Zhang's generalization; Holst-Sundberg)",
+   "lean": "statable now; proof needs general-Phi fit_transport/kappa_width_pos (~300-600 lines)",
+   "argument": "The only target exercising the full device (transport law + model inequality). If the classical hypotheses imply phi_+'''>0>phi_-''', those theorems shrink to a page; hypotheses not verified (sources unread)."
+  },
+  {
+   "rank": 4,
+   "target": "van der Pol uniqueness for all mu",
+   "lean": "statable now (upper bound ~10 lines given target 1)",
+   "argument": "Cheap sanity check and first Lean formalization of a textbook result, but low speedup since the classical proof is already short; existence for all mu blocked by missing Poincare-Bendixson."
+  },
+  {
+   "rank": 5,
+   "target": "Odd-F LMP degree 7 (<=3) via higher-order fit coordinates",
+   "lean": "statable now; proof needs new library",
+   "argument": "The natural test of whether E1 is a template (k-parameter polynomial fit) rather than a one-off. Status open/contested; low confidence, high payoff."
+  }
+ ],
+ "precedent_check": {
+  "earlier_equivalent": "None found. Nearest: Lagrange/Euler osculating elements / variation of parameters (method template, as in novelty.json); Filippov transformation + half-orbit comparison (Zhang Zhifen, Coppel, Dumortier-Li) without data-space fitting; arXiv:2409.04024 (quintic Z2-equivariant Lienard (II)) compares divergence integrals over half-arcs of nested cycles, a different mechanism (search snippet only). Li-Llibre 2012's method could not be read (ddd.uab.cat unreachable); NTDS2012 talk snippet says it re-proves Zeng Xianwu 1982 with geometric meaning of his conditions - no sign of fitted model coordinates, unverified.",
+  "post_release_uses": "None found. arXiv:2610.13080 (Oct 2026, slow-fast quintic Lienard, mentioned in novelty.json) did not appear in today's searches; status unverified. No search hit for 'quadratic fit' + Lienard after Oct 6 2026.",
+  "effect_on_grade": "No downgrade from precedent. The degree<=4 observation is a mild upgrade signal (reuse on an OTHER theorem with large budget savings) but in-distribution and using only half the device; does not by itself confirm a eureka step."
+ },
+ "sources": [
+  "data/pilot/143/novelty.json, family.json; data/items/143_lean.json",
+  "lean/OAI/Analysis/LienardCycles/{QuadraticCoordinates,GlobalFit,ConditionalFit,ActualFitTransport,QuadraticSlices,QuadraticVariation,RadiusSigns,AxisFit,AxisZeros,AxisCases,AxisComparison,UpperAssembly,CycleTransform,CycleIsolation,CaseOne,PositiveTransport,PositiveFit,OriginalProfile,PolynomialModel,Main,Model}.lean",
+  "143b sections/{introduction,fitting,transport,application,references}.tex",
+  "https://ddd.uab.cat/record/150546 (Li-Llibre JDE 252 (2012) 3142-3162; abstract via search only)",
+  "https://www.gsd.uab.cat/ntds2012/pdf/NTDS2012LiChengzhi.pdf (snippet only)",
+  "https://arxiv.org/pdf/2608.19542 (snippet only)",
+  "https://www.ams.org/proc/2007-135-06/S0002-9939-07-08688-1/ (DPR 2007, snippet)",
+  "https://arxiv.org/pdf/1802.06601 (snippet: Zhang two-cycle theorem)",
+  "https://arxiv.org/pdf/1008.2372 (snippet: odd-F claims)",
+  "https://arxiv.org/pdf/1202.3540 (snippet: Smale 13 / Gaiko)",
+  "https://ddd.uab.cat/pub/artpub/2013/gsduab_3432/LliVal2012c.pdf (snippet: H(m,n) known values)",
+  "https://arxiv.org/pdf/2409.04024 (snippet: quintic Z2-equivariant Lienard)",
+  "https://global-sci.com/jnma/article/view/13717 (snippet: Zhang theorem in predator-prey)"
+ ],
+ "search_log": [
+  "Local: grep CONTENTS.md for Lienard/limit cycle/planar vector field/Abel/Riccati/Schwarzian/osculat/canard/slow-fast -> only family 143. grep lean/OAI for LienardCycles imports outside the dir -> none.",
+  "Local: BFS/closure over data/items/143_lean.json uses-edges: chains main->H, main->fit_transport; quartic closure 827 decls/7,746 lines; model_inequality and fit_transport not in it.",
+  "WebSearch 2026-10-12: 'Li Llibre uniqueness of limit cycles Lienard degree four JDE 2012 method'; 'Zhang Zhifen uniqueness theorem limit cycle Lienard f(x)/g(x) nondecreasing proof'; 'quintic Lienard two limit cycles OpenAI quadratic fit LMP degree five October 2026'; 'Lienard systems type (m,n) H(m,n) known values survey'; 'Smale 13th problem Lienard status'; 'LMP conjecture degree 6 maximum open 2024 2025'; 'Lean 4 formalization limit cycle van der Pol Poincare-Bendixson Mathlib'; 'Lienard 2026 arXiv quintic new proof fitted coordinates half-orbits'; 'odd Lienard F degree 7 at most three limit cycles'; 'Gause predator-prey uniqueness Kuang Freedman'; 'arXiv 2610.13080'.",
+  "WebFetch ddd.uab.cat Li-Llibre preprint and gsd.uab.cat NTDS2012 slides: DNS failure (ENOTFOUND). arxiv.org blocked by policy. No full text read; all literature statements are from search snippets and are marked unverified."
+ ]
+}
