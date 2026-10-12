@@ -1,0 +1,702 @@
+{
+ "fid": "161",
+ "date": "2026-10-12",
+ "analyst_role": "downstream",
+ "method_note": "Text-level only: the release Lean is trusted as published; no lake build or comparator run (shared checkout). Dependency chain from data/items/161_lean.json ('uses' graph, BFS from OAI.SidorenkoCounterexample.main), cross-checked by grep. arxiv.org, caltech.edu and wordpress were unreachable (WebFetch ENOTFOUND); all literature claims rest on WebSearch summaries and are marked unverified unless read locally. One external repo (rohanarun/sidorenko-template-refinements, Codex-generated, Oct 9-10 2026) was cloned read-only into the scratchpad and its data treated as untrusted; I re-checked its alternate 13-point complex with my own script (pair multiplicity, Euler characteristic, degree sequence, colour refinement).",
+ "item": "C1 rank-layer limit (I08 + I25, with I07 K_xi and I09 parity identity folded): signed half-rank symmetric-matrix kernel over F_q whose common-center integrals converge to an exact pair-sign (hypergraph parity) model inside an ordinary bipartite graph density",
+ "item_statement": "For even D = 2r >= D0 and q -> infinity through odd primes, with X_i (i in 13 points), Y_j (j in 22 faces) independent uniform in S_D (symmetric D x D over F_q), and K_xi(Z) = 1{rank Z = r, sign Z = xi}/P(.), for every corner set B and signs xi: E prod_{(i,j) in B} K_{xi_ij}(X_i - Y_j) = E_eta prod_j prod_{e={i,k} subset j, (i,j),(k,j) in B} (1 + c0 eta_e xi_ij xi_kj) + o(1), eta_e independent uniform signs, c0 = chi((-1)^r). Averaging eta gives prod_{e: U_e subset B}(1 + prod_{kappa in U_e} xi_kappa): each doubly-covered pair tests the parity of its four incidence signs.",
+ "item_type": "witness (design/device inside a counterexample); functional class F5 per novelty pass; the kernel object K_xi alone is N0",
+ "lean_status": "as in paper",
+ "lean_status_why": "rankLayerLimit_proved (Coefficients.lean:776) proves RankLayerLimit (Discriminant.lean:465), which is lem:rank-layer verbatim for the paper's own corner set (the paper also states it only for this complex). Its mathematical content (configuration_bool_tendsto plus the pair-sign independence) is on the comparator path, although the packaged theorem itself is not: main uses the D = 4r (c0 = 1) specialisation configuration_even_rank_limit.",
+ "lean_gaps": [
+  "CORRECTION to novelty.json (test3 / lean_backed_note): the packaged statements rankLayerConvergence, rankLayerLimit_proved, RankLayerLimit, layerCorrelation and signModelCorrelation have 0 dependents and are NOT on the comparator path (161_lean.json in_proof_dag = false; grep finds no other reference). They are proved side theorems.",
+  "The comparator path reaches the same content through configuration_bool_tendsto (general r, GlobalMoments.lean:416) and pairBool_test_tendsto, entering via configuration_even_rank_limit (Types.lean:77). That lemma uses D = 2*(2r), so c0 = chi((-1)^{2r}) = 1. The c0 = -1 branch (D = 2 mod 4) is formalised only off-path.",
+  "On the path, the lemma is applied coordinatewise inside the typed activation kernel (conditionalMatrixMoment_tendsto, then typedMatrixKernel_tendsto). It is never invoked in the paper's B, xi form.",
+  "The reversed-difference clause (Y_j - X_i) is not stated separately. It is covered by rankKernel_neg (K_xi(-Z) = K_{c0 xi}(Z)) and activationMatrixKernel_symm, used in the symmetrisation.",
+  "'Uniform over B and signs' is implicit: Lean proves Tendsto for each (B, xi) separately, which suffices because the family is finite, exactly as the paper remarks.",
+  "D0 = singularTailThreshold := Classical.choose globalTail_dichotomy, with 1642 <= D0 (Tail.lean:599-600). It is non-constructive but proved.",
+  "Specialised to Fin 13 x Fin 22 (faces, corners, Fin 33 pairs), as in the paper. There is no general-complex version: 16 of the 35 files (9,540 of 23,761 lines) hard-code the complex, with 543 'decide' occurrences. The other 19 files (14,221 lines: Lagrangian, Orbits, OrbitBounds, Grassmann, SubspaceCounts, Signs, SignMoments, Projections, Normalization, LocalMoments, Planted, PairBounds, Nullity, TripleRanks, FormGluing, Restrictions, Configurations, Reduction, RandomHost) do not mention the complex and are reusable as is.",
+  "No sorry, axiom or native_decide in OAI/Combinatorics/Sidorenko (grep). The comparator permits propext, Quot.sound and Classical.choice."
+ ],
+ "version_for_speedup_test": "Give the prover L+ = Mathlib d13f23b + the 19 complex-agnostic files + RankLayerLimit/rankLayerLimit_proved and configuration_bool_tendsto restated for a parametrised complex (faces : Fin m -> Finset (Fin n)). The control arm L gets the same library minus Discriminant.lean:440-470, Coefficients.lean:640-790, GlobalMoments and the half-rank lemmas (complementary_rank_iff, half_rank_projection, signed_pair_compatibility). The generalisation is NOT in the release and must be written first (estimate 300-800 lines of signature changes plus complex-specific certificates per target).",
+ "comparator_chain": [
+  "OAI.SidorenkoCounterexample.main (RandomHost.lean:319)",
+  "OAI.SidorenkoCounterexample.main_proved (RandomHost.lean:307)",
+  "OAI.SidorenkoCounterexample.exists_symmetric_kernel (Symmetrization.lean:121; dominated share 0.94)",
+  "OAI.SidorenkoCounterexample.exists_oriented_kernel (Symmetrization.lean:25)",
+  "OAI.SidorenkoCounterexample.typedMatrixKernel_tendsto (Types.lean:373; dominated share 0.44)",
+  "OAI.SidorenkoCounterexample.conditionalMatrixMoment_tendsto (Types.lean:94)",
+  "OAI.SidorenkoCounterexample.configuration_even_rank_limit (Types.lean:77; D = 4r specialisation of the item)",
+  "branch A: OAI.SidorenkoCounterexample.configuration_bool_tendsto (GlobalMoments.lean:416) -> transverseDifference_tendsto -> faceError_mean_tendsto -> pairError_tendsto -> pairError_mean -> pairError_pointwise -> pairLocal_mismatch -> signed_pair_compatibility -> half_rank_projection -> matrix_complementary_rank_iff -> complementary_rank_iff (I25)",
+  "branch A': configuration_bool_tendsto -> matrixSingularTail_tendsto -> ... -> singularTailThreshold / globalTail_dichotomy (singular tail, Tail.lean)",
+  "branch B: configuration_even_rank_limit -> boolTestError_tendsto -> pairBool_test_tendsto -> pairBool_moment_tendsto -> pairSign_moment_tendsto (independent eta_e)",
+  "kernel: typedMatrixKernel -> activationMatrixKernel -> sampleMatrixKernel -> rankKernel -> signedLayer -> matrixSign (I07)",
+  "OFF PATH (proved, 0 dependents): rankLayerConvergence (Coefficients.lean:760), rankLayerLimit_proved (Coefficients.lean:776), RankLayerLimit / layerCorrelation / signModelCorrelation (Discriminant.lean:446-470)"
+ ],
+ "comparator_dependency_verdict": "The comparator depends on the item's content: the half-rank sign mechanism (I25), the center-integral limit and the pair-sign independence are all on the path. It does not depend on the paper-shaped packaged lemma, which is a proved but unused restatement. Dominated shares (configuration_bool_tendsto 0.28, configuration_even_rank_limit 0.38, conditionalMatrixMoment_tendsto 0.43) agree with the novelty pass's '84% of lines prove I08'.",
+ "lean_source": [
+  {
+   "name": "OAI.SidorenkoCounterexample.signedLayer",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/Discriminant.lean",
+   "line": 331,
+   "text": "noncomputable def signedLayer (r : ℕ) (ξ : ℤ) : Finset (SymMatrix K D) := by\n  classical\n  exact Finset.univ.filter fun Z => Z.val.rank = r ∧ matrixSign K D Z = ξ",
+   "on_comparator_path": true,
+   "role": "I07 support: rank-r, sign-xi layer of symmetric D x D matrices (Huo-Wan scheme class)"
+  },
+  {
+   "name": "OAI.SidorenkoCounterexample.layerMass",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/Discriminant.lean",
+   "line": 335,
+   "text": "noncomputable def layerMass (r : ℕ) (ξ : ℤ) : ℝ :=\n  (signedLayer K D r ξ).card / (Fintype.card (SymMatrix K D) : ℝ)",
+   "on_comparator_path": true,
+   "role": "I07 normaliser P(rank=r, sign=xi)"
+  },
+  {
+   "name": "OAI.SidorenkoCounterexample.rankKernel",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/Discriminant.lean",
+   "line": 338,
+   "text": "noncomputable def rankKernel (r : ℕ) (ξ : ℤ) (Z : SymMatrix K D) : ℝ := by\n  classical\n  exact if Z ∈ signedLayer K D r ξ then (layerMass K D r ξ)⁻¹ else 0",
+   "on_comparator_path": true,
+   "role": "I07 K_xi: normalised layer indicator (the kernel object; N0 per novelty pass)"
+  },
+  {
+   "name": "OAI.SidorenkoCounterexample.uniformMean_rankKernel",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/Discriminant.lean",
+   "line": 418,
+   "text": "theorem uniformMean_rankKernel {K : Type*} [Field K] [Fintype K] [DecidableEq K]\n    (D r : ℕ) (hr : 0 < r) (hrD : r ≤ D) (hK : ringChar K ≠ 2)\n    {ξ : ℤ} (hξ : ξ = 1 ∨ ξ = -1) :\n    uniformMean (rankKernel K D r ξ) = 1 := by ...",
+   "on_comparator_path": true,
+   "role": "E K_xi = 1 (mean-one property)"
+  },
+  {
+   "name": "OAI.SidorenkoCounterexample.layerCorrelation",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/Discriminant.lean",
+   "line": 446,
+   "text": "noncomputable def layerCorrelation (D : ℕ) (q : OddPrime)\n    (B : Finset (Fin 13 × Fin 22)) (ξ : Fin 13 × Fin 22 → ℤ) : ℝ :=\n  uniformMean fun xy : (Fin 13 → SymMatrix (ZMod q.val) D) ×\n      (Fin 22 → SymMatrix (ZMod q.val) D) =>\n    ∏ c ∈ B, rankKernel (ZMod q.val) D (D / 2) (ξ c) (xy.1 c.1 - xy.2 c.2)",
+   "on_comparator_path": false,
+   "role": "LHS of lem:rank-layer (packaged; off comparator path)"
+  },
+  {
+   "name": "OAI.SidorenkoCounterexample.signModelCorrelation",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/Discriminant.lean",
+   "line": 452,
+   "text": "noncomputable def signModelCorrelation (D : ℕ) (q : OddPrime)\n    (B : Finset (Fin 13 × Fin 22)) (ξ : Fin 13 × Fin 22 → ℤ) : ℝ := by\n  classical\n  let c₀ : ℝ := quadraticChar (ZMod q.val) ((-1) ^ (D / 2))\n  exact uniformMean fun η : ModelPair → Bool =>\n    ∏ j : Fin 22, ∏ e : ModelPair,\n      if e.val ⊆ faces j ∧ (∀ i ∈ e.val, (i,j) ∈ B) then\n        1 + c₀ * (if η e then 1 else -1) * ∏ i ∈ e.val, (ξ (i,j) : ℝ)\n      else 1",
+   "on_comparator_path": false,
+   "role": "RHS of lem:rank-layer: the eta pair-sign model (packaged; off comparator path)"
+  },
+  {
+   "name": "OAI.SidorenkoCounterexample.RankLayerLimit",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/Discriminant.lean",
+   "line": 465,
+   "text": "def RankLayerLimit : Prop := ∃ D₀ : ℕ, 0 < D₀ ∧\n  ∀ D : ℕ, D₀ ≤ D → Even D →\n    ∀ B : Finset (Fin 13 × Fin 22), B ⊆ corners →\n      ∀ ξ : Fin 13 × Fin 22 → ℤ, (∀ c ∈ B, ξ c = 1 ∨ ξ c = -1) →\n        Filter.Tendsto (fun q : OddPrime =>\n          layerCorrelation D q B ξ - signModelCorrelation D q B ξ)\n          primeInfinity (nhds 0)",
+   "on_comparator_path": false,
+   "role": "lem:rank-layer verbatim as a Prop (off comparator path)"
+  },
+  {
+   "name": "OAI.SidorenkoCounterexample.complementary_rank_iff",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/Discriminant.lean",
+   "line": 491,
+   "text": "/-- Equality in the dimension subadditivity for an operator and its complement\nis equivalent to idempotence. -/\ntheorem complementary_rank_iff {K V : Type*} [Field K] [AddCommGroup V]\n    [Module K V] [FiniteDimensional K V] (f : V →ₗ[K] V) :\n    finrank K (LinearMap.range f) + finrank K (LinearMap.range (LinearMap.id-f)) =\n      finrank K V ↔ IsIdempotentElem f := by ...",
+   "on_comparator_path": true,
+   "role": "I25 core: rank f + rank(1-f) = dim iff f idempotent (on path)"
+  },
+  {
+   "name": "OAI.SidorenkoCounterexample.half_rank_projection",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/Discriminant.lean",
+   "line": 532,
+   "text": "/-- Exact complementary-images equivalence in the main proof. Nonsingularity\nis determinant ≠ 0; no characteristic or symmetry hypothesis is discarded\nfrom an application, since the equivalence holds without those restrictions. -/\ntheorem half_rank_projection {K n : Type*} [Field K] [Fintype n] [DecidableEq n]\n    (r : ℕ) (hdim : Fintype.card n = 2*r) (A B : Matrix n n K)\n    (hB : B.det ≠ 0) (hA : A.rank = r) :\n    (B-A).rank = r ↔ A*B⁻¹*A=A := by ...",
+   "on_comparator_path": true,
+   "role": "I25: at half rank, (B-A) has rank r iff A B^-1 A = A (on path)"
+  },
+  {
+   "name": "OAI.SidorenkoCounterexample.signed_pair_compatibility",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/Normalization.lean",
+   "line": 219,
+   "text": "theorem signed_pair_compatibility (hd : D=2*r) (A B : SymMatrix K D)\n    (hB : B.val.det≠0) (ha : A.val.rank=r) (hb : (A-B).val.rank=r) :\n    quadraticChar K B.val.det = quadraticChar K ((-1 : K)^r) *\n      matrixSign K D A * matrixSign K D (A-B) := by ...",
+   "on_comparator_path": true,
+   "role": "I25 -> sign relation chi(det B) = c0 * sign A * sign(A-B) (the pair-sign mechanism; on path)"
+  },
+  {
+   "name": "OAI.SidorenkoCounterexample.pairLocal_mismatch",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/LocalMoments.lean",
+   "line": 480,
+   "text": "theorem pairLocal_mismatch (r : ℕ) (ξ ζ : ℤ) (B : SymMatrix K (2*r))\n    (hB : B.val.det≠0) (hm : ¬pairMatch r ξ ζ B) : pairLocal r ξ ζ B=0 := by ...",
+   "on_comparator_path": true,
+   "role": "local consequence: a common center kills mismatched pair signs (on path)"
+  },
+  {
+   "name": "OAI.SidorenkoCounterexample.faceLocal",
+   "kind": "def",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/Charts.lean",
+   "line": 127,
+   "text": "noncomputable def faceLocal (r : ℕ) (T : Finset (Fin 3)) (ξ : Fin 3 → ℤ)\n    (X : Fin 3 → SymMatrix K (2*r)) : ℝ :=\n  uniformMean (fun Y => ∏ k∈T, rankKernel K (2*r) r (ξ k) (X k-Y))",
+   "on_comparator_path": true,
+   "role": "center integral over one face Y_j (on path)"
+  },
+  {
+   "name": "OAI.SidorenkoCounterexample.pairSign_moment_tendsto",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/Monomials.lean",
+   "line": 270,
+   "text": "theorem pairSign_moment_tendsto (D : ℕ) (hD : Even D) (hbig : 12≤D)\n    (F : Finset (Fin 33)) (hF : F.Nonempty) :\n    Tendsto (fun q : OddPrime => uniformMean (fun X : Fin 13 → SymMatrix (ZMod q.val) D =>\n      ∏ e∈F, pairSign X e)) primeInfinity (nhds 0) := by ...",
+   "on_comparator_path": true,
+   "role": "asymptotic independence of the 33 pair determinant signs (supplies independent eta_e; on path)"
+  },
+  {
+   "name": "OAI.SidorenkoCounterexample.configuration_bool_tendsto",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/GlobalMoments.lean",
+   "line": 416,
+   "text": "theorem configuration_bool_tendsto (r : ℕ) (T : Fin 22 → Finset (Fin 3))\n    (ξ : Fin 22 → Fin 3 → ℤ) (hξ : ∀ j i,ξ j i=1 ∨ ξ j i= -1)\n    (hlarge : singularTailThreshold≤2*r) : Tendsto\n    (fun q : OddPrime => uniformMean (configurationProduct (K := ZMod q.val) r T ξ)-uniformMean\n      (fun X : Fin 13 → SymMatrix (ZMod q.val) (2*r) =>\n        boolConfiguration (quadraticChar (ZMod q.val) ((-1:ZMod q.val)^r)) T ξ (pairBool X))) primeInfinity (nhds 0) := by ...",
+   "on_comparator_path": true,
+   "role": "the analytic content of lem:rank-layer for general r (transverse + singular tail + bool model; on path)"
+  },
+  {
+   "name": "OAI.SidorenkoCounterexample.rankLayerConvergence",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/Coefficients.lean",
+   "line": 760,
+   "text": "theorem rankLayerConvergence (r : ℕ) (hlarge : singularTailThreshold≤2*r)\n    (B : Finset (Fin 13 × Fin 22)) (hB : B⊆corners) (ξ : Fin 13 × Fin 22 → ℤ)\n    (hξ : ∀ c∈B,ξ c=1 ∨ ξ c= -1) : Tendsto\n      (fun q : OddPrime => layerCorrelation (2*r) q B ξ-signModelCorrelation (2*r) q B ξ)\n      primeInfinity (nhds 0) := by ...",
+   "on_comparator_path": false,
+   "role": "lem:rank-layer for D=2r, all B, xi (packaged; 0 dependents, off path)"
+  },
+  {
+   "name": "OAI.SidorenkoCounterexample.rankLayerLimit_proved",
+   "kind": "theorem",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/Coefficients.lean",
+   "line": 776,
+   "text": "theorem rankLayerLimit_proved : RankLayerLimit := by ...",
+   "on_comparator_path": false,
+   "role": "RankLayerLimit proved (packaged; 0 dependents, off path)"
+  },
+  {
+   "name": "OAI.SidorenkoCounterexample.configuration_even_rank_limit",
+   "kind": "lemma",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/Types.lean",
+   "line": 77,
+   "text": "lemma configuration_even_rank_limit (r : ℕ) (hl : singularTailThreshold≤2*(2*r))\n    (T : Fin 22 → Finset (Fin 3)) (ξ : Fin 22 → Fin 3 → ℤ)\n    (hξ : ∀ j k,ξ j k=1 ∨ ξ j k= -1) : Tendsto\n    (fun q : OddPrime => uniformMean (configurationProduct (K := ZMod q.val) (2*r) T ξ))\n    primeInfinity (nhds (uniformMean (boolConfiguration 1 T ξ))) := by ...",
+   "on_comparator_path": true,
+   "role": "on-path specialisation: D = 4r, c0 = 1, limit = sign-model mean"
+  },
+  {
+   "name": "OAI.SidorenkoCounterexample.typedMatrixKernel_tendsto",
+   "kind": "lemma",
+   "file": "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/Types.lean",
+   "line": 373,
+   "text": "lemma typedMatrixKernel_tendsto {A B K : Type*} [Fintype A] [Fintype B] [Fintype K] [DecidableEq K]\n    (r : ℕ) (hl : singularTailThreshold≤2*(2*r)) (π : FiniteLaw A) (ν : FiniteLaw B)\n    (p : A → B → FiniteLaw (Activation K))\n    (hp : ∀ a b α,α≠∅ → (p a b).mean (activationPhi α)=0) :\n    Tendsto (fun q : OddPrime => bipartiteMoment\n      (typedMatrixLaw (F := ZMod q.val) (K := K) (2*r) π) (typedMatrixLaw (2*r) ν) (typedMatrixKernel (2*r) p))\n      primeInfinity (nhds (1+averagedCoefficient π ν p)) := by ...",
+   "on_comparator_path": true,
+   "role": "consumer: typed activation kernel density -> 1 + averaged coefficient (on path; dominated share 0.44)"
+  }
+ ],
+ "speedup_targets": [
+  {
+   "title": "No strong speedup target among KNOWN theorems",
+   "statement": "C1 is a device for producing deficits in nonnegative bipartite densities. Known theorems in its neighbourhood are either positive Sidorenko results, which the device cannot shorten, or hypergraph and signed-weight counterexamples, whose proofs are already a page and need no nonnegative realisation. The entries below are the best measurable candidates found. None is expected to show a large speedup, and only S1 would count as device reuse.",
+   "reference": "-",
+   "status": "-",
+   "how_item_helps": "-",
+   "expected_speedup": "-",
+   "confidence": 0.7,
+   "lean_feasibility": {
+    "score": "n/a",
+    "statable_with": "-",
+    "missing": [],
+    "formal_proof_to_compare": "-"
+   }
+  },
+  {
+   "title": "S1. Non-Sidorenko property of the second 13-point template complex (plantri #49243)",
+   "statement": "Let H' be the Levi (point-face incidence) graph of the 13-point, 22-face sphere triangulation with faces {{0,1,2}, {0,1,5}, {0,2,3}, {0,3,4}, {0,4,5}, {1,2,8}, {1,5,6}, {1,6,7}, {1,7,8}, {2,3,10}, {2,8,9}, {2,9,10}, {3,4,12}, {3,10,11}, {3,11,12}, {4,5,6}, {4,6,7}, {4,7,12}, {7,8,12}, {8,9,12}, {9,10,11}, {9,11,12}}. Then there is a finite simple G with an edge such that t(H',G) < p(G)^66.",
+   "reference": "github.com/rohanarun/sidorenko-template-refinements (Codex-generated, Oct 10 2026; experiments/order-13-cuts/candidate-13-49243.json). I checked locally: every pair lies in exactly 2 faces, V-E+F = 13-33+22 = 2, colour refinement of the Levi graph is discrete, and the point-degree sequence (4^4 5^4 6^5) differs from the original (4^3 5^6 6^4), so the graph is non-isomorphic.",
+   "status": "OPEN. The repo explicitly says 'not claimed as a newly proved counterexample: its full analytic transfer has not been independently verified'. It is listed here because it is the cleanest MEASURABLE reuse of the design; it is repeated under open_problems as OP1.",
+   "current_proof_size": "Original: paper 3,773 TeX lines; Lean 23,761 lines (9,540 complex-specific).",
+   "how_item_helps": "With C1 (the generic half-rank pair-sign mechanism) and the 14,221 complex-agnostic lines in the library, only the complex-specific layer has to be redone: pair-sign independence for the new pair set, activation supports, pinning scores, and the singular-tail bound. The tail bound is the hard part, because the alternate certificate uses a mixture of 20 cuts where the Lean's Tail/Exposure use exactly 3 bit-partitions.",
+   "expected_speedup": "med (relative to re-deriving from scratch); low as evidence of a jump (sibling witness of the same design)",
+   "confidence": 0.5,
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Copy of ComparatorChallenges/SidorenkoCounterexample.lean with the faces table replaced; SimpleGraph, Nat.card",
+    "missing": [],
+    "formal_proof_to_compare": "yes: the 23,761-line original; per-file diff gives a direct size comparison"
+   },
+   "faces": [
+    [
+     0,
+     1,
+     2
+    ],
+    [
+     0,
+     1,
+     5
+    ],
+    [
+     0,
+     2,
+     3
+    ],
+    [
+     0,
+     3,
+     4
+    ],
+    [
+     0,
+     4,
+     5
+    ],
+    [
+     1,
+     2,
+     8
+    ],
+    [
+     1,
+     5,
+     6
+    ],
+    [
+     1,
+     6,
+     7
+    ],
+    [
+     1,
+     7,
+     8
+    ],
+    [
+     2,
+     3,
+     10
+    ],
+    [
+     2,
+     8,
+     9
+    ],
+    [
+     2,
+     9,
+     10
+    ],
+    [
+     3,
+     4,
+     12
+    ],
+    [
+     3,
+     10,
+     11
+    ],
+    [
+     3,
+     11,
+     12
+    ],
+    [
+     4,
+     5,
+     6
+    ],
+    [
+     4,
+     6,
+     7
+    ],
+    [
+     4,
+     7,
+     12
+    ],
+    [
+     7,
+     8,
+     12
+    ],
+    [
+     8,
+     9,
+     12
+    ],
+    [
+     9,
+     10,
+     11
+    ],
+    [
+     9,
+     11,
+     12
+    ]
+   ]
+  },
+  {
+   "title": "S2. Hypergraph non-Sidorenko examples (Sidorenko 1993 loose triangle; Conlon-Lee-Sidorenko 2023: linear 3-graphs containing a loose triangle, 3-partite tight cycles)",
+   "statement": "Specific r-partite r-graphs F have t(F,W) < (E W)^{e(F)} for some nonnegative r-ary kernel W.",
+   "reference": "Sidorenko, Discrete Math. 1993; Conlon-Lee-Sidorenko arXiv:2307.04588 (IMRN 2024) [abstract via search, unverified]",
+   "status": "proved",
+   "current_proof_size": "about 1 page each (±1-weighted host plus even-subgraph expansion); no Lean formalisation known",
+   "how_item_helps": "Backwards only. C1's limiting sign model IS the hypergraph mechanism. In r-graphs the signs sit on the edges directly, so no center kernel is needed and the device adds nothing.",
+   "expected_speedup": "low (none expected)",
+   "confidence": 0.8,
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib Combinatorics/Hypergraph/Basic is minimal; define an r-partite hom density for finite r-ary kernels (~60-100 lines) over OAI FiniteLaw",
+    "missing": [
+     "r-ary kernel hom density (~60 lines)",
+     "loose triangle / tight cycle as Finset systems (~20 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "S3. Rank/sign layer sizes of symmetric matrices over F_q (MacWilliams 1969; Huo-Wan 1993; Schmidt 2015 Sect. 2)",
+   "statement": "Exact count of symmetric n x n matrices over F_q with rank r and discriminant sign xi.",
+   "reference": "MacWilliams, 'Orthogonal matrices over finite fields' (1969); Huo-Wan 1993; Schmidt 2015 (all in the 161 bib)",
+   "status": "proved (classical)",
+   "current_proof_size": "a few pages; the release Lean has orbit, Grassmann and Lagrangian counts and positivity (layerMass_pos) but, as far as I could grep, no closed-form layer count",
+   "how_item_helps": "Tool reuse, NOT device reuse: Signs/Orbits/SubspaceCounts would shorten a formal proof of the count, but C1 itself (center-product limit) plays no role.",
+   "expected_speedup": "low for C1 (med for the tooling)",
+   "confidence": 0.6,
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI SymMatrix, matrixSign, signedLayer (Discriminant.lean) + Mathlib Matrix.rank, quadraticChar",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "S4. Non-Sidorenko / uncommon linear systems via quadratic phases (Fox-Pham-Zhao 2019 single-equation characterisation; Kamcev-Liebenau-Morrison 2021; Altman 2022)",
+   "statement": "Certain linear systems over F_p^n have fewer solutions in some dense set A than random, witnessed by quadratic-form level sets.",
+   "reference": "Fox-Pham-Zhao, 'Common and Sidorenko linear equations' (QJM 2021); Kamcev-Liebenau-Morrison; Altman [search summaries, unverified]",
+   "status": "proved",
+   "current_proof_size": "a few pages each; no Lean",
+   "how_item_helps": "Cousin, not reuse. Every coordinate kernel K_xi(X - Y) is a Cayley kernel on the abelian group (S_D, +), so C1 is a statement about counts of the H-pattern system x_i - y_j in rank/sign layers. The FPZ/KLM negative examples, however, rest on Fourier sign patterns of quadratic phases, not on common-center pair-sign models.",
+   "expected_speedup": "low",
+   "confidence": 0.6,
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib AddChar, ZMod, Module over ZMod p",
+    "missing": [
+     "solution density of a linear system in A subset F_p^n (~40 lines)",
+     "Sidorenko/common property for systems (~30 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "open_problems": [
+  {
+   "id": "OP1",
+   "title": "Second 13-point template witness (plantri #49243): is its Levi graph non-Sidorenko?",
+   "statement": "Prove t(H',G) < p(G)^66 for some finite G, where H' is the Levi graph of the alternate 13-point sphere triangulation (faces listed under S1).",
+   "reference": "github.com/rohanarun/sidorenko-template-refinements, experiments/order-13-classification-independent.json (Oct 10 2026, Codex)",
+   "url": "https://github.com/rohanarun/sidorenko-template-refinements",
+   "status": "open (finite checks pass per repo; analytic transfer unverified, repo says so)",
+   "obstruction_match": "Exact: closed pseudomanifold (pairs in 2 faces), connected face graph, discrete colour refinement, cut mixture with pair coverage >= 1/3 (per repo).",
+   "adaptation_sketch": "Re-instantiate the 16 complex-specific Lean files with the new faces. Pair-sign independence (Monomials) and local moments go through mechanically. The activation supports (one negative corner, support forcing) need the new face table. The singular tail must be redone with a 20-cut mixture in place of 3 uniform bit-partitions; the Exposure/Coercivity argument currently assumes 3 equal-weight partitions.",
+   "payoff": "low-med mathematically (a second witness of the same size); high as a calibrated Lean reuse measurement",
+   "confidence": 0.55,
+   "difficulty": "med (mostly mechanical except the tail)",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Comparator file with faces replaced",
+    "missing": [],
+    "formal_proof_to_compare": "yes (original 23,761 lines)"
+   }
+  },
+  {
+   "id": "OP2",
+   "title": "Template theorem: every closed 3-uniform complex meeting the template conditions has a non-Sidorenko Levi graph (giving an infinite family?)",
+   "statement": "If a triple system has every pair in exactly two faces, a connected face graph, discrete colour refinement on its Levi graph, and an admissible cut mixture covering every pair with probability >= 1/3 (plus the support-forcing condition), then its Levi graph is not Sidorenko. Are there infinitely many such complexes (n >= 14 point sphere triangulations, max degree <= 6)?",
+   "reference": "paper Prop. complex (sections/complex.tex); rohanarun repo shows no template complex for n <= 12 and exactly 2 at n = 13 (unverified enumeration via plantri)",
+   "url": "https://github.com/rohanarun/sidorenko-template-refinements",
+   "status": "open; not stated in the paper (novelty.json open question 'Generality')",
+   "obstruction_match": "Full: this is C1 plus C2-C5 stated for a general complex.",
+   "adaptation_sketch": "Parametrise faces : Fin m -> Finset (Fin n). Replace the decide certificates by hypotheses. The singular-tail dimension D0 would depend on the complex (the residual constant 1641 is complex-specific; the repo lowers one step to 189). Degree <= 6 is forced by sum_{e at v} a_e = 2 (repo).",
+   "payoff": "high: an infinite family of non-Sidorenko graphs from one device is the strongest reuse evidence available within graph Sidorenko",
+   "confidence": 0.35,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Finset (Fin n) triples, SimpleGraph Levi graph, colour refinement as an iterated function (~80 lines), cut mixtures (~60 lines)",
+    "missing": [
+     "general Levi graph + pseudomanifold predicate (~40 lines)",
+     "colour-refinement discreteness (~80 lines)",
+     "admissible cut mixture / exposure orders (~100 lines)"
+    ],
+    "formal_proof_to_compare": "partial: original proof for one instance"
+   }
+  },
+  {
+   "id": "OP3",
+   "title": "Is there an uncommon bipartite graph (2 colours)? Is H, or a template graph, uncommon?",
+   "statement": "Find bipartite F and G with t(F,G) + t(F,G^c) < 2^{1-e(F)} (asymptotically).",
+   "reference": "Common-graph literature: Sidorenko implies common, so all bipartite graphs were expected to be common; no bipartite uncommon graph known as of 2025 [search summary]. Kral'-Noel-Norin-Volec-Wei (Combinatorica 2022): Sidorenko iff k-common for all k [abstract, unverified]",
+   "url": "https://arxiv.org/abs/2006.09422",
+   "status": "open. H is not k-common for SOME k by KNNVW (a theorem corollary), but 2-colour commonness of H is open",
+   "obstruction_match": "Partial: the device gives a deficit at one density p for one colour. 2-colour uncommonness needs simultaneous deficits for W and 1-W at mean 1/2 (or an exchange-symmetric kernel).",
+   "adaptation_sketch": "Use the forcing corollary's interpolation to reach t(H,W) = p^66 at p = 1/2 and ask whether a sign-symmetric activation law (xi -> -xi swaps layers when c0 = 1) gives t(H,1-W) <= 2^{-66} as well. The negative correction is O(eps^13), so 1-W needs its own deficit, which looks hard. Lovasz-type local results block small perturbations.",
+   "payoff": "high (resolves the commonness question for bipartite graphs)",
+   "confidence": 0.2,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Comparator homDensity/edgeDensity + Mathlib SimpleGraph.compl",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "OP4",
+   "title": "Abelian Cayley-host counterexample: is there a Cayley graph of a finite abelian group with t(H,Cay) < p^66?",
+   "statement": "Does Sidorenko's inequality for H fail already on Cayley graphs of finite abelian groups (no type layer)?",
+   "reference": "Zhao, 'Sidorenko-type inequalities for even subdivisions over finite abelian groups' arXiv:2507.15723 (positive for even subdivisions); Szegedy reduction to Cayley hosts over finite groups (as cited there); Zhao arXiv:2606.15368 conditional reduction [all via search summaries, unverified]",
+   "url": "https://arxiv.org/abs/2507.15723",
+   "status": "open (no abelian-Cayley Sidorenko counterexample found in search)",
+   "obstruction_match": "Strong at the kernel level: each coordinate kernel K_xi(X_i - Y_j) is an abelian Cayley kernel on (S_D, +), and C1 is a pattern count in rank/sign layers. The construction leaves the Cayley world only in the typed activation, colour-refinement pinning, dilution and crossed-product layers.",
+   "adaptation_sketch": "Encode types additively, e.g. a Z_m coordinate with a shift-dependent activation law, or replace pinning by averaging over translates. Check whether the abelian Fourier positivity heuristics (nonnegative Fourier transform implies Sidorenko) are violated by the layer indicators: quadratic-forms-graph eigenvalues are signed.",
+   "payoff": "high (sharp test of the Cayley-reduction programme; would show the obstruction is purely additive)",
+   "confidence": 0.25,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib AddCommGroup, Fintype, SimpleGraph.fromRel; comparator homDensity",
+    "missing": [
+     "Cayley graph of a symmetric subset (~15 lines; check Mathlib for an existing def)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "OP5",
+   "title": "K_{5,5} minus C_10 (Moebius-strip Levi graph): the smallest open Sidorenko case",
+   "statement": "Is K_{5,5} minus a Hamiltonian cycle Sidorenko?",
+   "reference": "Conlon-Lee, 'Sidorenko's conjecture for blow-ups' arXiv:1809.01259 (smallest open case; its square is Sidorenko); Lee-Schuelke arXiv:1910.08454 (not weakly norming) [search summaries]",
+   "url": "https://arxiv.org/abs/1809.01259",
+   "status": "open (AlphaEvolve 2511.02864 and other machine searches found no counterexample, per the novelty pass)",
+   "obstruction_match": "Weak. It is the Levi graph of a 5-point, 5-face Moebius strip: the 5 boundary pairs lie in only one face, so their eta factors average to 1, leaving 5 parity tests. It is 3-regular and highly symmetric, so colour refinement is NOT discrete and the pinning step (C4) fails outright. The template enumeration (n <= 12) has no survivors, consistent with the device not reaching graphs this small.",
+   "adaptation_sketch": "The device would need (i) a replacement for pinning on symmetric graphs and (ii) a sign mechanism for boundary pairs. Neither is in sight. Recorded because the brief requires it; expect failure.",
+   "payoff": "very high",
+   "confidence": 0.05,
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "comparator-style statement with H := K_{5,5} minus C_10 as a SimpleGraph on Fin 5 ⊕ Fin 5",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "OP6",
+   "title": "Symmetric non-Sidorenko graphs: must an edge-transitive (or biregular) bipartite graph be Sidorenko?",
+   "statement": "Is every edge-transitive bipartite graph Sidorenko? (Weakly norming implies edge-transitive, but Kral'-Martins-Pach-Wrochna 2019 found edge-transitive graphs that are not weakly norming.)",
+   "reference": "Kral'-Martins-Pach-Wrochna JCTA 162 (2019), arXiv:1802.05007; Hatami 2010 [search summaries]",
+   "url": "https://arxiv.org/abs/1802.05007",
+   "status": "open as far as found (not confirmed as an explicitly posed question; unverified)",
+   "obstruction_match": "Partial. The sign mechanism (C1) is symmetric-friendly; the face-transitive tetrahedron/octahedron-type complexes satisfy the pair-in-two-faces condition. But the paper's H is irregular (degrees 4,5,6) and the construction relies on WL-discrete pinning, which is impossible for edge-transitive graphs.",
+   "adaptation_sketch": "Replace colour-refinement pinning with a symmetrised activation law averaged over Aut(H), and check whether the unique-labelling (support forcing) step survives the averaging.",
+   "payoff": "high",
+   "confidence": 0.15,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib SimpleGraph.Iso/automorphisms (G ≃g G), edgeSet; comparator homDensity",
+    "missing": [
+     "edge-transitivity predicate (~10 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "OP7",
+   "title": "KNRS conjecture for H, and Sidorenko for the 1-subdivision of H",
+   "statement": "(a) Does every locally (rho,d)-dense graph contain >= (d^66 - o(1)) n^35 labelled copies of H? (b) Is the 1-subdivision of H Sidorenko? Chen-Lin-Ma: KNRS for H implies its subdivisions are Sidorenko.",
+   "reference": "Kohayakawa-Nagle-Roedl-Schacht 2010; Chen-Lin-Ma arXiv:2407.10861; Bradac-Sudakov-Wigderson 2024; Im-Li-Liu CPC 2026 (subdivisions under a local-density hypothesis) [search summaries]",
+   "url": "https://arxiv.org/abs/2407.10861",
+   "status": "open. Note Sidorenko failure for H does NOT refute KNRS for H: the counterexample host (typed, eps-diluted) is not locally dense",
+   "obstruction_match": "Weak-partial. A KNRS refutation needs the deficit inside a locally dense host. The rank-layer kernels themselves are near-uniform on large sets, but the type layer and dilution break local density.",
+   "adaptation_sketch": "Test whether a type-free (Cayley, cf. OP4) version of the deficit exists; any such host is automatically locally dense (Cayley kernels of mean p with small nontrivial Fourier coefficients). So OP7(a) essentially reduces to OP4 plus a quasirandomness bound.",
+   "payoff": "high",
+   "confidence": 0.15,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib SimpleGraph, Finset; labelledCopyCount in Mathlib Copy.lean",
+    "missing": [
+     "(rho,d)-dense predicate (~25 lines)",
+     "1-subdivision graph (~30 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "OP8",
+   "title": "Higher-uniformity analogue: Levi graphs of closed 3-dimensional pseudomanifolds (4-point facets, each triple in two facets)",
+   "statement": "Can half-rank (or other association-scheme) centers emulate a triple-parity model, giving non-Sidorenko Levi graphs of 4-uniform complexes, or non-Sidorenko 3-graphs from 4-uniform obstructions?",
+   "reference": "novelty.json open question 'Why half rank exactly?'; Conlon-Lee-Versteegen arXiv:2404.17467 (Levi-graph link for positivity)",
+   "url": "https://arxiv.org/abs/2404.17467",
+   "status": "open / new question",
+   "obstruction_match": "Partial. C1 produces PAIR signs: complementary images at half rank are a two-point relation. A 4-point face needs triple signs, for which no analogue of I25 is known.",
+   "adaptation_sketch": "Look for an association scheme with a ternary 'complementarity' relation, e.g. a Maslov/Kashiwara triple index of three Lagrangians, which the novelty pass already flags as the shadow behind I25.",
+   "payoff": "med",
+   "confidence": 0.15,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "statement is cheap (~100 lines), but any proof attempt needs Lagrangian triple-index theory beyond OAI Lagrangian.lean",
+    "missing": [
+     "4-uniform Levi graph (~30 lines)",
+     "triple-index sign over F_q (~500+ lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  {
+   "title": "Failure of the forcing conjecture for H (paper Cor. forcing)",
+   "note": "Interpolates the theorem's deficit kernel to t(H,W) = p^66 with W nonconstant. A corollary of the theorem, not device reuse. NOT formalised in the release (lean/docs/161.md). Statable with < 300 lines: a finite-kernel or graphon density via OAI FiniteLaw/kernelMean, plus a quasirandomness definition."
+  },
+  {
+   "title": "Amplification: t(H,F) < c p(F)^66 for every c > 0 (Cor. amplification (i))",
+   "note": "Tensor powers of a single host. Corollary. Not formalised; statable now with the comparator definitions."
+  },
+  {
+   "title": "Injective-copy Erdos-Simonovits benchmark fails at a fixed density (Cor. amplification (ii))",
+   "note": "Corollary (balanced blow-ups). Not formalised; statable now (Mathlib labelledCopyCount / injective homs)."
+  },
+  {
+   "title": "Turan exponent of H beats the deletion bound: ex(n,H) >= n^{2-33/65+c} for some c > 0",
+   "note": "Theorem + Conlon-Lee-Sidorenko arXiv:2307.04588 (for non-Sidorenko r-partite r-graphs; per search summary r = 2 is included, but the r = 2 case was previously vacuous; unverified). Corollary. Statable now with Mathlib SimpleGraph.extremalNumber."
+  },
+  {
+   "title": "Random Turan number improvement for H (Nie-Spiro adaptation of CLS)",
+   "note": "Corollary via 'Sidorenko hypergraphs and random Turan numbers' (arXiv:2309.12873); unverified."
+  },
+  {
+   "title": "H is not k-common for some k",
+   "note": "Theorem + Kral'-Noel-Norin-Volec-Wei (Sidorenko iff k-common for all k); unverified abstract. Corollary."
+  },
+  {
+   "title": "Zhao's conditional conjugacy-averaging reduction (arXiv:2606.15368)",
+   "note": "If that reduction is valid as stated, its averaging-monotonicity hypothesis must fail for H. Contrapositive corollary; reduction statement not read (unverified)."
+  }
+ ],
+ "release_reuse": {
+  "in_release": "None. CONTENTS.md has no other family on Sidorenko, forcing, common graphs, norming or homomorphism densities. No Lean file outside OAI/Combinatorics/Sidorenko references SidorenkoCounterexample, rankKernel or homDensity. quadraticChar appears in NumberTheory/Ostmann and SiegelZeros, which are unrelated Gauss-sum uses, not the design.",
+  "external_post_release": [
+   "rohanarun/sidorenko-template-refinements (Codex-generated draft, Oct 9-10 2026; cloned and read locally; data untrusted): (1) template minimality: no template complex on <= 12 points (plantri enumeration plus exact Hamiltonian-cycle weight obstructions); (2) exactly two template classes at 13 points, the original and #49243 (I re-checked #49243's pair multiplicity, sphere Euler characteristic, discrete refinement and non-isomorphism); (3) one residual counting step lowered from D >= 1642 to D >= 190. These reuse the DESIGN but refute no new conjecture: the second witness is explicitly unproved.",
+   "artuskg/sidorenko-template-refinements: named in the novelty pass's search snippets; not read (likely a fork)."
+  ]
+ },
+ "negative_controls": [
+  {
+   "title": "NC1 (proved-false analogue): Q3 = Levi graph of the tetrahedron boundary",
+   "statement": "The tetrahedron boundary is a closed sphere triangulation with every pair in exactly two faces, so the sign model applies, yet its Levi graph is the cube Q3 (K_{4,4} minus a perfect matching), which is weakly norming and hence Sidorenko (Hatami 2010).",
+   "expected": "The device must fail. It does: colour refinement on Q3 is not discrete (vertex-transitive), and the template enumeration has 0 survivors at n = 4..8 (repo table). This also shows the pair-sign mechanism alone (C1) is not enough; pinning and cut coverage are essential.",
+   "lean_feasibility": "statable now (Q3 as SimpleGraph on Fin 4 ⊕ Fin 4); no formal Sidorenko proof for Q3 to compare against"
+  },
+  {
+   "title": "NC2 (proved-false analogue): local Sidorenko near the constant kernel",
+   "statement": "Lovasz 2011: t(H,W) >= 1 for mean-one W with ||W-1||_inf <= 1/(4m) (and a cut-norm version). Fox-Wei 2017 on the local approach.",
+   "expected": "No perturbative use of C1 can give a deficit. The device works only at O(1) strength (the paper notes its final kernel cannot meet the local hypotheses). Any 'small-eps' variant of the rank-layer kernel must fail.",
+   "lean_feasibility": "statable now with OAI finite kernels (kernelMean, bipartiteMoment)"
+  },
+  {
+   "title": "NC3 (proved-false analogue): even subdivisions on abelian Cayley hosts; F_{5,3}",
+   "statement": "Zhao arXiv:2507.15723: even subdivisions satisfy Sidorenko on abelian Cayley hosts [unverified abstract]. F_{5,3} (Levi graph of all 10 triples on 5 points, each pair in THREE faces) is weakly norming (Conlon-Lee), hence Sidorenko.",
+   "expected": "The device's coordinate kernels are abelian Cayley, so they cannot refute even subdivisions. With pairs in 3 faces the eta-average gives 1 + ab + ac + bc, not a pure parity test, and the device should fail; it does, since F_{5,3} is Sidorenko.",
+   "lean_feasibility": "statable now (F_{5,3} on Fin 5 ⊕ Fin 10)"
+  },
+  {
+   "title": "NC4 (structural): positive-graph setting (real-valued W)",
+   "statement": "Positive graph conjecture (Camarena et al.; Conlon-Lee-Versteegen 2024): signs are free there, so hypergraph sign phenomena pass to Levi graphs directly (Sidorenko's Levi-graph theorem).",
+   "expected": "C1's purpose (realising signed correlations with a NONNEGATIVE kernel) is void, so no speedup is expected.",
+   "lean_feasibility": "statable now"
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "id": "OP1",
+   "title": "Second 13-point template witness (#49243)",
+   "lean": "statable now",
+   "argument": "The only target that is both Lean-statable today and an exact instance of the design, with a ready size baseline (the original 23,761 lines, 9,540 of them complex-specific). The speedup protocol is clean: library L+ = the 14,221 complex-agnostic lines plus C1 restated for a parametrised complex, against control L without the half-rank and center-limit files. Then measure budget to close the comparator-shaped statement for H'. Caveat: it is a sibling witness of the same design, so success calibrates the harness and supports generality but is weak evidence of a jump. The 20-cut tail is where any real difficulty lies."
+  },
+  {
+   "rank": 2,
+   "id": "OP2",
+   "title": "General template theorem / infinite family",
+   "lean": "statable with < 300 lines of new definitions",
+   "argument": "If C1 is a genuine device, its natural reach is a theorem quantified over complexes, and any template complex at n >= 14 would be a new non-Sidorenko graph that is not just the 13-point sphere again. This is the strongest available reuse test within graph Sidorenko. The definitions (pseudomanifold, Levi graph, discrete refinement, cut mixture) are cheap. The proof needs the tail bound uniformly over complexes, with D0 depending on the complex."
+  },
+  {
+   "rank": 3,
+   "id": "OP3",
+   "title": "2-colour uncommon bipartite graph",
+   "lean": "statable now",
+   "argument": "The most valuable new refutation the design could plausibly reach. It is statable with the comparator's own definitions plus SimpleGraph.compl. The obstruction matches only partly: one-colour deficit at O(eps^13) strength versus the needed two-colour deficit at p = 1/2. Low confidence, but a hit would be decisive downstream evidence (another conjecture refuted by the same design)."
+  },
+  {
+   "rank": 4,
+   "id": "OP4",
+   "title": "Abelian Cayley-host counterexample",
+   "lean": "statable with < 300 lines of new definitions",
+   "argument": "C1 is already an abelian Cayley statement (kernels K_xi(X - Y) on (S_D, +)). The open question is whether the non-Cayley scaffolding (types, pinning, dilution) can be absorbed. A positive answer feeds OP7 (KNRS) and tests Zhao's Cayley programme. A negative answer would localise the 'jump' in the type layer rather than in C1, which would matter for grading."
+  },
+  {
+   "rank": 5,
+   "id": "OP5",
+   "title": "K_{5,5} minus C_10",
+   "lean": "statable now",
+   "argument": "Included because it is the canonical open case and trivially statable. The analysis predicts the device FAILS here (boundary pairs, no discrete refinement, below the n = 13 template minimum). It therefore doubles as a negative control on the symmetric/small side. A model that 'finds' a K_{5,5} minus C_10 deficit with this device should be audited."
+  }
+ ],
+ "precedent_check": {
+  "earlier_equivalent": "None found. The target sign model is the known hypergraph mechanism (Sidorenko 1993; Conlon-Lee-Sidorenko 2023), and Sidorenko's Levi-graph theorem passes hypergraph sign phenomena to Levi graphs for real-valued (positivity) questions. Neither realises a pair-sign model with a nonnegative kernel through common centers, and no use of symmetric-matrix rank/sign layers in graph-density deficit problems was found. No downgrade.",
+  "after_oct_6_2026": "Only derivative work: rohanarun/sidorenko-template-refinements (Codex, Oct 9-10) reuses the design inside the same template (minimality <= 12 empty, second 13-point class, residual constant 1642 -> 190). artuskg fork not read. No independent paper using rank-layer centers elsewhere found (WebSearch, extended).",
+  "verdict": "No precedent; the device's documented reuse so far is confined to its own template (13-point sphere triangulations)."
+ },
+ "sources": [
+  "data/pilot/161/novelty.json, family.json",
+  "data/items/161_lean.json (dependency DAG)",
+  "data/raw/openai-math/lean/OAI/Combinatorics/Sidorenko/{Discriminant,Coefficients,GlobalMoments,Types,Charts,Monomials,Normalization,LocalMoments,Tail,RandomHost}.lean (read)",
+  "data/raw/openai-math/lean/ComparatorChallenges/SidorenkoCounterexample.{json,lean}; lean/docs/161.md",
+  "data/raw/openai-math/preprints/A-counterexample-to-Sidorenkos-conjecture-September-23-2026/build/sections/{introduction,kernel,complex}.tex (read)",
+  "https://github.com/rohanarun/sidorenko-template-refinements (cloned at d1df2a5, Oct 10 2026; README, progress.md, support-refinement.md, experiments/order-13-* read)",
+  "https://arxiv.org/abs/2307.04588 (Conlon-Lee-Sidorenko; search summary, unverified)",
+  "https://arxiv.org/abs/2309.12873 (Sidorenko hypergraphs and random Turan numbers; search summary)",
+  "https://arxiv.org/abs/2509.08680 (On Sidorenko exponents of hypergraphs; search summary)",
+  "https://arxiv.org/abs/2006.09422 (Kral'-Noel-Norin-Volec-Wei, non-bipartite k-common graphs; search summary)",
+  "https://arxiv.org/abs/2207.07775 and https://arxiv.org/abs/1912.02926 (commonness background; search summary)",
+  "https://arxiv.org/abs/1802.05007 (Kral'-Martins-Pach-Wrochna step Sidorenko; search summary)",
+  "https://arxiv.org/abs/1809.01259 (Conlon-Lee blow-ups; K_{5,5} minus C_10; search summary)",
+  "https://arxiv.org/abs/1910.08454 (Lee-Schuelke; search summary)",
+  "https://arxiv.org/abs/2407.10861 (KNRS for subdivisions, Chen-Lin-Ma; search summary)",
+  "https://arxiv.org/abs/2507.15723 (Zhao, even subdivisions over abelian groups; search summary)",
+  "https://arxiv.org/abs/2606.15368 (Zhao, conjugacy class averages; search summary)",
+  "https://arxiv.org/abs/2404.17467 (Conlon-Lee-Versteegen positive graphs; via novelty pass)",
+  "https://gilkalai.wordpress.com/2026/10/07/updates-sharing-ai-progress-on-mathematics-amazing-and-my-lecture-plans/ (search snippet)"
+ ],
+ "search_log": [
+  "Local: BFS over 161_lean.json uses-graph from main to 15 key declarations; grep for packaged rank-layer names (no external references); grep sorry/axiom/native_decide (none); split files into complex-specific (mention Fin 13/22/33 or faces) and complex-agnostic.",
+  "Local: CONTENTS.md grep (sidorenko, forcing, common graph, norming, homomorphism density, quasirandom, symmetric matrix, quadratic form, association scheme, Lagrangian, Turan): only 161 is relevant. OAI-wide grep for quadraticChar/homDensity/SidorenkoCounterexample outside the family: no design reuse.",
+  "Local: Mathlib d13f23b has SimpleGraph.extremalNumber, Copy/labelledCopyCount and a minimal Hypergraph; no graphons and no Cayley-graph helper found by grep.",
+  "WebSearch (extended): Sidorenko counterexample follow-ups Oct 2026; found the rohanarun repo. WebSearch: CLS extremal numbers statement; commonness of bipartite graphs; KNNVW k-common; KNRS status; KMPW edge-transitive; K_{5,5} minus C_10; Sidorenko on abelian Cayley hosts; template refinements repo.",
+  "WebFetch failed (ENOTFOUND) for arxiv.org and its.caltech.edu; gh API denied for the unattached repo; add_repo gave anonymous read, and I cloned shallowly into the scratchpad.",
+  "Own check of plantri #49243 complex: pairs 33, all multiplicity 2, Euler characteristic 2, point degrees 4^4 5^4 6^5 (original 4^3 5^6 6^4), colour refinement discrete."
+ ]
+}
