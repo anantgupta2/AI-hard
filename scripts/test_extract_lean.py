@@ -18,7 +18,7 @@ from pathlib import Path
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from extract_lean import build  # noqa: E402
+from extract_lean import DECL_RE, build  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 REAL_REPO = Path(os.environ.get("OPENAI_MATH_REPO", ROOT / "data" / "raw" / "openai-math"))
@@ -112,6 +112,14 @@ def test_local_field_notation_on_external_type():
     # v2: main -> kOK -> factorial -> residual made both look load-bearing for main
     assert by["OAI.Hie.residual"]["n_dependents"] == 0
     assert by["OAI.Hie.factorial"]["n_dependents"] == 0
+
+
+def test_universe_params_are_not_part_of_the_name():
+    # family 312: `theorem foo.{v}` was parsed as `foo.`, so the comparator target had no DAG
+    for line, name in [("theorem foo.{v} (x : Nat) : x = x := rfl", "foo"),
+                       ("noncomputable def Bar.baz.{u, v} : Nat := 0", "Bar.baz"),
+                       ("lemma a.b_c : True := trivial", "a.b_c")]:
+        assert DECL_RE.match(line).group(2) == name, (line, DECL_RE.match(line).group(2))
 
 
 def test_qualified_names_are_not_matched_by_last_component():

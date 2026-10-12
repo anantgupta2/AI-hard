@@ -61,8 +61,9 @@ DECL_KINDS = ("theorem", "lemma", "def", "abbrev", "structure", "inductive", "cl
 DEF_KINDS = {"def", "abbrev", "structure", "inductive", "class", "opaque"}
 THM_KINDS = {"theorem", "lemma"}
 MODIFIERS = ("private", "protected", "noncomputable", "partial", "unsafe", "nonrec", "local", "scoped")
+# The name stops before universe parameters: `theorem foo.{u, v}` declares `foo`.
 DECL_RE = re.compile(
-    r"^ ?(?:@\[[^\]]*\]\s*)*(?:(?:%s)\s+)*(%s)\b\s*([^\s:(\[{]*)" % ("|".join(MODIFIERS), "|".join(DECL_KINDS))
+    r"^ ?(?:@\[[^\]]*\]\s*)*(?:(?:%s)\s+)*(%s)\b\s*((?:[^\s:(\[{.]|\.(?!\{))*)" % ("|".join(MODIFIERS), "|".join(DECL_KINDS))
 )
 # Lean identifiers: unicode letters, digits, subscripts, _ ' ! ?, dotted components.
 IDENT_RE = re.compile(r"@?[^\W\d][\w'!?₀-₉ₐ-ₜ]*(?:\.[^\W\d][\w'!?₀-₉ₐ-ₜ]*)*")
