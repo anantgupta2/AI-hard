@@ -1,0 +1,525 @@
+{
+ "fid": 312,
+ "item": "C1: index-n partial cylinders P_j (stationary below n, a single joining (n+1)-cell at n, small-object completion against upper I_k above n) whose contractibility is supplied by the higher-index cases of a descending induction at a fixed coskeletal cutoff q (paper I19+I25+I27, payoff I28/I34)",
+ "item_type": "F3+F2 (auxiliary construction + self-feeding descending-induction scheme); provisional N3",
+ "date": "2026-10-12",
+ "method_note": "Text-level only. No lake build or comparator run (shared checkout; the release Lean is trusted as published per PLAN). Dependency chain from data/items/312_lean.json (fixed extractor) plus hand reading of the Lean files. Item not yet in data/eureka_shortlist.json, so there is no lean_decls hint; the novelty.json C1 'lean' field was used instead. arxiv.org blocked; external evidence is WebSearch snippets only, marked unverified where not read in full.",
+ "lean_status": "formalized, different route",
+ "lean_status_why": "The device itself is in the Lean verbatim (cylinderNode = stationary below n / critical at n / completedCylinder above n; cylinder_oneSided_contractible takes the higher-index invariant H : ExpansionContraction hC q (n+1)), and it is load-bearing for the comparator (cylinderPathData dominates 64.8% of the 856-declaration proof DAG). The induction runs on a reformulated invariant (contractibility preservation for J_{>=r}-cofibrations, not 'J_n pushouts are weak equivalences'), with trees and joint lifting replaced by other lemmas.",
+ "lean_gaps": [
+  "Induction invariant differs. The paper inducts on E(q,n), 'every J_n pushout from a cellular object in A_q is a weak equivalence'. The Lean inducts (strong induction on q-r) on ExpansionContraction hC q r: every J_{>=r}-cofibration from a cofibrant contractible cutoff model has a contractible target. A weak equivalence appears only at the end (exactBoundaryTest_of_cutoff_path). The bootstrap shape is the same: index-n cylinders are made contractible by the index-(n+1) statement.",
+  "No W calculus (division, change of boundary, two-out-of-three) is formalized. The Lean uses only ExactBoundaryTest, HasFillers and the (3)=>(1) direction of the weak-equivalence test.",
+  "Tree contractibility (paper Prop 3.7, J_{n+1} duplication) is replaced by whisker/reverse-whisker shapes plus free_hasFillers_of_top_homotopy, a small-object factorization and retract. Cylinder contractibility (Prop 4.2) is proved for the one-sided objects A_j^eps through whisker presentations and comparison maps (cylinder_oneSided_contractible), not by the paper's exact skeletal gluing formula as written.",
+  "Joint lifting is required for every J_k with k >= r (CutoffPathData.joint), which is stronger than the paper's J_n alone. It is proved with criticalJoint_retract and fullCylinder_joint instead of the four-vertex tree B.",
+  "The path object is per object and need not be functorial. CutoffPathData is chosen for each Y. fullCylinder is the presheaf Hom(cylinderRealization S, Y), interpreted through a section of cylinderProjection obtained by Classical.choose from the coherator's lifting property. It is then reflected into A_q (reflectedCylinder). The paper builds a functor P.",
+  "The P_j are defined for every j in N, not only j <= q. Above q, cutoff models have unique fillers, so this is harmless.",
+  "Scope: the comparator is exactly Theorem 1.1 (Henry's pushout conjecture). The homotopy hypothesis (Cor 5.2) and the semi-model structure (Cor 5.1) are not formalized.",
+  "Non-vacuity: no IsCoherator instance is constructed anywhere, so a Lean speedup experiment over this library should first build one (for example a free tower from Theta_0) to avoid testing a vacuous hypothesis set."
+ ],
+ "comparator": {
+  "file": "lean/ComparatorChallenges/GrothendieckElementaryExpansion.json",
+  "challenge_module": "ComparatorChallenges.GrothendieckElementaryExpansion",
+  "solution_module": "OAI.CategoryTheory.Globular.Main",
+  "theorem": "OAI.Grothendieck.elementary_expansion",
+  "permitted_axioms": [
+   "propext",
+   "Quot.sound",
+   "Classical.choice"
+  ],
+  "lean_checks_json": "no 312 entry in data/lean_checks.json (not run here)"
+ },
+ "comparator_chain": [
+  "OAI.Grothendieck.elementary_expansion",
+  "OAI.Grothendieck.GlobularTheory.Model.cutoff_elementary_exactBoundaryTest",
+  "OAI.Grothendieck.GlobularTheory.Model.expansionContraction_all  [descending induction; uses expansionContraction_top and expansionContraction_of_paths]",
+  "OAI.Grothendieck.GlobularTheory.Model.cylinderPathData  [called at CutoffExpansion.lean:79 inside the induction and at :99 for the final index n; section hypothesis H : ExpansionContraction hC q (n+1)]",
+  "OAI.Grothendieck.GlobularTheory.Model.reflectedCylinder -> fullCylinder -> cylinderRealization / cylinderInterpretation -> cylinderFrame",
+  "OAI.Grothendieck.GlobularTheory.Model.cylinderNode -> {OAI.Grothendieck.CylinderNode.stationary, OAI.Grothendieck.CylinderNode.critical, cylinderNext -> completedCylinder -> cylinderFactor}",
+  "OAI.Grothendieck.GlobularTheory.Model.reflectedCylinderEndpoint_lifts -> fullCylinderEndpoint_liftsBoundary -> cylinder_oneSided_split -> cylinder_oneSided_split_high -> cylinder_oneSided_contractible  [consumes H; uses cutoffFrame_diskWhisker_hasFillers, upper_boundary_is_source, cylinderNode_high_hasFillers]",
+  "OAI.Grothendieck.GlobularTheory.Model.reflectedCylinder_joint_cells -> fullCylinder_joint  [joint J_k lifting]"
+ ],
+ "comparator_chain_evidence": "BFS over 'uses' in data/items/312_lean.json from the target. Every listed declaration has in_proof_dag = true. Shortest paths: cylinderNode <- cylinderFrame <- fullCylinder <- reflectedCylinder <- cylinderPathData <- cutoff_elementary_exactBoundaryTest <- elementary_expansion; cylinder_oneSided_contractible <- cylinder_oneSided_split_high <- cylinder_oneSided_split <- fullCylinderEndpoint_liftsBoundary <- reflectedCylinderEndpoint_lifts <- cylinderPathData. Dominated shares: cutoff_elementary_exactBoundaryTest 0.735, cylinderPathData 0.648, cylinder_oneSided_contractible 0.033, fullCylinder_joint 0.023. The chain was also checked by hand in CutoffExpansion.lean:66-99.",
+ "lean_source": [
+  {
+   "name": "OAI.Grothendieck.GlobularTheory.Model.ExpansionContraction",
+   "kind": "def",
+   "file": "lean/OAI/CategoryTheory/Globular/Expansion.lean",
+   "line": 10,
+   "text": "def ExpansionContraction {C : GlobularTheory.{v}} (hC : C.IsCoherator)\n    (q r : ℕ) : Prop :=\n  ∀ {X Y : CutoffModels C q} (i : X ⟶ Y),\n    (sourceClass hC q r).rlp.llp i → Cofibrant hC q X →\n      X.obj.underlying.HasFillers → Y.obj.underlying.HasFillers",
+   "role": "Lean induction invariant (paper E(q,r) reformulated): J_{>=r}-cofibrations from cofibrant contractible cutoff models have contractible targets."
+  },
+  {
+   "name": "OAI.Grothendieck.CylinderNode",
+   "kind": "structure",
+   "file": "lean/OAI/CategoryTheory/Globular/CylinderObjects.lean",
+   "line": 59,
+   "text": "structure CylinderNode {K : Type u} [Category.{v} K] (D : GlobularFrame K) (j : ℕ) where\n  bd : K\n  obj : K\n  inc : bd ⟶ obj\n  bdEnd : Bool → (D.bd j ⟶ bd)\n  endpoint : Bool → (D.obj j ⟶ obj)\n  comm : ∀ ε, bdEnd ε ≫ inc = D.inc j ≫ endpoint ε",
+   "role": "One level j of a coglobular cylinder: boundary object, object P_j, two endpoint maps from the disk frame."
+  },
+  {
+   "name": "OAI.Grothendieck.CylinderNode.critical",
+   "kind": "def",
+   "file": "lean/OAI/CategoryTheory/Globular/CylinderObjects.lean",
+   "line": 70,
+   "text": "noncomputable def critical (D : GlobularFrame K) (n : ℕ) : CylinderNode D n where\n  bd := D.bd n\n  obj := D.obj (n+1)\n  inc := D.inc n ≫ D.diagram.source n\n  bdEnd _ := 𝟙 _\n  endpoint ε := if ε then D.diagram.target n else D.diagram.source n\n  comm ε := ...",
+   "role": "P_n = D_{n+1} with endpoints the source and target n-faces."
+  },
+  {
+   "name": "OAI.Grothendieck.CylinderNode.stationary",
+   "kind": "def",
+   "file": "lean/OAI/CategoryTheory/Globular/CylinderObjects.lean",
+   "line": 198,
+   "text": "def stationary (D : GlobularFrame K) (j : ℕ) : CylinderNode D j where\n  bd := D.bd j\n  obj := D.obj j\n  inc := D.inc j\n  bdEnd _ := 𝟙 _\n  endpoint _ := 𝟙 _\n  comm _ := by simp",
+   "role": "P_j = D_j with identity endpoints for j < n (stationary below n)."
+  },
+  {
+   "name": "OAI.Grothendieck.GlobularTheory.Model.cylinderFactor",
+   "kind": "def",
+   "file": "lean/OAI/CategoryTheory/Globular/CylinderObjects.lean",
+   "line": 234,
+   "text": "noncomputable def cylinderFactor (j : ℕ) (B : CutoffModels C q)\n    (e : Bool → (cutoffBoundary hC q j ⟶ B)) := by\n  let := cutoff_hasColimits hC q\n  let := cutoff_hasLimits hC q\n  let := boundaryClass_smallObject hC q (n+1)\n  exact MorphismProperty.factorizationData (boundaryClass hC q (n+1)).rlp.llp\n    (boundaryClass hC q (n+1)).rlp\n    (terminal.from (TwoEndpoints.obj (cutoffI hC q j) e))",
+   "role": "Small-object factorization of A_j^{01} -> 1 against the upper boundary inclusions I_k, k >= n+1."
+  },
+  {
+   "name": "OAI.Grothendieck.GlobularTheory.Model.completedCylinder",
+   "kind": "def",
+   "file": "lean/OAI/CategoryTheory/Globular/CylinderObjects.lean",
+   "line": 243,
+   "text": "noncomputable def completedCylinder (j : ℕ) (B : CutoffModels C q)\n    (e : Bool → (cutoffBoundary hC q j ⟶ B)) : CylinderNode (cutoffDiskFrame hC q) j := by\n  let := cutoff_hasColimits hC q\n  let F := cylinderFactor hC q n j B e\n  exact\n    { bd := B\n      obj := F.Z\n      inc := TwoEndpoints.base (cutoffI hC q j) e ≫ F.i\n      bdEnd := e\n      endpoint ε := TwoEndpoints.endpoint (cutoffI hC q j) e ε ≫ F.i\n      comm ε := by erw [← Category.assoc, TwoEndpoints.condition, Category.assoc] }",
+   "role": "Upper level P_j (j > n): the completed two-endpoint object."
+  },
+  {
+   "name": "OAI.Grothendieck.GlobularTheory.Model.cylinderNode",
+   "kind": "def",
+   "file": "lean/OAI/CategoryTheory/Globular/CylinderObjects.lean",
+   "line": 270,
+   "text": "noncomputable def cylinderNode : (j : ℕ) → CylinderNode (cutoffDiskFrame hC q) j\n  | 0 => if 0 < n then CylinderNode.stationary (cutoffDiskFrame hC q) 0\n      else CylinderNode.critical (cutoffDiskFrame hC q) 0\n  | j+1 => if j+1 < n then CylinderNode.stationary (cutoffDiskFrame hC q) (j+1)\n      else if j+1 = n then CylinderNode.critical (cutoffDiskFrame hC q) (j+1)\n      else cylinderNext hC q n (cylinderNode j)",
+   "role": "The index-n partial cylinder tower: stationary below n, critical at n, completed above n."
+  },
+  {
+   "name": "OAI.Grothendieck.GlobularTheory.Model.cylinder_oneSided_contractible",
+   "kind": "theorem",
+   "file": "lean/OAI/CategoryTheory/Globular/CylinderContractibility.lean",
+   "line": 95,
+   "text": "theorem cylinder_oneSided_contractible (hnq : n ≤ q) (H : ExpansionContraction hC q (n+1)) :\n    ∀ j, n < j → ∀ ε : Bool,\n      Cofibrant hC q (GlobularFrame.oneSided (cylinderEndpoint hC q n ε) j) ∧\n      (GlobularFrame.oneSided (cylinderEndpoint hC q n ε) j).obj.underlying.HasFillers ∧\n      (sourceClass hC q (n+1)).rlp.llp (GlobularFrame.oneSidedMap (cylinderEndpoint hC q n ε) j) := ...",
+   "role": "Bootstrap lemma: with H = ExpansionContraction q (n+1), the one-sided objects A_j^eps are cofibrant and contractible and A_j^eps -> P_j is an upper J-cofibration (paper Lemma 4.1/Prop 4.2)."
+  },
+  {
+   "name": "OAI.Grothendieck.GlobularTheory.Model.CutoffPathData",
+   "kind": "structure",
+   "file": "lean/OAI/CategoryTheory/Globular/RelativeLifting.lean",
+   "line": 232,
+   "text": "structure CutoffPathData {C : GlobularTheory.{v}} (hC : C.IsCoherator)\n    (q r : ℕ) (Y : CutoffModels C q) where\n  P : CutoffModels C q\n  p₀ : P ⟶ Y\n  p₁ : P ⟶ Y\n  lifts₀ : (boundaryClass hC q 0).rlp p₀\n  lifts₁ : (boundaryClass hC q 0).rlp p₁\n  joint : ∀ k, r ≤ k → ∀ (t : cutoffDisk hC q k ⟶ P)\n    (u₀ u₁ : cutoffDisk hC q (k+1) ⟶ Y),\n    t ≫ p₀ = cutoffJ hC q k ≫ u₀ → t ≫ p₁ = cutoffJ hC q k ≫ u₁ →\n    ∃ l : cutoffDisk hC q (k+1) ⟶ P,\n      cutoffJ hC q k ≫ l = t ∧ l ≫ p₀ = u₀ ∧ l ≫ p₁ = u₁",
+   "role": "The partial path object interface: endpoints lift all I_j, jointly lift J_k for k >= r."
+  },
+  {
+   "name": "OAI.Grothendieck.GlobularTheory.Model.cylinderPathData",
+   "kind": "def",
+   "file": "lean/OAI/CategoryTheory/Globular/ReflectedCylinder.lean",
+   "line": 91,
+   "text": "variable {C : GlobularTheory.{v}} (hC : C.IsCoherator) (q n : ℕ)\nvariable [HasColimitsOfSize.{v,v} (CutoffModels C q)] [HasLimitsOfSize.{v,v} (CutoffModels C q)]\nvariable (hnq : n ≤ q) (H : ExpansionContraction hC q (n+1))\n...\nnoncomputable def cylinderPathData (Y : CutoffModels C q) : CutoffPathData hC q n Y where\n  P := reflectedCylinder hC q n hnq H Y\n  p₀ := reflectedCylinderEndpoint hC q n hnq H Y false\n  p₁ := reflectedCylinderEndpoint hC q n hnq H Y true\n  ...",
+   "role": "Partial path object at index n from the reflected cylinder model; section variable H : ExpansionContraction hC q (n+1). Dominated share 0.648."
+  },
+  {
+   "name": "OAI.Grothendieck.GlobularTheory.Model.expansionContraction_of_paths",
+   "kind": "theorem",
+   "file": "lean/OAI/CategoryTheory/Globular/RelativeLifting.lean",
+   "line": 263,
+   "text": "theorem expansionContraction_of_paths {C : GlobularTheory.{v}} (hC : C.IsCoherator)\n    (q r : ℕ) (D : ∀ Y, Nonempty (CutoffPathData hC q r Y)) :\n    ExpansionContraction hC q r := ...",
+   "role": "Endpoint-section retract argument: path data at index r gives the invariant at r."
+  },
+  {
+   "name": "OAI.Grothendieck.GlobularTheory.Model.expansionContraction_top",
+   "kind": "theorem",
+   "file": "lean/OAI/CategoryTheory/Globular/Expansion.lean",
+   "line": 121,
+   "text": "theorem expansionContraction_top {C : GlobularTheory.{v}} (hC : C.IsCoherator)\n    (q : ℕ) : ExpansionContraction hC q q := ...",
+   "role": "Top case at the coskeletal cutoff."
+  },
+  {
+   "name": "OAI.Grothendieck.GlobularTheory.Model.expansionContraction_all",
+   "kind": "theorem",
+   "file": "lean/OAI/CategoryTheory/Globular/CutoffExpansion.lean",
+   "line": 66,
+   "text": "theorem expansionContraction_all {C : GlobularTheory.{v}} (hC : C.IsCoherator)\n    (q r : ℕ) : ExpansionContraction hC q r := ...",
+   "role": "Descending induction (strong induction on q-r), step = expansionContraction_of_paths fed by cylinderPathData hC q r _ Hnext."
+  },
+  {
+   "name": "OAI.Grothendieck.GlobularTheory.Model.cutoff_elementary_exactBoundaryTest",
+   "kind": "theorem",
+   "file": "lean/OAI/CategoryTheory/Globular/CutoffExpansion.lean",
+   "line": 82,
+   "text": "theorem cutoff_elementary_exactBoundaryTest {C : GlobularTheory.{v}} (hC : C.IsCoherator)\n    (q n : ℕ) (hnq : n ≤ q) {X Y : C.Model} (hX : X.IsCellular)\n    (a : disk C n ⟶ X) (i : X ⟶ Y) (b : disk C (n+1) ⟶ Y)\n    (sq : IsPushout a (J C n) i b) :\n    GlobularSet.ExactBoundaryTest (underlyingMap ((cutoffFunctor hC q).map i).hom) := ...",
+   "role": "Pushout lemma in A_q; uses cylinderPathData hC q n hnq (expansionContraction_all hC q (n+1))."
+  },
+  {
+   "name": "OAI.Grothendieck.elementary_expansion",
+   "kind": "theorem",
+   "file": "lean/OAI/CategoryTheory/Globular/ElementaryExpansion.lean",
+   "line": 34,
+   "text": "theorem elementary_expansion.{v} (C : GlobularTheory.{v}) (hC : C.IsCoherator)\n    (X : C.Model) (hX : X.IsCellular) (n : ℕ)\n    (a : GlobularTheory.Model.disk C n ⟶ X)\n    (Y : C.Model) (i : X ⟶ Y)\n    (b : GlobularTheory.Model.disk C (n + 1) ⟶ Y)\n    (square : IsPushout a (GlobularTheory.Model.J C n) i b) :\n    GlobularTheory.Model.WeakEquivalence hC i := ...",
+   "role": "Comparator target (Theorem 1.1); cutoff removed with q = max(n+1, d+1)."
+  }
+ ],
+ "lean_device_size": "The OAI Globular library has 58 files and 12,753 lines. The cylinder-related files (Cylinder*.lean, FullCylinder, ReflectedCylinder, Expansion, CutoffExpansion, RelativeLifting, OneSidedPresentation, CriticalJoint) have 3,177 lines. A reuse experiment would import OAI.CategoryTheory.Globular.CutoffExpansion and the cylinder files as library.",
+ "speedup_targets": [
+  {
+   "title": "S1. Lanari's operations on globular cylinders (compositions, identities, inverses, approximate interpretation)",
+   "statement": "For a Grothendieck infinity-groupoid Y, the coglobular cylinder objects represent path cells carrying compositions, identities and inverses compatible with the endpoints; Lanari interprets these and leaves the interpretation of all higher operations open.",
+   "reference": "Lanari, 'Towards a globular path object for weak infinity-groupoids', JPAA 224 (2020), arXiv:1805.00156, Defs 5.2-5.3, 6.1, Prop 6.2, Thm 6.5. Lanari 2018 (arXiv:1809.07923) Thm 4.10 is the dimension-3 sibling. Taylor arXiv:2609.20860 gives an isomorphic presentation of Lanari's cylinder (abstract only).",
+   "status": "known (partial results); the full interpretation is open in Lanari's setting",
+   "current_size": "Lanari 2020: a JPAA paper, page count unverified (about 30-40 pp. by snippet). No Lean anywhere. The OAI analogue for its own P_j is cylinderInterpretation plus FullCylinder, a few hundred lines.",
+   "how_item_helps": "The device replaces explicit operation-by-operation constructions with one lifting argument. Once P(S) is contractible, every generator of the coherator is interpreted on Hom(P_j,Y) in free order (paper I28). Applied at n = 0, the partial cylinders are full cylinders, and the operations Lanari built by hand come for free at a fixed cutoff q. For Lanari's specific objects one must show they are contractible; that is where the bootstrap would be reused.",
+   "caveat": "Borderline as reuse. If the contractibility of Lanari's cylinder objects is derived from Thm 1.1 itself, it is a corollary and does not count. It counts only if a descending induction at a cutoff supplies it for Lanari's objects without first proving Thm 1.1 at the same index. It also works only after a coskeletal cutoff; at q = infinity the descending induction has no start.",
+   "expected_speedup": "med",
+   "confidence": "med",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI.Grothendieck GlobularFrame, CylinderNode, TwoEndpoints, CutoffModels, cutoffDiskFrame; Mathlib pushouts",
+    "missing": "Lanari's explicit cylinder frame (finite pushouts of globes at each level) as a GlobularFrame, about 150-250 lines; the statement 'Hom(Lanari cylinder, Y) carries a C-model structure with endpoint maps', about 30 lines",
+    "formal_proof_to_compare": "The OAI cylinderInterpretation/fullCylinder for the 312 P_j (CylinderInterpretation.lean, FullCylinder.lean). No formalization of Lanari's construction exists."
+   }
+  },
+  {
+   "title": "S2. Model structure on algebraic Kan complexes (pushouts of free filler attachments are weak equivalences)",
+   "statement": "Algebraic Kan complexes (simplicial sets with chosen horn fillers, i.e. algebras for the free-filler monad) carry a combinatorial model structure Quillen equivalent to sSet; in particular the unit X -> free algebraic Kan complex on X, and pushouts of free horn-filler attachments, are weak equivalences.",
+   "reference": "Nikolaus, 'Algebraic models for higher categories', Indag. Math. 21 (2011) 52-75, arXiv:1003.1342",
+   "status": "known",
+   "current_size": "24 pp. (journal pages per search snippet). No Lean. Mathlib d13f23b has SSet, KanComplex, Coskeletal, AnodyneExtensions and SSet.modelCategoryQuillen classes; the OAI Thomason library (family 317) constructs a KanQuillenModel.",
+   "how_item_helps": "This is the same obstruction in simplicial form: freely adjoining fillers creates new composites and must not change the homotopy type. The device's analogue would be a cutoff at a coskeletal level q (Mathlib has Coskeletal), with descending induction on the horn dimension, where partial Delta^1-cylinders that are stationary below n get their fillers from higher horn dimensions. Nikolaus avoids the problem by transfer, because the underlying simplicial sets are already fibrant and the free functor preserves anodyne maps. The device is therefore unnecessary and probably longer.",
+   "expected_speedup": "low",
+   "confidence": "med",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib SSet, SSet.horn, KanComplex, SSet.modelCategoryQuillen (I/J classes); OAI.Thomason KanQuillenModel for weak equivalences",
+    "missing": "algebraic Kan complex as an algebra of the chosen-filler monad or as a structure with filler choices and compatibility, about 120-200 lines; free algebraic Kan complex via the small object argument, about 80 lines",
+    "formal_proof_to_compare": "none (no formal proof of Nikolaus's theorem known)"
+   }
+  },
+  {
+   "title": "S3. Henry's semi-model structure and homotopy hypothesis for cylinder coherators",
+   "statement": "For coherators with built-in cylinder structure (Henry's 'cylinder coherators'), Mod(C) has the canonical left semi-model structure and the homotopy hypothesis holds.",
+   "reference": "Henry, 'Algebraic models of homotopy types and the homotopy hypothesis', arXiv:1609.04622 (2016), Secs 4-5",
+   "status": "known",
+   "current_size": "about 70 pp. preprint (unverified). No Lean.",
+   "how_item_helps": "Henry gets path objects because cylinders are axioms of the theory. The device builds index-wise partial cylinders inside any coherator in the Ara-Henry convention, so it could replace the cylinder axioms. If cylinder coherators satisfy the arity-height convention, this is just Thm 1.1 plus Henry's reduction, i.e. a corollary; if not, see O1 (unverified which case holds).",
+   "expected_speedup": "low",
+   "confidence": "low",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "GlobularTheory, IsCoherator",
+    "missing": "cylinder-coherator axioms (about 200 lines) plus the semi-model structure and the comparison with spaces (major; Mathlib has ModelCategory basics but no semi-model categories and no Quillen equivalence sSet <-> Top)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "S4. Brown-Golasinski / Ara-Metayer folk model structure on strict omega-groupoids (calibration target)",
+   "statement": "Strict omega-groupoids carry a model structure whose generating trivial cofibrations are the J_n; in particular pushouts of J_n are weak equivalences.",
+   "reference": "Brown-Golasinski, Cahiers 1989 (crossed complexes); Ara-Metayer, 'The Brown-Golasinski model structure on strict infinity-groupoids revisited', HHA 13 (2011), arXiv:1010.2599",
+   "status": "known",
+   "current_size": "Ara-Metayer about 20 pp. (unverified); the pushout lemma follows in a few lines from Metayer's explicit path object. No Lean.",
+   "how_item_helps": "The device applies, since partial cylinders stationary below n exist strictly, but its bootstrap is idle: strict cylinders are path objects without any contractibility argument. Expected gain is zero. This calibrates the experiment: a prover with the device should not take longer here.",
+   "expected_speedup": "low",
+   "confidence": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "OAI GlobularTheory/Model (a strict-groupoid globular theory would have to be built as a GlobularTheory); the OAI Thomason library has strict n-categories",
+    "missing": "strict omega-groupoid theory as a GlobularTheory (free strict groupoids on globular sums), about 500+ lines; or a separate strict-groupoid structure plus homotopy groups",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "speedup_targets_verdict": "No strong speedup target outside the corollary cone was found. Every known theorem in which the obstruction appears is either (i) a corollary of Thm 1.1 or of its internal cutoff lemma (see theorem_corollaries), (ii) proved more cheaply by transfer (Nikolaus) or by explicit strict cylinders (Ara-Metayer), or (iii) only plausibly shortened (Lanari's cylinder operations, med). The device is tailored to a single conjecture, as novelty.json warned.",
+ "open_problems": [
+  {
+   "title": "O1. Henry's pushout conjecture / homotopy hypothesis for Grothendieck coherators OUTSIDE the Ara-Henry arity convention",
+   "statement": "Let C be a Grothendieck coherator in Maltsiniotis' general sense, where generating fillers d_j -> S may have dim(S) > j. Is every pushout of J_n along a cell of a cellular C-model a weak equivalence? Equivalently, does the homotopy hypothesis hold for all coherators, so that the theory is independent of the coherator?",
+   "reference": "Maltsiniotis 2010 (arXiv:1009.2331); Ara 2013 (arXiv:1206.2941) Secs 2.3, 2.9-2.11; Henry 2016 Sec 5.3; 312 Def 1.1 and 02-cutoffs-trees.tex:40-66",
+   "url": "https://arxiv.org/abs/1009.2331",
+   "status": "open. 312 restricts to the convention; no source found resolving the general case (snippet-level).",
+   "obstruction_match": "Exact and localized. The convention is used precisely in the cutoff reflector R_q: 'If j <= q, the generating arity bound dim(S) <= j makes the tuple sets on S in X and Z identical' (02-cutoffs-trees.tex:51-53). The partial cylinders, the bootstrap and the retract argument never use it. Without the bound, an operation of output dimension j <= q may read cells above q, and R_q need not preserve cells through q, so the descending induction loses its base.",
+   "adaptation_sketch": "(a) Replace R_q by a cutoff in which operations with high-arity inputs are interpreted on unique fillers. This needs the high cells to be determined, so try a two-parameter cutoff (q, q') with q' >= max arity height of the generators needed below q. That bound is finite at each tower stage, but not uniformly. (b) Alternatively, prove that every coherator receives a convention coherator by an equivalence on models that preserves J-pushouts, then transport. (c) Run the existing ExpansionContraction/cylinderPathData chain unchanged on top of the new cutoff. This is a clean device-reuse test, because only the reflector changes.",
+   "payoff": "high (removes the convention; gives coherator-independence in Maltsiniotis' generality)",
+   "confidence": "med",
+   "difficulty": "med-high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI.Grothendieck.GlobularTheory, Shape, AdmissiblePair, IsFreeExtension, CellularPresentation, Model, WeakEquivalence, IsPushout, J",
+    "missing": "AdmissiblePair' without the field 'height : arity.height <= n + 1' and IsCoherator' (about 20 lines). WeakEquivalence, cutoffFunctor etc. take hC : C.IsCoherator, so the unit/Joined infrastructure must be re-parametrized to IsCoherator' (about 100-250 lines, mostly copying).",
+    "formal_proof_to_compare": "The OAI elementary_expansion proof for the convention case (856-declaration DAG) is the baseline. A reuse experiment measures how much of the DAG survives when only exists_cutoff (dominated share about 0.06) is replaced."
+   }
+  },
+  {
+   "title": "O2. Taylor's generalized pushout conjecture for controlled theories / infinity-Lawvere theories",
+   "statement": "For the infinity-Lawvere theories obtained as Grothendieck realizations of controlled theories (monoidal, symmetric monoidal, coherent infinity-groups, Picard infinity-groupoids), pushouts of the generating J-maps along cellular models are weak equivalences. This would give canonical semi-model structures and the corresponding homotopy hypotheses.",
+   "reference": "Taylor, 'Algebraic coherators, controlled theories, and Grothendieck realizations', arXiv:2607.28540 (Jul 2026), Conj 5.7, Thm 5.8; companion arXiv:2607.24716",
+   "url": "https://arxiv.org/abs/2607.28540",
+   "status": "open (conjecture; 312 settles only the Ara-Henry Grothendieck case, which is a corollary)",
+   "obstruction_match": "It is the same pushout-of-J statement for richer globular-type theories. The device needs (i) a coskeletal cutoff that preserves low cells, which requires an arity convention for the controlled theory, (ii) groupoidal inverses for the tree/whisker contractibility, and (iii) contractible P(S) so that every generator can be interpreted in free order. Symmetric monoidal structure adds non-globular operations, so (i) and (iii) must be redone.",
+   "adaptation_sketch": "Check whether Taylor's algebraic coherators admit a free cellular order with an arity-height bound. If they do, the 312 chain should go through almost verbatim with the theory swapped. If not, the problem falls under O1. Monoidal or one-object cases may reduce to the Grothendieck case by suspension, which would make them corollaries.",
+   "payoff": "high",
+   "confidence": "med-low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "GlobularTheory (for the one-object/monoidal special case only)",
+    "missing": "controlled theories, Grothendieck realization, infinity-Lawvere theories (major, >1000 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "O3. Homotopy hypothesis for Batanin-Leinster weak omega-groupoids (algebras of a contractible globular operad)",
+   "statement": "For a contractible globular operad with system of compositions, the category of its groupoidal algebras, with its weak equivalences, models homotopy types.",
+   "reference": "Batanin 1998; Cisinski, 'Batanin higher groupoids and homotopy types' (2007; faithful and conservative but not full); survey status open per Henry 2016 and Henry's 2018 research statement",
+   "url": "https://arxiv.org/abs/math/0604442",
+   "status": "open per 2016-2018 sources (unverified for 2026)",
+   "obstruction_match": "Batanin algebras present the same free-algebraic-structure problem, and the pushout lemma for J_n is again the crux. Ara and Bourke compare Batanin-Leinster omega-categories with Grothendieck-Maltsiniotis ones. If an analogous comparison of groupoid models lands in the Ara-Henry convention, the result is a corollary of 312. Otherwise the device must be run on operad algebras, and the obstruction is the same as in O1: operad arities are not height-bounded by output dimension.",
+   "adaptation_sketch": "First settle the comparison: Batanin groupoids should be equivalent to models of a coherator, probably outside the convention. Then apply O1.",
+   "payoff": "med-high",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "none (Mathlib has no globular operads)",
+    "missing": "globular operads, contractibility, algebras (major)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "O4. Homotopy hypothesis for Brunerie's type-theoretic weak infinity-groupoids (and the CaTT family)",
+   "statement": "Models of Brunerie's type theory (weak infinity-groupoids definable in dependent type theory) are equivalent, homotopically, to spaces.",
+   "reference": "Brunerie, 'On the homotopy groups of spheres in HoTT' appendix / talks (2013); Finster-Mimram CaTT (arXiv:1706.02866); Benjamin-Finster-Mimram, 'Globular weak omega-categories as models of a type theory' (arXiv:2106.04475, Higher Structures 2024); Henry 2018 research statement: comparison with spaces open",
+   "url": "https://arxiv.org/abs/2106.04475",
+   "status": "open (per Henry 2018; unverified for 2026)",
+   "obstruction_match": "Brunerie groupoids are Grothendieck infinity-groupoids for a specific coherator built from contractible contexts. Whether it meets the Ara-Henry arity bound is unverified. Coherences of output dimension j on contexts of higher dimension appear allowed, which would put it under O1. If it meets the bound, the result is a corollary of 312.",
+   "adaptation_sketch": "Decide the arity convention for Brunerie's coherator (a syntactic check). If it is outside, attack via O1; if inside, derive the result as a corollary and record it under theorem_corollaries.",
+   "payoff": "med",
+   "confidence": "med-low",
+   "difficulty": "med",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "GlobularTheory/Shape could host the coherator if written as a free tower",
+    "missing": "type-theoretic syntax of Brunerie/CaTT and its initiality (major; no Lean development known to us)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "O5. Directed analogue: canonical (folk-type) model / semi-model structure on weak omega-categories with omega-weak equivalences",
+   "statement": "On Batanin-Leinster or Grothendieck-Maltsiniotis weak omega-categories, is there a (semi-)model structure whose weak equivalences are the omega-weak equivalences (essentially surjective in every dimension), extending Lafont-Metayer-Worytkiewicz's folk structure on strict omega-Cat?",
+   "reference": "Fujii-Hoshino-Maehara, arXiv:2406.13240 (2-out-of-3 for omega-weak equivalences) and CT2024/CT2025 abstracts; Lafont-Metayer-Worytkiewicz, arXiv:0712.0617",
+   "url": "https://arxiv.org/abs/2406.13240",
+   "status": "apparently open (no source found settling it; unverified)",
+   "obstruction_match": "Partial. The pushout of a free 'reversible cell' attachment must preserve omega-equivalence, and the free construction adds composites. 317 Appendix (08-method-context.tex:30-45), however, shows the device's final step fails in the directed setting: the exact-boundary single-joining-cell test does not detect Street weak equivalences (0 -> 1 <- 2), and the tree comparison's inverse traversal has no directed replacement.",
+   "adaptation_sketch": "Replace J_n by coinductive-equivalence generating cofibrations, partial cylinders by directed (Gray) cylinders stationary below n, and contractibility by 'every boundary has an equivalence filler'. This is low confidence: the bootstrap's core uses inverses.",
+   "payoff": "med",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "OAI Thomason strict n-categories (strict case only); OAI Globular for globular theories",
+    "missing": "coherator for omega-categories (pertinent admissible pairs, about 200 lines) plus coinductive omega-weak equivalences (about 300+ lines) plus directed cylinder frames",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "O6. Grothendieck-Maltsiniotis (infinity,n)-categories model (infinity,n)-categories",
+   "statement": "Grothendieck-Maltsiniotis infinity-categories whose cells above dimension n are invertible carry a canonical (semi-)model structure equivalent to a standard model of (infinity,n)-categories.",
+   "reference": "Maltsiniotis 2010 (arXiv:1009.2331) Sec 'infinity-categories'; Ara's thesis (unverified title/statement); Lanari's thesis (Macquarie 2022) on Grothendieck infinity-categories",
+   "url": "https://arxiv.org/abs/1009.2331",
+   "status": "open (unverified)",
+   "obstruction_match": "Above n the structure is groupoidal, so the descending induction from a cutoff q can run for indices k > n with partial cylinders as in 312. Below n the directed obstruction of O5 returns. A partial match.",
+   "adaptation_sketch": "Use the 312 chain for the J_k with k > n (the groupoidal top part, where the bootstrap works verbatim) and a separate directed argument for k <= n. A clean sub-problem: 'J_k pushouts for k > n are equivalences in Grothendieck (infinity,n)-categories'.",
+   "payoff": "med",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "GlobularTheory, Shape",
+    "missing": "coherators for infinity-categories with invertibility above n, and the corresponding weak equivalences",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "O7. Choice-free / internal pushout lemma (homotopy hypothesis inside a topos or type theory)",
+   "statement": "Prove Henry's pushout conjecture constructively, or internally to an elementary topos, e.g. for Henry's internally definable cylinder coherators or an internal Grothendieck coherator.",
+   "reference": "Henry 2016 (cylinder coherators definable in type theory); Henry, 'Weak model categories in classical and constructive mathematics' (TAC 2020)",
+   "url": "https://arxiv.org/abs/1609.04622",
+   "status": "open (no constructive proof known; unverified)",
+   "obstruction_match": "The device's ingredients are constructive in shape (descending finite induction at fixed q, explicit P_j for j <= n). The upper completions use the small object argument, and the Lean uses Classical.choose 5 times (chosen unit, chosen fillers) and permits Classical.choice.",
+   "adaptation_sketch": "Replace the small-object completion of P_j (j > n) by an explicit finite cellular completion. Only finitely many upper dimensions matter below a fixed q, but cells are infinitely many, so try algebraic (AWFS) small object arguments, which are constructive.",
+   "payoff": "low-med",
+   "confidence": "low",
+   "difficulty": "med-high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "the comparator statement itself; the test is whether a proof exists with axioms ⊆ {propext, Quot.sound}",
+    "missing": "none (statement unchanged; #print axioms on a new proof)",
+    "formal_proof_to_compare": "OAI elementary_expansion (uses Classical.choice)"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  {
+   "title": "Pushout lemma for (q+1)-coskeletal (cutoff) Grothendieck groupoids",
+   "note": "Internal lemma cutoff_elementary_exactBoundaryTest of the item itself. Henry-Lanari (arXiv:1905.05625; TAC 39(26) 2023, pp. 735-768) show n-groupoids and (n+1)-coskeletal infinity-groupoids have the same homotopy theory, and that a left semi-model structure on n-groupoids implies the generalized homotopy hypothesis. So the homotopy hypothesis for Grothendieck n-groupoids for every n (they did n = 3, Lanari 1809.07923 Thm 4.10 for the semi-model structure) should follow. Lean: statable with < 300 lines (truncated models); useful as an internal-consistency Lean check, not as reuse."
+  },
+  {
+   "title": "Path object for cutoff models (Lanari's goal at finite cutoff)",
+   "note": "cylinderPathData hC q 0 gives, for each Y in A_q, a P with p_0, p_1 lifting all I_j and (p_0,p_1) lifting all J_k: a path object for fibrant objects at cutoff q. Statable now in OAI terms (∀ Y, Nonempty (CutoffPathData hC q 0 Y)). This is the device's own n = 0 instance, not reuse. Without the cutoff (q = infinity) the descending induction has no base."
+  },
+  {
+   "title": "Cor 5.1 canonical left semi-model structure; Cor 5.2 homotopy hypothesis; coherator independence within the convention",
+   "note": "via Henry 2016 Thm 5.3.5 / Cor 5.3.13; not formalized."
+  },
+  {
+   "title": "Taylor 2607.28540 Thm 5.8 in the Ara-Henry convention",
+   "note": "removes Taylor's hypothesis in the convention case only."
+  },
+  {
+   "title": "Henry 2016 Lemma 5.3.4 extensions (transfinite cellular, cofibrant retracts) and the Whitehead theorem for cofibrant models",
+   "note": "standard consequences of the semi-model structure."
+  }
+ ],
+ "release_reuse": {
+  "searched": "CONTENTS.md and all preprint sources: grep for coherator / pushout conjecture / partial cylinder / path object / semi-model / groupoid; Lean imports of OAI.CategoryTheory.Globular from other directories.",
+  "families_found": [
+   317
+  ],
+  "family_317": {
+   "title": "Thomason model structures in all strict higher dimensions (25 Sep 2026; catalog row 317; comparator ThomasonModelStructures, Lean OAI/CategoryTheory/Thomason)",
+   "relation": "Cites 312 as OpenAI2026 and summarizes its method (08-method-context.tex:1-28). Its own pushout argument uses positive relative prisms: strict right Gray cylinders stationary on the old sieve (03-relative-prisms.tex Lemma relative-prism; Lemma pushout-cylinder at :232-276). These glue along an arbitrary attachment via the internal hom and the pushout universal property.",
+   "is_it_device_reuse": "No. It is an analogue, not a reuse of C1. (1) 317's cylinders are classical homotopies rel A: 'stationary on the old part'. They are not index-n partial cylinders and are not defined by a single joining cell at one expansion index. (2) There is no contractibility bootstrap: the strict cylinder is given by an explicit chain formula, and its gluing needs 'no injectivity, freeness, or cofibrancy hypothesis'. (3) There is no descending induction at a coskeletal cutoff; 317 notes that the strict analogue of the cutoff exists but 'supplies no comparison with Street weak equivalences'. (4) 317 states 'No result of [312] is a premise of this proof', and its appendix says the claims about 312 are not inputs. (5) Lean: no file outside OAI/CategoryTheory/Globular imports OAI.CategoryTheory.Globular, so the 317 Lean does not use 312's declarations.",
+   "what_is_shared": "The high-level pattern 'control a pushout by a cylinder that is stationary on the old part and glues to the constant cylinder on the attaching target'. This is the classical homotopy-extension idea (transfer, N0), which 312 also contains.",
+   "count_for_PLAN_device_reuse_tally": "0 (record as 'analogue in the model's own manuscripts, one day later')"
+  }
+ },
+ "negative_controls": [
+  {
+   "title": "NC1. Two-out-of-three for weak equivalences of C-models",
+   "statement": "If two of f, g, gf are weak equivalences (WeakEquivalence hC) then so is the third.",
+   "reference": "Ara 2013 (arXiv:1206.2941) Sec 4; 312 Sec 2 (not formalized in the OAI Lean)",
+   "why_device_should_not_help": "No free expansion and no pushout are involved; the proof is homotopy-group functoriality. A prover with the device in its library should show no speedup. If it 'uses' the cylinders, that indicates a spurious-use artefact.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI.Grothendieck.GlobularTheory.Model.WeakEquivalence, C.Model morphisms",
+    "missing": "none",
+    "formal_proof_to_compare": "none (paper proof cited from Ara)"
+   }
+  },
+  {
+   "title": "NC2 (proved-false analogue). The exact-boundary single-joining-cell test detects Street weak equivalences of strict omega-categories",
+   "statement": "False: the inclusion of object 0 into 0 -> 1 <- 2 is a Street weak equivalence (terminal object), but 0 and 2 are joined by no single arrow in either direction.",
+   "reference": "family 317, 08-method-context.tex:30-45",
+   "why_device_should_not_help": "The device's last step (exactBoundaryTest_of_cutoff_path, endpoint-section retract) needs groupoidal inverses and single joining cells. In directed settings the device must fail, or need a new test. 317 proves its directed pushout result without it.",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "OAI.Thomason strict n-categories and Street nerve (family 317 library); OAI.Grothendieck.GlobularSet.ExactBoundaryTest",
+    "missing": "a bridge from the Thomason NCategory cells to a GlobularSet and the specific 3-object category, about 100-200 lines",
+    "formal_proof_to_compare": "317's Lean contains the Thomason model structure, which does not use 312"
+   }
+  },
+  {
+   "title": "NC3. Homotopy hypothesis for STRICT infinity-groupoids",
+   "statement": "False: simply connected homotopy types realized by strict infinity-groupoids are products of Eilenberg-Mac Lane spaces (Ara 'Strict infinity-groupoids are Grothendieck infinity-groupoids', Thm 5.4 as cited in 312 intro; Simpson). The pushout lemma does hold there (Brown-Golasinski).",
+   "reference": "312 00-introduction.tex:19-23; Ara-Metayer arXiv:1010.2599",
+   "why_device_should_not_help": "The device can at most deliver the pushout lemma. The homotopy hypothesis needs Henry's reduction for weak coherators. A pipeline that tries to 'prove the homotopy hypothesis with the device' for strict groupoids must fail, which separates the device from the corollary layer.",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "none in Mathlib; OAI Globular cannot express strict groupoids without a new GlobularTheory",
+    "missing": "strict groupoid theory plus realization to spaces",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "target": "O1 coherators outside the Ara-Henry convention",
+   "lean_usable": true,
+   "score": "statable with < 300 lines of new definitions",
+   "argument": "This is the best device-reuse test available. The convention is used in exactly one place, the cutoff reflector (02-cutoffs-trees.tex:51-53; exists_cutoff, dominated share about 0.06). The partial cylinders, the ExpansionContraction bootstrap and the retract argument are untouched. A Lean experiment drops the height field from AdmissiblePair, supplies a new cutoff, and measures how much of the 856-declaration DAG is reused unchanged and how much prover budget the rest takes with versus without the cylinder files in the library. Success would also settle an open question (coherator independence in Maltsiniotis' generality). Risk: no replacement cutoff exists, in which case the device does not transfer. That is informative either way."
+  },
+  {
+   "rank": 2,
+   "target": "S1 Lanari's cylinder operations",
+   "lean_usable": true,
+   "score": "statable with < 300 lines of new definitions",
+   "argument": "This is a measurable speedup on a known (partial) theorem. With the device, all of Lanari's compositions, identities and inverses on cylinder cells follow from one contractibility-plus-lifting argument (I28) instead of separate constructions. It is valid at a fixed cutoff, and it counts as reuse only if the contractibility of Lanari's objects comes from the descending bootstrap rather than from Thm 1.1. Formalize Lanari's cylinder frame in the OAI GlobularFrame/CylinderNode language, then compare proof lengths and prover budget against the existing cylinderInterpretation."
+  },
+  {
+   "rank": 3,
+   "target": "S2 Nikolaus algebraic Kan complexes",
+   "lean_usable": true,
+   "score": "statable with < 300 lines of new definitions",
+   "argument": "This is a cross-model test of whether the device's pattern (coskeletal cutoff, descending induction on cell dimension, partial cylinders stationary below n) transfers to simplicial algebraic models. Mathlib provides SSet, horns, KanComplex, Coskeletal and the Quillen I/J classes, and family 317's OAI library supplies a KanQuillenModel. Expected speedup is low, because transfer is cheaper, so this mainly tests discoverability and generality. A null result is the expected outcome and strengthens the 'tailored device' reading."
+  },
+  {
+   "rank": 4,
+   "target": "O2 Taylor's generalized pushout conjecture",
+   "lean_usable": false,
+   "score": "needs major new library",
+   "argument": "This has the highest payoff among open problems and is the closest in form. Whether the device applies hinges on whether algebraic coherators of controlled theories admit an arity-height-bounded free order. If they do, the 312 chain should transfer almost verbatim; if not, the problem reduces to O1. It is not Lean-usable now."
+  },
+  {
+   "rank": 5,
+   "target": "O4 Brunerie / CaTT groupoids (via O1)",
+   "lean_usable": false,
+   "score": "needs major new library",
+   "argument": "A cheap syntactic check decides the case: does Brunerie's coherator meet the arity bound? If yes, the result is a corollary; if no, it is a concrete instance of O1 with a well-studied coherator, a natural first test case once O1's Lean setup exists."
+  }
+ ],
+ "precedent_check": {
+  "earlier_equivalent": "None found (snippet level). The closest unread sources are Lanari 2018 (arXiv:1809.07923; a 3-dimensional 'endofunctor that behaves like a path object', and 'slightly less than' a path object in general) and Taylor, 'A Tale of Two Paths' (arXiv:2609.20860, 8 Sep 2026; a cylinder isomorphic to Lanari's, according to the abstract and introduction). Neither could be read in full (arXiv blocked). Henry-Lanari 2023 uses coskeletal/truncated models (the cutoff ingredient) but, at snippet level, not index-wise partial cylinders or a descending bootstrap. Taylor 2604.09867/2510.22326 induct upward (n -> n+1). If either unread text contains a path object that is partial in an expansion index and draws its contractibility from higher-index cases, C1 drops to N2.",
+  "after_release": "No use of the device after Oct 6, 2026 was found (searches for partial cylinders, the pushout conjecture, elementary expansions 2026). Inside the release, 317 (Sep 25) has only a classical stationary-cylinder analogue (see release_reuse).",
+  "downgrade": "none at present; the status remains fragile pending full-text reads of 1809.07923 and 2609.20860"
+ },
+ "summary_verdict": "Part A: the item is genuinely in the Lean and load-bearing (formalized, different route). Part B: no strong downstream speedup on other known theorems. The best reuse test is O1, coherators outside the arity convention, where only the cutoff reflector breaks; it is Lean-statable in under 300 lines. Release reuse: 0, since 317 is an analogue. C1 stays an N3 candidate with no confirmed jump.",
+ "search_log": [
+  "Local: data/pilot/312/{novelty,family}.json/.md; lean/OAI/CategoryTheory/Globular (Expansion, CutoffExpansion, ElementaryExpansion, CylinderObjects, CylinderContractibility, RelativeLifting, ReflectedCylinder, FullCylinder, CylinderLifting, CylinderSplitting, CylinderShapes, WhiskerUniverse, CylinderInterpretation, Model.lean:307-345); ComparatorChallenges/GrothendieckElementaryExpansion.json; lean/docs/312.md; data/items/312_lean.json (BFS from target)",
+  "Local: paper 00-introduction.tex (full), 01-preliminaries.tex:34-62, 02-cutoffs-trees.tex:40-70 and 200-280, 03-partial-cylinders.tex:1-135",
+  "Local: family 317 08-method-context.tex (full), 01-introduction.tex:110-205, 03-relative-prisms.tex:1-80 and 225-285; grep of 317 sections for stationary/induction; grep of all OAI Lean for imports of OAI.CategoryTheory.Globular",
+  "Local: CONTENTS.md grep (cylinder, groupoid, coherator, model structure, pushout, operad, homotopy hypothesis); grep of all preprints for coherator/pushout conjecture/partial cylinder: only 312 and 317",
+  "Local: Mathlib d13f23b (lean/.lake/packages/mathlib) AlgebraicTopology/SimplicialSet (KanComplex, Coskeletal, AnodyneExtensions), ModelCategory (PathObject, Cylinder), SSet.modelCategoryQuillen; OAI Thomason KanQuillenModel",
+  "WebSearch: Henry Lanari homotopy hypothesis Grothendieck n-groupoids pushout lemma truncated coskeletal -> 1905.05625 (n-groupoids vs (n+1)-coskeletal; semi-model => generalized HH)",
+  "WebSearch: Taylor algebraic coherators controlled theories generalized pushout conjecture -> 2607.28540 abstract, 2607.24716",
+  "WebSearch: homotopy hypothesis Brunerie weak infinity groupoids type theory open -> Henry 2018 research statement (comparison open), MPIM seminar (n <= 3)",
+  "WebSearch: Fujii Hoshino Maehara omega-weak equivalences model structure -> 2406.13240 (2-out-of-3), CT2024/2025 abstracts; LMW 0712.0617",
+  "WebSearch: Batanin weak omega-groupoids homotopy hypothesis Cisinski -> math/0604442 (faithful, conservative), 2016 survey: open",
+  "WebSearch: Ara Grothendieck-Maltsiniotis (infinity,n) conjecture -> 1009.2331, 1206.2941, 1212.3085 (thesis not surfaced)",
+  "WebSearch (extended): Henry pushout conjecture proof partial cylinders elementary expansion October 2026 -> no hit (only TAC 39(26))",
+  "WebSearch: 'A Tale of Two Paths' Taylor -> 2609.20860 abstract/intro only",
+  "WebSearch: mathoverflow homotopy hypothesis Grothendieck pushout lemma coherator independence -> no MO thread; arXiv sources only",
+  "WebSearch: Nikolaus algebraic Kan complexes -> 1003.1342, Indag. Math. 21 (2011) 52-75",
+  "WebSearch: Penon / Simpson / algebraic weak omega-categories model structure -> no settled source (Cottrell thesis)",
+  "WebSearch: Benjamin Finster Mimram CaTT models -> 2106.04475 (CaTT models = Maltsiniotis omega-categories); nothing on HH"
+ ],
+ "sources": [
+  "local: data/raw/openai-math/lean/OAI/CategoryTheory/Globular/*.lean (fd4aeeb)",
+  "local: data/raw/openai-math/preprints/The-Grothendieck-homotopy-hypothesis-via-elementary-expansions-September-24-2026/build/sections/*.tex",
+  "local: data/raw/openai-math/preprints/Thomason-Model-Structures-in-Every-Strict-Higher-Dimension-September-25-2026/build/sections/{01,03,08}*.tex",
+  "local: data/items/312_lean.json; data/pilot/312/novelty.json; data/pilot/312/family.json",
+  "https://arxiv.org/pdf/1905.05625 (snippet)",
+  "http://www.tac.mta.ca/tac/volumes/39/26/39-26.pdf (snippet)",
+  "https://conferences.inf.ed.ac.uk/ct2019/abstracts/18.pdf (snippet)",
+  "https://arxiv.org/pdf/2607.28540 (abstract snippet)",
+  "https://arxiv.org/pdf/2607.24716 (snippet)",
+  "https://arxiv.org/pdf/2609.20860 (abstract snippet; unread)",
+  "https://arxiv.org/pdf/1805.00156 (snippet)",
+  "https://arxiv.org/abs/1809.07923 (title only; unread)",
+  "https://arxiv.org/pdf/1609.04622 (snippet)",
+  "https://www.normalesup.org/~henry/Jan 2018 - research statement.pdf (snippet)",
+  "https://www.mpim-bonn.mpg.de/node/11280 (snippet)",
+  "https://arxiv.org/pdf/2406.13240v2 (snippet)",
+  "https://archive.math.muni.cz/conference/ct2025/data/uploads/abstracts/maehara.pdf (snippet)",
+  "https://arxiv.org/pdf/0712.0617 (snippet)",
+  "https://arxiv.org/pdf/math/0604442 (snippet)",
+  "https://arxiv.org/abs/1009.2331 (snippet)",
+  "https://arxiv.org/pdf/1206.2941 (snippet)",
+  "https://ar5iv.arxiv.org/html/1212.3085 (snippet)",
+  "https://arxiv.org/pdf/1003.1342 (snippet)",
+  "https://arxiv.org/abs/2106.04475 (snippet)",
+  "https://arxiv.org/pdf/2604.09867 (snippet)",
+  "https://arxiv.org/pdf/2510.22326 (snippet)",
+  "https://arxiv.org/pdf/1010.2599 (from novelty.json; unread here)"
+ ]
+}
