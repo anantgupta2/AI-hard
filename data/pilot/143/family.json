@@ -1,0 +1,2321 @@
+{
+ "family": 143,
+ "title": "Hilbert's sixteenth problem: uniform bounds for limit cycles",
+ "manuscripts": [
+  {
+   "id": "143a",
+   "title": "Uniform bounds for planar polynomial limit cycles",
+   "manuscript_dir": "preprints/uniform-bounds-for-planar-polynomial-limit-cycles-September-24-2026",
+   "source_root": "preprints/uniform-bounds-for-planar-polynomial-limit-cycles-September-24-2026/build",
+   "tex_files": [
+    "main.tex",
+    "macros.tex",
+    "sections/01-introduction.tex",
+    "sections/02-flags.tex",
+    "sections/03-separation.tex",
+    "sections/04-calculus.tex",
+    "sections/05-elimination.tex",
+    "sections/06-additive.tex",
+    "sections/07-regular.tex",
+    "sections/08-mixed.tex",
+    "sections/09-subdivision.tex",
+    "sections/10-terminal.tex",
+    "sections/11-counting.tex",
+    "figures/proof-roadmap.tex",
+    "figures/coupled-bands.tex",
+    "figures/matching-arguments.tex",
+    "figures/retained-charges.tex",
+    "references/references.bib"
+   ],
+   "lines": 12457,
+   "date": "September 24, 2026",
+   "author": "OpenAI",
+   "formalized": false,
+   "in_formalization_yaml": false
+  },
+  {
+   "id": "143b",
+   "title": "Two limit cycles for quintic Lienard systems",
+   "manuscript_dir": "preprints/two-limit-cycles-for-quintic-lienard-systems-September-24-2026",
+   "source_root": "preprints/two-limit-cycles-for-quintic-lienard-systems-September-24-2026/build",
+   "tex_files": [
+    "paper.tex",
+    "sections/introduction.tex",
+    "sections/arcs.tex",
+    "sections/fitting.tex",
+    "sections/model.tex",
+    "sections/transport.tex",
+    "sections/application.tex",
+    "sections/sharpness.tex",
+    "sections/references.tex",
+    "figures/half-arcs.tex"
+   ],
+   "lines": 3265,
+   "date": "September 24, 2026",
+   "author": "OpenAI",
+   "formalized": true,
+   "in_formalization_yaml": true
+  }
+ ],
+ "file_line_convention": "paper file:line relative to <manuscript_dir>/build/sections (143a = uniform-bounds paper, 143b = quintic Lienard paper; each item carries a 'paper' field); Lean paths relative to lean/OAI/Analysis/LienardCycles (openai-math fd4aeeb)",
+ "commit": "fd4aeeb",
+ "analyst_role": "FAMILY analyst (both papers + Lean, text level; Lean NOT built by this agent - shared checkout; orchestrator compiles the comparator). Algebraic identities of 143b re-checked with sympy.",
+ "base_library_L": "Mathlib d13f23b + bibliographies. 143a references.bib (24 entries): Hilbert1902, Dulac1923, Ilyashenko1985/1990/1991/2002, Ecalle1992, Yeung2025, Roussarie1998, Bautin1952, IlyashenkoYakovenko1995, Kaloshin2003, BinyaminiNovikovYakovenko2010, KaiserRolinSpeissegger2009, GalalKaiserSpeissegger2020, LionRolin1997, Opris2023, BierstoneMilman1988, Gabrielov1968, Khovanskii1984Finiteness, Khovanskii1984Rolle, Sard1942. 143b thebibliography (17 entries): LMP (Lins-de Melo-Pugh 1977), Rychkov 1975, DPR 2007, DMD 2011, DMH 2015, LiLlibre 2012, LiLu 2014, LlibreZhang 2017, CLZZ (arXiv:2608.19542, Aug 2026), Rosales (preprint Aug 2026), Odani 1996, GGG 2017, OT (Ovsienko-Tabachnikov Schwarzian), CGP 1996 (Schwarzian cycle bounds), Perko 2001.",
+ "main_statement": {
+  "file_line": "143a sections/01-introduction.tex:12-16 (headline of family); 143b sections/introduction.tex:13-17 (formalized)",
+  "latex": "\\begin{theorem}[Uniform boundedness] For each integer d>=1, there is a finite nonnegative integer B(d) such that every real planar polynomial vector field of degree at most d has at most B(d) limit cycles in the whole plane. \\end{theorem}  ||  \\begin{theorem} If deg F<=5, the system x'=y-F(x), y'=-x has at most two limit cycles in R^2. Some members of this class have two limit cycles. Thus its exact maximum is two. \\end{theorem}",
+  "paraphrase": "143a (headline, NOT formalized): for each degree d there is a finite B(d) bounding the number of limit cycles of every planar polynomial vector field of degree <= d (existential part of Hilbert's 16th problem), non-effective. 143b (formalized, comparator OAI.QuinticLienard.main): every classical Lienard system x'=y-F(x), y'=-x with deg F <= 5 has at most 2 limit cycles and 2 is attained (degree-5 case of the Lins-de Melo-Pugh conjecture).",
+  "comparator": {
+   "file": "lean/ComparatorChallenges/QuinticLienard.lean",
+   "json": "lean/ComparatorChallenges/QuinticLienard.json",
+   "theorem": "OAI.QuinticLienard.main : (forall F : Polynomial R, F.degree <= 5 -> {C : Set Plane | IsLimitCycle F C}.encard <= 2) and (exists F : Polynomial R, F.degree <= 5 and {C | IsLimitCycle F C}.encard = 2)",
+   "solution_module": "OAI.Analysis.LienardCycles.Main",
+   "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+   ],
+   "definition_names": [],
+   "model": "vectorField F (x,y) = (y - F.eval x, -x); IsSolution: global C^1 solution on all of R (HasDerivAt at every t); IsPeriodicOrbit C: exists solution z, T>0, z T-periodic, z nonconstant, C = range z; IsLimitCycle C: periodic orbit with an open U containing C such that every periodic orbit C' contained in U equals C. Count = Set.encard (ENat), so infinitely many cycles would also be excluded."
+  },
+  "match_check": "143b: exact. Comparator defs (QuinticLienard.lean:7-23) are textually identical to solution Model.lean:7-23; Main.lean:20-23 proves `main` as <upper_bound, Sharpness.sharpness>. Isolation notion = 'some neighbourhood containing no other whole periodic orbit', identical to paper's introduction.tex:7-11; geometric count without multiplicity; F of degree <=5 including degenerate/constant F (paper first normalizes F(0)=0 by shifting y; Lean instead carries the constant term poly a 0 through the matching, CycleIsolation.lean:26, and makes the x^5 coefficient nonnegative via the homeomorphism flipY with F -> -F, CycleTransform.lean:54-59). 'degree <= 5' in Lean = degree of primitive F as in the paper. No loophole found: solutions are required on all of R (true for periodic orbits); encard counts sets of points. definition_names is empty, which is the norm in this release (388/416 comparator JSONs with in-file defs have it empty), so the comparator matches the statement against the challenge-file definitions. 143a: NOT formalized, no comparator.",
+  "formalized_vs_claimed": "Formalized: all of Theorem 1.1 of 143b (upper bound + sharpness). NOT formalized: the whole of 143a (uniform boundedness for all degrees, ~11.9k TeX lines) - it is not in formalization.yaml and lean/docs/143.md lists only the quintic paper. The family's headline result (Hilbert 16 uniform bound) therefore rests on an unrefereed, unformalized paper; the Lean-backed result is the far narrower LMP degree-5 case.",
+  "note_for_comparator": "Not compiled by this agent (shared checkout; no lake build). Status pending orchestrator. 146 files, imports only Mathlib.",
+  "paraphrase_by_manuscript": {
+   "143a": "Existential (uniform) part of Hilbert's 16th problem: for each degree d the Hilbert number H(d) is finite. Non-effective; no formula for B(d). Limit cycles counted geometrically, no hyperbolicity or genericity assumption, no use of individual finiteness (Ilyashenko-Ecalle) as a premise.",
+   "143b": "Lins Neto-de Melo-Pugh conjecture in degree 5: every classical Lienard system with polynomial F of degree <=5 (no parity/sign restriction) has at most 2 limit cycles, and 2 is attained. Previously known: odd quintic (Rychkov 1975), quartic (Li-Llibre 2012), slow-fast cyclicity <=2 (Li-Lu 2014); conjecture false for n>=6."
+  },
+  "latex_by_manuscript": {
+   "143a": "\\begin{theorem}[Uniform boundedness] For each integer d>=1, there is a finite nonnegative integer B(d) such that every real planar polynomial vector field of degree at most d has at most B(d) limit cycles in the whole plane. \\end{theorem}",
+   "143b": "\\begin{theorem} If deg F<=5, the system x'=y-F(x), y'=-x has at most two limit cycles in R^2. Some members of this class have two limit cycles. Thus its exact maximum is two. \\end{theorem}"
+  }
+ },
+ "trust_surface": {
+  "lean": "146 files, 16,659 lines in lean/OAI/Analysis/LienardCycles; one file imports Mathlib, all others import only sibling OAI.Analysis.LienardCycles files; no other OAI dir imported",
+  "grep_scope": "all 146 .lean files, word-boundary grep",
+  "counts": {
+   "sorry": 0,
+   "admit": 0,
+   "axiom": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque": 0,
+   "ofReduceBool/skipKernelTC": 0,
+   "partial def": 0,
+   "set_option maxHeartbeats": 0,
+   "set_option autoImplicit": 0,
+   "decide": "2 (ModelAlgebra.lean:269 `Odd (3:N) by decide`; SharpCycles.lean:60 `(2:N)!=0 by decide`) - trivial"
+  },
+  "note": "Text-level clean. No heartbeat overrides at all (unusual; suggests a compact, short-proof style). 143a has no Lean, so it has no trust surface beyond the prose."
+ },
+ "labels": {
+  "A": {
+   "label": "A3",
+   "secondary": {
+    "143a": "A3 (quantitative bound) with innermost form A1 'forall fields, #cycles <= B(d)'; existence of a finite B(d) per d; explicit_rate=false (non-effective)",
+    "143b": "A3 sharp: exact maximum = 2; upper bound is A5-form (no field with 3 limit cycles), lower bound A2 (explicit F_eps)",
+    "hard_direction_form": "upper bound (A5/A1 form)",
+    "explicit_rate": false
+   },
+   "evidence": {
+    "quote": "there is a finite nonnegative integer B(d) such that every real planar polynomial vector field of degree at most d has at most B(d) limit cycles ... It does not furnish an effective formula for B(d).",
+    "file_line": "143a 01-introduction.tex:12-21; 143b introduction.tex:13-17"
+   },
+   "confidence": "0.8",
+   "note": "Both headline claims are counting bounds; 143b is sharp (exact value), 143a non-explicit."
+  },
+  "B": {
+   "label": "B1",
+   "per_manuscript": {
+    "143a": "B1 - claims positive resolution of the uniform-boundedness (existential) part of Hilbert's 16th problem, open since 1900 (Ilyashenko 2002 calls it open even for d=2).",
+    "143b": "B1 for the posed problem 'degree-5 case of the LMP conjecture' (open, cf. CLZZ arXiv:2608.19542 Aug 2026 lists it open); B3 relative to the full LMP conjecture (which is false for n>=6) and relative to Hilbert 16."
+   },
+   "flags": {
+    "full_only_with_prior": false,
+    "adds_corollaries_for_other_conjectures": true,
+    "corollaries": [
+     "143b: refutes Hernandez Rosales' proposed degree-5 four-cycle example (introduction.tex:50-66: it is Odani's Example 3, exactly 2 cycles)",
+     "143a: the projection principle (absolute isolated-zero finiteness => uniform component bounds) is stated as reusable for other analytic classes (01-introduction.tex:229-235)"
+    ],
+    "posed_by": "143a: Hilbert 1900 (Problem 16, second part; uniform version per Ilyashenko 2002 pp.301-304). 143b: Lins, de Melo, Pugh 1977."
+   },
+   "evidence": {
+    "quote": "Theorem~\\ref{thm:uniform} gives a positive resolution of the uniform boundedness assertion in the second part of Hilbert's sixteenth problem. / This proves the degree-five case of the Lins Neto--de Melo--Pugh conjecture.",
+    "file_line": "143a 01-introduction.tex:18-21; 143b paper.tex:30-34 (abstract)"
+   },
+   "confidence": "143a: 0.3 (label conditional on correctness of an extraordinary unformalized claim); 143b: 0.85 (conditional on comparator compiling)"
+  },
+  "C": {
+   "primary": "C3",
+   "primary_evidence": {
+    "quote": "143b: 'A first zero reached from strictly positive values would instead have a nonpositive outward derivative. This contradiction proves W>0' (model.tex:886-890); 143a: 'Suppose there is an infinite sequence of distinct isolated solutions ... a contradiction' (05-elimination.tex:1086-1123) and 'If the original field had more limit cycles, one could select B_*(d)+1 of them, a contradiction' (11-counting.tex:1028-1031)",
+    "file_line": "143b model.tex:862-913, transport.tex:309-359; 143a 05-elimination.tex:1086-1123, 11-counting.tex:1000-1032"
+   },
+   "per_manuscript": {
+    "143a": "C3 primary (non-constructive: escaping-sequence contradictions, compactness, Sard/Fubini generic tilt; bound not effective). Secondaries: C2 (induction on number of parameters in Projection count; induction on ordinary variables / limiting-zero order in Prop. elimination-recursion; box induction on jet order), C5 heavy (Lion-Rolin preparation, Bierstone-Milman local finiteness and uniform fiber bounds, Sard, Gabrielov/Khovanskii framework), C4 (asymptotic estimate chains on complex bands).",
+    "143b": "C3 primary for the upper bound (first-zero barrier contradictions along characteristics; Rolle-type zero count). C1 for sharpness (explicit F_eps = eps(4x-20/3x^3+8/5x^5), first-order energy displacement). Secondaries: C4 (sign/derivative estimate chain: global fit -> model inequality -> curvature/intercept shape comparisons), C2 (continuous induction along characteristics, not discrete), C5 light (smooth ODE dependence via Perko; Schwarzian identities via OT - all re-proved in Lean)."
+   },
+   "secondaries": [
+    "C1 (143b sharpness)",
+    "C2 (143a parameter induction; 143b continuous induction)",
+    "C4",
+    "C5 (143a: Lion-Rolin preparation, Bierstone-Milman, Sard invoked without re-proof)"
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "Polynomial factorizations (J, A, T, N identities) are displayed and 'can be checked by collecting powers of l' (model.tex:769); Lean has 2 trivial `decide` uses and no native_decide.",
+    "file_line": "143b model.tex:735-792; lean ModelAlgebra.lean:269, SharpCycles.lean:60"
+   },
+   "ih_strengthened": true,
+   "ih_template": "143a: 'strengthen to all substructures' - Projection count is proved 'simultaneously for all systems in the stated closure, by induction on the number a of parameters' (11-counting.tex:107-109), the hereditary closure being exactly what lets the induction recurse; plus 'carry an extra tracked quantity' - the elimination induction carries two quantitative alternatives for a non-vanishing center field (05-elimination.tex:15-24). 143b: no discrete induction; its barrier arguments carry an extra tracked quantity (sign of lambda-k(h) fed into the kappa_r transport, transport.tex:270-283).",
+   "ih_evidence": {
+    "quote": "We prove the assertion for square systems first, simultaneously for all systems in the stated closure, by induction on the number a of parameters.",
+    "file_line": "143a 11-counting.tex:107-109; 05-elimination.tex:15-24"
+   },
+   "ih_note": "Both strengthenings match library templates (all substructures / extra tracked quantity) -> capped at N2 as IH devices.",
+   "confidence": "C3 0.7; secondaries 0.6"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "E1 (143b quadratic-fit coordinates: global fit theorem + transport law), Lean-backed; E3 (143a packet-tree separation + absolute-zero criterion), informal only",
+   "evidence": {
+    "quote": "every admissible pair (M,M_r) has a unique fit by a profile lambda(u-h)+kappa(u-h)^2/2 ... The fitted slope and curvature evolve according to the two transport equations",
+    "file_line": "143b introduction.tex:86-96"
+   },
+   "confidence": "0.45",
+   "caveats": [
+    "E1 has a strong template neighbour (method of osculating elements / variation of parameters: represent the actual solution by the model member matching value and derivative, then transport the parameters) - could drop to N2 in the novelty pass",
+    "E3 lives in an unformalized 12k-line paper whose correctness is the main open question; it can only go to data/eureka_informal.json",
+    "quick literature checks only (WebSearch, snippet level)"
+   ],
+   "flags": {
+    "builds_on_prior_model_produced_result": false,
+    "provenance_note": "No model-produced sources cited in either paper; the 2026 citations (CLZZ arXiv:2608.19542, Hernandez Rosales preprint) are human preprints. The two papers do not cite each other and share no devices (143b is elementary real ODE comparison; 143a is Ilyashenko/Ecalle-style complex asymptotics)."
+   }
+  },
+  "E": {
+   "problem": {
+    "openai_subject": "Dynamical systems and ergodic theory",
+    "msc": "34C07 (theory of limit cycles of polynomial and analytic vector fields; Hilbert 16th problem); 37G15; 34C05; 143a also 34M30/34E05 (asymptotic expansions), 32B20 (subanalytic sets)"
+   },
+   "lean_dir": "OAI/Analysis/LienardCycles (Lean field 'Analysis')",
+   "method": [
+    {
+     "field": "real ODE theory (smooth dependence, variational equations, flows)",
+     "status": "essential",
+     "manuscript": "both",
+     "note": "143b: Perko Secs 2.2-2.3 cited; Lean re-proves global flows/analytic dependence (GlobalODE.lean, SmoothFlow.lean, FiniteFlow.lean)"
+    },
+    {
+     "field": "projective differential geometry (Schwarzian derivative, ratio of solutions, chain rule; Riccati linearization)",
+     "status": "essential",
+     "manuscript": "143b",
+     "note": "OT cited for classical identities; proof re-derives them (model.tex:468-494); Lean ModelAlgebra/Schwarzian.lean"
+    },
+    {
+     "field": "elementary real algebra (polynomial sign certificates)",
+     "status": "essential",
+     "manuscript": "143b",
+     "note": "J, A, T, w_* factorizations (model.tex:720-792)"
+    },
+    {
+     "field": "classical perturbation / averaging (Melnikov first-order displacement)",
+     "status": "essential",
+     "manuscript": "143b",
+     "note": "sharpness only (sharpness.tex)"
+    },
+    {
+     "field": "complex analysis (Phragmen-Lindelof/maximum principles, Cauchy estimates, dbar-corrections on nested complex domains)",
+     "status": "essential",
+     "manuscript": "143a",
+     "note": "separation theorem, Sec. 3"
+    },
+    {
+     "field": "resurgence / asymptotic analysis (Ilyashenko superexact series, Ecalle analysable functions, Gevrey series, transseries)",
+     "status": "essential (method-level, re-proved for own class)",
+     "manuscript": "143a",
+     "note": "Ilyashenko1991, Ecalle1992, GalalKaiserSpeissegger2020 cited as precedents; their theorems are not invoked"
+    },
+    {
+     "field": "o-minimality / subanalytic geometry (Lion-Rolin preparation, Bierstone-Milman, Gabrielov)",
+     "status": "essential",
+     "manuscript": "143a",
+     "note": "preparation theorem invoked without re-proof (09-subdivision.tex:23-50); Bierstone-Milman Cor 2.7 (local finiteness) and Thm 3.14 (uniform fiber bounds) invoked"
+    },
+    {
+     "field": "differential topology (Sard, Morse tilts, proper functions)",
+     "status": "essential",
+     "manuscript": "143a",
+     "note": "Projection count (11-counting.tex:64-205)"
+    },
+    {
+     "field": "fewnomial/Pfaffian theory (Khovanskii)",
+     "status": "background-cited (Rolle lemma reproved)",
+     "manuscript": "143a",
+     "note": "Khovanskii1984Rolle no-contact Rolle principle re-proved by Jordan curve argument (09-subdivision.tex:681-724); Khovanskii1984Finiteness cited as analogue of projection count"
+    },
+    {
+     "field": "bifurcation theory (rotated vector fields)",
+     "status": "essential (re-proved, not cited)",
+     "manuscript": "143a",
+     "note": "Lemma counting-rotation is Duff's rotated-field argument; Duff/Perko not cited"
+    },
+    {
+     "field": "local theory of limit cycles (Ilyashenko-Yakovenko cyclic systems, Roussarie, Kaiser-Rolin-Speissegger, Bautin, BNY, Kaloshin)",
+     "status": "background-cited",
+     "manuscript": "143a",
+     "note": "IlyashenkoYakovenko1995 Sec 0.4 named as predecessor of matching equations"
+    }
+   ],
+   "cross_field_count": {
+    "143a": 5,
+    "143b": 2
+   },
+   "share_invoked_theorems_other_fields": "143a ~0.6 (preparation, Bierstone-Milman x2, Sard, Gabrielov are subanalytic geometry/differential topology); 143b ~0.2 (Schwarzian identities; rest is ODE)"
+  },
+  "provenance_flag": "No: neither paper builds on a prior model-produced result (2026 citations are human preprints CLZZ arXiv:2608.19542 and Hernandez Rosales); the two papers do not cite each other."
+ },
+ "items": [
+  {
+   "id": "Q01",
+   "kind": "definition (inline)",
+   "name": "limit cycle (geometric, counted once)",
+   "file_line": "introduction.tex:7-11",
+   "statement": "Image of a nonconstant periodic solution isolated among periodic orbits; counted once regardless of multiplicity/stability; center orbits are not limit cycles.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'A limit cycle is the image of a nonconstant periodic solution that is isolated among periodic orbits.'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "statement-level",
+    "why": "in comparator statement"
+   },
+   "analytic_check": "analytic: subterm of the goal (IsLimitCycle)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard definition"
+   },
+   "provisional_F": null,
+   "lean": "Model.lean:20-23 IsLimitCycle (in target signature closure)",
+   "paper": "143b"
+  },
+  {
+   "id": "Q02",
+   "kind": "construction",
+   "name": "half-plane arc equation u=x^2/2, du/dy = phi_pm(u) - y, phi_pm(u)=F(+-sqrt(2u))",
+   "file_line": "introduction.tex:80-82; arcs.tex:3-16, 487-495",
+   "statement": "On each half-plane, y is monotone in time; with u=x^2/2 every excursion is an arc of du/dy = phi(u) - y.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'On each half-plane, u=x^2/2 transforms an orbit into an arch satisfying u_y=phi(u)-y'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "high (plumbing-level)",
+    "why": "all later objects live on these arcs"
+   },
+   "analytic_check": "near-analytic: Filippov/Lienard transformation z = int g = x^2/2 of the goal's system",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "classical Filippov transformation used throughout Lienard uniqueness theory (Zhang Zhifen, Coppel)"
+   },
+   "provisional_F": null,
+   "lean": "ScalarArcs.lean (IsArch, 64% of DAG depends), AxisBranches.lean phi_square, PolynomialModel.lean",
+   "paper": "143b"
+  },
+  {
+   "id": "Q03",
+   "kind": "definition",
+   "name": "arc endpoint data: half-width r(h,t), relative midpoint M, v=M_r",
+   "file_line": "arcs.tex:32-46",
+   "statement": "r=(y_> - y_<)/2, M=(y_>+y_<)/2 - phi(h) at base height h for the arc of peak t; v = dM/dr at fixed h.",
+   "cited_or_new": {
+    "status": "new (notation)",
+    "cue": "'Set r(h,t)=..., M=...'"
+   },
+   "uses_items": [
+    "Q02"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "the coordinates in which every later statement is made"
+   },
+   "analytic_check": "not a subterm of the goal; elementary combination of the two y-axis intercepts",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "abbreviation (mean and half-difference of the two half-return endpoints)"
+   },
+   "provisional_F": null,
+   "lean": "ScalarArcs.width/midpoint (ScalarArcs.lean:364-365), PositiveTransport.M/v",
+   "paper": "143b"
+  },
+  {
+   "id": "Q04",
+   "kind": "lemma",
+   "name": "Global arc coordinates (lem:arc-data)",
+   "file_line": "arcs.tex:24-124",
+   "statement": "Each arc meets u=h transversally exactly twice; t->r(h,t) smooth increasing bijection (h,inf)->(0,inf); |M|<r, |v|<1, r^2>=2(t-h); dh/dt|_r>0.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "proof by u_yy = phi'(u)u_y - 1 (every critical point a nondegenerate max)"
+   },
+   "uses_items": [
+    "Q02",
+    "Q03"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential, routine",
+    "why": "entry point for all smoothness/monotonicity"
+   },
+   "analytic_check": "N/A - routine ODE",
+   "provisional_N": {
+    "grade": "N0/N1",
+    "why": "standard qualitative ODE arguments"
+   },
+   "provisional_F": null,
+   "lean": "ArchVariation.lean, CanonicalVariation.lean, PositiveWidth.lean, WidthCoordinates.lean",
+   "paper": "143b"
+  },
+  {
+   "id": "Q05",
+   "kind": "definition (inline)",
+   "name": "characteristics, operator D = d_h - alpha d_r, hyperbolic angles theta=arctanh(M/r), L=arctanh(v); characteristic system",
+   "file_line": "arcs.tex:128-183",
+   "statement": "Curves of fixed peak in the (h,r)-plane ('characteristics'); along them h'=-r sech^2 theta, theta'=k(h)-sinh(2theta)/r, L'=sinh(2theta)/r, k'=-r sech^2theta phi''(h).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'We call these curves in the (h,r)-plane \\emph{characteristics}.'"
+   },
+   "uses_items": [
+    "Q03",
+    "Q04"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "all comparisons are first-zero arguments along characteristics"
+   },
+   "analytic_check": "not in goal; Prufer-type angle variables",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "method of characteristics + Prufer-like hyperbolic angle substitution; standard devices"
+   },
+   "provisional_F": null,
+   "lean": "ReferenceCharacteristic (Characteristic.lean), ActualCharacteristic.*",
+   "paper": "143b"
+  },
+  {
+   "id": "Q06",
+   "kind": "lemma",
+   "name": "Variation at fixed height and width (lem:variation)",
+   "file_line": "arcs.tex:187-238",
+   "statement": "First variation of the midpoint under a profile variation psi: [(M+r)K(y_>)-(M-r)K(y_<)] dY = int K psi(u) dy with positive coefficient; strict profile comparison phi1(u)-phi1(h) > phi0(u)-phi0(h) for u>h implies M1>M0.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "'Multiplication by K and integration prove ...'"
+   },
+   "uses_items": [
+    "Q03"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "gives P,Q>0 and the comparison used in prop:intercept"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N0/N1",
+    "why": "linear variational equation + integrating factor; standard comparison principle"
+   },
+   "provisional_F": null,
+   "lean": "ArchVariation.fixed_profile_variation / PartialCalculus.scalar_ode_variation",
+   "paper": "143b"
+  },
+  {
+   "id": "Q07",
+   "kind": "computation",
+   "name": "parabolic variation table at zero profile (1/3, 1/15, 1/105 coefficients)",
+   "file_line": "arcs.tex:240-267",
+   "statement": "For the zero profile arc u=(w^2-y^2)/2, delta M(0,w) for psi = s, s^2/2, s^3/6 equals w^2/3, w^4/15, w^6/105 (and width derivatives).",
+   "cited_or_new": {
+    "status": "new (computation)",
+    "cue": "'Direct polynomial integration gives'"
+   },
+   "uses_items": [
+    "Q06"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "fixes small-width expansions and J matrix"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "explicit integrals"
+   },
+   "provisional_F": null,
+   "lean": "PositiveParabolic.lean, ScaledCoefficients.lean (fit_cubic)",
+   "paper": "143b"
+  },
+  {
+   "id": "Q08",
+   "kind": "lemma",
+   "name": "Smooth scaling at zero width (lem:arc-scaling)",
+   "file_line": "arcs.tex:269-340",
+   "statement": "M = k(h) r^2/3 + r^3 A, v = 2k(h) r/3 + r^2 B, t = h + r^2(1/2 + rC) with smooth remainders through r=0 (via signed auxiliary parameter rho).",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "'introduce a signed auxiliary parameter rho'"
+   },
+   "uses_items": [
+    "Q06",
+    "Q07"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "initial data for every characteristic argument"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "standard blow-up/rescaling with smooth remainder"
+   },
+   "provisional_F": null,
+   "lean": "ScaledProfile.* (ScaledAlgebraic.lean, ScaledExpansion.lean)",
+   "paper": "143b"
+  },
+  {
+   "id": "Q09",
+   "kind": "lemma",
+   "name": "Transverse extension to the axis (lem:axis-extension)",
+   "file_line": "arcs.tex:377-483",
+   "statement": "For phi continuous at 0 with phi(0)=0 (derivatives may blow up), limiting endpoints a(t)<0<b(t) exist on an open ray of peaks; M(0,r) smooth, |M|<r, |M_r|<1; r-derivatives converge as h->0.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "'Derivatives of phi need not extend to zero.'"
+   },
+   "uses_items": [
+    "Q04"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "phi_pm(u)=F(+-sqrt 2u) is not smooth at u=0 (odd coefficients give u^{1/2} terms)"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "careful but standard ODE continuation"
+   },
+   "provisional_F": null,
+   "lean": "Axis*.lean (AxisLimits, AxisRegularity, AxisWidthGerm, AxisWidthRegularity)",
+   "paper": "143b"
+  },
+  {
+   "id": "Q10",
+   "kind": "proposition",
+   "name": "Periodic-orbit matching (prop:cycle-matching)",
+   "file_line": "arcs.tex:498-620",
+   "statement": "Nonconstant periodic orbits <-> zeros of Delta(r)=M_+(0,r)-M_-(0,r) on one open interval; each orbit has one positive and one negative y-axis crossing; isolated orbits <-> isolated zeros (no hyperbolicity assumption).",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "'periodic orbits are zeros of the difference between the two height-zero midpoint functions'"
+   },
+   "uses_items": [
+    "Q02",
+    "Q09"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "reduces the count to isolated zeros of one real function"
+   },
+   "analytic_check": "near-analytic: classical half-return-map matching",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "Lienard half-maps matching is classical (LMP, Rychkov); midpoint parametrization is a re-coordinatization"
+   },
+   "provisional_F": null,
+   "lean": "CycleIsolation.lean (IsLimitCycle.matching:23, limitCycle_encard_le_matching:70), PeriodicOval/OvalMatching/ReturnNeighborhood.lean",
+   "paper": "143b"
+  },
+  {
+   "id": "Q11",
+   "kind": "definition",
+   "name": "quadratic reference profile q_{lambda,kappa}(u)=lambda u + kappa u^2/2; model midpoint H(lambda,kappa,r); P=H_lambda, Q=H_kappa, R=P_r, S=Q_r, G=PS-QR",
+   "file_line": "fitting.tex:3-14",
+   "statement": "Midpoint data of the quadratic profile at base height 0 and width r, and its first parameter/width derivatives.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'For the reference profile ... let H(lambda,kappa,r) be its midpoint data'"
+   },
+   "uses_items": [
+    "Q03",
+    "Q04"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "every later estimate is a statement about H and its derivatives; Lean QuadraticCoordinates.H has 404 DAG dependents (31.7% of DAG, ~52% of the core)"
+   },
+   "analytic_check": "not a subterm of the goal or of L; a special function defined implicitly through ODE solutions",
+   "provisional_N": {
+    "grade": "N2 (as a definition; part of E1)",
+    "why": "the choice 'quadratic profile as comparison family' is motivated in the paper by the common even part (introduction.tex:83-85); comparison with a model equation is standard, the specific two-parameter model family is new"
+   },
+   "provisional_F": null,
+   "lean": "QuadraticCoordinates.lean:20-26 (H,P,Q,Hr,R,S,G)",
+   "paper": "143b"
+  },
+  {
+   "id": "Q12",
+   "kind": "lemma",
+   "name": "Reference functions j_kappa, Theta_kappa, L_kappa (fit:references)",
+   "file_line": "fitting.tex:63-162",
+   "statement": "Quadratic arcs labelled by peak slope z: smooth reference system with j(0,z)=z, |j-z|<=|kappa| s^2/2, d_z j>0, d_z Theta>0, z->Theta(s,z) bijection onto R, d_z L>0.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": ""
+   },
+   "uses_items": [
+    "Q05",
+    "Q11"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "monotone labelling needed for curvature comparison and global fit"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "standard monotonicity/integrating factor"
+   },
+   "provisional_F": null,
+   "lean": "Characteristic.lean (ReferenceCharacteristic.J, A, D), J_surjective",
+   "paper": "143b"
+  },
+  {
+   "id": "Q13",
+   "kind": "definition",
+   "name": "reference slope field J_kappa(s,theta)",
+   "file_line": "fitting.tex:164-174",
+   "statement": "J_kappa(s,theta)=j_kappa(s,z(kappa,s,theta)); (J_kappa)_theta>0.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'define the reference slope field'"
+   },
+   "uses_items": [
+    "Q12"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "the comparison field"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "inverse-function re-labelling"
+   },
+   "provisional_F": null,
+   "lean": "ReferenceCharacteristic.J",
+   "paper": "143b"
+  },
+  {
+   "id": "Q14",
+   "kind": "lemma",
+   "name": "Curvature comparison (lem:curvature-comparison)",
+   "file_line": "fitting.tex:177-262",
+   "statement": "For actual profile phi and constant curvature kappa, E(s)=k(h(s))-J_kappa(s,theta(s)) satisfies E'+aE=-s(phi''(h)-kappa)sech^2 theta, z'=E/d_zTheta, E(s)=int_0^s exp(-int a) f; phi''>=kappa => E<=0, theta >= Theta_kappa(s,z(r)), L(r)>=L_kappa(r,z(r)) (strict if not identically equal).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The following comparison will also be used for nonquadratic profiles.'"
+   },
+   "uses_items": [
+    "Q05",
+    "Q12",
+    "Q13"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "used in global fit (conditional derivative), third-derivative and range lemmas"
+   },
+   "analytic_check": "not in goal; Sturm/Chaplygin-type comparison with a reference field",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "comparison of a Riccati-type angle equation with a reference field; template = Sturm comparison / differential inequalities"
+   },
+   "provisional_F": null,
+   "lean": "ScalarComparison.lean, ActualCharacteristic.*, CurvatureRange.lean",
+   "paper": "143b"
+  },
+  {
+   "id": "Q15",
+   "kind": "definition",
+   "name": "midpoint fit slope lambda_*(r,M,kappa); conditional derivative v_hat, L_hat",
+   "file_line": "fitting.tex:264-287",
+   "statement": "For given r, |M|<r, kappa: unique slope with H(lambda_*,kappa,r)=M; v_hat=H_r at the fit, L_hat=arctanh v_hat.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'Define the conditional derivative and its angle by'"
+   },
+   "uses_items": [
+    "Q11",
+    "Q12"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "first half of the global fit"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "implicit-function definition"
+   },
+   "provisional_F": null,
+   "lean": "ConditionalFit.lean (conditionalV:40, label:89)",
+   "paper": "143b"
+  },
+  {
+   "id": "Q16",
+   "kind": "lemma",
+   "name": "Positive conditional derivative (fit:conditional-derivative)",
+   "file_line": "fitting.tex:289-385",
+   "statement": "d_kappa L_hat>0 and d_kappa v_hat = G/P > 0; hence G>0 for every model arc (quantitative first-order bound, no differentiation of improper integrals).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": ""
+   },
+   "uses_items": [
+    "Q14",
+    "Q15"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "Jacobian G>0 is what makes the fit a diffeomorphism"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1/N2",
+    "why": "technical consequence of Q14"
+   },
+   "provisional_F": null,
+   "lean": "ConditionalFit.conditionalV_deriv/strictMono, RadiusSigns.G_pos",
+   "paper": "143b"
+  },
+  {
+   "id": "Q17",
+   "kind": "lemma",
+   "name": "Properness of the conditional fit (fit:properness)",
+   "file_line": "fitting.tex:389-462",
+   "statement": "L_hat(r,M,kappa) -> +-inf as kappa -> +-inf (monotone convergence + average-slope contradiction).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": ""
+   },
+   "uses_items": [
+    "Q14",
+    "Q15"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "surjectivity of the global fit"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "technical"
+   },
+   "provisional_F": null,
+   "lean": "FitProperness.lean (seqL_not_bddAbove:144)",
+   "paper": "143b"
+  },
+  {
+   "id": "Q18",
+   "kind": "lemma",
+   "name": "R,S>0 and width identity (fit:positive-derivatives)",
+   "file_line": "fitting.tex:466-535",
+   "statement": "kappa P + lambda = (rH_r+H)/(r^2-H^2); kappa R = r(1-H_r^2)/(r^2-H^2)((L_mod)_r - 2H/(r^2-H^2)); R,S>0 everywhere.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": ""
+   },
+   "uses_items": [
+    "Q11",
+    "Q12",
+    "Q16"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "signs P,Q,R,S,G>0 used in every later step"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "technical"
+   },
+   "provisional_F": null,
+   "lean": "RadiusSigns.lean (R_pos, S_pos)",
+   "paper": "143b"
+  },
+  {
+   "id": "Q19",
+   "kind": "theorem",
+   "name": "Global quadratic fit (thm:quadratic-fit)",
+   "file_line": "fitting.tex:537-575",
+   "statement": "For every r>0 and (M,v) with |M|<r, |v|<1 there is a unique (lambda,kappa) in R^2 with H=M, H_r=v; (lambda,kappa,r) -> (H,H_r,r) is a diffeomorphism R^2 x (0,inf) -> {|M|<r,|v|<1}; P,Q,R,S,G>0.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The first technical step is a global interpolation theorem: every admissible pair (M,M_r) has a unique fit by a profile' (introduction.tex:88-92)"
+   },
+   "uses_items": [
+    "Q11",
+    "Q15",
+    "Q16",
+    "Q17",
+    "Q18"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "Lean fitK_spec/conditionalV_exists ~10% of DAG downstream; every actual arc gets fitted coordinates"
+   },
+   "analytic_check": "not in goal or L",
+   "provisional_N": {
+    "grade": "N3 candidate (with Q20 = E1)",
+    "why": "global 2-jet interpolation of the actual endpoint data by an ODE-defined model family; no such global fit found in Lienard literature"
+   },
+   "provisional_F": "F5",
+   "lean": "GlobalFit.lean (fitK:82, fitD:85, fitK_spec:87, fit_unique:99, fitK_analytic:109)",
+   "paper": "143b"
+  },
+  {
+   "id": "Q20",
+   "kind": "lemma",
+   "name": "Transport of the fit (lem:fit-transport)",
+   "file_line": "fitting.tex:606-653",
+   "statement": "Fitted parameters of an actual profile satisfy P lambda_r + Q kappa_r = 0, D kappa = -(R/G)(lambda - k(h)), D lambda - kappa = (S/G)(lambda - k(h)).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The fit records both the midpoint and its response to a change in width; their two transport equations determine the evolution of the fitted slope and curvature.'"
+   },
+   "uses_items": [
+    "Q05",
+    "Q19"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "the only channel through which the profile shape enters; Lean ActualFitTransport.fit_transport"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N3 candidate (with Q19 = E1)",
+    "why": "analogue of Lagrange's osculating-element equations (variation of parameters) for a non-standard state (midpoint vs width)"
+   },
+   "provisional_F": "F5",
+   "lean": "ActualFitTransport.lean:105 fit_transport",
+   "paper": "143b"
+  },
+  {
+   "id": "Q21",
+   "kind": "theorem",
+   "name": "Model inequality (thm:model-inequality): (R/G)_r <= 0",
+   "file_line": "model.tex:28-35 (proof 860-913)",
+   "statement": "For all lambda, kappa in R, r>0: d/dr (R/G) <= 0 at fixed model parameters.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The central model estimate, Theorem~\\ref{thm:model-inequality}, controls how one of these coefficients changes with width' (introduction.tex:96-99)"
+   },
+   "uses_items": [
+    "Q11",
+    "Q19",
+    "Q22",
+    "Q24",
+    "Q25",
+    "Q26"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "Lean model_inequality / Cr_nonpos dominated share 16.6% of DAG (~27% of core); drives kappa_r sign in Prop. third-derivative"
+   },
+   "analytic_check": "not in goal; a sign property of a special function defined by ODE",
+   "provisional_N": {
+    "grade": "N2 (upper N3) = E2",
+    "why": "new sign inequality, proved with classical tools (first-zero transport, Schwarzian chain rule, Riccati linearization)"
+   },
+   "provisional_F": null,
+   "lean": "CurvatureComparison.lean:105 model_inequality; CurvatureTransport.lean:32 Cr_nonpos",
+   "paper": "143b"
+  },
+  {
+   "id": "Q22",
+   "kind": "definition",
+   "name": "W = R S_r - S R_r, gamma, model transport operator calD = kappa d_lambda - alpha d_r",
+   "file_line": "model.tex:45-105",
+   "statement": "(R/G)_r = -P W/G^2; calD W = (2gamma+3alpha_r)W + gamma_r G_r - gamma_rr G; W = 16 r^3/45 + O(r^4).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'It therefore suffices to prove W>=0.'"
+   },
+   "uses_items": [
+    "Q11",
+    "Q18"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "reduces Q21 to a Wronskian-type sign"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "Wronskian of (R,S) in r; standard reduction"
+   },
+   "provisional_F": null,
+   "lean": "CurvatureComparison.lean (W, transport_W_at_zero, W_positive_near_zero)",
+   "paper": "143b"
+  },
+  {
+   "id": "Q23",
+   "kind": "definition",
+   "name": "endpoint coordinates m=r-H, n=r+H, ell=dn/dm, w=ell_m/ell, Schwarzian calS of the endpoint correspondence n(m); weighted endpoint quantities X, Z, gamma; D_*, w_*",
+   "file_line": "model.tex:154-208",
+   "statement": "calS = ell_mm/ell - 3/2 w^2 is the Schwarzian of m -> n(m); X=kappa P+d, Z=dP+3kappa Q, gamma as endpoint averages.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'Thus calS is the Schwarzian derivative of n=n(m).' / 'Here the map pairs the two endpoints of a quadratic arc' (introduction.tex:105-107)"
+   },
+   "uses_items": [
+    "Q11",
+    "Q22"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "the sign at a zero of W reduces to ordering of w and w_*"
+   },
+   "analytic_check": "not in goal; Schwarzian of an endpoint correspondence",
+   "provisional_N": {
+    "grade": "N2 = part of E2",
+    "why": "Schwarzian methods for limit cycles exist (Coll-Gasull-Prohens 1996, cited, via return maps); applying it to the endpoint pairing of a model arc is a variant"
+   },
+   "provisional_F": null,
+   "lean": "ModelEndpoint.lean, Schwarzian.lean, ModelAlgebra.schwarzian:23",
+   "paper": "143b"
+  },
+  {
+   "id": "Q24",
+   "kind": "lemma",
+   "name": "Endpoint algebra (model:endpoint-algebra)",
+   "file_line": "model.tex:210-380",
+   "statement": "X_m Z_mm - Z_m X_mm = l^2(m+n)^2/(m^2n^2(1+l)^3) D_* = 3kappa^2/m_r^3 W; at a zero of W, gamma_rr - sigma0 gamma_r = m_r^2 l(m+n)^2/((1+l)m^2n^2) (w_*-w)/(m-n).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The exact determinant identity is'"
+   },
+   "uses_items": [
+    "Q22",
+    "Q23"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "exact reduction"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "algebraic identity; the two numerator reductions re-verified with sympy by this agent"
+   },
+   "provisional_F": null,
+   "lean": "EndpointAlgebra.lean, EndpointSigns.lean, ModelEndpoint.LowerChart.formulas",
+   "paper": "143b"
+  },
+  {
+   "id": "Q25",
+   "kind": "lemma",
+   "name": "Riccati linearization, common projective label, Schwarzian formula, inverse-square bound (model:Riccati)",
+   "file_line": "model.tex:393-561",
+   "statement": "calS = 2b(m+n l^2) + d^2/2 (l^2-1) - d(1/m + l^2/n) + 3/2(l^2/n^2 - 1/m^2); l = mV(-m)^2/(nV(n)^2); w formula; if d<0, d^2>=4bm then w <= 1/m - l/n + d l - 2nu.",
+   "cited_or_new": {
+    "status": "new (classical tools)",
+    "cue": "'the classical Schwarzian ratio identity and chain rule \\cite{OT} then determine the endpoint Schwarzian'"
+   },
+   "uses_items": [
+    "Q23"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "supplies the sign of calS needed in all three cases"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Riccati -> linear system linearization and Schwarzian of ratio of solutions are textbook (OT); the endpoint-correspondence application and 'common projective label' across the singular point y=0 are the new twist"
+   },
+   "provisional_F": null,
+   "lean": "Riccati.lean (inverse_square_integral_bound), RiccatiComparison/RiccatiJets/RiccatiDerivatives.lean, Schwarzian.lean:91",
+   "paper": "143b"
+  },
+  {
+   "id": "Q26",
+   "kind": "lemma",
+   "name": "Signs at a possible zero of W (model:zero-sign), three cases",
+   "file_line": "model.tex:565-858",
+   "statement": "If kappa>0 and W=0 then gamma_rr - sigma0 gamma_r > 0; cases m<=n; m>n & l>=1; m>n & 0<l<1 (polynomial certificates J(l,z), A, T, baseline factorization).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'We partition the possibilities for m,n,l.'"
+   },
+   "uses_items": [
+    "Q24",
+    "Q25",
+    "Q12"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "closes the first-zero argument for W"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "case analysis with polynomial sign certificates (J(0,1+xi)=xi^2+4xi+1 etc. - re-verified with sympy)"
+   },
+   "provisional_F": null,
+   "lean": "ModelAlgebra.lean (A_pos, J_pos, wStar_pos, last_case_nonneg_T/neg_T, last_case:249), EndpointSigns.gamma_source_sign:93, SchwarzianScaling.zero_sign_unscaled",
+   "paper": "143b"
+  },
+  {
+   "id": "Q27",
+   "kind": "lemma",
+   "name": "Small-width fit (lem:fit-small-width)",
+   "file_line": "transport.tex:15-120",
+   "statement": "kappa(h,r)=phi''(h)+2/7 phi'''(h) r^2+O(r^3), kappa_r = 4/7 phi''' r + O(r^2), lambda = k(h) - phi'''(h) r^4/35 + O(r^5), smooth remainders.",
+   "cited_or_new": {
+    "status": "new (computation)",
+    "cue": "'J^{-1}b = (-1/35, 2/7)'"
+   },
+   "uses_items": [
+    "Q07",
+    "Q08",
+    "Q19"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "initial sign for the kappa_r barrier argument"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "Taylor expansion; J^{-1}b re-verified"
+   },
+   "provisional_F": null,
+   "lean": "ScaledCoefficients.fit_cubic, ActualSmallWidth.lean (kappa_deriv_limit)",
+   "paper": "143b"
+  },
+  {
+   "id": "Q28",
+   "kind": "proposition",
+   "name": "Strict third derivative (prop:third-derivative)",
+   "file_line": "transport.tex:122-292",
+   "statement": "phi'''>0 on (0,inf) => lambda(h,r) < k(h) and kappa_r(h,r) > 0 for all h,r>0 (reverse for phi'''<0).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'Propositions ... formulate these comparisons for general smooth profiles, independently of the polynomial application.' (introduction.tex:112-115)"
+   },
+   "uses_items": [
+    "Q14",
+    "Q20",
+    "Q21",
+    "Q27"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "Lean kappa_width_pos dominated share 22.3%; makes q=kappa_+-kappa_- nondecreasing in Case 2"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N2 = E4",
+    "why": "shape comparison; neighbour: monotonicity criteria in Lienard uniqueness (Zhang Zhifen f/g monotone, Coppel survey), Chebyshev-system/third-derivative criteria for Abelian integrals"
+   },
+   "provisional_F": null,
+   "lean": "CurvaturePositive.lean:75 QuinticFit.kappa_width_pos; ActualCharacteristic.w_pos/feed_nonneg",
+   "paper": "143b"
+  },
+  {
+   "id": "Q29",
+   "kind": "proposition",
+   "name": "Fitted slope intercept (prop:intercept)",
+   "file_line": "transport.tex:294-364",
+   "statement": "If ((k(u)-d)/u)'>0 for all u>0 then lambda - h kappa < d everywhere (reverse for <0).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": ""
+   },
+   "uses_items": [
+    "Q06",
+    "Q20",
+    "Q27"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (Case 4 only)",
+    "why": "Case 4 sign gap"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N2 = part of E4",
+    "why": "the hypothesis (phi'(u)-d)/u monotone is a Zhang-Zhifen-type ratio condition"
+   },
+   "provisional_F": null,
+   "lean": "Intercept.lean (intercept_negative:130), AxisIntercept.axisLambda_lt",
+   "paper": "143b"
+  },
+  {
+   "id": "Q30",
+   "kind": "lemma",
+   "name": "Range of the fitted curvature (lem:fitted-curvature-range)",
+   "file_line": "transport.tex:366-398",
+   "statement": "min phi'' <= kappa(h,r) <= max phi'' over [h,t], strict if phi'' nonconstant.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": ""
+   },
+   "uses_items": [
+    "Q14",
+    "Q19"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium (Case 3)",
+    "why": "curvature gap in Case 3"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "mean-value-type consequence of Q14"
+   },
+   "provisional_F": null,
+   "lean": "CurvatureRange.lean (curvature_lower:93, curvature_upper:112)",
+   "paper": "143b"
+  },
+  {
+   "id": "Q31",
+   "kind": "lemma",
+   "name": "Isolated-zero count for f' = b q, q nondecreasing (lem:isolated-zero-count)",
+   "file_line": "application.tex:78-104",
+   "statement": "f' = b q with b>0 continuous, q nondecreasing => at most two isolated zeros (zero intervals allowed); positive derivative at every zero => at most one zero.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": ""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "final count"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N0/N1",
+    "why": "Rolle-type argument (Chebyshev/Descartes-style counting)"
+   },
+   "provisional_F": null,
+   "lean": "SecantIntegral.lean:40 isolated_zero_count_linear",
+   "paper": "143b"
+  },
+  {
+   "id": "Q32",
+   "kind": "construction",
+   "name": "quintic profile split phi_pm = d0 u + b0 u^2 +- p(u), p = e u^{1/2}+c u^{3/2}+a u^{5/2} (a>=0), and the four sign cases of (e,c)",
+   "file_line": "application.tex:3-33, 106-248",
+   "statement": "Even coefficients give a common quadratic part, odd coefficients change sign; case 1 (e,c>=0) no cycles; case 2 (e>=0,c<0) p'''>0 -> <=2; case 3 (e<0,c>=0) p''>0 -> <=1; case 4 (e,c<0) u p''-p'>0 -> <=1.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The quintic coefficient structure provides a complete sign partition.' (introduction.tex:119-120)"
+   },
+   "uses_items": [
+    "Q10",
+    "Q28",
+    "Q29",
+    "Q30",
+    "Q31"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "assembly; only Case 2 allows two cycles"
+   },
+   "analytic_check": "near-analytic: decomposition of F into even/odd parts",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "case split on signs; p''', p'', up''-p' formulas re-verified with sympy"
+   },
+   "provisional_F": null,
+   "lean": "UpperAssembly.lean:42-73, AxisCases.lean, CaseOne.lean, CoefficientCases.lean",
+   "paper": "143b"
+  },
+  {
+   "id": "Q33",
+   "kind": "lemma (inline)",
+   "name": "Case 1: no periodic orbit when p>0 (integrating factor)",
+   "file_line": "application.tex:108-121",
+   "statement": "If two positive arches share endpoints, w=u_+-u_- satisfies a linear ODE with positive forcing and w(A)=w(B)=0, contradiction.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": ""
+   },
+   "uses_items": [
+    "Q02"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "Case 1"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "classical comparison/Filippov argument"
+   },
+   "provisional_F": null,
+   "lean": "CaseOne.lean:78 no_periodic_case1",
+   "paper": "143b"
+  },
+  {
+   "id": "Q34",
+   "kind": "construction",
+   "name": "Sharpness: F_eps = eps(4x - 20/3 x^3 + 8/5 x^5), first-order energy displacement Q(s,0) = -pi s^2(s^2-1)(s^2-4)",
+   "file_line": "sharpness.tex:259-330",
+   "statement": "Two simple zeros s=1,2 (Q_s = 6pi, -48pi) give two hyperbolic cycles for small eps>0.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'The method is a direct first-order return-displacement calculation, in the classical perturbative tradition'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential (lower bound)",
+    "why": "lower bound"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "classical Melnikov/averaging (LMP 1977); computation re-verified with sympy"
+   },
+   "provisional_F": null,
+   "lean": "SharpReturn.lean, SharpFlow.lean, SharpPhysical.lean, SharpCycles.lean (sharpness:107)",
+   "paper": "143b"
+  },
+  {
+   "id": "Q35",
+   "kind": "observation",
+   "name": "Refutation of Hernandez Rosales' degree-5 four-cycle proposal (Odani Example 3)",
+   "file_line": "introduction.tex:50-66",
+   "statement": "x'' + (1/10)(x^4-10x^2+5)x' + x = 0 rescales (x=sqrt5 u) to Odani's example with exactly two cycles; amplitude equation 2X^4-10X^2+5=0 has roots X^2=(5+-sqrt15)/2.",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'This is Odani's Example~3 ... for which exactly two periodic solutions are proved \\cite{Odani}.'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "none (context)",
+    "why": "consistency with the upper bound"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "re-derivation from Odani; X^2 roots re-verified"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143b"
+  },
+  {
+   "id": "Q36",
+   "kind": "construction",
+   "name": "normalizations: F(0)=0 by translating y; reflection X=-x(-t) to make a>=0",
+   "file_line": "application.tex:3-15",
+   "statement": "Reflection plus time reversal preserves geometric cycles and negates the x^5 coefficient.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": ""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "low",
+    "why": "WLOG"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard symmetry"
+   },
+   "provisional_F": null,
+   "lean": "CycleTransform.lean:59 limitCycle_encard_neg (flipY, F -> -F; Lean variant of the paper's reflection), UpperAssembly.lean:67-73; constant term kept as poly a 0 (CycleIsolation.lean:26) instead of translating y",
+   "paper": "143b"
+  },
+  {
+   "id": "U01",
+   "kind": "definition (inline)",
+   "name": "limit cycle (geometric)",
+   "file_line": "01-introduction.tex:3-10",
+   "statement": "Periodic orbit with an open neighbourhood containing no other periodic orbit; geometric images counted once.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'It is a \\emph{limit cycle} if some open neighborhood of that image contains no other periodic orbit.'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "statement-level",
+    "why": "headline"
+   },
+   "analytic_check": "analytic (goal)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U02",
+   "kind": "definition",
+   "name": "logarithmic flag (free/dependent scales, exact log relations f_i = sum a_ij Z_j + b_i), height blocks, saturation",
+   "file_line": "02-flags.tex:33-91",
+   "statement": "Ordered scales Z_1>>...>>Z_m>>1 along an escaping sequence, f_i=log Z_i, h_i=e^{-Z_i}; dependent scales tied triangularly to later ones with bounded backgrounds; saturated if within each block dependent nodes precede free and log Z_first-free = o(log Z_last-dependent).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'a finite saturated flag records the ordered large scales and their exact logarithmic relations' (01-introduction.tex:135-137)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "bookkeeping for all multi-scale asymptotics; every packet is defined on a flag"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N2 (part of E3)",
+    "why": "multi-scale bookkeeping akin to transseries scales / Ilyashenko-Yakovenko multi-parameter Dulac asymptotics / valuative hierarchies in o-minimal preparation"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U03",
+   "kind": "lemma",
+   "name": "Finite saturation and preservation of free coordinates; stability under bounded backgrounds",
+   "file_line": "02-flags.tex:92-261",
+   "statement": "A finite set of large inputs admits a flag after linear change; logarithms of free scales can be inserted; finite saturation; promoting an ordinary coordinate t->0 keeps old free coordinates free.",
+   "cited_or_new": {
+    "status": "new (technical)",
+    "cue": ""
+   },
+   "uses_items": [
+    "U02"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "infrastructure"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "Gaussian-elimination-type ordering of scales"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U04",
+   "kind": "lemma",
+   "name": "Real and angular path estimates; good contours and buffered sides; background sensitivity; exceptional anchor constant; common safe columns",
+   "file_line": "02-flags.tex:366-917",
+   "statement": "Complex paths through far anchors along which the largest scale turns vertical first; nested contours with Re of scales positive and separated; control of anchor-dependent growth and simultaneous avoidance of pole lattices.",
+   "cited_or_new": {
+    "status": "new (technical)",
+    "cue": "'We construct nested contours on which their real parts remain positive and quantitatively separated.'"
+   },
+   "uses_items": [
+    "U02",
+    "U03"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "domains for separation"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Ilyashenko's 'standard domains' and Phragmen-Lindelof setups for superexact series are the template"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U05",
+   "kind": "definition",
+   "name": "packet: tree of raw functions S^{j,+-}_alpha on bands, child exponent sets, transitions, growth/safe-column and antiholomorphic-source estimates, lateral determinations",
+   "file_line": "03-separation.tex:62-209",
+   "statement": "An actual analytic function plus two lateral trees of successive asymptotic expansions in e^{-a Z_j}, with domain, transition, error and growth estimates; supports iterated left-finite.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'A \\emph{packet} records an actual analytic function together with two trees of successive asymptotic expansions' (01-introduction.tex:202-206)"
+   },
+   "uses_items": [
+    "U02",
+    "U04"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "the central data type of Secs 3-8"
+   },
+   "analytic_check": "not in goal or L",
+   "provisional_N": {
+    "grade": "N3 candidate (part of E3; unverified)",
+    "why": "nearest: Ilyashenko superexact asymptotic series, Ecalle analysable functions/transseries, Galal-Kaiser-Speissegger Ilyashenko algebras (one variable). Multi-scale tree without simultaneous convergence is the claimed novelty"
+   },
+   "provisional_F": "F1/F5",
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U06",
+   "kind": "theorem",
+   "name": "Separation (thm:separation)",
+   "file_line": "03-separation.tex:222-265 (proof to 1328)",
+   "statement": "On a saturated flag, if all paired terminal coefficients vanish the actual function vanishes identically far in the regime; otherwise the first nonzero exponent lambda has equal lateral coefficients and exp(sum lambda_i Z_i) S^1 -> c_lambda(t).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'the separation theorem uses a \\emph{tree} of expansions on successive complex bands ... upgrades arbitrarily high fixed exponential decay to exact vanishing by weighted Cauchy corrections and maximum principles' (01-introduction.tex:208-216)"
+   },
+   "uses_items": [
+    "U05",
+    "U04"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "quasianalyticity engine of the whole argument"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N3 candidate (= core of E3; unverified)",
+    "why": "nearest: Ilyashenko 1991 Phragmen-Lindelof theorem for superexact series; Ecalle quasianalyticity; GKS 2020 injectivity"
+   },
+   "provisional_F": "F5",
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U07",
+   "kind": "lemmas",
+   "name": "Holomorphic proxies/Cauchy correction; propagation of coupled growth; source ratios; weighted maximum estimate; upgrade at preceding transition; one finite transition; terminal coefficient comparison; uniformity",
+   "file_line": "03-separation.tex:321-1428",
+   "statement": "Technical steps of the separation proof (dbar-corrections, weighted maximum principle removing N-dependent constants, induction from terminal level to root).",
+   "cited_or_new": {
+    "status": "new (technical)",
+    "cue": ""
+   },
+   "uses_items": [
+    "U05",
+    "U06"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "proof of U06"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1/N2",
+    "why": "standard complex-analytic estimate techniques, intricate"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U08",
+   "kind": "definitions",
+   "name": "finite request; controlled family; differentiated primitive contract (Assumption); positive in series order / strict positive increment",
+   "file_line": "04-calculus.tex:34-182",
+   "statement": "Uniformity bookkeeping for finitely many labels/derivative orders/budgets; packets whose negative-exponent coefficients vanish.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'A \\emph{finite request} specifies finitely many packet labels, a finite derivative order...'"
+   },
+   "uses_items": [
+    "U05"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "quantifier hygiene"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "bookkeeping"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U09",
+   "kind": "theorem",
+   "name": "Packet calculus (thm:calculus)",
+   "file_line": "04-calculus.tex:184-241 (proof to 1144)",
+   "statement": "Packets closed under finite sums, products, independent derivatives, exponential monomials, regular analytic operations, unit inversion, and regular implicit solution in ordinary variables (with finite coherence jet order).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The need to verify closure separately from asymptotic injectivity is substantive: Yeung's analysis ... exhibits a failure at a differential closure step' (04-calculus.tex:10-16)"
+   },
+   "uses_items": [
+    "U06",
+    "U08"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "closure needed for elimination and counting"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N2 (part of E3)",
+    "why": "closure of quasianalytic classes under implicit functions is the pattern of Rolin-Speissegger-Wilkie / Ilyashenko algebras; multivariable version claimed new"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U10",
+   "kind": "proposition",
+   "name": "Elimination with a deferred floor (prop:elimination-recursion) + promotion, local inverse estimate, Taylor replay, common domains lemmas",
+   "file_line": "05-elimination.tex:41-1030",
+   "statement": "Induction on ordinary variables / order of a limiting zero, with an exact mode and two quantitative alternatives for a center field that need not vanish; constructs charts through anchors where the equations vanish while a free large input survives.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'We therefore prove the exact-zero assertion together with two quantitative alternatives for a center field that need not vanish' (05-elimination.tex:19-21)"
+   },
+   "uses_items": [
+    "U09"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "turns separation into isolated-zero finiteness"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Weierstrass-preparation/elimination template with strengthened (tracked) hypothesis"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U11",
+   "kind": "definition",
+   "name": "retestable for elimination",
+   "file_line": "05-elimination.tex:1038-1051",
+   "statement": "Germ invariance of terminal formal coefficients under small perturbations of retained free inputs preserving flag relations and regimes.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'A packet library is \\emph{retestable for elimination} if'"
+   },
+   "uses_items": [
+    "U05",
+    "U09"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "hypothesis of U12"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "technical condition"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U12",
+   "kind": "theorem",
+   "name": "Absolute isolated-zero finiteness (thm:absolute-zero)",
+   "file_line": "05-elimination.tex:1053-1137",
+   "statement": "A finite real system with all coordinates (incl. coefficient parameters) variable has finitely many isolated solutions if every sequence of distinct solutions is either analytic at its limit or an anchored saturated flag regime of a retestable library; closure under derivatives, products, inverses, multipliers, specializations.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'We call this \\emph{absolute isolated-zero finiteness}.' (01-introduction.tex:119-127)"
+   },
+   "uses_items": [
+    "U06",
+    "U09",
+    "U10",
+    "U11"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "the property fed to the projection count"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N3 candidate (part of E3; unverified)",
+    "why": "parametric quasianalytic finiteness; nearest: o-minimal uniform finiteness, Khovanskii finiteness property"
+   },
+   "provisional_F": "F5",
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U13",
+   "kind": "theorems",
+   "name": "Primitive passage packets: additive (thm:additive-packets), one-rate regular/stable (thm:regular-packets), mixed two-clock (thm:mixed-packets)",
+   "file_line": "06-additive.tex:105-131; 07-regular.tex:24-60; 08-mixed.tex:41-67",
+   "statement": "Scalar normal-form passage ODEs (actions with log corrections, endpoint layers, clocks L,W with ratio c=W/L comparable/0/inf) have outputs satisfying the packet + differentiated primitive + retestability conditions.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The models include additive transfers, regular or stable transfers with one large clock, and transfers with two clocks' (01-introduction.tex:149-153)"
+   },
+   "uses_items": [
+    "U05",
+    "U09",
+    "U11"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "verifies hypotheses of U12 for actual Dulac-type maps (~4.4k TeX lines)"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Dulac maps of saddles/saddle-nodes and slow-fast passages are classical (Ilyashenko-Yakovenko, Roussarie, Mourtada); packet verification is new"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U14",
+   "kind": "theorem",
+   "name": "Simultaneous globally subanalytic preparation (thm:subdivision-preparation)",
+   "file_line": "09-subdivision.tex:23-50",
+   "statement": "Lion-Rolin preparation: on finitely many cells f_nu = c_nu(p)|x-a(p)|^{q_nu} U_nu(...) with strong units.",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'This is the globally subanalytic case of Lion--Rolin preparation' (09-subdivision.tex:52-55)"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "geometric finiteness"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "invoked theorem (Lion-Rolin 1997; Opris 2023)"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U15",
+   "kind": "construction",
+   "name": "box induction: complete radius list, far domains -> monomial annuli Du = A tau^lambda u^m F(X); jet-order induction -> nozero / simple-root terminal boxes; one weighted resonant redo",
+   "file_line": "09-subdivision.tex:148-659",
+   "statement": "Preparation of the scalar field D_0 z = R(p,x,z) on cells, uniform in coefficients, without blow-up desingularization.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The \\emph{complete radius list} for the following split is'"
+   },
+   "uses_items": [
+    "U14"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "replaces desingularization of singular points; source of the finite alphabet"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Newton-polygon / preparation-based normalization; cf. Lion-Rolin, Parusinski, classical Bendixson-Seidenberg desingularization"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U16",
+   "kind": "lemma",
+   "name": "Crossings of a boundary arc (lem:subdivision-crossing)",
+   "file_line": "09-subdivision.tex:688-724",
+   "statement": "A periodic orbit crosses a transverse arc at most once; a tangential nonsingular arc lies in one trajectory.",
+   "cited_or_new": {
+    "status": "cited (re-proved)",
+    "cue": "'the no-contact case of the planar Rolle principle ... \\citep[Lemma~1]{Khovanskii1984Rolle}. We include its Jordan-curve proof'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "uniform word length"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Poincare-Bendixson transversal lemma / Khovanskii Rolle"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U17",
+   "kind": "theorem",
+   "name": "Finite passage templates (thm:finite-templates)",
+   "file_line": "09-subdivision.tex:746-795",
+   "statement": "For each d, finitely many identity pieces, charts and passage rules, integers N_d, E_d: apart from <=E_d orbits with tangential boundary arcs, every periodic orbit is a cyclic word of <= N_d passages/connectors from a finite alphabet.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": ""
+   },
+   "uses_items": [
+    "U15",
+    "U16"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "uniformity in coefficients comes from here + U20"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "finite-covering of coefficient space via subanalytic decomposition; template = Roussarie's compactification/finite cyclicity reduction"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U18",
+   "kind": "theorem",
+   "name": "Terminal reduction (thm:terminal-reduction) + diagonal primitives, tied endpoints, structural extensions, boundary corners",
+   "file_line": "10-terminal.tex:9-1201",
+   "statement": "Each terminal passage is one scalar transfer (ordinary/additive/one-rate/mixed) with regular argument graphs; independent arguments, exact residual-amplitude identities; analytic extension at bounded-clock corners.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": ""
+   },
+   "uses_items": [
+    "U13",
+    "U17"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "connects geometry to the analytic primitives"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1/N2",
+    "why": "technical normal-form reductions"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U19",
+   "kind": "definitions",
+   "name": "admissible open data; positive-margin completeness; finite differential and algebraic closure; absolute zero property for this closure",
+   "file_line": "11-counting.tex:22-57",
+   "statement": "Open analytic systems with margins g_j>0 whose bounded positive-margin limits stay in the domain; closure under constants, coordinates, sums, products, derivatives, inverses of nonzero functions, specializations; every generated system has finitely many isolated real solutions.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'We call this condition \\emph{positive-margin completeness}.'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "interface between analysis and counting"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N2 (part of E5)",
+    "why": "cf. Khovanskii's 'finiteness property' for Pfaffian varieties and o-minimal definable families"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U20",
+   "kind": "theorem",
+   "name": "Projection count (thm:projection-count)",
+   "file_line": "11-counting.tex:64-205",
+   "statement": "If F(p,x)=0 has full row rank on its zero set and the absolute zero property for its closure, fibers M_p have a uniform bound N on connected components (points if m=n). Proof: barrier rho = 1+|p|^2+|x|^2+sum g_j^{-2}, generic tilt via Sard/Fubini, induction on #parameters.",
+   "cited_or_new": {
+    "status": "new (variant of classical)",
+    "cue": "'Uniform component bounds for relatively compact subanalytic families are classical \\citep[Corollary~1]{Gabrielov1968} ... Khovanskii similarly reduces component bounds to critical-point equations of proper functions' (11-counting.tex:9-18)"
+   },
+   "uses_items": [
+    "U19"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "absolute-to-uniform implication"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "Khovanskii critical-point counting with proper Morse tilt (Khovanskii 1984, Thm 3-4); paper says so"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U21",
+   "kind": "theorem",
+   "name": "Matching systems (thm:matching-system): moving cuts, endpoint graph ties, cyclic rank, injection of hyperbolic cycles into fiber components",
+   "file_line": "11-counting.tex:221-534",
+   "statement": "Finitely many fixed open analytic systems per degree; every retained periodic orbit is represented; at a hyperbolic cycle full row rank (cyclic matrix kernel zero iff multiplier != 1); different hyperbolic cycles lie on different components (analytic continuation along a component stays in the cycle).",
+   "cited_or_new": {
+    "status": "new (variant)",
+    "cue": "'This formulation has a predecessor in Ilyashenko and Yakovenko's cyclic systems ... Here the cuts are allowed to move along the orbit' (01-introduction.tex:108-113)"
+   },
+   "uses_items": [
+    "U17",
+    "U18",
+    "U19"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "turns cycle counting into component counting"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N2 (= E5)",
+    "why": "Ilyashenko-Yakovenko cyclic systems (named precedent); moving cuts + component injection is the variant"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U22",
+   "kind": "lemmas",
+   "name": "Graph and finite-jet lifting; cleared finite differential closure; recovery after graph enlargement",
+   "file_line": "11-counting.tex:551-703",
+   "statement": "Exact enlargements by regular graphs preserve isolated solutions; denominators cleared; a free flag input stays recoverable.",
+   "cited_or_new": {
+    "status": "new (technical)",
+    "cue": ""
+   },
+   "uses_items": [
+    "U19",
+    "U21"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "makes the closure compatible with packet tests"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "implicit-function bookkeeping"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U23",
+   "kind": "lemma",
+   "name": "Hyperbolic realization of a finite cycle count by rotation (lem:counting-rotation)",
+   "file_line": "11-counting.tex:938-998",
+   "statement": "For finitely many limit cycles of V, V + mu(-Q,P) with small mu of one sign has at least as many hyperbolic cycles nearby (w' = div V w + |V|^2 > 0, psi(r)=a r^m).",
+   "cited_or_new": {
+    "status": "standard (not cited)",
+    "cue": ""
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "removes the hyperbolicity restriction from the component count"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Duff 1953 rotated vector fields / Perko 1975 (not cited in the paper)"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  },
+  {
+   "id": "U24",
+   "kind": "construction",
+   "name": "final assembly: B_*(d) = T(d) + sum_w sum_I N_{w,I}; affine rescaling into the fixed square",
+   "file_line": "11-counting.tex:1000-1032",
+   "statement": "Any finite collection of limit cycles is moved into the square by z=a+Ru (degree preserved), rotated to hyperbolic cycles, and bounded by B_*(d).",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": ""
+   },
+   "uses_items": [
+    "U20",
+    "U21",
+    "U23"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "conclusion"
+   },
+   "analytic_check": "N/A",
+   "provisional_N": {
+    "grade": "N0/N1",
+    "why": "routine"
+   },
+   "provisional_F": null,
+   "lean": null,
+   "paper": "143a"
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "smooth dependence on initial data/parameters, flow box, transversality",
+   "bib_key": "Perko",
+   "locator": "Secs 2.2-2.3",
+   "field": "ODE",
+   "used_at": "143b arcs.tex:77-79 and throughout",
+   "status": "cited (paper); re-proved in Lean (GlobalODE.lean, SmoothFlow.lean, FiniteFlow.lean)",
+   "essential_for_headline": true,
+   "manuscript": "143b"
+  },
+  {
+   "name": "Schwarzian of a ratio of solutions of a''=Q0 a equals -2Q0; Schwarzian chain rule",
+   "bib_key": "OT",
+   "locator": "Notices AMS 2009",
+   "field": "projective differential geometry",
+   "used_at": "143b model.tex:475-494",
+   "status": "cited and re-derived in the paper (one-line proof); Lean re-proves",
+   "essential_for_headline": true,
+   "manuscript": "143b"
+  },
+  {
+   "name": "Odani's exact two-cycle result (Example 3)",
+   "bib_key": "Odani",
+   "locator": "Example 3",
+   "field": "ODE (Lienard)",
+   "used_at": "143b introduction.tex:58-60",
+   "status": "cited, context only (refuting Rosales)",
+   "essential_for_headline": false,
+   "manuscript": "143b"
+  },
+  {
+   "name": "Implicit/inverse function theorem, Taylor with smooth remainder, dominated/monotone convergence",
+   "bib_key": null,
+   "locator": null,
+   "field": "analysis",
+   "used_at": "143b passim",
+   "status": "standard; in Mathlib",
+   "essential_for_headline": true,
+   "manuscript": "143b"
+  },
+  {
+   "name": "Lion-Rolin preparation theorem for globally subanalytic (log-exp) functions, finite-family form",
+   "bib_key": "LionRolin1997; Opris2023",
+   "locator": "LionRolin Sec 0.3, Thm 1 Sec 0.4, Sec 1.1(5),(1),(6); Opris Def 2.14/Fact 2.15",
+   "field": "o-minimality / subanalytic geometry",
+   "used_at": "143a 09-subdivision.tex:23-77",
+   "status": "cited, invoked without re-proof",
+   "essential_for_headline": true,
+   "manuscript": "143a"
+  },
+  {
+   "name": "Uniform finiteness of fiber components for (globally) subanalytic families",
+   "bib_key": "BierstoneMilman1988",
+   "locator": "Theorem 3.14",
+   "field": "subanalytic geometry",
+   "used_at": "143a 09-subdivision.tex:62-66; 11-counting.tex:9-11",
+   "status": "cited, invoked",
+   "essential_for_headline": true,
+   "manuscript": "143a"
+  },
+  {
+   "name": "Local finiteness of connected components of real analytic sets",
+   "bib_key": "BierstoneMilman1988",
+   "locator": "Corollary 2.7",
+   "field": "real analytic geometry",
+   "used_at": "143a 05-elimination.tex:1088-1090; 11-counting.tex:831-835",
+   "status": "cited, invoked",
+   "essential_for_headline": true,
+   "manuscript": "143a"
+  },
+  {
+   "name": "Sard's theorem (+ Fubini) for a generic tilt",
+   "bib_key": "Sard1942",
+   "locator": null,
+   "field": "differential topology",
+   "used_at": "143a 11-counting.tex:139-144, 187-193",
+   "status": "cited, invoked",
+   "essential_for_headline": true,
+   "manuscript": "143a"
+  },
+  {
+   "name": "Gabrielov projection / uniform component bounds",
+   "bib_key": "Gabrielov1968",
+   "locator": "Corollary 1",
+   "field": "subanalytic geometry",
+   "used_at": "143a 11-counting.tex:9-11",
+   "status": "background-cited (paper proves its own projection count)",
+   "essential_for_headline": false,
+   "manuscript": "143a"
+  },
+  {
+   "name": "Khovanskii finiteness via critical points of proper functions",
+   "bib_key": "Khovanskii1984Finiteness",
+   "locator": "Sec 4 Thms 3-4",
+   "field": "fewnomials / Pfaffian geometry",
+   "used_at": "143a 11-counting.tex:12-14",
+   "status": "background-cited (method template)",
+   "essential_for_headline": false,
+   "manuscript": "143a"
+  },
+  {
+   "name": "Planar Rolle principle (no-contact case)",
+   "bib_key": "Khovanskii1984Rolle",
+   "locator": "Lemma 1",
+   "field": "planar dynamics",
+   "used_at": "143a 09-subdivision.tex:681-724",
+   "status": "cited and re-proved",
+   "essential_for_headline": true,
+   "manuscript": "143a"
+  },
+  {
+   "name": "Ilyashenko-Yakovenko cyclic systems for elementary polycycles",
+   "bib_key": "IlyashenkoYakovenko1995",
+   "locator": "Sec 0.4",
+   "field": "local bifurcation theory",
+   "used_at": "143a 01-introduction.tex:108-113",
+   "status": "background-cited (named predecessor)",
+   "essential_for_headline": false,
+   "manuscript": "143a"
+  },
+  {
+   "name": "Quasianalyticity of superexact / analysable expansions",
+   "bib_key": "Ilyashenko1991; Ecalle1992; GalalKaiserSpeissegger2020",
+   "locator": null,
+   "field": "asymptotic analysis / resurgence",
+   "used_at": "143a 03-separation.tex:11-19",
+   "status": "background-cited (paper proves own separation theorem)",
+   "essential_for_headline": false,
+   "manuscript": "143a"
+  },
+  {
+   "name": "Yeung's coefficient-closure obstruction in Ilyashenko 1991",
+   "bib_key": "Yeung2025",
+   "locator": "QTDS 2025 Art. 57",
+   "field": "limit cycles",
+   "used_at": "143a 01-introduction.tex:39-41; 04-calculus.tex:10-14",
+   "status": "background-cited (motivates explicit closure)",
+   "essential_for_headline": false,
+   "manuscript": "143a"
+  },
+  {
+   "name": "Rotated vector fields (Duff 1953, Perko 1975)",
+   "bib_key": null,
+   "locator": null,
+   "field": "bifurcation theory",
+   "used_at": "143a 11-counting.tex:938-998",
+   "status": "re-proved, NOT cited",
+   "essential_for_headline": true,
+   "manuscript": "143a"
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Normalize F(0)=0, coefficient of x^5 >= 0; pass to half-plane arc equations du/dy = phi_pm(u) - y with u = x^2/2.",
+   "items": [
+    "Q36",
+    "Q02"
+   ],
+   "manuscript": "143b"
+  },
+  {
+   "step": 2,
+   "claim": "Arc coordinates (r, M, v) at base height h; characteristics and hyperbolic angles; variation formula; smooth zero-width scaling; continuation to the nonsmooth axis h=0.",
+   "items": [
+    "Q03",
+    "Q04",
+    "Q05",
+    "Q06",
+    "Q07",
+    "Q08",
+    "Q09"
+   ],
+   "manuscript": "143b"
+  },
+  {
+   "step": 3,
+   "claim": "Periodic orbits <-> zeros of Delta(r)=M_+(0,r)-M_-(0,r) on one interval; isolated orbits <-> isolated zeros.",
+   "items": [
+    "Q10"
+   ],
+   "manuscript": "143b"
+  },
+  {
+   "step": 4,
+   "claim": "Quadratic model family H(lambda,kappa,r); reference characteristics; curvature comparison; global quadratic fit (diffeomorphism, P,Q,R,S,G>0); transport law for fitted (lambda,kappa) of any actual profile.",
+   "items": [
+    "Q11",
+    "Q12",
+    "Q13",
+    "Q14",
+    "Q15",
+    "Q16",
+    "Q17",
+    "Q18",
+    "Q19",
+    "Q20"
+   ],
+   "manuscript": "143b"
+  },
+  {
+   "step": 5,
+   "claim": "Model inequality (R/G)_r <= 0 via W=RS_r-SR_r, first-zero argument along model characteristics; sign at a zero from endpoint algebra + Schwarzian of endpoint correspondence (Riccati linearization) + three-case polynomial certificates.",
+   "items": [
+    "Q21",
+    "Q22",
+    "Q23",
+    "Q24",
+    "Q25",
+    "Q26"
+   ],
+   "manuscript": "143b"
+  },
+  {
+   "step": 6,
+   "claim": "Shape comparisons for general profiles: phi'''>0 => kappa_r>0 and lambda<k(h); ((phi'-d)/u)'>0 => lambda - h kappa < d; fitted curvature range.",
+   "items": [
+    "Q27",
+    "Q28",
+    "Q29",
+    "Q30"
+   ],
+   "manuscript": "143b"
+  },
+  {
+   "step": 7,
+   "claim": "Quintic sign partition on (e,c): case 1 no cycles; case 2 Delta' = A Delta + B q with q nondecreasing -> <=2 isolated zeros; cases 3,4 Delta'>0 at zeros -> <=1.",
+   "items": [
+    "Q31",
+    "Q32",
+    "Q33"
+   ],
+   "manuscript": "143b"
+  },
+  {
+   "step": 8,
+   "claim": "Sharpness by first-order energy displacement for F_eps.",
+   "items": [
+    "Q34"
+   ],
+   "manuscript": "143b"
+  },
+  {
+   "step": 1,
+   "claim": "Analytic part: logarithmic flags and complex paths/contours along escaping sequences.",
+   "items": [
+    "U02",
+    "U03",
+    "U04"
+   ],
+   "manuscript": "143a"
+  },
+  {
+   "step": 2,
+   "claim": "Packets and the separation theorem (quasianalyticity of multi-scale expansion trees).",
+   "items": [
+    "U05",
+    "U06",
+    "U07"
+   ],
+   "manuscript": "143a"
+  },
+  {
+   "step": 3,
+   "claim": "Packet calculus (closure incl. regular implicit functions), elimination induction, absolute isolated-zero finiteness criterion.",
+   "items": [
+    "U08",
+    "U09",
+    "U10",
+    "U11",
+    "U12"
+   ],
+   "manuscript": "143a"
+  },
+  {
+   "step": 4,
+   "claim": "Verify packet/retestability hypotheses for additive, one-rate and mixed passage models.",
+   "items": [
+    "U13"
+   ],
+   "manuscript": "143a"
+  },
+  {
+   "step": 5,
+   "claim": "Geometric part: Lion-Rolin preparation, box induction, crossing lemma -> finite passage templates (bounded words) for all fields of degree <= d in a fixed square; terminal reduction to the analytic primitives.",
+   "items": [
+    "U14",
+    "U15",
+    "U16",
+    "U17",
+    "U18"
+   ],
+   "manuscript": "143a"
+  },
+  {
+   "step": 6,
+   "claim": "Counting: admissible open data + closure; projection count (absolute finiteness => uniform component bound); matching systems with moving cuts inject hyperbolic cycles into fiber components; absolute zero property verified for the matching systems.",
+   "items": [
+    "U19",
+    "U20",
+    "U21",
+    "U22"
+   ],
+   "manuscript": "143a"
+  },
+  {
+   "step": 7,
+   "claim": "Rotation makes any finite set of limit cycles hyperbolic; affine rescaling into the square; B(d) = T(d) + sum of component bounds.",
+   "items": [
+    "U23",
+    "U24"
+   ],
+   "manuscript": "143a"
+  }
+ ],
+ "lean_structure": {
+  "files": 146,
+  "lines": 16659,
+  "declarations": 1352,
+  "kind_counts": {
+   "theorem": 1047,
+   "def": 280,
+   "abbrev": 9,
+   "instance": 8,
+   "structure": 6,
+   "inductive": 2
+  },
+  "proof_dag_size": 1274,
+  "proof_dag_lines": 11947,
+  "core_vs_implementation": "By file -> paper-section mapping of the 1274 DAG declarations (11,947 DAG lines): ODE/flow infrastructure (SmoothFlow, GlobalODE, FiniteFlow, AlgebraicFlow, PartialCalculus, ...) 133 decls / 10.9% lines; arc coordinates + periodic-orbit matching (paper Sec 2: ScalarArcs, Arch*, Positive*, Width*, Periodic*, Cycle*, Axis limits) 366 decls / 40.7% lines; quadratic fit (Sec 3) 250 / 15.2%; model inequality (Sec 4) 168 / 14.3%; transport + quintic application (Secs 5-6) 302 / 16.2%; sharpness (Sec 7) 55 / 2.8%. Mathematical core (Secs 3-7) = 775/1274 decls (61%), ~48% of DAG lines; re-proved background (ODE flows, arc/matching plumbing) = 39% of decls, 52% of lines.",
+  "key_items_dag": {
+   "QuadraticCoordinates.H (QuadraticCoordinates.lean:20)": "frac_dag_dependents 0.317 (404 decls) = ~52% of the core; dominated_share ~0 (target also reached through matching/sharpness branches)",
+   "QuadraticFit.fitK_spec / conditionalV_exists (GlobalFit.lean:69-92)": "frac 0.10; dominated 0.04",
+   "QuadraticCoordinates.model_inequality (CurvatureComparison.lean:105) / Cr_nonpos (CurvatureTransport.lean:32)": "dominated_share 0.166 (~211 decls, ~27% of core)",
+   "ModelEndpoint.gamma_source_sign (EndpointSigns.lean:93)": "dominated 0.114",
+   "QuinticFit.kappa_width_pos (CurvaturePositive.lean:75)": "dominated 0.223",
+   "AxisFlow.matching_isolated_case2 (AxisCases.lean:21)": "dominated 0.251 (only case with two cycles)",
+   "upper_bound (UpperAssembly.lean:67)": "dominated 0.735",
+   "Sharpness.sharpness (SharpCycles.lean:107)": "dominated 0.044",
+   "ScalarArcs.IsArch (ScalarArcs.lean:236)": "frac 0.644 (plumbing; structure used in 27 files)"
+  },
+  "route_differences_from_paper": [
+   "None substantive found at text level: Lean mirrors the paper's objects one-to-one (H,P,Q,R,S,G in QuadraticCoordinates.lean:20-26; reference characteristic J/A/D in Characteristic.lean; W, model_inequality; Schwarzian/Riccati files; four (e,c) cases in UpperAssembly.lean:42-60 with a 6-coefficient vector a : Fin 6 -> R).",
+   "Lean builds its own global ODE flow and analytic-dependence layer (GlobalODE.lean 321 lines, SmoothFlow.lean 475 lines, AlgebraicFlow.lean) because Mathlib lacks it - re-proved background, ~11% of DAG lines.",
+   "Lean case 1 subdivides into p == 0 (no isolated matching zeros, UpperAssembly.lean:35-49) and p != 0 (no periodic orbit, CaseOne.lean:78), as the paper.",
+   "Cases 3 and 4 in Lean are bounded by <=2 via the zero set (matching_zeros_case3/4 give a stronger <=1 on all zeros), consistent with paper."
+  ],
+  "extractor_caveat": "scripts/extract_lean.py v3 text-level; many proofs are `fun_prop`/`simpa using`-heavy, so some tactic-internal edges may be missed; dominated_share of large infrastructure items is ~0 because the target is reachable through several branches. Section grouping above is by file name and approximate."
+ },
+ "eureka_candidates_ranked": [
+  "E1 Q11+Q19+Q20 quadratic-fit coordinates (global fit + transport law) [143b, Lean]",
+  "E2 Q21-Q26 model inequality (R/G)_r<=0 via Schwarzian of the endpoint correspondence [143b, Lean]",
+  "E3 U05+U06+U09+U12 multi-scale packet trees, separation and absolute isolated-zero finiteness [143a, no Lean]",
+  "E4 Q28+Q29 shape comparisons phi''' sign -> kappa_r sign; ((phi'-d)/u)' sign -> intercept [143b, Lean]",
+  "E5 U19+U21 reduction of uniform boundedness to absolute finiteness of moving-cut matching systems [143a, no Lean]"
+ ],
+ "eureka_candidates": [
+  {
+   "rank": 1,
+   "item": "E1 = Q11+Q19+Q20: quadratic-fit coordinates for Lienard half-arcs (global diffeomorphism (lambda,kappa,r) -> (H,H_r,r) and transport law D kappa = -(R/G)(lambda-k), D lambda - kappa = (S/G)(lambda-k))",
+   "provisional_N": "N3 candidate (borderline N2)",
+   "provisional_F": "F5 (change of representation: replace endpoint data (M,M_r) by fitted model parameters) with F1 flavour (new defined objects H,P,Q,R,S,G)",
+   "for": "It is the engine of the only known proof of the degree-5 LMP case (open since 1977; CLZZ Aug 2026 lists it open). Odd-only methods (Rychkov) and slow-fast cyclicity (Li-Lu) did not reach the general quintic; the fit converts the comparison of two non-symmetric half-arcs into monotonicity of two scalar fitted quantities (kappa_+-kappa_-, intercepts) driven by phi''' and ((phi'-d)/u)' signs. Not a subterm of the goal or of L; H is defined implicitly through ODE solutions. Lean: H has 404 DAG dependents (~52% of the core), the fit and transport are used by every case. Tiny to state, hard to find - fits the Cook-Reckhow pattern of a short extension definition with a large payoff.",
+   "against": "Strong method template: Lagrange osculating elements / variation of parameters (represent the actual solution by the member of a model family matching value and first derivative, then derive transport ODEs for the parameters); comparison with a model equation is standard in Lienard uniqueness (Zhang Zhifen, Coppel, Villari-Zanolin energy comparison, Perez-Gonzalez-Torregrosa-Torres). The motivation is visible in the problem (even coefficients give a common quadratic part; introduction.tex:83-85), so the pivot from L may be short. Reuse beyond Lienard-type equations unclear (downstream test).",
+   "nearest_neighbour": "Method of osculating elements (celestial mechanics) / variation of parameters; Filippov transformation + comparison theorems for Lienard systems (Zhang Zhifen 1958, Coppel 1989 survey); Villari-Zanolin energy-level comparison; Rychkov 1975 odd quintic",
+   "lit_check": "WebSearch 'Lienard half-orbit comparison quadratic profile midpoint width Schwarzian' (2026-10-12): no source uses a quadratic-profile fit of endpoint midpoint/width data; nearest hits are energy-level comparison (Villari-Zanolin) and comparison without containment hypothesis (Perez-Gonzalez et al. 2016). WebSearch on degree-5 LMP: no prior proof found; CLZZ (arXiv 2608.19542) still lists n=5 open."
+  },
+  {
+   "rank": 2,
+   "item": "E2 = Q21 (+Q22-Q26): model inequality (R/G)_r <= 0, proved through W = RS_r - SR_r, first-zero transport, and the Schwarzian of the endpoint correspondence n(m) of a quadratic arc via Riccati linearization and a common projective label",
+   "provisional_N": "N2 (upper N3)",
+   "provisional_F": "(if N3) F2 - a sign invariant of a special function, propagated along characteristics",
+   "for": "Load-bearing (dominated share 16.6% of the Lean DAG, ~27% of the core); the only nontrivial input needed to turn the fit transport into the kappa_r monotonicity. The idea of reading the arc as a projective correspondence between its two endpoints and computing its Schwarzian explicitly is unusual. Not in goal or L.",
+   "against": "Its statement is a natural question once E1 exists (what sign does the transport coefficient's width derivative have?); the tools are textbook (Schwarzian of ratio of solutions, chain rule, Riccati linearization - OT cited), and the case analysis is polynomial sign certificates. Schwarzian-based cycle bounds exist (Coll-Gasull-Prohens 1996, cited). Chain depth: pays off only after E1 is in place.",
+   "nearest_neighbour": "Coll-Gasull-Prohens 1996 (Schwarzian of return maps for cycle bounds); negative-Schwarzian arguments in 1-D dynamics (Singer); Ovsienko-Tabachnikov",
+   "lit_check": "Covered by the same WebSearch: no Schwarzian-of-endpoint-correspondence argument found for Lienard arcs."
+  },
+  {
+   "rank": 3,
+   "item": "E3 = U05+U06+U09+U12 (143a): packets (trees of successive lateral asymptotic expansions on nested complex bands over a saturated logarithmic flag), separation theorem, packet calculus and absolute isolated-zero finiteness",
+   "provisional_N": "N3 candidate (informal only; correctness unverified)",
+   "provisional_F": "F5 (multi-scale representation) / F1 (packet as new object)",
+   "for": "If correct, it supplies the missing multivariable quasianalytic finiteness that blocked uniform boundedness (the paper itself notes GKS 2020 only treats one variable, 01-introduction.tex:72-77, and Yeung 2025 found a closure gap in Ilyashenko 1991). It replaces simultaneous convergence in all small exponentials by a tree of expansions with weighted Cauchy corrections. Not in goal or L.",
+   "against": "Unformalized, unrefereed, ~6k lines of dense asymptotics with uniformity-over-finite-request quantifiers that are hard to audit; strong precedents (Ilyashenko superexact series + Phragmen-Lindelof, Ecalle analysable functions, Ilyashenko algebras of GKS, Kaiser-Rolin-Speissegger o-minimality of transition maps). Cannot enter the Lean shortlist; belongs in data/eureka_informal.json.",
+   "nearest_neighbour": "Ilyashenko 1991 (superexact asymptotic series, Phragmen-Lindelof); Ecalle 1992 (analysable functions); Galal-Kaiser-Speissegger 2020 (Ilyashenko algebras with transserial asymptotics); Kaiser-Rolin-Speissegger 2009",
+   "lit_check": "WebSearch 'uniform boundedness limit cycles polynomial vector fields Hilbert 16th 2026': no independent confirmation or discussion of this claim; a 2026 arXiv paper still calls uniform boundedness open even for n=2; a 2014 Llibre-Pedregal claim exists and is not accepted."
+  },
+  {
+   "rank": 4,
+   "item": "E4 = Q28+Q29: shape comparisons for general smooth profiles (phi'''>0 => fitted kappa increases with width and lambda<k(h); ((phi'-d)/u)'>0 => lambda - h kappa < d)",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "Stated for general profiles 'independently of the polynomial application' (introduction.tex:112-115), so reusable for other Lienard-type F; Lean kappa_width_pos dominated share 22%.",
+   "against": "Their hypotheses are classical Lienard shape conditions (Zhang Zhifen's monotone f/g, third-derivative/Chebyshev criteria); they are consequences of E1+E2 plus barrier arguments.",
+   "nearest_neighbour": "Zhang Zhifen uniqueness theorem (f(x)/x monotone); Coppel 1989; Chebyshev-system criteria for Abelian integrals (Grau-Manosas-Villadelprat)",
+   "lit_check": "not separately searched beyond E1's search"
+  },
+  {
+   "rank": 5,
+   "item": "E5 = U19+U21 (143a): matching systems with moving cuts, where coefficients become unknowns and hyperbolic cycles inject into fiber components; uniformity reduced to absolute isolated-zero finiteness via the projection count",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "Clean architectural reduction that separates the analytic difficulty (absolute finiteness) from uniformity; stated as reusable for other classes (01-introduction.tex:229-235).",
+   "against": "Named precedents: Ilyashenko-Yakovenko cyclic systems (moving cuts are the new twist); projection count is Khovanskii/Gabrielov critical-point counting (paper says so); rotation lemma is Duff's rotated fields.",
+   "nearest_neighbour": "Ilyashenko-Yakovenko 1995 Sec 0.4; Khovanskii 1984 (finiteness property, Thms 3-4); o-minimal uniform finiteness; Roussarie's finite-cyclicity reduction",
+   "lit_check": "WebSearch on Khovanskii finiteness/critical points: confirms the classical template (Khovanskii 1984 Faa 18:2; Moussu-Roche); no search hit for the moving-cut variant."
+  }
+ ],
+ "correctness_audit": {
+  "verdict": "143b: careful, internally coherent paper whose upper-bound argument I read line by line at the level of identities and case logic; all displayed algebraic identities I tested hold (sympy): p''', p'', up''-p' formulas for the four cases; J(l,z), A(l,z) endpoint values; the baseline factorization (z-1)S0 + ... = (z-1)AT/(2z^4) and Delta0 = -(z-1)T/((z+1)z^2); the two numerator reductions and A0, A_beta of eq. model:gamma-coefficients and A0+beta A_beta = (m+n)^2(w_*-w)/(m^2n^2(m-n)); W = 16r^3/45; J^{-1}b = (-1/35, 2/7); sharpness Q(s,0) = -pi s^2(s^2-1)(s^2-4), Q_s = 6pi, -48pi; Rosales roots X^2=(5+-sqrt15)/2. Trust ultimately rests on the Lean (16.7k lines, text-clean, faithful comparator), compile pending. 143a: extraordinary claim (Hilbert 16 existential part for all d), 11.9k lines, no Lean, read at the level of statements, architecture and the final counting section (Sec. 11 read in full); Secs 3-8 not checkable at this depth.",
+  "checked": [
+   "143b introduction, arcs, fitting, model, transport, application, sharpness read in full",
+   "143b polynomial identities and sign certificates (sympy)",
+   "143b case logic of Prop. third-derivative (exhaustive E-sign cases; matched-angle integral contradiction)",
+   "143b model.tex Case 1/2/3 sign logic",
+   "comparator model vs paper definitions; textual identity of comparator and Model.lean defs",
+   "trust-surface grep (0 sorry/axiom/native_decide/maxHeartbeats)",
+   "Lean top-level assembly (UpperAssembly.lean, Main.lean) matches paper's case split",
+   "143a Sec. 11 (projection count, matching systems, absolute-zero completion, rotation lemma, final proof) read in full; Secs 1, 2 (start), 3 (definitions/theorem), 4-10 theorem statements and selected proofs"
+  ],
+  "concerns": [
+   "143a is unformalized and unreviewed; the family headline (Hilbert 16 uniform bound) is therefore NOT certified by the comparator, which only covers the quintic Lienard paper. Treat 143a as an unverified claim of the first magnitude.",
+   "143a crux: the absolute zero property (Thm 5.x + Thm 11.2 completion) asserts finiteness of isolated solutions for systems where coefficients, endpoints, multipliers and derivative jets are all unknowns, built from Dulac-type transition maps near arbitrarily degenerate configurations - in effect a multiparameter quasianalytic/o-minimal finiteness for all polynomial-field passages, which is beyond what Ilyashenko/Ecalle (individual finiteness) or GKS (one variable) provide. Errors, if any, most likely sit in the uniformity-per-finite-request quantifiers of Secs 3-8 and in the retestability (germ invariance) of the primitive packets.",
+   "143a geometric step replaces blow-up desingularization of degenerate singular points by one-variable Lion-Rolin preparation of the scalar field plus a jet-order box induction (09-subdivision.tex:148-659); whether every degenerate polycycle/limit periodic set (including non-elementary graphics, cycles near infinity after rescaling) is captured by the three passage models is not obvious and not checked here.",
+   "143a rotation lemma (Duff's rotated vector fields) is used without citation; correct as stated (finite collections only).",
+   "143a: 'all but at most T(d) periodic orbits' with tangential boundary arcs are discarded and re-added in the bound - fine, but T(d)=E_d depends on the uniform finiteness of boundary pieces, which relies on Bierstone-Milman Thm 3.14 after algebraic compactification of coefficient space (09-subdivision.tex:62-66).",
+   "143b: Lean compile result pending (orchestrator). If it fails, 143b reduces to a 3.2k-line unrefereed paper, though its algebra checks out.",
+   "143b relies on Lemma axis-extension for profiles with u^{1/2}-type singularities at u=0 (odd coefficients); handled with care (no derivative of phi at 0 used) and formalized."
+  ],
+  "consistency_checks": [
+   "143b vs known results: odd quintic (d0=b0=0) reduces to Rychkov's bound 2; quartic (a=0 and the x^5 normalization) is consistent with Li-Llibre's bound 1 only in cases 3/4 - case 2 with a=0 (e>=0,c<0) gives <=2 here, weaker than but consistent with Li-Llibre (no contradiction).",
+   "143b sharpness example lies in Case 2 (e=sqrt2*4eps>0, c=2^{3/2}(-20/3)eps<0, a>0), the only case allowing two cycles - consistent.",
+   "143a does not use or cite 143b; 143b does not invoke 143a. No circularity."
+  ]
+ },
+ "extraction_friction": [
+  "Two manuscripts with completely different methods; only 143b is formalized. Items are prefixed Q (143b) and U (143a); file:line is relative to each manuscript's build/sections.",
+  "143a is 11.9k TeX lines of dense multi-scale asymptotics; most lemmas are technical sub-steps and were grouped (U04, U07, U10, U13, U18, U22) rather than itemized one by one; inline \\emph definitions in 143a (contact bins, complete radius list, full candidate-center set, working-box/structural margin, power moderate/conditioned in r, visible/negligible) are covered inside the grouped items.",
+  "143b Lean names are descriptive (QuadraticCoordinates.H, GlobalFit.fitK, model_inequality), so paper-Lean joins are easy; namespace is OAI.QuinticLienard.* (not a family id).",
+  "Extractor ranks plumbing (IsArch, GlobalODE.flow, SmoothFlow.*) highest by frac_dag_dependents; candidate ranking used dominated_share and section grouping instead.",
+  "Lean not built here; all Lean statements are text-level.",
+  "No reasoning trace for this family."
+ ]
+}
