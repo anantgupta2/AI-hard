@@ -1,0 +1,1605 @@
+{
+ "family": "161",
+ "title": "Counterexamples to Sidorenko's conjecture and the forcing conjecture",
+ "manuscripts": [
+  {
+   "id": "161",
+   "title": "A counterexample to Sidorenko's conjecture",
+   "manuscript_dir": "preprints/A-counterexample-to-Sidorenkos-conjecture-September-23-2026",
+   "source_root": "preprints/A-counterexample-to-Sidorenkos-conjecture-September-23-2026/build",
+   "tex_files": [
+    "main.tex",
+    "macros.tex",
+    "sections/introduction.tex",
+    "sections/complex.tex",
+    "sections/kernel.tex",
+    "sections/transverse.tex",
+    "sections/orbits.tex",
+    "sections/planted.tex",
+    "sections/tail.tex",
+    "sections/consequences.tex",
+    "figures/proof-overview.tex",
+    "figures/corner-activation.tex"
+   ],
+   "lines": 3920,
+   "date": "September 23, 2026",
+   "author": "OpenAI"
+  }
+ ],
+ "file_line_convention": "paper paths relative to <manuscript_dir>/build; Lean paths relative to lean/ (openai-math fd4aeeb), Lean dir lean/OAI/Combinatorics/Sidorenko",
+ "commit": "fd4aeeb",
+ "analyst_role": "FAMILY analyst (paper + Lean, text level; Lean NOT built by this agent - lake build / comparator left to the orchestrator because the checkout is shared). Extractor run: scripts/extract_lean.py 161 (v3) -> data/items/161_lean.json.",
+ "base_library_L": "Mathlib d13f23b + the paper's 27-entry references.bib (chunggrahamwilson1989, conlonfoxsudakov2010, conlonkimleelee2018, conlonlee2017, conlonlee2021, coregliano2024, coreglianorazborov2021, erdoslovaszspencer1979, gowerswolf2011, hatami2010, huowan1993, imliliu2026, kimleelee2016, kramertent2010, liszegedy2025, lovasz2011local, lovaszszegedy2006, mckay1981, schmidt2015, sidorenko1991, sidorenko1993, skokanthoma2004, simonovits1984, szegedy2015entropy, taylor1992, weisfeilerleman1968, zhao2026conjugacy)",
+ "main_statement": {
+  "file_line": "sections/introduction.tex:18-26 (Theorem thm:main); corollaries introduction.tex:279-298, 335-345",
+  "latex": "\\begin{theorem} Let H be the incidence graph of the 22 triples on 13 points in Table~\\ref{tab:complex}. This bipartite graph has 35 vertices and 66 edges. There is a finite simple undirected graph G with at least one edge such that t(H,G)<p(G)^{66}. \\end{theorem}",
+  "paraphrase": "Sidorenko's conjecture (every bipartite H with an edge satisfies t(H,G)>=p(G)^{e(H)} for all G) is false: an explicit 35-vertex, 66-edge connected bipartite H (the vertex-face incidence graph of a 22-triangle complex on 13 points) has strictly fewer homomorphisms into some finite simple host than the random-graph benchmark. Corollaries: the deficit can be amplified to any ratio c>0 (tensor powers), persists for injective copies at a positive limiting density (blow-ups), and H is not p-forcing at one p, refuting the Skokan-Thoma / Conlon-Fox-Sudakov forcing conjecture.",
+  "comparator": {
+   "file": "lean/ComparatorChallenges/SidorenkoCounterexample.lean",
+   "json": "lean/ComparatorChallenges/SidorenkoCounterexample.json",
+   "theorem": "OAI.SidorenkoCounterexample.main : ∃ size : ℕ, 0 < size ∧ ∃ host : SimpleGraph (Fin size), (∃ left right, host.Adj left right) ∧ homDensity H host < (edgeDensity host) ^ 66",
+   "solution_module": "OAI.Combinatorics.Sidorenko.RandomHost",
+   "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+   ],
+   "definition_names": [],
+   "model": "faces : Fin 22 → Finset (Fin 13) (the 22 triples of Table tab:complex, checked entry by entry); H : SimpleGraph (Fin 13 ⊕ Fin 22) with Adj = membership incidence (symmetric); homCount = Nat.card of all edge-preserving maps V→W (noninjective included); homDensity = homCount / |W|^|V|; edgeDensity = 2|edgeSet| / |W|^2."
+  },
+  "match_check": "Exact for Theorem thm:main. The 22 faces in the comparator equal Table tab:complex row by row; homDensity counts all homomorphisms divided by n^35 (Nat.card PatternVertex = 35) and edgeDensity is 2|E|/n^2 = p(G); 'at least one edge' is the explicit Adj witness. Bipartiteness of H is by construction (incidence only between Fin 13 and Fin 22), not separately asserted. The challenge file re-declares faces/PatternVertex/incidence/H/homCount/homDensity/edgeDensity; these are textually identical to OAI/Combinatorics/Sidorenko/Basic.lean:7-32 up to binder names (left/right vs u/v, hom vs f) in proofs and lambda binders. definition_names is empty, so the orchestrator should confirm the comparator tool matches these constants (same names, same namespace).",
+  "formalized_vs_claimed": "Formalized: Theorem thm:main exactly (via kernel → oriented kernel → symmetric kernel → random host; Symmetrization.lean / RandomHost.lean). NOT formalized: Corollary cor:amplification (tensor powers, injective copies) and Corollary cor:forcing (forcing conjecture); lean/docs/161.md: 'The separate forcing-conjecture consequence in the paper is outside this statement.' Both corollaries are short, standard derivations from the host G.",
+  "note_for_comparator": "Compilation not run by this agent (shared checkout). Status pending the orchestrator's `lake build OAI.Combinatorics.Sidorenko.RandomHost` + comparator run."
+ },
+ "trust_surface": {
+  "lean": "35 files, 23,761 lines in lean/OAI/Combinatorics/Sidorenko; imports only Mathlib and own files (linear import chain Basic → Grassmann → … → Symmetrization → RandomHost); 2,280 declarations",
+  "grep_scope": "all 35 .lean files, word-boundary grep",
+  "counts": {
+   "sorry": 0,
+   "admit": 0,
+   "axiom": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque (keyword)": 0,
+   "ofReduceBool/skipKernelTC": 0,
+   "partial def": 0,
+   "set_option (any, incl. maxHeartbeats)": 0,
+   "decide (all forms)": 541,
+   "decide +kernel": "282 (Refinement.lean certificate lemmas)",
+   "open Classical / Classical.choose": "used (e.g. Tail.lean:599 singularTailThreshold := Classical.choose globalTail_dichotomy)"
+  },
+  "note": "The 2 'admit' and 1 'axiom' hits are English words in docstrings (Orbits.lean:496 'admit literal symmetric-form', Reduction.lean:276-277 'admit Lagrangian extensions ... no completion or existence axiom is used'). No trust-relevant constructs at text level. decide/decide +kernel are kernel-checked finite certificates on the 35-vertex complex (pair tables, colour-refinement rounds, exposure orders, degree sums such as Spans.lean:351 `degree_choose_sum = 618`). No set_option at all, notably no heartbeat raises."
+ },
+ "labels": {
+  "A": {
+   "label": "A2",
+   "secondary": {
+    "hard_direction_form": "n/a",
+    "explicit_rate": false,
+    "witness_explicitness": "pattern H explicit; host G only existential (random sampling of a finite kernel whose parameters D (>=1642 in Lean), theta, rho, eps, q are chosen by limits / Classical.choose)"
+   },
+   "evidence": {
+    "quote": "There is a finite simple undirected graph \\(G\\) with at least one edge such that \\[ t(H,G)<p(G)^{66}. \\]",
+    "file_line": "sections/introduction.tex:21-25"
+   },
+   "confidence": "0.95",
+   "note": "Existential counterexample to a universal conjecture; H fixed, G exists. Cor. amplification (i) is also A2 with an unbounded ratio; no explicit host size is given."
+  },
+  "B": {
+   "label": "B2",
+   "flags": {
+    "full_only_with_prior": false,
+    "adds_corollaries_for_other_conjectures": true,
+    "corollaries": [
+     "forcing conjecture (Skokan-Thoma question; Conlon-Fox-Sudakov Conjecture 2) refuted at one density p",
+     "injective Erdos-Simonovits random-graph benchmark contradicted (cor:amplification ii)",
+     "unbounded Sidorenko ratio (cor:amplification i)"
+    ],
+    "posed_by": "Sidorenko 1991/1993 (functional form; Erdos-Simonovits supersaturation lineage); forcing conjecture: Skokan-Thoma 2004 / Conlon-Fox-Sudakov 2010"
+   },
+   "evidence": {
+    "quote": "Sidorenko's conjecture asserts that ... whenever \\(H\\) is bipartite and has at least one edge. We disprove this conjecture.",
+    "file_line": "sections/introduction.tex:11-16"
+   },
+   "confidence": "0.9 (conditional on correctness; Lean certificate pending)",
+   "note": "Fully refutes the conjecture as stated (homomorphism form, finite simple hosts)."
+  },
+  "C": {
+   "primary": "C1",
+   "primary_evidence": {
+    "quote": "We first construct a strict density gap for a finite nonnegative kernel and then retain it when sampling a finite simple host.",
+    "file_line": "sections/introduction.tex:28-31"
+   },
+   "secondaries": [
+    "C4 (q-asymptotic estimation chain: transverse L^1 approximations, Gauss-sum TV bound, orbit masses, profile cost vs local gain exponents, coercivity Q>=(P^2+T^2+delta^2)/342)",
+    "C3 (existence of G by random sampling + convexity; parameters fixed by limits and Classical.choose; no explicit host)",
+    "C2 (secondary only: exposure orders along face-growth sequences, induction on face-graph distance propagating large pair dimensions, rounds of colour refinement; no strengthened IH)"
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "Table~\\ref{tab:complex-orders} gives all six orders and their new-point certificates",
+    "file_line": "sections/complex.tex:168-201; Lean Refinement.lean (282 `decide +kernel`)"
+   },
+   "computer_assisted_note": "The proof only checks finite certificates on a 35-vertex structure (hand-checkable; the analyst re-verified them in Python). The complex itself was very likely found by computer search for a triple system meeting the bit-class, separation and refinement constraints, but the paper does not say so; no search is part of the proof.",
+   "ih_strengthened": false,
+   "ih_template": null,
+   "ih_evidence": {
+    "quote": "We claim by induction on t that every face at distance t from j_0 is three-active and every pair on it has dimension at least M-(t+1)K\\sqrt M.",
+    "file_line": "sections/tail.tex:409-422"
+   },
+   "ih_note": "The only explicit induction is a distance induction with the hypothesis as stated; no strengthening.",
+   "C5_note": "Essentially every external tool is re-derived in the paper (Gauss-sum rank bound, Lagrangian counts, split-form counts, sampling lemma, tensor powers); no theorem is invoked purely as a black box on the headline path. Kramer-Tent is cited 'see also' for a classification the paper re-proves.",
+   "confidence": "C1 0.85; secondaries 0.7"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "I07+I08 signed half-rank layer kernel / rank-layer sign model (N3 candidate, F5); I15 two-branch activation law with support forcing (N3 candidate, F3)",
+   "evidence": {
+    "quote": "Half rank is the key geometric constraint: when the difference between two point matrices is nonsingular, the two rank-r images through a common center are complementary, which relates their determinant signs.",
+    "file_line": "sections/introduction.tex:84-89"
+   },
+   "confidence": "0.5",
+   "caveats": [
+    "Grades conditional on an unrefereed claim resolving a 35-year-old conjecture; trust rests on the Lean compile (pending).",
+    "Quick literature checks only (WebSearch snippets); full novelty grading is the novelty agent's task.",
+    "The kernel's raw material (symmetric-matrix association scheme, Lagrangian Grassmannian counting, Gauss sums, WL refinement) is all classical; D3 rests on the FUNCTION these pieces are assembled to perform (simulating a hypergraph-parity obstruction in an ordinary graph), which a strict judge may call a new bridge rather than a jump.",
+    "Downgrade to D2 if a precedent is found that uses association-scheme / quadratic-form kernels to engineer signed homomorphism-density corrections (e.g. in common-graph or step-Sidorenko work), or if experts regard the hypergraph-to-graph 'centre vertex' simulation as known folklore."
+   ],
+   "flag_builds_on_prior_model_produced_result": false,
+   "flag_note": "No cited work is model-produced. The two 2026 citations are human-authored: imliliu2026 (CPC 35(2), 2026) and zhao2026conjugacy (arXiv:2606.15368; per search snippet its AI disclosure covers ChatGPT for language polishing/editing only); both are background-cited only. No reasoning trace for this family."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Combinatorics",
+    "msc2020": "05C35 (extremal problems in graph theory), 05C60 (homomorphisms / isomorphism), 05C80 (random graphs); graph limits 05C99",
+    "lean_dir": "Combinatorics",
+    "note": ""
+   },
+   "lean_dir_field": "Combinatorics (OAI/Combinatorics/Sidorenko)",
+   "method_fields": [
+    {
+     "field": "quadratic forms / bilinear algebra over finite fields (rank + discriminant classification, split forms, Schur complements; association scheme of symmetric matrices)",
+     "tag": "essential"
+    },
+    {
+     "field": "finite symplectic geometry / classical groups (Lagrangian Grassmannian counts, symplectic reduction, ordered triple orbits; Taylor, Kramer-Tent)",
+     "tag": "essential"
+    },
+    {
+     "field": "analytic number theory / character sums (quadratic Gauss sums, additive-character Fourier analysis on F_q^s; Gowers-Wolf rank bound)",
+     "tag": "essential"
+    },
+    {
+     "field": "probability (independent sampling, total variation, Chebyshev, change of measure / planted law)",
+     "tag": "essential"
+    },
+    {
+     "field": "graph isomorphism / colour refinement (Weisfeiler-Leman, McKay equitable partitions)",
+     "tag": "essential (pinning)"
+    },
+    {
+     "field": "graph limits (kernels, step graphons, Lovasz-Szegedy sampling)",
+     "tag": "essential (home-field infrastructure)"
+    },
+    {
+     "field": "elementary quadratic optimisation (coercivity of a piecewise quadratic on a polyhedral cone)",
+     "tag": "essential, routine"
+    },
+    {
+     "field": "topology of surfaces (the complex is a triangulated 2-sphere)",
+     "tag": "not used (analyst observation; the paper never invokes it)"
+    },
+    {
+     "field": "graph norms / weakly norming graphs, entropy methods, local Sidorenko (Hatami, Szegedy, Lovasz, Coregliano, Conlon-Lee)",
+     "tag": "background-cited (locating H relative to positive results)"
+    }
+   ],
+   "cross_field_count": 5,
+   "share_invoked_from_other_fields": "~0.75: of ~8 invoked external results (Huo-Wan/Schmidt counts, Taylor Lagrangian/split counts, Kramer-Tent classification, Gowers-Wolf Gauss-sum bound, WL/McKay refinement, Lovasz-Szegedy sampling, CFS tensor power, Chung-Graham-Wilson C4 criterion) 6 are from outside combinatorics/graph limits; all re-derived in the text."
+  }
+ },
+ "items": [
+  {
+   "id": "I01",
+   "kind": "definition",
+   "name": "homomorphism density t(H,G), edge density p(G), Sidorenko inequality",
+   "file_line": "sections/introduction.tex:3-15",
+   "statement": "t(H,G)=hom(H,G)/|V(G)|^{|V(H)|} (all maps, noninjective included); p(G)=2|E(G)|/|V(G)|^2; conjecture t(H,G)>=p(G)^{|E(H)|} for bipartite H with an edge.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'Sidorenko's conjecture asserts that'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential (goal)",
+    "why": "statement of the problem"
+   },
+   "analytic_check": "IS the goal (subterm of target)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "textbook graph-limits notions (Lovasz-Szegedy; Sidorenko 1991/93)"
+   },
+   "provisional_F": null,
+   "lean": "Basic.lean:25-32 homCount/homDensity/edgeDensity (identical to comparator)"
+  },
+  {
+   "id": "I02",
+   "kind": "theorem",
+   "name": "Main theorem (counterexample)",
+   "file_line": "sections/introduction.tex:18-26",
+   "statement": "For the incidence graph H of the 22 triples on 13 points (35 vertices, 66 edges) there is a finite simple G with an edge and t(H,G)<p(G)^66.",
+   "cited_or_new": {
+    "status": "new (claimed resolution)",
+    "cue": "'We disprove this conjecture.'"
+   },
+   "uses_items": [
+    "I03",
+    "I20",
+    "I21",
+    "I41"
+   ],
+   "load_bearing_guess": {
+    "guess": "headline",
+    "why": "target"
+   },
+   "analytic_check": "goal",
+   "provisional_N": {
+    "grade": "n/a",
+    "why": "headline result, not a device"
+   },
+   "provisional_F": null,
+   "lean": "RandomHost.lean:319 OAI.SidorenkoCounterexample.main (comparator target)"
+  },
+  {
+   "id": "I03",
+   "kind": "definition (witness)",
+   "name": "The complex: 22 triples on I={0..12}, point pairs E, incidence graph H, corners",
+   "file_line": "sections/complex.tex:77-126 (Table tab:complex)",
+   "statement": "Faces j in J (22 triples listed with opposite faces and a 3-bit label); E = point pairs inside faces (33); H=(I sqcup J, C) with C={(i,j): i in j}; a 'corner' is an incidence.",
+   "cited_or_new": {
+    "status": "new (witness)",
+    "cue": "'we call these subsets \\emph{faces}'; 'We call an incidence (i,j) a \\emph{corner}'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential (witness)",
+    "why": "every later construction is indexed by its faces/pairs/corners"
+   },
+   "analytic_check": "Appears in the formal goal (Basic.lean faces/H). Per counterexample rule judged against the problem as originally posed (Sidorenko 1986/1991: all bipartite H): H is not a subterm of the posed problem.",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Analyst check (not stated in the paper): each of the 33 pairs lies in exactly two faces, every vertex link is a single cycle and V-E+F=13-33+22=2, so the complex is a 13-vertex triangulation of the 2-sphere and H is its vertex-face (Levi) incidence graph - a classical object class. The specific choice is tailored to proof-generated constraints (bit classes, WL-discreteness, separation). No prior proposal of sphere-triangulation incidence graphs as Sidorenko candidates found (WebSearch, 3 queries). Graded N2 as an object; its discoverability is inseparable from I07/I15 (see eureka candidate 3)."
+   },
+   "provisional_F": null,
+   "lean": "Basic.lean:7-23 (faces, PatternVertex, incidence, H)"
+  },
+  {
+   "id": "I04",
+   "kind": "definition (inline)",
+   "name": "face-neighbor graph; bit labels; separation a_e",
+   "file_line": "sections/complex.tex:128-134; bits column of Table tab:complex",
+   "statement": "Faces are adjacent if they share a pair; a_e = (1/3)#{bit positions where the two faces on e differ}.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'This defines the \\emph{face-neighbor graph}. For a pair e in E, define a_e'"
+   },
+   "uses_items": [
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential for singular tail (I35, I38)",
+    "why": "the 1/3-separation surplus E (tail.tex:126) is what kills the large-dimension mode"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "proper 8-colouring of the dual graph used as a fractional-cover device; colourings of face graphs are classical, the 'six bit classes each a spanning growth sequence' requirement is bespoke"
+   },
+   "provisional_F": null,
+   "lean": "Exposure.lean:63-70 classFace/classPoint/... tables; Coercivity.lean:538 separationCount, :607 separationExcess"
+  },
+  {
+   "id": "I05",
+   "kind": "proposition",
+   "name": "Prop. complex: (1) each pair in exactly two faces, |E|=33, face graph connected; (2) six bit classes, each 11 faces covering 13 points with a growth order; (3) all a_e>=1/3, some >1/3; (4) color refinement of H is discrete",
+   "file_line": "sections/complex.tex:143-262",
+   "statement": "Finite certificate (tables tab:complex, tab:complex-orders, degree/neighbor table eq:complex-colors).",
+   "cited_or_new": {
+    "status": "new (finite verification)",
+    "cue": "'The complex has the following properties.'"
+   },
+   "uses_items": [
+    "I03",
+    "I04"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "(1) gives the parity model and connectivity; (2),(3) give the global cost; (4) gives pinning"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "finite facts about the witness; independently re-verified by the analyst in Python (all four parts, plus support identity eq:kernel-support-intersection)"
+   },
+   "provisional_F": null,
+   "lean": "Refinement.lean (316 decls, 282 `decide +kernel` certificate lemmas), Activation.lean:23-124 tables, Exposure.lean:63-74, GlobalMoments.lean facePair lemmas"
+  },
+  {
+   "id": "I06",
+   "kind": "definition (inline)",
+   "name": "discriminant sign of a symmetric form",
+   "file_line": "sections/kernel.tex:12-19; sections/transverse.tex:26-30",
+   "statement": "sign(Z)=chi(det of the induced nondegenerate form on V/rad Z).",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'its \\emph{sign} is the quadratic character of the determinant'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "defines the layers of K_xi"
+   },
+   "analytic_check": "not in goal; in L (classical invariant of quadratic forms; Huo-Wan, Schmidt)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard rank+discriminant classification of quadratic forms over F_q"
+   },
+   "provisional_F": null,
+   "lean": "Discriminant.lean:12 radicalQuotientForm"
+  },
+  {
+   "id": "I07",
+   "kind": "definition (key construction)",
+   "name": "signed half-rank layer kernel K_xi(Z) on S_D (D=2r), c_0=chi((-1)^r)",
+   "file_line": "sections/kernel.tex:19-29 (eq:kernel-rank-definition)",
+   "statement": "K_xi(Z)=1{rank Z=r, sign Z=xi}/P(rank=r, sign=xi), a mean-one nonnegative kernel on pairs (point matrix X_i, center matrix Y_j) evaluated at X_i-Y_j.",
+   "cited_or_new": {
+    "status": "new use of known object",
+    "cue": "no precedent cue; 'Conditions on the rank and discriminant sign of a symmetric matrix difference are the relations in the association scheme of symmetric matrices studied by Huo and Wan' (introduction.tex:256-263)"
+   },
+   "uses_items": [
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (the analytic engine)",
+    "why": "every matrix kernel in the construction is a product of these"
+   },
+   "analytic_check": "not in goal or L as a statement; the underlying relation is a class of the symmetric-matrix association scheme (Huo-Wan 1993)",
+   "provisional_N": {
+    "grade": "N3 (candidate, jointly with I08/I25)",
+    "why": "Object = normalized relation of a known association scheme (N0 as an object). Its FUNCTION is new: at half rank, a common center forces complementary images (I25) so the center integral turns three face incidences into a multiplicative constraint on the determinant signs of the three point-pair differences, i.e. it simulates a 3-uniform hypergraph parity constraint inside an ordinary bipartite homomorphism density. No neighbour found using association-scheme / Lagrangian-Grassmannian kernels for Sidorenko or homomorphism-density sign engineering (WebSearch, 4 queries)."
+   },
+   "provisional_F": "F5 (change of representation: homomorphism density -> finite quadratic-form / Lagrangian geometry) with F3 aspects",
+   "lean": "Discriminant.lean:338 rankKernel; Types.lean sampleMatrixKernel"
+  },
+  {
+   "id": "I08",
+   "kind": "lemma",
+   "name": "Rank-layer limit (lem:rank-layer)",
+   "file_line": "sections/kernel.tex:31-49",
+   "statement": "For fixed even D>=D_0, as q->inf over odd primes, E prod_{(i,j) in B} K_{xi_ij}(X_i-Y_j) = E_eta prod_j prod_{e={i,k} subset j, both active}(1+c_0 eta_e xi_ij xi_kj)+o(1), uniformly in B and signs, eta_e independent uniform signs; same with Y_j-X_i.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'This is the finite correlation that the kernel construction turns negative' (introduction.tex:76-78)"
+   },
+   "uses_items": [
+    "I07",
+    "I25",
+    "I26",
+    "I27",
+    "I28",
+    "I30",
+    "I41"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (84% of Lean lines prove it)",
+    "why": "the only analytic input of the construction"
+   },
+   "analytic_check": "not in goal or L",
+   "provisional_N": {
+    "grade": "N3 (candidate, with I07)",
+    "why": "see I07; the limiting 'sign model' with independent eta_e on pairs is the conceptual bridge; its proof is long but each step is classical counting"
+   },
+   "provisional_F": "F5",
+   "lean": "Coefficients.lean:760 rankLayerConvergence; GlobalMoments.lean:187-210; Types.lean:373 typedMatrixKernel_tendsto (dominated_share 0.44, under-linked)"
+  },
+  {
+   "id": "I09",
+   "kind": "identity",
+   "name": "parity form of the sign model; four-corner sets U_e",
+   "file_line": "sections/kernel.tex:51-75 (eq:kernel-four-corners, eq:kernel-parity-model)",
+   "statement": "E_eta prod(1+c_0 eta_e xi xi) = prod_{e: U_e subset B}(1+prod_{kappa in U_e} xi_kappa): each fully active pair tests the parity of its four incidence signs.",
+   "cited_or_new": {
+    "status": "new (elementary)",
+    "cue": "'Thus every fully active pair tests the parity of its four incidence signs'"
+   },
+   "uses_items": [
+    "I03",
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "turns I08 into a combinatorial parity model"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "one-line averaging over independent signs (c_0^2=1)"
+   },
+   "provisional_F": null,
+   "lean": "GlobalMoments.lean (model products), Coefficients.lean labelProduct"
+  },
+  {
+   "id": "I10",
+   "kind": "definition",
+   "name": "bipartite kernel density t_{I,J}(W), transpose, symmetric t(H,U)",
+   "file_line": "sections/kernel.tex:87-100",
+   "statement": "t_{I,J}(W)=E prod_{(i,j) in C} W(x_i,y_j) with independent samples; W^T swaps sides.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "no cue"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "plumbing",
+    "why": "notation"
+   },
+   "analytic_check": "in L (bigraphon densities)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard"
+   },
+   "provisional_F": null,
+   "lean": "Symmetrization.lean bipartiteMoment, kernelMean"
+  },
+  {
+   "id": "I11",
+   "kind": "definition (key construction)",
+   "name": "typed activation kernel W_q((a,x),(b,y)) = E_{S,xi|a,b} prod_{kappa in S} K_{xi_kappa}(x^kappa-y^kappa)",
+   "file_line": "sections/kernel.tex:102-129 (eq:kernel-activation)",
+   "statement": "Vertices carry a type (intended point/face) and one independent matrix coordinate per kappa in a coordinate set K; at each type pair an activation law picks which coordinates are used and with which signs.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'A type records which point or face of the fixed complex a sampled vertex is intended to represent.'"
+   },
+   "uses_items": [
+    "I07",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "the kernel whose density is computed"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "typed/blow-up kernels with independent coordinate products are standard graphon constructions (tensor products, step graphons); the novelty is in the laws (I15)"
+   },
+   "provisional_F": null,
+   "lean": "Types.lean activationMatrixKernel, typedMatrixKernel, typedMatrixLaw"
+  },
+  {
+   "id": "I12",
+   "kind": "definition + condition",
+   "name": "phi_alpha, overlap moments A_ab(alpha,beta), zero-first-moment condition",
+   "file_line": "sections/kernel.tex:131-152 (eq:kernel-zero-moments, eq:kernel-disjoint-zero)",
+   "statement": "phi_alpha=1{alpha subset S} prod_{kappa in alpha} xi_kappa; A_ab(alpha,beta)=E phi_alpha phi_beta; impose E phi_alpha=0 for all nonempty alpha, so disjoint nonempty pairs give zero.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'We will impose the moment condition'"
+   },
+   "uses_items": [
+    "I11"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "forces every nonzero term in the expansion to be all-nonempty (via connectivity)"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Fourier/Walsh moment engineering on sign variables; standard technique, specific use new"
+   },
+   "provisional_F": null,
+   "lean": "GlobalMoments.lean:620 activationPhi; Types.lean activationMoment"
+  },
+  {
+   "id": "I13",
+   "kind": "definition",
+   "name": "coefficient C_A(a,b) = sum over all-nonempty pair labels alpha_e of prod over corners A_{a(i)b(j)}(alpha_e(i,j), alpha_f(i,j))",
+   "file_line": "sections/kernel.tex:154-174 (eq:kernel-coefficient)",
+   "statement": "Limiting nonconstant contribution at type assignment (a,b).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'define'"
+   },
+   "uses_items": [
+    "I12"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "bookkeeping of I14"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "finite expansion coefficient"
+   },
+   "provisional_F": null,
+   "lean": "Coefficients.lean labelProduct, nonemptyLabels; Types.lean:201 typedCoefficient, :205 averagedCoefficient"
+  },
+  {
+   "id": "I14",
+   "kind": "lemma",
+   "name": "Coordinate expansion (lem:kernel-expansion)",
+   "file_line": "sections/kernel.tex:176-235",
+   "statement": "Under zero first moments, t_{I,J}(W_q)=1+sum_{a,b} prod pi prod nu C_A(a,b)+o(1); transpose analogous.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I08",
+    "I09",
+    "I12",
+    "I13",
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "reduces the density to a finite signed sum"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "expansion of a product + face-graph connectivity propagation; routine given I08/I12"
+   },
+   "provisional_F": null,
+   "lean": "Types.lean:373 typedMatrixKernel_tendsto; GlobalMoments.lean configuration_bool_tendsto (dominated 0.28)"
+  },
+  {
+   "id": "I15",
+   "kind": "definition (key construction)",
+   "name": "activation sets M_kappa=U_e cup U_f (7 coords), Gamma_kappa=U_e triangle U_f (6), and the two-branch base law with one negative corner sign sigma",
+   "file_line": "sections/kernel.tex:245-310 (eq:kernel-seven-six, base law, eq:kernel-branch-biases, eq:kernel-base-moment); figures/corner-activation.tex",
+   "statement": "At corner kappa: w.p. 1/2 S=M_kappa with sign law 2^-7(1+sigma theta prod_Gamma xi), w.p. 1/2 S=Gamma_kappa with 2^-6(1-sigma theta prod_Gamma xi). First moments cancel (E phi_Gamma=0) while the overlap moment A(U_e,U_f)=sigma theta/2 survives; exactly one sigma=-1.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'use this \\emph{base law}'; 'two choices of active coordinate set have opposite sign biases' (introduction.tex:96-98)"
+   },
+   "uses_items": [
+    "I12",
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (sole source of negativity)",
+    "why": "produces the single negative term"
+   },
+   "analytic_check": "not in goal or L",
+   "provisional_N": {
+    "grade": "N3 (candidate)",
+    "why": "A finite gadget that cancels every first moment yet keeps a signed second (overlap) moment, so the global product has exactly one surviving negative term. Nearest neighbours: second-order perturbation analysis around the constant kernel (Lovasz 2011 local Sidorenko), sign-perturbation constructions for common/step-Sidorenko graphs (Kral' et al.), London's matrix counterexample for P_4 (non-graph inequality). None found that cancels first moments by branch-switching of supports. Against: moment-matching with branch-mixtures is a standard probabilistic design move."
+   },
+   "provisional_F": "F3 (auxiliary construction)",
+   "lean": "Activation.lean:13-19 cornerPoint/pairCorners/cornerMax/cornerGamma, :790 cornerLaw; Types.lean:164 basePairLaw"
+  },
+  {
+   "id": "I16",
+   "kind": "lemma",
+   "name": "Support forcing (lem:kernel-support)",
+   "file_line": "sections/kernel.tex:312-361",
+   "statement": "At identity types the base-law coefficient has exactly one nonzero term, alpha_e=U_e, value -(theta/2)^66; proof via support identity cap_{kappa in U_g} M_kappa = U_g.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I15",
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "the negative term"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N2 (part of candidate I15)",
+    "why": "short combinatorial argument using 'each pair in two faces' and 'distinct triples share at most one pair'; analyst re-verified support identity computationally"
+   },
+   "provisional_F": null,
+   "lean": "Activation.lean:749 corner_support (dominated 0.042); Coefficients.lean:146 identity_activeCoefficient (0.053); Types.lean:184 basePairLaw_identity (0.054)"
+  },
+  {
+   "id": "I17",
+   "kind": "lemma",
+   "name": "Pinning by vertex and pair scores (lem:pinning)",
+   "file_line": "sections/kernel.tex:383-453",
+   "statement": "If color refinement of a bipartite F is discrete within parts, there are vertex/pair scores s such that id is the unique maximizer of Q(f)=sum s_{f(u)}+sum_{edges} s_{f(u)f(v)} over all part-preserving maps (repetitions allowed). Round scores -||h_t||^2 + 2<h_t,.> give a sum-of-squares identity; lexicographic weighting L_0^{R-t}.",
+   "cited_or_new": {
+    "status": "new (adapted)",
+    "cue": "'the type scores adapt color refinement~\\cite{weisfeilerleman1968,mckay1981}'"
+   },
+   "uses_items": [
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "dominates non-identity type maps"
+   },
+   "analytic_check": "not in goal; WL/equitable partitions in L",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "color refinement and its LP/fractional-isomorphism duals are classical (Tinhofer, Grohe et al.); the quadratic score identity is a neat but close variant of the 'refinement = local histogram equality' characterization"
+   },
+   "provisional_F": null,
+   "lean": "Pinning.lean:78 pinning_step, :117 pinning_complex (dominated 0.21 incl. Refinement tables); Dilution.lean:127 neighborHistogram, :140 VertexPairScores. Lean route: perturbation-mix of scores (exists_positive_perturbation) instead of L_0 lexicographic weights"
+  },
+  {
+   "id": "I18",
+   "kind": "construction",
+   "name": "Gibbs priors pi_a ~ e^{rho s_a}, thinning lambda_ab=e^{rho(s_ab-s_max)}; choose rho large",
+   "file_line": "sections/kernel.tex:455-511 (eq:kernel-priors, eq:kernel-thinning, eq:kernel-finite-gap)",
+   "statement": "Thinning multiplies every all-nonempty term by prod lambda, so the type-sum is Z^{-1} sum C(a,b) e^{rho Q(a,b)}; identity dominates, giving t_0<0.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I16",
+    "I17"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "makes the averaged coefficient negative"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "exponential tilting / Laplace principle"
+   },
+   "provisional_F": null,
+   "lean": "Pinning.lean:186-295 exponentialPrior, gibbsThinning, exponential_dominant_negative, exists_negative_coefficient (dominated 0.33)"
+  },
+  {
+   "id": "I19",
+   "kind": "construction",
+   "name": "dilution by an inactive point type: t(W)=1+eps^13 t_0, t(W^T)=1+eps^22 t_1",
+   "file_line": "sections/kernel.tex:513-573 (eq:kernel-dilution, eq:kernel-product-gap)",
+   "statement": "Inactive type * with probability 1-eps on the point side; the 13 vs 22 asymmetry makes the controlled negative term dominate the uncontrolled transpose term.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I14",
+    "I18"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "needed for the symmetric kernel"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "small-parameter asymmetry trick; uses |I|<|J|; simple but load-bearing"
+   },
+   "provisional_F": null,
+   "lean": "Dilution.lean FiniteLaw.diluted, exists_dilution_gap"
+  },
+  {
+   "id": "I20",
+   "kind": "proposition",
+   "name": "Negative symmetric kernel via crossed product V((x,y),(x',y'))=W(x,y')W(x',y)",
+   "file_line": "sections/kernel.tex:575-605",
+   "statement": "Symmetric, mean one, t(H,V)=t_{I,J}(W) t_{I,J}(W^T)<1; scale into [0,1].",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I19"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "symmetrization"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard bigraphon-to-graphon symmetrization (equivalence of bipartite and symmetric Sidorenko forms)"
+   },
+   "provisional_F": null,
+   "lean": "Symmetrization.lean:77 crossedKernel, :25 exists_oriented_kernel, :121 exists_symmetric_kernel (dominated 0.94)"
+  },
+  {
+   "id": "I21",
+   "kind": "lemma",
+   "name": "Transfer to a finite simple host (lem:finite-host)",
+   "file_line": "sections/kernel.tex:611-668",
+   "statement": "Sampling n>(595+66 mu^66)/Delta labelled vertices gives E t(H,G_n)<=mu^66-Delta+595/n and convexity gives a realization with t(H,G)<p(G)^66.",
+   "cited_or_new": {
+    "status": "standard (rederived)",
+    "cue": "'We use the standard independent sampling construction for graphons \\cite[Lemma 2.4]{lovaszszegedy2006}'"
+   },
+   "uses_items": [
+    "I20"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (routine)",
+    "why": "finite host"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Lovasz-Szegedy sampling with explicit collision error"
+   },
+   "provisional_F": null,
+   "lean": "RandomHost.lean:264-309"
+  },
+  {
+   "id": "I22",
+   "kind": "lemma",
+   "name": "Subspaces and symmetric matrices (Grassmann counts, signed rank layers, nullity tail)",
+   "file_line": "sections/transverse.tex:38-108",
+   "statement": "Gaussian binomials; P(rank k, sign xi)=(1/2+O(1/q))q^{-b(n-k)}; P(dim ker>=u)=O(q^{-b(u)}).",
+   "cited_or_new": {
+    "status": "standard (rederived)",
+    "cue": "'Exact counts by these invariants appear, for example, in Schmidt'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "background",
+    "why": "normalizations"
+   },
+   "analytic_check": "in L (classical)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Huo-Wan/Schmidt; MacWilliams counts"
+   },
+   "provisional_F": null,
+   "lean": "Grassmann.lean, Normalization.lean, Signs.lean"
+  },
+  {
+   "id": "I23",
+   "kind": "lemma",
+   "name": "Split forms and maximal isotropic subspaces (N_r=prod(1+q^a))",
+   "file_line": "sections/transverse.tex:124-190",
+   "statement": "Nondegenerate 2r-form has an r-dim totally isotropic subspace iff det character is c_0; count of maximal isotropic subspaces.",
+   "cited_or_new": {
+    "status": "standard (rederived)",
+    "cue": "'see also Taylor [Exercise 11.3]'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "background",
+    "why": "center counts"
+   },
+   "analytic_check": "in L (classical groups)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Taylor 1992"
+   },
+   "provisional_F": null,
+   "lean": "Projections.lean/Restrictions.lean"
+  },
+  {
+   "id": "I24",
+   "kind": "lemma",
+   "name": "Concentration of restriction signs",
+   "file_line": "sections/transverse.tex:196-251",
+   "statement": "For any family U of r-subspaces, the fraction with nonsingular restriction of sign xi is 1/2 +O(q^{-1/2}+|U|^{-1/2}) in L^1.",
+   "cited_or_new": {
+    "status": "new (elementary)",
+    "cue": "no cue"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "supplies factor 1/2"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "second-moment / pairwise near-independence argument"
+   },
+   "provisional_F": null,
+   "lean": "Restrictions.lean"
+  },
+  {
+   "id": "I25",
+   "kind": "lemma",
+   "name": "Complementary images at half rank",
+   "file_line": "sections/transverse.tex:258-291",
+   "statement": "B nonsingular, rank A=r in S_{2r}: rank(B-A)=r iff AB^{-1}A=A; then chi(det B)=c_0 xi_1 xi_2.",
+   "cited_or_new": {
+    "status": "new (elementary)",
+    "cue": "'The following projection identity explains the special role of half rank.'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential (pivot of I07)",
+    "why": "links center ranks to pair determinant signs"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "elementary linear algebra; the insight is in choosing half rank (I07)"
+   },
+   "provisional_F": null,
+   "lean": "Discriminant.lean:491 complementary_rank_iff; Projections.lean"
+  },
+  {
+   "id": "I26",
+   "kind": "lemma",
+   "name": "Local transverse approximation; center parametrization by maximal L-isotropic subspaces",
+   "file_line": "sections/transverse.tex:293-445",
+   "statement": "On transverse face triples, F_j=(16+O(1/q)) f_{xi1}(Q;L) -> 8 on matches (and 4 f -> 2 for two active incidences); L^1 error O(q^{-1/2}).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I23",
+    "I24",
+    "I25"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "face factor limit"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "counting via I23-I25"
+   },
+   "provisional_F": null,
+   "lean": "LocalMoments.lean, Restrictions.lean, Normalization.lean"
+  },
+  {
+   "id": "I27",
+   "kind": "lemma",
+   "name": "Joint determinant signs (asymptotic independence of the 33 pair signs)",
+   "file_line": "sections/transverse.tex:459-589",
+   "statement": "For D>=12 the law of (chi det(X_i-X_k))_e tends in TV to uniform on {+-1}^E; proof by Schur complement + quadratic Gauss sum rank bound.",
+   "cited_or_new": {
+    "status": "standard tool (rederived)",
+    "cue": "'We use the standard rank bound for a quadratic Gauss sum; see Gowers and Wolf [Lemma 3.3]'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "independent eta_e"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "Gauss-sum equidistribution, standard"
+   },
+   "provisional_F": null,
+   "lean": "SignMoments.lean:434 schur_sign_moment; Monomials.lean:227-270 pairSign_moment_bound/_tendsto"
+  },
+  {
+   "id": "I28",
+   "kind": "proposition",
+   "name": "Transverse limit",
+   "file_line": "sections/transverse.tex:593-630",
+   "statement": "Rank-layer identity on the event T of nonsingular point differences.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I26",
+    "I27"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "half of I08"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "telescoping product bound + TV"
+   },
+   "provisional_F": null,
+   "lean": "GlobalMoments.lean, Charts.lean"
+  },
+  {
+   "id": "I29",
+   "kind": "lemma",
+   "name": "Lagrangian counting formulas; symplectic reduction; pair transitivity",
+   "file_line": "sections/orbits.tex:20-150",
+   "statement": "L_N=prod(q^j+1); containment probabilities; P(dim(A cap B)=h) ~ q^{-b(h)}.",
+   "cited_or_new": {
+    "status": "standard (rederived)",
+    "cue": "'standard finite classical geometry; see Taylor'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "background",
+    "why": "costs"
+   },
+   "analytic_check": "in L",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Taylor 1992"
+   },
+   "provisional_F": null,
+   "lean": "Lagrangian.lean, Reduction.lean, Grassmann.lean"
+  },
+  {
+   "id": "I30",
+   "kind": "lemma",
+   "name": "Chart comparison: symmetric matrices as graph Lagrangians; rank defect = intersection dimension; unsigned kernel J",
+   "file_line": "sections/orbits.tex:152-229; introduction.tex:116-127",
+   "statement": "Gamma_X={(x,Xx)} Lagrangian; dim(Gamma_X cap Gamma_Y)=D-rank(X-Y); signed weighted integrals bounded by unsigned Lagrangian ones.",
+   "cited_or_new": {
+    "status": "standard (transfer)",
+    "cue": "'Symmetric matrices then admit a useful interpretation as Lagrangian subspaces'"
+   },
+   "uses_items": [
+    "I29"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (enables tail)",
+    "why": "moves singular configurations into a homogeneous space"
+   },
+   "analytic_check": "not in goal; in L (graphs of symmetric maps are Lagrangian)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "classical (transfer from symplectic geometry)"
+   },
+   "provisional_F": null,
+   "lean": "Charts.lean; Lagrangian.lean:169 graphLagrangian"
+  },
+  {
+   "id": "I31",
+   "kind": "proposition",
+   "name": "Mass of ordered triple orbits (dimensional profile, cost C=(D+1)c+sum b(s_i)); individual orbit lower bound",
+   "file_line": "sections/orbits.tex:231-527",
+   "statement": "Every ordered symplectic orbit of a feasible profile has mass asymp q^{-C}; residual transverse orbits = congruence classes of nonsingular forms.",
+   "cited_or_new": {
+    "status": "new (with classical classification)",
+    "cue": "'For this classification of ordered transverse triples, see also Kramer and Tent'"
+   },
+   "uses_items": [
+    "I29"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "denominator for planted ratio"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "Kramer-Tent classification + counting"
+   },
+   "provisional_F": null,
+   "lean": "TripleRanks.lean, Orbits.lean, SubspaceCounts.lean, Configurations.lean, OrbitBounds.lean"
+  },
+  {
+   "id": "I32",
+   "kind": "definition + identity",
+   "name": "planted law nu and density ratio dnu/dmu = F_{123}",
+   "file_line": "sections/planted.tex:23-51",
+   "statement": "Choose center Y, then three Lagrangians meeting Y in dimension r; the center integral equals nu(O)/mu(O) on each orbit.",
+   "cited_or_new": {
+    "status": "new use of standard device",
+    "cue": "'Define the \\emph{planted law}'"
+   },
+   "uses_items": [
+    "I31"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "pointwise bound on face factors"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "planting / change of measure is standard in random-structure counting"
+   },
+   "provisional_F": null,
+   "lean": "Planted.lean"
+  },
+  {
+   "id": "I33",
+   "kind": "lemmas",
+   "name": "lift-form parametrization, subspace cost, cyclic difference image, nullity cost",
+   "file_line": "sections/planted.tex:141-330",
+   "statement": "Lagrangians meeting Y' in R are graphs of symmetric forms on R^circ; pair intersections = p_i + nullity of cyclic differences; image codimension b(dim V).",
+   "cited_or_new": {
+    "status": "new (elementary)",
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I32"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "numerator counts"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "linear-algebra counting"
+   },
+   "provisional_F": null,
+   "lean": "Planted.lean, FormGluing.lean, Nullity.lean"
+  },
+  {
+   "id": "I34",
+   "kind": "proposition + lemma",
+   "name": "Gain exponents g (three active) and g_2(h)=b(floor(h/2)) (two active)",
+   "file_line": "sections/planted.tex:359-484",
+   "statement": "Pointwise face factor O(q^g) with explicit maximum over finitely many parameter tuples.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I32",
+    "I33"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "local gains"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "explicit exponent bookkeeping"
+   },
+   "provisional_F": null,
+   "lean": "Planted.lean, Coercivity.lean (TailTuple, tailGain)"
+  },
+  {
+   "id": "I35",
+   "kind": "proposition",
+   "name": "Global profile cost via six bit-class exposure orders and a geometric mean",
+   "file_line": "sections/tail.tex:43-94",
+   "statement": "P(profile)=O(q^{-C}) with C=(1/2)(sum_j C_j - sum_e (1-a_e) b(h_e)); each class exposed face by face along a spanning growth order, P(A)^6 <= prod_t P(A_t).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I04",
+    "I05",
+    "I31"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "probability side of the tail budget"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Shearer/Hoelder-style fractional-cover averaging over several exposure orders; bespoke use of the bit labelling"
+   },
+   "provisional_F": null,
+   "lean": "Exposure.lean (classFace tables, profileCost :397), PairBounds.lean"
+  },
+  {
+   "id": "I36",
+   "kind": "definitions + lemma",
+   "name": "baseline beta_j, slack S_j, excess separation E; faces with <=2 active incidences have S_j>=h^2/24-h/12",
+   "file_line": "sections/tail.tex:112-184",
+   "statement": "C - sum g_j = sum_j S_j + E; equality cases classified.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I34",
+    "I35"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "tail accounting"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "algebra"
+   },
+   "provisional_F": null,
+   "lean": "Coercivity.lean faceBaseline, separationExcess"
+  },
+  {
+   "id": "I37",
+   "kind": "lemma",
+   "name": "Coercivity Q >= (P^2+T^2+delta^2)/342",
+   "file_line": "sections/tail.tex:254-344",
+   "statement": "Homogeneous quadratic part of the slack is coercive on the feasible cone.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I36"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "bounds pair dimensions by sqrt(M)"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "piecewise-quadratic minimization; analyst verified endpoint values and the exact slack identity eq:slack symbolically (sympy)"
+   },
+   "provisional_F": null,
+   "lean": "Coercivity.lean:124/:466 coercivity"
+  },
+  {
+   "id": "I38",
+   "kind": "lemma",
+   "name": "Profiles not separated by the first cost: propagation through the face graph, then choose D",
+   "file_line": "sections/tail.tex:378-513",
+   "statement": "Large pair dimension propagates to all pairs (connectivity), contradicting E<=33M via a pair with a_e>1/3; then D>M_*+44C_* forces u=c, v=0 and integer slack classification leaves c=0, h_e in {0,2}.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I37",
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "reduces to residual profiles"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "bootstrap/propagation argument combined with choosing the dimension after a uniform bound; ingenious ordering but standard ingredients"
+   },
+   "provisional_F": null,
+   "lean": "Coercivity.lean:972 uniform_tail_dichotomy; Tail.lean:282 globalTail_dichotomy, :599 singularTailThreshold (>=1642)"
+  },
+  {
+   "id": "I39",
+   "kind": "lemma",
+   "name": "Strict span inequality sum_i k_i >= 2k (+1 if not direct)",
+   "file_line": "sections/tail.tex:527-564",
+   "statement": "For subspaces on edges of a simple graph, local spans dominate twice the global span, strictly if not a direct sum.",
+   "cited_or_new": {
+    "status": "new (elementary)",
+    "cue": "no cue"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "essential (residual case)",
+    "why": "forces q^{-D} in nondirect case"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "elementary incremental-dimension argument"
+   },
+   "provisional_F": null,
+   "lean": "Spans.lean:121 strict_span_inequality, :235 indexed_strict_span"
+  },
+  {
+   "id": "I40",
+   "kind": "lemma",
+   "name": "Costs for residual profiles (nondirect O(q^{-D+1641}); direct O(q^{-(1/3)sum b(h_e)}))",
+   "file_line": "sections/tail.tex:566-655",
+   "statement": "Counting pair spaces and containments; constant 618 = sum C(2 deg(i),2).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I39",
+    "I29"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "finishes tail"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "counting; analyst re-checked 618 and 1575+66=1641"
+   },
+   "provisional_F": null,
+   "lean": "Spans.lean directPairProfile_card_bound, nondirectPairProfile_card_bound"
+  },
+  {
+   "id": "I41",
+   "kind": "proposition",
+   "name": "Vanishing singular contribution; proof of the rank-layer lemma",
+   "file_line": "sections/tail.tex:659-724",
+   "statement": "For sufficiently large even D (and D>1641), the weighted contribution of configurations with some positive pair intersection is o(1).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "no cue"
+   },
+   "uses_items": [
+    "I35",
+    "I38",
+    "I40",
+    "I30",
+    "I28"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "completes I08"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "assembly"
+   },
+   "provisional_F": null,
+   "lean": "Tail.lean:756 actualSingularTail_bound"
+  },
+  {
+   "id": "I42",
+   "kind": "corollary",
+   "name": "Amplification and injective supersaturation (cor:amplification)",
+   "file_line": "sections/introduction.tex:279-298; sections/consequences.tex:13-46",
+   "statement": "(i) t(H,F)<c p(F)^66 for every c>0 via categorical powers; (ii) fixed deficit for injective copies at positive limiting density via blow-ups.",
+   "cited_or_new": {
+    "status": "standard derivation",
+    "cue": "'This is the standard tensor-power principle \\cite[Section 2]{conlonfoxsudakov2010}'"
+   },
+   "uses_items": [
+    "I02"
+   ],
+   "load_bearing_guess": {
+    "guess": "corollary-only",
+    "why": "consequence"
+   },
+   "analytic_check": "n/a",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "tensor power / blow-up"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I43",
+   "kind": "definition + corollary",
+   "name": "p-forcing; failure of the forcing conjecture (cor:forcing)",
+   "file_line": "sections/introduction.tex:311-345; sections/consequences.tex:50-141",
+   "statement": "Interpolate W_s=(1-s)W_0+sW_1 between the host's adjacency kernel (t(H)<p^66) and a rank-one perturbation p+delta ab (t(H)>p^66) to get a nonconstant graphon with t(K_2)=p, t(H)=p^66; sample to finite graphs with t(C_4)->limit>p^4.",
+   "cited_or_new": {
+    "status": "new (short)",
+    "cue": "'Conlon, Fox, and Sudakov formulate the forcing conjecture'"
+   },
+   "uses_items": [
+    "I02"
+   ],
+   "load_bearing_guess": {
+    "guess": "corollary-only",
+    "why": "second conjecture refuted"
+   },
+   "analytic_check": "n/a",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "intermediate-value interpolation; standard"
+   },
+   "provisional_F": null,
+   "lean": "not formalized (lean/docs/161.md: outside the statement)"
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "rank/discriminant counts of symmetric matrices over F_q (association scheme of symmetric matrices)",
+   "bib_key": "huowan1993; schmidt2015",
+   "locator": "Schmidt Sec. 2, Prop. 2.1",
+   "field": "algebraic combinatorics / finite-field linear algebra",
+   "used_at": "transverse.tex:32-108; introduction.tex:256-261",
+   "status": "re-proved (elementary estimates)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "split forms and maximal isotropic subspace counts",
+   "bib_key": "taylor1992",
+   "locator": "Exercise 11.3",
+   "field": "classical groups / finite geometry",
+   "used_at": "transverse.tex:119-190",
+   "status": "re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "symplectic reduction, Lagrangian counts, pair transitivity",
+   "bib_key": "taylor1992",
+   "locator": "Thm 7.4, Lemma 7.5, Exercises 8.1-8.2",
+   "field": "finite symplectic geometry",
+   "used_at": "orbits.tex:20-150",
+   "status": "re-proved",
+   "essential_for_headline": true
+  },
+  {
+   "name": "classification of ordered transverse Lagrangian triples by congruence classes of forms",
+   "bib_key": "kramertent2010",
+   "locator": "Thm 6, Sec. 2.3",
+   "field": "symplectic geometry / buildings",
+   "used_at": "orbits.tex:384-394",
+   "status": "re-proved ('see also')",
+   "essential_for_headline": true
+  },
+  {
+   "name": "quadratic Gauss sum rank bound |E psi(p(z))| <= q^{-rank/2}",
+   "bib_key": "gowerswolf2011",
+   "locator": "Lemma 3.3",
+   "field": "additive combinatorics / character sums",
+   "used_at": "transverse.tex:528-545",
+   "status": "re-proved (differencing argument)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "colour refinement / equitable partitions",
+   "bib_key": "weisfeilerleman1968; mckay1981",
+   "locator": "McKay Secs. 2.3-2.6",
+   "field": "graph isomorphism",
+   "used_at": "complex.tex:136-141; kernel.tex:375-453",
+   "status": "concept adapted; pinning lemma new",
+   "essential_for_headline": true
+  },
+  {
+   "name": "independent sampling from a graphon (W-random graphs)",
+   "bib_key": "lovaszszegedy2006",
+   "locator": "Sec. 2.6, Lemma 2.4",
+   "field": "graph limits",
+   "used_at": "kernel.tex:607-668; consequences.tex:123-140",
+   "status": "re-proved with explicit collision error",
+   "essential_for_headline": true
+  },
+  {
+   "name": "tensor-power amplification",
+   "bib_key": "conlonfoxsudakov2010",
+   "locator": "Sec. 2",
+   "field": "extremal graph theory",
+   "used_at": "consequences.tex:20-29",
+   "status": "re-proved",
+   "essential_for_headline": false
+  },
+  {
+   "name": "edge + C4 characterization of quasirandomness",
+   "bib_key": "chunggrahamwilson1989",
+   "locator": "",
+   "field": "quasirandom graphs",
+   "used_at": "introduction.tex:317-319; consequences.tex:103-121",
+   "status": "definition only (C4 density > p^4 shown directly by Cauchy-Schwarz)",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Hatami's regularity condition for weakly norming graphs; Coregliano degree-count criterion; Lovasz local Sidorenko",
+   "bib_key": "hatami2010; coregliano2024; lovasz2011local",
+   "locator": "Coregliano Thm 3.6; Lovasz Thms 4.1, 5.1",
+   "field": "graph norms / Sidorenko positive results",
+   "used_at": "introduction.tex:218-254",
+   "status": "background-cited (consistency checks only)",
+   "essential_for_headline": false
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Fix the witness complex (22 triples, 13 points): each pair in two faces, connected face graph, six bit classes with spanning growth orders, separation a_e>=1/3 with one >1/3, WL-discrete incidence graph.",
+   "items": [
+    "I03",
+    "I04",
+    "I05"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Rank-layer lemma (stated, proved in steps 6-8): products of signed half-rank kernels K_xi(X_i-Y_j) over random symmetric matrices converge to a sign model prod_j prod_pairs(1+c_0 eta_e xi xi) with independent eta_e; averaging gives a parity test of four incidence signs per fully active pair.",
+   "items": [
+    "I06",
+    "I07",
+    "I08",
+    "I09"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "Typed activation kernel with zero first moments; coordinate expansion: t_{I,J}(W_q)=1+sum_{type maps} weights * C_A(a,b)+o(1) with all labels nonempty.",
+   "items": [
+    "I10",
+    "I11",
+    "I12",
+    "I13",
+    "I14"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "One coordinate per corner; two-branch base law (M_kappa vs Gamma_kappa) with one negative corner sign; support forcing gives the unique identity-type term -(theta/2)^66.",
+   "items": [
+    "I15",
+    "I16"
+   ]
+  },
+  {
+   "step": 5,
+   "claim": "Pin types: colour-refinement scores make identity the unique maximizer of Q over all part-preserving maps; Gibbs priors + thinning with large rho make the averaged coefficient t_0<0; dilution (eps^13 vs eps^22) controls the transpose; crossed product gives a symmetric [0,1] kernel with t(H,U)<mu^66; sampling gives the finite host.",
+   "items": [
+    "I17",
+    "I18",
+    "I19",
+    "I20",
+    "I21"
+   ]
+  },
+  {
+   "step": 6,
+   "claim": "Transverse part of the rank-layer lemma: half-rank complementary images relate center ranks to pair determinant signs; centers counted via maximal isotropic subspaces of L=B_0^{-1}-B_1^{-1}; restriction signs concentrate at 1/2; joint pair signs asymptotically independent by Schur complements + Gauss sums.",
+   "items": [
+    "I22",
+    "I23",
+    "I24",
+    "I25",
+    "I26",
+    "I27",
+    "I28"
+   ]
+  },
+  {
+   "step": 7,
+   "claim": "Singular part, local: symmetric matrices -> graph Lagrangians (rank defect = intersection dimension); orbit masses q^{-C}; planted-law density ratio bounds each face factor by q^g with explicit gains.",
+   "items": [
+    "I29",
+    "I30",
+    "I31",
+    "I32",
+    "I33",
+    "I34"
+   ]
+  },
+  {
+   "step": 8,
+   "claim": "Singular part, global: profile probability via six bit-class exposures and geometric mean; slack = sum S_j + separation excess; coercivity bounds pair dimensions; propagation over the connected face graph + an a_e>1/3 pair bounds them uniformly; choose D large to force equality profiles (c=0, h_e in {0,2}); span counts give strict decay; hence the rank-layer lemma.",
+   "items": [
+    "I35",
+    "I36",
+    "I37",
+    "I38",
+    "I39",
+    "I40",
+    "I41"
+   ]
+  },
+  {
+   "step": 9,
+   "claim": "Consequences: tensor powers / blow-ups (amplification, injective copies); interpolation W_s between host and rank-one perturbation gives a nonconstant graphon with t(K_2)=p, t(H)=p^66, refuting the forcing conjecture.",
+   "items": [
+    "I42",
+    "I43"
+   ]
+  }
+ ],
+ "lean_structure": {
+  "files": 35,
+  "lines": 23761,
+  "declarations": 2280,
+  "kind_counts": {
+   "theorem": 1727,
+   "def": 442,
+   "abbrev": 86,
+   "instance": 19,
+   "structure": 6
+  },
+  "proof_dag_size": 1600,
+  "core_vs_implementation": "Branch split by file lines: singular-tail / Lagrangian geometry (Grassmann, Lagrangian, FormGluing, Nullity, Reduction, TripleRanks, Orbits, SubspaceCounts, Configurations, OrbitBounds, Planted, Coercivity, PairBounds, Exposure, Spans, Tail) 13,539 lines (57%); transverse + joint signs + chart (Discriminant, Signs, Projections, Restrictions, Normalization, LocalMoments, SignMoments, Monomials, Charts, GlobalMoments) 6,420 (27%); combinatorial construction + pinning + symmetrization + host (Basic, Activation, Coefficients, Types, Dilution, Refinement, Pinning, Symmetrization, RandomHost) 3,802 (16%). Re-proved classical background (Grassmann/Lagrangian/split-form counts, Gauss sums, orbit classification) is perhaps 30-40% of the rank-layer branch; Refinement.lean (316 decls) is pure certificate plumbing. No implementation layer comparable to 103/112; the mathematical core is most of the code.",
+  "key_items_dag": {
+   "exists_symmetric_kernel (Symmetrization.lean:121)": "dominated_share 0.94",
+   "typedMatrixKernel_tendsto (Types.lean:373) = rank-layer branch entry": "dominated_share 0.44 (under-estimate; see extractor_caveat). By file lines the rank-layer lemma (I08) is ~84% of the Lean.",
+   "exists_negative_coefficient (Pinning.lean:295) = combinatorial branch": "dominated_share 0.33, of which pinning_complex 0.21 is mostly Refinement certificate tables",
+   "configuration_bool_tendsto (GlobalMoments.lean:416)": "0.28",
+   "basePairLaw_identity / identity_activeCoefficient / corner_support (I15/I16)": "0.054 / 0.053 / 0.042 dominated; 1,915 lines (8%) in Activation+Coefficients+Types; small but the only source of negativity",
+   "globalTail_dichotomy (Tail.lean:282) / uniform_tail_dichotomy (Coercivity.lean:972) / actualSingularTail_bound (Tail.lean:756)": "0.057 / 0.044 / 0.048 (heavily under-linked)"
+  },
+  "route_differences_from_paper": [
+   "Pinning: Lean pinning_step (Pinning.lean:78) combines rounds by a small positive perturbation (exists_positive_perturbation) rather than the paper's lexicographic weights L_0^{R-t}; refinement is certified directly on the incidence graph in 4 rounds of tables (Refinement.lean) rather than via the point-graph argument of complex.tex:212-261. Same conclusion.",
+   "Dimension: Lean takes rank parameter 2r with r := singularTailThreshold (Classical.choose of globalTail_dichotomy, proven >= 1642), matrices of size 2*(2*r) (Symmetrization.lean:30-50); the paper only asserts 'sufficiently large even D' plus D>1641.",
+   "Corollaries cor:amplification and cor:forcing are not formalized."
+  ],
+  "extractor_caveat": "scripts/extract_lean.py v3 misses links made by `have h := lemma args` inside tactic proofs: e.g. tripleFaceDensity_tail_bound (used Tail.lean:519), directPairProfile_card_bound / nondirectPairProfile_card_bound (Tail.lean:234-236), indexed_strict_span (Spans.lean:622) show in_proof_dag=False. Hence Planted.lean (3/45 decls in DAG), Exposure (9/105), Spans (5/78), Nullity (6/71) are badly under-counted and DAG shares for the singular-tail branch are lower bounds. Refinement.lean's 316 certificate lemmas inflate the combinatorial branch's declaration count."
+ },
+ "eureka_candidates_ranked": [
+  "I07+I08 (+I25) signed half-rank rank-layer sign model",
+  "I15+I16 two-branch activation law + support forcing",
+  "I03 witness complex (triangulated 2-sphere incidence graph with 3-bit labelling)",
+  "I17+I18 colour-refinement pinning with Gibbs tilting",
+  "I35+I38 six-class exposure cost + separation surplus + propagation"
+ ],
+ "eureka_candidates": [
+  {
+   "rank": 1,
+   "item": "I07+I08 (+I25): signed half-rank layer kernel K_xi on symmetric matrices over F_q and the rank-layer sign-model limit",
+   "provisional_N": "N3 (candidate)",
+   "provisional_F": "F5 (change of representation) / F3",
+   "for": "Nothing like it occurs in the goal (which mentions only H and G) or in L. It is the mechanism that makes the counterexample possible: a common 'center' matrix at half rank forces complementary images (I25), so a face of three incidences becomes a multiplicative constraint on the determinant signs of the three point-pair differences, and the pair signs are asymptotically independent. In effect it simulates, inside an ordinary bipartite homomorphism density, the kind of 3-wise parity obstruction that makes hypergraph Sidorenko fail (loose triangle), a transfer the field had no mechanism for. The rank-layer lemma is ~84% of the Lean code (by lines) and is the single analytic input of the construction. It is syntactically small (an indicator of a rank/sign layer) but hard to find.",
+   "against": "Every raw ingredient is classical: the rank+discriminant relations form the Huo-Wan association scheme (cited by the paper itself), Lagrangian/graph-of-symmetric-map geometry and split-form counts are textbook (Taylor), the joint-sign independence is a Gauss-sum computation (Gowers-Wolf), and algebraic hosts built from quadratic characters (Paley graphs, norm graphs, random algebraic constructions) are standard in extremal graph theory. A strict judge could call it a new bridge (association schemes -> Sidorenko) rather than a new concept. Its downstream reuse beyond Sidorenko-type density questions is untested.",
+   "nearest_neighbour": "Huo-Wan 1993 association scheme of symmetric matrices (same relation, no density use); hypergraph Sidorenko counterexamples (Sidorenko 1993 loose triangle; Conlon-Lee-Sidorenko arXiv:2307.04588, 3-partite tight cycles) for the parity idea; London's weighted-matrix counterexample for P_4 (non-graph inequality); Lovasz-Szegedy/Lovasz 2011 local analysis showing any counterexample kernel must be far from constant.",
+   "lit_check": "WebSearch (2026-10-12): 'Sidorenko counterexample symmetric matrices finite field rank kernel', 'dual polar graph symmetric matrices half rank Lagrangian Grassmannian homomorphism density', 'Sidorenko incidence graph triangulation sphere', 'Sidorenko 3-uniform loose triangle parity': no prior use of rank-layer / Lagrangian kernels for homomorphism-density sign engineering found (snippet level). Wikipedia now reports OpenAI's claim only."
+  },
+  {
+   "rank": 2,
+   "item": "I15+I16 (+I12): two-branch activation law on M_kappa / Gamma_kappa with one negative corner sign; zero first moments; support forcing to a unique -(theta/2)^66 term",
+   "provisional_N": "N3 (candidate)",
+   "provisional_F": "F3 (auxiliary construction)",
+   "for": "A finite gadget, invented for this H, that cancels every nonconstant first sign moment yet keeps a signed overlap moment. Together with the support identity cap_{kappa in U_g} M_kappa = U_g it makes the identity-type coefficient a single, negative product. It is the sole source of negativity in the proof, and it is not in the goal or in L. The paper's own text has no precedent cue.",
+   "against": "Mixtures of branches with opposite biases to kill first moments are a routine design move in Fourier/moment engineering. The support argument is short and uses only 'each pair in two faces'. Only 8% of the Lean (1,915 lines). Highly specific to the complex, so a downstream speedup outside Sidorenko-type questions is unlikely; it may be a one-off device.",
+   "nearest_neighbour": "second-order (local) Sidorenko expansions around the constant kernel (Lovasz 2011); sign-perturbation constructions in common/step-Sidorenko graph work (Kral', Martins, Pach, Wrochna 2019); Walsh-Fourier moment-matching designs.",
+   "lit_check": "Covered by the same searches; no construction with branch-switched supports found (snippet level)."
+  },
+  {
+   "rank": 3,
+   "item": "I03 (+I04/I05): the witness H, a 13-vertex triangulation of the 2-sphere (22 triangles) with a 3-bit face labelling whose six bit classes are spanning growth sequences",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "Judged against the problem as originally posed (Sidorenko: all bipartite H), the witness is not a subterm. No prior literature proposes sphere-triangulation incidence graphs as candidates (the smallest previously open case discussed is K_{5,5} minus C_10). The paper's degree checks show it escapes every known positive criterion (not weakly norming, fails Coregliano's degree counts, minimum degree 3).",
+   "against": "As an object it belongs to a classical class: Levi graphs of triangulated surfaces (analyst observation: V-E+F=2, all links are cycles; the paper never says 'sphere'). Its properties are exactly the constraints the proof needs, so its discovery is probably a computer search downstream of I07/I15, not an independent idea. A witness is a single instance and cannot be reused downstream.",
+   "nearest_neighbour": "incidence graphs of simplicial complexes and partial Steiner triple systems; K_{5,5} minus C_10 and the Mobius ladder as standard open cases.",
+   "lit_check": "WebSearch 'Sidorenko conjecture incidence graph triangulation sphere candidate counterexample': nothing relevant."
+  },
+  {
+   "rank": 4,
+   "item": "I17+I18: pinning by colour-refinement vertex/pair scores plus Gibbs priors and thinning",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "It turns WL-discreteness of H into a weighting under which the identity type assignment dominates all part-preserving maps, repetitions included. The sum-of-squares round score -||h(f(u))||^2+2<h(f(u)),h(u)> is a neat identity. Without it the negative identity term could be swamped.",
+   "against": "WL/equitable partitions and their LP and fractional-isomorphism duals are classical, exponential tilting is the Laplace principle, and the paper itself says it 'adapts' colour refinement.",
+   "nearest_neighbour": "Tinhofer / Grohe-Kersting-Mladenov-Selman fractional isomorphism; Dell-Grohe-Rattan homomorphism indistinguishability; Boker WL for graphons.",
+   "lit_check": "WebSearch 'color refinement Weisfeiler-Leman scores pin identity homomorphism weighted graph ... graphon': related WL-graphon work only; no identical scoring lemma found."
+  },
+  {
+   "rank": 5,
+   "item": "I35+I36+I38: profile cost by six bit-class exposure orders with a geometric mean, the separation surplus E from a_e>1/3, and propagation of a large pair dimension across the face graph",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "This is the device that controls the singular tail, the main technical obstruction (the normalised kernels grow like a power of q). The bit labelling is designed so that every pair is internal to at most two of the six classes (a_e>=1/3), and the surplus from one strictly separated pair kills the 'common intersection' mode via propagation.",
+   "against": "Averaging several exposure or covering orders is Shearer / Hoelder fractional-cover reasoning. The coercivity and propagation steps are ordinary estimates.",
+   "nearest_neighbour": "Shearer's lemma / fractional edge covers in homomorphism counting (Friedgut-Kahn, Galvin-Tetali); exposure-martingale counting.",
+   "lit_check": "not searched separately (generic technique)."
+  }
+ ],
+ "correctness_audit": {
+  "verdict": "This is an extraordinary claim: it disproves a well-known 1986/1991 conjecture. The paper is compact (3.9k lines) and internally coherent at the level read. Sections complex and kernel were checked line by line. Transverse, orbits, planted and tail were read in full; the exponent algebra was spot-checked symbolically. No gap was found. Trust rests on the Lean formalization (23.8k lines, text-level clean, comparator statement faithful to the theorem); the compile result is pending from the orchestrator. If it compiles under the three standard axioms, Theorem 1 is certified independently of the paper's prose.",
+  "checked": [
+   "All four parts of Prop. complex re-verified in Python: 33 pairs each in exactly two faces; face graph connected; six bit classes of 11 faces, each with a growth order; min a_e = 1/3 with 5 pairs above 1/3 (incl. {0,2} with a_e=1); colour refinement discrete after 4 rounds (35 colours); point degrees (4,6,4,6,5,4,5,5,5,6,5,6,5)",
+   "Support identity eq:kernel-support-intersection and |M_kappa|=7 verified computationally for all 66 corners and 33 pairs",
+   "Base-law moments: E phi_Gamma = 0 and A(U_e,U_f)=sigma theta/2 (kernel.tex:281-310), checked by hand",
+   "Coordinate-expansion bookkeeping: per-corner factor equals phi_{alpha_e} phi_{alpha_f} (kernel.tex:206-235), checked by hand",
+   "chi(det L)=eta_12 eta_13 eta_23 and the transverse normalisation exponents r(r-1)/2-b(2r)+3b(r)=0 and r^2-b(2r)+2b(r)=0 (sympy)",
+   "Gauss-sum TV bound (1/2) q^{-1/2} (transverse.tex:547-558), checked by hand",
+   "Common-space gain identity g_C=(r+c+1)u-2u^2 and the exact slack identity eq:slack (sympy, symbolic in all 10 variables)",
+   "Coercivity endpoint values F(P/3+delta), F(P+3delta), G(x/3), G(x) (sympy) and the 1/342 constant",
+   "Residual constant 618 = sum_i C(2 deg i, 2) and 1575+66=1641",
+   "Comparator faces and definitions vs Table tab:complex and Basic.lean: identical",
+   "Trust-surface grep (0 sorry/axiom/native_decide/set_option)"
+  ],
+  "concerns": [
+   "The result is unreviewed. Search finds only the Wikipedia mention of OpenAI's claim and no independent expert verification (2026-10-12).",
+   "The singular-tail sections (orbits/planted/tail) have many exponent inequalities and constants (342, 33M, 44C_*, 1641). They were spot-checked, not fully audited by hand. The paper notes that the local maximizing tuples need not be simultaneously realizable and that only necessary constraints are used, so the argument is an upper bound; it is plausible but intricate.",
+   "Wikipedia calls the counterexample 'constructive', which overstates it. H is explicit, but G is only shown to exist: D is huge (>=1642 in the paper; the Lean matrix size is 2*(2r) with r := singularTailThreshold >= 1642), q, eps and rho come from limits, and G is a random sample. No explicit host or density gap is computable from the paper.",
+   "The forcing and amplification corollaries are not in the Lean. They are short and standard, but uncertified.",
+   "The comparator JSON lists no definition_names. The orchestrator should confirm that the comparator matches the challenge-file constants (faces, H, homDensity, edgeDensity) against the solution's Basic.lean (textually identical).",
+   "Heavy use of Classical.choose (e.g. singularTailThreshold) is fine under the permitted axioms. The ~541 decide calls are kernel-checked finite certificates; none is native_decide."
+  ],
+  "consistency_checks": [
+   "lean/docs/161.md scope matches the comparator (main theorem only; forcing consequence excluded)",
+   "Lean top-level route (exists_negative_coefficient -> dilution -> typedMatrixKernel_tendsto x2 -> OrientedKernel -> crossed product -> SymmetricCounterKernel -> random host) mirrors kernel.tex Sections 2.3-2.5 and Figure proof-overview",
+   "Lean finiteHost_main uses the paper's exact host-size bound n > (595+66 mu^66)/Delta (RandomHost.lean:300-302 vs kernel.tex:620)"
+  ]
+ },
+ "extraction_friction": [
+  "12 TeX files, 3,920 lines; all \\input resolved (main.tex lists 8 sections plus 2 figure files).",
+  "Definitions are mostly inline (\\emph{faces}, \\emph{corner}, \\emph{face-neighbor graph}, \\emph{sign}, \\emph{base law}, \\emph{planted law}, \\emph{profile}, \\emph{dimensional profile}, \\emph{p-forcing}). The main construction (the activation laws) is defined in a bulleted list, not in a definition environment.",
+  "Key structural fact not stated in the paper: the complex is a 13-vertex triangulated 2-sphere. An extractor working only from the paper would miss this neighbour class.",
+  "The extractor under-links `have := lemma` uses inside tactic proofs, so singular-tail DAG shares are lower bounds. Refinement.lean certificate lemmas (316) inflate declaration counts. Load-bearing shares are therefore reported by file lines as well.",
+  "Lean names are descriptive and match paper sections well (Activation, Pinning, Planted, Coercivity, Spans, Tail), so joining paper and Lean was easy. The Lean pinning route differs slightly from the paper's.",
+  "No reasoning trace for this family; the discovery process (especially the search for the complex) is invisible."
+ ]
+}
