@@ -1,0 +1,527 @@
+{
+ "family": 143,
+ "title": "Hilbert's sixteenth problem: uniform bounds for limit cycles (143a) and two limit cycles for quintic Lienard systems (143b)",
+ "analyst_role": "novelty",
+ "date": "2026-10-12",
+ "inputs": [
+  "docs/PLAN.md",
+  "docs/novelty_agent_prompt.md",
+  "data/pilot/143/family.json + family.md (no trace, no f1_*)",
+  "data/pilot/287/novelty.json, data/pilot/322/novelty.json (format)",
+  "143b build/sections/{introduction,fitting,references}.tex (read); model/transport via family.json",
+  "143a build/sections/01-introduction.tex (read), 03-separation.tex opening, references/references.bib",
+  "lean/OAI/Analysis/LienardCycles/{QuadraticCoordinates,GlobalFit,ActualFitTransport,CurvatureComparison,CurvatureTransport,CurvaturePositive,OriginalProfile}.lean (spot checks)",
+  "lean/docs/143.md, CONTENTS.md:3443-3459"
+ ],
+ "base_library_L": "Mathlib d13f23b + both bibliographies: 143b thebibliography (17: LMP, Rychkov, DPR, DMD, DMH, LiLlibre, LiLu, LlibreZhang, CLZZ arXiv:2608.19542, Rosales Aug-2026 preprint, Odani, GGG, OT, CGP 1996, Perko) and 143a references.bib (24: Ilyashenko 1985/1990/1991/2002, Ecalle 1992, Yeung 2025, Roussarie 1998, Bautin, Ilyashenko-Yakovenko 1995, Kaloshin 2003, Binyamini-Novikov-Yakovenko 2010, Kaiser-Rolin-Speissegger 2009, Galal-Kaiser-Speissegger 2020, Lion-Rolin 1997, Opris 2023, Bierstone-Milman 1988, Gabrielov 1968, Khovanskii 1984 x2, Sard 1942, Dulac, Hilbert). L- = L (no cited work is model-produced, so nothing is removed for contamination control).",
+ "precedent_checks": [
+  {
+   "work": "Chen-Li-Zhang-Zhang (CLZZ), 'The number of limit cycles of piecewise linear Lienard systems', arXiv:2608.19542v1 (20 Aug 2026)",
+   "fetched": false,
+   "ai_disclosure": "none mentioned in search summaries (unverified: arxiv.org unreachable)",
+   "contains_candidates": "absent: piecewise-linear Lienard systems; per search snippet it states 'the maximum number of limit cycles of system (1) remains unknown for n>=5', i.e. it treats degree 5 as open. No quadratic fit, no Schwarzian.",
+   "role_in_paper": "status citation (143b introduction.tex:34-38: reports the degree-5 problem open)"
+  },
+  {
+   "work": "M. Hernandez Rosales, 'A global algebraic variety approach to the maximum number of limit cycles in Lienard equations', ResearchGate preprint, 31 Aug 2026",
+   "fetched": false,
+   "ai_disclosure": "unknown (not indexed by search; ResearchGate unreachable)",
+   "contains_candidates": "absent per 143b's own account: a proposed 4-cycle quintic example that 143b refutes (it is Odani's Example 3; leading-order roots X^2=(5+-sqrt15)/2). An averaging/algebraic-variety approach, not a fit device.",
+   "role_in_paper": "refuted claim (143b introduction.tex:44-66)"
+  },
+  {
+   "work": "M. Yeung, 'Dulac's Theorem Revisited', QTDS 24 (2025) art. 57; arXiv:2402.12506",
+   "fetched": false,
+   "ai_disclosure": "none known (human 2024 preprint; unverified)",
+   "contains_candidates": "absent: identifies a coefficient-closure gap in a leading-term argument of Ilyashenko 1991. Motivates 143a's explicit independent-argument bookkeeping (04-calculus.tex:13) but contains no packet / tree-of-expansions device.",
+   "role_in_paper": "143a background (gap in prior mechanism)"
+  },
+  {
+   "work": "Opris, 'On preparation theorems for R_an,exp-definable functions', J. Logic & Analysis 15 (2023)",
+   "fetched": false,
+   "ai_disclosure": "n/a (2023 journal paper)",
+   "contains_candidates": "absent: invoked tool (preparation), N0",
+   "role_in_paper": "invoked for Lion-Rolin finite-family preparation (U14)"
+  },
+  {
+   "work": "Uncited, post-manuscript: arXiv:2610.13080 'Limit cycles of slow-fast quintic Lienard systems' (Oct 2026)",
+   "fetched": false,
+   "ai_disclosure": "unknown",
+   "contains_candidates": "absent per search summary: singular-perturbation result (at most two cycles for 0<eps<eps0(F)), half-orbit sign analysis of v=y-F(x); no fit coordinates. Post-dates 143b (24 Sep 2026), so not a precedent; it may or may not cite the OpenAI release.",
+   "role_in_paper": "not cited (later work)"
+  },
+  {
+   "work": "Problem-name searches for model-produced prior work: 'Hilbert's sixteenth' / 'quintic Lienard' / 'Lins-de Melo-Pugh' with ChatGPT, GPT-5, OpenAI, AI-assisted, AlphaEvolve",
+   "fetched": false,
+   "ai_disclosure": "only hits are the OpenAI release itself (github openai/math lean/docs/143.md) and the VibeMathed aggregator, which attributes the 2026-09-24 quintic result to an unreleased internal OpenAI model ('Lean-checked, statement unaudited'). No earlier model-produced Lienard or Hilbert-16 work found.",
+   "contains_candidates": "n/a",
+   "role_in_paper": "provenance search"
+  }
+ ],
+ "candidates": [
+  {
+   "id": "E1",
+   "name": "Quadratic-fit coordinates for Lienard half-arcs (global fit + transport law)",
+   "manuscript": "143b",
+   "lean_backed": true,
+   "lean_decls": [
+    "QuinticLienard.QuadraticCoordinates.H/P/Q/R/S/G (QuadraticCoordinates.lean:20-26)",
+    "QuadraticFit.fitK/fitK_spec/fit_unique (GlobalFit.lean:82-99)",
+    "ActualFitTransport.fit_transport (ActualFitTransport.lean:105)"
+   ],
+   "paper_items": [
+    "Q11 model midpoint H(lambda,kappa,r) and P,Q,R,S,G (fitting.tex:1-20)",
+    "Q19 thm:quadratic-fit: (lambda,kappa,r)->(H,H_r,r) is a diffeomorphism onto {|M|<r,|v|<1}",
+    "Q20 lem:fit-transport (fitting.tex:606-651)",
+    "Q14 curvature comparison (gadget)"
+   ],
+   "trace": "no trace for family 143",
+   "statement": "For the arc equation du/dy=phi(u)-y at base height h and half-width r, with endpoint data M (relative midpoint) and v=M_r, there is a unique quadratic profile lambda(u-h)+kappa(u-h)^2/2 whose arc has the same (M,M_r); the fitted parameters satisfy P lambda_r+Q kappa_r=0, D kappa=-(R/G)(lambda-k(h)), D lambda-kappa=(S/G)(lambda-k(h)), with D the characteristic derivative and k(h)=phi'(h).",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Lagrange/Euler method of osculating elements / variation of parameters (celestial mechanics; general ODE form e.g. Efroimsky 2005)",
+      "relation": "represent the actual solution by the member of a model family that matches the current state (value + first derivative), then derive transport ODEs for the parameters with a source equal to the model-actual discrepancy. Lemma 3.7 is exactly this computation applied to the arc-data characteristic system (fitting.tex:617-651: subtract the model's transport from the actual one and solve a 2x2 system with determinant G).",
+      "verdict": "close variant at method level (template); the instance (state = arc endpoint midpoint and its width derivative, model = quadratic Filippov profiles, global invertibility) is not in it"
+     },
+     {
+      "ref": "Krylov-Bogoliubov equivalent linearization / describing functions / harmonic balance (nonlinear oscillations)",
+      "relation": "choose model parameters so that the model reproduces chosen output data of the nonlinear oscillator rather than its coefficients",
+      "verdict": "genuinely different (heuristic approximation, no exact transport or comparison); data-space fitting precedent only"
+     },
+     {
+      "ref": "Massera 1954 homothetic-orbit comparison; Sansone; Sabatini-Villari survey arXiv:1101.2761",
+      "relation": "uniqueness of Lienard cycles by comparing an orbit with a one-parameter family of model curves (homothetic copies)",
+      "verdict": "genuinely different (fixed scaling family, no fitted coordinates)"
+     },
+     {
+      "ref": "Filippov transformation + comparison of the two branches F1(z),F2(z) on the half-planes (Zhang Zhifen 1958/1986; Coppel 1989; Dumortier-Li 1996/97; Li-Llibre 2012 degree 4; Zhou-Yuan 2023)",
+      "relation": "same coordinates (u=x^2/2, du/dy=phi_pm(u)-y) and the same task (compare non-symmetric half-orbits); conditions on F1-F2 or on ratios",
+      "verdict": "genuinely different for the device (no fit of endpoint data); known route for the setting. Li-Llibre full text not readable here."
+     },
+     {
+      "ref": "Villari-Zanolin energy-level comparison; Perez-Gonzalez-Torregrosa-Torres comparison without containment",
+      "relation": "comparison of a Lienard system with a model system",
+      "verdict": "genuinely different"
+     },
+     {
+      "ref": "Rychkov 1975 (odd quintic); Li-Lu 2014 (slow-fast degree 5, slow divergence integral); arXiv:2610.13080 (Oct 2026, slow-fast, post-dates 143b)",
+      "relation": "prior/later degree-5 partial results",
+      "verdict": "genuinely different (symmetric or singular-limit methods)"
+     }
+    ],
+    "searches": "WebSearch 2026-10-12: 'quintic Lienard at most two limit cycles LMP degree 5 proof 2026'; 'Lienard half-orbit comparison osculating / variation of parameters fitted parabola'; 'Filippov transformation comparison two half-planes z=x^2/2 Zhang Zhifen'; 'Li Llibre 2012 degree four proof method'; 'Dumortier Li Lienard half orbits Coppel'; 'Massera homothetic orbits comparison'; 'method of osculating elements model family limit cycles'; 'LMP conjecture degree five open 2025/2026'. family.json's own search ('quadratic profile midpoint width Schwarzian'). WebFetch failed with DNS errors on every host tried (arxiv.org, vibemathed.com, ddd.uab.cat) and Bash curl to export.arxiv.org got proxy 403, so no full text was read. All literature claims rest on search-engine summaries plus analyst domain knowledge; quotes are unverified.",
+    "verdict": "no near-equivalent found in Lienard/limit-cycle literature; method-level template exists (osculating elements). Closest is a template, not an instance."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "The goal (OAI.QuinticLienard.main: encard of IsLimitCycle sets <= 2 and = 2) mentions no model family, no fitted parameters and no endpoint midpoint data. H is defined implicitly through solutions of the model arc ODE (midpointAtWidth of the profile lambda u+kappa u^2/2). No statement in L has it as a subterm. Caveat: the paper's own heuristic (introduction.tex:83-85, 'This common part suggests using quadratic profiles as a comparison family') shows the model family choice is suggested by the goal's coefficient structure; what is not suggested is fitting in endpoint-data space with exact transport."
+   },
+   "test3": {
+    "verdict": "pass",
+    "evidence": "family.json (extractor v3): QuadraticCoordinates.H has 404 DAG dependents (31.7% of DAG, ~52% of the Secs 3-7 core); fitK_spec 10% downstream; every two-cycle and one-cycle case (cases 2-4) goes through fit_transport. Dominated share of H is ~0 only because case 1 and sharpness reach the target by other branches; knockout of E1 disconnects cases 2-4 of upper_bound (dominated 73.5%), with no alternative route in the paper."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "no trace. Estimated >=2 from L + arcs/matching (must choose a 2-parameter model family AND decide to fit endpoint data (M,M_r) rather than Taylor-osculate phi); about 1 if the hint 'use quadratic profiles as a comparison family' is given.",
+    "chain_depth": "2 (pays off only with E2's model inequality and E4's shape comparisons)",
+    "protocol": "P-E1"
+   },
+   "final": {
+    "N": "N3 (provisional: tests 1-3 pass, test 4 pending; borderline N2)",
+    "F": "F5 (change of representation: endpoint data -> fitted model parameters) with F1 flavour (new defined objects H,P,Q,R,S,G)",
+    "confidence": 0.4,
+    "justification": "The engine of the first proof of the degree-5 LMP case (open since 1977; CLZZ Aug 2026 still lists it open). No Lienard or limit-cycle source in searches fits a model profile to arc endpoint data. Cook-style: H and the fit are a few lines to state, are implicitly defined, and about half the Lean core hangs on them. Strong downgrade risk: the derivation of the transport law is the classical osculating-elements computation (10 lines) and the model family is suggested by the problem's even part, so once 'fit a quadratic in data space' is posed the rest is routine (arm A). Grade drops to N2 if arm B of P-E1 hits at the calibrated rate, or if an expert finds a fitted-model comparison in the Chinese-school Lienard literature (Ye Yanqian / Zhang Zhifen monographs, not readable here). Not transfer: osculating elements is the N0 method; the candidate is the problem-specific coordinate system and its global invertibility (Theorem 3.6)."
+   }
+  },
+  {
+   "id": "E2",
+   "name": "Model inequality (R/G)_r <= 0 via the Schwarzian of the quadratic arc's endpoint correspondence",
+   "manuscript": "143b",
+   "lean_backed": true,
+   "lean_decls": [
+    "QuadraticCoordinates.model_inequality (CurvatureComparison.lean:105)",
+    "Cr_nonpos (CurvatureTransport.lean:32)",
+    "ModelEndpoint.gamma_source_sign (EndpointSigns.lean:93)",
+    "Schwarzian.lean, Riccati.lean, ModelAlgebra.lean"
+   ],
+   "paper_items": [
+    "Q21 thm:model-inequality",
+    "Q22 W=RS_r-SR_r, first-zero argument",
+    "Q23 endpoint coordinates m=r-H, n=r+H, Schwarzian of n(m)",
+    "Q25 Riccati linearization, common projective label",
+    "Q24/Q26 endpoint algebra and three-case sign certificates"
+   ],
+   "trace": "no trace for family 143",
+   "statement": "For every model profile (lambda,kappa) and width r>0, d/dr (R/G) <= 0. Proof: W=RS_r-SR_r=16r^3/45+O(r^4)>0 near 0; at a first zero of W along model characteristics the sign of gamma_rr - sigma0 gamma_r is fixed by an endpoint determinant identity and the Schwarzian of the endpoint correspondence n(m) of a quadratic arc (via Riccati linearization), closed by three polynomial certificates.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Coll-Gasull-Prohens, JDE 132 (1996) 203-221 (cited as CGP)",
+      "relation": "Schwarzian derivative of a return map used to bound limit cycles",
+      "verdict": "close variant of the tool use (cycle bound via Schwarzian sign); different map (return map vs endpoint correspondence of a model arc)"
+     },
+     {
+      "ref": "Ovsienko-Tabachnikov (Notices 2009; Sturm theory and Ghys theorem, dg-ga/9510007)",
+      "relation": "Schwarzian of a ratio of solutions = -2Q0; Riccati <-> second-order linear ODE; projective structures",
+      "verdict": "ingredient (N0 transfer, cited)"
+     },
+     {
+      "ref": "Negative-Schwarzian arguments in 1-D dynamics (Singer 1978); Chebyshev-criterion/Riccati 'centroid curve' methods for Abelian integrals (Grau-Manosas-Villadelprat TAMS 2011; Gasull et al.)",
+      "relation": "Schwarzian/Riccati sign arguments to control zeros",
+      "verdict": "template (known route)"
+     },
+     {
+      "ref": "first-zero (barrier) arguments along characteristics",
+      "relation": "standard ODE comparison",
+      "verdict": "N0 technique"
+     }
+    ],
+    "searches": "WebSearch 2026-10-12: 'Coll Gasull Prohens 1996 Schwarzian'; 'Schwarzian uniqueness limit cycles Lienard Gasull Manosas Villadelprat Chebyshev'; 'Schwarzian of map pairing endpoints of trajectory arc Riccati projective structure Sturm'. WebFetch failed with DNS errors on every host tried (arxiv.org, vibemathed.com, ddd.uab.cat) and Bash curl to export.arxiv.org got proxy 403, so no full text was read. All literature claims rest on search-engine summaries plus analyst domain knowledge; quotes are unverified.",
+    "verdict": "close variant at tool level (CGP 1996 Schwarzian cycle bounds; OT identities); the specific endpoint-correspondence object not found"
+   },
+   "test2": {
+    "verdict": "borderline (analytic relative to E1)",
+    "evidence": "Not a subterm of the goal or of L. But once E1 is in place, R/G is literally the coefficient of the kappa transport, and asking for the sign of its width derivative is the obvious next question; the statement is analytic relative to L+E1."
+   },
+   "test3": {
+    "verdict": "pass",
+    "evidence": "model_inequality/Cr_nonpos dominated share 16.6% of the DAG (~27% of the core); gamma_source_sign 11.4%. Needed for kappa_width_pos (E4) and hence cases 2-4."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "about 1 given E1 (the question is posed by E1); the Schwarzian route itself ~1-2",
+    "chain_depth": "2 (requires E1)",
+    "protocol": "P-E2"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Load-bearing and technically clever (reading the model arc as a projective correspondence between its endpoints), but the statement is posed by E1, the tools are textbook (Schwarzian of a solution ratio, chain rule, Riccati linearization, first-zero barrier, polynomial sign certificates) and Schwarzian-based cycle bounds are a known route (CGP 1996, cited by the paper itself). Upper N3 only if the endpoint-correspondence Schwarzian were judged independently discoverable-hard; no evidence for that."
+   }
+  },
+  {
+   "id": "E3",
+   "name": "Packets (trees of lateral asymptotic expansions on nested complex bands), separation theorem, packet calculus and absolute isolated-zero finiteness",
+   "manuscript": "143a",
+   "lean_backed": false,
+   "lean_decls": [],
+   "paper_items": [
+    "U02 logarithmic flags",
+    "U05 def:packet",
+    "U06 thm:separation",
+    "U09 thm:calculus",
+    "U12 thm:absolute-zero"
+   ],
+   "trace": "no trace for family 143",
+   "statement": "A packet records an analytic function together with two trees (lateral +/- determinations) of successive asymptotic expansions on nested complex bands over a saturated logarithmic flag, with domain/transition/error estimates. Separation: if both trees vanish the function vanishes (no simultaneous convergence in all small exponentials). With a differentiated implicit calculus and elimination induction this yields absolute isolated-zero finiteness: finitely many isolated solutions when coefficients, cut positions, multipliers and jets all vary.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Ilyashenko 1991 (Finiteness theorems for limit cycles): superexact asymptotic series + Phragmen-Lindelof",
+      "relation": "nested expansions whose coefficients are themselves expanded at the next level; quasianalyticity from complete asymptotic data. 143a places its separation theorem in this tradition (03-separation.tex:11-19).",
+      "verdict": "close variant (one-variable, no parameters); packets are its multi-scale, multi-clock, parametric extension"
+     },
+     {
+      "ref": "Ecalle 1992 (analysable functions, accelero-summation, lateral sums)",
+      "relation": "multi-level resummation with lateral determinations on either side of Stokes directions; the paper's 'lateral determinations' vocabulary is Ecalle's",
+      "verdict": "close variant (template)"
+     },
+     {
+      "ref": "Galal-Kaiser-Speissegger 2020 (Ilyashenko algebras, quasianalytic transserial asymptotics); Speissegger/Galal program toward several variables and Dulac with parameters",
+      "relation": "injectivity/quasianalyticity theorem for an expansion class; one variable only; the multivariable parametric version is the stated open goal of this program",
+      "verdict": "close variant (the item is what this program aims at)"
+     },
+     {
+      "ref": "Kaiser-Rolin-Speissegger 2009 (o-minimality of transition maps at nonresonant hyperbolic singularities; uniform bounds for small unfoldings)",
+      "relation": "parametric finiteness near polycycles via o-minimality",
+      "verdict": "genuinely different mechanism, same target in a restricted class"
+     },
+     {
+      "ref": "Yeung 2025 (closure gap in Ilyashenko 1991)",
+      "relation": "motivates independent-argument bookkeeping",
+      "verdict": "background"
+     }
+    ],
+    "searches": "WebSearch 2026-10-12: 'Ilyashenko algebras multivariable quasianalytic transition maps Speissegger Galal Kaiser o-minimal Dulac uniform finiteness'; 'uniform boundedness limit cycles 2026 OpenAI Hilbert sixteenth reaction'; 'Hilbert sixteenth ChatGPT/GPT-5/OpenAI 2026'. No independent confirmation or discussion of 143a found; sources still call uniform boundedness open (Wikipedia; Ilyashenko 2002). WebFetch failed with DNS errors on every host tried (arxiv.org, vibemathed.com, ddd.uab.cat) and Bash curl to export.arxiv.org got proxy 403, so no full text was read. All literature claims rest on search-engine summaries plus analyst domain knowledge; quotes are unverified.",
+    "verdict": "close variants exist (Ilyashenko superexact series; Ecalle lateral multi-level expansions; GKS one-variable algebras). The new part is the multi-clock parametric extension and its proof, not a new kind of object."
+   },
+   "test2": {
+    "verdict": "pass",
+    "evidence": "No packet, flag or absolute-zero notion occurs in the goal (finite B(d)). In L the nearest statements are one-variable (Ilyashenko, GKS); the multivariable separation statement is not a subterm."
+   },
+   "test3": {
+    "verdict": "pass (text level)",
+    "evidence": "Secs 2-8 (~6k of 11.9k TeX lines) exist to prove thm:absolute-zero, which is the sole analytic input to the counting section (thm:matching-system). No Lean, so no DAG measure."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "no trace; ~1 from L at the level of 'extend Ilyashenko superexact series to several clocks with lateral trees' (the goal is named in GKS/Galal); the proof is the hard part",
+    "chain_depth": "3 (packets -> separation -> calculus -> absolute zero -> counting)",
+    "protocol": "P-E3 (informal only)"
+   },
+   "final": {
+    "N": "N2 (upper N3; conditional on correctness, which is unverified)",
+    "F": null,
+    "confidence": 0.45,
+    "justification": "If correct, 143a would settle the existential Hilbert 16 problem and packets would be the key analytic engine. But as a device a packet is a multi-scale, parametric extension of Ilyashenko's superexact series combined with Ecalle's lateral determinations, and the paper itself frames separation inside that quasianalytic tradition. Extending a named framework to more variables is a close variant (N2), even when the extension is very hard. The hardness here is in the proof, not in finding the object. Not Lean-backed: it could never enter the Lean shortlist, and at N2 it does not enter data/eureka_informal.json either. Upgrade to N3 only if experts (Ilyashenko, Speissegger, Kaiser, Rolin) judge the tree-without-simultaneous-convergence separation to be a genuinely new mechanism and the proof survives refereeing."
+   }
+  },
+  {
+   "id": "E4",
+   "name": "Shape comparisons for general profiles: phi'''>0 => kappa_r>0 and lambda<k(h); ((phi'-d)/u)'>0 => lambda-h kappa<d",
+   "manuscript": "143b",
+   "lean_backed": true,
+   "lean_decls": [
+    "QuinticFit.kappa_width_pos (CurvaturePositive.lean:75)",
+    "Intercept.intercept_negative (Intercept.lean:130)",
+    "CurvatureRange.curvature_lower/upper"
+   ],
+   "paper_items": [
+    "Q28 prop:third-derivative",
+    "Q29 prop:intercept",
+    "Q30 fitted-curvature range"
+   ],
+   "trace": "no trace for family 143",
+   "statement": "As named; stated in the paper for general smooth profiles, but in Lean only for the quintic profile class phi(u)=F(sqrt(2u)) with a : Fin 6 -> R.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Zhang Zhifen uniqueness theorem (monotone f(x)/g(x)-type ratio); Coppel 1989; Li-Llibre 2012",
+      "relation": "classical Lienard shape hypotheses yield cycle bounds",
+      "verdict": "close variant (hypothesis type)"
+     },
+     {
+      "ref": "Chebyshev/third-derivative criteria (Grau-Manosas-Villadelprat 2011)",
+      "relation": "sign of higher derivatives controls zero counts",
+      "verdict": "template"
+     }
+    ],
+    "searches": "Covered by E1/E2 searches; not separately searched. WebFetch failed with DNS errors on every host tried (arxiv.org, vibemathed.com, ddd.uab.cat) and Bash curl to export.arxiv.org got proxy 403, so no full text was read. All literature claims rest on search-engine summaries plus analyst domain knowledge; quotes are unverified.",
+    "verdict": "close variants at hypothesis level; the conclusions are consequences of E1+E2 plus barrier arguments"
+   },
+   "test2": {
+    "verdict": "borderline",
+    "evidence": "Hypotheses are classical shape conditions; conclusions are stated in E1's coordinates, so analytic relative to L+E1+E2."
+   },
+   "test3": {
+    "verdict": "pass",
+    "evidence": "kappa_width_pos dominated share 22.3%; matching_isolated_case2 (consumer) 25.1%."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "about 1 given E1+E2",
+    "chain_depth": "3",
+    "protocol": "negative control in P-E1"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Barrier-argument consequences of E1+E2 under classical Lienard shape conditions. Potentially reusable for other Lienard-type F (paper says so), which makes them the natural downstream test bed for E1, but they are not jumps themselves."
+   }
+  },
+  {
+   "id": "E5",
+   "name": "Moving-cut matching systems + projection count: uniform boundedness reduced to absolute isolated-zero finiteness",
+   "manuscript": "143a",
+   "lean_backed": false,
+   "lean_decls": [],
+   "paper_items": [
+    "U19 admissible open data / absolute zero property",
+    "U20 thm:projection-count",
+    "U21 thm:matching-system",
+    "U22 graph and jet lifting"
+   ],
+   "trace": "no trace for family 143",
+   "statement": "Represent a return by equations matching endpoints of finitely many local passages with moving cuts; within each regular chart, different hyperbolic cycles lie in different fiber components; a Khovanskii-type projection count bounds components uniformly once absolute finiteness holds for the differential/algebraic closure; Duff rotation makes isolated cycles hyperbolic.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Ilyashenko-Yakovenko 1995 cyclic systems (Sec 0.4), named by the paper (01-introduction.tex:112-115)",
+      "relation": "same representation with fixed cuts",
+      "verdict": "close variant (moving cuts are the twist)"
+     },
+     {
+      "ref": "Khovanskii 1984 finiteness/critical-point counting; Gabrielov complement; Wilkie 1999 theorem of the complement (uniform finiteness of nonsingular solutions for derivative-closed classes -> o-minimality); o-minimal uniform finiteness",
+      "relation": "absolute finiteness for a derivative-closed class gives uniform bounds on fiber components",
+      "verdict": "close variant / N0 principle"
+     },
+     {
+      "ref": "Roussarie 1998 (finite cyclicity reduction via compactness of parameter space)",
+      "relation": "alternative reduction of uniform boundedness",
+      "verdict": "genuinely different route"
+     }
+    ],
+    "searches": "WebSearch 2026-10-12: 'Ilyashenko Yakovenko finite cyclicity elementary polycycles cyclic systems moving cuts Roussarie Hilbert-Arnold Kaloshin'; family.json's Khovanskii search. WebFetch failed with DNS errors on every host tried (arxiv.org, vibemathed.com, ddd.uab.cat) and Bash curl to export.arxiv.org got proxy 403, so no full text was read. All literature claims rest on search-engine summaries plus analyst domain knowledge; quotes are unverified.",
+    "verdict": "close variants named by the paper itself"
+   },
+   "test2": {
+    "verdict": "fail (borderline)",
+    "evidence": "Up to unfolding, 'uniform bound on fiber components of a derivative-closed class with absolute finiteness' is the Khovanskii/Wilkie finiteness principle in L-adjacent literature (Khovanskii1984 is in L)."
+   },
+   "test3": {
+    "verdict": "pass (text level)",
+    "evidence": "Sec 11 is the whole uniformity argument."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "about 1",
+    "chain_depth": "1",
+    "protocol": "none (N2)"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Clean architecture, but each piece has a named precedent (cyclic systems, Khovanskii/Gabrielov/Wilkie uniform finiteness, Duff rotated fields). Leans N1 in substance; kept at N2 for the moving-cut variant."
+   }
+  }
+ ],
+ "excluded_from_candidates": [
+  {
+   "paper": "Q01-Q10 (limit-cycle definition, Filippov/half-plane arc equation u=x^2/2, arc data r,M,v, characteristics, matching Prop 2.5)",
+   "reason": "goal vocabulary or classical (Filippov transformation, Coppel/Zhang Zhifen school); N0-N1 plumbing, 39% of Lean DAG"
+  },
+  {
+   "paper": "Q31 isolated-zero count for f'=b q (SecantIntegral.isolated_zero_count_linear)",
+   "reason": "Rolle-type count, N0/N1"
+  },
+  {
+   "paper": "Q33-Q36 (case 1 integrating factor, sharpness F_eps by first-order averaging, Rosales refutation, normalizations)",
+   "reason": "N0: classical averaging/Melnikov lower bound (as in LMP 1977); sharpness is only 4.4% dominated share"
+  },
+  {
+   "paper": "Q12-Q18, Q22, Q24, Q26, Q27, Q30 (reference functions, conditional fit, R,S>0, W, endpoint algebra, three-case sign certificates, small-width fit, curvature range)",
+   "reason": "proof gadgets folded into E1/E2 (N1 individually)"
+  },
+  {
+   "paper": "U14 Lion-Rolin preparation, U16 crossing lemma, U23 rotation lemma (Duff 1953, uncited), U24 final assembly",
+   "reason": "N0 invoked or classical tools"
+  },
+  {
+   "paper": "U02-U04, U07, U08, U10, U11, U13, U15, U17, U18, U22 (flags, contours, Cauchy corrections, elimination, primitive passage packets, box induction, templates, terminal reduction)",
+   "reason": "143a technical machinery feeding E3/E5; graded through them, N1-N2 individually (family.json)"
+  }
+ ],
+ "family_D": {
+  "label": "D3 (provisional)",
+  "confidence": 0.4,
+  "rests_on": "E1 alone (quadratic-fit coordinates, 143b, Lean-backed). E2, E4 are N2 in its wake; E3 and E5 (143a, no Lean) are N2.",
+  "falls_to": "D2 if (a) arm B of P-E1 shows contamination-controlled models propose a data-space fit of a 2-parameter model profile family with transport equations at the calibrated rate; or (b) an expert (Li Chengzhi, Llibre, Gasull, De Maesschalck, Dumortier) identifies a fitted-model / osculating comparison in the Lienard uniqueness literature (Ye Yanqian and Zhang Zhifen monographs, Li-Llibre 2012, Dumortier-Li were not readable here); or (c) the osculating-elements template is judged to make E1 a close variant rather than a template.",
+  "not_transfer": "Osculating elements, Schwarzian/Riccati identities, Filippov transformation, averaging, Lion-Rolin preparation, Khovanskii counting, Sard and Duff rotation are N0 transfer. The candidate is the problem-specific fitted coordinate system, so the cross-field exclusion does not apply.",
+  "correctness_caveat": "143b: Lean (146 files, 16.7k lines, text-clean, comparator OAI.QuinticLienard.main matches the paper exactly) is trusted as published per PLAN 2026-10-12 and was not built here. 143a: extraordinary, unformalized, unrefereed claim to the existential Hilbert 16; no independent confirmation found; E3/E5 grades are conditional on correctness.",
+  "compression_note": "E1 is Cook-shaped: a handful of implicitly defined real functions (H and four derivatives, G) on which ~52% of the Lean core depends, turning a two-sided non-symmetric arc comparison into sign/monotonicity of two scalar fitted quantities. Note for the downstream test: in Lean the model side (H..G, model_inequality, fit) is profile-independent, but fit_transport and kappa_width_pos are stated only for the quintic profile class (a : Fin 6 -> R), so reuse on other Lienard degrees requires restating the actual-profile layer.",
+  "headline_vs_comparator": "The family headline (143a, uniform boundedness) is not formalized; the comparator certifies only 143b. D3 rests entirely on 143b."
+ },
+ "provenance_flag": {
+  "applies": "no",
+  "builds_on_prior_model_result_strict": false,
+  "model_produced_precedent": false,
+  "explanation": "Cited 2025-26 works: CLZZ arXiv:2608.19542 (Aug 2026, piecewise-linear Lienard, human authors; search summaries mention no AI; reports n=5 open; contains no candidate), Hernandez Rosales (Aug 2026 ResearchGate preprint; a refuted example; AI disclosure unknown; no candidate), Yeung 2025 (human 2024 preprint; gap in Ilyashenko 1991; no candidate). Abstract pages could not be fetched (WebFetch DNS failure; curl proxy 403), so disclosure is from search summaries only. Searches for Hilbert 16 / quintic Lienard / LMP plus ChatGPT, GPT-5, OpenAI, AI-assisted, AlphaEvolve found only the OpenAI release itself and an aggregator (VibeMathed) attributing 143b to an unreleased internal OpenAI model. The two 143 manuscripts do not cite each other or any model output; no other release family touches limit cycles (CONTENTS.md). The papers themselves are model-produced (author 'OpenAI')."
+ },
+ "bridge_novelty": [
+  {
+   "import": "Variation of parameters / method of osculating elements (celestial mechanics, general ODE) -> Lienard half-arc comparison (E1)",
+   "status": "new bridge (no precedent found for this problem type; template-level)",
+   "evidence": "No Lienard/LMP source in searches fits model profiles to endpoint data; the classical Lienard comparison literature uses fixed comparison families (Massera homothety, energy levels, F1-F2 branch conditions). Summary-level only. Per CLAUDE.md a new bridge is not automatically a jump; it is recorded separately from E1's N3."
+  },
+  {
+   "import": "Projective differential geometry (Schwarzian, Riccati linearization) -> limit-cycle bounds (E2)",
+   "status": "known route",
+   "evidence": "Coll-Gasull-Prohens 1996 (Schwarzian of return maps for cycle bounds; cited); Riccati/centroid methods for Abelian integrals (Gasull, Grau, Manosas, Villadelprat)"
+  },
+  {
+   "import": "Real algebraic sign certificates -> Lienard sign cases",
+   "status": "known route",
+   "evidence": "standard in Lienard and Abelian-integral zero counting"
+  },
+  {
+   "import": "Averaging / first-order Melnikov -> sharpness lower bound",
+   "status": "known route",
+   "evidence": "LMP 1977; Llibre-Zhang 2017 survey"
+  },
+  {
+   "import": "Resurgence / quasianalytic asymptotics (Ecalle, Ilyashenko) -> uniform finiteness (E3)",
+   "status": "known route",
+   "evidence": "Ilyashenko 1991, Ecalle 1992; GKS 2020 and the Speissegger-Galal program target exactly the parametric version"
+  },
+  {
+   "import": "O-minimal / subanalytic geometry (Lion-Rolin, Bierstone-Milman, Gabrielov) -> Hilbert 16 (U14, E5)",
+   "status": "known route",
+   "evidence": "Kaiser-Rolin-Speissegger 2009; Speissegger program; Roussarie school"
+  },
+  {
+   "import": "Khovanskii fewnomial / Pfaffian finiteness -> cycle counting (E5)",
+   "status": "known route",
+   "evidence": "Khovanskii 1984; Ilyashenko-Yakovenko 1995; Binyamini-Novikov-Yakovenko 2010"
+  },
+  {
+   "import": "Differential topology (Sard generic tilt) and rotated vector fields (Duff 1953, uncited)",
+   "status": "known route",
+   "evidence": "classical in limit-cycle theory (Perko, Ye Yanqian)"
+  }
+ ],
+ "discoverability_protocols": {
+  "common": {
+   "models": "Training-data cutoff strictly before 2026-09-24 (manuscript date; release 2026-10-06). Canary probe: ask whether the degree-5 Lins-de Melo-Pugh case is resolved and whether a 'quadratic fit' proof is known; exclude any model that describes the 143b argument. No browsing or retrieval. Exclude the OpenAI model(s) that produced the release; run them only as an uncontrolled upper-reference arm. Judge must differ from proposer. No model-produced precedent needs excluding (provenance flag: no).",
+   "context_L_minus": "Mathlib d13f23b digest (ODE: IsSolution/HasDerivAt, implicit/inverse function theorem, Polynomial, intermediate value, Rolle) plus 143b's bibliography as abstracts plus invoked statements, plus the non-hidden part of 143b: introduction WITHOUT the 'Method' paragraph (introduction.tex:77-133 removed), Section 2 arcs.tex (Q02-Q10: arc equation, arc data r,M,v, characteristics, variation formula, matching Prop 2.5), Q31 zero-count lemma, sharpness.",
+   "sampling": "n=256 per arm, temperature 1.0, fixed reasoning budget (e.g. 32k tokens); unbiased pass@k for k in {1,2,4,...,256}; K=256.",
+   "judging": "Two independent LLM judges with the paper's precedent remarks (introduction.tex:83-104) and this file's neighbour list in the prompt; a Lienard specialist checks all hits and 10% of misses; Lean equivalence against QuadraticCoordinates.H / GlobalFit.fitK_spec / ActualFitTransport.fit_transport where a formal statement is proposed.",
+   "controls": "Positive: Cook-Reckhow ER extension variables for PHP. Negative: Q02 (Filippov transformation), Q10 (matching), E4 (given E1+E2). Threshold calibrated as in PLAN step 4.",
+   "prompt_template": "Problem: Show that x'=y-F(x), y'=-x with deg F<=5 has at most two limit cycles. Library: [L- digest]. Established results you may use: [Section 2 statements verbatim]. [arm A only: Hint: the even coefficients give the same quadratic part in both half-plane profiles, so quadratic profiles are a natural comparison family.] Propose the single most useful new definition, coordinate system or lemma, stated precisely, with a proof sketch of how it is used."
+  },
+  "P-E1": {
+   "item": "E1 quadratic-fit coordinates + transport law (Lean-backed)",
+   "hide": "Q11-Q30 and everything downstream: fitting.tex, model.tex, transport.tex, application.tex (Secs 3-6), and the Method paragraph of the introduction.",
+   "arm_A_pivot": "Give the hint that quadratic profiles are the comparison family. Expected moderate hit rate; measures whether data-space fitting + transport follows once the model family is named.",
+   "arm_B_decisive": "No hint. Decides N3.",
+   "arm_C_open": "Problem statement + L- only (Section 2 also hidden): tests whether arc/endpoint coordinates and the fit are both found.",
+   "equivalence": "Hit: a map from arc endpoint data (relative midpoint M and its width derivative M_r, or an equivalent pair such as the two endpoint heights and their width derivatives) to the parameters of a two-parameter model profile family (quadratic lambda u+kappa u^2/2 or an affine reparametrisation), claimed unique/invertible on the admissible region, together with evolution equations for the fitted parameters along characteristics whose source is the actual-minus-model slope discrepancy (or equivalent). Partial (recorded, not counted): Taylor-osculating parabola of phi at a point; comparison with a fixed model equation without fitting; fit without transport.",
+   "k": "1..256 (powers of 2)",
+   "pivot_distance": ">=2 (arm B); about 1 (arm A)",
+   "chain_depth": 2
+  },
+  "P-E2": {
+   "item": "E2 model inequality via endpoint-correspondence Schwarzian (Lean-backed, N2: run as calibration)",
+   "hide": "model.tex (Q21-Q26) and downstream; give E1 (fitting.tex) in full.",
+   "arm": "Ask for a proof that (R/G)_r <= 0 (statement given) and, separately, for 'the key inequality needed to make the kappa transport monotone' (statement hidden).",
+   "equivalence": "Hit: any correct proof route to (R/G)_r<=0 (credited separately if it uses a Schwarzian/projective-correspondence argument); statement hit if the sign of d/dr(R/G) is identified as the needed estimate.",
+   "k": "1..64",
+   "pivot_distance": "about 1",
+   "chain_depth": 2
+  },
+  "P-E3": {
+   "item": "E3 packets/separation (no Lean; N2; informal only, optional)",
+   "protocol": "LLM-judge, text level: hide Secs 2-8 of 143a; give Sec 1 minus 'Analytic ingredients', Ilyashenko 1991/Ecalle 1992/GKS 2020 abstracts; ask for the analytic finiteness principle needed for thm:projection-count. Hit: a nested/tree asymptotic expansion class in several scales with lateral determinations and a quasianalyticity (separation) theorem without simultaneous convergence. Pen-and-paper review by an expert in Ilyashenko-Ecalle theory. Never counts toward a confirmed eureka step."
+  }
+ },
+ "open_questions": [
+  "Read Li-Llibre 2012, Dumortier-Li 1996/97, Coppel 1989 and the Ye Yanqian / Zhang Zhifen monographs in full: is there any fitted-model or osculating comparison of half-arcs? This is the main risk to E1's N3.",
+  "Fetch arXiv abstract pages (2608.19542, 2610.13080) and the Rosales preprint when network allows; confirm AI-disclosure status (currently from search summaries only).",
+  "Does arXiv:2610.13080 (Oct 2026, slow-fast quintic Lienard) cite the OpenAI release or reuse E1? If it reuses the fit device, that is downstream evidence.",
+  "Downstream test for E1 (PLAN step 9): candidate targets are other Lienard classes where two-sided non-symmetric half-arc comparison is the obstacle (e.g. x''+f(x)x'+g(x)=0 with g nonlinear, generalized Lienard with deg F=5 and g(x)=x+..., quartic case re-proof as a negative-control corollary). The Lean actual-profile layer is quintic-specific (Fin 6 -> R), so restating it is a prerequisite.",
+  "Correctness of 143a: absolute zero property and the desingularization substitute (family.md risks). An expert reading by the Ilyashenko / Speissegger / Roussarie schools is needed before E3 is graded further.",
+  "Expert query (Speissegger, Kaiser, Rolin): is a multivariable tree-of-expansions separation without simultaneous convergence new, or folklore within the Ilyashenko-algebra program? Decides E3 N2 vs N3.",
+  "Is the dominated share ~0 of QuadraticCoordinates.H an artifact of case 1/sharpness branches? A knockout run on upper_bound restricted to cases 2-4 would make test 3 quantitative."
+ ],
+ "sources": [
+  "https://github.com/openai/math/blob/adc7f1241b42e322a6451854ab7e4b4c146bf78a/lean/docs/143.md (search result; local copy read)",
+  "https://vibemathed.com/problem/lins-de-melo-pugh-quintic-lienard (search result only; fetch failed)",
+  "https://arxiv.org/pdf/2608.19542 (CLZZ; search result only)",
+  "https://arxiv.org/html/2610.13080 (slow-fast quintic Lienard, Oct 2026; search result only)",
+  "https://arxiv.org/pdf/1101.2761 (Sabatini-Villari, legacy of Sansone; Massera; search result only)",
+  "https://ddd.uab.cat/pub/artpub/2012/gsduab_3055/joudifequ_a2012v252p3142preprint.pdf (Li-Llibre degree 4; search result only)",
+  "https://ddd.uab.cat/pub/artpub/2017/221320/expmat_a2017v35n3p286preprint.pdf (Llibre-Zhang survey; search result only)",
+  "https://portalrecerca.uab.cat/ca/publications/limit-cycles-for-non-smooth-differential-equations-via-schwarzian/ (CGP 1996; search result only)",
+  "https://www.doi.org/10.1090/S0002-9947-2010-05007-X (Grau-Manosas-Villadelprat; search result only)",
+  "https://arxiv.org/pdf/dg-ga/9510007 (Ovsienko-Tabachnikov Sturm theory/Schwarzian; search result only)",
+  "https://ar5iv.arxiv.org/html/1606.02751 (Speissegger quasianalytic Ilyashenko algebras; search result only)",
+  "https://macsphere.mcmaster.ca/bitstream/11375/20117/2/Galal_Zeinab_201607_MSc.pdf (Galal thesis; search result only)",
+  "https://arxiv.org/pdf/math/0010174 ; https://arxiv.org/pdf/math/0111053 (Kaloshin; Hilbert-Arnold; search results only)",
+  "https://aa.usno.navy.mil/downloads/reports/Efroimsky2005a.pdf (osculating elements / variation of parameters; search result only)",
+  "https://doaj.org/article/697ed851730740529add6413fc277ec9 (Zhou-Yuan 2023 Filippov transformation uniqueness; search result only)",
+  "https://en.wikipedia.org/wiki/Hilbert's_sixteenth_problem (status; search result only)"
+ ]
+}
