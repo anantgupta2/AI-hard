@@ -1,0 +1,442 @@
+{
+ "fid": "322",
+ "item": "C1: opposite-endpoint return map g on extremal directions, whose Kuratowski contraction factor (1-M/r)(1-M/s) <= (1-M/(1+t))^2 < 1 is supplied by the hypothetical attained defect M, so that Darbo's theorem gives aligned chords (paper I10+I15 -> I16, prop:alignment; provisional N3, F3+F5)",
+ "item_type": "F3+F5 (auxiliary construction + re-representation of the extremal problem as a chi-contraction fixed-point problem); a lemma-level device, not a witness",
+ "lean_status": "as in paper",
+ "lean_status_why": "ReturnMap.lean defines exactly the paper's g (eq:return) and its radii p,s,u,r, ReturnMapEstimate/ReturnMapBounds/ReturnMapNoncompactness prove eq:contraction, the factor (1-M/(1+t))^2 and chi(gH) <= gamma chi(H) for every H in C, and Alignment.lean feeds them to a re-proved Darbo theorem to get prop:alignment; exists_alignedConfiguration is on the comparator's only path to M = 0 (no_attained_positive_defect).",
+ "lean_gaps": [
+  "Route identical to the paper (radial contacts, extremal set E, r = u + M, two triangle inequalities, scalar binning of p and u, Darbo). No weaker or special-case statement: the comparator OAI.Tingley.tingley_sphere_isometry_full matches the headline exactly (uniqueness even among non-continuous linear maps).",
+  "Totalization: for the Darbo step g is extended to all of X as returnAmbient (value 0 off the unit sphere, likewise pAmbient/sAmbient/uAmbient/rAmbient); only ContinuousOn the sphere is proved. The paper works on S_X directly. Harmless: C is inside E ⊂ S_X.",
+  "Lean splits the device into a map-agnostic abstraction: exists_fixedPoint_of_return_estimate (any continuous g : X → X on a nonempty closed bounded convex C in a Banach space, any scalar functions p,s,u,r with radii in [1-t,1+t], s = p + M, r = u + M and the paper's two-point estimate, has a fixed point). The paper states this inline only for its g. For downstream reuse this is the cleaner library interface.",
+  "Darbo is re-proved (CondensingFixedPoint.lean via nested condensing sets with chi -> 0, compact convex intersection, then Schauder via Sperner/Brouwer on simplices); Mathlib d13f23b has none of chi, Darbo, Schauder or Brouwer. This is N0 background (39% of the target DAG) and not part of C1.",
+  "The device is applied to the completed-ultrapower isometry produced by positive_maxDefect_attained_or_inverse (DefectAttainment.lean), not to the original f; the paper does the same (lem:attainment). exists_alignedConfiguration assumes CompleteSpace X, HasDefectBound f M for all q in [0,1] and attainment signedDefect f t x0 y = M.",
+  "The invariant convex set C comes from C2 (exists_return_invariant_convex, positive hull-growth schedule); C1 needs it as input. C1 alone does not give alignment.",
+  "Minor bookkeeping: the paper's r||g(v)-g(v')|| <= |r-r'| + |u-u'| + u||w-w'|| becomes 2|u-u'| + u||w-w'|| in Lean, using r-r' = u-u' on E; same estimate.",
+  "Text-level only: lake build and comparator were NOT run here (shared checkout; Lean trusted as published per orchestrator)."
+ ],
+ "comparator_chain": [
+  "OAI.Tingley.tingley_sphere_isometry_full (Extension.lean:101; comparator TingleySphereIsometry, solution_module OAI.Analysis.SphereIsometry.Main)",
+  "OAI.Tingley.extension / extension_unit / extension_unique (Extension.lean; extension f := radialLinearIsometryEquiv f (hasDefectBound_zero f))",
+  "OAI.Tingley.hasDefectBound_zero",
+  "OAI.Tingley.maxDefect_eq_zero",
+  "OAI.Tingley.no_attained_positive_defect (Extension.lean:27: obtain ⟨C⟩ := exists_alignedConfiguration ...; exact alignedConfiguration_impossible ...)",
+  "OAI.Tingley.exists_alignedConfiguration (Alignment.lean:61) [C1 composite = prop:alignment]",
+  "  ├ OAI.Tingley.exists_return_invariant_convex (AlignmentSet.lean:21) [C2]",
+  "  ├ OAI.Tingley.returnAmbient_pair_estimate_on → returnAmbient_pair_estimate → returnSphere_pair_estimate (ReturnMapEstimate.lean:82) [C1: eq:contraction]",
+  "  │    └ rRadius_eq_add / extremal_radius_identities / sRadius_eq_add (ExtremalPropagation.lean) ; fxPoint_eq, fzPoint_eq, zPoint_eq, sphere_norm_sub",
+  "  ├ OAI.Tingley.exists_fixedPoint_of_return_estimate (ReturnMapFixedPoint.lean:22) [C1: estimate ⇒ fixed point]",
+  "  │    ├ OAI.Tingley.chi_return_image_le (ReturnMapNoncompactness.lean:60) → finiteDiameterCover_image_of_scalar_bins, return_pair_uniform_bound → return_coefficient_le (ReturnMapBounds.lean:21)",
+  "  │    ├ OAI.Tingley.return_contraction_factor_mem_Ico (ReturnMapBounds.lean:94)",
+  "  │    └ OAI.Tingley.exists_fixedPoint_of_kuratowski_contraction (CondensingFixedPoint.lean:26) [Darbo, N0]",
+  "  └ OAI.Tingley.aligned_of_return_fixed (Alignment.lean:25)",
+  "       └ OAI.Tingley.returnSphere, xPoint, zPoint, wDirection, pRadius, sRadius, uRadius, rRadius (ReturnMap.lean:69-106) → radialRadius / radialContact (RadialContact.lean)"
+ ],
+ "comparator_chain_note": "Read by hand from imports and proof terms, cross-checked against data/items/322_lean.json (extractor v3): dominated_share of exists_alignedConfiguration = 0.665 of the 579-decl target DAG, exists_fixedPoint_of_return_estimate = 0.408 (mostly the Darbo stack beneath it), returnSphere has 24 dependents, pRadius 61. No alternative path to maxDefect_eq_zero bypasses exists_alignedConfiguration.",
+ "lean_source": [
+  {
+   "name": "OAI.Tingley.{pRadius,xPoint,sRadius,wDirection,uRadius,zPoint,rRadius,returnSphere}",
+   "kind": "def (the return map g and its four radii)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/SphereIsometry/ReturnMap.lean",
+   "line": 69,
+   "text": "/-- The first radial radius. The isometry is an explicit common parameter even\nthough this first contact only uses the domain center. -/\ndef pRadius (_f : UnitSphere X ≃ᵢ UnitSphere Y) (y : UnitSphere X)\n    (t : ℝ) (ht : 0 < t ∧ t < 1) (v : UnitSphere X) : ℝ :=\n  radialRadius (t • (y : X)) (returnCenter_lt_one y t ht) v\n\nvariable (f : UnitSphere X ≃ᵢ UnitSphere Y) (y : UnitSphere X)\nvariable (t : ℝ) (ht : 0 < t ∧ t < 1)\n\n/-- The first contact point `t y + p v`. -/\ndef xPoint (v : UnitSphere X) : UnitSphere X :=\n  ⟨t • (y : X) + pRadius f y t ht v • (v : X),\n    norm_radialRadius (t • (y : X)) (returnCenter_lt_one y t ht) v⟩\n\ndef sRadius (v : UnitSphere X) : ℝ :=\n  ‖(f (xPoint f y t ht v) : Y) - t • (f y : Y)‖\n\n/-- The image-side outward unit direction. -/\ndef wDirection (v : UnitSphere X) : UnitSphere Y :=\n  normalize ((f (xPoint f y t ht v) : Y) - t • (f y : Y))\n    (unit_sub_center_ne_zero (f (xPoint f y t ht v)) (f y) t ht)\n\n/-- The second radial contact uses the negative of the actual direction `w`. -/\ndef uRadius (v : UnitSphere X) : ℝ :=\n  radialRadius (t • (f y : Y)) (returnCenter_lt_one (f y) t ht)\n    (sphereNeg (wDirection f y t ht v))\n\ndef zPoint (v : UnitSphere X) : UnitSphere X :=\n  f.symm (radialContact (t • (f y : Y)) (returnCenter_lt_one (f y) t ht)\n    (sphereNeg (wDirection f y t ht v)))\n\ndef rRadius (v : UnitSphere X) : ℝ :=\n  ‖(zPoint f y t ht v : X) - t • (y : X)‖\n\n/-- The genuine return map on the unit sphere. -/\ndef returnSphere (v : UnitSphere X) : UnitSphere X :=\n  normalize (t • (y : X) - (zPoint f y t ht v : X))\n    (center_sub_unit_ne_zero (zPoint f y t ht v) y t ht)"
+  },
+  {
+   "name": "OAI.Tingley.returnAmbient",
+   "kind": "def (totalization of g to X for the Darbo step)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/SphereIsometry/ReturnMap.lean",
+   "line": 265,
+   "text": "/-- Total ambient functions, used only on the sphere by the convex-set argument. -/\ndef pAmbient (v : X) : ℝ :=\n  if hv : ‖v‖ = 1 then pRadius f y t ht ⟨v, hv⟩ else 0\n\ndef sAmbient (v : X) : ℝ :=\n  if hv : ‖v‖ = 1 then sRadius f y t ht ⟨v, hv⟩ else 0\n\ndef uAmbient (v : X) : ℝ :=\n  if hv : ‖v‖ = 1 then uRadius f y t ht ⟨v, hv⟩ else 0\n\ndef rAmbient (v : X) : ℝ :=\n  if hv : ‖v‖ = 1 then rRadius f y t ht ⟨v, hv⟩ else 0\n\ndef returnAmbient (v : X) : X :=\n  if hv : ‖v‖ = 1 then (returnSphere f y t ht ⟨v, hv⟩ : X) else 0"
+  },
+  {
+   "name": "OAI.Tingley.{extremalSphere,extremalSet}",
+   "kind": "def (extremal set E = {s - p = M})",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/SphereIsometry/ExtremalPropagation.lean",
+   "line": 30,
+   "text": "def extremalSphere : Set (UnitSphere X) :=\n  {v | sRadius f y t ht v - pRadius f y t ht v = M}\n\ndef extremalSet : Set X :=\n  Subtype.val '' extremalSphere f y t ht M"
+  },
+  {
+   "name": "OAI.Tingley.extremal_radius_identities",
+   "kind": "theorem (statement; r = u + M and the forced triangle equality)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/SphereIsometry/ExtremalPropagation.lean",
+   "line": 122,
+   "text": "theorem extremal_radius_identities (hb : HasDefectBound f M) {v : UnitSphere X}\n    (hv : v ∈ extremalSphere f y t ht M) :\n    rRadius f y t ht v - uRadius f y t ht v = M ∧\n    pRadius f y t ht v + rRadius f y t ht v =\n      sRadius f y t ht v + uRadius f y t ht v ∧\n    ‖pRadius f y t ht v • (v : X) +\n      rRadius f y t ht v • (returnSphere f y t ht v : X)‖ ="
+  },
+  {
+   "name": "OAI.Tingley.returnSphere_pair_estimate",
+   "kind": "theorem (statement; the two-point estimate eq:contraction)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/SphereIsometry/ReturnMapEstimate.lean",
+   "line": 80,
+   "text": "/-- The exact two-point estimate for the constructed return map on its actual\nextremal sphere set. Both endpoint comparisons use the original sphere isometry. -/\ntheorem returnSphere_pair_estimate\n    (f : UnitSphere X ≃ᵢ UnitSphere Y) (y : UnitSphere X)\n    (t : ℝ) (ht : 0 < t ∧ t < 1) (M : ℝ) (hb : HasDefectBound f M)\n    {v v' : UnitSphere X}\n    (hv : v ∈ extremalSphere f y t ht M)\n    (hv' : v' ∈ extremalSphere f y t ht M) :\n    ‖(returnSphere f y t ht v : X) - (returnSphere f y t ht v' : X)‖ ≤\n      (uRadius f y t ht v * pRadius f y t ht v /\n        (rRadius f y t ht v * sRadius f y t ht v)) * ‖(v : X) - (v' : X)‖ +\n      2 * |uRadius f y t ht v - uRadius f y t ht v'| / rRadius f y t ht v +\n      2 * uRadius f y t ht v * |pRadius f y t ht v - pRadius f y t ht v'| /\n        (rRadius f y t ht v * sRadius f y t ht v) := by"
+  },
+  {
+   "name": "OAI.Tingley.return_coefficient_le",
+   "kind": "theorem (statement; up/rs <= (1-M/U)^2, the self-supplied margin)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/SphereIsometry/ReturnMapBounds.lean",
+   "line": 21,
+   "text": "theorem return_coefficient_le {p s u r M U : ℝ}\n    (hp : 0 ≤ p) (_hu : 0 ≤ u) (hr : 0 < r) (hs : 0 < s)\n    (hM : 0 ≤ M) (hrU : r ≤ U) (hsU : s ≤ U)\n    (hrm : r = u + M) (hsm : s = p + M) :\n    u * p / (r * s) ≤ (1 - M / U) ^ 2 := by"
+  },
+  {
+   "name": "OAI.Tingley.chi_return_image_le",
+   "kind": "theorem (statement; chi(gH) <= (1-M/(1+t))^2 chi(H))",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/SphereIsometry/ReturnMapNoncompactness.lean",
+   "line": 58,
+   "text": "/-- The exact all-subsets contraction, including the empty subset. The scalar\nrelations and the two-point estimate are supplied by the actual return map. -/\ntheorem chi_return_image_le\n    {X : Type*} [PseudoMetricSpace X]\n    {C : Set X} {g : X → X} {p s u r : X → ℝ} {t M : ℝ}\n    (ht0 : 0 < t) (ht1 : t < 1) (hM : 0 < M)\n    (hCne : C.Nonempty) (hCb : Bornology.IsBounded C)\n    (_hgC : Set.MapsTo g C C)\n    (hbounds : ∀ v ∈ C,\n      (1 - t ≤ p v ∧ p v ≤ 1 + t) ∧\n      (1 - t ≤ s v ∧ s v ≤ 1 + t) ∧\n      (1 - t ≤ u v ∧ u v ≤ 1 + t) ∧\n      (1 - t ≤ r v ∧ r v ≤ 1 + t))\n    (hs : ∀ v ∈ C, s v = p v + M)\n    (hr : ∀ v ∈ C, r v = u v + M)\n    (hpair : ∀ v ∈ C, ∀ v' ∈ C,\n      dist (g v) (g v') ≤\n        (u v * p v / (r v * s v)) * dist v v' +\n        2 * |u v - u v'| / r v +\n        2 * u v * |p v - p v'| / (r v * s v))\n    {H : Set X} (hHC : H ⊆ C) :\n    chi (g '' H) ≤ (1 - M / (1 + t)) ^ 2 * chi H := by"
+  },
+  {
+   "name": "OAI.Tingley.exists_fixedPoint_of_return_estimate",
+   "kind": "theorem (statement; generic: estimate => fixed point)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/SphereIsometry/ReturnMapFixedPoint.lean",
+   "line": 19,
+   "text": "/-- The radius bounds and two-point estimate imply an actual fixed point.\nThe hypotheses contain neither a noncompactness estimate nor a fixed-point\nprinciple: both are supplied by the preceding constructive proofs. -/\ntheorem exists_fixedPoint_of_return_estimate\n    {C : Set X} {g : X → X} {p s u r : X → ℝ} {t M : ℝ}\n    (ht0 : 0 < t) (ht1 : t < 1) (hM : 0 < M)\n    (hCne : C.Nonempty) (hCclosed : IsClosed C)\n    (hCb : Bornology.IsBounded C) (hCconvex : Convex ℝ C)\n    (hg : ContinuousOn g C) (hgC : Set.MapsTo g C C)\n    (hbounds : ∀ v ∈ C,\n      (1 - t ≤ p v ∧ p v ≤ 1 + t) ∧\n      (1 - t ≤ s v ∧ s v ≤ 1 + t) ∧\n      (1 - t ≤ u v ∧ u v ≤ 1 + t) ∧\n      (1 - t ≤ r v ∧ r v ≤ 1 + t))\n    (hs : ∀ v ∈ C, s v = p v + M)\n    (hr : ∀ v ∈ C, r v = u v + M)\n    (hpair : ∀ v ∈ C, ∀ v' ∈ C,\n      dist (g v) (g v') ≤\n        (u v * p v / (r v * s v)) * dist v v' +\n        2 * |u v - u v'| / r v +\n        2 * u v * |p v - p v'| / (r v * s v)) :\n    ∃ x ∈ C, g x = x := by"
+  },
+  {
+   "name": "OAI.Tingley.AlignedConfiguration",
+   "kind": "structure (the aligned chords, prop:alignment conclusion)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/SphereIsometry/AlignedConfiguration.lean",
+   "line": 23,
+   "text": "structure AlignedConfiguration\n    (f : UnitSphere X ≃ᵢ UnitSphere Y) (y : UnitSphere X) (t M : ℝ) where\n  x : UnitSphere X\n  z : UnitSphere X\n  v : UnitSphere X\n  w : UnitSphere Y\n  p : ℝ\n  r : ℝ\n  s : ℝ\n  u : ℝ\n  p_pos : 0 < p\n  r_pos : 0 < r\n  s_pos : 0 < s\n  u_pos : 0 < u\n  x_eq : (x : X) = t • (y : X) + p • (v : X)\n  z_eq : (z : X) = t • (y : X) - r • (v : X)\n  fx_eq : (f x : Y) = t • (f y : Y) + s • (w : Y)\n  fz_eq : (f z : Y) = t • (f y : Y) - u • (w : Y)\n  s_sub_p : s - p = M\n  r_sub_u : r - u = M\n  chord_sum : p + r = s + u\n  chord_le_two : p + r ≤ 2\n"
+  },
+  {
+   "name": "OAI.Tingley.exists_alignedConfiguration",
+   "kind": "theorem (statement; prop:alignment)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/SphereIsometry/Alignment.lean",
+   "line": 60,
+   "text": "/-- Alignment has no supplied invariant-set, contraction or fixed-point premise. -/\ntheorem exists_alignedConfiguration [CompleteSpace X]\n    (f : UnitSphere X ≃ᵢ UnitSphere Y) (y x₀ : UnitSphere X)\n    (t M : ℝ) (ht : 0 < t ∧ t < 1) (hM : 0 < M)\n    (hb : HasDefectBound f M) (hatt : signedDefect f t x₀ y = M) :\n    Nonempty (AlignedConfiguration f y t M) := by"
+  },
+  {
+   "name": "OAI.Tingley.exists_fixedPoint_of_kuratowski_contraction",
+   "kind": "theorem (statement; Darbo, re-proved; N0 ingredient)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/SphereIsometry/CondensingFixedPoint.lean",
+   "line": 24,
+   "text": "/-- A continuous self-map satisfying the actual all-subsets Kuratowski\ncontraction has a fixed point. No compactness premise on `C` is required. -/\ntheorem exists_fixedPoint_of_kuratowski_contraction\n    {C : Set E} (hne : C.Nonempty) (hclosed : IsClosed C)\n    (hbounded : Bornology.IsBounded C) (hconv : Convex ℝ C)\n    {g : E → E} (hg : ContinuousOn g C) (hmap : MapsTo g C C)\n    {γ : ℝ} (hγ0 : 0 ≤ γ) (hγ1 : γ < 1)\n    (hχ : ∀ H : Set E, H ⊆ C → chi (g '' H) ≤ γ * chi H) :\n    ∃ x ∈ C, g x = x := by"
+  },
+  {
+   "name": "OAI.Tingley.no_attained_positive_defect",
+   "kind": "theorem (statement + 2-line proof; where C1 meets the comparator chain)",
+   "file": "data/raw/openai-math/lean/OAI/Analysis/SphereIsometry/Extension.lean",
+   "line": 27,
+   "text": "theorem no_attained_positive_defect\n    {X : Type u} {Y : Type v}\n    [NormedAddCommGroup X] [NormedSpace ℝ X] [CompleteSpace X]\n    [NormedAddCommGroup Y] [NormedSpace ℝ Y] [CompleteSpace Y]\n    (f : UnitSphere X ≃ᵢ UnitSphere Y) (t M : ℝ)\n    (ht : 0 < t ∧ t < 1) (hM : 0 < M) (hb : HasDefectBound f M)\n    (x y : UnitSphere X) (hatt : signedDefect f t x y = M) : False := by\n  obtain ⟨C⟩ := exists_alignedConfiguration f y x t M ht hM hb hatt\n  exact alignedConfiguration_impossible hM ht hb C"
+  }
+ ],
+ "speedup_targets": [
+  {
+   "title": "S1. Finite-dimensional stability of sphere isometries (Vestfrid): ε-isometries of the unit spheres of ℓ2^n, ℓ∞^n and ℓ1^n are uniformly close to linear isometries",
+   "statement": "If f : S_X → S_X (X = ℓ2^n, ℓ∞^n or ℓ1^n) is a surjective ε-isometry, |‖f(x)-f(y)‖-‖x-y‖| ≤ ε, then there is a linear isometry T with sup_{x∈S_X} ‖f(x)-Tx‖ ≤ C(n)·ε (exact constants not verified).",
+   "reference": "I. A. Vestfrid, 'Near-isometries of the unit sphere', Ukrainian Math. J. 72(4) (2020) (ℓ2^n, ℓ∞^n); I. A. Vestfrid, 'ε-isometries of the unit sphere in ℓ1^n', Colloq. Math. 177 (2024) 127-133, DOI 10.4064/cm9491-1-2025. Abstracts only (search summaries); full texts not read.",
+   "status": "known theorems (class-specific, finite-dimensional, dimension-dependent constants)",
+   "current_proof_size": "~7 pp (ℓ1^n paper, pp. 127-133); UMJ paper length not verified. No Lean formalization anywhere found.",
+   "how_item_helps": "The device turns an attained extremal defect into an exact fixed-point configuration. With ε-slack, extremality gives r ≥ u + M - ε and s = p + M on E, so the two-point estimate becomes γ·dist + scalar oscillation + O(ε) with γ = (1-M/(1+t))^2. A χ-contraction with additive error gives an invariant convex set of χ ≤ O(ε)/(1-γ) = O(ε/M), i.e. approximately aligned chords; a quantitative chord contradiction would then bound M ≤ C√ε (or Cε^α) uniformly in n. This would replace three class-specific arguments by one dimension-free argument. The final step (approximately radial T ⇒ near a linear isometry) is NOT supplied by the device and is a real gap (Omladič-Šemrl/Hyers-Ulam need a uniform global ε-isometry; T is only ε·‖x‖-close).",
+   "expected_speedup": "low-med (paper level: a uniform proof is plausible but the rate may be worse than Vestfrid's; Lean: the existing lemmas are stated for exact isometries f : UnitSphere X ≃ᵢ UnitSphere Y and must be re-proved with slack)",
+   "confidence": 0.25,
+   "counts_as": "device reuse (the theorem of 322 does not imply ε-stability)",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI.Analysis.SphereIsometry.Model (UnitSphere, normalize) + Mathlib LinearIsometryEquiv (X ≃ₗᵢ[ℝ] Y), NormedSpace ℝ, CompleteSpace; EuclideanSpace ℝ (Fin n), WithLp ∞ / WithLp 1 (Fin n → ℝ)",
+    "missing": "none to state. To reuse the device: ε-slack versions of ExtremalPropagation/ReturnMapEstimate and an additive-error chi lemma (~300-500 lines refactor); the generic exists_fixedPoint_of_return_estimate cannot be used as is (it needs exact s = p + M, r = u + M).",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "S2. Darbo applications for maps that are Lipschitz up to the oscillation of finitely many bounded scalar observables (generic shell, calibration target)",
+   "statement": "If g maps a nonempty closed bounded convex C in a Banach space continuously into itself, and dist(g v, g v') ≤ γ dist(v,v') + K Σ_i |φ_i(v) - φ_i(v')| for finitely many bounded φ_i : C → ℝ and γ < 1, then g has a fixed point (because χ(gH) ≤ γ χ(H)). Instances: existence theorems for nonlinear functional-integral equations proved by Darbo in the Banaś-Goebel tradition where the nonlinearity enters through finitely many scalar functionals.",
+   "reference": "Darbo 1955; Sadovskii 1967; J. Banaś, K. Goebel, Measures of Noncompactness in Banach Spaces (1980). The scalar-binning lemma is OAI.Tingley.finiteDiameterCover_image_of_scalar_bins (ReturnMapNoncompactness.lean:21).",
+   "status": "known (classical compact-perturbation-of-contraction principle)",
+   "current_proof_size": "a few lines on paper given Darbo; Lean: chi_return_image_le (~75 lines) + exists_fixedPoint_of_return_estimate (~30 lines) on top of 2.9k lines of re-proved Darbo/Schauder/Sperner",
+   "how_item_helps": "exists_fixedPoint_of_return_estimate / chi_return_image_le are map-agnostic: any g with that two-point estimate gets a fixed point with zero additional analysis. This is reuse of the N0 shell, NOT of the eureka content (the M-supplied margin). Its value is as a calibration: it measures how much of any downstream speedup comes from the re-proved Darbo stack rather than from C1.",
+   "expected_speedup": "low for the device (high for 'Darbo available vs not', which is transfer)",
+   "confidence": 0.6,
+   "counts_as": "reuse of the generic (N0) component only",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib + OAI.Tingley.chi (KuratowskiBasic.lean) and exists_fixedPoint_of_kuratowski_contraction",
+    "missing": "none",
+    "formal_proof_to_compare": "the OAI lemmas themselves; no Mathlib Darbo"
+   }
+  },
+  {
+   "title": "S3. Leung-Ng-Wong positive-sphere Tingley theorems for L^p (1 ≤ p ≤ ∞) and C(K)",
+   "statement": "Every surjective isometry between the positive unit spheres {x ≥ 0, ‖x‖ = 1} of two L^p spaces (resp. C(K) spaces) extends to a surjective real-linear isometry.",
+   "reference": "C.-W. Leung, C.-K. Ng, N.-C. Wong, positive Tingley problem, Trans. AMS (published Jan 2025) and arXiv:2006.08944; question originally Peralta's. Abstract-level only.",
+   "status": "known theorems (class-specific)",
+   "current_proof_size": "journal paper, length not verified; no Lean",
+   "how_item_helps": "Only if the opposite-contact step can be run inside the positive cone. It cannot as is: −w is not a positive direction, so the return map leaves the positive sphere. Included because it is the nearest measurable known theorem with a sphere-isometry hypothesis that is not a corollary of 322. Expected to show NO speedup; useful as a soft negative control.",
+   "expected_speedup": "low (probably none)",
+   "confidence": 0.1,
+   "counts_as": "device reuse attempt (not implied by the 322 theorem)",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib ContinuousMap C(K, ℝ) with its order and sup norm; MeasureTheory.Lp with lattice order; LinearIsometryEquiv",
+    "missing": "a 'positive unit sphere' subtype (~10 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "S4. Hammer-type affine diameters: every interior point of a convex body in ℝ^n lies on an affine diameter (chord with parallel supporting hyperplanes at both ends)",
+   "statement": "For a convex body K ⊂ ℝ^n and c ∈ int K there are x, z ∈ ∂K with c ∈ [x,z] and a nonzero functional φ with φ(x) = max_K φ, φ(z) = min_K φ.",
+   "reference": "P. C. Hammer, 'Diameters of convex bodies', Proc. AMS 5 (1954); surveyed in Grünbaum 1963 'Measures of symmetry for convex sets' (recalled from memory; not verified this session).",
+   "status": "known (finite-dimensional)",
+   "current_proof_size": "~2-3 pp; no Lean",
+   "how_item_helps": "Template match only: an 'aligned chord' (C1's output) is a chord through an interior centre with a common support structure at both ends, and a fixed direction of a direction-to-direction return map produces it. But the classical proof is a degree/continuity argument, the problem has no isometry and no defect, so C1's specific content (M supplies the contraction margin) has nothing to act on.",
+   "expected_speedup": "low",
+   "confidence": 0.1,
+   "counts_as": "template-level analogy (would not count as device reuse even if it worked)",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib Convex, interior, frontier, ContinuousLinearMap; OAI SimplexFixedPoint (Brouwer on simplices)",
+    "missing": "'affine diameter' predicate (~20 lines); a Brouwer/degree form on spheres of directions usable for the proof (~200 lines on top of OAI's simplex Brouwer)",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "speedup_targets_verdict": "No strong speedup candidate found. Every known theorem that the 322 Lean would shorten dramatically is a corollary of the Tingley theorem itself (listed under theorem_corollaries). Known theorems not implied by the theorem (S1, S3, S4) either need a quantitative re-proof of the device with slack (S1) or lack the antipodal/opposite-contact structure and the defect that C1 exploits (S3, S4). S2 only reuses the N0 Darbo shell.",
+ "open_problems": [
+  {
+   "title": "O1. Dimension-free stability of Tingley's problem (ε-isometries of unit spheres)",
+   "statement": "Is there a universal C (and α > 0) such that for all real Banach spaces X, Y and every surjective ε-isometry f : S_X → S_Y there is a surjective linear isometry T : X → Y with sup_{x∈S_X} ‖f(x) - Tx‖ ≤ C ε^α?",
+   "reference": "Vestfrid UMJ 2020 and Colloq. Math. 2024/25 (finite-dim classes only); Hyers-Ulam / Omladič-Šemrl 1995 (whole spaces, 2ε sharp); Matoušková, 'Almost isometries of balls', JFA 190 (2002) 507-525 (bi-Lipschitz near-isometries of Euclidean balls far from isometries: a warning that the multiplicative version fails). URLs: https://umj.imath.kiev.ua/index.php/umj/article/view/6049 ; https://impan.pl/en/publishing-house/journals-and-series/colloquium-mathematicum/all/177/1/115838/varepsilon-isometries-of-the-unit-sphere-in-ell-n-1",
+   "status": "open as far as found (no general result in searches; not verified against a problem list)",
+   "obstruction_match": "Exactly C1's obstruction with a quantitative twist: no compactness, so an approximately extremal configuration must be aligned by a dimension-free fixed-point argument; the defect M is again the only source of a contraction margin.",
+   "adaptation_sketch": "(1) define D_q as in 322; attainment in ultrapowers survives (ε-isometries pass to ultrapowers with the same ε). (2) On E_ε = {s - p ≥ M - ε}, triangle equalities hold up to O(ε): r ≥ u + M - O(ε). (3) The two-point estimate gives χ(gH) ≤ γχ(H) + O(ε) with γ = (1-M/(1+t))^2; the Darbo iteration gives a nonempty compact-modulo-O(ε/M) invariant convex set and approximate fixed points (Lean: needs an additive-error variant of chi_return_image_le). (4) Quantitative versions of the secant lemma and chord contradiction give M ≤ C ε^α. (5) Gap: from 'radial extension has defect ≤ Cε^α' to 'near a linear isometry' needs an approximate Mazur-Ulam for positively homogeneous maps, which is not standard.",
+   "payoff": "high (a dimension-free stability theorem would subsume Vestfrid's three papers and be a genuine downstream use of the device, not of the theorem)",
+   "confidence": 0.3,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI.Analysis.SphereIsometry.Model (UnitSphere, normalize) + Mathlib LinearIsometryEquiv (X ≃ₗᵢ[ℝ] Y), NormedSpace ℝ, CompleteSpace; Real.rpow",
+    "missing": "none to state; to run the device: ε-slack ReturnMap/ExtremalPropagation lemmas + additive-error χ lemma (~400 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "O2. Tingley's problem for phase-isometries between unit spheres of arbitrary real Banach spaces",
+   "statement": "If f : S_X → S_Y is surjective with {‖f(x)+f(y)‖, ‖f(x)-f(y)‖} = {‖x+y‖, ‖x-y‖}, is there ε : S_X → {±1} with εf the restriction of a linear isometry?",
+   "reference": "Tan-Huang (phase-isometries on real normed spaces, arXiv:1905.01637); Tan-Gao (C(K)); Tan-Zhang-Huang (CL-spaces); Enami-Matsuzaki arXiv:2603.00583 (2026; flags a step in Tan-Zhang-Huang needing justification); arXiv:2606.22320 (uniform algebras, 2026). URL: https://arxiv.org/html/2603.00583v1",
+   "status": "open in general (class-by-class results only; abstract-level)",
+   "obstruction_match": "Partial. Once a sign function making εf an isometry is found, the 322 theorem finishes (theorem-corollary use). The device itself matters only if the defect argument is run directly on a sign-invariant defect: the opposite-contact step uses −w and is symmetric under w ↦ −w, which is suggestive.",
+   "adaptation_sketch": "Define a phase defect D^±_q(x,y) = min over signs of the 322 defect; attain it in ultrapowers; on directions where the sign is locally constant the return map is defined and the same r = u + M identities hold; use C2's invariant convex set (connected, so a consistent sign exists on it) and C1's contraction to align chords; contradiction as in 322. The real difficulty is global sign coherence (the literature's sticking point), which C1 does not address.",
+   "payoff": "med-high",
+   "confidence": 0.25,
+   "difficulty": "med-high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI.Analysis.SphereIsometry.Model (UnitSphere, normalize) + Mathlib LinearIsometryEquiv (X ≃ₗᵢ[ℝ] Y), NormedSpace ℝ, CompleteSpace",
+    "missing": "phase-isometry predicate (~10 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "O3. Mankiewicz-type Tingley problem for boundaries of convex bodies",
+   "statement": "If K ⊂ X, L ⊂ Y are bounded convex bodies and τ : ∂K → ∂L is a surjective isometry (ambient norm metrics), does τ extend to an affine isometry?",
+   "reference": "Posed in the Tingley literature in Mankiewicz's spirit (per search summary of F. Cabello Sánchez, 'A reflection on Tingley's problem and some applications', JMAA 2019; https://dehesa.unex.es/bitstream/10662/19970/4/2019Reflection.pdf could not be fetched). Unverified wording.",
+   "status": "open (unverified)",
+   "obstruction_match": "The radial-contact machinery (RadialContact.lean) generalizes to Minkowski gauges of any body with an interior point. But the 322 defect D_q compares chords from centres ty and t f(y), i.e. it uses that τ fixes the origin. For non-symmetric bodies there is no distinguished centre, so the hard part (finding the centre map) is outside C1.",
+   "adaptation_sketch": "Reduce to symmetric case when K = -K; otherwise first prove that τ maps some interior 'centre' (e.g. via affine diameters, cf. S4) to a centre of L, then run the 322 argument with gauge radii. Expect failure at the centre step.",
+   "payoff": "high",
+   "confidence": 0.15,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib Convex, IsBounded, interior, frontier, IsometryEquiv on subtypes, AffineIsometryEquiv",
+    "missing": "none to state",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "O4. Positive Tingley problem for general ordered Banach spaces / Banach lattices",
+   "statement": "Does every surjective isometry between the positive unit spheres of two Banach lattices (or ordered Banach spaces) extend to a surjective real-linear isometry?",
+   "reference": "Peralta's question as generalized by Leung-Ng-Wong (TAMS 2025; arXiv:2006.08944); Ezumi-Lin-Miura arXiv:2601.17704 (C0(X), 2026); arXiv:2607.10685 (absolutely continuous functions, 2026). URL: https://arxiv.org/html/2601.17704v1",
+   "status": "open in general; known for L^p, C(K), C0(X), von Neumann algebras (abstract-level)",
+   "obstruction_match": "Weak: no antipodes inside the positive sphere, so the opposite contact tb - uw leaves the domain of f. The device does not apply without a replacement for −w (e.g. order-complement directions).",
+   "adaptation_sketch": "Replace the opposite contact by the contact in direction (e - w) for an order unit e when one exists; check whether r = u + M style identities survive. Low expectation.",
+   "payoff": "med",
+   "confidence": 0.1,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib NormedLatticeAddCommGroup / OrderedAddCommGroup + NormedSpace ℝ, LinearIsometryEquiv",
+    "missing": "positive-unit-sphere subtype (~10 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "O5. Tingley's problem for quasi-Banach (p-normed, 0 < p < 1) spaces",
+   "statement": "Does every surjective isometry between unit spheres of two quasi-Banach (p-Banach) spaces extend to a real-linear isometry?",
+   "reference": "Huang-Zhu arXiv:2607.11244 (Schatten classes 0 < p ≠ 2 < ∞, including quasi-Banach); references [26,35] there for ℓ_p-type quasi-Banach cases (not identified).",
+   "status": "open in general (class-specific results only)",
+   "obstruction_match": "Same problem shape, but the device's two pillars fail: Hahn-Banach supports (lem:support, used by C2 and the contradiction) can vanish (L_p[0,1]* = 0 for p < 1), and Schauder/Darbo for non-locally-convex spaces is the delicate Schauder-conjecture territory (Cauty 2001). Expected failure; doubles as a negative control.",
+   "adaptation_sketch": "Restrict to p-Banach spaces with separating duals and use p-convex hulls; the contraction estimate (two triangle inequalities) survives with ‖·‖^p, but the convex invariant set does not.",
+   "payoff": "med",
+   "confidence": 0.1,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib has no quasi-norm class",
+    "missing": "QuasiNormedSpace / p-norm structure and its unit sphere (~150-250 lines)",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "O6. Local Tingley: isometries between relatively open subsets of unit spheres",
+   "statement": "If U ⊂ S_X, V ⊂ S_Y are relatively open (connected) and τ : U → V is a surjective isometry, is τ the restriction of a linear isometry X → Y?",
+   "reference": "Cabello Sánchez 2019 (strictly convex spaces: an onto sphere isometry that is the identity on a relatively open subset is the identity; finite-dim strictly convex: linear iff linear on an open set). General local question: status unverified.",
+   "status": "open/unverified",
+   "obstruction_match": "Poor: C1 needs the global defect bound over all of S_X and the inverse f^{-1} at the opposite contact, which may lie outside V.",
+   "adaptation_sketch": "Work with small t so that all contacts stay near y; local attainment by ultrapowers of germs. Unclear.",
+   "payoff": "med",
+   "confidence": 0.1,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI.Analysis.SphereIsometry.Model (UnitSphere, normalize) + Mathlib LinearIsometryEquiv (X ≃ₗᵢ[ℝ] Y), NormedSpace ℝ, CompleteSpace; IsOpen on subtypes",
+    "missing": "none",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "O7. Figiel-type theorem for into (non-surjective) sphere isometries",
+   "statement": "If f : S_X → S_Y is an isometry (not onto), is there a norm-one linear Q : span‾ f(S_X) → X with Q∘f = id on S_X (the sphere analogue of Figiel's 1968 theorem)?",
+   "reference": "Figiel 1968 (whole spaces); Godefroy-Kalton 2003. The sphere version is recalled from the Cheng-Dong circle of work; not verified this session.",
+   "status": "unverified (likely open in general)",
+   "obstruction_match": "C1 uses f^{-1} at the opposite contact (zPoint := f.symm (radialContact ...)). Without surjectivity this step is undefined; the ℓ∞ counterexample in the negative controls shows a linear extension can fail, but a Figiel-type left inverse is a weaker conclusion.",
+   "adaptation_sketch": "Run the return map in the reverse direction (Y → X) where f^{-1} is only needed on f(S_X) when the opposite contact lands in f(S_X); prove that the extremal set is closed under that operation. Low expectation.",
+   "payoff": "med",
+   "confidence": 0.1,
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "OAI.Analysis.SphereIsometry.Model (UnitSphere, normalize) + Mathlib LinearIsometryEquiv (X ≃ₗᵢ[ℝ] Y), NormedSpace ℝ, CompleteSpace; Submodule.span, topologicalClosure, ContinuousLinearMap",
+    "missing": "none",
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "title": "O8. Affine diameters through interior points of bounded convex bodies in infinite-dimensional Banach spaces",
+   "statement": "Does every interior point of a bounded closed convex body in a Banach space lie on a chord [x,z] with a functional attaining its max at x and its min at z?",
+   "reference": "Finite-dimensional theorem: Hammer 1954 (S4). Infinite-dimensional version: not found as a posed problem (my formulation; status unverified).",
+   "status": "unverified",
+   "obstruction_match": "Template: aligned chord through an interior centre = fixed direction of a return map; no compactness. Missing: any self-supplied contraction margin (no defect M), which is C1's actual content. In non-reflexive spaces sup-attainment already fails (James), so the statement may be false.",
+   "adaptation_sketch": "Look for an extremal functional (e.g. maximal 'asymmetry defect' of chords through c, attained in an ultrapower) whose positivity supplies a χ-contraction for the direction map. Speculative.",
+   "payoff": "low-med",
+   "confidence": 0.1,
+   "difficulty": "med",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Mathlib Convex, interior, ContinuousLinearMap, IsMaxOn/IsMinOn",
+    "missing": "none",
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  "Mazur-Ulam property for every real Banach space (Cheng-Dong question) — immediate restatement.",
+  "Tingley 1987: f(-x) = -f(x) for sphere isometries of finite-dimensional spaces.",
+  "Kadets-Martín 2012 (finite-dimensional polyhedral spaces) and Banakh 2022 (every 2-dimensional space has the MUP; also arXiv:1911.03767 absolutely smooth planar case).",
+  "Class results: Ding (ℓ^p, ℓ∞(Γ)-type), Tan (L^p), Fernández-Polo-Peralta (von Neumann algebras), Mori (preduals), Mori-Ozawa (unital C*-algebras as real spaces), Fakhoury (Schreier spaces, JFA 2025), Maślany (Tsirelson-type T[θ,S_α]), Huang-Zhu (Schatten 0<p<∞, Haagerup L_p) — all become one-line instances (real-linear conclusion).",
+  "Object-level rigidity: isometric unit spheres ⇒ linearly isometric spaces, in every dimension (contains Nakamura-Tanaka arXiv:2609.31096, finite-dim, posted 2 days after the 322 manuscript).",
+  "For phase-isometry problems (O2), the extension half of every known class result reduces to the 322 theorem once a sign function is fixed.",
+  "Lean note: these are measurable as 'instantiate tingley_sphere_isometry_full' (Banakh's 2D theorem is statable now with EuclideanSpace/WithLp in dimension 2), but they measure the theorem's reach, not reuse of the device."
+ ],
+ "release_reuse": "None found. No other OAI Lean file imports OAI.Analysis.SphereIsometry; grep of all preprint .tex for Darbo/Sadovskii/'measure of noncompactness'/condensing returned only 'Darboux' false positives (families with Darboux equations / Christoffel-Darboux). CONTENTS.md mentions Tingley only in entry 322.",
+ "negative_controls": [
+  {
+   "title": "N1. Non-surjective sphere isometries into ℓ∞ (proved false)",
+   "statement": "For separable X with {a_n} dense in S_X, Φ(x) = (1, (‖x - a_n‖ - 1)_n) is an isometry S_X → S_{ℓ∞} (first coordinate 1, others in [-1,1]; sup_n |‖x-a_n‖-‖x'-a_n‖| = ‖x - x'‖). Φ(-x) ≠ -Φ(x), so no linear extension exists.",
+   "why_device_fails": "zPoint := f.symm (radialContact ...) needs the opposite contact to lie in the range of f; surjectivity is essential to C1 and the counterexample shows it cannot be dropped.",
+   "lean": "statable now (Mathlib lp (fun _ => ℝ) ∞); counterexample formalizable in ~100-200 lines"
+  },
+  {
+   "title": "N2. Uniform (non-isometric) version: Mazur map S_{ℓp} → S_{ℓ2} (proved false analogue)",
+   "statement": "The Mazur map x ↦ sign(x)|x|^{p/2} is a uniform homeomorphism between the unit spheres of ℓ_p (1 ≤ p < ∞) and ℓ_2 (Mazur 1929; the tool used by Odell-Schlumprecht 1994), yet ℓ_p and ℓ_2 are not linearly isomorphic for p ≠ 2.",
+   "why_device_fails": "C1 relies on exact distance preservation to force r = u + M and s = p + M (equality in two triangle inequalities); under uniform/bi-Lipschitz control those identities and the contraction margin disappear.",
+   "lean": "statable now; Mazur map formalization would need lp-space API work (~300 lines)"
+  },
+  {
+   "title": "N3. Complex linearity (proved false)",
+   "statement": "Complex conjugation on S_ℂ (or coordinatewise on S_{ℂ^n}) is a surjective sphere isometry that is not complex-linear.",
+   "why_device_fails": "The device works with real chords and real scalars t, p, r, s, u; it can only ever yield real-linearity, consistent with the 322 docs ('real linearity rather than complex linearity').",
+   "lean": "statable now"
+  },
+  {
+   "title": "N4. Mankiewicz / Mazur-Ulam for balls or whole spaces (device unnecessary)",
+   "statement": "Isometries between unit balls (or open connected sets) extend affinely (Mankiewicz 1972); onto isometries of normed spaces are affine (Mazur-Ulam, in Mathlib).",
+   "why_device_fails": "Not a failure but no help: interior points give midpoints directly; a prover with C1 in its library should show zero speedup. Good baseline for the Lean speedup protocol.",
+   "lean": "Mazur-Ulam is in Mathlib (IsometryEquiv.toRealLinearIsometryEquivOfMapZero); Mankiewicz is statable now"
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "target": "O1 dimension-free stability of Tingley (ε-isometries)",
+   "lean_usable": true,
+   "argument": "The only target where C1's specific content (the defect M manufactures the contraction margin) is needed and the 322 theorem does not already settle the question. Statable now with UnitSphere + LinearIsometryEquiv. A Lean test: give the prover the 322 library and ask for M ≤ Cε^α for the ultrapower-attained defect; compare with and without ReturnMap*/Alignment. Risks: the exact-isometry lemmas must be re-proved with slack, and the last step (approximate Mazur-Ulam for homogeneous maps) is a separate obstacle that C1 does not touch."
+  },
+  {
+   "rank": 2,
+   "target": "S1 Vestfrid's finite-dimensional sphere ε-isometry theorems (ℓ2^n, ℓ∞^n, ℓ1^n)",
+   "lean_usable": true,
+   "argument": "The measurable known-theorem version of O1: statable now (EuclideanSpace, WithLp ∞/1), finite dimension removes the ultrapower and makes Darbo collapse to Brouwer, so the test isolates the return map + margin. Expected speedup low-med; a positive result would be the first genuine downstream reuse of the device."
+  },
+  {
+   "rank": 3,
+   "target": "O2 phase-isometries between unit spheres",
+   "lean_usable": true,
+   "argument": "Active 2020-2026 literature with class-by-class results and a recently flagged gap (Enami-Matsuzaki 2026). Statable now. Mostly a theorem-corollary use, but the opposite-contact step is sign-symmetric, so a sign-invariant defect run of C1 is a concrete, testable adaptation. Confidence 0.25."
+  },
+  {
+   "rank": 4,
+   "target": "S2 generic scalar-binned Darbo shell (calibration)",
+   "lean_usable": true,
+   "argument": "Cheap, statable now, and already isolated in Lean (exists_fixedPoint_of_return_estimate is map-agnostic). Run it to separate the speedup due to the re-proved Darbo/Schauder stack (transfer, N0) from any speedup due to C1. Needed so that O1/S1 results are not misattributed."
+  },
+  {
+   "rank": 5,
+   "target": "O3 boundaries of convex bodies (Mankiewicz-type Tingley)",
+   "lean_usable": true,
+   "argument": "Statable now; the radial-contact layer generalizes to gauges, so the test would show whether C1 transfers once a centre is fixed. Expect failure at the centre-finding step, which makes it informative about the device's scope rather than a likely success."
+  }
+ ],
+ "precedent_check": {
+  "after_2026_10_06": "No post-release use of the return-map/self-supplied-contraction device found. Searches on 2026-10-12 (Tingley + OpenAI/October 2026; Tingley + Darbo/measure of noncompactness/return map; Darbo + sphere isometry) returned only pre-release class-specific work and no reaction to the 322 manuscript.",
+  "earlier_equivalent": "None found. Nearest: Nakamura-Tanaka arXiv:2609.31096 (25 Sep 2026; Plücker contraction bodies, object-level, no return map, no Darbo); facial methods (Cheng-Dong, Tanaka, Mori-Ozawa) are close to C2, not C1; affine-diameter fixed-point arguments (Hammer 1954) are template-level only. Darbo/Sadovskii are ingredients (N0). No downgrade from this check; but full texts of Tingley 1987, Kadets-Martín 2012 and Cabello Sánchez 2019 remain unread (arxiv.org and several hosts blocked), so this is summary-level.",
+  "verdict": "no precedent found; no downgrade"
+ },
+ "sources": [
+  "data/raw/openai-math/lean/OAI/Analysis/SphereIsometry/{ReturnMap,ReturnMapBounds,ReturnMapEstimate,ReturnMapNoncompactness,ReturnMapFixedPoint,ExtremalPropagation,AlignedConfiguration,Alignment,AlignmentSet,CondensingFixedPoint,KuratowskiBasic,Basic,Extension,RadialContact,Model,Main}.lean",
+  "data/raw/openai-math/lean/ComparatorChallenges/TingleySphereIsometry.json; lean/docs/322.md",
+  "data/raw/openai-math/preprints/A-positive-solution-to-Tingleys-problem-September-23-2026/build/main.tex (lines 80-120, 210-294)",
+  "data/items/322_lean.json (extractor v3); data/pilot/322/{family,novelty}.{json,md}",
+  "https://umj.imath.kiev.ua/index.php/umj/article/view/6049 (Vestfrid, Near-isometries of the unit sphere; abstract via search only, fetch failed)",
+  "https://impan.pl/en/publishing-house/journals-and-series/colloquium-mathematicum/all/177/1/115838/varepsilon-isometries-of-the-unit-sphere-in-ell-n-1 (Vestfrid, ℓ1^n; abstract via search)",
+  "https://arxiv.org/pdf/2501.17672 (Šemrl 2025, approximate isometries of Hilbert spaces; search summary)",
+  "https://www.mis.mpg.de/events/event/almost-isometries-of-balls (Matoušková talk abstract)",
+  "https://arxiv.org/html/2601.17704v1 (Ezumi-Lin-Miura 2026, positive spheres of C0(X); search summary)",
+  "https://arxiv.org/abs/2006.08944 (Leung-Ng-Wong; search summary)",
+  "https://arxiv.org/html/2603.00583v1 (Enami-Matsuzaki 2026, phase-isometries; search summary)",
+  "https://ar5iv.labs.arxiv.org/html/1905.01637 (Tan-Huang, phase-isometries on real normed spaces; search summary)",
+  "https://arxiv.org/pdf/2606.22320 (phase-isometries on uniform algebras, 2026; title only)",
+  "https://arxiv.org/pdf/2607.11244 (Huang-Zhu, Schatten classes; search summary)",
+  "https://dehesa.unex.es/bitstream/10662/19970/4/2019Reflection.pdf (Cabello Sánchez 2019; fetch failed, search summary only)",
+  "https://ar5iv.labs.arxiv.org/html/2103.09268 (Banakh 2D MUP), https://ar5iv.labs.arxiv.org/html/1206.4839 (Kadets-Martín)",
+  "https://arxiv.org/pdf/1801.02473 (Peralta survey on Tingley's problem)"
+ ],
+ "search_log": [
+  "2026-10-12 WebSearch: 'stability Tingley problem epsilon-isometry unit spheres Banach spaces open problem Ding' -> no general stability result; UMJ Vestfrid paper",
+  "WebSearch: 'phase-isometries between unit spheres real normed spaces Tingley problem' -> Tan-Huang line, C(K), ℓp(Γ,H), L∞(Γ); 2601.17704",
+  "WebSearch: 'Tingley problem positive unit sphere ... Peralta Leung Ng Wong' -> LNW TAMS 2025, 2006.08944, 2601.17704",
+  "WebFetch www-math.nsysu.edu.tw (LNW TAMS pdf) -> DNS failure",
+  "WebSearch: 'approximate isometry unit sphere Tingley stability ε-isometry ...' -> Vestfrid ℓ2^n/ℓ∞^n (UMJ), ℓ1^n (Colloq. Math.), Šemrl 2501.17672, Omladič-Šemrl",
+  "WebSearch: 'isometries between open subsets of unit spheres ... local Tingley Mankiewicz' -> Cabello Sánchez 2019 (convex-body boundary question; strictly convex local result)",
+  "WebFetch dehesa.unex.es (Cabello Sánchez) -> DNS failure; WebFetch umj.imath.kiev.ua -> DNS failure",
+  "WebSearch: 'Tingley problem quasi-Banach p-normed 0<p<1' -> Huang-Zhu Schatten incl. quasi-Banach; no general result",
+  "WebSearch: '\"Tingley\" 2026 general solution ... Darbo OR measure of noncompactness OR return map' -> nothing linking Darbo with Tingley",
+  "WebSearch: 'Tingley problem solved OpenAI October 2026 ...' -> no post-release reaction found",
+  "WebSearch: 'Darbo fixed point theorem isometry extension problem unit sphere ...' -> generic Darbo literature only",
+  "WebSearch: 'Mazur-Ulam property non-surjective isometry unit sphere into strictly convex' -> nothing on into-isometries",
+  "WebSearch: 'Vestfrid ε-isometries unit sphere ℓ_1^n ... abstract' -> Colloq. Math. 177 (2024) 127-133",
+  "WebSearch: 'Matoušková Almost isometries of balls JFA 2002' -> citation + talk abstract",
+  "WebSearch: 'phase-isometries unit spheres Wigner type Tingley open problem ... Tan Huang' -> 2603.00583 gap remark, 2606.22320",
+  "Local: grep CONTENTS.md and all preprint .tex for Darbo/Sadovskii/noncompactness/condensing (only Darboux false hits); grep lean/OAI for imports of OAI.Analysis.SphereIsometry outside the family (none)",
+  "arxiv.org not fetched (network policy); everything literature-side is summary-level"
+ ],
+ "notes": "Text-level analysis only: no lake build, no comparator run (shared checkout; Lean trusted as published). Verbatim lean_source texts are signatures/definitions copied by line range; proofs omitted (texts end at ':= by')."
+}
