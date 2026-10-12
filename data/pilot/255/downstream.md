@@ -96,7 +96,7 @@ These follow from Thm 1.4 or Thm 1.1:
 |---|---|---|---|---|
 | S1 | EFW: QIs of DL(n,n) / lamplighters are height-respecting | Rules out flip mismatches between adjacent tiles, using exact tree volumes n^{2r\|E\|} vs n^{r\|E\|}. Only a sub-step; coarse differentiation and quadrilaterals dominate | low–med | < 300 lines (trees with Busemann height, DL graph) |
 | S2 | Ferragut 2026: horospherical products, swap consistency | Only for balanced products of isomorphic factors; the core uses quadrilaterals | low | major library |
-| S3 | Rank-1 orientation agreement in Sol (EFW II, reused by Peng II §4) | C1 is uniform in rank, whereas Peng apparently needs a separate rank-1 EFW argument (unverified) | low; a special case, so it does not count | statable now (calibration only) |
+| S3 | Rank-1 orientation agreement in Sol (EFW II, reused by Peng II §4) | C1 is uniform in rank, whereas Peng repeats the EFW II rank-1 loop argument (verified 2026-10-12) | low; a special case, so it does not count | statable now (calibration only) |
 
 ### Open problems
 | ID | Problem | Status | Match | Payoff / conf. / difficulty | Lean |
@@ -135,11 +135,11 @@ These follow from Thm 1.4 or Thm 1.1:
 
 ## Precedent
 - **After Oct 6, 2026:** nothing found that uses the device or comments on 255.
-- **Peng II §4:** the same sub-problem; its mechanism is unverified. Snippets say:
-  - for rank ≥ 2 the linear parts "have to be the same";
-  - rank 1 "follows exactly the same proof as in [EFW2]".
+- **Peng II §4** (read in full from arXiv:1002.4451 on 2026-10-12): the same sub-problem, by a **different mechanism**.
+  - Thm 4.1 uses EFW II coarse topology: illegal-circuit loops, Gromov products, and rank-1 geodesic counting used only to force divergence. Higher rank is "many rank 1 argument".
+  - Cor 4.0.1 then equalizes the linear parts by a measure-vs-length argument.
+  - There is no facet reflection, exponent doubling or alternating bundle count, so C1 is not a close variant. C1 stays N3 (conf 0.40).
 
-  C1 is uniform in rank, which hints that the mechanisms differ. If Peng's rank ≥ 2 argument is a cross-tile volume count, C1 falls to N2. **Reading Peng II §4 in full remains the decisive pending check.**
 - **EFW and Ferragut:** quadrilaterals, a different mechanism.
 - **Classical pieces:** the reflection lemma is N0, and the doubling identity is elementary.
 

@@ -2,9 +2,34 @@
 
 Analyst role: novelty. Date: 2026-10-12. Machine-readable version: `novelty.json`.
 
+## Full-text re-check (2026-10-12)
+
+arXiv became reachable, so the decisive open check was done on the PDFs. Peng II (arXiv:1002.4451v1) §1.1, §3.3, all of §4 and §5.1 were read in full. Peng I (0802.2596) was scanned (contents, introduction, keywords); it covers single boxes only. Details are in `novelty.json` → `verified_checks`.
+
+**What Peng II §4 does.** It solves the same sub-problem as C1, making the linear parts of the standard maps agree across tiles, but by a different mechanism: EFW II coarse topology.
+- **Thm 4.1** says root-class horocycles go near horocycles over the whole big box. The proof uses:
+  - H graphs of "shadow vertices";
+  - Gromov products in a hyperbolic slice;
+  - the illegal-circuit loop lemma (4.2.5);
+  - a rank-1 geodesic counting lemma (4.3.2), used only to force geodesics to diverge;
+  - "the loop that prevents blocking" (Thm 4.2, Fig. 3).
+- Higher rank "basically consists of many rank 1 argument as appeared in [EFW2]" (p.2).
+- **Cor 4.0.1** then equalizes the linear parts by a measure-vs-length argument. Horocycle pieces of equal measure sit at heights that differ by ε·diam B. The connecting geodesics have length O(diam B), but their preimages would need length e^{ε·diam B}, a contradiction.
+
+**What is absent from Peng.** There is no forced facet reflection, no opposite-image exponent doubling P = 2P(E), and no alternating two-sheet bundle count.
+
+**Where Peng does count volumes.** Only *within* a tile (§3.3, by counting half planes). That is the abelian precedent for C3, C4 and I23, and it confirms their N2 grades. C4 is tighter than recorded: Peng also reaches affinity by counting.
+
+**Peng §5.** It aligns translational parts with EFW I quadrilaterals. C2 stays N2 on its other neighbours.
+
+**Verdict.** Peng II §4 is **not** a close variant of C1, so the main downgrade risk is resolved. Peng's Cor 4.0.1 shows that a *measure-based* contradiction to a label mismatch already exists in the literature. Only C1's specific device (reflection + doubling + alternation) is new, which caps the gain in confidence.
+- **C1:** stays an N3 candidate; confidence 0.35 → **0.40**.
+- **family_D:** stays D3 (provisional, weak); confidence 0.35 → **0.40**.
+- The remaining risks are folklore (an expert query) and test 4 (P-C1). P-C1 now gives partial credit to Peng-style loop arguments and to measure-vs-length arguments.
+
 **L** = Mathlib d13f23b plus 255's 28-entry bibliography (EFW, Peng I–II, Shalom, Cornulier–Tessera, Dymarz, DFX, Farb–Mosher, Guivarc'h, Gromov, Li, KMN, Bieri, Ganzburg, Grayevsky–Pallier, Le Boudec, ...). No reasoning trace was released. The release's Lean is trusted as published and was not built.
 
-**Access caveat.** WebFetch could not reach arxiv.org, ar5iv, msp.org or math.uchicago.edu (DNS failure), and the proxy refused export.arxiv.org (403). All literature checks are therefore at WebSearch snippet level, and no abstract or PDF was read directly.
+**Access caveat (original pass; Peng since verified, see above).** WebFetch could not reach arxiv.org, ar5iv, msp.org or math.uchicago.edu (DNS failure), and the proxy refused export.arxiv.org (403). All literature checks are therefore at WebSearch snippet level, and no abstract or PDF was read directly.
 
 ## 1. Verdicts first
 
@@ -20,17 +45,17 @@ Analyst role: novelty. Date: 2026-10-12. Machine-readable version: `novelty.json
 
 | ID | Item | N | F | Conf. | Lean-backed |
 |---|---|---|---|---|---|
-| C1 | Reflection doubling for neighbouring labels (Prop 7.1 + tuple lifts) | **N3 (weak candidate)** | F3 (F4 flavour) | 0.35 | **yes**, on the chain of all 3 targets |
+| C1 | Reflection doubling for neighbouring labels (Prop 7.1 + tuple lifts) | **N3 (weak candidate)** | F3 (F4 flavour) | 0.40 (was 0.35; Peng II re-checked) | **yes**, on the chain of all 3 targets |
 | C2 | Cone-quotient Haar trace tests / conditioned probes (Prop 8.3) | N2 (was N3 weak) | — | 0.55 | yes |
 | C3 | Volume exponent P(E) + symmetry group 𝒜_G | N2 | — | 0.7 | yes |
 | C4 | Affinity criterion (Lemma 6.6) + anti-folding inequality | N2 | — | 0.65 | yes |
 | C5 | Inverse coupling (Lemma 5.5) | N1 (was N2) | — | 0.5 | yes |
 | C6 | I23, I26, I33, I38 | N2 | — | 0.65 | yes |
 
-**family_D: D3 (provisional, weak), confidence 0.35.**
+**family_D: D3 (provisional, weak), confidence 0.40** (0.35 before the 2026-10-12 Peng re-check).
 - It rests on C1 alone.
 - It falls to D2 under any of three conditions:
-  - Peng II §4 ("Aligning the linear part of standard maps") turns out to be volume-based;
+  - ~~Peng II §4 turns out to be volume-based~~ (checked 2026-10-12: it is not);
   - an expert calls cross-tile "unfolding doubles volume" folklore;
   - test P-C1 finds the device easy to discover once P is given.
 
@@ -63,7 +88,7 @@ It then splits:
 **C1, reflection doubling.**
 - **Mechanism.** Co-location on the α_i facet forces A₁⁻¹A₂ to be the facet reflection. An inward segment E then has opposite target images, with P(E′₁∪E′₂) = 2P(E). Alternating switch bundles on the two sheets give target volume e^{2rP(E)}, while the source terminals are covered by e^{rP(E)} balls.
 - **Neighbours:**
-  - Peng 2011 II §4 aligns linear parts across tiles. It is the same sub-problem and a named precedent (intro:43-47), but its mechanism is unverified.
+  - Peng 2011 II §4 aligns linear parts across tiles. It is the same sub-problem and a named precedent (intro:43-47). Verified 2026-10-12: the mechanism is EFW II loops plus a measure-vs-length corollary (Cor 4.0.1), so it is a different mechanism.
   - EFW and Ferragut use quadrilaterals, a different mechanism.
   - Internally, C1 is the cross-sheet mirror of the paper's own anti-folding inequality I28 and an application of its P-comparison (Lemma 5.4).
   - Ping-pong growth is genuinely different.
@@ -71,7 +96,7 @@ It then splits:
   - Test 2: passes.
   - Test 3: passes by knockout.
   - Test 4: protocol P-C1.
-- **Grade.** It stays an N3 candidate only because no external work with this mechanism was found. The risk is high.
+- **Grade.** It stays an N3 candidate (0.40) because no external work with this mechanism was found, now including the full text of Peng II §4. The risk is still substantial.
 
 **C2, offset probes.** The Haar multiplier of a nilpotent quotient used as a height meter is the measure-scaling idea of Farb–Mosher, Dymarz, Dymarz–Xie and DFX; the paper's own §10 also uses it. The sub-problem is Peng II §5, "Patching". The exact-cancellation probe pair is engineering, so C2 is **N2**.
 
@@ -123,8 +148,8 @@ It then splits:
 The trace's pivot distance and chain depth cannot be reported, because no trace was released.
 
 ## 6. Open questions
-1. Read Peng II §4–5 in full. If it is volume-based, C1 falls to N2 and the family to D2. This is the single most important pending check.
-2. Verify all snippet-level claims against the PDFs.
+1. ~~Read Peng II §4–5 in full.~~ Done 2026-10-12: not volume-based; C1 stays N3 (see the re-check section at the top).
+2. Verify the remaining snippet-level claims against the PDFs (only Peng I–II have been verified so far).
 3. Ask experts (Peng, Dymarz, Xie, Pallier, Cornulier, Fisher) whether the alternation-doubling count is folklore.
 4. Downstream: does the device shorten any *other* theorem (e.g. Heintze-type or Sol₅-like rigidity), as opposed to corollaries of Thm 1.4?
 5. Confirm the Remez bridge.
