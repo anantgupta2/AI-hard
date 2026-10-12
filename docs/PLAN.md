@@ -196,6 +196,8 @@ Metrics:
 - Not formalized: 004 (Hilbert's tenth problem over ℚ), 002 (BSD formula in Selmer coranks 0 and 1) and 074 (Kakeya in R^3 maximal and R^4 dimension). These are analyzed fully, and their N3 items go on the informal list only.
 - 102 (Unique Games) already has its analyses; its comparators are compiled in this pass.
 
+**Stratified batch 2** (added 2026-10-12, `data/random_batch_2.json`): one Lean-formalized family per subject, for the 12 subjects with the fewest analysed families, drawn with seed 20261012: 033, 094, 143, 161, 194, 222, 240, 255, 262, 312, 322, 342. Each gets the family and novelty passes; eligible N3 items get a downstream list, then join the Lean shortlist. Per the user (2026-10-12), Lean formalizations are assumed to work from here on: no further builds or Comparator re-checks for new families; `data/lean_checks.json` covers only the families checked before this batch.
+
 **Calibration items.**
 - **Positive control:** Cook's ER extension variables for PHP, formalized as a small Lean or DIMACS example. These must pass tests 2–4.
 - **Negative controls:** plumbing definitions and analytic abbreviations from the pilot.
