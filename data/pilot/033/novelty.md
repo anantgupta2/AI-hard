@@ -1,8 +1,32 @@
 # Family 033 novelty pass: Iitaka subadditivity, variation, and logarithmic additivity
 
+## Full-text re-check (2026-10-12)
+
+arXiv became reachable, so the decisive precedent check was redone from full texts (curl + pdftotext). Details and verbatim quotes are in `verified_checks` in `novelty.json`.
+
+**BFMT, arXiv:2508.19215v2, read in full.**
+- *Unconditional:* the Griffiths bundle of any polarizable integral pure VHS with unipotent monodromy extends amply to a Baily–Borel compactification Y^BB of the period image (Thm 1.2/5.2, Cor 1.3/4.2).
+- *Conditional:* the Hodge line of a CY VHS (rank-one deepest Hodge piece, which is C1's setting) is semiample **if** it is integrable (Def 2.17) and has torsion combinatorial monodromy (Def 2.23); see Thm 1.6/4.1. Examples 4.6–4.7 show both conditions are needed.
+- *b-semiampleness* (Thm 1.5) needs "∆ effective over the generic point of X". The analytic version (Thm 7.3) needs "the general fiber of f is an lc pair". The two conditions are verified only under the klt-pair hypothesis (‡), via Ambro 2005 Thm 3.3 (which assumes "B_η is effective"; confirmed in full text), PZ20 and HX16.
+- *Sub-pairs:* Def 6.18 and Thm 6.28 (the canonical bundle formula, M = Hodge line) do allow sub-pairs (∆ = E + F − G). This confirms ORB's stated use of 6.28 rather than 1.5.
+- **Remark 4.8:** the authors say "it is not clear … whether a geometric polarizable integral pure CY variation automatically has Hodge bundle which is integrable and has torsion combinatorial monodromy." So extending BFMT to the κ(F)=0 root-cover VHS with a negative generic sub-boundary is explicitly open.
+- *Nothing adjoint:* BFMT have no K_S + jL, K + D, log-general-type or hyperbolicity statement. They do not cite Brunebarbe–Cadorel and never mention Iitaka or C_{n,m}. They are also silent on AI use.
+- *Closest content to the rank-loss step:* in the conditional Y^BBH picture (Thm 1.7, §7.3.1), boundary strata are lower-dimensional. C1's rank loss is the **unconditional numerical shadow** of that conditional statement. It is not contained in BFMT.
+- *Correction:* if BFMT's conditions held, M would be b-semiample and C1 would be **superseded**. C1 would not literally be a "trivial corollary": it lives on the full period image, where L need not be big.
+
+**Other sources.**
+- *Brunebarbe 2020 (2007.12965, §1 read):* an Arakelov inequality L_V ≤ γ⁻¹K(D), and Cor 1.11 (L_V(−γ⁻¹D) big ⇒ general type). Both concern the *big Griffiths* bundle, so this is a neighbour and not C1.
+- *Read at abstract level only:* Floris 2111.03373, Rapion 2608.22682 and BC 1707.01327. None of them is C1.
+
+**Verdict.** No containment and no close variant was found, so there is no downgrade.
+- C1 stays **N3 (provisional)**. Confidence rises from 0.40 to **0.45**. It is not raised further because the rank-loss step shadows BFMT's conditional picture, test 4 has not been run and correctness is unreviewed.
+- family_D stays **D3 (provisional)**, also 0.40 → **0.45**.
+- Remaining risks: (a) the expert query on integrability/TCM for root-cover VHS; (b) the full text of 2608.22682; (c) P-C1 arm B.
+
+
 Novelty analyst, 2026-10-12. Corpus `openai/math` @ `fd4aeeb`. Structured version: `novelty.json`. There is no trace and there are no `f1_*` files. Lean was not built or run; the release's Lean is trusted as published.
 
-**Access caveat.** WebFetch failed with DNS errors for arxiv.org, adsabs and researchgate. Every external claim below therefore rests on WebSearch snippets plus domain knowledge, and none of the external papers was read in full.
+**Access caveat.** WebFetch failed with DNS errors for arxiv.org, adsabs and researchgate. Every external claim below therefore rests on WebSearch snippets plus domain knowledge, and none of the external papers was read in full. *(Superseded on 2026-10-12 for BFMT, Ambro 2005 and Brunebarbe 2020; see the re-check above.)*
 
 ## Verdicts up front
 
@@ -19,7 +43,7 @@ Novelty analyst, 2026-10-12. Corpus `openai/math` @ `fd4aeeb`. Structured versio
 
 | id | Item | N | F | conf | Lean-backed |
 |---|---|---|---|---|---|
-| C1 | Adjoint positivity of the entire highest Hodge line on the full-period quotient (M = p\*L, K_S+jL big) via strict rank loss on boundary and ramification divisors | **N3 (provisional)** | F3 + F5 | 0.40 | **no** → informal list |
+| C1 | Adjoint positivity of the entire highest Hodge line on the full-period quotient (M = p\*L, K_S+jL big) via strict rank loss on boundary and ramification divisors | **N3 (provisional)** | F3 + F5 | 0.45 (was 0.40; see re-check) | **no** → informal list |
 | C2 | Adjoint-addition interpolation | N2 | – | 0.75 | no |
 | C3 | Analytic birational-constancy criterion (VAR) | N2 | – | 0.65 | no |
 | C4 | Marked periods, Higgs-tail line, period-twist removal (REV) | N2 | – | 0.70 | no |
@@ -29,7 +53,7 @@ Novelty analyst, 2026-10-12. Corpus `openai/math` @ `fd4aeeb`. Structured versio
 | C8 | Exact rank-one comparison / least-index root cover | N1 | – | 0.70 | no |
 | C9 | Kähler b-semiampleness via product covers (BSA) | N2 | – | 0.70 | no |
 
-**family_D: D3 (provisional), confidence 0.40, resting on C1 alone.**
+**family_D: D3 (provisional), confidence 0.45 (was 0.40 before the full-text re-check), resting on C1 alone.**
 - It is not Lean-backed. The comparator certifies only REV's trivial negative-fiber branch.
 - C1 therefore goes on `data/eureka_informal.json`, not on the Lean shortlist. This agent did not edit that file.
 
