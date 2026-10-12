@@ -15,7 +15,7 @@ M cites S as "ScalarCompanion", and E cites M as "MLT". Both are model-produced,
   Tr(H_{−W})_−^γ ≤ 2((γ−½)/(γ+½))^{γ−½} L^cl_{γ,1} ∫W^{γ+½}.
   - The constant is optimal and equals the one-bound-state constant L^(1)_{γ,1}.
   - Equality holds at (r+1)sech²(rx), r=(γ−½)^{-1}.
-  - This is the full open-interval case of the 1D Lieb–Thirring conjecture (Lieb–Thirring 1976). γ=1 was settled days earlier by Read–Schulz (arXiv:2609.10478, a human preprint, confirmed by search). The OpenAI proof is uniform in σ=γ−½∈(0,1), so it does not rely on Read–Schulz.
+  - This is the full open-interval case of the 1D Lieb–Thirring conjecture (Lieb–Thirring 1976). γ=1 was settled days earlier by Read–Schulz (arXiv:2609.10478; AI-assisted preprint: its 'Use of AI' section says a first version of the main argument was developed by GPT-6 Astra, with extensions using Fable 5.1 and GPT-6; verified from the full text 2026-10-12). The OpenAI proof is uniform in σ=γ−½∈(0,1), so it does not rely on Read–Schulz.
 - **262-M**: the same constant holds for measurable Hermitian W≥0 of any finite size m, noncommuting and of any rank.
 - **262-E**: equality holds iff W = U·diag(w_1..w_k,0..0)·U* in one constant unitary basis, with w_j=(r+1)a_j²sech²(ra_j(x−x_j)). The scales and centres are independent, and there are at most m eigenvalues.
 - **Comparator** (`ComparatorChallenges/LiebThirring.lean`):

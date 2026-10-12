@@ -2,21 +2,48 @@
 
 Novelty analyst, 2026-10-12. Machine-readable version: `novelty.json`. Inputs: `family.json`/`family.md` (there is no trace and no f1 file), the S/M/E TeX, and the Lean field definitions (text only).
 
-**Access caveat.** arxiv.org and its mirrors were unreachable from this session: WebFetch failed on DNS and the Bash proxy returned 403. Everything said about Read–Schulz below comes from WebSearch result summaries, so all RS wording is **unverified**. Check it against arXiv:2609.10478v2 before citing it.
+## Full-text re-check (2026-10-12)
+arXiv became reachable, so Read–Schulz arXiv:2609.10478 was read in full: v2 (18 pp) and v1 (9 pp), via curl and pdftotext. Details and quotes are in `novelty.json` → `verified_checks[0]`.
+
+- **RS's matrix device** has two parts.
+  - The explicit **cumulative mass matrix** A(x)=∫Q. It is K-free, runs from 0 to I, and satisfies A′=Q. Q=UUᵀ is rank one in §1; in v2 §2 it is a density matrix of any rank.
+  - A **midpoint Schur-multiplier lift** of a *fixed* scalar q=−α tan(α(s−½)) applied to the density: B = Σ c_rl A^r Q A^l, i.e. B_ij = q((λ_i+λ_j)/2)Q_ij.
+  - This gives the flux F_q=¼Tr(BQ), the square ‖W′−½BW‖², and a pointwise divided-difference positivity condition q(s)q(t)+q[s,t] ≤ −κ. That condition is proved with a Stein identity C−TCT=DPD and a fourth-power embedding.
+- **Verdict on C1:** a **genuinely different device for the same job**, neither equivalent nor a close variant.
+  - The two constructions run in opposite directions. RS's log-derivative matrix is an explicit function of the density, *linear* in it. In 262, B is a free path variable between K and −K, and the density is the *nonlinear* field M_δ(B).
+  - RS has no K, no pencil K²−2sB+s², no phase-space s-integral, no gradient primitive J and no rank-one comparison.
+  - The σ=½ member of M_δ is the K-dependent log-pencil field, so no reparametrization turns it into RS's B.
+  - The only shared step is the completed square with a matrix log-derivative multiplier. For N=1 both reduce to Benguria–Loss/Keller.
+- **No Laptev–Weidl / phase-space matrix device in RS.** LW00 is cited only for dimension lifting (Thm 2), and DLL08 only for duality.
+- **The phrase "matrix correction" does not occur in RS.** It is 262-S's own paraphrase.
+- **AI disclosure: YES, in both versions.** "A first version of the main argument was developed by GPT-6 Astra under the guidance of L.R." The v2 extensions were done "using Fable 5.1 and GPT-6". So the earlier "human paper, no AI disclosure" record was **wrong**.
+- **Grade effects:**
+  - **C1:** stays **N3 (borderline N2)**; confidence **0.40 → 0.45**. The "σ=½ member = RS" downgrade route is closed. The rise is only slight because RS shows that a matrix lift of the same scalar calibration already existed at γ=1, and the Weyl-density expert risk and Test 4 are untouched.
+  - **family_D:** **D3 (provisional), 0.40 → 0.45.**
+  - **Provenance flag:** `model_produced_precedent` → **true**; the flag stays *partial*. S does not build on RS strictly, since RS is cited for priority only.
+  - **C2:** the RS relation is confirmed (same γ=1 result, any rank, different device).
+  - **C5:** the template shared with RS is narrower than recorded (completed square only; RS's constant comes from pointwise κ, not a boundary difference). It stays N2.
+  - **C4:** RS uses a different positivity gadget of the same genre. It stays N2.
+  - **C6:** RS needs no path existence, since A is explicit, so C6 remains absent from RS.
+  - **C8:** RS gives only the equality example, no classification. Unchanged.
+
+The sections below are the original snippet-level pass. Where they conflict with this section, this section wins.
+
+**Access caveat.** arxiv.org and its mirrors were unreachable from this session: WebFetch failed on DNS and the Bash proxy returned 403. Everything said about Read–Schulz below comes from WebSearch result summaries, so all RS wording was unverified at the time. *Superseded by the full-text re-check above.*
 
 ## Provenance verdict: **partial**
-- **Closest precedent:** Read–Schulz, arXiv:2609.10478 (v1 2026-09-09, v2 2026-09-14), a human paper. No search summary shows any AI disclosure; affiliations are academic (Orsay, Copenhagen). S cites v2, so the paper was in the model's context.
+- **Closest precedent:** Read–Schulz, arXiv:2609.10478 (v1 2026-09-09, v2 2026-09-14), an **AI-assisted** paper with academic authors (Orsay, Copenhagen). Its 'Use of AI' section names GPT-6 Astra, GPT-6 and Fable 5.1; this was verified 2026-10-12, and the snippet-level pass had wrongly recorded no disclosure. S cites v2, so the paper was in the model's context.
 - **What RS contains, as summarized:**
   - the sharp γ=1 constant 4/(3√3π);
   - an operator-valued bound L_{1,d} ≤ (2/√3)L^cl;
-  - a method that extends Benguria–Loss's cumulative-mass argument to orthonormal families via a **cumulative mass matrix** A(x)=∫_{−∞}^x UUᵀ (0≤A≤I, A′=UUᵀ, any rank), with a tangent-type auxiliary q and a Riccati-type identity.
+  - a method that extends Benguria–Loss's cumulative-mass argument to orthonormal families via a **cumulative mass matrix** A(x)=∫_{−∞}^x UUᵀ (0≤A≤I, A′=UUᵀ, rank one in §1; any-rank Q in v2 §2), with a tangent-type auxiliary q and a Riccati-type identity.
 - **Model-produced prior work:** none found before 262-S. M builds on S, and E builds on M; both are model-produced, which is why the flag is "partial".
 - **Effect on the Lean candidate:** none. C1 lives in S, and S builds on no model output.
 
 ## Final grades
 | Id | Item | N | F | Conf. | Lean-backed | Route |
 |---|---|---|---|---|---|---|
-| C1 | Regularized matrix field M_δ(B)=c∫(f(K²−2sB+s²)−f(s²))ds with primitive J and rank-one comparison (I05/I07–I09/I11/I14) | **N3** (borderline N2) | F1 (F3) | 0.40 | **yes** (`matrixField`, `fieldPrimitive`, `source_rankone_comparison`) | **Lean shortlist** |
+| C1 | Regularized matrix field M_δ(B)=c∫(f(K²−2sB+s²)−f(s²))ds with primitive J and rank-one comparison (I05/I07–I09/I11/I14) | **N3** (borderline N2) | F1 (F3) | 0.45 (was 0.40; RS verified) | **yes** (`matrixField`, `fieldPrimitive`, `source_rankone_comparison`) | **Lean shortlist** |
 | C2 | Integrated trace comparison tr(NV) ≥ tr(N^q) with exact SOS deficit (M Thm 3.1, I25) | N2 (provisional N3 withdrawn) | – | 0.55 | no | none (informal list only if ever regraded N3) |
 | C3 | Potential-free action inequality keeping the k_i (S Thm 2.1) | N2 (templated-strengthening cap) | – | 0.7 | partial (`ActionClaim` unproved; `finite_action_upper_test` proved) | – |
 | C4 | Gamma–Gaussian conjugation average + Klein (I10/I12/I13) | N2 | – | 0.65 | yes | – |
@@ -33,7 +60,7 @@ Novelty analyst, 2026-10-12. Machine-readable version: `novelty.json`. Inputs: `
 - **Conclusion:** M_δ is not the γ=1 member of RS's construction, and the precedent does not downgrade C1.
 - **What they share** is the Benguria–Loss architecture: a matrix path with prescribed endpoints, a calibration whose boundary difference gives the constant, and a completed square. That shared template is why C5 is N2.
 
-## Why C1 stays N3 only at 0.40
+## Why C1 stays N3 only at 0.45 (0.40 before the RS full-text check)
 **Interpretation.** X_s(B) = (s−B)² + (K²−B²) is the Fourier symbol of −(d/dx − iB)² + K² − B². M itself makes this explicit with ∇ = ∂−iB. So M_δ is, up to regularization, a *local Weyl density* of a constant operator with a non-abelian gauge shift.
 - In the commuting case the shift integrates out, giving the classical scalar calibration (k²−b²)^σ. That is Keller's one-state first integral.
 - In the noncommuting case the shift makes the field affine in B, so it is a trace gradient. Naive (K²−B²)^σ is not a gradient.
@@ -51,10 +78,10 @@ Novelty analyst, 2026-10-12. Machine-readable version: `novelty.json`. Inputs: `
 - **Main risk.** An expert may call it "just" a gauge-shifted Laptev–Weidl phase-space density used as a calibration, which would make it N2.
 
 ## family_D
-**D3 (provisional), confidence 0.40.** It rests on C1 alone.
+**D3 (provisional), confidence 0.45** (0.40 before the RS full-text check). It rests on C1 alone.
 
 It falls to D2 if any of these happens:
-- the full RS text has an energy-dependent matrix field matching M_δ at σ=½;
+- ~~the full RS text has an energy-dependent matrix field matching M_δ at σ=½~~ (checked 2026-10-12: it does not);
 - an expert identifies M_δ as a known Weyl-density calibration;
 - Test 4 shows high pass@k in the directed arm.
 
