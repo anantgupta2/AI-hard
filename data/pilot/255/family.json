@@ -1,0 +1,1771 @@
+{
+ "family": 255,
+ "title": "Quasi-isometric recognition of virtually polycyclic groups",
+ "manuscripts": [
+  {
+   "id": "255",
+   "title": "Quasi-isometric Recognition of Virtually Polycyclic Groups",
+   "manuscript_dir": "preprints/quasi-isometric-recognition-of-virtually-polycyclic-groups-September-24-2026",
+   "source_root": "preprints/quasi-isometric-recognition-of-virtually-polycyclic-groups-September-24-2026/build",
+   "tex_files": [
+    "main.tex",
+    "introduction.tex",
+    "models.tex",
+    "boxes.tex",
+    "polynomial.tex",
+    "stationary.tex",
+    "profiles.tex",
+    "labels.tex",
+    "reflection-figure.tex",
+    "offsets.tex",
+    "uniformity.tex",
+    "boundary.tex",
+    "recognition.tex",
+    "lipschitz-appendix.tex"
+   ],
+   "lines": 5465,
+   "date": "September 24, 2026",
+   "author": "OpenAI",
+   "bib_entries": 28
+  }
+ ],
+ "file_line_convention": "paper paths relative to <manuscript_dir>/build; Lean paths relative to lean/ (openai-math fd4aeeb), PolycyclicRecognition files abbreviated relative to OAI/GroupTheory/PolycyclicRecognition",
+ "commit": "fd4aeeb",
+ "analyst_role": "FAMILY analyst (paper + Lean, text level). Lean NOT built by this agent (shared checkout; orchestrator compiles the comparator). scripts/extract_lean.py 255 (v3) was run -> data/items/255_lean.json.",
+ "base_library_L": "Mathlib d13f23b + the paper's 28-entry references.bib (EFW 2007/2012/2013, Peng 2011 I-II, Shalom 2004, Cornulier-Tessera 2017/2020, Dymarz 2010, DFX 2025, Gromov 1981, Li 2018, KMN 2009, Bieri 1981, Dekimpe 2000, Dixmier 1957, Hoermander 1967, Guivarc'h 1973, Pansu 1983, Ganzburg 2017, Greschonig-Schmidt 2000, Farb-Mosher 2000, Farb-Weinberger 2008, Geng 2015, Tessera 2008, Cornulier-de la Harpe 2016, Grayevsky-Pallier 2025, Le Boudec 2025). Lean also imports the external `gromov` package (Aaron1011/gromov @8db79f1, Gromov's polynomial-growth theorem, forward direction).",
+ "main_statement": {
+  "file_line": "introduction.tex:10-22, 95-101",
+  "latex": "\\begin{theorem} Let $P$ be a finitely generated virtually polycyclic group, and let $H$ be any finitely generated group. If $H$ and $P$ are quasi-isometric, then $H$ is virtually polycyclic. \\end{theorem} \\begin{corollary} If a finitely generated group $H$ is quasi-isometric to a lattice in a connected simply connected solvable Lie group, then a finite-index subgroup of $H$ is a uniform lattice in some connected simply connected solvable Lie group. \\end{corollary} \\begin{theorem}[Uniform bounded height] Let $G$ be a connected simply connected real-triangulable unimodular Lie group ... There is a finite subgroup $\\A_G\\leq\\GL(W)$ such that, for every $K\\geq1$ and $C\\geq0$, there is a constant $B=B(G,K,C)$ ... Every $(K,C)$ self quasi-isometry $F$ of $G$ has an $A_F\\in\\A_G$ satisfying $\\|\\pi F(g)-\\pi F(1)-A_F\\pi(g)\\|\\leq B$.\\end{theorem}",
+  "paraphrase": "Virtual polycyclicity is a quasi-isometry invariant among all finitely generated groups (no solvability assumed on H). Equivalently (EFW lattice-recognition conjecture), groups QI to solvable Lie lattices are virtually uniform lattices in possibly different simply connected solvable Lie groups. The engine: every self-QI of a unimodular real-triangulable Lie group moves the canonical height coordinate by an element of a fixed finite linear group A_G up to a uniformly bounded error.",
+  "comparator": {
+   "file": "lean/ComparatorChallenges/PolycyclicRecognition.lean",
+   "json": "lean/ComparatorChallenges/PolycyclicRecognition.json",
+   "theorems": [
+    "OAI.PolycyclicRecognition.group_recognition : GroupCoarseEquivalence P J -> IsVirtuallyPolycyclic P -> IsVirtuallyPolycyclic J /\\ exists finite-index Gamma <= J isomorphic to a uniform lattice in some SimplyConnectedSolvableLieModel",
+    "OAI.PolycyclicRecognition.main_uniform_bounded_height : for R (simply connected solvable Lie group), any ProperChainMetric, a TriangularAdjoint basis, unimodular, W ~ HeightSpace, pi : R ->* Multiplicative W compatible with Exp, exists finite subgroup A <= (W ~L W) with forall K>=1, C>=0, exists B>=0, forall F : SelfQuasiIsometry K C, exists AF in A, forall g, ||pi(F g) - (pi(F 1) + AF(pi g))|| <= B",
+    "OAI.PolycyclicRecognition.lattice_recognition : finite-covolume lattice Lambda in S, GroupCoarseEquivalence Lambda J -> finite-index subgroup of J isomorphic to a uniform lattice in some SimplyConnectedSolvableLieModel"
+   ],
+   "solution_module": "OAI.GroupTheory.PolycyclicRecognition.Recognition",
+   "definition_names": [],
+   "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+   ],
+   "model": "Coarse equivalence of f.g. groups encoded algebraically (bornologous maps with finite-set errors), equivalent to QI for word metrics. Lie models are bundled: finite-dimensional real manifold, LieGroup, T2, second countable, SimplyConnectedSpace, Group.IsSolvable. Height space = L / inf ker of the diagonal characters of a triangular adjoint basis. Uniform lattice = discrete + compact fundamental cover. Finite covolume = invariant probability on G/Lambda."
+  },
+  "match_check": "Thm 1.1 + Cor 1.2: exact (group_recognition additionally includes the Dekimpe realization of J, i.e. the Cor 1.2 conclusion). Thm 1.4: exact or slightly stronger: the metric may be any proper compatible left-invariant metric with linear chains (paper: left-invariant Riemannian), W any normed space with a linear iso to the height quotient, pi any group hom agreeing with q o heightProjection on Exp; A is only asserted to be some finite subgroup (the paper's A_G is the explicit symmetry group of P; the Lean proof uses templateSymmetryGroup D, so the construction matches). Real-triangulability enters as existence of TriangularAdjoint. Universe restriction P J : Type (harmless). No definition_names, so comparator definitions are fixed by the statement file itself; I found no loophole at text level.",
+  "formalized_vs_claimed": "Formalized (claimed sorry-free): Thm 1.1, Cor 1.2 (finite-covolume version), Thm 1.4, plus the Dekimpe realization of the recognized group. All cited inputs except Gromov are re-proved inside the OAI dir or bypassed (Li FP/duality transfer, Bieri, Dekimpe, Cornulier-Tessera model reduction, Dixmier exp-diffeomorphism, Remez, ergodic decomposition, nilpotent BCH/Haar). Gromov's theorem comes from the external `gromov` package. Not separately formalized: nothing claimed in the paper appears missing; route differences listed under lean_structure.",
+  "note_for_comparator": "Compilation not run by this agent (shared checkout). Status pending orchestrator. ~262k Lean lines in 3090 files plus the gromov package (76 files, 26.9k lines) - build cost is large."
+ },
+ "trust_surface": {
+  "lean": "3090 files, 262,281 lines in lean/OAI/GroupTheory/PolycyclicRecognition; imports OAI/GroupTheory/CyclicSeries, OAI/GroupTheory/Thompson, OAI/Probability/CriticalPercolation/Nilpotent (other families' model-produced code) and the external package `gromov` (Aaron1011/gromov @8db79f1).",
+  "grep_scope": "all 3090 .lean files, ripgrep word-boundary",
+  "counts": {
+   "sorry": 0,
+   "admit": 13,
+   "axiom": 1,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque (keyword)": 0,
+   "ofReduceBool/skipKernelTC": 0,
+   "partial": 5,
+   "decide (small Bool/Prop/numeral facts)": 44,
+   "set_option maxHeartbeats": 0
+  },
+  "note": "All 13 'admit', the single 'axiom' and the 5 'partial' hits are English words in docstrings (e.g. Algebra/DynkinInput.lean:21 'never a global axiom', Analysis/WordBoxComparison.lean:87 'admit one'). Cited theorems are encoded as Prop-valued '*Input' definitions (e.g. LiFinitenessInput, BieriDualityInput, DekimpeLatticeRealizationInput, ReducedCohomologyInput, ElementaryAmenableFinitenessInput); the final theorems are hypothesis-free, so every Input actually used must be discharged by a theorem (checked at text level for gromov, dekimpe, cornulierTesseraModel, liFiniteness, liDuality, bieriDuality, remez, geodesicMetricExistence, lieRiemannianMetric, matrixLieDifferential, ergodic decomposition). The KMN Input appears only in the legacy PublishedRecognitionInputs path, which the final theorems do not use (they go through RecognitionWithoutKMN). gromov package: no sorry/axiom outside comments (Gromov/Unipotent/GammaN.lean:742-778 commented-out sorry); its FormalConjecturesCheck states it proves only the forward direction of Gromov's theorem, which is what is used.",
+  "compile_status": "pending (orchestrator)"
+ },
+ "labels": {
+  "A": {
+   "label": "A1",
+   "secondary": {
+    "hard_direction_form": "n/a (not a characterization; virtually polycyclic => QI-closed class)",
+    "explicit_rate": false,
+    "bounded_height_form": "Thm 1.4 is A1 with a uniform (non-explicit) constant: exists finite A_G, forall K,C exists B, forall F exists A_F"
+   },
+   "evidence": {
+    "quote": "If $H$ and $P$ are quasi-isometric, then $H$ is virtually polycyclic.",
+    "file_line": "introduction.tex:10-12"
+   },
+   "confidence": "0.85",
+   "note": "Universal closure statement over all f.g. H. The existential 'exists polycyclic finite-index subgroup' is a property inside the conclusion, not a constructed witness."
+  },
+  "B": {
+   "label": "B1",
+   "secondary": "B4 (Thm 1.4 extends Peng's height-respecting theorem and EFW Sol rigidity to all unimodular real-triangulable models)",
+   "flags": {
+    "full_only_with_prior": false,
+    "adds_corollaries_for_other_conjectures": true,
+    "corollaries": [
+     "Cor 1.2 lattice-recognition formulation (EFW Conj. 1.2)",
+     "uniform bounded height for all unimodular real-triangulable groups (Farb-Mosher horizontal-preservation type conjectures, FarbMosher2000 Sec. 5)"
+    ],
+    "posed_by": "Eskin-Fisher-Whyte 2007, Conjecture 1.2 and Remark (3), p. 929; Farb-Mosher 2000 problem list"
+   },
+   "evidence": {
+    "quote": "This resolves the lattice-recognition conjecture of Eskin, Fisher and Whyte",
+    "file_line": "main.tex:59-62 (abstract); introduction.tex:26-35, 74-78"
+   },
+   "confidence": "0.8 (conditional on correctness)",
+   "note": "Uses earlier theorems as tools (Gromov, Shalom approach, Cornulier-Tessera, Li, KMN, Bieri) but not prior special cases; quick search (2026-10-12) found the conjecture still listed as open in 2025 literature (Grayevsky-Pallier 2025)."
+  },
+  "C": {
+   "primary": "C4",
+   "primary_evidence": {
+    "quote": "A quasi-isometry therefore forces $P(E)\\le P(E')$. Applying this comparison in both directions will restrict an affine height slope to the finite group",
+    "file_line": "introduction.tex:123-135"
+   },
+   "secondaries": [
+    "C3 (compactness/contradiction: weak limits of profile laws, 'suppose labels differ ... contradiction', ergodic decomposition; existence of invariant means)",
+    "C5 (Gromov 1981, Cornulier-Tessera 2020 Cor 1.9, Li 2018 Cor 4.47/4.48, KMN 2009 Thm 1.1, Bieri Thm 9.23, Dekimpe Thm 4.1, Hoermander 1967 invoked without re-proof in the paper)",
+    "C2 (minor: telescoping across scales r -> qr, Lemma 9.3; Lean: induction on nilpotency class for reduced cohomology)"
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "44 `decide` uses, all on numerals/Bool filters (e.g. Analysis/HarmonicSeparatedRadii.lean:16 `pow_pos (by decide) n`)",
+    "file_line": "lean/OAI/GroupTheory/PolycyclicRecognition/**"
+   },
+   "ih_strengthened": false,
+   "ih_template": null,
+   "ih_evidence": {
+    "quote": "Telescope along scales $R,qR,q^2R,\\ldots$",
+    "file_line": "uniformity.tex:183-193"
+   },
+   "ih_note": "No load-bearing induction; the only iterations are scale telescoping and fixed-depth recurrence.",
+   "confidence": "C4 0.6 (C3 almost co-primary); secondaries 0.7"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "I31 reflection-doubling neighbor-label argument (alternating two-sheet bundles, target exponent 2P(E) vs source P(E)); runner-up I35 quotient-Haar offset probes; supporting new functional I08/I10 (bracket-word volume exponent P and its finite symmetry group A_G) graded N2",
+   "evidence": {
+    "quote": "Alternating moves on the sheets would then produce a target volume exponent twice the source exponent, contradicting the volume comparison.",
+    "file_line": "introduction.tex:168-173; labels.tex:39-54"
+   },
+   "confidence": "0.4",
+   "caveats": [
+    "Grades conditional on correctness of an unrefereed resolution of a ~20-year-old conjecture",
+    "quick WebSearch only; EFW/Peng coarse-differentiation papers (quadrilateral/monotonicity arguments) are the closest neighbours and were not read in full",
+    "Lean DAG shares of the N3 candidates are small (<1% of the height core) because the formalization is very distributed; dominated-share proxy is weak here"
+   ],
+   "flag_builds_on_prior_model_produced_result": false,
+   "flag_note": "The paper cites no model-produced work. The Lean imports three other OAI (model-produced) library dirs (CyclicSeries, Thompson, CriticalPercolation/Nilpotent; ~117 decls in the DAG) for generic group/nilpotent lemmas - Lean-level reuse only."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Group theory",
+    "msc2020": "20F65 (geometric group theory), 20F16 (solvable/polycyclic groups), 22E25 (nilpotent and solvable Lie groups), 22E40 (discrete subgroups of Lie groups), 51F30 (Lipschitz and coarse geometry)",
+    "lean_dir": "GroupTheory"
+   },
+   "lean_dir_field": "GroupTheory (OAI/GroupTheory/PolycyclicRecognition, subdirs Algebra 1120 files, Geometry 1047, Analysis 549, Finiteness 267, Lattices 101)",
+   "method_fields": [
+    {
+     "field": "Lie theory (Cartan subalgebras, generalized weights, Engel, Dixmier exponential diffeomorphism, BCH/Dynkin)",
+     "tag": "essential"
+    },
+    {
+     "field": "large-scale geometry of nilpotent groups (Guivarc'h-Pansu graded limits, polynomial growth/doubling)",
+     "tag": "essential"
+    },
+    {
+     "field": "convex geometry / polyhedral combinatorics (support functions, polyhedral norm, hyperplane-arrangement chambers, extremal rays)",
+     "tag": "essential"
+    },
+    {
+     "field": "ergodic theory / measured group theory (Shalom couplings, invariant measures, ergodic decomposition Greschonig-Schmidt)",
+     "tag": "essential"
+    },
+    {
+     "field": "unitary representations / reduced 1-cohomology (Cornulier-Tessera property H_t)",
+     "tag": "essential (paper); Lean: nilpotent-group vanishing applied to the Cartan factor"
+    },
+    {
+     "field": "real analysis / polynomial inequalities (Remez-type sublevel sets, Ganzburg)",
+     "tag": "essential (re-proved)"
+    },
+    {
+     "field": "PDE (Hoermander hypoellipticity of sums of squares)",
+     "tag": "essential (paper, regularity in affinity criterion); avoided in Lean"
+    },
+    {
+     "field": "measure theory on locally compact groups (Haar, Radon averaging, Fubini, Portmanteau)",
+     "tag": "essential"
+    },
+    {
+     "field": "amenability (invariant means, Folner sets)",
+     "tag": "essential"
+    },
+    {
+     "field": "growth of groups (Gromov polynomial growth theorem)",
+     "tag": "essential"
+    },
+    {
+     "field": "homological group theory (FP_infinity, Poincare duality groups: Li, Bieri; KMN elementary amenable finiteness)",
+     "tag": "essential (paper); KMN avoided in Lean"
+    },
+    {
+     "field": "lattices in solvable Lie groups (Dekimpe, Farb-Weinberger, Geng, Milnor-Svarc)",
+     "tag": "essential for model reduction and Cor 1.2"
+    },
+    {
+     "field": "coarse differentiation and boundary rigidity (EFW, Peng, Dymarz, DFX)",
+     "tag": "background-cited (no theorem invoked)"
+    }
+   ],
+   "cross_field_count": 10,
+   "share_invoked_from_other_fields": "~0.75 of invoked external theorems are outside geometric group theory (Cornulier-Tessera 2020, Dixmier, Hoermander, Greschonig-Schmidt, Li x2, Bieri, KMN, Dekimpe; vs in-field Gromov, Milnor-Svarc, Cornulier-Tessera 2017 reduction)"
+  }
+ },
+ "items": [
+  {
+   "id": "I01",
+   "kind": "definition (inline)",
+   "name": "polycyclic / virtually polycyclic group",
+   "file_line": "introduction.tex:3",
+   "statement": "A group is polycyclic if it has a finite subnormal series with cyclic factors; virtually polycyclic if it has a polycyclic subgroup of finite index.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'A group is \\emph{polycyclic} if'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "high (statement vocabulary)",
+    "why": "appears in Thm 1.1"
+   },
+   "analytic_check": "Occurs in the goal (subterm of the statement).",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "textbook notion"
+   },
+   "provisional_F": null,
+   "lean": "Comparator: IsPolycyclic via ChromaticCyclic.CyclicSeries; IsVirtuallyPolycyclic"
+  },
+  {
+   "id": "I02",
+   "kind": "definition (inline)",
+   "name": "(K,C)-quasi-isometry; uniform quasi-action",
+   "file_line": "introduction.tex:5-9,107",
+   "statement": "Bi-Lipschitz up to additive C and C-dense image; a uniform quasi-action is the transported left-translation action of H on G with uniform constants and bounded multiplication defect.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'A $(K,C)$-\\emph{quasi-isometry}'; 'This is a \\emph{uniform quasi-action}'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "high (statement vocabulary)",
+    "why": "goal vocabulary"
+   },
+   "analytic_check": "Occurs in the goal.",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard geometric group theory"
+   },
+   "provisional_F": null,
+   "lean": "Comparator: GroupCoarseEquivalence (algebraic, finite-set errors), SelfQuasiIsometry; Lean: transferredMap"
+  },
+  {
+   "id": "I03",
+   "kind": "definition (inline)",
+   "name": "real-triangulable Lie group; unimodular",
+   "file_line": "introduction.tex:82",
+   "statement": "Connected simply connected Lie group whose adjoint representation is simultaneously upper triangular over R; unimodular = left Haar right-invariant.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'connected simply connected \\emph{real-triangulable} Lie groups'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "hypothesis of Thm 1.4"
+   },
+   "analytic_check": "Occurs in the hypothesis of the goal.",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Cornulier-Tessera terminology; completely solvable groups"
+   },
+   "provisional_F": null,
+   "lean": "Comparator: TriangularAdjoint, ModelIsUnimodular"
+  },
+  {
+   "id": "I04",
+   "kind": "definition",
+   "name": "exponential height map pi : G -> W = g / (cap ker chi_j)  (Def 1.3)",
+   "file_line": "introduction.tex:84-93; models.tex:362-381",
+   "statement": "W is the quotient of the Lie algebra by the common kernel of all diagonal characters of a real triangular form of ad; pi is the integrated homomorphism.",
+   "cited_or_new": {
+    "status": "new name for a known object",
+    "cue": "'The relevant quotient has a canonical definition'"
+   },
+   "uses_items": [
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "every height estimate is stated in W"
+   },
+   "analytic_check": "Analytic: it is a subterm of the statement of Thm 1.4 (comparator heightKernel / HeightSpace). For split abelian-by-abelian groups it is the EFW/Peng height (projection to A).",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "Abbreviation (common kernel of the roots); generalizes the EFW/Peng/Farb-Mosher height function."
+   },
+   "provisional_F": null,
+   "lean": "Comparator: heightKernel, HeightSpace, heightProjection (in the target statement closure)"
+  },
+  {
+   "id": "I05",
+   "kind": "lemma",
+   "name": "Cartan model: generalized weight decomposition, N=exp(n), D=exp(d), q : N x| D -> G surjective with kernel {(a^-1,a): a in N cap D}  (Lemma 2.1)",
+   "file_line": "models.tex:38-153",
+   "statement": "Choose a Cartan subalgebra d; n = subalgebra generated by nonzero generalized weight spaces is a nilpotent ideal, g = n + d; homogeneous generators X_i with nonzero weights alpha_i; multiplication N x| D -> G is a surjective submersion whose kernel is the overlap N cap D.",
+   "cited_or_new": {
+    "status": "cited + re-proved",
+    "cue": "'see also [CornulierTessera2017, Section 4.D] for the Cartan grading'; 'the argument does not require a complementary subgroup to N'"
+   },
+   "uses_items": [
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "all box/packing estimates use (n,d) coordinates and keep the overlap kernel"
+   },
+   "analytic_check": "Not a subterm of the goal; Cartan grading is in L (Cornulier-Tessera 2017; Mathlib has LieSubalgebra.IsCartanSubalgebra, engel).",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Cartan grading of solvable Lie algebras is classical; keeping N cap D instead of a split complement is a technical choice (N1)."
+   },
+   "provisional_F": null,
+   "lean": "CartanWordModel / CartanFactorModel; Mathlib LieAlgebra.exists_isCartanSubalgebra_engel"
+  },
+  {
+   "id": "I06",
+   "kind": "lemma",
+   "name": "Nilpotent coordinates, dilations Delta_r and graded Cartan limit D_infinity (Lemma 2.2)",
+   "file_line": "models.tex:162-360",
+   "statement": "Polynomial coordinate bounds ||v_j|| <= C(1+|d|)^j and converse; transported group laws converge to the associated graded group; Haar = Lebesgue; polynomial volume growth and doubling.",
+   "cited_or_new": {
+    "status": "cited + re-proved",
+    "cue": "'These weighted coordinates and graded limits belong to the classical large-scale geometry of nilpotent groups; see [Guivarch1973, Pansu1983]'"
+   },
+   "uses_items": [
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium-high",
+    "why": "used to place growing D-charts on the fixed domain D_infinity"
+   },
+   "analytic_check": "In L (Guivarc'h, Pansu).",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "classical (asymptotic cone of nilpotent groups)"
+   },
+   "provisional_F": null,
+   "lean": "Algebra/Dynkin*, NilpotentCoordinatesInput (proved), RescaledLieFamily"
+  },
+  {
+   "id": "I07",
+   "kind": "lemma",
+   "name": "Canonical height and volume-preserving actions: W = V / cap ker alpha_i; Ad_d = e^{gamma(pi d)} U_gamma(d) with polynomial unipotent part; exact weight dilations S_w preserve Haar  (Lemma 2.3)",
+   "file_line": "models.tex:383-495",
+   "statement": "Identifies W with the Cartan abelianization modulo the generator-weight kernels, separates exponential and polynomial factors of the D-action, and uses unimodularity (trace on n is 0) to make S_w and Ad_d Haar-preserving.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "'The construction supplies the canonical height using any chosen Cartan subalgebra'"
+   },
+   "uses_items": [
+    "I04",
+    "I05",
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "every conjugation estimate uses it"
+   },
+   "analytic_check": "Routine linear algebra over L.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "standard weight-space bookkeeping"
+   },
+   "provisional_F": null,
+   "lean": "CartanTrace, CartanJacobian (det_idealWeightDilation_eq_one), CartanActualConjugation"
+  },
+  {
+   "id": "I08",
+   "kind": "definition",
+   "name": "bracket-word list Z, support exponents s_i(E), word widths h_Z(E) = sum of separate maxima, volume exponent P(E) = max over word bases of sum h_Z(E)",
+   "file_line": "boxes.tex:21-64",
+   "statement": "For compact E in W: s_i(E)=max_E alpha_i; h_Z(E)= sum over letters of Z of s_i(E) (letters may be used at different heights); P(E)=max over bases B selected from Z of sum_{Z in B} h_Z(E). Heisenberg example: zero-weight bracket Z gets width e^{r(b-a)}, P=2(b-a).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The letters in a product may be applied at different support positions. Their available amplitudes therefore contribute the sum of the separate maxima h_Z(E), which can exceed max_E gamma_Z.'"
+   },
+   "uses_items": [
+    "I05",
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "guess": "very high",
+    "why": "P is the single invariant compared on both sides of every volume argument (Lemmas 5.4, 6.5, Prop 7.1, Prop 8.3) and defines A_G"
+   },
+   "analytic_check": "Not a subterm of the goal (the goal only mentions a finite group A). Not in Mathlib. For Sol/abelian-by-abelian with abelian N it reduces to the EFW/Peng box volume e^{r(b-a)} summed over roots.",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Close neighbour: EFW/Peng 'boxes' in Sol and abelian-by-abelian groups whose volume is exponential in the height range; volume entropy. The bracket-word 'sum of separate maxima' extension to nonabelian N with zero-weight brackets is a genuine variant. Candidate for N3 only if the novelty judge finds no counterpart for nonabelian N."
+   },
+   "provisional_F": null,
+   "lean": "CartanWordModel.supportIn, boxCost (Geometry/CartanBoxExponents.lean:32-36); supportIn is used by 10% of the height core"
+  },
+  {
+   "id": "I09",
+   "kind": "definition",
+   "name": "weighted box B_r(E,L) and box calculus (Lemma 3.1)",
+   "file_line": "boxes.tex:43-160",
+   "statement": "B_r(E,L) = exp_N(sum t_Z e^{r h_Z(E)} Z, |t_Z|<=L) in a maximizing basis; uniformly bounded normalized structure constants, polynomial product bounds, vol ~ L^{dim N} e^{r P(E)}, dilation shift, conjugation estimate.",
+   "cited_or_new": {
+    "status": "new (routine given I08)",
+    "cue": "'For r>=0 and L>0, put'"
+   },
+   "uses_items": [
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "guess": "very high",
+    "why": "all counting arguments live in these boxes"
+   },
+   "analytic_check": "Not in the goal; elementary given I08.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "box with exponentially scaled coordinates; same idea as EFW boxes"
+   },
+   "provisional_F": null,
+   "lean": "CartanWordModel.boxBasis, groupBox (Geometry/CartanGroupBoxes.lean)"
+  },
+  {
+   "id": "I10",
+   "kind": "lemma+definition",
+   "name": "polyhedral norm p(w)=P([0,w]) and the support-symmetry group A = {A in GL(W): P(AE)=P(E) for all compact convex E}  (Lemma 3.2); A_G := A",
+   "file_line": "boxes.tex:174-233; introduction.tex:96-103",
+   "statement": "P is translation invariant (bases have total weight zero by unimodularity), depends on convex hull, Lipschitz; p is a polyhedral norm (positive relation sum c_i alpha_i = 0); A is finite (isometries of a polytope norm) and its pullback permutes the oriented generator-weight rays.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The finite group A_G will be constructed from the exponential rates of bracket-generated volume in Lemma 3.2.'"
+   },
+   "uses_items": [
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "guess": "very high",
+    "why": "A_G is the finite group of Thm 1.4; every label lies in it"
+   },
+   "analytic_check": "Its existence (a finite group) is in the goal; its construction from P is not. Nearest: the finite group of height symmetries in EFW (Sol: Z/2 flip) and Peng's root-permuting maps.",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Known neighbours: EFW's QI(Sol) = (Bilip x Bilip) x| Z/2 (height flip), Peng's finite permutations of roots for abelian-by-abelian models. Defining the group as the symmetry group of a volume-exponent functional is a new packaging."
+   },
+   "provisional_F": null,
+   "lean": "templateSymmetryGroup (Algebra/TemplateSymmetries.lean:23); templateSymmetry_weight_ray"
+  },
+  {
+   "id": "I11",
+   "kind": "lemma",
+   "name": "Uniform product schemes with submersive limits (Lemma 3.3)",
+   "file_line": "boxes.tex:235-350",
+   "statement": "Every element of B_r(E,L) is a bounded-length generator product with bounded parameters, Borel measurably; along subsequences one fixed scheme has a submersive normalized limit.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "'Besides generating a box, later volume arguments need a scheme whose normalized limiting map has full differential rank somewhere.'"
+   },
+   "uses_items": [
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "feeds every recurrence/polynomial-image volume argument"
+   },
+   "analytic_check": "Compactness + inverse function theorem.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "standard bracket-generation/IFT argument"
+   },
+   "provisional_F": null,
+   "lean": "CartanUniformGeneration, CartanInverseSections, BoundedGeneratorSchemes"
+  },
+  {
+   "id": "I12",
+   "kind": "lemma",
+   "name": "Logarithmic distortion and short switches at supporting heights (Lemma 3.4)",
+   "file_line": "boxes.tex:359-395",
+   "statement": "|n|_G <= C log(2+||log n||); a generator move of amplitude e^{r s_i(E)} at a D-position of height alpha_i = r s_i(E) costs o(r) (O(log r) exactly).",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'At a supporting height, an exponentially large generator displacement can be made by a short path in G.'"
+   },
+   "uses_items": [
+    "I07",
+    "I11"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "every path construction uses switches"
+   },
+   "analytic_check": "In L (exponential distortion of the exponential radical; Guivarc'h, Osin, Cornulier).",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "exponential distortion is classical"
+   },
+   "provisional_F": null,
+   "lean": "CartanSupportSwitch (exists_uniform_support_switch_bound)"
+  },
+  {
+   "id": "I13",
+   "kind": "lemma",
+   "name": "Paths visiting support positions (Lemma 3.5)",
+   "file_line": "boxes.tex:400-470",
+   "statement": "Every u in B_r(E,L) is reached from a pivot by O(r)-length paths with bounded legs/switches whose heights stay in rE+O(log r).",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "'move along this leg on the current D-chart, switch at d_i, and reverse the leg on the new sheet'"
+   },
+   "uses_items": [
+    "I11",
+    "I12"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "lower bound side of all volume comparisons"
+   },
+   "analytic_check": "Combination of I11, I12.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "EFW-style box paths generalized"
+   },
+   "provisional_F": null,
+   "lean": "SupportVisitPaths, CartanDirectionalVisits"
+  },
+  {
+   "id": "I14",
+   "kind": "lemma",
+   "name": "Path packing upper bound (Lemma 3.6): a-separated endpoints of O(r)-paths with heights in rE number <= C(1+r)^b e^{rP(E)}",
+   "file_line": "boxes.tex:480-560",
+   "statement": "Upper volume bound via lifted increments in N x| D, conjugation estimates and product Haar; does not use injectivity of q.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'For upper bounds we separate chosen lifts in N x| D.'"
+   },
+   "uses_items": [
+    "I08",
+    "I09",
+    "I07",
+    "I05"
+   ],
+   "load_bearing_guess": {
+    "guess": "very high",
+    "why": "upper side of every volume comparison"
+   },
+   "analytic_check": "Not in goal; the matching of upper (P(E)) and lower (P(E)) exponents is what makes P a quasi-isometry-sensitive invariant.",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Upper half of a two-sided 'height-range volume entropy'; EFW/Peng counted box volumes for abelian N."
+   },
+   "provisional_F": null,
+   "lean": "CartanWordPacking (exists_ambient_word_packing_bound), CartanSegmentCellPacking"
+  },
+  {
+   "id": "I15",
+   "kind": "lemma",
+   "name": "Polynomial packing at bounded height (Lemma 3.7)",
+   "file_line": "boxes.tex:562-591",
+   "statement": "Paths of length O(t) with bounded relative heights have polynomially many separated endpoints.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "'In particular this is a finite polynomial bound; it does not follow by interpreting a subexponential error as polynomial.'"
+   },
+   "uses_items": [
+    "I14"
+   ],
+   "load_bearing_guess": {
+    "guess": "high (recognition step)",
+    "why": "gives polynomial growth of the height kernel (Lemma 11.2)"
+   },
+   "analytic_check": "Classical in spirit (bounded-height = nilpotent-like growth).",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "routine"
+   },
+   "provisional_F": null,
+   "lean": "PolynomialBoundedChainPacking"
+  },
+  {
+   "id": "I16",
+   "kind": "lemma",
+   "name": "Packing at a fixed D-position and multiplicity of variable lifts (Lemmas 3.8, 3.9)",
+   "file_line": "boxes.tex:593-659",
+   "statement": "N-volume on a slice xNd gives proportional separated counts; the N-volume hidden in one projected ball (including N cap D) is at most C(1+T)^b e^{cH}.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "'It controls how much N-volume can be hidden in one projected ball, including volume arising from N cap D.'"
+   },
+   "uses_items": [
+    "I05",
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "lower bound side; handles non-split overlap"
+   },
+   "analytic_check": "routine",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "measure-theoretic bookkeeping"
+   },
+   "provisional_F": null,
+   "lean": "FixedSheetPacking, CartanPathTupleLifts"
+  },
+  {
+   "id": "I17",
+   "kind": "lemma",
+   "name": "Polynomial image volume (Lemma 4.1): |Phi(E)|_in >= C c0^{b+1}(1+B)^{-b^2} m^{A1}(1+R)^{-A2}",
+   "file_line": "polynomial.tex:29-203",
+   "statement": "Quantitative Remez-type sublevel estimate for a derivative minor, slicing and a cube of injectivity give an inner-volume lower bound for the image of any measurable parameter set under a polynomial map; subexponential version for converging submersive families.",
+   "cited_or_new": {
+    "status": "cited idea, re-proved",
+    "cue": "'The scalar sublevel estimate uses a Remez-type argument; see [Ganzburg2017] ... The image-volume estimate below is proved directly'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "converts restricted parameter measure to endpoint volume in Lemma 6.5 and Prop 7.1"
+   },
+   "analytic_check": "In L up to constants (Remez/Carbery-Wright-type sublevel estimates).",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "explicit-constant version of known polynomial sublevel/IFT estimates"
+   },
+   "provisional_F": null,
+   "lean": "RemezPolynomialInput proved in Analysis/RemezFromInterpolation.lean; exists_subexponential_polynomial_image_sequence (1.5% of DAG)"
+  },
+  {
+   "id": "I18",
+   "kind": "lemma",
+   "name": "Backward recurrence (Lemma 4.2)",
+   "file_line": "polynomial.tex:216-296",
+   "statement": "In a unimodular group, nested sets S_0 c ... c S_h = S with a_{j-1} >= a_j^2/(2D_j) such that from S_{j-1} the random step u_j ~ sigma_j * sigma_j^vee lands in S_j with probability >= a_j/(2D_j).",
+   "cited_or_new": {
+    "status": "new (short)",
+    "cue": "'The next lemma supplies that parameter set while keeping every intermediate state in a prescribed measurable set.'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "keeps every intermediate sheet 'good' (profile close to the limit) along switch sequences"
+   },
+   "analytic_check": "Cauchy-Schwarz on the symmetric kernel T_j; a standard return-probability lower bound.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "Cauchy-Schwarz return-time estimate (cf. Khintchine-type recurrence, 'symmetrized steps return with probability >= mu(A)^2'); the backward nesting is a routine iteration."
+   },
+   "provisional_F": null,
+   "lean": "exists_backward_recurrence_sets (Algebra/BackwardRecurrenceSets.lean:17)"
+  },
+  {
+   "id": "I19",
+   "kind": "corollary",
+   "name": "Restricted product parameters (Cor 4.3) + Remark 4.4",
+   "file_line": "polynomial.tex:305-419",
+   "statement": "Combines I17 and I18: a starting point with e^{-o(r)} measure of successful parameters whose product image has inner volume e^{-o(r)}.",
+   "cited_or_new": {
+    "status": "new (combination)",
+    "cue": "'We combine the two estimates.'"
+   },
+   "uses_items": [
+    "I17",
+    "I18"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "the 'restricted switches retain exponential volume' step"
+   },
+   "analytic_check": "Combination.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "composition of I17, I18"
+   },
+   "provisional_F": null,
+   "lean": "CartanBoxProbeChains, ProductProbeSelection"
+  },
+  {
+   "id": "I20",
+   "kind": "lemma",
+   "name": "Lipschitz representatives / coarse-inverse pairs (Lemma 5.1, App. A)",
+   "file_line": "stationary.tex:29-47; lipschitz-appendix.tex:1-99",
+   "statement": "Every (K,C)-QI is within B of a Lambda-Lipschitz map with a Lambda-Lipschitz coarse inverse.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'We prove the uniform replacement lemma'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "needed for compact-open compactness"
+   },
+   "analytic_check": "In L (nerve/partition-of-unity smoothing).",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard"
+   },
+   "provisional_F": null,
+   "lean": "LipschitzPairBounds, CoarsePairMetricChange"
+  },
+  {
+   "id": "I21",
+   "kind": "construction",
+   "name": "compact pair space Omega, normalized sections X (F(e)=e) and Y (Fbar(e)=e), commuting target/domain actions, right actions T_x, U_y (Lemma 5.2)",
+   "file_line": "stationary.tex:49-125",
+   "statement": "A topological measured-coupling space of normalized quasi-isometry pairs; invariant probabilities exist by amenability.",
+   "cited_or_new": {
+    "status": "adapted",
+    "cue": "'This construction follows Shalom's measured-coupling viewpoint [Shalom2004, Sections 2.1--2.2]'; 'The continuous pair space and the transfer of the same slope to its inverse are constructed below.'"
+   },
+   "uses_items": [
+    "I20"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "carries the cocycle and the invariant measures"
+   },
+   "analytic_check": "Not in goal; in L (Shalom 2004).",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "continuous-pair version of Shalom's coupling of QI pairs (paper states the precedent)"
+   },
+   "provisional_F": null,
+   "lean": "NormalizedPair, CompactPairs, PairErgodic"
+  },
+  {
+   "id": "I22",
+   "kind": "lemma",
+   "name": "Slope for a fixed ergodic measure via reduced cohomology (Lemma 5.3)",
+   "file_line": "stationary.tex:127-213",
+   "statement": "Height evaluation b(x)(xi)=pi F_xi(x) is an L^2 cocycle; Cornulier-Tessera H-bar^1 vanishing gives l(x)= integral of b and an averaged sublinear estimate.",
+   "cited_or_new": {
+    "status": "cited (transfer)",
+    "cue": "'Real-triangulable Lie groups have property WAP_t, and hence property H_t, by [CornulierTessera2020, Corollary 1.9]'"
+   },
+   "uses_items": [
+    "I21"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "first source of linear slopes"
+   },
+   "analytic_check": "Transfer of a known theorem (unitary reduced cohomology).",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Cross-field transfer (harmonic analysis / unitary representations) = N0 by the codebook."
+   },
+   "provisional_F": null,
+   "lean": "Route differs: CartanCocycleRestriction.lean applies a Lean-proved reduced-cohomology vanishing for nilpotent groups (Finiteness/NilpotentReducedCohomology.lean) to the Cartan factor D, avoiding Cornulier-Tessera; ReducedCohomologyInput (Finiteness/ReducedCohomologyInput.lean) is the cited form"
+  },
+  {
+   "id": "I23",
+   "kind": "lemma",
+   "name": "Volume comparison for an averaged slope (Lemma 5.4): P(pi E_V) <= P(l E_V), hence l = A pi with A invertible",
+   "file_line": "stationary.tex:220-292",
+   "statement": "Source endpoints over E have e^{rP(E)} separated points; for most xi the image paths stay at heights r(l E_V + o(1)); path packing gives P(E) <= P(lE_V).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'We now use the first volume comparison to show that this homomorphism detects exactly the exponential height directions.'"
+   },
+   "uses_items": [
+    "I08",
+    "I13",
+    "I14",
+    "I16",
+    "I22"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "turns cohomological slopes into elements of GL(W)"
+   },
+   "analytic_check": "Not in goal; first instance of the core volume-exponent comparison.",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "instance of the I08/I14 device; volume-growth comparisons under QI are standard in kind"
+   },
+   "provisional_F": null,
+   "lean": "StationarySlope, stationaryPullback"
+  },
+  {
+   "id": "I24",
+   "kind": "lemma",
+   "name": "Inverse coupling (Lemma 5.5): Haar x mu on Omega disintegrates as nu x m on Y x G; ball-averaged transfer functions give the inverse slope exactly A^{-1}",
+   "file_line": "stationary.tex:294-477",
+   "statement": "Uses unimodularity and the two product structures of Omega to transport the coboundary approximation from F to Fbar with precisely the inverse linear part.",
+   "cited_or_new": {
+    "status": "new (adapted)",
+    "cue": "'An independently obtained slope for Fbar would not yet show that A preserves P. We need its slope to be exactly A^{-1}.'"
+   },
+   "uses_items": [
+    "I21",
+    "I22"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "needed to get P(AE)=P(E) i.e. A in A_G"
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Measure-equivalence coupling symmetry (X x Y fundamental domains, Furman/Shalom) is classical; the ball-averaged transfer avoiding traces on null sections is a technical variant."
+   },
+   "provisional_F": null,
+   "lean": "inverseCoupling (Algebra/InverseCoupling.lean:30) dominates 1.8% of the height core"
+  },
+  {
+   "id": "I25",
+   "kind": "proposition",
+   "name": "Finite stationary labels (Prop 5.6) and stationary increments (Cor 5.7)",
+   "file_line": "stationary.tex:479-553",
+   "statement": "For every ergodic invariant mu there is A_mu in A_G with averaged sublinear height estimate; for non-ergodic mu the normalized increments approach the finite set {A pi v}.",
+   "cited_or_new": {
+    "status": "new (combination)",
+    "cue": "'It is the only stationary conclusion needed for the microstep argument'"
+   },
+   "uses_items": [
+    "I22",
+    "I23",
+    "I24",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "input to profile convexity"
+   },
+   "analytic_check": "Combination.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "assembly"
+   },
+   "provisional_F": null,
+   "lean": "StationaryApproximation, ErgodicMixtureLimits"
+  },
+  {
+   "id": "I26",
+   "kind": "definition",
+   "name": "chart profiles f_{r,x,n}(z) = (pi F(x n Delta_r z) - pi F(x))/r on D_infinity, with random N-coordinate n = a k_0, a uniform in B_r(C), and enlarged deterministic suffix k_0 (Def 6.1)",
+   "file_line": "profiles.tex:59-104",
+   "statement": "Random rescaled height functions on D-sheets indexed by n; polytope C = {alpha_i(w) <= ||alpha_i||}, domain U_delta with margin c delta, c s_- > 2 m s_+.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The chart profile is the random continuous function'"
+   },
+   "uses_items": [
+    "I06",
+    "I08",
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "guess": "very high",
+    "why": "the object made affine, label-matched and offset-matched in Sections 6-9"
+   },
+   "analytic_check": "Not in goal or L. Nearest: coarse differentiation (EFW: random boxes at random scales become epsilon-monotone), Pansu-type blow-ups/ultralimits of QIs.",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "a measured, sheet-indexed variant of coarse differentiation/blow-up; the randomization over N-boxes (rather than over scales) is new in detail"
+   },
+   "provisional_F": null,
+   "lean": "CartanProfile*, SequenceCartanProfileIncrement"
+  },
+  {
+   "id": "I27",
+   "kind": "lemma",
+   "name": "Interior slack and occupation invariance (Lemmas 6.2, 6.3)",
+   "file_line": "profiles.tex:113-230",
+   "statement": "Conjugating the suffix keeps the box exponentially close to itself inside U_delta; chart-averaged normalized pairs converge to G-invariant probabilities.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "'We need chart averages that are asymptotically unchanged by each fixed right translation.'"
+   },
+   "uses_items": [
+    "I26",
+    "I21"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "connects arbitrary maps to invariant measures (Section 5)"
+   },
+   "analytic_check": "Folner/Krylov-Bogolyubov averaging.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "standard averaging"
+   },
+   "provisional_F": null,
+   "lean": "Occupation*, CartanProfileConcentration"
+  },
+  {
+   "id": "I28",
+   "kind": "lemma",
+   "name": "Convex increment constraint (Lemma 6.4) and segment volume inequality (Lemma 6.5)",
+   "file_line": "profiles.tex:246-458",
+   "statement": "For supported limit profiles f and horizontal segments J: (f(end)-f(start))/T in conv{A pi v} and P(f(J)) >= T p(pi v); the second uses backward recurrence + polynomial image to retain e^{rP(E)} endpoint volume on good sheets.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'Finite derivative labels alone would still permit folding: the scalar function t -> |t| has derivative +-1 almost everywhere. The second inequality retains the volume information needed to rule out this behavior.'"
+   },
+   "uses_items": [
+    "I25",
+    "I26",
+    "I17",
+    "I18",
+    "I14"
+   ],
+   "load_bearing_guess": {
+    "guess": "very high",
+    "why": "the two hypotheses of the affinity criterion"
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Anti-folding via volume is the analogue of EFW's monotonicity (no backtracking of geodesics in coarse differentiation)."
+   },
+   "provisional_F": null,
+   "lean": "CartanProfileSegmentVolume, CartanProfileIncrement"
+  },
+  {
+   "id": "I29",
+   "kind": "lemma",
+   "name": "Affinity criterion (Lemma 6.6): a horizontally Lipschitz f on U_delta satisfying both segment inequalities is A pi z + b with A in A_G",
+   "file_line": "profiles.tex:460-677",
+   "statement": "Derivative is B(z) pi with B(z) an isometry of p hence in A_G; equality in a support-vs-variation chain forces weight signs to be monotone and then constant along generic lines; passage to extremal rays of chambers gives affinity on spanning horizontal lines; Hoermander's sum-of-squares theorem gives smoothness, so the label is constant.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The following criterion isolates this deterministic argument.'"
+   },
+   "uses_items": [
+    "I10",
+    "I28"
+   ],
+   "load_bearing_guess": {
+    "guess": "very high",
+    "why": "gives Prop 6.7 (affine limits)"
+   },
+   "analytic_check": "Not in goal or L. Nearest: Cheeger-Kleiner monotone sets in the Heisenberg group, Pansu/Rademacher differentiation, EFW monotone geodesics.",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Deterministic rigidity lemma 'no folding + finite labels => affine'. Ingredients (Rademacher, chamber arguments, Hoermander) are classical; the support-vs-positive-variation equality trick is a fresh combination. N3 only if the judge rates the sign-monotonicity argument unprecedented."
+   },
+   "provisional_F": null,
+   "lean": "affine_profile_of_segment_inequalities (Analysis/ProfileAffinityCriterion.lean:14), dominates 4.6% of the height core; Lean replaces Hoermander with generator words + inverse function theorem (Analysis/LocalProfileAffinity.lean header)"
+  },
+  {
+   "id": "I30",
+   "kind": "proposition",
+   "name": "Affine profile limits and distance to the affine class (Prop 6.7, Cor 6.8)",
+   "file_line": "profiles.tex:679-755",
+   "statement": "All supported limit profiles are affine with label in A_G; uniform convergence in probability to the affine class.",
+   "cited_or_new": {
+    "status": "new (assembly)",
+    "cue": "'Every function in the support of every limiting law has the form'"
+   },
+   "uses_items": [
+    "I28",
+    "I29"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "input to Sections 7-9"
+   },
+   "analytic_check": "Assembly.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "assembly"
+   },
+   "provisional_F": null,
+   "lean": "CartanProfileAffinity, AffineProfileConcentration"
+  },
+  {
+   "id": "I31",
+   "kind": "proposition",
+   "name": "Neighboring labels via reflection doubling (Prop 7.1)",
+   "file_line": "labels.tex:17-336; reflection-figure.tex",
+   "statement": "If two sheets joined by one generator step had different labels A_1 != A_2, they agree on the alpha_i facet so A_1^{-1}A_2 is the orthogonal reflection there; an inward source segment E then has two opposite target images with P(E'_1 cup E'_2) = 2P(E); alternating h bundles of switches on the two sheets gives target terminal volume e^{2rP(E)} while the source terminal points are covered by e^{rP(E)} balls: contradiction.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The contradiction comes from reflecting an inward height segment at a facet of C.'; 'Alternating moves on the sheets would then produce a target volume exponent twice the source exponent'"
+   },
+   "uses_items": [
+    "I08",
+    "I10",
+    "I14",
+    "I17",
+    "I18",
+    "I19",
+    "I30",
+    "I32"
+   ],
+   "load_bearing_guess": {
+    "guess": "very high",
+    "why": "without it different sheets could carry different affine maps; needed for uniform sublinear estimate"
+   },
+   "analytic_check": "Not a subterm of goal or L. Nearest: EFW Sol arguments that a QI cannot send up-flats to down-flats (quadrilateral/tripod arguments); entropy doubling by alternating ping-pong.",
+   "provisional_N": {
+    "grade": "N3",
+    "why": "Candidate: a gadget (alternating bundles on two sheets) built only to turn a label mismatch into a volume-exponent doubling 2P(E) vs P(E). No exact precedent found in a quick search; EFW/Peng use quadrilaterals and monotonicity, not volume doubling."
+   },
+   "provisional_F": "F3 (auxiliary construction: alternating two-sheet bundle scheme) / F4 (P as a potential that doubles)",
+   "lean": "FiniteLabelReflection (exists_reflected_direction_of_finite_labels), ReflectedSegmentSupport, CartanRootNeighborLabels, CartanUniformNeighborLabels; all small DAG shares (<1% of height core)"
+  },
+  {
+   "id": "I32",
+   "kind": "lemma",
+   "name": "Volume from endpoint tuples (Lemma 7.2)",
+   "file_line": "labels.tex:57-134",
+   "statement": "Separated tuples with box-bounded lifts give an N^h increment set of volume >= M e^{-o(r)}; overlap N cap D handled without centrality.",
+   "cited_or_new": {
+    "status": "new (routine)",
+    "cue": "'allowing N cap D != {1}'"
+   },
+   "uses_items": [
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "used in I31"
+   },
+   "analytic_check": "routine",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "measure bookkeeping"
+   },
+   "provisional_F": null,
+   "lean": "CartanPathTupleLifts"
+  },
+  {
+   "id": "I33",
+   "kind": "definition+lemma",
+   "name": "pure/mixed words, cone ideals i_S, cone quotients L_S = N/I_S with G-action and exact Haar multiplier e^{ell_S(pi g)} (Lemma 8.1); ray quotients L_alpha",
+   "file_line": "offsets.tex:11-111; boundary.tex:19-61",
+   "statement": "For S a ray or 2-generator cone in W*, mixed words span a d-invariant ideal containing d cap n; quotient is a simply connected nilpotent group on which G acts with Haar multiplier the trace form ell_S, a positive combination of inside weights.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'A word in the generators X_i is called \\emph{pure for S} if every letter has weight in S, and \\emph{mixed for S} otherwise.'"
+   },
+   "uses_items": [
+    "I05",
+    "I07",
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "guess": "very high",
+    "why": "detects offsets (Sec 8) and gives boundary maps (Sec 10)"
+   },
+   "analytic_check": "Not in goal. Nearest: horospherical/partial boundaries of Heintze and SOL-like groups (Dymarz, Xie, DFX 'nilpotent boundaries'), boundary Haar/Hausdorff scaling in Farb-Mosher.",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "variant of known 'boundary = quotient of N by contracted directions' constructions; the cone (two-generator) version and trace-detection are new in detail"
+   },
+   "provisional_F": null,
+   "lean": "coneWordIdeal (6.3% of core dependents), coneProjection, CartanConeGroup, RayQuotientContraction"
+  },
+  {
+   "id": "I34",
+   "kind": "lemma",
+   "name": "Ideal boxes and strict-width covering/absorption (Lemma 8.2)",
+   "file_line": "offsets.tex:113-279",
+   "statement": "Templates T_j = eps_j T_* make pure widths zero and mixed widths positive; tiling of the T_1 ideal box by conjugated T_2 boxes with e^{r(P_1-P_2)} anchors; O(delta r) errors absorbed by positive mixed widths.",
+   "cited_or_new": {
+    "status": "new (technical)",
+    "cue": "'we will cover the ideal coordinates by translates of a smaller box and bound their number by the ratio of the two box volumes'"
+   },
+   "uses_items": [
+    "I09",
+    "I33"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "the counting skeleton of Prop 8.3"
+   },
+   "analytic_check": "routine given I33",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "box tiling"
+   },
+   "provisional_F": null,
+   "lean": "ConeIdealTiling, finite_conjugate_tiling"
+  },
+  {
+   "id": "I35",
+   "kind": "proposition",
+   "name": "Equality of neighboring offsets via conditioned probes (Prop 8.3)",
+   "file_line": "offsets.tex:297-702",
+   "statement": "Probes n_1 = n S(i_1 exp sigma(s)), n_2 = n S(i_1) k with exact cancellation n_1^{-1}n_2 independent of i_1; the first path pins the target quotient coordinate, the second pins the ideal coordinate; summing over tiles gives e^{rP_1} <= e^{r(P_1 - ell_{S'}(b_2-b_1))}, so all cone traces of b_2-b_1 vanish and b_1=b_2.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'The comparison will balance three counts.'; 'Their design gives the exact cancellation'"
+   },
+   "uses_items": [
+    "I33",
+    "I34",
+    "I30",
+    "I31",
+    "I14",
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "guess": "very high",
+    "why": "removes O(delta) offset errors that co-location alone cannot"
+   },
+   "analytic_check": "Not in goal or L.",
+   "provisional_N": {
+    "grade": "N3",
+    "why": "Candidate (weaker than I31): a three-count balance using quotient Haar multipliers as a 'height meter' for offsets; no direct precedent found in quick search. Against: Haar-multiplier/modular-function arguments for height are standard (Farb-Mosher, Dymarz)."
+   },
+   "provisional_F": "F3 (auxiliary probe construction) / F5 (change of representation to ideal x quotient coordinates)",
+   "lean": "cone_offset_nonpos_of_probe_restrictions, eq_of_rootOffsetCone_trace_inequalities, CartanPolar*Offset (dominated shares < 1% of height core)"
+  },
+  {
+   "id": "I36",
+   "kind": "lemma+proposition",
+   "name": "Suffix concentration, scale stabilization, uniform sublinear height estimate (Lemmas 9.1, 9.3, Prop 9.4)",
+   "file_line": "uniformity.tex:24-290",
+   "statement": "Ordinary chart laws concentrate on a single affine map; labels stabilize across scales r..(1+delta/2)r and basepoints; telescoping gives |pi F(xg) - pi F(x) - A_F pi g| <= eps(R) R uniformly; A_{Fbar} = A_F^{-1}.",
+   "cited_or_new": {
+    "status": "new (assembly)",
+    "cue": "'We now remove the random chart center.'"
+   },
+   "uses_items": [
+    "I30",
+    "I31",
+    "I35"
+   ],
+   "load_bearing_guess": {
+    "guess": "very high",
+    "why": "Lean: exists_published_sublinear_height dominates 49% of the height core"
+   },
+   "analytic_check": "Telescoping is routine.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "assembly / telescoping of I31, I35"
+   },
+   "provisional_F": null,
+   "lean": "CartanWordModel.exists_uniform_published_sublinear_height (dominated share 0.49 of height core)"
+  },
+  {
+   "id": "I37",
+   "kind": "lemma",
+   "name": "Boundary maps from sublinear height control (Lemma 10.1)",
+   "file_line": "boundary.tex:63-219",
+   "statement": "Contracting rays x exp(tv), alpha(pi v)<0, project to convergent points of the ray quotient; gives homeomorphisms f_beta : L_alpha -> L_beta with compact shadows, inverse from Fbar.",
+   "cited_or_new": {
+    "status": "adapted",
+    "cue": "'Boundary actions play a central role in [Dymarz2010] and [DymarzFisherXie2025]'"
+   },
+   "uses_items": [
+    "I33",
+    "I36"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "bounded-height upgrade"
+   },
+   "analytic_check": "In L in spirit (boundary maps of height-respecting QIs: Farb-Mosher, Dymarz, Xie).",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "boundary map from height control is standard"
+   },
+   "provisional_F": null,
+   "lean": "RayBoundaryModel, BoundaryMapFamily"
+  },
+  {
+   "id": "I38",
+   "kind": "lemma",
+   "name": "Volumes of boundary images and bounded variation on N-fibers (Lemmas 10.2, 10.3)",
+   "file_line": "boundary.tex:223-315",
+   "statement": "vol f_beta(x U) ~ e^{ell_beta(pi F(x))}; moving along an N-fiber does not change source quotient sets for other rays, so target ray heights change boundedly; the positive relation bounds the remaining ray.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'Here the contracting quotient boundaries are used to compare Haar volumes of boundary images and bound the height error.'"
+   },
+   "uses_items": [
+    "I33",
+    "I37",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "bounded (not just sublinear) error"
+   },
+   "analytic_check": "Not in goal.",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Haar/Hausdorff measure of boundary images recording height is known for BS(1,n)/Sol-type (Farb-Mosher quasi-similarities); the multi-ray + positive-relation trick is a variant"
+   },
+   "provisional_F": null,
+   "lean": "CartanBoundaryLeaf (nilpotent_leaf_bound_from_boundary_traces), CartanLeafHeight"
+  },
+  {
+   "id": "I39",
+   "kind": "lemma",
+   "name": "Averaging translates of a Radon measure (Lemma 10.4)",
+   "file_line": "boundary.tex:329-393",
+   "statement": "If rho(zE_j) ~ a_j for all z then a_j/mu(E_j) ~ a_0/mu(E_0), via Tonelli and doubling.",
+   "cited_or_new": {
+    "status": "new (elementary)",
+    "cue": "'Absolute continuity of rho is not required.'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "turns boundary image volumes into the trace-height identity"
+   },
+   "analytic_check": "Elementary measure theory in L.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "Tonelli + doubling"
+   },
+   "provisional_F": null,
+   "lean": "Analysis/HaarAveraging.lean, HaarAveragingScales"
+  },
+  {
+   "id": "I40",
+   "kind": "theorem",
+   "name": "Uniform bounded height (Thm 1.4)",
+   "file_line": "introduction.tex:95-103; boundary.tex:395-467",
+   "statement": "There is a finite A_G <= GL(W) such that every (K,C) self-QI F has A_F in A_G with ||pi F(g) - pi F(1) - A_F pi(g)|| <= B(G,K,C).",
+   "cited_or_new": {
+    "status": "new (main geometric theorem)",
+    "cue": "'We establish uniform height control for the general solvable Lie models'"
+   },
+   "uses_items": [
+    "I36",
+    "I37",
+    "I38",
+    "I39",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "guess": "very high",
+    "why": "comparator target main_uniform_bounded_height"
+   },
+   "analytic_check": "This is the goal.",
+   "provisional_N": {
+    "grade": "n/a (theorem)",
+    "why": "Main theorem; extends EFW (Sol), Peng (nondegenerate unimodular split abelian-by-abelian), Farb-Mosher horizontal-preservation conjectures."
+   },
+   "provisional_F": null,
+   "lean": "main_uniform_bounded_height = uniform_bounded_height (ConditionalBoundedHeight.lean:43) via CartanWordModel.exists_uniform_height_intrinsic (dominated share 0.398 of whole DAG)"
+  },
+  {
+   "id": "I41",
+   "kind": "lemma",
+   "name": "Model reduction (Lemma 11.1)",
+   "file_line": "recognition.tex:42-127",
+   "statement": "Dekimpe: finite-index Gamma uniform lattice in simply connected solvable S; Cornulier-Tessera: S QI to a real-triangulable G; metric Folner sets show H amenable and G unimodular; Gamma\\S is a finite K(Gamma,1) and PD.",
+   "cited_or_new": {
+    "status": "cited (transfer)",
+    "cue": "'Dekimpe's lattice realization theorem [Dekimpe2000, Theorem 4.1]'; 'Cornulier--Tessera's reduction [CornulierTessera2017, Lemma 3.A.1]'"
+   },
+   "uses_items": [
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "sets up both Lie models"
+   },
+   "analytic_check": "Transfer.",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "cited theorems"
+   },
+   "provisional_F": null,
+   "lean": "dekimpeLatticeRealizationInput, cornulierTesseraModelInput proved in Lean; unimodularity obtained from lattice comparison (isMulRightInvariant_of_lattice_comparison)"
+  },
+  {
+   "id": "I42",
+   "kind": "lemma",
+   "name": "Polynomial growth in a height kernel (Lemma 11.2)",
+   "file_line": "recognition.tex:137-180",
+   "statement": "If ||pi f(h) - tau(h)|| <= D on H_0, every f.g. subgroup of ker tau has polynomial growth (via Lemma 3.7) and is virtually nilpotent (Gromov).",
+   "cited_or_new": {
+    "status": "new (standard pattern)",
+    "cue": "'The polynomial packing estimate needed here is stronger than an estimate of the form e^{o(t)}.'"
+   },
+   "uses_items": [
+    "I15"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "kernel is locally virtually nilpotent"
+   },
+   "analytic_check": "Pattern in EFW 2012 Thm 7.3 / Peng.",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "standard; the paper credits EFW2012 for the progression"
+   },
+   "provisional_F": null,
+   "lean": "TypeFPInfinity.heightKernel_virtuallyPolycyclic, PolynomialBoundedChainPacking, gromovPolynomialGrowthInput (external gromov package)"
+  },
+  {
+   "id": "I43",
+   "kind": "proposition",
+   "name": "Recognition from height: A_h homomorphism to finite A_G, H_0 = ker, amenable correction tau(h) = m_x(s(hx)-s(x)) is a homomorphism within D_1 of s; ker tau locally virtually nilpotent; H elementary amenable (Prop 11.3)",
+   "file_line": "recognition.tex:195-287",
+   "statement": "Bounded-defect quasi-homomorphism on an amenable group corrected to a homomorphism by an invariant mean.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'Amenability then corrects the bounded defect in the height translations to a homomorphism'"
+   },
+   "uses_items": [
+    "I40",
+    "I42"
+   ],
+   "load_bearing_guess": {
+    "guess": "very high",
+    "why": "the group-theoretic bridge"
+   },
+   "analytic_check": "In L (Hyers-Ulam / invariant-mean correction of quasimorphisms on amenable groups).",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard"
+   },
+   "provisional_F": null,
+   "lean": "Analysis/AmenableCorrection.lean, TransferredHeight.exists_normal_finiteIndex_height"
+  },
+  {
+   "id": "I44",
+   "kind": "theorem",
+   "name": "Recognition endgame (proof of Thm 1.1)",
+   "file_line": "recognition.tex:289-344",
+   "statement": "Li: FP_infinity transfers by QI; KMN: elementary amenable FP_infinity is virtually type F and virtually solvable; Li: PD transfers between finite-cd QI groups; Bieri: solvable PD groups are polycyclic.",
+   "cited_or_new": {
+    "status": "cited (transfer)",
+    "cue": "'Li's coarse invariance theorem [Li2018, Corollary 4.47]'; '[KrophollerMartinezPerezNucinkis2009, Theorem 1.1, (viii)=>(v)]'; 'Bieri's theorem [Bieri1981, Theorem 9.23]'"
+   },
+   "uses_items": [
+    "I41",
+    "I43"
+   ],
+   "load_bearing_guess": {
+    "guess": "very high",
+    "why": "headline conclusion"
+   },
+   "analytic_check": "Transfer.",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "chain of cited homological theorems"
+   },
+   "provisional_F": null,
+   "lean": "Comparator group_recognition; Lean avoids KMN (Algebra/RecognitionWithoutKMN.lean: rational dimension, bounded finite-subgroup orders); Li and Bieri inputs proved (liFinitenessInput, liDualityInput, bieriDualityInput)"
+  },
+  {
+   "id": "I45",
+   "kind": "corollary",
+   "name": "Lattice recognition (Cor 1.2)",
+   "file_line": "introduction.tex:18-22; recognition.tex:346-363",
+   "statement": "A f.g. group QI to a lattice in a simply connected solvable Lie group is virtually a uniform lattice in some (possibly different) such group.",
+   "cited_or_new": {
+    "status": "cited (transfer)",
+    "cue": "'Such a lattice is polycyclic [FarbWeinberger2008, Proposition 3.4], and is uniform [Geng2015, Theorem 2.9(i)]'"
+   },
+   "uses_items": [
+    "I44",
+    "I41"
+   ],
+   "load_bearing_guess": {
+    "guess": "high (headline)",
+    "why": "EFW formulation"
+   },
+   "analytic_check": "Transfer.",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "deduction via Dekimpe/Mostow-type facts"
+   },
+   "provisional_F": null,
+   "lean": "Comparator lattice_recognition (finite-covolume hypothesis; Lean proves polycyclicity of discrete f.g. subgroups directly: isPolycyclic_finitelyGenerated_discrete_solvableLieGroup)"
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Gromov's polynomial growth theorem",
+   "bib_key": "Gromov1981",
+   "locator": "Main Theorem p.54",
+   "field": "geometric group theory",
+   "used_at": "recognition.tex:179, 307",
+   "status": "cited (paper); Lean via external gromov package (forward direction)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Vanishing of reduced 1-cohomology (property WAP_t/H_t) for real-triangulable groups",
+   "bib_key": "CornulierTessera2020",
+   "locator": "Cor 1.9",
+   "field": "harmonic analysis / unitary representations",
+   "used_at": "stationary.tex:169-187",
+   "status": "cited (paper); Lean replaces by a proved nilpotent-group vanishing applied to D (Geometry/CartanCocycleRestriction.lean)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Ergodic decomposition of quasi-invariant measures",
+   "bib_key": "GreschonigSchmidt2000",
+   "locator": "Thm 5.2",
+   "field": "ergodic theory",
+   "used_at": "stationary.tex:120-125, 531",
+   "status": "cited; Lean proves the compact-metrizable case (Analysis/CompactErgodicDecomposition.lean:25)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Exponential map of a real-root solvable Lie group is a diffeomorphism",
+   "bib_key": "Dixmier1957",
+   "locator": "Thm 3",
+   "field": "Lie theory",
+   "used_at": "models.tex:126-128",
+   "status": "cited; Lean input proved (DixmierRegularityFromTopology, ExponentialChartBridge)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Hoermander sum-of-squares hypoellipticity",
+   "bib_key": "Hormander1967",
+   "locator": "Thm 1.1",
+   "field": "PDE",
+   "used_at": "profiles.tex:660-667",
+   "status": "cited (paper); Lean avoids it (LocalProfileAffinity: generator words + IFT)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Remez-type measurable-set inequalities",
+   "bib_key": "Ganzburg2017",
+   "locator": "Thms 1.1-1.2",
+   "field": "approximation theory",
+   "used_at": "polynomial.tex:14-18",
+   "status": "attributed; re-proved directly in paper and Lean",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Lattice realization of virtually polycyclic groups",
+   "bib_key": "Dekimpe2000",
+   "locator": "Thm 4.1",
+   "field": "Lie groups / lattices",
+   "used_at": "recognition.tex:58-60, 354",
+   "status": "cited; Lean proved (Lattices/PolycyclicLatticeRealization.lean:55)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Every simply connected solvable Lie group is QI to a real-triangulable one; diffeomorphic to R^n",
+   "bib_key": "CornulierTessera2017",
+   "locator": "Lemma 3.A.1, Lemma 3.B.2, Sec 4.D",
+   "field": "Lie groups / geometric group theory",
+   "used_at": "recognition.tex:65-67, 120-122; models.tex:73",
+   "status": "cited; Lean proved (Algebra/CornulierTesseraConstruction.lean:19)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Milnor-Svarc lemma",
+   "bib_key": "CornulierDeLaHarpe2016",
+   "locator": "Thm 4.C.5(1), Prop 4.C.11(3)",
+   "field": "geometric group theory",
+   "used_at": "recognition.tex:61-64",
+   "status": "cited",
+   "essential_for_headline": true
+  },
+  {
+   "name": "QI invariance of FP_n and of Poincare duality among finite-cd groups",
+   "bib_key": "Li2018",
+   "locator": "Cor 4.47, Cor 4.48",
+   "field": "homological group theory / coarse geometry",
+   "used_at": "recognition.tex:316-339",
+   "status": "cited; Lean proved (Finiteness/CoarseFiniteness.lean:16,24)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Elementary amenable groups of type FP_infinity are virtually of type F (and virtually solvable)",
+   "bib_key": "KrophollerMartinezPerezNucinkis2009",
+   "locator": "Thm 1.1 (viii)=>(v), Sec 2",
+   "field": "homological group theory",
+   "used_at": "recognition.tex:320-323",
+   "status": "cited (paper); Lean avoids it (Algebra/RecognitionWithoutKMN.lean)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Solvable Poincare duality groups are polycyclic",
+   "bib_key": "Bieri1981",
+   "locator": "Thm 9.23",
+   "field": "homological group theory",
+   "used_at": "recognition.tex:341-343",
+   "status": "cited; Lean proved (Finiteness/SolvablePoincareFiniteness.lean:76)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Lattices in simply connected solvable Lie groups are polycyclic and uniform",
+   "bib_key": "FarbWeinberger2008; Geng2015",
+   "locator": "Prop 3.4; Thm 2.9(i)",
+   "field": "Lie groups / lattices",
+   "used_at": "recognition.tex:348-350",
+   "status": "cited; Lean proves polycyclicity of discrete f.g. subgroups directly",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Measured-coupling / cocycle viewpoint for QIs of amenable groups",
+   "bib_key": "Shalom2004",
+   "locator": "Secs 2.1-2.2",
+   "field": "measured group theory",
+   "used_at": "stationary.tex:12-15",
+   "status": "method adapted, no theorem invoked",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Hopf-Rinow, Engel, Arzela-Ascoli, Rademacher-type line differentiation, inverse function theorem",
+   "bib_key": "(standard)",
+   "locator": "-",
+   "field": "analysis / Lie algebra",
+   "used_at": "models.tex:18; profiles.tex:488-511",
+   "status": "standard background",
+   "essential_for_headline": true
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Model reduction: P ~ uniform lattice Gamma in S ~QI real-triangulable unimodular G; H amenable; Gamma of type F and PD.",
+   "items": [
+    "I41"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Lie coordinates: Cartan model q: N x| D -> G keeping N cap D; graded limit D_infinity; canonical height W and exact weight dilations.",
+   "items": [
+    "I05",
+    "I06",
+    "I07"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "Volume calculus: bracket-word exponent P(E), boxes, product schemes, switches; matching upper (path packing) and lower (fixed-sheet packing) bounds e^{rP(E)+o(r)}; finite symmetry group A_G of P.",
+   "items": [
+    "I08",
+    "I09",
+    "I10",
+    "I11",
+    "I12",
+    "I13",
+    "I14",
+    "I16"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "Restricted products keep volume: polynomial image volume + backward recurrence.",
+   "items": [
+    "I17",
+    "I18",
+    "I19"
+   ]
+  },
+  {
+   "step": 5,
+   "claim": "Stationary slopes: compact pair space, H-bar^1 vanishing gives l=A pi (volume comparison), inverse coupling gives slope A^{-1}, hence A in A_G for every ergodic invariant measure.",
+   "items": [
+    "I20",
+    "I21",
+    "I22",
+    "I23",
+    "I24",
+    "I25"
+   ]
+  },
+  {
+   "step": 6,
+   "claim": "Chart profiles of an arbitrary QI: occupation measures are invariant; limits satisfy convex-increment and segment-volume inequalities; affinity criterion makes them A pi z + b.",
+   "items": [
+    "I26",
+    "I27",
+    "I28",
+    "I29",
+    "I30"
+   ]
+  },
+  {
+   "step": 7,
+   "claim": "Neighbouring sheets share labels (reflection doubling) and offsets (cone-quotient Haar probes).",
+   "items": [
+    "I31",
+    "I32",
+    "I33",
+    "I34",
+    "I35"
+   ]
+  },
+  {
+   "step": 8,
+   "claim": "Remove randomness, stabilize across scales/basepoints: uniform sublinear height estimate with a single A_F; A_{Fbar}=A_F^{-1}.",
+   "items": [
+    "I36"
+   ]
+  },
+  {
+   "step": 9,
+   "claim": "Bounded error: ray-quotient boundary homeomorphisms; Haar volumes of boundary images record ell_beta(height); N-fiber variation bounded; Radon averaging gives ell_beta(pi F(d)) = ell_alpha(pi d)+O(1); Thm 1.4.",
+   "items": [
+    "I37",
+    "I38",
+    "I39",
+    "I40"
+   ]
+  },
+  {
+   "step": 10,
+   "claim": "Recognition: labels give homomorphism H -> A_G; amenable correction tau; ker tau locally virtually nilpotent (Gromov) so H elementary amenable; Li FP_infinity, KMN type F + solvable, Li duality, Bieri => polycyclic finite-index subgroup; Cor 1.2 via Dekimpe.",
+   "items": [
+    "I42",
+    "I43",
+    "I44",
+    "I45"
+   ]
+  }
+ ],
+ "lean_structure": {
+  "files": 3090,
+  "lines": 262281,
+  "declarations": 10961,
+  "kind_counts": {
+   "theorem": 8239,
+   "def": 2201,
+   "instance": 315,
+   "abbrev": 135,
+   "structure": 66,
+   "class": 3,
+   "inductive": 2
+  },
+  "proof_dag_size": 7308,
+  "dag_by_subdir": {
+   "Algebra": 2794,
+   "Geometry": 2274,
+   "Analysis": 1274,
+   "Finiteness": 642,
+   "Lattices": 200,
+   "OAI/GroupTheory/Thompson": 90,
+   "OAI/GroupTheory/CyclicSeries": 14,
+   "OAI/Probability/CriticalPercolation": 13,
+   "top-level": 9
+  },
+  "core_vs_implementation": "Mathematical core = closure of CartanWordModel.exists_uniform_height_intrinsic (Thm 1.4 engine): 3970 decls (54% of the 7308-decl target DAG); its dominated share of the whole DAG is 0.398. The rest re-proves background theory (BCH/Dynkin, Lie integration, Dixmier, Dekimpe lattice realization, Cornulier-Tessera reduction, Li/Bieri homological finiteness and duality, Remez) - mostly N0 transfer re-proved.",
+  "key_items_dag": {
+   "CartanWordModel.exists_uniform_height_intrinsic (Thm 1.4)": "dominated share 0.398 of whole DAG",
+   "CartanWordModel.exists_uniform_published_sublinear_height (Prop 9.4)": "dominated 0.489 of height core",
+   "CartanWordModel.supportIn / boxCost (P(E), I08)": "dependents 10.1% / 7.1% of height core; dominated 0 (shared vocabulary)",
+   "templateSymmetryGroup (A_G, I10)": "2.0% of DAG depends on it; dominated 0",
+   "affine_profile_of_segment_inequalities (Lemma 6.6, I29)": "dominated 4.6% of height core",
+   "inverseCoupling (Lemma 5.5, I24)": "dominated 1.8% of height core",
+   "exists_reflected_direction_of_finite_labels (Prop 7.1 core, I31)": "dominated 0.1% of height core; 0.6% dependents",
+   "cone_offset_nonpos_of_probe_restrictions / eq_of_rootOffsetCone_trace_inequalities (Prop 8.3, I35)": "dominated 0.4% / 0.2% of height core",
+   "unitaryReducedVanishing_nilpotent (replacement for Cornulier-Tessera)": "dominated 1.1% of height core",
+   "exists_subexponential_polynomial_image_sequence (Lemma 4.1)": "dominated 0.5%; 1.5% of DAG depends on it",
+   "exists_backward_recurrence_sets (Lemma 4.2)": "dominated 0.3%"
+  },
+  "route_differences_from_paper": [
+   "Reduced cohomology: the paper cites Cornulier-Tessera 2020 Cor 1.9 for G; Lean proves vanishing of reduced H^1 for nilpotent groups (induction on class via center, Finiteness/NilpotentReducedCohomology.lean) and applies it to the Cartan factor D, identifying D-fixed vectors with G-fixed vectors by 'contracted root generation' (Geometry/CartanCocycleRestriction.lean).",
+   "Affinity criterion: the paper uses Hoermander's theorem for smoothness; Lean's LocalProfileAffinity 'does not assume a smooth profile or a hypoellipticity conclusion' (generator words + inverse function theorem).",
+   "Endgame: the paper uses KMN 2009; Lean final theorems go through Algebra/RecognitionWithoutKMN.lean ('Rational dimension, bounded finite subgroup orders, and duality after removing a finite normal subgroup').",
+   "Unimodularity of G: paper via metric Folner sets; Lean via lattice comparison (isMulRightInvariant_of_lattice_comparison).",
+   "Metric generality: the Lean height theorem accepts any proper compatible left-invariant metric with linear chains (coarse_pair_metric_change), not only Riemannian."
+  ],
+  "extractor_caveat": "scripts/extract_lean.py v3 ranking is dominated by vocabulary defs (CartanWordModel, wordList, Bases); its 739 'candidate defs' all have dominated share <= 0.3%. Lemma candidates are assembly theorems. The formalization is extremely distributed (one paper lemma -> dozens of files), so the 20% load-bearing proxy cannot be met by any single new item; measure on clusters instead."
+ },
+ "eureka_candidates": [
+  {
+   "rank": 1,
+   "item": "I31 reflection-doubling for neighbouring labels (Prop 7.1)",
+   "provisional_N": "N3",
+   "provisional_F": "F3 (alternating two-sheet bundle gadget) / F4 (P doubles)",
+   "for": "Converts a purely algebraic mismatch (two labels in A_G differing by a facet reflection) into a quantitative contradiction: alternating switches on two sheets reach e^{2rP(E)} target volume from e^{rP(E)} source terminals. Nothing like the doubling identity P(E'_1 cup E'_2)=2P(E) occurs in the goal or in L. Without it, different sheets could carry different affine maps and no global slope exists.",
+   "against": "Its ingredients (volume counting, backward recurrence, polynomial images) are all in the paper's own toolkit; conceptually it is the volume-exponent version of EFW's 'a QI cannot interchange up and down directions' arguments (quadrilaterals in coarse differentiation). Small Lean share (<1% of height core).",
+   "nearest_neighbour": "Eskin-Fisher-Whyte coarse differentiation (Sol, Annals 2012/2013): monotone geodesics and quadrilateral arguments forcing height-respecting; Peng 2011 I-II for abelian-by-abelian.",
+   "lit_check": "WebSearch (EFW/Peng/DFX/Le Boudec/Grayevsky-Pallier): no volume-doubling-by-alternation argument found at snippet level."
+  },
+  {
+   "rank": 2,
+   "item": "I35 conditioned probes + cone-quotient Haar multipliers for offsets (Prop 8.3, with I33/I34)",
+   "provisional_N": "N3 (weak) / N2",
+   "provisional_F": "F3 / F5",
+   "for": "Exact cancellation n_1^{-1}n_2 independent of the ideal probe lets one endpoint carry two independent coordinate restrictions; summing the tile bound e^{r(P_2-ell(b_2-b_1))} over e^{r(P_1-P_2)} tiles reads off every cone trace of the offset difference. Removes an O(delta) error co-location cannot.",
+   "against": "Haar-multiplier/modular-function detection of height and quotients of N by contracted directions are standard (Farb-Mosher, Dymarz, Xie, DFX boundaries); the tiling count is routine.",
+   "nearest_neighbour": "Dymarz 2010 / DFX 2025 nilpotent boundaries; Farb-Mosher BS(1,n) boundary quasi-similarities with measure scaling.",
+   "lit_check": "WebSearch: no matching 'trace test on cone quotients' found (snippet level)."
+  },
+  {
+   "rank": 3,
+   "item": "I08 + I10 bracket-word volume exponent P(E) (sum of separate maxima) and its finite symmetry group A_G",
+   "provisional_N": "N2 (N3 if no nonabelian counterpart exists)",
+   "provisional_F": "F1 (new defined invariant) if N3",
+   "for": "A single convex-geometric functional, two-sided (upper and lower packing) at exponential scale, whose symmetry group is finite and defines the finite group in Thm 1.4; handles nonabelian N and zero-weight brackets (Heisenberg example P=2(b-a)). Reused in every comparison of Sections 5-8.",
+   "against": "For abelian N this is EFW/Peng box volume; volume entropy of height ranges is classical; A_G generalizes known root-permutation groups (Peng) and the Sol flip.",
+   "nearest_neighbour": "EFW 2007/2012 boxes in Sol and DL(m,n); Peng 2011 II finite group permuting roots; Cornulier's exponential radical/volume growth invariants.",
+   "lit_check": "WebSearch: Peng's root-permutation framing and exponential-radical invariants found; no bracket-word sum-of-maxima functional found (snippet level)."
+  },
+  {
+   "rank": 4,
+   "item": "I29 deterministic affinity criterion (Lemma 6.6) with I28 anti-folding segment volume inequality",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "Equality chain 'support maximum <= positive variation <= p-length' forces weight-sign monotonicity and then constant labels; turns finite-label derivatives plus no-folding into global affinity. 4.6% dominated share of the height core (largest of the candidates).",
+   "against": "Rademacher-type differentiation, chamber/extremal-ray arguments and Hoermander are classical; analogous rigidity of 'monotone' objects is known (Cheeger-Kleiner monotone sets; EFW epsilon-monotone geodesics).",
+   "nearest_neighbour": "Cheeger-Kleiner (Heisenberg monotone sets are half-spaces); EFW coarse differentiation monotonicity; Pansu differentiability.",
+   "lit_check": "Not specifically searched beyond EFW/Peng; quick judgement."
+  },
+  {
+   "rank": 5,
+   "item": "I24 inverse coupling with exactly inverse slope (Lemma 5.5)",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "Needed to get P(AE)=P(E) rather than two unrelated slopes; ball-averaged transfer avoids traces of L^2 functions on null sections.",
+   "against": "Symmetry of measure-equivalence couplings and transport of cocycles across X x Y fundamental domains is standard (Furman, Shalom).",
+   "nearest_neighbour": "Shalom 2004 Sec 2; Furman measure-equivalence couplings.",
+   "lit_check": "Shalom 2004 confirmed as the precedent (paper names it)."
+  }
+ ],
+ "correctness_audit": {
+  "verdict": "Extraordinary claim (resolves the EFW lattice-recognition conjecture, open since 2005-07). Paper (5.5k TeX lines) is dense but internally coherent at the level read: all 11 sections read in full; Sections 3, 5, 6 (affinity criterion), 7 (reflection) and 10 checked at proof-sketch level, key identities checked by hand. Trust rests on the 262k-line Lean formalization, which at text level is free of sorry/axiom/native_decide and whose comparator is faithful; compile result pending from orchestrator.",
+  "checked": [
+   "translation invariance of P: every weight-homogeneous basis of n has total weight = trace character = 0 by unimodularity (boxes.tex:138-143, 194-205)",
+   "p is a norm via the positive relation sum c_i alpha_i = 0 and mandatory letters (boxes.tex:207-215)",
+   "finiteness of A_G as isometries of a polyhedral norm (boxes.tex:217-220)",
+   "Heisenberg example s_X=b, s_Y=-a, h_Z=b-a, P=2(b-a) (boxes.tex:51-64)",
+   "reflection step: orthogonal map in an A-invariant inner product fixing ker alpha_i pointwise is identity or reflection; P(E'_1 cup E'_2)=2P(E) for opposite segments (labels.tex:173-194)",
+   "trace tests determine offsets: ray test + two-generator cones with c,d>0 span W* (offsets.tex:683-692)",
+   "amenable correction tau is a homomorphism within D_1 of s (recognition.tex:250-269)",
+   "endgame chain Li -> KMN -> Li duality -> Bieri (citations and logic)",
+   "comparator statements vs Thm 1.1/Cor 1.2/Thm 1.4",
+   "trust-surface grep over 3090 files and the gromov package"
+  ],
+  "concerns": [
+   "Unreviewed; quick search (2026-10-12) found no expert confirmation; 2025 literature (Grayevsky-Pallier) still lists the conjecture as open.",
+   "Prop 7.1 uses a diagonal argument with violating delta -> 0 and boundary convergence of profiles via equicontinuity (labels.tex:144-163); the facet co-location estimate is only o(r) after delta -> 0, a delicate order-of-limits point.",
+   "Many 'subexponential envelope' conventions (boxes.tex:163-172; uniformity.tex Remark 9.2) and order-of-choice subtleties (scheme fixed before restricting parameters, Remark 4.4); these are exactly where an informal proof could fail, so the Lean build is decisive.",
+   "Paper and Lean follow partly different routes (Cornulier-Tessera, Hoermander and KMN are not used in Lean). The paper's own uses of those theorems are therefore not certified; e.g. applying CT2020 Cor 1.9 to the L^2(X,mu) representation needs the WAP condition, which the paper asserts for Hilbert representations (true) - low risk.",
+   "Lean depends on the third-party `gromov` package (Gromov's theorem, 26.9k lines, Aug 2026); its correctness is part of the trust base and it must compile under the pinned toolchain.",
+   "Size: 262k Lean lines + gromov; any build failure reverts the claim to an unrefereed paper."
+  ],
+  "consistency_checks": [
+   "lean/docs/255.md scope matches the comparator (recognition + lattice realization + bounded height).",
+   "ConditionalBoundedHeight.lean defines A := templateSymmetryGroup D mapped through the height iso, i.e. the paper's A_G = symmetry group of P.",
+   "Recognition.lean final theorems take no Input hypotheses; group_recognition_of_gromov is instantiated with the proved gromovPolynomialGrowthInput."
+  ]
+ },
+ "extraction_friction": [
+  "Single manuscript but 13 \\input files; theorem numbering is per section (shared counter), so 'Lemma 3.2' etc. had to be reconstructed.",
+  "Key definitions are inline (chart profiles, pure/mixed words, uniform quasi-action, labels via \\emph).",
+  "The Lean is enormous (3090 files, 10,961 decls) and extremely fine-grained; paper lemmas map to clusters of files with non-paper names (Cartan*, Published*, Polar*).",
+  "Lean encodes cited theorems as Prop '*Input' definitions and later proves them; one must check which Inputs reach the final theorems (legacy PublishedRecognitionInputs still mentions KMN).",
+  "Extractor dominated-share ranking surfaces vocabulary/assembly decls; the N3 candidates sit below 1% of the core.",
+  "Lean imports three other OAI dirs (Thompson, CyclicSeries, CriticalPercolation) - cross-family Lean reuse complicates provenance."
+ ],
+ "eureka_candidates_ranked": [
+  "I31 reflection-doubling for neighbouring labels (Prop 7.1)",
+  "I35 conditioned probes + cone-quotient Haar multipliers for offsets (Prop 8.3, with I33/I34)",
+  "I08 + I10 bracket-word volume exponent P(E) (sum of separate maxima) and its finite symmetry group A_G",
+  "I29 deterministic affinity criterion (Lemma 6.6) with I28 anti-folding segment volume inequality",
+  "I24 inverse coupling with exactly inverse slope (Lemma 5.5)"
+ ]
+}
