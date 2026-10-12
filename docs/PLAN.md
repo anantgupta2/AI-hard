@@ -207,6 +207,8 @@ Metrics:
   - 322: 15 Tingley/Mazur–Ulam full texts use no fixed-point argument like C1; C1 0.45 → 0.50. Tingley 1987 and Ding's survey are not on arXiv and remain unread.
   - 094: the GGNS ChatGPT 5.5 Pro disclosure is verified verbatim.
 
+**Bulk A/B/C pass** (2026-10-12): every one of the 372 families labelled on axes A–C from a short bundle (summary, abstracts, first theorem statements; `scripts/abc_bulk_inputs.py`, brief `docs/abc_bulk_prompt.md`), by 8 cheap agents. Results in `data/abc_bulk/` (`labels_all.json`, `stats.json`, `report.md`, from `scripts/abc_bulk_stats.py`). Agreement with the in-depth labels on 39 families: A κ = 0.77, B κ = 0.79, C κ = 0.44, so A and B are usable release-wide and C is only indicative.
+
 **Calibration items.**
 - **Positive control:** Cook's ER extension variables for PHP, formalized as a small Lean or DIMACS example. These must pass tests 2–4.
 - **Negative controls:** plumbing definitions and analytic abbreviations from the pilot.
