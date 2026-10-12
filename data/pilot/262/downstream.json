@@ -1,0 +1,551 @@
+{
+ "fid": 262,
+ "item": "C1: regularized energy-dependent matrix field M_delta(B) = c lim_R int_{-R}^{R} (f(K^2 - 2sB + s^2) - f(s^2) I) ds on the Riccati variable B, its primitive J (dJ = -tr(M dB)), and the rank-one comparison M(B) = aa^T => a^T(K^2 - B^2)a >= |a|^{2q} (262-S Sec. 3-4)",
+ "item_type": "F1 (secondary F3)",
+ "lean_status": "as in paper",
+ "lean_status_why": "The field, its primitive, the commuting-data values, the boundary values and the rank-one comparison are Lean definitions and theorems with the paper's exact formulas (MatrixOrder.lean:16-56), and the comparator target depends on them through finite_action_upper_test; the Lean version is if anything more general (any complex Hermitian C in place of K^2).",
+ "lean_gaps": [
+  "GENERALIZATION (not a weakening): the core development is for hermitianField sigma delta C B with an arbitrary complex Hermitian C (quadraticMatrix C B s = s^2 I + C - 2sB) and complex Hermitian B; the rank-one comparison is proved at that generality (rankone_hermitian_comparison) and transferred to the real field with C = K^2 by complexification (complexify_matrixField, source_rankone_comparison). The paper states everything for real symmetric B and diagonal K.",
+  "Definition: matrixField is Filter.limUnder of the symmetric-cutoff truncatedField (junk value if no limit); convergence is proved (hermitianField_cutoff_limit) for sigma < 1, delta > 0 via the paired s/-s integrand, which is absolutely integrable. Matches the paper's \"symmetric cutoff is part of the definition\".",
+  "Gradient route: the paper proves dJ = -tr(M dB) by a closed-curve argument with potentials -(1/2s) tr F(X_s(B)); Lean builds an explicit potential (pairedTracePotential / hermitianPotential with secondPrimitive) and proves HasFDerivAt directly. Same content, different proof.",
+  "The Prop wrapper RankOneClaim and its proof rankOneClaim are not in the comparator DAG; the DAG uses source_rankone_comparison directly (cosmetic).",
+  "The paper's Thm 2.1 (H^1_0 action inequality) is the unproved Prop ActionClaim in Lean; the field is consumed by finite_action_upper_test for continuous amplitudes with derivatives, which suffices for the comparator. This is a gap in the surrounding theorem, not in the item.",
+  "Only the scalar paper (262-S) is formalized. 262-M's use of the field (N = M_delta + delta^sigma) and C2 are not in Lean.",
+  "The field is only meaningful for 0 < sigma < 1 (all lemmas assume it); at sigma >= 1 the Lean fieldNormalization evaluates to 0 by the Bochner-integral convention.",
+  "Checked at text level only (no lake build, no comparator run), per orchestrator instruction; dependency chain from data/items/262_lean.json (extractor v3)."
+ ],
+ "comparator_chain": [
+  "OAI.SharpLiebThirring.sharp_lieb_thirring (Main.lean:38, comparator target)",
+  "OAI.SharpLiebThirring.negativeMoment_bound",
+  "OAI.SharpLiebThirring.finite_complex_eigenfamily_bound",
+  "OAI.SharpLiebThirring.SpectralProof.real_family_bound",
+  "OAI.SharpLiebThirring.SpectralProof.real_family_action_bound",
+  "OAI.SharpLiebThirring.SpectralProof.real_family_bound_sorted",
+  "OAI.SharpLiebThirring.SpectralProof.compact_trial_bound",
+  "OAI.SharpLiebThirring.SpectralProof.finite_spectral_trial",
+  "OAI.SharpLiebThirring.ActionProof.finite_action_upper_test (IntervalAction.lean:154)",
+  "OAI.SharpLiebThirring.ActionProof.regularized_action_upper_test (IntervalAction.lean:117)",
+  "OAI.SharpLiebThirring.ActionProof.matrix_compact_penalty (ActionPenalty.lean:113)",
+  "OAI.SharpLiebThirring.MatrixProof.source_rankone_comparison (RankOne.lean:601)",
+  "OAI.SharpLiebThirring.MatrixProof.rankone_hermitian_comparison (RankOne.lean:460)",
+  "OAI.SharpLiebThirring.MatrixProof.hermitianField (FieldLimit.lean:433)"
+ ],
+ "comparator_chain_branches": {
+  "field_and_primitive": "regularized_action_upper_test -> ActionProof.penalized_action_integral -> matrixField -> truncatedField; penalized_action_integral -> MatrixProof.fieldPrimitive_hasFDerivAt; penalized_action_integral -> ActionProof.action_ode_identity -> MatrixProof.fieldPrimitive_path_derivative",
+  "boundary_values": "finite_action_upper_test -> MatrixProof.fieldPrimitive_endpoint_limit (also regularized_action_upper_test -> fieldPrimitive)",
+  "path_flow_uses_field": "regularized_action_upper_test -> MatrixFlow.source_connecting_path -> MatrixFlow.matrixField_isolated_coordinate -> matrixX / regularizedPrimitive; source_connecting_path -> scalarMu; source_connecting_path -> MatrixFlow.source_path_state_barrier -> MatrixFlow.sourceField_state_nonpos -> MatrixProof.hermitianField_state_jensen; source_connecting_path -> MatrixFlow.coordinate_mu_locallyLipschitz -> MatrixProof.matrixField_diagonal",
+  "not_on_chain": "OAI.SharpLiebThirring.RankOneClaim and MatrixProof.rankOneClaim (the Prop wrapper and its proof) are NOT in the proof DAG; the DAG calls source_rankone_comparison directly. The wrapper is a cosmetic statement only.",
+  "shares": "extractor v3 (data/items/262_lean.json): dominated share source_rankone_comparison 0.128, rankone_hermitian_comparison 0.125, fieldPrimitive_hasFDerivAt 0.039; matrixField has 38 DAG dependents (5% of the 944-decl DAG), regularizedPrimitive 122 (16%); family.md: field+rank-one block = 301 decls, 69% of the 435-decl mathematical core."
+ },
+ "lean_source": [
+  {
+   "name": "OAI.SharpLiebThirring.regularizedPrimitive",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LiebThirring/MatrixOrder.lean",
+   "line": 16,
+   "text": "/-- The regularized primitive, including beta = 0 without a special convention. -/\ndef regularizedPrimitive (σ δ y : ℝ) : ℝ :=\n  ∫ t in 0..y, (max t 0 + δ) ^ (σ - 3 / 2)"
+  },
+  {
+   "name": "OAI.SharpLiebThirring.fieldNormalization",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LiebThirring/MatrixOrder.lean",
+   "line": 20,
+   "text": "def fieldNormalization (σ : ℝ) : ℝ :=\n  σ / ∫ s : ℝ, (1 + s ^ 2) ^ (σ - 3 / 2)"
+  },
+  {
+   "name": "OAI.SharpLiebThirring.scalarMu",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LiebThirring/MatrixOrder.lean",
+   "line": 23,
+   "text": "def scalarMu (σ δ z : ℝ) : ℝ :=\n  fieldNormalization σ * ∫ s : ℝ,\n    regularizedPrimitive σ δ (s ^ 2 + z) - regularizedPrimitive σ δ (s ^ 2)"
+  },
+  {
+   "name": "OAI.SharpLiebThirring.matrixX",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LiebThirring/MatrixOrder.lean",
+   "line": 30,
+   "text": "def matrixX (k : Fin N → ℝ) (B : Matrix (Fin N) (Fin N) ℝ) (s : ℝ) :\n    Matrix (Fin N) (Fin N) ℝ :=\n  Matrix.diagonal (fun i ↦ (k i) ^ 2) - (2 * s) • B + (s ^ 2) • 1"
+  },
+  {
+   "name": "OAI.SharpLiebThirring.truncatedField",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LiebThirring/MatrixOrder.lean",
+   "line": 34,
+   "text": "/-- The symmetric cutoff is part of the definition, not replaced\nby a potentially non-absolutely-convergent whole-line Bochner integral. -/\ndef truncatedField (σ δ : ℝ) (k : Fin N → ℝ) (B : Matrix (Fin N) (Fin N) ℝ)\n    (R : ℝ) : Matrix (Fin N) (Fin N) ℝ :=\n  fieldNormalization σ • ∫ s in (-R)..R,\n    cfc (regularizedPrimitive σ δ) (matrixX k B s) -\n      regularizedPrimitive σ δ (s ^ 2) • 1"
+  },
+  {
+   "name": "OAI.SharpLiebThirring.matrixField",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LiebThirring/MatrixOrder.lean",
+   "line": 42,
+   "text": "/-- The symmetric-cutoff limit, whose convergence and local regularity are proved below. -/\ndef matrixField (σ δ : ℝ) (k : Fin N → ℝ) (B : Matrix (Fin N) (Fin N) ℝ) :\n    Matrix (Fin N) (Fin N) ℝ :=\n  Filter.limUnder Filter.atTop (truncatedField σ δ k B)"
+  },
+  {
+   "name": "OAI.SharpLiebThirring.fieldPrimitive",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LiebThirring/MatrixOrder.lean",
+   "line": 47,
+   "text": "def fieldPrimitive (σ δ : ℝ) (k : Fin N → ℝ) (B : Matrix (Fin N) (Fin N) ℝ) : ℝ :=\n  -(∫ t in (0 : ℝ)..1, Matrix.trace (B * matrixField σ δ k (t • B)))"
+  },
+  {
+   "name": "OAI.SharpLiebThirring.RankOneClaim",
+   "kind": "def (Prop)",
+   "file": "lean/OAI/Analysis/LiebThirring/MatrixOrder.lean",
+   "line": 50,
+   "text": "/-- The rank-one comparison for the symmetric-cutoff matrix field. -/\ndef RankOneClaim : Prop :=\n  ∀ (σ δ : ℝ) (k : Fin N → ℝ) (B : Matrix (Fin N) (Fin N) ℝ) (a : Fin N → ℝ),\n    0 < σ → σ < 1 → 0 < δ → (∀ i, 0 < k i) → B.IsHermitian →\n    matrixField σ δ k B = Matrix.vecMulVec a a →\n    (∑ i, a i * ((Matrix.diagonal (fun i ↦ (k i) ^ 2) - B ^ 2) *ᵥ a) i) ≥\n      (∑ i, (a i) ^ 2) ^ (1 + 1 / σ)"
+  },
+  {
+   "name": "OAI.SharpLiebThirring.MatrixProof.quadraticMatrix",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LiebThirring/FieldLimit.lean",
+   "line": 313,
+   "text": "def quadraticMatrix (C B : Matrix n n ℂ) (s : ℝ) : Matrix n n ℂ :=\n  s ^ 2 • 1 + (C - (2 * s) • B)"
+  },
+  {
+   "name": "OAI.SharpLiebThirring.MatrixProof.hermitianField",
+   "kind": "def",
+   "file": "lean/OAI/Analysis/LiebThirring/FieldLimit.lean",
+   "line": 433,
+   "text": "def hermitianField (σ δ : ℝ) (C B : Matrix n n ℂ) : Matrix n n ℂ :=\n  (fieldNormalization σ / 2) • ∫ s : ℝ, pairedFieldIntegrand σ δ C B s"
+  },
+  {
+   "name": "OAI.SharpLiebThirring.MatrixProof.hermitianField_cutoff_limit",
+   "kind": "lemma",
+   "file": "lean/OAI/Analysis/LiebThirring/FieldLimit.lean",
+   "line": 462,
+   "text": "lemma hermitianField_cutoff_limit {σ δ : ℝ} (hσ : σ < 1) (hδ : 0 < δ)\n    {C B : Matrix n n ℂ} (hC : C.IsHermitian) (hB : B.IsHermitian) :\n    Tendsto (fun R : ℝ ↦ fieldNormalization σ • ∫ s in -R..R, fieldIntegrand σ δ C B s)\n      atTop (𝓝 (hermitianField σ δ C B))"
+  },
+  {
+   "name": "OAI.SharpLiebThirring.MatrixProof.hermitianPotential_hasFDerivAt",
+   "kind": "lemma (gradient property, complex Hermitian, general C)",
+   "file": "lean/OAI/Analysis/LiebThirring/FieldPrimitive.lean",
+   "line": 185,
+   "text": "lemma hermitianPotential_hasFDerivAt {σ δ : ℝ} (hσ : σ < 1) (hδ : 0 < δ)\n    (C B : selfAdjoint (Matrix n n ℂ)) :\n    HasFDerivAt (hermitianPotential σ δ C)\n      (traceGradientMap (hermitianField σ δ C B)) B"
+  },
+  {
+   "name": "OAI.SharpLiebThirring.MatrixProof.fieldPrimitive_path_derivative",
+   "kind": "lemma (dJ = -tr(M dB) along paths)",
+   "file": "lean/OAI/Analysis/LiebThirring/BoundaryValues.lean",
+   "line": 235,
+   "text": "lemma fieldPrimitive_path_derivative {σ δ : ℝ} (hσ : σ < 1) (hδ : 0 < δ)\n    (k : Fin N → ℝ) {B : ℝ → selfAdjoint (Matrix (Fin N) (Fin N) ℝ)}\n    {B' : selfAdjoint (Matrix (Fin N) (Fin N) ℝ)} {x : ℝ} (hB : HasDerivAt B B' x) :\n    HasDerivAt (fun x ↦ fieldPrimitive σ δ k (B x))\n      (-trace (matrixField σ δ k (B x) * (B' : Matrix (Fin N) (Fin N) ℝ))) x"
+  },
+  {
+   "name": "OAI.SharpLiebThirring.MatrixProof.matrixField_diagonal",
+   "kind": "lemma (commuting/diagonal data)",
+   "file": "lean/OAI/Analysis/LiebThirring/BoundaryValues.lean",
+   "line": 89,
+   "text": "lemma matrixField_diagonal {N : ℕ} {σ δ : ℝ} (hσ : σ < 1) (hδ : 0 < δ)\n    (k b : Fin N → ℝ) :\n    matrixField σ δ k (diagonal b) = diagonal (fun i ↦ scalarMu σ δ (k i ^ 2 - b i ^ 2))"
+  },
+  {
+   "name": "OAI.SharpLiebThirring.MatrixProof.fieldPrimitive_endpoint_limit",
+   "kind": "lemma (boundary values, delta -> 0)",
+   "file": "lean/OAI/Analysis/LiebThirring/BoundaryValues.lean",
+   "line": 162,
+   "text": "lemma fieldPrimitive_endpoint_limit {N : ℕ} {σ : ℝ} (hσ₀ : 0 < σ) (hσ₁ : σ < 1)\n    (k : Fin N → ℝ) (hk : ∀ i, 0 ≤ k i) :\n    Tendsto (fun δ : ℝ ↦ fieldPrimitive σ δ k (-diagonal k) - fieldPrimitive σ δ k (diagonal k))\n      (𝓝[>] 0) (𝓝 (∑ i, ∫ s in -(k i)..k i, (k i ^ 2 - s ^ 2) ^ σ))"
+  },
+  {
+   "name": "OAI.SharpLiebThirring.MatrixProof.hermitianField_state_jensen",
+   "kind": "lemma (directional/state Jensen)",
+   "file": "lean/OAI/Analysis/LiebThirring/RankOne.lean",
+   "line": 26,
+   "text": "lemma hermitianField_state_jensen {σ δ : ℝ} (hσ₀ : 0 < σ) (hσ₁ : σ < 1) (hδ : 0 < δ)\n    (φ : Matrix n n ℂ →L[ℝ] ℝ) (hφ : ∀ A, A.PosSemidef → 0 ≤ φ A) (hφ₁ : φ 1 = 1)\n    {C B : Matrix n n ℂ} (hC : C.IsHermitian) (hB : B.IsHermitian) :\n    φ (hermitianField σ δ C B) ≤ scalarMu σ δ (φ C - (φ B) ^ 2)"
+  },
+  {
+   "name": "OAI.SharpLiebThirring.MatrixProof.rankone_hermitian_comparison",
+   "kind": "lemma (rank-one comparison, complex Hermitian, general C)",
+   "file": "lean/OAI/Analysis/LiebThirring/RankOne.lean",
+   "line": 460,
+   "text": "/-- The complete complex Hermitian rank-one comparison, before identifying the\nreal symmetric field with its complexification. -/\nlemma rankone_hermitian_comparison {σ δ : ℝ} (hσ₀ : 0 < σ) (hσ₁ : σ < 1) (hδ : 0 < δ)\n    {C B : Matrix n n ℂ} (hC : C.IsHermitian) (hB : B.IsHermitian) (a : n → ℂ)\n    (hM : hermitianField σ δ C B = vecMulVec a (star a)) :\n    (vectorMass a) ^ (1 + 1 / σ) ≤ (trace (vecMulVec a (star a) * (C - B ^ 2))).re"
+  },
+  {
+   "name": "OAI.SharpLiebThirring.MatrixProof.source_rankone_comparison",
+   "kind": "theorem (rank-one comparison, real field)",
+   "file": "lean/OAI/Analysis/LiebThirring/RankOne.lean",
+   "line": 601,
+   "text": "/-- The rank-one comparison for the real field\nwith its symmetric-cutoff definition. -/\ntheorem source_rankone_comparison {N : ℕ} {σ δ : ℝ} (hσ₀ : 0 < σ) (hσ₁ : σ < 1)\n    (hδ : 0 < δ) (k : Fin N → ℝ) {B : Matrix (Fin N) (Fin N) ℝ} (hB : B.IsHermitian)\n    (a : Fin N → ℝ) (hM : matrixField σ δ k B = vecMulVec a a) :\n    (∑ i, a i ^ 2) ^ (1 + 1 / σ) ≤\n      ∑ i, a i * ((diagonal (fun i ↦ k i ^ 2) - B ^ 2) *ᵥ a) i"
+  }
+ ],
+ "speedup_targets": [
+  {
+   "id": "S1",
+   "title": "Sharp 1D Lieb-Thirring for finite Hermitian-matrix potentials at gamma = 1 (Read-Schulz Prop. 4, finite-matrix case) and on (1/2,3/2) (262-M Thm 1.1)",
+   "statement": "For m x m measurable Hermitian W >= 0 with int tr W^{gamma+1/2} < inf: Tr(-d^2/dx^2 (x) I_m - W)_-^gamma <= 2((gamma-1/2)/(gamma+1/2))^{gamma-1/2} L^cl_{gamma,1} int tr W^{gamma+1/2}; at gamma = 1 the constant is 4/(3 sqrt3 pi).",
+   "reference": "Read-Schulz arXiv:2609.10478v2 (Sep 2026; not read in full, unverified); 262-M (OpenAI, Oct 5 2026, unformalized).",
+   "status": "gamma = 1: proved by Read-Schulz (human, different device: cumulative-mass matrix A(x)). (1/2,3/2): claimed by 262-M, unrefereed, no Lean.",
+   "reuse_class": "EXTENSION of the item's own theorem (same family/problem). Does NOT count toward a confirmed jump per the brief and CLAUDE.md. Listed because it is the only measurable Lean experiment where the device library is reused in a new formal proof.",
+   "current_proof_size": "Read-Schulz: about 9-15 pages (v1 9 pp per listing summary, unverified). 262-M: about 1,900 TeX lines. No formal proof anywhere. Scalar baseline: OAI 262 DAG 944 decls / 10,192 lines.",
+   "how_item_helps": "262-M reuses the field M_delta verbatim (its N = M_delta + delta^sigma, I27), the primitive J, boundary values and the continuation; only the rank-one comparison must be replaced by the full-rank trace comparison tr(NV) >= tr(N^q) (C2). In Lean the field is already defined for arbitrary complex Hermitian C and B (hermitianField), with the gradient, state-Jensen and rank-one lemmas stated at that generality, so the field half of 262-M would be import-only. The new work is C2 (boundary maps, log-det, SOS) plus matrix-valued H1/spectral plumbing.",
+   "expected_speedup": "med (library reuse of perhaps half of the 301-decl field block; C2 and matrix spectral plumbing are new). Not a jump test.",
+   "confidence": "med",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Mathlib Matrix, IsHermitian, cfc, MemLp, ENNReal; copy Model.lean (95 lines) with val : R -> (Fin m -> C) and W : R -> Matrix (Fin m) (Fin m) C.",
+    "missing": [
+     "matrix-valued H1 / schrodingerForm / negativeMoment / potentialMass with tr W^{gamma+1/2} (about 100-150 lines, mirroring Model.lean)"
+    ],
+    "formal_proof_to_compare": "none (Read-Schulz and 262-M unformalized); scalar 262 Lean is the only baseline"
+   }
+  },
+  {
+   "id": "S2",
+   "title": "Keller / one-bound-state inequality (Lieb-Thirring 1976 one-state constant) as an N = 1 control",
+   "statement": "If -d^2/dx^2 - W has a negative eigenvalue -k^2 then k^{2 gamma} <= L^(1)_{gamma,1} int W^{gamma+1/2}, 1/2 < gamma < 3/2.",
+   "reference": "Keller, J. Math. Phys. 2 (1961); Lieb-Thirring 1976.",
+   "status": "classical",
+   "reuse_class": "special case of the theorem (N = 1); for N = 1 the field is the scalar first integral (k^2-b^2)^sigma (Keller/Bogomolny). Control, not reuse.",
+   "current_proof_size": "about 1-2 pages (variational/ODE). OAI OneState.lean is 53 lines and does not use the field.",
+   "how_item_helps": "It should not: at N = 1 M_delta(b) = (k^2-b^2+delta)^sigma - delta^sigma is the classical calibration. Useful as a calibration of the speedup harness: with-item vs without-item budgets should be equal.",
+   "expected_speedup": "low (expected none; control)",
+   "confidence": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "oneStateMoment, potentialMass, sharpConstant from Model.lean",
+    "missing": [],
+    "formal_proof_to_compare": "OAI 262 OneState.lean + Main.lean (oneStateConstant = sharp) exists"
+   }
+  },
+  {
+   "id": "S3",
+   "title": "Sharp Lieb-Thirring on Kirchhoff star graphs with an even number of edges (Demirel-Frank) for 1/2 < gamma < 3/2",
+   "statement": "On a star graph with N even edges and Kirchhoff vertex condition, Tr(H_W)_-^gamma <= L_{gamma,1} int W^{gamma+1/2}, with the same optimal constant as on R.",
+   "reference": "Demirel-Frank, Sharp eigenvalue bounds on quantum star graphs, arXiv:1503.06915 (abstract via search summary only; unverified).",
+   "status": "known: optimal constant on even star graphs equals the line constant (for all gamma, per summary). Combined with 262-S it now has the explicit value L^(1)_{gamma,1}.",
+   "reuse_class": "COROLLARY of the theorem (Demirel-Frank reduction + 262-S). Device reuse only if one proved it directly on the graph, which is not needed.",
+   "current_proof_size": "Demirel-Frank: a reduction of a few pages (unverified). No formal proof.",
+   "how_item_helps": "Through the theorem, not the device.",
+   "expected_speedup": "low (as device reuse)",
+   "confidence": "med",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Model.lean pattern on Fin N copies of [0,inf) with continuity + Kirchhoff",
+    "missing": [
+     "star-graph H1 with vertex continuity and the form (about 120 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "S4",
+   "title": "Sharp matrix Lieb-Thirring at gamma = 3/2 (Laptev-Weidl 2000; Benguria-Loss 2000 commutation proof)",
+   "statement": "Tr(-d^2/dx^2 - W)_-^{3/2} <= (3/16) int tr W^2 for Hermitian-matrix (and operator) valued W >= 0.",
+   "reference": "Laptev-Weidl, Acta Math. 184 (2000); Benguria-Loss, Math. Res. Lett. 7 (2000).",
+   "status": "classical",
+   "reuse_class": "limit corollary of 262-M (gamma -> 3/2, constants converge); as a device test it is a NEGATIVE control: at sigma = 1 the naive field K^2 - B^2 is already a trace gradient (of tr(K^2 B) - tr B^3/3), so the device is unnecessary, and in Lean fieldNormalization 1 = 1/(integral of a non-integrable function) = 1/0 = 0, so matrixField is identically 0.",
+   "current_proof_size": "Benguria-Loss: about 8 pages; Laptev-Weidl: about 25 pages (trace formulae). No formal proof.",
+   "how_item_helps": "It does not; the action-path framework with the naive calibration suffices.",
+   "expected_speedup": "low (expected none)",
+   "confidence": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "as S1 (matrix-valued Model.lean) at gamma = 3/2; scalar case statable now with Model.lean",
+    "missing": [
+     "matrix-valued Model.lean copy (100-150 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "open_problems": [
+  {
+   "id": "O1",
+   "title": "Sharp Lieb-Thirring on the half-line with a Hermitian Robin matrix (or Dirichlet) boundary condition for 1/2 < gamma < 3/2",
+   "statement": "For H = -d^2/dx^2 (x) I - V on L^2(R_+, C^N) with phi'(0) = S phi(0), find the sharp bound on Tr(H)_-^gamma in terms of int tr V^{gamma+1/2} (and S), 1/2 < gamma < 3/2.",
+   "reference": "Exner-Laptev-Usman, CMP 326 (2014), arXiv:1301.4986 (sharp results stated for the matrix semi-axis problem, range reported for gamma >= 3/2 / endpoint cases; not read in full); Schimmer, J. Spectral Theory (2022), arXiv:1912.13264 (improved non-sharp Robin/Dirichlet bounds via double commutation).",
+   "url": "https://arxiv.org/abs/1301.4986 ; https://arxiv.org/abs/1912.13264",
+   "status": "open in the interval as far as found (WebSearch summaries only). Neumann (S = 0) is now a corollary of 262-S by even reflection with constant 2 L^(1)_{gamma,1}; Robin with S != 0 and Dirichlet are not.",
+   "obstruction_match": "Strongest structural match found. The calibration identity (J(B) + a^T B a)' produces the boundary term a(0)^T B(0) a(0); for Robin data the quadratic form has exactly the boundary term <phi(0), S phi(0)>, so the path should start at B(0) = S (a non-diagonal Hermitian matrix that need not commute with K) instead of at K. The Lean field and primitive are already defined and differentiable at every Hermitian B and for any Hermitian C (hermitianField, hermitianPotential_hasFDerivAt), so J(S) is available; for diagonal S, fieldPrimitive_diagonal gives it in closed form.",
+   "adaptation_sketch": "Replace the two-sided path K -> -K on a finite interval by a one-sided path S -> -K on [0, r]; redo the mod-2 continuation with a fixed initial value (the start is no longer a free endpoint, so the parity count changes); compute J(-K) - J(S); identify the extremal (likely a truncated soliton with matched log-derivative). Dirichlet corresponds to B(0) = +inf and needs a renormalized primitive (scalar mu is negative and linear for negative arguments, so the naive boundary term diverges).",
+   "payoff": "med (closes a named family of half-line problems; not a famous conjecture)",
+   "confidence": "low-med",
+   "difficulty": "med-high (topology of the path step must be redone; the sharp form with S is not scale invariant and may not be one-bound-state type)",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "Model.lean pattern on Set.Ioi 0 with val : R -> (Fin N -> C), boundary term star(u 0) * S * v 0; Mathlib MemLp on restricted measure, Matrix.IsHermitian",
+    "missing": [
+     "half-line matrix H1 with trace at 0 (about 80 lines)",
+     "Robin form + negativeMoment (about 60 lines)"
+    ],
+    "formal_proof_to_compare": "none (no formalization of ELU or Schimmer)"
+   }
+  },
+  {
+   "id": "O2",
+   "title": "Sharp Lieb-Thirring on Kirchhoff star graphs with an odd number of edges, general (non-radial) potentials",
+   "statement": "Is the optimal LT constant on a star graph with N odd edges equal to the line constant (now known to be L^(1)_{gamma,1} for 1/2 < gamma < 3/2)?",
+   "reference": "Demirel-Frank, arXiv:1503.06915 (per search summary: equal for even N; for odd N only for radial potentials, almost optimal in general). Demirel thesis, Stuttgart.",
+   "url": "https://arxiv.org/abs/1503.06915",
+   "status": "open for odd N and general potentials (per summary; unverified)",
+   "obstruction_match": "A star graph with N edges is a C^N-valued half-line problem with a non-scalar vertex condition (continuity + Kirchhoff); trial functions are vector-valued and the log-derivative at the vertex is a genuinely noncommuting matrix. This is exactly the noncommutative situation the field was built for, but the potential is diagonal (scalar per edge), so the rank-one structure is per eigenfunction, not per edge.",
+   "adaptation_sketch": "Encode each eigenfunction as an N-vector of edge values; the vertex condition restricts B(0) to matrices compatible with the Kirchhoff subspace; run the one-sided path argument of O1 with that boundary set. Check first whether odd N reduces to O1 with a rank-one Robin S.",
+   "payoff": "low-med",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "as O1, plus vertex conditions",
+    "missing": [
+     "star-graph H1 (about 120 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O3",
+   "title": "Sharp Lieb-Thirring constants for Jacobi matrices (discrete Schrodinger operators) for 1/2 < gamma < 3/2",
+   "statement": "Sharp constants in sum_j (|E_j| - 2)_+^gamma (and the Hundertmark-Simon form with |E^2-4|) <= C sum_n (|b_n|^{gamma+1/2} + c|a_n - 1|^{gamma+1/2}).",
+   "reference": "Hundertmark-Simon, J. Approx. Theory 118 (2002); Schimmer, arXiv:1310.3764 (sharp gamma = 1/2, 3/2 via Jacobi approximations, non-sharp interpolation in between); arXiv:1312.1907 (new non-sharp discrete constants); Laptev-Loss-Schimmer (Hundertmark-Simon conjecture).",
+   "url": "https://arxiv.org/abs/1310.3764",
+   "status": "open in the interval (per summaries)",
+   "obstruction_match": "Weak. The discrete Riccati variable obeys a Moebius recursion, not a first-order ODE, and the gauge-shift identity k^2 - 2sb + s^2 = (s-b)^2 + k^2 - b^2 that makes the field affine in B has no direct analogue for the discrete symbol 2 cos theta. The calibration-plus-continuation architecture might transfer; the field itself probably does not.",
+   "adaptation_sketch": "Look for a discrete pencil X_theta(B) affine in B whose theta-average reproduces the discrete one-state calibration; use the Lean field lemmas (state-Jensen, rank-one) only if such a pencil exists.",
+   "payoff": "med",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "finite Jacobi matrices: Matrix (Fin n) (Fin n) R, IsHermitian.eigenvalues; statement for finite sections (eigenvalues outside [-2,2]) uniform in n",
+    "missing": [],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O4",
+   "title": "Lieb-Thirring constants in dimension d >= 2 (R_{gamma,d} = L_{gamma,d}/L^cl_{gamma,d} for 1 <= gamma < 3/2)",
+   "statement": "Improve the best bounds R <= 1.456 (Frank-Hundertmark-Jex-Nam) and R_{1,d} <= 2/sqrt3 (Read-Schulz) toward the conjecture R_{gamma,d} = 1 where expected.",
+   "reference": "Schimmer, The state of the Lieb-Thirring conjecture, arXiv:2203.06051; FHJN, JEMS (2021); Read-Schulz arXiv:2609.10478v2 Sec. 2 (summary only).",
+   "url": "https://arxiv.org/abs/2203.06051",
+   "status": "open",
+   "obstruction_match": "Only through the theorem. A 1D operator-valued version of 262-M (finite-matrix constant is size-independent, so a finite-rank approximation should extend it) plus Laptev-Weidl lifting gives R_{gamma,d} <= 2((gamma-1/2)/(gamma+1/2))^{gamma-1/2} for 1 <= gamma < 3/2 (about 1.059 at gamma = 5/4). This is a COROLLARY (see theorem_corollaries). The field is a 1D Riccati object; no d-dimensional analogue of the gauge-shifted pencil is evident.",
+   "adaptation_sketch": "None for the device. For the corollary: operator-valued approximation + lifting.",
+   "payoff": "high (famous)",
+   "confidence": "low (as device reuse)",
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "d-dimensional H1 form could mirror Model.lean, but the lifting needs operator-valued 1D potentials on L^2(R^{d-1}) and the sharp gamma >= 3/2 Laptev-Weidl theorem",
+    "missing": [
+     "operator-valued Schrodinger forms",
+     "Laptev-Weidl lifting",
+     "semiclassical constants in d dims"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O5",
+   "title": "Sharp Hardy-Lieb-Thirring inequality on the half-line for 1/2 < gamma < 3/2",
+   "statement": "Sharp constant in Tr(-d^2/dx^2 - 1/(4x^2) - V)_-^gamma <= C int_0^inf V^{gamma+1/2} (Dirichlet at 0), and variants with alpha(alpha-1)/x^2.",
+   "reference": "Ekholm-Frank, arXiv:math/0611247 (non-sharp, critical exponent); Laptev, factorisation paper (gamma = 3/2); Frank-Laptev-Weidl.",
+   "url": "https://arxiv.org/abs/math/0611247",
+   "status": "open for the sharp constant in the interval (inferred from summaries; unverified)",
+   "obstruction_match": "Partial: Riccati/log-derivative variable with a singular boundary value b ~ 1/(2x) at 0; the field's primitive must be evaluated at an unbounded endpoint, as in O1-Dirichlet.",
+   "adaptation_sketch": "Ground-state substitution phi = x^{1/2} psi turns the Hardy operator into a weighted problem; try a weighted action inequality with the same field. Likely needs a new field because the weight breaks the s-integral scaling.",
+   "payoff": "low-med",
+   "confidence": "low",
+   "difficulty": "high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "half-line H1 as in O1 plus the Hardy term",
+    "missing": [
+     "half-line H1 with Dirichlet trace (about 80 lines)",
+     "Hardy form domain (about 80 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  },
+  {
+   "id": "O6",
+   "title": "Sharp 1D Lieb-Thirring for higher-order or fractional operators ((-d^2/dx^2)^l, |p|^{2s}) in the one-bound-state regime",
+   "statement": "Determine sharp constants for Tr((-d^2/dx^2)^l - W)_-^gamma in the range where one-bound-state optimizers are conjectured.",
+   "reference": "Schimmer survey arXiv:2203.06051 (higher-order discussion); Frank, The Lieb-Thirring inequalities: recent results and open problems (2020).",
+   "url": "https://arxiv.org/abs/2203.06051",
+   "status": "open",
+   "obstruction_match": "Poor; recorded as a likely failure. The device uses that the second-order symbol k^2 - 2sb + s^2 is affine in b after the gauge shift; for (s-b)^4 + ... the dependence on B is not affine, so the s-integral of f(X_s(B)) is no longer a trace gradient by the same argument, and there is no first-order Riccati reduction.",
+   "adaptation_sketch": "Would need a different lift; treat as a near-negative control.",
+   "payoff": "med",
+   "confidence": "very low",
+   "difficulty": "very high",
+   "lean_feasibility": {
+    "score": "statable with < 300 lines of new definitions",
+    "statable_with": "H^l(R) as (val, derivatives) tuple in the Model.lean style",
+    "missing": [
+     "H^l form domain (about 120 lines)"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "theorem_corollaries": [
+  {
+   "title": "Read-Schulz gamma = 1 scalar sharp constant L_{1,1} = 4/(3 sqrt3 pi)",
+   "relation": "direct instance of MainClaim at gamma = 1 (sharpConstant 1 = 2 (1/3)^{1/2} L^cl_{1,1} = 4/(3 sqrt3 pi))",
+   "lean": "statable now; proof is MainClaim 1 plus a Gamma-function evaluation",
+   "counts_as_reuse": false
+  },
+  {
+   "title": "262-M sharp finite-matrix LT on (1/2,3/2) and 262-E equality cases",
+   "relation": "same-family extensions; M reuses the field verbatim and replaces the rank-one comparison by C2; E builds on M",
+   "lean": "statable with < 300 lines (matrix Model.lean); unformalized",
+   "counts_as_reuse": false
+  },
+  {
+   "title": "Endpoint limits gamma -> 1/2 (Hundertmark-Lieb-Thomas 1998, L = 1/2) and gamma -> 3/2 (L = 3/16), scalar; matrix versions (HLW 2000, Laptev-Weidl 2000) from 262-M",
+   "relation": "limits of the theorem; the device itself degenerates at sigma = 0 and sigma = 1 (normalization c -> 0 / divergent integral)",
+   "lean": "scalar statable now",
+   "counts_as_reuse": false
+  },
+  {
+   "title": "Neumann half-line sharp LT with constant 2 L^(1)_{gamma,1}, 1/2 < gamma < 3/2",
+   "relation": "even reflection: Neumann eigenvalues are the even-sector eigenvalues of the reflected full-line problem; the sech^2 optimizer is even, so the constant is sharp",
+   "lean": "statable with < 300 lines (half-line H1)",
+   "counts_as_reuse": false
+  },
+  {
+   "title": "Even-edge star graphs (Demirel-Frank reduction) get the explicit sharp constant L^(1)_{gamma,1}",
+   "relation": "theorem + known reduction (S3)",
+   "lean": "statable with < 300 lines",
+   "counts_as_reuse": false
+  },
+  {
+   "title": "Higher-dimensional bound R_{gamma,d} <= 2((gamma-1/2)/(gamma+1/2))^{gamma-1/2} for 1 <= gamma < 3/2, all d",
+   "relation": "operator-valued extension of 262-M by finite-rank approximation (plausible, uniform constant; not checked) + Laptev-Weidl lifting with the sharp L^cl_{gamma+1/2,d-1}; improves Read-Schulz 2/sqrt3 (which already gives R <= 1.1547 for gamma >= 1 via Aizenman-Lieb monotonicity) strictly on (1,3/2), e.g. about 1.059 at gamma = 5/4. Not stated in the release (grep of 262-M). Reach of the theorem, not reuse of the device.",
+   "lean": "needs major new library",
+   "counts_as_reuse": false
+  },
+  {
+   "title": "Non-existence of multi-function orthonormal ground states for the 1D dual (Lieb-Thirring kinetic) problem in the conjugate range",
+   "relation": "dual form of 262-S plus 262-E equality classification (only single solitons attain); related to Frank-Gontier-Lewin NLS for orthonormal functions (CMP 2021)",
+   "lean": "statable with < 300 lines",
+   "counts_as_reuse": false
+  }
+ ],
+ "release_reuse": {
+  "same_family": [
+   "262-M (field reused verbatim as N = M_delta + delta^sigma; rank-one comparison replaced by C2)",
+   "262-E (inherits through M)"
+  ],
+  "other_families": "none found",
+  "how_checked": "grep of CONTENTS.md, all preprint .tex for Lieb-Thirring / X_s(B) / K^2-2sB, and of lean/OAI outside Analysis/LiebThirring for LiebThirring"
+ },
+ "negative_controls": [
+  {
+   "id": "N1",
+   "title": "gamma < 1/2 in d = 1: no Lieb-Thirring inequality (proved false)",
+   "statement": "For 0 < gamma < 1/2, optimalConstant gamma = top: with W = eps w, the ground state energy is about -(eps int w)^2/4, so |E|^gamma / int W^{gamma+1/2} ~ eps^{gamma-1/2} -> inf.",
+   "why_device_fails": "sigma = gamma - 1/2 < 0: fieldNormalization is negative, mu(z) = (z+delta)^sigma - delta^sigma is decreasing, and the rank-one exponent 1 + 1/sigma is negative; every field lemma carries 0 < sigma.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Model.lean: optimalConstant gamma = top",
+    "missing": [],
+    "formal_proof_to_compare": "none; short proof (weak-coupling bound state)"
+   }
+  },
+  {
+   "id": "N2",
+   "title": "gamma > 3/2: the one-bound-state constant is false (proved false)",
+   "statement": "For gamma > 3/2, ENNReal.ofReal (sharpConstant gamma) < optimalConstant gamma, since L_{gamma,1} = L^cl_{gamma,1} > L^(1)_{gamma,1} (Lieb-Thirring 1976; Frank-Gontier-Lewin CMP 2021: never attained by finitely many eigenvalues for gamma > max(0, 2-d/2)).",
+   "why_device_fails": "sigma >= 1: integral of (1+s^2)^{sigma-3/2} diverges; in Lean the Bochner integral of a non-integrable function is 0, so fieldNormalization = 0 and matrixField is identically 0. At sigma = 1 the naive field K^2 - B^2 is already a gradient (see S4), so the device is unnecessary there.",
+   "lean_feasibility": {
+    "score": "statable now",
+    "statable_with": "Model.lean sharpConstant, optimalConstant",
+    "missing": [],
+    "formal_proof_to_compare": "none; proof needs Weyl asymptotics (large)"
+   }
+  },
+  {
+   "id": "N3",
+   "title": "Non-self-adjoint (complex) potentials in 1D",
+   "statement": "Lieb-Thirring-type bounds for complex V fail in the strong form (Boegli 2021, arXiv:2111.03938; Boegli-Stampach 2021; Boegli-Petpradittha-Stampach 2025, arXiv:2510.02192), per summaries.",
+   "why_device_fails": "The field uses Hermitian functional calculus (cfc), trace gradients on selfAdjoint matrices and Klein-type monotonicity; none survive for non-normal pencils.",
+   "lean_feasibility": {
+    "score": "needs major new library",
+    "statable_with": "non-self-adjoint spectral theory on L^2(R)",
+    "missing": [
+     "discrete spectrum of non-self-adjoint operators"
+    ],
+    "formal_proof_to_compare": "none"
+   }
+  }
+ ],
+ "top5": [
+  {
+   "rank": 1,
+   "target": "O1: sharp half-line LT with Hermitian Robin matrix S (1/2 < gamma < 3/2)",
+   "lean_usable": true,
+   "counts_as_device_reuse": true,
+   "argument": "Best structural match found. The calibration identity produces a boundary term a^T B a that matches the Robin form term exactly when the path starts at B(0) = S, and the Lean field, primitive and gradient are already defined for arbitrary Hermitian B and C, so the device is importable as is. Statable with about 150 new lines (half-line matrix H1 + Robin form). Measurement: prover budget for the one-sided action inequality with vs without MatrixOrder/FieldLimit/FieldPrimitive/BoundaryValues/RankOne. Risks: the sharp form is not scale invariant and is not known; the continuation (36% of the DAG, PL parity) must be redone for a fixed initial value; Neumann (S = 0) is only a corollary."
+  },
+  {
+   "rank": 2,
+   "target": "S1: finite-matrix sharp LT at gamma = 1 (Read-Schulz) / on (1/2,3/2) (262-M)",
+   "lean_usable": true,
+   "counts_as_device_reuse": false,
+   "argument": "Cleanest measurable library-value experiment: the field is reused verbatim and only C2 is new. Statable with about 120 lines of matrix Model.lean. It is an extension of the item's own theorem, so a speedup here does NOT confirm a jump; it calibrates how much the device library is worth to a prover. Comparing with Read-Schulz's different device (cumulative mass A(x)) at gamma = 1 is also an informal test of whether the field is the cheaper route."
+  },
+  {
+   "rank": 3,
+   "target": "O2: odd-edge Kirchhoff star graphs",
+   "lean_usable": true,
+   "counts_as_device_reuse": true,
+   "argument": "Vector-valued half-line problem with a noncommuting vertex condition, so the field's noncommutative content is actually needed. Statable with about 120 lines. Low confidence: the potential is diagonal per edge, and odd N may reduce to O1 with a rank-one Robin S, in which case it merges with rank 1."
+  },
+  {
+   "rank": 4,
+   "target": "O3: sharp Jacobi-matrix LT for 1/2 < gamma < 3/2",
+   "lean_usable": true,
+   "counts_as_device_reuse": true,
+   "argument": "Statable now on finite sections. Included because it is the only open discrete target and is cheap to state; but the gauge-shift identity behind the field has no evident discrete analogue, so expect failure. Doubles as a negative-leaning control."
+  },
+  {
+   "rank": 5,
+   "target": "N1/N2 + S2/S4 controls (gamma < 1/2 false; gamma > 3/2 one-state constant false; N = 1 Keller; sigma = 1 naive field)",
+   "lean_usable": true,
+   "counts_as_device_reuse": false,
+   "argument": "All statable now with Model.lean. They bracket the device: it is defined exactly on 0 < sigma < 1, the range where the theorem holds, collapses to the classical calibration at N = 1, and is superfluous at sigma = 1. A speedup harness that reports gains on these is miscalibrated."
+  }
+ ],
+ "verdict_part_b": "No strong device-reuse speedup target on a known theorem was found. Every known theorem the item reaches (Read-Schulz gamma = 1, endpoints 1/2 and 3/2, matrix versions, Neumann half-line, even star graphs, higher-d constants via lifting) is reached through the THEOREM or its same-family extension, not through the device. The device is tied to second-order 1D problems with 0 < sigma < 1 (it degenerates at both endpoints and has no evident discrete, higher-order or d-dimensional analogue). The only plausible device-reuse candidates are open half-line/graph problems (O1, O2) where a noncommuting boundary matrix enters, with low-medium confidence.",
+ "precedent_check": {
+  "post_release_uses_found": "none. WebSearch (2026-10-12) for follow-ups to the 1D LT resolution and for the pencil/trace-gradient construction found only Read-Schulz (Sep 2026, pre-release, different device) and press about the release. No expert reaction found.",
+  "earlier_equivalent_found": "none beyond those listed in novelty.json (Read-Schulz cumulative-mass matrix A(x): different object; Laptev-Weidl phase-space integral: ingredient without the B-shift; Benguria-Loss 2000/2004: template). A search for f(K^2 - 2sB + s^2)-type trace-gradient fields returned unrelated Riccati trace bounds and one 2026 covariance-estimation paper (arXiv:2608.20223) that uses a trace-gradient flow but no pencil integral or calibration (summary only).",
+  "downgrade": "No downgrade from this pass. The main risk (an expert identifying M_delta as a known local Weyl density of a gauge-shifted operator used as a calibration) is unresolved.",
+  "release_internal_reuse": "Only 262-M and 262-E (same family). No other family in the release (CONTENTS.md, preprint grep, OAI Lean grep) uses the field or LiebThirring declarations; other Lieb-Thirring mentions are Araki-Lieb-Thirring trace inequalities or LT used as a black box (Coulomb families)."
+ },
+ "sources": [
+  "data/pilot/262/novelty.json, family.json, family.md",
+  "data/items/262_lean.json (extractor v3)",
+  "lean/OAI/Analysis/LiebThirring/{MatrixOrder,FieldLimit,FieldPrimitive,BoundaryValues,RankOne,IntervalAction,ActionPenalty,Model,Main}.lean",
+  "lean/ComparatorChallenges/LiebThirring.json",
+  "preprints/Sharp-One-Dimensional-Lieb-Thirring-Constants-September-23-2026/build/sections/{matrix-field,rank-one}.tex",
+  "preprints/Sharp-one-dimensional-Lieb-Thirring-inequalities-for-matrix-potentials-October-5-2026/build/{sections/introduction.tex,notes/history.tex}",
+  "https://arxiv.org/abs/1301.4986 (Exner-Laptev-Usman; summary only)",
+  "https://arxiv.org/abs/1912.13264 (Schimmer, semi-axis; summary only)",
+  "https://arxiv.org/abs/1503.06915 (Demirel-Frank, star graphs; summary only)",
+  "https://arxiv.org/abs/1310.3764 (Schimmer, Jacobi; summary only)",
+  "https://arxiv.org/abs/1312.1907 (discrete LT constants; summary only)",
+  "https://www.ma.ic.ac.uk/~alaptev/Papers/LLS_Jacobi.pdf (Laptev-Loss-Schimmer; summary only)",
+  "https://arxiv.org/abs/math/0611247 (Ekholm-Frank, half-line critical; summary only)",
+  "https://arxiv.org/abs/2002.04964 (Frank-Gontier-Lewin, NLS for orthonormal functions II; summary only)",
+  "https://arxiv.org/abs/2111.03938 ; https://arxiv.org/abs/2510.02192 (Boegli et al., complex potentials; summary only)",
+  "https://arxiv.org/abs/2609.10478 (Read-Schulz; summary only)",
+  "https://arxiv.org/abs/2203.06051 (Schimmer survey; summary only)",
+  "https://arxiv.org/abs/2608.20223 (unrelated trace-gradient flow; summary only)"
+ ],
+ "search_log": [
+  "WebSearch: sharp Lieb-Thirring half-line Robin Dirichlet Exner Laptev Usman",
+  "WebSearch: Lieb-Thirring metric star graph sharp constant Kirchhoff",
+  "WebSearch (extended): Lieb-Thirring conjecture one dimension resolved 2026 matrix field follow-up",
+  "WebSearch: Demirel Frank star graphs odd edges",
+  "WebSearch: Exner Laptev Usman semiaxis matrix potential gamma >= 3/2 Robin",
+  "WebSearch: Lieb-Thirring Jacobi matrices sharp constant 1/2 < gamma < 3/2",
+  "WebSearch: Boegli complex potentials Lieb-Thirring counterexample",
+  "WebSearch: Frank Gontier Lewin orthonormal NLS gamma > 3/2",
+  "WebSearch: Hardy-Lieb-Thirring half-line sharp constant",
+  "WebSearch (extended): Lieb-Thirring 1/2<gamma<3/2 OpenAI October 2026 reaction",
+  "WebSearch: matrix Riccati trace gradient field f(K^2-2sB+s^2) calibration",
+  "arxiv.org not fetched (network policy); every paper above is UNVERIFIED beyond search-summary level.",
+  "Local: grep of release CONTENTS.md / preprints / lean for reuse; BFS over data/items/262_lean.json uses-graph for the chain."
+ ],
+ "lean_checked_at_text_level_only": true,
+ "analyst": "downstream agent, 2026-10-12"
+}
