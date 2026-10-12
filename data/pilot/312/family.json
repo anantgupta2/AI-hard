@@ -1,0 +1,1395 @@
+{
+ "family": 312,
+ "title": "The Grothendieck homotopy hypothesis",
+ "manuscripts": [
+  {
+   "id": "312",
+   "title": "The Grothendieck homotopy hypothesis via elementary expansions",
+   "manuscript_dir": "preprints/The-Grothendieck-homotopy-hypothesis-via-elementary-expansions-September-24-2026",
+   "source_root": "preprints/The-Grothendieck-homotopy-hypothesis-via-elementary-expansions-September-24-2026/build",
+   "tex_files": [
+    "paper.tex",
+    "preamble.tex",
+    "sections/00-introduction.tex",
+    "sections/01-preliminaries.tex",
+    "sections/02-cutoffs-trees.tex",
+    "sections/03-partial-cylinders.tex",
+    "sections/04-consequences.tex",
+    "figures/tree-string.tex",
+    "figures/joint-endpoints.tex"
+   ],
+   "lines": 2008,
+   "date": "September 24, 2026",
+   "author": "OpenAI"
+  }
+ ],
+ "file_line_convention": "paths relative to <manuscript_dir>/build; Lean paths relative to lean/ (openai-math fd4aeeb)",
+ "commit": "fd4aeeb",
+ "analyst_role": "FAMILY analyst (paper + Lean, text level; Lean not built by this agent - orchestrator compiles the comparator)",
+ "base_library_L": "Mathlib d13f23b + the paper's 16-entry references.bib (Grothendieck1983 Pursuing Stacks, Maltsiniotis2007/2010, Ara2013, AraStrict2013, Henry2016, HenryLanari2023, Lanari2018, Lanari2020, Taylor2026, Berger2002, Bourke2016, Bourke2020, BarrWells1985, Quillen1967, Hovey1999). Mathlib has no Grothendieck infinity-groupoids, coherators or globular theories; the Lean dir builds them from scratch on Mathlib's category theory (pushouts, IsPushout/IsPullback, TransfiniteCompositionOfShape, small object argument, lifting properties).",
+ "main_statement": {
+  "file_line": "sections/00-introduction.tex:50-69",
+  "latex": "Fix any Grothendieck coherator C. Let X be a cellular C-infinity-groupoid, let n>=0, and let a:D_n->X be any cell. In the pushout square [D_n --s_n--> D_{n+1}; a down; X --i--> X^+] where s_n is the source inclusion, the map i:X->X^+ is a weak equivalence.",
+  "paraphrase": "Henry's pushout conjecture (Henry 2016 Conj 5.3.3): freely adjoining to a cellular weak globular infinity-groupoid a new n-cell a' parallel to an existing n-cell a together with an (n+1)-cell a -> a' (an 'elementary expansion') does not change pi_0 or any based homotopy group, even though the free algebraic construction creates many new composites and coherence cells. By Henry's reduction this yields the canonical left semi-model structure and a Quillen equivalence with spaces (the homotopy hypothesis) for every coherator in the Ara-Henry convention.",
+  "comparator": {
+   "file": "lean/ComparatorChallenges/GrothendieckElementaryExpansion.lean",
+   "json": "lean/ComparatorChallenges/GrothendieckElementaryExpansion.json",
+   "theorem": "OAI.Grothendieck.elementary_expansion (C : GlobularTheory) (hC : C.IsCoherator) (X : C.Model) (hX : X.IsCellular) (n : N) (a : disk C n --> X) (Y : C.Model) (i : X --> Y) (b : disk C (n+1) --> Y) (square : IsPushout a (J C n) i b) : WeakEquivalence hC i",
+   "solution_module": "OAI.CategoryTheory.Globular.Main",
+   "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+   ],
+   "model": "Self-contained encoding (comparator re-declares all definitions; solution Model.lean matches them verbatim up to namespace placement). GlobularSet: Cell : N -> Type, source/target with globular identities. Globe category with Face (id | face lt side). Table/Shape: iterated pushouts in presheaves on Globe (Type 0) gluing d_h to the target b-face of the last globe, b < last, b < h; Hom of Shape = presheaf maps (Theta_0 full subcategory). TheoryData: category on Shapes with base functor; GlobularTheory: base preserves the designated pushouts. AdmissiblePair: (n, arity S with height <= n+1, parallel source/target : globe n -> S). IsFreeExtension: universal property among GlobularTheories under base. CellularPresentation: N-indexed tower, stage 0 initial, each step a free extension by fillers of admissible pairs, colimit universal property. IsCoherator: such a presentation exists AND every admissible pair has a filler. Model: presheaf on C.Obj taking designated pushouts to pullbacks. disk n = yoneda(globe n); J n = yoneda(source n). Model.IsCellular: transfinite composition (well-ordered, OrderBot, SuccOrder) from an initial model whose successor steps are BoundaryAttachments (universal property of attaching a family of cells along boundaries). WeakEquivalence hC f: componentsMap bijective (Quot of Joined 0) and for all x : 0-cell, n, homotopyMap bijective, where HomotopyGroup x n = (n+1)-cells with source = target = baseCell x n (iterated chosen unit C.unit := Classical.choose of a filler of the pair (id,id)) modulo Joined (n+1). IsPushout is taken in the category C.Model (models of the theory), as in the paper."
+  },
+  "match_check": "Exact for Theorem 1.1. (i) Coherator: generators d_j -> S adjoined for parallel pairs d_{j-1} => S with dim(S) <= j matches AdmissiblePair (filler dimension n+1, arity height <= n+1); condition (2) matches IsCoherator.2; 'freeness includes globular completion' matches IsFreeExtension quantifying over GlobularTheories. (ii) Cellular = transfinite composite of boundary attachments (paper: pushouts of coproducts of I_j, including I_0). (iii) J_n = source inclusion D_n -> D_{n+1}; the square is a pushout in Mod(C). (iv) W = bijection on pi_0 and on pi_r(X,x) for r>=1 at all vertices x, with based groups at iterated units: matches Components/HomotopyGroup with the chosen unit. Group structure is not part of the statement (bijection of sets), but HomotopyGroups.lean upgrades it to MulEquiv (homotopyGroupIsoOfWeakEquivalence), so nothing is lost. (v) Universe: shapes live in Type 0, theories/models in Type v; harmless.",
+  "formalized_vs_claimed": "Formalized: Theorem 1.1 (= Henry's pushout conjecture) for all coherators in the Ara-Henry convention, arbitrary (transfinite) cellular X and arbitrary attaching cell. NOT formalized: Cor 5.1 (semi-model structure), Cor 5.2 (Quillen equivalence with spaces = the homotopy hypothesis of the title), Prop 2.4 directions (1)=>(2)=>(3), Lemmas 2.2-2.3 (division, change of boundary), Lemma 2.5 (2-out-of-3 etc. for W). The title claim therefore rests on Theorem 1.1 (Lean) + Henry 2016's reduction (Thm 5.1.2(5), Prop 5.3.6-5.3.7, Cor 5.3.12-5.3.13; an arXiv preprint) + the paper's spelled-out verification of Henry's hypotheses (unformalized).",
+  "note_for_comparator": "Not built by this agent (shared checkout). Orchestrator should run `lake build OAI.CategoryTheory.Globular.Main` and comparator GrothendieckElementaryExpansion."
+ },
+ "trust_surface": {
+  "lean": "58 files, 12,753 lines in lean/OAI/CategoryTheory/Globular; imports only Mathlib (Model.lean:1) and own files; no other OAI dirs",
+  "grep_scope": "all 58 .lean files (grep, text level)",
+  "counts": {
+   "sorry": 0,
+   "admit": 0,
+   "axiom": 0,
+   "native_decide": 0,
+   "implemented_by": 0,
+   "extern": 0,
+   "unsafe": 0,
+   "opaque (keyword)": 0,
+   "ofReduceBool/skipKernelTC": 0,
+   "partial def": 0,
+   "decide (Bool/Prop decisions, incl. `by decide` on small numerals)": 0,
+   "set_option maxHeartbeats": 0,
+   "set_option synthInstance.maxSize": 0,
+   "set_option autoImplicit true": 0,
+   "Classical.choose": 5
+  },
+  "note": "Cleanest trust surface seen so far: no decide, no heartbeat bumps, no autoImplicit. Classical.choose appears for the chosen unit (part of the statement) and chosen fillers/lifts. Only residual risks: (a) faithfulness of the self-made encoding (checked above, looks exact); (b) potential vacuity - the library never constructs an example of IsCoherator, so the comparator statement is not shown to be non-vacuous; existence is standard mathematics (Theta_0 is initial; free extensions exist) and the encoding looks satisfiable, so the risk is low but untested."
+ },
+ "labels": {
+  "A": {
+   "label": "A1",
+   "secondary": {
+    "hard_direction_form": "n/a (universal statement: every elementary expansion of every cellular model of every coherator is a weak equivalence). The corollary (homotopy hypothesis) is an equivalence of homotopy theories (A4-like), but it is not the comparator target.",
+    "explicit_rate": false
+   },
+   "evidence": {
+    "quote": "where s_n is the source inclusion, the map i:X->X^+ is a weak equivalence.",
+    "file_line": "sections/00-introduction.tex:67-68"
+   },
+   "confidence": "0.9",
+   "note": "Outer forall over C, X, n, a; innermost conclusion is a property (bijectivity on pi_0 and all pi_r)."
+  },
+  "B": {
+   "label": "B1",
+   "flags": {
+    "full_only_with_prior": true,
+    "adds_corollaries_for_other_conjectures": true,
+    "corollaries": [
+     "canonical left semi-model structure on Mod(C) (Henry 2016 Thm 5.3.5)",
+     "Grothendieck homotopy hypothesis: Quillen equivalence Mod(C) ~ Spaces (Henry 2016 Cor 5.3.13)",
+     "independence of the homotopy theory from the chosen coherator (within the convention)",
+     "removes the hypothesis of Taylor 2026 Thm 5.8 (generalized pushout conjecture) at least in the Ara-Henry setting"
+    ],
+    "posed_by": "Grothendieck 1983 (Pursuing Stacks; homotopy hypothesis), made precise by Maltsiniotis 2007/2010; the pushout conjecture is Henry 2016 Conjecture 5.3.3"
+   },
+   "evidence": {
+    "quote": "In particular, Theorem~\\ref{thm:main} resolves Henry's pushout conjecture affirmatively.",
+    "file_line": "sections/00-introduction.tex:75-76"
+   },
+   "confidence": "0.8 (B1 for Henry's conjecture; the homotopy hypothesis is B1 only together with Henry 2016's reduction, hence the flag)",
+   "note": "Scope restricted to coherators in the Ara-Henry convention (generating fillers of output dimension j have arity height <= j). Whether every coherator in Maltsiniotis' more general sense is covered is not discussed; quick searches (2026-10-12) found the general pushout conjecture still described as open in the literature (Taylor 2026 assumes it)."
+  },
+  "C": {
+   "primary": "C2",
+   "primary_evidence": {
+    "quote": "We then hold q fixed and descend in the index n of the elementary expansion.",
+    "file_line": "sections/00-introduction.tex:133-134"
+   },
+   "secondaries": [
+    "C1 (construction of the partial-cylinder path functor P with endpoint maps, Sec 4)",
+    "C5 (Cor 5.1-5.2 invoke Henry 2016's comparison without re-proof; Prop 2.4 / Lemma 2.2 adapt Ara 2013)",
+    "C3 secondary-weak (retract / 2-out-of-3 arguments rather than explicit inverses)"
+   ],
+   "computer_assisted": false,
+   "computer_assisted_evidence": {
+    "quote": "0 occurrences of decide / native_decide in 58 Lean files; no search or enumeration anywhere",
+    "file_line": "lean/OAI/CategoryTheory/Globular/*.lean"
+   },
+   "ih_strengthened": true,
+   "ih_template": "add a parameter: the coskeletal cutoff q (all constructions in A_q, top case trivial), with descending strong induction on the expansion index n at fixed q (assume E(q,j) for all n<j<=q). Nested: increasing cylinder dimension j and the free stage order of C. Lean variant (ExpansionContraction q r): conclusion WEAKENED to contractibility preservation but hypothesis class enlarged to all J_{>=r}-cofibrations (saturation; 'strengthen to all subsets/substructures' template).",
+   "ih_evidence": {
+    "quote": "For the rest of this section and the construction in the next, fix 0<=n<q and assume E(q,j) for every n<j<=q.",
+    "file_line": "sections/02-cutoffs-trees.tex:260-262"
+   },
+   "ih_note": "The induction runs DOWNWARD: higher-index expansions are used to build/contract the objects needed at index n. The top case is made trivial only by the cutoff. This direction reversal is the structural heart of the proof.",
+   "confidence": "0.75"
+  },
+  "D": {
+   "label": "D3",
+   "provisional": true,
+   "max_item": "E1 scheme = I19 (cutoff + descending induction) + I25 (index-n partial cylinders P_j) + I27 (their contractibility from higher-index cases)",
+   "evidence": {
+    "quote": "The partial paths used here are adapted to one expansion index at a time: the already established higher-index expansions make their representing objects contractible, which then permits every operation of the fixed coherator to be interpreted in its original free order.",
+    "file_line": "sections/00-introduction.tex:106-110"
+   },
+   "confidence": "0.45",
+   "caveats": [
+    "N3 is a candidate only: every component has a precedent (Lanari 2020 cylinders/path object, Metayer cylinders, Henry-Lanari coskeletal models, endomorphism-theory interpretation, small-object retract argument); the claim of novelty is the combination/bootstrapping order",
+    "quick literature checks only (WebFetch to arxiv.org failed; snippet-level searches)",
+    "result unreviewed; the headline homotopy hypothesis depends on Henry 2016's unformalized reduction"
+   ],
+   "flag_builds_on_prior_model_produced_result": false,
+   "flag_note": "No cited work appears model-produced. Taylor2026 (arXiv:2607.28540, July 2026) is recent; a companion arXiv:2607.24716 by the same author refers to it as 'our' earlier work; no sign of model authorship in snippets (not verified from full text)."
+  },
+  "E": {
+   "problem_field": {
+    "openai_subject": "Topology",
+    "msc2020": "55U35 (abstract homotopy theory / model categories), 18N65 (weak infinity-groupoids / higher categories), 55P15, 18N40 (homotopical algebra)",
+    "lean_dir": "CategoryTheory",
+    "note": "Algebraic topology problem solved entirely with higher-category / universal-algebra methods."
+   },
+   "lean_dir_field": "CategoryTheory (OAI/CategoryTheory/Globular)",
+   "method_fields": [
+    {
+     "field": "higher category theory: globular theories, coherators, models (Berger, Ara, Maltsiniotis)",
+     "tag": "essential"
+    },
+    {
+     "field": "homotopical algebra: cofibrantly generated (semi-)model structures, small object argument, lifting properties, retract argument (Quillen, Hovey)",
+     "tag": "essential"
+    },
+    {
+     "field": "universal algebra / categorical logic: finite-limit sketches, essentially algebraic theories, locally presentable categories (Barr-Wells)",
+     "tag": "essential (paper cites; Lean re-proves needed colimit/reflection facts)"
+    },
+    {
+     "field": "combinatorics of pasting schemes / trees (spines, tree diagrams)",
+     "tag": "essential (elementary)"
+    },
+    {
+     "field": "classical homotopy theory of spaces (Quillen equivalence sSet ~ Top; Henry's cylinder categories)",
+     "tag": "corollary-only (Cor 5.2)"
+    },
+    {
+     "field": "strict infinity-groupoids (Ara 2013 strict, Eilenberg-Mac Lane obstruction)",
+     "tag": "background-cited"
+    },
+    {
+     "field": "type theory / identity types (Bourke 2016)",
+     "tag": "background-cited"
+    }
+   ],
+   "cross_field_count": 1,
+   "share_invoked_from_other_fields": "~0.1: essentially all invoked results are in higher category theory/homotopical algebra (Ara 2013 Thm 4.18 + Lemma 4.12, Lanari Prop 3.8, Henry 2016 reductions, Hovey small object argument); only the corollary's comparison with Spaces reaches classical topology. Problem field (Topology) vs method field (category theory) differ, but this is the intended formulation of the problem, not a transfer."
+  }
+ },
+ "items": [
+  {
+   "id": "I01",
+   "kind": "definition (inline)",
+   "name": "globular set; parallel cells; s_i,t_i; d_j, boundary of d_j",
+   "file_line": "sections/01-preliminaries.tex:9-17",
+   "statement": "Cells in each dimension with source/target maps satisfying the globular identities; two cells are parallel if their immediate sources and targets agree; d_j is the representable j-globe; boundary of d_0 is empty.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'A \\emph{globular set} consists of'"
+   },
+   "uses_items": [],
+   "load_bearing_guess": {
+    "guess": "high (vocabulary)",
+    "why": "every statement is about globular sets"
+   },
+   "analytic_check": "occurs in the goal (GlobularSet, Parallel, Boundary in the comparator)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "textbook (Grothendieck 1983, Maltsiniotis 2010, Ara 2013)"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Model.lean:9-71 (GlobularSet, Hom, Parallel, Joined, Boundary, boundary)"
+  },
+  {
+   "id": "I02",
+   "kind": "definition (inline)",
+   "name": "globular sum shape / pasting scheme, height, tuple, Theta_0 with designated sums",
+   "file_line": "sections/01-preliminaries.tex:19-32",
+   "statement": "S = d_{h1} amalg_{d_{b1}} ... d_{hl}, b_a < h_a, h_{a+1}; height = max cell dimension; Theta_0 = shapes with globular maps; designated sums are these amalgamations.",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'goes back to Berger \\cite[Definition~1.5]{Berger2002}'"
+   },
+   "uses_items": [
+    "I01"
+   ],
+   "load_bearing_guess": {
+    "guess": "high (vocabulary)",
+    "why": "arities of all operations"
+   },
+   "analytic_check": "in goal (Table, Shape, Shape.attach/seam/inl/inr in comparator)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Berger 2002, Ara 2013, Maltsiniotis 2010"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Model.lean:160-229 (Table, Shape); comparator re-declares them"
+  },
+  {
+   "id": "I03",
+   "kind": "definition",
+   "name": "Def 2.1 coherator convention (globular theory; Grothendieck coherator in the Ara-Henry convention)",
+   "file_line": "sections/01-preliminaries.tex:34-52",
+   "statement": "A globular theory is a category under Theta_0 with the same objects preserving designated sums. A Grothendieck coherator has a tower C_0=Theta_0 -> C_1 -> ... with colimit C, stage r+1 freely adjoining fillers d_j -> S of chosen parallel pairs d_{j-1} => S with j>0 and dim(S) <= j; and every such pair has a filler.",
+   "cited_or_new": {
+    "status": "cited (convention fixed by the paper)",
+    "cue": "'This is the admissibility convention of Ara ... fixed in \\cite[Section~5.3]{Henry2016}'"
+   },
+   "uses_items": [
+    "I02"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (hypothesis)",
+    "why": "the arity bound dim(S)<=j for generators is what makes the cutoff reflector (I15) work"
+   },
+   "analytic_check": "in goal (GlobularTheory, AdmissiblePair.height, IsFreeExtension, CellularPresentation, IsCoherator)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Ara 2013 Sec 2.3, 2.9-2.11; Henry 2016 Sec 5.3; Maltsiniotis 2010"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Model.lean:231-345"
+  },
+  {
+   "id": "I04",
+   "kind": "definition (inline)",
+   "name": "models A = Mod(C); endomorphism category E_G; free functor F; D_j, boundary D_j, I_j, J_j; sets I, J",
+   "file_line": "sections/01-preliminaries.tex:65-109",
+   "statement": "Models: presheaves on C taking designated sums to limits = globular sets with interpretations of each freely adjoined operation. E_G(S,T)=Set(G(T),G(S)); interpretations are functors C_r -> E_G under Theta_0. D_j=F(d_j), I_j: boundary D_j -> D_j, J_j: D_j -> D_{j+1} source inclusion.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'To make this universal-property argument explicit'"
+   },
+   "uses_items": [
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "guess": "high (vocabulary)",
+    "why": "J_n is in the theorem; E_G is the endomorphism-theory device used for interpretations"
+   },
+   "analytic_check": "in goal (Model, freeShape, disk, J)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Maltsiniotis/Ara; endomorphism theory is standard (Ara 2013 Sec 2.9; Bourke 2016)"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Model.lean:357-392; TupleSystem.endTheory Homotopy.lean:350; Boundary.lean (I)"
+  },
+  {
+   "id": "I05",
+   "kind": "definition (inline)",
+   "name": "I-cellular extension; cellular; finitely cellular",
+   "file_line": "sections/01-preliminaries.tex:111-122",
+   "statement": "Transfinite composite of pushouts of coproducts of I_j; cellular = map from initial model is such; finitely cellular includes I_0.",
+   "cited_or_new": {
+    "status": "standard (with explicit convention note)",
+    "cue": "footnote: 'Although Definition~5.3.2 of \\cite{Henry2016} prints n>0 ...'"
+   },
+   "uses_items": [
+    "I04"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (hypothesis)",
+    "why": "theorem is for cellular X"
+   },
+   "analytic_check": "in goal (Model.CellularPresentation, BoundaryAttachment, IsCellular)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Hovey 1999 cell complexes"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Model.lean:394-420"
+  },
+  {
+   "id": "I06",
+   "kind": "definition (inline)",
+   "name": "units e, e_p^q; compositions *_i; inverses w_i; homotopy ~; pi_0, pi_r(X;u,v), pi_r(X,x)",
+   "file_line": "sections/01-preliminaries.tex:145-177, 267-274",
+   "statement": "Chosen operations from contractibility; alpha ~ beta iff one (r+1)-cell joins them; homotopy sets; based groups at iterated units.",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'the homotopy-group calculus ... used here \\cite[Section~4]{Ara2013}'"
+   },
+   "uses_items": [
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "guess": "high",
+    "why": "defines weak equivalence"
+   },
+   "analytic_check": "in goal (unit, baseCell, Loops, HomotopyGroup, Components)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Ara 2013 Sec 4; Maltsiniotis"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Model.lean:424-519; Fillers.lean (composition, inverse, compCell); Homotopy.lean:110-205 (joined_refl/symm/trans)"
+  },
+  {
+   "id": "I07",
+   "kind": "lemma",
+   "name": "Lemma 2.2 Division with specified boundaries (normalization operations U_h^k, c_h, d_h, K_gamma)",
+   "file_line": "sections/01-preliminaries.tex:189-265",
+   "statement": "Left/right multiplication by a fixed r-cell gamma at level i<r induces bijections between homotopy sets at a prescribed boundary and at the induced boundary (empty sets allowed).",
+   "cited_or_new": {
+    "status": "cited, re-proved with explicit boundary correction",
+    "cue": "'The following is the division calculus of \\cite[Lemma~4.12]{Ara2013}; we give its boundary correction explicitly.'"
+   },
+   "uses_items": [
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "guess": "paper: needed for Prop 2.4 (1)=>(2); Lean: absent",
+    "why": "Lean proves only (3)=>(1) of the weak-equivalence test and never needs division"
+   },
+   "analytic_check": "not a subterm of the goal; statement in Ara 2013",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Ara 2013 Lemma 4.12 (the paper says so)"
+   },
+   "provisional_F": null,
+   "lean": "not formalized (no division lemma in the Globular dir)"
+  },
+  {
+   "id": "I08",
+   "kind": "lemma",
+   "name": "Lemma 2.3 Change of boundary and vertex",
+   "file_line": "sections/01-preliminaries.tex:276-308",
+   "statement": "Endomorphism homotopy sets at any (r-1)-cell u biject with pi_r(X,x) for x its source/target vertex; arrows x->y give natural bijections.",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'\\cite[Theorem~4.13 and Corollaries~4.14--4.15]{Ara2013}'"
+   },
+   "uses_items": [
+    "I07"
+   ],
+   "load_bearing_guess": {
+    "guess": "paper only",
+    "why": "used in Prop 2.4 and Lemma 2.5"
+   },
+   "analytic_check": "Ara 2013",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Ara 2013 Thm 4.13"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I09",
+   "kind": "proposition",
+   "name": "Prop 2.4 Weak-equivalence test (exact-boundary criterion)",
+   "file_line": "sections/01-preliminaries.tex:318-361",
+   "statement": "f in W iff bijective on pi_0 and on all pi_r(X;u,v) iff for every boundary b and cell y of Y with boundary fb there is x with boundary exactly b and an (r+1)-cell fx -> y.",
+   "cited_or_new": {
+    "status": "cited",
+    "cue": "'The next formulation is \\cite[Theorem~4.18]{Ara2013}'"
+   },
+   "uses_items": [
+    "I06",
+    "I07",
+    "I08"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (direction (3)=>(1) only)",
+    "why": "the whole proof works with the exact-boundary test; Lean formalizes only (3)=>(1) as weakEquivalence_of_exactBoundaryTest"
+   },
+   "analytic_check": "Ara 2013 Thm 4.18",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Ara 2013 Thm 4.18"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Basic.lean:35 ExactBoundaryTest; Cutoff.lean:25 weakEquivalence_of_exactBoundaryTest"
+  },
+  {
+   "id": "I10",
+   "kind": "lemma",
+   "name": "Lemma 2.5 Closure properties of W (2-out-of-3, retracts, filtered colimits, transfinite composites)",
+   "file_line": "sections/01-preliminaries.tex:363-392",
+   "statement": "W has 2-out-of-3, retract closure, closure under filtered colimits of arrows.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "no citation"
+   },
+   "uses_items": [
+    "I08",
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "guess": "paper: used throughout; Lean: replaced",
+    "why": "Lean works with HasFillers/ExactBoundaryTest and only needs retract closure of HasFillers (Composition.lean:158) and filtered colimits of HasFillers (SmallObject.lean:139)"
+   },
+   "analytic_check": "not analytic but standard",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard model-category facts"
+   },
+   "provisional_F": null,
+   "lean": "partial: HasFillers.retract, hasFillers_of_filteredColimit"
+  },
+  {
+   "id": "I11",
+   "kind": "definition",
+   "name": "Def 2.6 contractible model (X -> 1 in W; equivalently nonempty with joining cells for all parallel pairs)",
+   "file_line": "sections/01-preliminaries.tex:394-406",
+   "statement": "X contractible iff X->1 in W iff every parallel pair has a joining cell iff X->1 lifts against all I_j.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "\\begin{definition}"
+   },
+   "uses_items": [
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "the inductive invariant (Lean IH is preservation of contractibility)"
+   },
+   "analytic_check": "not a subterm of goal; standard",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Ara 2013; Maltsiniotis 'contractible'"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Fillers.lean:44 HasFillers (all boundaries fillable)"
+  },
+  {
+   "id": "I12",
+   "kind": "lemma",
+   "name": "Lemma 2.7 Lifting tests: W with RLP(J_j) => RLP(I_j); I-inj = W cap J-inj; every model is J-fibrant",
+   "file_line": "sections/01-preliminaries.tex:411-441",
+   "statement": "Approximate lift plus lifting its homotopy against J_j corrects to a strict lift.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "no citation (Henry 2016 has the analogue)"
+   },
+   "uses_items": [
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "used to convert J-lifting of path endpoints into I-lifting"
+   },
+   "analytic_check": "standard",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Henry 2016 Sec 5.3; folklore for algebraically fibrant objects"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Composition.lean:181 liftsBoundary_of_contractible; Expansion.lean:16 boundary_rlp_of_source_rlp"
+  },
+  {
+   "id": "I13",
+   "kind": "remark/construction",
+   "name": "Unit retraction D_{j+1} -> D_j of J_j and of its pushouts / transfinite composites",
+   "file_line": "sections/01-preliminaries.tex:443-449",
+   "statement": "The unit on the source cell retracts J_j; pushouts and transfinite composites inherit compatible retractions.",
+   "cited_or_new": {
+    "status": "standard",
+    "cue": "'The existence of these retractions alone does not establish weak equivalence.'"
+   },
+   "uses_items": [
+    "I06"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "used in base case, Lemma 3.6, final retract argument"
+   },
+   "analytic_check": "near-analytic (J_n is in goal)",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Henry 2016 'elementary retraction'"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Cutoff.lean:238 elementary_pushout_retraction"
+  },
+  {
+   "id": "I14",
+   "kind": "definition (inline)",
+   "name": "q-coskeletal model; A_q",
+   "file_line": "sections/02-cutoffs-trees.tex:17-27",
+   "statement": "Every globular boundary of dimension j>q has exactly one filler.",
+   "cited_or_new": {
+    "status": "cited (context)",
+    "cue": "'Coskeletal globular models ... are studied in \\cite[Section~2]{HenryLanari2023}'"
+   },
+   "uses_items": [
+    "I01"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "the setting of the descending induction"
+   },
+   "analytic_check": "not in goal; in literature",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "standard coskeleton notion; Henry-Lanari 2023 Sec 2"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Reflection.lean:181 IsCoskeletal; Colimits.lean CutoffModels"
+  },
+  {
+   "id": "I15",
+   "kind": "lemma",
+   "name": "Lemma 3.1 Cutoff reflector R_q (built in the free order of C; bijective on cells through q; R_k R_q = R_k)",
+   "file_line": "sections/02-cutoffs-trees.tex:29-76",
+   "statement": "A_q -> A has a left adjoint R_q whose unit is bijective on cells of dimension <= q; constructed by keeping cells through q, putting a unique cell over each parallel pair above q, and interpreting generators in the original free order (generators of output <= q use the arity bound dim(S)<=j).",
+   "cited_or_new": {
+    "status": "new (construction), context cited",
+    "cue": "'We construct the reflector needed here directly, keeping the chosen free order of the coherator.'"
+   },
+   "uses_items": [
+    "I03",
+    "I14"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "turns every finite-dimensional test into a problem with a trivial top case; ~28% of the Lean DAG (reflector + plumbing); exists_cutoff_reflection dominated share 0.06"
+   },
+   "analytic_check": "not a subterm of goal; coskeletal reflection exists in L-literature (Henry-Lanari), not in Mathlib",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Coskeletal truncation/reflection of algebraic models is standard (Henry-Lanari 2023 Sec 2; general reflection onto orthogonality classes); novelty only in checking compatibility with the free order under the arity bound"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Reflection.lean:184 exists_cutoff_reflection; CutoffExistence.lean:211 exists_cutoff; Colimits.lean:284-340 chosenCutoff, cutoffFunctor, cutoffAdjunction"
+  },
+  {
+   "id": "I16",
+   "kind": "lemma",
+   "name": "Lemma 3.2 Higher attachments preserve lower cells",
+   "file_line": "sections/02-cutoffs-trees.tex:97-117",
+   "statement": "Relative cellular extensions using only I_j (or J_j) with j>k are bijective on cells through dimension k (in A and in A_q).",
+   "cited_or_new": {
+    "status": "new proof of a folklore fact",
+    "cue": "proof via reflection into A_k"
+   },
+   "uses_items": [
+    "I15"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "used for spines, base case, cylinders"
+   },
+   "analytic_check": "standard flavour",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "immediate from the reflector (a unique-filler argument)"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Expansion.lean:76 upper_cofibration_low_bijective; Colimits.lean:88 low_bijective_transfinite"
+  },
+  {
+   "id": "I17",
+   "kind": "definition+lemma",
+   "name": "Recursive description [S_1..S_p], v(S), spine T_m(S) and Lemma 3.3 Finite spine",
+   "file_line": "sections/02-cutoffs-trees.tex:121-176",
+   "statement": "T_0(S)=[v(S_1),...,v(S_p)], T_m(S)=[T_{m-1}(S_1),...]; T_m(S) has height <= m+1, contains all cells of S through dimension m, and T_m(S)->S is a finite composite of pushouts of source inclusions d_j->d_{j+1}, j>m.",
+   "cited_or_new": {
+    "status": "new (explicit), concept standard",
+    "cue": "'We use an explicit recursive description'"
+   },
+   "uses_items": [
+    "I02"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "reduces contractibility of F(S) and of whiskered shapes to low-height arities"
+   },
+   "analytic_check": "not in goal; tree recursion of pasting schemes is standard (Batanin/Berger trees)",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "Spine-style truncation of a pasting scheme; the 'source-inclusion filtration' of globular sums is folklore (Ara/Lanari use similar filtrations)"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Spines.lean:13 SpineData, :143 spine; LinearShape.lean LinearData (the Lean route uses LinearData/linearization)"
+  },
+  {
+   "id": "I18",
+   "kind": "proposition",
+   "name": "Prop 3.4 Contractibility of free shapes F(S), F_q(S)",
+   "file_line": "sections/02-cutoffs-trees.tex:182-212",
+   "statement": "For every nonempty finite globular-sum shape, F(S) and F_q(S) are contractible.",
+   "cited_or_new": {
+    "status": "cited (re-proved)",
+    "cue": "'Contractibility of free globular sums is established in \\cite[Proposition~3.8]{Lanari2020}. The spine argument below proves the statement directly'"
+   },
+   "uses_items": [
+    "I16",
+    "I17",
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "starting point for all contractibility"
+   },
+   "analytic_check": "Lanari 2020 Prop 3.8",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Lanari 2020 Prop 3.8 (paper says so); Ara-Maltsiniotis for strict case"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/SmallFree.lean:76 linearFree_hasFillers"
+  },
+  {
+   "id": "I19",
+   "kind": "definition (inline)",
+   "name": "assertion E(q,n); 'upper' index; descending induction on n at fixed cutoff q",
+   "file_line": "sections/02-cutoffs-trees.tex:214-270",
+   "statement": "E(q,n): for every cellular X in A_q and every a: D_n -> X, the pushout of J_n along a is a weak equivalence. Prove by descending induction on n with q fixed; upper J-cellular extensions are in W.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'We will prove E(q,n) by descending induction on n.'"
+   },
+   "uses_items": [
+    "I15",
+    "I13"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (proof skeleton)",
+    "why": "organizes the whole proof; Lean variant ExpansionContraction q r (contractibility preservation of J_{>=r}-cofibrations), Expansion.lean:10"
+   },
+   "analytic_check": "non-analytic: the cutoff parameter q and the reversed induction order do not occur in the goal",
+   "provisional_N": {
+    "grade": "N2 (part of the N3 scheme E1)",
+    "why": "Adding a parameter (cutoff q) is a standard IH template; the descending order is unusual but alone is a templated strengthening (capped N2); its value is realized only together with I27/I29"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Expansion.lean:10 ExpansionContraction; CutoffExpansion.lean:66 expansionContraction_all (strong induction on q-r)"
+  },
+  {
+   "id": "I20",
+   "kind": "lemma",
+   "name": "Lemma 3.5 Top-dimensional base case E(q,q)",
+   "file_line": "sections/02-cutoffs-trees.tex:234-258",
+   "statement": "At the cutoff the J_q pushout is a weak equivalence: retraction + bijection below q + unique fillers above q.",
+   "cited_or_new": {
+    "status": "new (easy)",
+    "cue": "'The top case is immediate from the retraction and the unique higher fillers.'"
+   },
+   "uses_items": [
+    "I13",
+    "I15",
+    "I16"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "base of descending induction"
+   },
+   "analytic_check": "analytic",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "immediate once the cutoff is set up"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Expansion.lean:121 expansionContraction_top"
+  },
+  {
+   "id": "I21",
+   "kind": "lemma",
+   "name": "Lemma 3.6 Upper-cell splitting and pushout",
+   "file_line": "sections/02-cutoffs-trees.tex:272-312",
+   "statement": "An upper I-cellular weak equivalence i: U -> V with U cellular admits a retraction, and its pushouts along maps to cellular U' are in W.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'A factorization argument then gives Lemma~\\ref{lem:upper-cell}'"
+   },
+   "uses_items": [
+    "I19",
+    "I12",
+    "I10",
+    "I13"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "used in every gluing step for cylinders and the joint lifting"
+   },
+   "analytic_check": "standard small-object/retract argument (Hovey 2.1.14) applied to upper indices",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "Retract argument: trivial cofibrations are retracts of J-cell complexes (standard model-category lemma); Lean version upper_boundary_is_source / upper_pushout_hasFillers with contractibility in place of W"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Expansion.lean:27 upper_boundary_is_source; :54 upper_pushout_hasFillers"
+  },
+  {
+   "id": "I22",
+   "kind": "definition (inline)",
+   "name": "tree diagram at depth n; K^lin (linear string on same vertices)",
+   "file_line": "sections/02-cutoffs-trees.tex:316-331, 342-351",
+   "statement": "Finite oriented tree in each depth-n slot (vertices n-cells with common lower boundary, edges (n+1)-cells), nested via strings; K^lin replaces each tree by a forward string.",
+   "cited_or_new": {
+    "status": "new (packaging)",
+    "cue": "'Define a \\emph{tree diagram at depth n} as follows.'"
+   },
+   "uses_items": [
+    "I17"
+   ],
+   "load_bearing_guess": {
+    "guess": "medium",
+    "why": "domain class for Prop 3.7; Lean specializes to whiskers and reverse whiskers"
+   },
+   "analytic_check": "not in goal",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "trees of cells are standard groupoid-presentation material"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Coglobular.lean:339 linearization; Tree.lean linearFree (only whisker-shaped trees are formalized)"
+  },
+  {
+   "id": "I23",
+   "kind": "proposition",
+   "name": "Prop 3.7 Contractibility of tree diagrams via J_{n+1} duplication (generator-homotopy promotion)",
+   "file_line": "sections/02-cutoffs-trees.tex:335-428",
+   "statement": "Under E(q,j) for j>n, F_q(K) is contractible for each depth-n tree diagram K: compare with the string model L via f,g; get edge homotopies alpha_e: e -> gf(e); adjoin duplicates e' with delta_e: e -> e' (J_{n+1} attachments), maps a_0,a_1: A->Q, common retraction r, h: Q->A with h a_0 = id, h a_1 = gf; 2-out-of-3 makes gf in W; gf factors through contractible L.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'To pass from these individual homotopies to a statement about all coherences, we duplicate the top generators using only expansions already covered by the induction.'"
+   },
+   "uses_items": [
+    "I18",
+    "I19",
+    "I21",
+    "I22",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "Lean free_hasFillers_of_top_homotopy (Groupoid.lean:268) + whiskerFree_bounded_hasFillers (dominated share 0.15) + cutoffFrame_whisker_hasFillers (0.27)"
+   },
+   "analytic_check": "non-analytic (not in goal); but the mechanism is the standard 'homotopic maps via a cylinder/duplicate object' trick",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Promoting generator-wise homotopies to a weak equivalence via a cylinder-like object Q with two inclusions and a common retraction is the classical left-homotopy argument; the new part is that Q uses only J_{n+1} (already covered) - a design choice serving the descending induction"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Groupoid.lean:239 lift_of_top_joined; :268 free_hasFillers_of_top_homotopy; Tree.lean:583 whiskerLinear_top, :648 whiskerFree_bounded_hasFillers"
+  },
+  {
+   "id": "I24",
+   "kind": "definition+proposition",
+   "name": "whiskered shapes H_eps(S) and Prop 3.8 Contractibility after adjoining whiskers",
+   "file_line": "sections/02-cutoffs-trees.tex:430-476",
+   "statement": "H_eps(S): adjoin to F_q(S), for each n-cell x, a duplicate x' and one (n+1)-cell joining them (orientation eps, or chosen per cell). Contractible: reduce to T_n(S) (a tree diagram) and push along the upper J-cellular map H(T_n S) -> H(S).",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'\\begin{proposition}[Contractibility after adjoining whiskers]'"
+   },
+   "uses_items": [
+    "I17",
+    "I23",
+    "I19"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "C_n(S)=H_eps(S) is the start of the cylinder gluing (Lemma 4.1)"
+   },
+   "analytic_check": "non-analytic",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "a whiskering is a standard 'mapping cylinder at one level'; the contractibility proof is I23 + I17"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/Whisker.lean:127 WhiskerCell, :172 whisker; SpineWhisker.lean:298 whiskerFree_hasFillers; ReverseWhisker.lean:364; WhiskerUniverse.lean:107 cutoffFrame_whisker_hasFillers (dominated share 0.27)"
+  },
+  {
+   "id": "I25",
+   "kind": "definition",
+   "name": "partial cylinder objects P_j (coglobular), endpoints e_0,e_1, P(S)=colim P_j, domains A_j^eps (one-sided) and A_j^{01} (two-sided)",
+   "file_line": "sections/03-partial-cylinders.tex:37-132",
+   "statement": "P_j = D_j for j<n (stationary, both endpoints identity); P_n = D_{n+1} (endpoints source/target n-faces); for n<j<=q, P_j = small-object completion of A_j^{01} against upper I_k. A map P_j -> Y is a j-cylinder: endpoints agree below n, are joined by one (n+1)-cell at n, and are made compatible above.",
+   "cited_or_new": {
+    "status": "new (adapted)",
+    "cue": "'Representing path cells by maps out of a coglobular cylinder follows the strategy of Lanari ... Here the cylinders depend on the fixed cutoff and expansion index'"
+   },
+   "uses_items": [
+    "I19",
+    "I21",
+    "I04"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (central device)",
+    "why": "the representing objects of the path functor; Lean cylinderFrame/CylinderNode (CylinderObjects.lean:59-330), fullCylinder; cylinderPathData has dominated share 0.65 of the whole Lean DAG"
+   },
+   "analytic_check": "non-analytic: neither P_j nor 'partial cylinder' occurs in goal or in Mathlib",
+   "provisional_N": {
+    "grade": "N3 (candidate, with I19/I26/I27 as scheme E1)",
+    "why": "Full cylinders/path objects are precedented (Metayer; Lafont-Metayer-Worytkiewicz; Lanari 2020 Defs 5.2-5.3, 6.1). New: stationary below n, a single cell at n, and an upper completion whose contractibility follows from higher-index cases - which removes exactly the obstacle Lanari left open"
+   },
+   "provisional_F": "F3 (auxiliary construction) + F2 (tailored to the induction index)",
+   "lean": "OAI/CategoryTheory/Globular/CylinderObjects.lean:59 CylinderNode, :270 cylinderNode, :305 cylinderFrame, :319 cylinderEndpoint; CylinderFramework.lean GlobularFrame"
+  },
+  {
+   "id": "I26",
+   "kind": "lemma",
+   "name": "Lemma 4.1 Exact skeletal gluing C_l(S) and its identities C_n(S)=H_eps(S), C_{j-1}(d_j)=A_j^eps, C_dim(S)(S)=P(S)",
+   "file_line": "sections/03-partial-cylinders.tex:141-202",
+   "statement": "C_l(S) = F(S) amalg_{F(sk_l S)} P(sk_l S) is built from C_{l-1}(S) by pushing out coproducts of A_l^eps -> P_l.",
+   "cited_or_new": {
+    "status": "new (bookkeeping)",
+    "cue": "'The following formula specifies which cylinder objects are used at each stage and keeps track of all shared faces.'"
+   },
+   "uses_items": [
+    "I25",
+    "I24"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (plumbing)",
+    "why": "the filtration that transfers contractibility"
+   },
+   "analytic_check": "analytic (colimit bookkeeping)",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "a skeletal filtration of a left Kan extension; routine"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/SkeletalPresentation.lean:66 comparison_lifting; OneSidedPresentation.lean:85; CylinderPresentations.lean:60 whiskerPresentation; CylinderGluing.lean"
+  },
+  {
+   "id": "I27",
+   "kind": "proposition",
+   "name": "Prop 4.2 Cylinder contractibility (P_j, A_j^eps, P(S) contractible; A_j^eps -> P_j upper cellular weak equivalence)",
+   "file_line": "sections/03-partial-cylinders.tex:204-253",
+   "statement": "Induction on j>n: A_j^eps from H_eps(d_j) by pushing out earlier A_l^eps -> P_l; Lemma 3.6 keeps everything in W; P_j inherits low fillers and has upper fillers by construction.",
+   "cited_or_new": {
+    "status": "new",
+    "cue": "'Contractibility of P(S) is the output needed from the geometric construction.'"
+   },
+   "uses_items": [
+    "I24",
+    "I26",
+    "I21",
+    "I18"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "the key bootstrapping step where higher-index expansions (IH) make the representing objects contractible; Lean cylinder_oneSided_contractible (CylinderContractibility.lean:95, dominated 0.033)"
+   },
+   "analytic_check": "non-analytic",
+   "provisional_N": {
+    "grade": "N3 (candidate, part of scheme E1)",
+    "why": "this is where the descending induction pays off; no precedent found that derives contractibility of path-object representing objects from higher-index pushout cases"
+   },
+   "provisional_F": "F2",
+   "lean": "OAI/CategoryTheory/Globular/CylinderContractibility.lean:71-124"
+  },
+  {
+   "id": "I28",
+   "kind": "proposition",
+   "name": "Prop 4.3 Partial path functor P: A_q -> A_q with endpoints p_0,p_1; each p_eps lifts all I_j; (p_0,p_1) lifts J_n",
+   "file_line": "sections/03-partial-cylinders.tex:255-439",
+   "statement": "(PY)_j = Hom(P_j, Y); interpret each generator theta (in the original free order) by extending the prescribed map A_j^{01} -> P(S) over P_j using contractibility of P(S); individual lifting from retractions of A_j^eps -> P_j; joint lifting via the 4-vertex tree B (y0-x0-x1-y1) and B -> A_{n+1}^{01} -> P_{n+1}.",
+   "cited_or_new": {
+    "status": "new (adapted from Lanari/Bourke)",
+    "cue": "'His construction leaves the extension to compatible interpretations of all higher operations open.' (intro:105-106)"
+   },
+   "uses_items": [
+    "I25",
+    "I27",
+    "I21",
+    "I23",
+    "I03"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "Lean: cylinderTheory / representedTheory (a theory of (operation, cylinder-map) pairs) with section of cylinderProjection; fullCylinder, reflectedCylinder, cylinderPathData (dominated 0.65)"
+   },
+   "analytic_check": "non-analytic",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "Interpreting the operations of a cellular theory on a coglobular object with fillers, in the free order, is the standard endomorphism-theory/ coglobular-object technique (Ara 2013 Sec 2.9; Bourke 2016 Thm 5.1; Lanari 2020); what is new is that its contractibility input is now available (I27)"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/CylinderTheory.lean:52 cylinderTheory; CylinderInterpretation.lean:114,166; FullCylinder.lean:31; ReflectedCylinder.lean:14,91; CylinderPathLifting.lean:101 fullCylinder_joint; CriticalJoint.lean:13 criticalJoint_retract"
+  },
+  {
+   "id": "I29",
+   "kind": "lemma (proof step)",
+   "name": "Completion of the descending induction: endpoint-section retract argument (h, u=p_1 h, u-bar = u r, v = i u-bar; iu retract of v)",
+   "file_line": "sections/03-partial-cylinders.tex:441-517",
+   "statement": "Section h of p_0 over cellular X; u=p_1h in W; joint lifting gives f: Y -> PY with p_0 f = id, p_1 f = i u r; v in W; iu is a retract of v; 2-out-of-3 gives i in W.",
+   "cited_or_new": {
+    "status": "new (standard pattern)",
+    "cue": "'a retract argument then proves that the expansion itself is a weak equivalence'"
+   },
+   "uses_items": [
+    "I28",
+    "I13",
+    "I10"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "Lean: exactBoundaryTest_of_cutoff_path (CutoffExpansion.lean:10), weakEquivalence_of_cutoff_path, expansionContraction_of_paths (RelativeLifting.lean:263), ExactBoundaryTest.of_retract_factor"
+   },
+   "analytic_check": "analytic given P",
+   "provisional_N": {
+    "grade": "N1",
+    "why": "the 'path object + retraction implies trivial cofibration' pattern is Quillen/Brown-style folklore (cf. Henry 2016's criterion)"
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/CutoffExpansion.lean:10-60; RelativeLifting.lean:263-371; Homotopy.lean:34 exactBoundaryTest_endpoint_section"
+  },
+  {
+   "id": "I30",
+   "kind": "theorem",
+   "name": "Theorem 1.1 (main): elementary expansions of cellular C-groupoids are weak equivalences",
+   "file_line": "sections/00-introduction.tex:50-69",
+   "statement": "For any Grothendieck coherator C, cellular X, n>=0, a: D_n -> X, the pushout i: X -> X^+ of s_n: D_n -> D_{n+1} along a is a weak equivalence.",
+   "cited_or_new": {
+    "status": "new (resolves Henry 2016 Conj 5.3.3)",
+    "cue": "'In particular, Theorem~\\ref{thm:main} resolves Henry's pushout conjecture affirmatively.'"
+   },
+   "uses_items": [
+    "I15",
+    "I19",
+    "I29",
+    "I09"
+   ],
+   "load_bearing_guess": {
+    "guess": "goal",
+    "why": "comparator target"
+   },
+   "analytic_check": "goal",
+   "provisional_N": {
+    "grade": "n/a (goal)",
+    "why": ""
+   },
+   "provisional_F": null,
+   "lean": "OAI/CategoryTheory/Globular/ElementaryExpansion.lean:34 OAI.Grothendieck.elementary_expansion"
+  },
+  {
+   "id": "I31",
+   "kind": "corollary",
+   "name": "Cor 5.1 canonical cofibrantly generated left semi-model structure on Mod(C)",
+   "file_line": "sections/04-consequences.tex:28-120",
+   "statement": "W, cofibrations I-cof, fibrations J-inj, trivial fibrations I-inj; cofibrant = retracts of cellular; all objects fibrant.",
+   "cited_or_new": {
+    "status": "cited reduction (Henry 2016 Thm 5.3.5), proof spelled out",
+    "cue": "'The first consequence is the canonical structure of \\cite[Theorem~5.3.5]{Henry2016}.'"
+   },
+   "uses_items": [
+    "I30",
+    "I10",
+    "I12"
+   ],
+   "load_bearing_guess": {
+    "guess": "corollary",
+    "why": "not formalized"
+   },
+   "analytic_check": "n/a",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Henry 2016 Thm 5.3.5 given Thm 1.1"
+   },
+   "provisional_F": null,
+   "lean": "not formalized (lean/docs/312.md: 'The later semi-model structure and full comparison ... are not included')"
+  },
+  {
+   "id": "I32",
+   "kind": "corollary",
+   "name": "Cor 5.2 Grothendieck homotopy hypothesis: Mod(C) Quillen equivalent to Spaces",
+   "file_line": "sections/04-consequences.tex:147-234",
+   "statement": "|-| : Mod(C) <-> Spaces : Pi_infty is a Quillen equivalence; Mod(C)[W^-1] ~ Ho(Spaces).",
+   "cited_or_new": {
+    "status": "cited reduction (Henry 2016 Thm 5.1.2(5), Prop 5.3.6-5.3.7, Cor 5.3.12-5.3.13)",
+    "cue": "'Henry's Theorem~5.1.2(5) now gives ...'"
+   },
+   "uses_items": [
+    "I30",
+    "I31",
+    "I18"
+   ],
+   "load_bearing_guess": {
+    "guess": "corollary (headline of the title)",
+    "why": "not formalized"
+   },
+   "analytic_check": "n/a",
+   "provisional_N": {
+    "grade": "N0",
+    "why": "Henry 2016 Cor 5.3.13 given Thm 1.1"
+   },
+   "provisional_F": null,
+   "lean": "not formalized"
+  },
+  {
+   "id": "I33",
+   "kind": "definition (Lean only)",
+   "name": "ExpansionContraction q r: J_{>=r}-cofibrations from cofibrant contractible objects in A_q have contractible targets",
+   "file_line": "lean/OAI/CategoryTheory/Globular/Expansion.lean:10-14",
+   "statement": "forall i: X -> Y in (sourceClass q r).rlp.llp, Cofibrant X, HasFillers X -> HasFillers Y.",
+   "cited_or_new": {
+    "status": "new (formalizer's invariant)",
+    "cue": "Lean docstring-free; replaces paper's E(q,j)"
+   },
+   "uses_items": [
+    "I19",
+    "I11"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential (Lean IH)",
+    "why": "shows that the paper's IH (weak equivalence for all cellular starts) can be weakened to contractibility preservation (closed under the saturated J_{>=r} class); the 2-out-of-3 calculus of W and the division lemma are then unnecessary for Thm 1.1"
+   },
+   "analytic_check": "non-analytic",
+   "provisional_N": {
+    "grade": "N2",
+    "why": "a weaker invariant (contractibility) closed under the saturated class; a templated 'uniform version / strengthen to all substructures' plus weakening"
+   },
+   "provisional_F": "F2 (if anything)",
+   "lean": "lean/OAI/CategoryTheory/Globular/Expansion.lean:10; CutoffExpansion.lean:66 expansionContraction_all"
+  },
+  {
+   "id": "I34",
+   "kind": "definition (Lean only)",
+   "name": "CutoffPathData q r Y and cylinderPathData",
+   "file_line": "lean/OAI/CategoryTheory/Globular/RelativeLifting.lean:232-243; ReflectedCylinder.lean:91-121",
+   "statement": "Object P with p_0,p_1: P -> Y each lifting all I_k, jointly lifting J_k for all k>=r. cylinderPathData builds it as the cutoff reflection of the full cylinder model.",
+   "cited_or_new": {
+    "status": "new (Lean packaging of I28)",
+    "cue": ""
+   },
+   "uses_items": [
+    "I28",
+    "I33"
+   ],
+   "load_bearing_guess": {
+    "guess": "essential",
+    "why": "dominated share 0.648 of the Lean proof DAG (single largest bottleneck)"
+   },
+   "analytic_check": "non-analytic",
+   "provisional_N": {
+    "grade": "N2 (Lean form of I25/I28)",
+    "why": "packaging of the partial path object"
+   },
+   "provisional_F": null,
+   "lean": "lean/OAI/CategoryTheory/Globular/ReflectedCylinder.lean:91"
+  }
+ ],
+ "invoked_external_theorems": [
+  {
+   "name": "Weak-equivalence test / homotopy-group calculus (Thm 4.18; Thm 4.13, Cor 4.14-4.15)",
+   "bib_key": "Ara2013",
+   "locator": "Thm 4.13, 4.18; Cor 4.14-4.15",
+   "field": "higher category theory",
+   "used_at": "sections/01-preliminaries.tex:312-361",
+   "status": "cited and re-proved (sketch)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Division calculus",
+   "bib_key": "Ara2013",
+   "locator": "Lemma 4.12",
+   "field": "higher category theory",
+   "used_at": "sections/01-preliminaries.tex:185-265",
+   "status": "cited, re-proved with boundary correction; not needed in Lean",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Free-adjunction/globular-completion universal properties",
+   "bib_key": "Ara2013",
+   "locator": "Sec 2.9",
+   "field": "higher category theory",
+   "used_at": "sections/01-preliminaries.tex:75-91",
+   "status": "cited",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Contractibility of free globular sums",
+   "bib_key": "Lanari2020",
+   "locator": "Prop 3.8",
+   "field": "higher category theory",
+   "used_at": "sections/02-cutoffs-trees.tex:178-212",
+   "status": "cited, re-proved by spines",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Finite-limit sketch theory: models form a locally presentable category; filtered colimits computed on cells",
+   "bib_key": "BarrWells1985",
+   "locator": "Sec 4.4, Thms 1, 2, 4",
+   "field": "categorical logic",
+   "used_at": "sections/01-preliminaries.tex:124-141",
+   "status": "cited (Lean re-derives what it needs)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Small object argument",
+   "bib_key": "Quillen1967; Hovey1999",
+   "locator": "Hovey Thm 2.1.14, Cor 2.1.15",
+   "field": "homotopical algebra",
+   "used_at": "sections/01-preliminaries.tex:134-141; sections/02-cutoffs-trees.tex:284-288; sections/03-partial-cylinders.tex:100-111",
+   "status": "cited (Lean uses Mathlib's MorphismProperty.factorizationData / small object machinery)",
+   "essential_for_headline": true
+  },
+  {
+   "name": "Elementary pushout assertion suffices for the semi-model structure and the comparison with spaces",
+   "bib_key": "Henry2016",
+   "locator": "Thm 5.3.5, Prop 5.3.6-5.3.7, Lemma 5.3.9-5.3.11, Cor 5.3.12-5.3.13, Thm 5.1.2(5), Prop 4.4.4",
+   "field": "homotopical algebra / higher category theory",
+   "used_at": "sections/04-consequences.tex:122-234",
+   "status": "cited, invoked without re-proof (C5) - corollary only",
+   "essential_for_headline": "only for the homotopy-hypothesis corollary (title), not for Thm 1.1"
+  },
+  {
+   "name": "Finitely cellular case extends to transfinite/cofibrant (Lemma 5.3.4)",
+   "bib_key": "Henry2016",
+   "locator": "Lemma 5.3.4",
+   "field": "homotopical algebra",
+   "used_at": "sections/00-introduction.tex:76-79",
+   "status": "mentioned; the paper treats arbitrary cellular objects directly",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Quillen equivalence sSet ~ Top",
+   "bib_key": "Hovey1999",
+   "locator": "Thm 3.6.7",
+   "field": "algebraic topology",
+   "used_at": "sections/00-introduction.tex:17-19",
+   "status": "background",
+   "essential_for_headline": false
+  },
+  {
+   "name": "Strict infinity-groupoids model only products of Eilenberg-Mac Lane spaces",
+   "bib_key": "AraStrict2013",
+   "locator": "Thm 5.4",
+   "field": "algebraic topology",
+   "used_at": "sections/00-introduction.tex:20-22",
+   "status": "background (motivation)",
+   "essential_for_headline": false
+  }
+ ],
+ "proof_architecture": [
+  {
+   "step": 1,
+   "claim": "Algebraic setup: coherator tower in free order, models as globular sets with operations, free models D_j, I_j, J_j, cellular objects.",
+   "items": [
+    "I01",
+    "I02",
+    "I03",
+    "I04",
+    "I05"
+   ]
+  },
+  {
+   "step": 2,
+   "claim": "Homotopy calculus and exact-boundary test: weak equivalence <=> every specified boundary lift exists up to one higher cell; closure properties; I-inj = W cap J-inj; unit retractions of J_j. (Lean: only test (3)=>(1) and contractibility tools.)",
+   "items": [
+    "I06",
+    "I07",
+    "I08",
+    "I09",
+    "I10",
+    "I11",
+    "I12",
+    "I13"
+   ]
+  },
+  {
+   "step": 3,
+   "claim": "Coskeletal cutoff R_q (interpreting generators in the original free order; uses arity bound) preserving cells through q; higher attachments preserve lower cells.",
+   "items": [
+    "I14",
+    "I15",
+    "I16"
+   ]
+  },
+  {
+   "step": 4,
+   "claim": "Spines T_m(S) reduce free shapes to height m+1 arities; free shapes contractible.",
+   "items": [
+    "I17",
+    "I18"
+   ]
+  },
+  {
+   "step": 5,
+   "claim": "Fix q; descending induction on n; top case E(q,q) by retraction + unique fillers; upper J-cellular maps are in W and upper I-cellular weak equivalences split and are stable under cellular pushout.",
+   "items": [
+    "I19",
+    "I20",
+    "I21"
+   ]
+  },
+  {
+   "step": 6,
+   "claim": "Using only higher-index expansions: tree diagrams and whiskered shapes are contractible (compare tree with string; promote edge homotopies via J_{n+1} duplication).",
+   "items": [
+    "I22",
+    "I23",
+    "I24"
+   ]
+  },
+  {
+   "step": 7,
+   "claim": "Index-n partial cylinders P_j (stationary below n, one (n+1)-cell at n, upper small-object completion above); skeletal gluing from whiskered shapes shows all P_j, A_j^eps, P(S) contractible.",
+   "items": [
+    "I25",
+    "I26",
+    "I27"
+   ]
+  },
+  {
+   "step": 8,
+   "claim": "Partial path functor P on A_q: interpret every generator in free order using contractibility of P(S); endpoints lift all I_j; jointly they lift J_n (tree B).",
+   "items": [
+    "I28"
+   ]
+  },
+  {
+   "step": 9,
+   "claim": "Endpoint section + unit retraction: iu is a retract of v=i u r in W, so i in W; this closes the descending induction at fixed q.",
+   "items": [
+    "I29"
+   ]
+  },
+  {
+   "step": 10,
+   "claim": "Remove the cutoff: each exact-boundary test in dimension k is detected in A_q for q >= max(n+1,k+1); hence Theorem 1.1.",
+   "items": [
+    "I15",
+    "I30"
+   ]
+  },
+  {
+   "step": 11,
+   "claim": "Corollaries via Henry 2016: semi-model structure and Quillen equivalence with spaces (homotopy hypothesis).",
+   "items": [
+    "I31",
+    "I32"
+   ]
+  }
+ ],
+ "lean_structure": {
+  "files": 58,
+  "lines": 12753,
+  "declarations": 1034,
+  "kind_counts": {
+   "theorem": 554,
+   "def": 381,
+   "structure": 33,
+   "abbrev": 32,
+   "instance": 31,
+   "inductive": 3
+  },
+  "proof_dag_size": 856,
+  "core_vs_implementation": "DAG (856 decls, 451 theorems) by file group: statement/model infra 11%, groupoid calculus + W-test 15%, cutoff reflector and colimit/realization plumbing 28%, small-object/lifting 5%, spines/whiskers/linear shapes 15%, cylinders + operation interpretation 25%, final assembly 1%. Mathematical core (whiskers + cylinders + small-object + assembly) ~46% of the DAG; the cutoff reflector is a re-proof of a near-standard construction (~28%).",
+  "key_items_dag": {
+   "cutoff_elementary_exactBoundaryTest (CutoffExpansion.lean:82)": "dominated_share 0.735 (everything except the outer cutoff-removal step)",
+   "cylinderPathData (ReflectedCylinder.lean:91)": "dominated_share 0.648 - the partial path object (I25/I28/I34) is the single largest bottleneck",
+   "cutoffFrame_whisker_hasFillers (WhiskerUniverse.lean:107)": "dominated_share 0.272 (whisker contractibility, I24)",
+   "whiskerFree_bounded_hasFillers (Tree.lean:648)": "dominated_share 0.153 (tree/whisker vs string comparison, I23)",
+   "exists_cutoff_reflection / exists_cutoff": "dominated_share ~0.06 each (I15)",
+   "cylinder_oneSided_contractible (CylinderContractibility.lean:95)": "dominated_share 0.033 (I27)",
+   "ExpansionContraction (Expansion.lean:10)": "frac_dag_dependents 0.09, used in 11 files (Lean IH, I33)"
+  },
+  "route_differences_from_paper": [
+   "Induction invariant: Lean proves ExpansionContraction q r ('J_{>=r}-cofibrations from cofibrant contractible objects have contractible targets') by strong induction on q-r, instead of the paper's E(q,n) ('J_n pushouts from any cellular object are weak equivalences'). Weak equivalence appears only in the final step, which uses CutoffPathData directly for an arbitrary cellular X.",
+   "No W calculus: the Lean never proves 2-out-of-3, Lemma 2.2 (division), Lemma 2.3 (change of boundary) or Prop 2.4 (1)=>(3); it uses ExactBoundaryTest, HasFillers, retract closure of HasFillers, and weakEquivalence_of_exactBoundaryTest ((3)=>(1)).",
+   "Trees: only whisker-shaped trees (uniform orientation, and ReverseWhisker) on linearized shapes are formalized (Tree.lean, SpineWhisker.lean, ReverseWhisker.lean). The J_{n+1}-duplication argument (Q, a_0, a_1, r, h) is replaced by free_hasFillers_of_top_homotopy: factor g: L -> F(S) by the J_{>=n+1} small object argument, get a contractible Z by the IH, lift generators into Z with lift_of_top_joined, so F(S) is a retract of Z.",
+   "Joint endpoint lifting: instead of the 4-vertex tree B, GlobularFrame.criticalJoint_retract (CriticalJoint.lean:13) exhibits the joint-source domain as a retract of the one-sided domain at n+1; CutoffPathData requires joint lifting of J_k for all k >= r (needed because the IH covers the whole class).",
+   "Operation interpretation: cylinderTheory = representedTheory (a globular theory of pairs (operation, cylinder map) compatible with endpoints), with a section of cylinderProjection built from the CellularPresentation (the paper's 'interpret in free order'); fullCylinder is then a model, reflected into A_q (reflectedCylinder).",
+   "Cofibrant (llp against I-injectives in A_q) is used instead of 'cellular' inside the induction; isCellular_cutoff_cofibrant converts."
+  ],
+  "extractor_caveat": "scripts/extract_lean.py v3 found 0/1 targets: declarations with explicit universe parameters (`theorem elementary_expansion.{v}`) are parsed with a trailing '.' (5 decls affected: elementary_expansion, exactBoundaryTest_at_of_low_square, homotopyGroupGroup, homotopyMapHom, homotopyGroupIsoOfWeakEquivalence). DAG figures here come from a scratch copy patched to strip the trailing '.' (one line after DECL_RE.match); data/items/312_lean.json is the unpatched official output (empty DAG). Suggest fixing DECL_RE in the extractor (exclude '.{' universe suffix)."
+ },
+ "eureka_candidates_ranked": [
+  "E1 index-n partial cylinders bootstrapped by descending induction at a coskeletal cutoff (I19+I25+I27)",
+  "E2 generator-homotopy promotion through already-covered J_{n+1} expansions (I23/I24)",
+  "E3 Lean invariant ExpansionContraction: contractibility preservation suffices (I33)",
+  "E4 cutoff reflector built in the coherator's free order (I15)",
+  "E5 spine filtration T_m(S) (I17)"
+ ],
+ "eureka_candidates": [
+  {
+   "rank": 1,
+   "item": "E1 = I19 + I25 + I27 (+ I28): cutoff q, descending induction on n, and index-n partial cylinders whose representing objects are contractible by the higher-index cases",
+   "provisional_N": "N3",
+   "provisional_F": "F3 (auxiliary objects P_j built only to drive the proof) + F2 (the reversed, cutoff-parametrized induction that makes them contractible)",
+   "for": "Henry's conjecture was open since 2016 (Lanari's full path object stalled on interpreting all higher operations; Henry-Lanari and Lanari only reached dimension 3; Taylor 2026 still assumes a generalized form). The fix is non-analytic: neither the cutoff, nor 'partial' cylinders stationary below n, nor the downward order occur in the goal or in L. Once in place, contractibility of P(S) makes the interpretation of every operation automatic, and the theorem follows by a retract argument. In Lean the partial path object (cylinderPathData) dominates 65% of the proof DAG and the whisker contractibility another 27%.",
+   "against": "All ingredients are precedented: cylinders as path objects (Metayer; Lafont-Metayer-Worytkiewicz; Lanari 2020 Defs 5.2-6.1, which the paper cites as its strategy), coskeletal truncation (Henry-Lanari 2023 Sec 2), interpretation via endomorphism theories (Ara, Bourke 2016), 'path object with lifting => trivial cofibration' (Brown/Quillen folklore, Henry 2016). The descending induction is an 'add a parameter' IH template (capped at N2 alone). Novelty lies in the combination and the induction order; the device is tailored to this conjecture, so a downstream speedup outside the pushout-lemma family (e.g. (infinity,n)-categories, other coherator conventions, Taylor's controlled theories) is the real test.",
+   "nearest_neighbour": "Lanari 2020 'Towards a globular path object for weak infinity-groupoids' (arXiv:1805.00156) - full cylinder path object, compositions/identities/inverses only; Lanari 2018/Henry-Lanari 2023 (dimension 3, bicategory of cylinders); Ara-Maltsiniotis 'Strict infinity-groupoids are Grothendieck infinity-groupoids' (Metayer cylinders); arXiv:2604.09867 'An Inductive Strategy Towards a Solution to the Generalized Homotopy Hypothesis' (upward n -> n+1 transfer, conditional).",
+   "lit_check": "WebSearch 2026-10-12: snippets for Henry's pushout lemma/conjecture, Lanari path object, Taylor 2026 and arXiv:2604.09867 show the conjecture still treated as open and no partial-cylinder / descending-cutoff argument; WebFetch of arxiv.org failed (DNS), so full texts not checked."
+  },
+  {
+   "rank": 2,
+   "item": "E2 = I23/I24: promote edge-wise homotopies alpha_e to a weak equivalence gf via a duplicate object Q built from J_{n+1} attachments (Lean: free_hasFillers_of_top_homotopy via small-object factorization)",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "This is the step that turns 'each generator is homotopic to its image' into a statement about all freely generated coherences, which is precisely the difficulty of the conjecture; it uses only already-covered indices.",
+   "against": "Standard left-homotopy/cylinder argument (two inclusions with a common retraction; 'homotopic maps induce the same map on homotopy'). The tree-vs-string comparison is groupoid folklore.",
+   "nearest_neighbour": "Classical: a map left-homotopic to an equivalence through a cylinder object is an equivalence (Quillen 1967; Hovey Ch.1); Ara 2013 Sec 4 homotopy calculus.",
+   "lit_check": "not separately searched beyond E1 queries"
+  },
+  {
+   "rank": 3,
+   "item": "E3 = I33 (Lean only): ExpansionContraction - induct on contractibility preservation of the saturated class of J_{>=r}-cofibrations",
+   "provisional_N": "N2",
+   "provisional_F": "F2",
+   "for": "Shows the paper's IH is stronger than needed; removes the whole W calculus (division lemma, 2-out-of-3) from the proof of Thm 1.1; a cleaner invariant for downstream reuse.",
+   "against": "A weakening plus saturation of a known induction statement; templated.",
+   "nearest_neighbour": "Standard reductions 'trivial cofibrations iff preserve contractibility of fibrant replacements' in model-category practice.",
+   "lit_check": "none (internal comparison paper vs Lean)"
+  },
+  {
+   "rank": 4,
+   "item": "E4 = I15 cutoff reflector R_q interpreted in the original free order (needs generator arity height <= output dimension)",
+   "provisional_N": "N2",
+   "provisional_F": null,
+   "for": "Makes the top case trivial and keeps all low cells; shows exactly where the Ara-Henry admissibility convention is used.",
+   "against": "Coskeletal reflection is standard (Henry-Lanari 2023 Sec 2; reflections onto orthogonality classes in locally presentable categories).",
+   "nearest_neighbour": "Henry-Lanari 2023 Sec 2 (n-coskeletal and n-truncated models)",
+   "lit_check": "WebSearch confirms Henry-Lanari 2023 has a section 'n-coskeletal and n-truncated models' (TAC 39(26))"
+  },
+  {
+   "rank": 5,
+   "item": "E5 = I17 spine T_m(S) and its source-inclusion filtration",
+   "provisional_N": "N1",
+   "provisional_F": null,
+   "for": "Gives a uniform reduction of shape questions to height m+1 arities used twice (free shapes, whiskers).",
+   "against": "Elementary tree recursion of pasting schemes; Lanari 2020 Prop 3.8 already proves the consequence.",
+   "nearest_neighbour": "Lanari 2020 Prop 3.8; Batanin/Berger tree combinatorics",
+   "lit_check": "none"
+  }
+ ],
+ "correctness_audit": {
+  "verdict": "Theorem 1.1 (Henry's pushout conjecture) is backed by a sorry-free, axiom-clean Lean proof with a faithful, self-contained statement (pending the orchestrator's build + comparator run). The Lean follows a related but leaner route, which independently corroborates the core idea (partial cylinders + descending cutoff induction). The title claim (homotopy hypothesis) is NOT formalized; it rests on Henry 2016's reduction plus the paper's unformalized Section 5 verification. Scope is the Ara-Henry convention of coherators. Unreviewed; no expert reaction found.",
+  "checked": [
+   "comparator definitions vs paper Def 2.1 / Sec 2.1: admissible pairs, free extension, coherator, models, cellular, J_n, W (match)",
+   "solution Model.lean contains every comparator declaration verbatim (whitespace-normalized block match: 70/80 blocks literal; the 10 Model.* homotopy definitions differ only by namespace placement, `def Model.eval` in comparator vs `namespace GlobularTheory.Model ... def eval` in solution, bodies identical)",
+   "final Lean assembly (ElementaryExpansion.lean:34-66) mirrors the paper's cutoff-removal proof (03-partial-cylinders.tex:519-538)",
+   "Lean IH and base case (Expansion.lean:121, CutoffExpansion.lean:66-83)",
+   "paper's retract argument (03:499-508): vi=iu, (iu)r=v, ri=id - checks",
+   "base case E(q,q) (02:238-258): retraction r with ri=id; for d=q the two q-cells r(y)-image and y are parallel and joined uniquely - checks",
+   "trust grep (0 sorry/axiom/decide/native_decide/maxHeartbeats)"
+  ],
+  "concerns": [
+   "Homotopy hypothesis (Cor 5.2) relies on Henry 2016 (arXiv:1609.04622, preprint) Thm 5.1.2(5), Prop 5.3.6-5.3.7, Cor 5.3.12-5.3.13 and on the paper's claim that Henry's Lemma 5.3.11 contains a typo ('trivial cofibration' should be 'acyclic fibration', 04-consequences.tex:217-220); not formalized and not independently checked here.",
+   "Convention dependence: the arity bound dim(S) <= j on generating fillers is load-bearing (cutoff reflector, 02:51-57; interpretation step, 03:305-312). Coherators in other conventions (e.g. Maltsiniotis' unrestricted ones, Taylor's algebraic coherators) are not covered; 'every Grothendieck coherator' in the abstract means 'in the Ara-Henry convention'.",
+   "Paper footnote (01:113-118) reinterprets Henry's Def 5.3.2 ('prints n>0') to include I_0; the theorem includes n=0 (adjoining an object and an arrow). Harmless for the Lean statement, but the match with Henry's conjecture as printed is up to this reading.",
+   "Paper's Prop 3.7 (02:388-412) uses W's 2-out-of-3 with r a_0 = r a_1 = id; fine, but the Lean replaces this by a different argument, so the paper's exact text for trees with arbitrary orientations (beyond whiskers / reverse whiskers) is not machine-checked.",
+   "Potential vacuity of the Lean statement is not excluded (no IsCoherator instance constructed); low risk.",
+   "Prop 4.3's interpretation step treats limit stages 'by union' (03:367-369) - the Lean handles the N-indexed tower via CellularPresentation.colimit; OK in the formalization."
+  ],
+  "consistency_checks": [
+   "lean/docs/312.md scope ('elementary-expansion theorem ... The later semi-model structure and full comparison with the homotopy theory of spaces are not included') matches the comparator",
+   "catalog_families.csv: comparators GrothendieckElementaryExpansion, lean_declarations OAI.Grothendieck.elementary_expansion, lean_dirs OAI/CategoryTheory/Globular - consistent"
+  ]
+ },
+ "extraction_friction": [
+  "9 TeX files (2,008 lines incl. preamble/bib/figures); all \\input resolved (paper.tex: preamble + 5 sections; figures/tree-string and figures/joint-endpoints are \\input inside sections).",
+  "Extractor v3 bug: `theorem foo.{v}` names get a trailing '.', so the comparator target was not found (0/1 targets, empty DAG). Patched copy used in scratch; official data/items/312_lean.json left as produced.",
+  "Many definitions are inline (globular set, pasting scheme, cellular, coskeletal, tree diagram, whiskers, partial cylinders, E(q,n)); the key device (P_j) is defined in prose, not in a definition environment.",
+  "Paper and Lean routes diverge (IH, trees vs whiskers, joint lifting), so paper-Lean joins are by role, not by name; Lean names are descriptive (no whimsical code names).",
+  "Large share of Lean is re-proved infrastructure (cutoff reflector, realization/colimit plumbing ~28%), which inflates closure shares (e.g. GlobularSet appears in 80% of DAG)."
+ ]
+}
