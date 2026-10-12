@@ -1,0 +1,650 @@
+{
+ "family": 262,
+ "title": "Sharp one-dimensional Lieb-Thirring inequalities (scalar, finite-matrix, equality cases)",
+ "analyst_role": "novelty",
+ "date": "2026-10-12",
+ "inputs": [
+  "docs/PLAN.md",
+  "docs/novelty_agent_prompt.md",
+  "data/pilot/287/novelty.json (key template)",
+  "data/pilot/262/family.json + family.md (no trace, no f1_* files)",
+  "262-S build/sections/{introduction,action-framework,matrix-field,rank-one,action-limit}.tex + references.bib",
+  "262-M build/notes/history.tex, sections/introduction.tex, sections/trace.tex:1-140",
+  "262-E sections/introduction.tex (precedent remarks)",
+  "lean/OAI/Analysis/LiebThirring/MatrixOrder.lean:1-95, RankOne.lean:595-625 (text only)"
+ ],
+ "environment_note": "arxiv.org, alphaxiv, semanticscholar, ar5iv and export.arxiv.org were all unreachable (WebFetch DNS failure; Bash proxy returned 403 on CONNECT). All precedent content below comes from WebSearch result summaries, i.e. a summarizing model's paraphrase of arxiv.org/abs, /pdf and /html pages. Every quote from Read-Schulz is UNVERIFIED and must be checked against https://arxiv.org/pdf/2609.10478v2.",
+ "base_library_L": "Mathlib d13f23b + references.bib of 262-S (23 entries, INCLUDING ReadSchulz2026 = arXiv:2609.10478v2, LaptevWeidl2000, AizenmanLieb1978, BenguriaLoss2004, HLW2000, DLL2008, Petz1994, Hiai2010, DaleckiiKrein1965, Milnor1965, Teschl2009). For 262-M/E, L also contains the model-produced ScalarCompanion (=262-S) and MLT (=262-M), plus BenguriaLoss2000 and FrankGontierLewin2025. L- (contamination control) removes ReadSchulz2026 and the model-produced companions.",
+ "precedent_checks": [
+  {
+   "work": "Read, L. and Schulz, M. R., 'The sharp one-dimensional Lieb-Thirring inequality for the sum of eigenvalues', arXiv:2609.10478 (v1 2026-09-09; v2 2026-09-14), math.SP, cross-list math.AP",
+   "cited_in_262": "S references.bib key ReadSchulz2026 (v2, 'Version 2, 14 September 2026'); S introduction.tex:106-122; M history.tex:34-38 (Prop 4, Eq. 2.1); E introduction.tex:84-85",
+   "role_in_262": "Priority/context only (gamma=1 case already covered); not invoked in any proof. S explicitly contrasts methods: 'Our proof retains the individual eigenvalue scales in a finite-interval action inequality.'",
+   "access": "WebSearch only (4 queries; arXiv abs/pdf/html and a pith.science summary surfaced as hits). WebFetch and curl to arxiv.org failed. Content below is summarizer paraphrase, unverified.",
+   "ai_assistance_declared": "none found in search summaries; affiliations reported as academic (Orsay, Copenhagen). One summary of the math.SP listing shows v1 as 'Larry Read', 9 pages; v2 lists Read and Schulz and adds a Section 2 on higher-dimensional constants. Not verified.",
+   "claims_as_reported": [
+    "L_{1,1} = 4/(3 sqrt(3) pi) (sharp; equality V = (3/4) sech^2 x, single eigenvalue -1/4)",
+    "operator-valued extension: L_{1,d} <= (2/sqrt 3) L^cl_{1,d} in every dimension (improves Corso-Ried 1.44655)"
+   ],
+   "method_as_reported": "Dual kinetic form at exponent one (sum of kinetic energies controls int rho^3, scalar constant pi^2/4 from Sz.-Nagy / Benguria-Loss). Benguria-Loss's scalar cumulative-mass argument is rewritten with an auxiliary function q (tangent-type, kappa = alpha^2, Riccati-type identity b' + b^2 = -alpha^2) and extended to orthonormal families through the cumulative mass matrix A(x) = int_{-inf}^x U U^T dy (0 <= A <= I, A' = U U^T, which may have rank > 1) and a matrix correction to the kinetic energy.",
+   "comparison": [
+    {
+     "item": "C1 regularized matrix field M_delta(B) + rank-one comparison (I05/I14)",
+     "verdict": "genuinely different object; shared architecture template only",
+     "detail": "RS's matrix variable is the cumulative mass A(x) (integrated density, K-free, endpoints 0 and I, A' = density exactly). 262's variable B is a matrix Riccati / log-derivative variable with endpoints K and -K; the density appears only through the penalized constraint M(B) = aa^T. At sigma = 1/2 (gamma = 1) the 262 field has beta = 0, f = regularized log, so M(B) = c int (log(X_s(B)+delta) - log(s^2+delta)) ds, a log-det-type field of the pencil K^2 - 2sB + s^2; it is not a function of a cumulative mass and RS has no energy scales k_i. So 262's field is NOT the gamma=1 member of RS's construction. The shared template is: a matrix path with prescribed endpoints + a calibration whose boundary difference gives the sharp constant + a completed square (Benguria-Loss lineage). That template drags C5 (calibration identity) to N2 but does not touch the field itself."
+    },
+    {
+     "item": "C2 integrated trace comparison tr(NV) >= tr(N^q) (I25, 262-M)",
+     "verdict": "close variant at gamma = 1 in RESULT (not in device)",
+     "detail": "RS already handles density matrices of any rank at exponent one (operator-valued potentials, via A(x)); M concedes its gamma=1 case is contained in RS. M's device (half-line boundary maps of -(d/dx - iB)^2 + V, log-det identity, SOS deficit) is absent from RS as far as summaries show."
+    },
+    {
+     "item": "C5 calibration identity (I15)",
+     "verdict": "close variant (template)",
+     "detail": "Both are matrix extensions of the Benguria-Loss Riccati/cumulative-mass calibration with a completed square."
+    },
+    {
+     "item": "C4 Gaussian conjugation average + Klein (I12/I13)",
+     "verdict": "absent"
+    },
+    {
+     "item": "C6 row-sign mod-2 continuation (I17)",
+     "verdict": "absent"
+    },
+    {
+     "item": "C8 dimension-free equality defect (I31)",
+     "verdict": "absent (RS identifies the gamma=1 optimizer but no stability/classification reported)"
+    }
+   ]
+  },
+  {
+   "work": "Benguria, R. D. and Loss, M., 'Connection between the Lieb-Thirring conjecture for Schrodinger operators and an isoperimetric problem for ovals on the plane', Contemp. Math. 362 (2004) 53-61; arXiv:math-ph/0402048",
+   "cited_in_262": "S BenguriaLoss2004",
+   "ai_assistance_declared": "no (2004)",
+   "content": "Cumulative mass as new variable; reduction to a Dirichlet Poincare inequality on (0,1); weight pi cot(pi s) as logarithmic derivative (per search summary). Scalar, one function.",
+   "contains_candidates": {
+    "C1": "absent (scalar Riccati calibration only)",
+    "C5": "scalar ancestor of the template"
+   }
+  },
+  {
+   "work": "Benguria, R. D. and Loss, M., 'A simple proof of a theorem of Laptev and Weidl', Math. Res. Lett. 7 (2000) 195-203",
+   "cited_in_262": "M, E (BenguriaLoss2000)",
+   "ai_assistance_declared": "no (2000)",
+   "content": "Matrix Riccati factorization and commutation proof of the sharp matrix gamma = 3/2 inequality (from domain knowledge plus M trace.tex remark; paper not fetched).",
+   "contains_candidates": {
+    "C2": "method ancestor (Riccati factorization + positive square)",
+    "C7": "method ancestor",
+    "C1": "absent"
+   }
+  },
+  {
+   "work": "Laptev, A. and Weidl, T., 'Sharp Lieb-Thirring inequalities in high dimensions', Acta Math. 184 (2000); arXiv:math-ph/9903007",
+   "cited_in_262": "S, M (LaptevWeidl2000)",
+   "ai_assistance_declared": "no",
+   "content": "Operator-valued gamma=3/2 trace identities; dimension lifting via momentum (phase-space) integration of operator-valued symbols xi^2 + V.",
+   "contains_candidates": {
+    "C1": "ingredient only: the momentum integral c int f(s^2 + Z) ds of a matrix symbol is the Laptev-Weidl/semiclassical phase-space integral; the B-shift (s - B)^2 + K^2 - B^2 that makes it affine in B is absent"
+   }
+  },
+  {
+   "work": "Schimmer, L., 'The state of the Lieb-Thirring conjecture', arXiv:2203.06051 (2022)",
+   "ai_assistance_declared": "no",
+   "content": "Lists d=1, 1/2 < gamma < 3/2 as open; best bound R <= 1.456 (FHJN 2021) for 1 <= gamma < 3/2. Confirms no pre-2026 resolution.",
+   "contains_candidates": {
+    "all": "absent"
+   }
+  },
+  {
+   "work": "Model-produced companions inside the family: 262-S (Sep 23, 2026) cited by 262-M as ScalarCompanion; 262-M cited by 262-E as MLT",
+   "ai_assistance_declared": "yes (OpenAI release)",
+   "contains_candidates": {
+    "C2": "its rank-one case is S Prop 4.1 (C1)",
+    "C8": "builds on M Thm 3.1 (C2)"
+   }
+  }
+ ],
+ "ai_prior_work_search": "WebSearch 'Lieb-Thirring conjecture one dimension ChatGPT OR GPT-5 OR OpenAI OR AI-assisted proof 2026' returned only RS (no AI disclosure in summaries), a computationalcomplexity.org blog post (Oct 2026) and a kingy.ai article about the OpenAI release itself. No model-produced Lieb-Thirring work predating 262-S was found.",
+ "candidates": [
+  {
+   "id": "C1",
+   "name": "Regularized energy-dependent matrix field M_delta(B) with primitive J and rank-one comparison",
+   "paper_items": [
+    "I05 (S matrix-field.tex:22-82, eq:X-M)",
+    "I07/I08/I09 (J, mu, directional Jensen, diagonal rule, boundary values)",
+    "I11 linearization point Y_s",
+    "I14 Prop 4.1 (S rank-one.tex:6-15)"
+   ],
+   "trace": "no trace for 262",
+   "statement": "For K = diag(k_i) > 0, delta > 0, f(0)=0, f'(y) = (y_+ + delta)^{sigma-3/2}: M(B) = c lim_R int_{-R}^{R} (f(K^2 - 2sB + s^2) - f(s^2) I) ds on Sym_N. It is a trace gradient (dJ = -tr(M dB)), equals (K^2-B^2+delta)^sigma - delta^sigma on commuting data, and M(B) = aa^T implies a^T(K^2-B^2)a >= |a|^{2q}.",
+   "lean_backed": true,
+   "lean_decls": [
+    "OAI.SharpLiebThirring.matrixX",
+    "truncatedField",
+    "matrixField",
+    "fieldPrimitive",
+    "scalarMu (MatrixOrder.lean:17-55)",
+    "RankOneClaim (MatrixOrder.lean:58-64)",
+    "MatrixProof.source_rankone_comparison (RankOne.lean:601)",
+    "MatrixProof.rankOneClaim"
+   ],
+   "interpretation": "The s-integral is a phase-space (momentum) integral: X_s(B) = (s-B)^2 + (K^2-B^2) is the Fourier symbol of the constant-coefficient operator -(d/dx - iB)^2 + K^2 - B^2 (262-M trace.tex makes this explicit with nabla = d/dx - iB). Up to regularization, M(B) is the diagonal kernel of (H_B+delta)^beta/beta minus its free counterpart, i.e. a local Weyl density of a constant non-abelian 'magnetic' operator, with B the matrix Riccati variable acting as a gauge shift. In the commuting case the shift integrates out (eq:shift), giving the scalar calibration (k^2-b^2)^sigma; in the noncommuting case the shift is what makes the field affine in B and hence a gradient.",
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Read-Schulz arXiv:2609.10478 (Sep 2026, human; in L)",
+      "relation": "matrix extension of Benguria-Loss calibration via cumulative mass matrix at gamma = 1",
+      "verdict": "genuinely different object (shared path+calibration template); not the sigma=1/2 member"
+     },
+     {
+      "ref": "Benguria-Loss 2004 (cumulative mass), Benguria-Loss 2000 (matrix Riccati commutation)",
+      "relation": "scalar/matrix Riccati calibrations",
+      "verdict": "template ancestor; different object"
+     },
+     {
+      "ref": "Scalar specialization: Keller 1961 one-state problem; Bogomolny-type first integral a' = -ba with b^2 = k^2 - a^{2/sigma}",
+      "relation": "N = 1 case of the field is the classical first integral of the soliton ODE",
+      "verdict": "equivalent in the scalar case only (so the scalar field is N0/N1)"
+     },
+     {
+      "ref": "Laptev-Weidl 2000 lifting; Lieb-Thirring semiclassical phase-space integral; Aizenman-Lieb 1978 spectral-parameter integration",
+      "relation": "momentum integrals c int f(s^2+Z) ds of (operator-valued) symbols; the identity c int f'(s^2+z) ds = sigma (z+delta)^{sigma-1} is the standard L^cl computation",
+      "verdict": "ingredient; the B-shifted symbol and its use as a gradient field are absent"
+     },
+     {
+      "ref": "Trace-function differentiation d tr F(A)[H] = tr(f(A)H); Hellmann-Feynman (density/current as derivative w.r.t. potential/vector potential)",
+      "relation": "why an affine-in-B family gives a gradient",
+      "verdict": "textbook ingredient"
+     },
+     {
+      "ref": "Noncommutative field theory / spectral-action heat-kernel traces of gauge fields (search hits arXiv:1111.2871, hep-th/0011095)",
+      "relation": "traces of functions of operators built from matrix gauge fields",
+      "verdict": "genuinely different (no comparison principle, no calibration use)"
+     }
+    ],
+    "verdict": "pass (no near-equivalent found for the matrix field as an object); scalar specialization and every ingredient are classical",
+    "searches": "WebSearch (standard/extended) 2026-10-12: Read-Schulz method (4 queries); 'matrix field integral f(K^2-2sB+s^2) trace gradient noncommuting'; 'semiclassical phase space integral matrix-valued symbol (xi-A)^2+V non-abelian constant vector potential Lieb-Thirring'; LT 1D conjecture status 2026; AI-assisted LT work. arXiv full text, zbMATH, MathOverflow and Google Scholar could not be queried (network policy). Absence claims rest on WebSearch summaries plus domain knowledge."
+   },
+   "test2": {
+    "verdict": "pass (borderline)",
+    "evidence": "The field occurs nowhere in the goal (comparator MainClaim / S Thm 1.1) or in the action inequality (ActionClaim). In L, the commuting/scalar value (k^2-b^2)^sigma is analytic (Keller first integral), and the unshifted momentum integral int f(s^2 + Z) ds of a matrix symbol is in L via Laptev-Weidl. The noncommutative extension that is simultaneously a gradient, exact on commuting data and rank-one-comparable is not equivalent to any of these: naive (K^2-B^2)^sigma is not a gradient. The step that is not in L is the identity-driven choice k^2 - 2sb + s^2 = (s-b)^2 + k^2 - b^2 (gauge shift) as the lift. Syntactically tiny, which is irrelevant."
+   },
+   "test3": {
+    "verdict": "pass (knockout)",
+    "lean": "Field + rank-one block = 301 of 435 core declarations (69%); dominated share of source_rankone_comparison 0.13, finite_action_upper_test 0.79. Whole-DAG share of matrixField 0.05 (diluted by the 36% PL-parity block, which is Lean-only plumbing). Removing the field removes the primitive J, the path ODE eps B' = M(B) - aa^T and the boundary values; no alternative route exists in the paper or Lean.",
+    "note": "M and E reuse it (M: N = M_delta + delta^sigma, I27), but those are the same family/problem, so this is not device reuse across problems."
+   },
+   "test4": {
+    "status": "not run",
+    "pivot_distance": "n/a (no trace)",
+    "chain_depth": "n/a",
+    "protocol": "P-C1"
+   },
+   "final": {
+    "N": "N3",
+    "F": "F1",
+    "F_secondary": "F3",
+    "confidence": 0.4,
+    "justification": "Read-Schulz does not contain it: RS's matrix object is the cumulative mass A(x) (K-free, endpoints 0 and I), whereas 262's field lives on the Riccati variable B with energy scales K, and its sigma=1/2 member is a log-type pencil integral, not a function of A. No neighbour found for the noncommutative field in the searches listed. The grade is borderline N2 because every ingredient is in L (scalar calibration, LT phase-space integral, trace-gradient calculus, Benguria-Loss calibration template). An expert may see M_delta as 'just' the local Weyl density of -(d/dx - iB)^2 + K^2 - B^2, a known kind of object with a gauge shift, and so a close variant of Laptev-Weidl phase-space lifting. The rank-one comparison (I14) is proved with N2 gadgets (C4) and counts here only jointly with the field. Lean-backed: eligible for the Lean shortlist. Not a confirmed eureka step: no downstream speedup test yet."
+   }
+  },
+  {
+   "id": "C2",
+   "name": "Integrated trace comparison tr(NV) >= tr(N^q) with exact SOS deficit (262-M Thm 3.1)",
+   "paper_items": [
+    "I25 (M trace.tex:24-46)",
+    "I26 half-line boundary maps S, T (M trace.tex Lemma 3.2)",
+    "I27 N = M_delta + delta^sigma"
+   ],
+   "trace": "no trace",
+   "statement": "B, V Hermitian with (sI-B)^2 + V >= bI for all s; R(t) = pi^{-1} int ((sI-B)^2+V+t)^{-1} ds; N = c_sigma int t^beta (t^{-1/2} - R(t)) dt. If N >= 0 then tr(NV) >= tr(N^q), with deficit c_sigma int t^beta (tr(R Z^2) + q ||R^{-1/2} - R^{1/2}(t+N^{1/sigma})^{1/2}||^2) dt.",
+   "lean_backed": false,
+   "lean_decls": [],
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "262-S Prop 4.1 (model-produced, in L of M)",
+      "relation": "rank-one special case N = aa^T",
+      "verdict": "special case of C2 (C2 is its full-rank strengthening)"
+     },
+     {
+      "ref": "Read-Schulz 2609.10478 operator-valued gamma=1",
+      "relation": "same RESULT at gamma=1 for densities of any rank (M concedes this)",
+      "verdict": "close variant (result level, one exponent)"
+     },
+     {
+      "ref": "Benguria-Loss 2000 matrix Riccati commutation; Laptev-Weidl 2000 trace identities",
+      "relation": "Riccati factorization + log-det/trace identity + positive square for sharp matrix LT at gamma=3/2",
+      "verdict": "method template"
+     },
+     {
+      "ref": "Clark-Gesztesy matrix Weyl-Titchmarsh trace formulas (math/9905070, math/9905143, math/0102040); Rybkin trace inequalities",
+      "relation": "diagonal Green's function = (m_+ + m_-)^{-1}, log-det trace formulas",
+      "verdict": "ingredients (transfer, same field)"
+     }
+    ],
+    "verdict": "no equivalent statement found; close variants at result level (RS gamma=1) and statement level (its own rank-one case)",
+    "searches": "WebSearch 'matrix trace inequality tr(N^q) integrated resolvent (s-B)^2+V Weyl m-function half-line log determinant'; family.md searches (Clark-Gesztesy). No hit for the inequality."
+   },
+   "test2": {
+    "verdict": "fail (statement) / pass (proof device)",
+    "evidence": "Relative to L for 262-M (which contains ScalarCompanion), the statement is the rank-free version of S's rank-one comparison (tr(NV) with N = aa^T is a^T V a; tr(N^q) = |a|^{2q}); it is the first conjecture anyone holding S would write. The proof device (boundary maps S, T of -(d/dx - iB)^2 + V with (S+T)/2 = R^{-1}, log-det balance, SOS) is a Benguria-Loss/Weyl-Titchmarsh transfer."
+   },
+   "test3": {
+    "verdict": "pass",
+    "lean": "not formalized",
+    "evidence": "It is the only new analytic step of M (replaces S's rank-one comparison) and its deficit drives E's equality classification (I31)."
+   },
+   "test4": {
+    "status": "not run",
+    "protocol": "P-C2 (informal, LLM-judge + pen-and-paper)"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.55,
+    "justification": "Templated strengthening (rank-one -> any rank) of a statement already in M's L, proved with a Benguria-Loss commutation method plus Weyl-Titchmarsh boundary maps; its gamma=1 content is in Read-Schulz. The exact SOS deficit is a genuine and useful refinement but is design within a known method. Downgraded from the provisional N3. If the orchestrator prefers to judge against a human-only L (excluding S), C2 merges into the C1 cluster and does not add a separate N3. Not Lean-backed: would be informal-list only if ever regraded N3."
+   }
+  },
+  {
+   "id": "C3",
+   "name": "Potential-free finite-interval action inequality keeping individual scales k_i (S Thm 2.1)",
+   "paper_items": [
+    "I02",
+    "I03",
+    "I04 triangularity"
+   ],
+   "statement": "sup over lower-triangular C of E_K(Cu) >= sum_i int_{-k_i}^{k_i} (k_i^2 - s^2)^sigma ds.",
+   "lean_backed": "partial",
+   "lean_decls": [
+    "ActionClaim (MatrixOrder.lean:84, stated but unproved)",
+    "finite_action_upper_test (IntervalAction.lean:154, proved for classical amplitudes; dominated share 0.79)"
+   ],
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Lieb-Thirring duality (spectral <-> kinetic inequality, e.g. Schulz 2022 duality cited by RS)",
+      "verdict": "close variant (template)"
+     },
+     {
+      "ref": "Eden-Foias / DLL 2008 orthonormal-function methods",
+      "verdict": "template"
+     }
+    ],
+    "verdict": "close variant (strengthened dual form)"
+   },
+   "test2": {
+    "verdict": "fail (borderline)",
+    "evidence": "A Legendre-dual reformulation of the goal that carries an extra tracked quantity (each scale k_i) and restricts to triangular coefficient matrices (standard min-max flag)."
+   },
+   "test3": {
+    "verdict": "pass",
+    "lean": "finite_action_upper_test dominated share 0.79"
+   },
+   "test4": {
+    "status": "not run",
+    "protocol": "none (capped)"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "Templated strengthening of the target ('carry an extra tracked quantity'), capped at N2 by the PLAN rule. Its difficulty is entirely in C1 + C6."
+   }
+  },
+  {
+   "id": "C4",
+   "name": "Integrated tangent map as an even Gamma-Gaussian average of conjugations e^{itB} . e^{-itB}, combined with Klein's trace inequality",
+   "paper_items": [
+    "I10 resolvent tangent inequality",
+    "I12 (S Lemma 4.3)",
+    "I13 (S Lemma 4.4)"
+   ],
+   "statement": "P(Z)_{ij} = P_{ij} Z_{ij} with P_{ij} the characteristic function of an even probability measure at z_i - z_j, so P(Z) = int e^{itB} Z e^{-itB} dnu(t); and tr(M(B) D) >= tr(M(B) P(D)).",
+   "lean_backed": true,
+   "lean_decls": [
+    "inside MatrixProof namespace of RankOne.lean (rank-one core block)"
+   ],
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Bochner + positive-definite Schur multipliers as mixed-unitary averages (Harris-Levene-Paulsen-Plosker-Rahaman, arXiv:1807.06491)",
+      "verdict": "close variant"
+     },
+     {
+      "ref": "Daleckii-Krein / Hiai divided differences; Petz 1994 Klein inequality",
+      "verdict": "equivalent ingredients"
+     }
+    ],
+    "verdict": "close variant"
+   },
+   "test2": {
+    "verdict": "pass (weak)",
+    "evidence": "Not a subterm of the goal; but each piece is a statement in L."
+   },
+   "test3": {
+    "verdict": "pass (inside C1)"
+   },
+   "test4": {
+    "status": "not run",
+    "protocol": "negative control in P-C1"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.65,
+    "justification": "A neat combination of textbook matrix-analysis facts (Bochner representation of a positive-definite kernel, Klein's inequality applied to unitary conjugates commuting with (sI-B)^2). Gadget of C1, not separately a eureka candidate."
+   }
+  },
+  {
+   "id": "C5",
+   "name": "Calibration identity along the penalized path and the compact penalty limit",
+   "paper_items": [
+    "I15 (S action-limit.tex eq:action-identity)",
+    "I18 compact penalty"
+   ],
+   "statement": "(J(B) + a^T B a)' = 2 a'^T B a - eps^{-1} ||M(B) - aa^T||^2 along eps B' = M(B) - aa^T; then 2a'^T B a <= |a'|^2 + a^T B^2 a.",
+   "lean_backed": true,
+   "lean_decls": [
+    "ActionPenalty.lean, ActionBounds.lean (matrix_compact_penalty dominated share 0.13)"
+   ],
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Benguria-Loss 2000/2004 Riccati calibrations; Read-Schulz 2026 matrix cumulative-mass calibration",
+      "verdict": "close variant (template)"
+     }
+    ],
+    "verdict": "close variant"
+   },
+   "test2": {
+    "verdict": "fail",
+    "evidence": "Completed-square/Riccati calibration is the standard template once a field with a primitive is given."
+   },
+   "test3": {
+    "verdict": "pass"
+   },
+   "test4": {
+    "status": "not run"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "Matrix Benguria-Loss/Read-Schulz-type calibration; novel content inherited from C1."
+   }
+  },
+  {
+   "id": "C6",
+   "name": "Connecting path K -> -K with lower-triangular C by mod-2 continuation modulo row signs",
+   "paper_items": [
+    "I16 mod-2 continuation (Milnor)",
+    "I17 terminal matching modulo row signs",
+    "I23 Lean-only PL mod-2 degree"
+   ],
+   "statement": "For every eps there are lower-triangular C and a C^1 path B with eps B' = M(B) - (Cu)(Cu)^T, B(x_-) = K, B(x_+) = -K; existence by parity of the boundary of the quotient zero set, with one transverse orbit at theta = 0 and zero rows excluded.",
+   "lean_backed": true,
+   "lean_decls": [
+    "equivariant_continuation (dominated 0.36)",
+    "source_connecting_path (dominated 0.43)",
+    "PLParity/CubeFlags/FiniteParity blocks (36% of DAG)"
+   ],
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Degree-theoretic shooting for two-point BVPs (Leray-Schauder / mod-2 degree, Milnor 1965)",
+      "verdict": "close variant (template)"
+     },
+     {
+      "ref": "Free Z_2^N-equivariant degree arguments",
+      "verdict": "ingredient"
+     }
+    ],
+    "verdict": "close variant"
+   },
+   "test2": {
+    "verdict": "fail (template)",
+    "evidence": "Standard shooting/continuation template applied to a new ODE."
+   },
+   "test3": {
+    "verdict": "pass (essential, large Lean share)"
+   },
+   "test4": {
+    "status": "not run"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.7,
+    "justification": "Degree-theoretic shooting with an equivariance quotient; no neighbour specific to LT, but the template is standard. The Lean PL replacement is N0 background."
+   }
+  },
+  {
+   "id": "C7",
+   "name": "Half-line boundary maps S, T for -(d/dx - iB)^2 + V + t (Riccati identities, (S+T)/2 = R^{-1}, log-det balance)",
+   "paper_items": [
+    "I26 (M trace.tex Lemma 3.2 ff.)"
+   ],
+   "lean_backed": false,
+   "lean_decls": [],
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Matrix Weyl-Titchmarsh theory: diagonal Green's function = (m_+ + m_-)^{-1}; Clark-Gesztesy trace formulas",
+      "verdict": "equivalent (specialized to constant coefficients with a non-abelian first-order term)"
+     }
+    ],
+    "verdict": "equivalent up to specialization"
+   },
+   "test2": {
+    "verdict": "fail"
+   },
+   "test3": {
+    "verdict": "pass (inside C2)"
+   },
+   "test4": {
+    "status": "not run"
+   },
+   "final": {
+    "N": "N1",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Known-route transfer of matrix Weyl-Titchmarsh theory to a constant-coefficient operator; family.md's N2 is lowered to N1 (specialization)."
+   }
+  },
+  {
+   "id": "C8",
+   "name": "Dimension-free quantitative defect Phi_K and m-column compactness for the equality classification (262-E)",
+   "paper_items": [
+    "I31",
+    "I32",
+    "I33/I34 constant channel spaces and matrix Riccati rigidity"
+   ],
+   "lean_backed": false,
+   "lean_decls": [],
+   "test1": {
+    "neighbours": [
+     {
+      "ref": "Stability/defect templates for sharp functional inequalities (Bianchi-Egnell style); Frank-Gontier-Lewin 2025 multisoliton optimizers at gamma = 3/2",
+      "verdict": "close variant (template)"
+     }
+    ],
+    "verdict": "close variant"
+   },
+   "test2": {
+    "verdict": "fail (template)"
+   },
+   "test3": {
+    "verdict": "pass (for E)"
+   },
+   "test4": {
+    "status": "not run"
+   },
+   "final": {
+    "N": "N2",
+    "F": null,
+    "confidence": 0.6,
+    "justification": "Stability-defect template fed by C2's exact deficit; rigidity via sech^2/tanh Riccati solutions is N0-N1."
+   }
+  }
+ ],
+ "excluded_from_candidates": [
+  {
+   "paper": "I19-I22 spectral passage (KLMN, min-max exhaustion, signed corollary, sech^2 sharpness)",
+   "reason": "N0-N1 background"
+  },
+  {
+   "paper": "I23 PL mod-2 degree (Lean only)",
+   "reason": "N0 re-proof of Milnor; folded into C6"
+  },
+  {
+   "paper": "I28 realification, I29 trace Young",
+   "reason": "N0"
+  },
+  {
+   "paper": "I08/I09 scalar facts (mu, Jensen, diagonal rule, sign equivariance)",
+   "reason": "N1 once the field is given; folded into C1"
+  }
+ ],
+ "family_D": {
+  "label": "D3 (provisional)",
+  "confidence": 0.4,
+  "rests_on": "C1 alone (the regularized matrix field M_delta with its rank-one comparison; Lean-backed). C2 was downgraded to N2.",
+  "falls_to": "D2 if (i) the full Read-Schulz text turns out to contain a K-dependent or energy-dependent matrix field whose sigma = 1/2 member matches M_delta (summaries say no); (ii) an expert identifies M_delta as a known local Weyl density / phase-space lift used as a calibration field (e.g. in matrix LT, Pauli or non-abelian gauge settings); or (iii) Test 4 shows the field is proposed at high pass@k once the action-inequality framework is given.",
+  "not_transfer": "Ingredients (LT phase-space integral, trace-gradient calculus, Benguria-Loss calibration, Klein, Bochner) are N0. The candidate is their coupling into one gradient field with a rank-one comparison, so the cross-field-transfer exclusion does not apply.",
+  "correctness_caveat": "S is fully formalized with a clean text-level trust surface; the Lean is trusted as published (no lake/comparator run here, per the 2026-10-12 policy). M and E are unformalized and unrefereed.",
+  "compression_note": "The field buys a uniform-in-sigma proof where only gamma = 1/2, 1, 3/2 were known (each by a different method). Whether it shortens OTHER theorems (e.g. sharp LT-type bounds for vector NLS ground states, or Read-Schulz's gamma = 1 result as a re-proof) is the downstream question."
+ },
+ "provenance_flag": {
+  "applies": "partial",
+  "builds_on_prior_model_result_strict": "S: false; M and E: true (M builds on S = ScalarCompanion, E builds on M = MLT)",
+  "model_produced_precedent": false,
+  "explanation": "The closest external precedent, Read-Schulz arXiv:2609.10478 (v1 Sep 9, v2 Sep 14, 2026), shows no AI-assistance disclosure in any search summary (academic affiliations; unverified because arxiv.org was unreachable). It is cited by S (v2) so it was in the model's context, but it contains a different matrix object. No model-produced Lieb-Thirring work before 262-S was found. The C1 item (in S) is therefore unaffected; the flag is set only because M and E build on model-produced companions.",
+  "contamination_dates": "RS v1 2026-09-09; S 2026-09-23; M, E 2026-10-05; release 2026-10-06"
+ },
+ "bridge_novelty": [
+  {
+   "import": "Semiclassical phase-space integral / Laptev-Weidl momentum lifting -> calibration field construction (C1)",
+   "classification": "intra-field repurposing (new use, known object type)",
+   "confidence": 0.5,
+   "evidence": "Same field (LT theory). The momentum integral is in L; using a B-shifted symbol to make a gradient field is new as far as searched."
+  },
+  {
+   "import": "Matrix analysis (Stieltjes/resolvent representation, Daleckii-Krein divided differences, Klein, Bochner Gaussian mixtures) -> rank-one comparison (C4)",
+   "classification": "known route",
+   "confidence": 0.75,
+   "evidence": "Matrix trace inequalities are routine in operator-valued LT (DLL 2008, Laptev-Weidl, HLW 2000); Schur multipliers as mixed-unitary averages are known (arXiv:1807.06491)."
+  },
+  {
+   "import": "Differential topology (mod-2 degree, Milnor) -> path existence in an LT proof (C6)",
+   "classification": "known route in ODE/BVP shooting; first use in LT as far as searched",
+   "confidence": 0.5,
+   "evidence": "No LT paper using degree-theoretic continuation found; shooting by degree is standard in nonlinear BVPs."
+  },
+  {
+   "import": "Matrix Weyl-Titchmarsh m-functions and log-det trace formulas -> matrix trace inequality (C2, C7)",
+   "classification": "known route",
+   "confidence": 0.75,
+   "evidence": "Benguria-Loss 2000 commutation and Laptev-Weidl trace identities already use Riccati factorizations for sharp matrix LT; Clark-Gesztesy trace formulas."
+  },
+  {
+   "import": "Integrable systems (sech^2 solitons, Riccati rigidity) -> optimizer classification (C8)",
+   "classification": "known route",
+   "confidence": 0.85,
+   "evidence": "Keller 1961; Lieb-Thirring 1976; Frank-Gontier-Lewin 2025 multisolitons at gamma = 3/2."
+  },
+  {
+   "import": "Probability (Gamma-Gaussian mixtures, characteristic functions) -> positivity of Schur multipliers (C4)",
+   "classification": "known route",
+   "confidence": 0.8,
+   "evidence": "Bochner's theorem; standard."
+  }
+ ],
+ "discoverability_protocols": {
+  "common": {
+   "models": "Training-data cutoff strictly before 2026-09-09 (Read-Schulz arXiv:2609.10478v1). Exclude any model whose data or retrieval could contain 2609.10478 (v1/v2), the three 262 manuscripts (Sep 23 and Oct 5, 2026), the openai/math release (Oct 6, 2026) or press coverage of it. Canary probes: ask for the sharp L_{1,1} constant and its status, the title/content of arXiv:2609.10478, and whether the 1D Lieb-Thirring conjecture on (1/2,3/2) is resolved; exclude any model that answers from knowledge. Exclude the OpenAI model lineage that produced 262 from the main pool (uncontrolled upper-reference arm only). No browsing or tools. Judge model differs from proposer.",
+   "context_L_minus": "Mathlib d13f23b digest (Matrix, cfc / continuous functional calculus, IsHermitian, intervalIntegral, PosSemidef) + 262-S bibliography minus ReadSchulz2026 (22 entries as abstracts plus invoked statements).",
+   "arms": {
+    "L-": "main, contamination-controlled",
+    "L": "adds Read-Schulz 2609.10478 to measure whether the human gamma=1 precedent raises hit rates",
+    "open": "problem statement only (sharp 1D LT on (1/2,3/2))",
+    "directed": "gives Theorem 2.1 (action inequality), the scalar calibration m(b) = (k^2-b^2)^sigma, and the required framework: find M: Sym_N -> Sym_N and J with dJ = -tr(M dB), M = (K^2-B^2)^sigma on commuting data (up to regularization), and the rank-one comparison"
+   },
+   "sampling": "n = 256 samples per arm, temperature 1.0, fixed reasoning budget (e.g. 32k tokens); unbiased pass@k for k in {1,2,4,8,16,32,64,128,256}.",
+   "judging": "Two independent LLM judges with S's precedent remarks (introduction.tex:106-122) and this file's neighbour list; a human analyst checks all hits and 10% of misses. Where a proposal is a concrete Lean term, check it against the RankOneClaim spec (MatrixOrder.lean:58-64) and the gradient property in Lean.",
+   "controls": "Positive: Cook-Reckhow ER extension variables for PHP. Negative: C4 (Gaussian conjugation average), C5 (calibration identity), naive (K^2-B^2)_+^sigma (should be rejected by judges as not a gradient)."
+  },
+  "P-C1": {
+   "item": "C1 regularized matrix field + rank-one comparison",
+   "lean_backed": true,
+   "hide": "I05, I07-I09, I11-I14 and everything downstream that names the field: I15, I17 (path ODE), I18, the action-limit proof, Lean MatrixOrder.lean field defs, FieldPrimitive, BoundaryValues, RankOne, FieldFlow, ConnectingPath, ActionPenalty. Keep: Thm 2.1 statement, triangularity (I04), spectral passage (I19-I22).",
+   "prompt_template": "Problem: prove sup_{C lower triangular} E_K(Cu) >= sum_i int_{-k_i}^{k_i}(k_i^2-s^2)^sigma ds for orthonormal u in H^1_0(I;R^N), 0<sigma<1. [directed arm: In the scalar case the calibration b with a^2 = (k^2-b^2)^sigma closes the argument by a completed square. Construct a matrix analogue.] Propose the single most useful new definition or lemma, stated precisely, with a proof sketch.",
+   "equivalence_criterion": "HIT: a field on Sym_N that (a) is a trace gradient, (b) reduces to (K^2-B^2)^sigma (or a regularization) on commuting data, and (c) is the momentum/phase-space integral of a scalar function of the pencil K^2 - 2sB + s^2 (or (s-B)^2 + K^2 - B^2), up to normalization, regularization, or the equivalent Weyl-density form for -(d/dx - iB)^2 + K^2 - B^2. ALT-HIT (recorded separately): any other field satisfying (a), (b) and the rank-one comparison, verified by proof. PARTIAL (not counted): the pencil lift without the rank-one comparison, or naive (K^2-B^2)^sigma.",
+   "k": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32,
+    64,
+    128,
+    256
+   ],
+   "excluded_sources": [
+    "arXiv:2609.10478 (v1, v2)",
+    "262-S, 262-M, 262-E manuscripts",
+    "openai/math release (2026-10-06) and coverage",
+    "lean/OAI/Analysis/LiebThirring"
+   ]
+  },
+  "P-C2": {
+   "item": "C2 integrated trace comparison (informal list only if regraded N3; currently N2)",
+   "lean_backed": false,
+   "hide": "M Section 3 (Thm 3.1, Lemma 3.2, deficit formula) and E appendix-trace.",
+   "context": "L- plus 262-S (ScalarCompanion) including its rank-one comparison.",
+   "prompt_template": "Given S's field and rank-one comparison, extend it to densities of arbitrary rank: prove tr(NV) >= tr(N^q) for N = c_sigma int t^beta (t^{-1/2} - pi^{-1} int ((s-B)^2+V+t)^{-1} ds) dt >= 0.",
+   "equivalence_criterion": "A correct proof (pen-and-paper check by a human analyst) via any route; separately record whether the boundary-map/log-det route is found.",
+   "k": [
+    1,
+    4,
+    16,
+    64
+   ],
+   "note": "Informal protocol; never counts as a confirmed eureka step."
+  }
+ },
+ "lean_routing": {
+  "lean_shortlist": [
+   "C1"
+  ],
+  "informal_list": [],
+  "note": "C2 (provisional N3 in family.md) is regraded N2, so it does not enter data/eureka_informal.json. If an expert or Test 4 reverses that, it goes to the informal list (no Lean)."
+ },
+ "open_questions": [
+  "Read the full Read-Schulz text (arXiv:2609.10478v2; network policy blocked arxiv.org here) and confirm: (a) the matrix variable is only the cumulative mass A(x); (b) the 'matrix correction to the kinetic energy' is not an energy-dependent pencil field; (c) no AI disclosure. Spot-check every RS quote in this file.",
+  "Expert query (e.g. Frank, Laptev, Weidl, Schimmer, Read): is the momentum integral of f((xi - B)^2 + K^2 - B^2), i.e. the local Weyl density of a constant non-abelian gauge shift, known as a calibration or gradient field anywhere (matrix LT, Pauli operators, non-abelian Lieb-Thirring, Yang-Mills)? This is the main risk to C1's N3.",
+  "Does M_delta at sigma = 1/2 (log pencil) reproduce Read-Schulz's gamma=1 argument after a change of variables (B <-> cumulative mass)? If yes, C1 drops to N2 as a one-parameter generalization.",
+  "Downstream: can the field (not the theorem) shorten other sharp inequalities, e.g. vector NLS ground states with distinct masses, Read-Schulz's operator-valued gamma=1 bound, or the 1/2 and 3/2 endpoints? Route to docs/downstream_agent_prompt.md.",
+  "C2: is tr(NV) >= tr(N^q) a known inequality in another guise (e.g. a Lieb-Thirring/Legendre inequality for constant-coefficient operators with matrix gauge fields)? zbMATH/MathOverflow were not queryable."
+ ],
+ "sources": [
+  "https://arxiv.org/abs/2609.10478 (via WebSearch summary only)",
+  "https://arxiv.org/html/2609.10478 (via WebSearch summary only)",
+  "https://arxiv.org/pdf/2609.10478 (via WebSearch summary only)",
+  "https://pith.science/paper/2609.10478 (search hit; summary only)",
+  "https://arxiv.org/list/math.SP/recent (search hit; listing summary)",
+  "https://arxiv.org/pdf/math-ph/0402048 (Benguria-Loss 2004)",
+  "https://loss.math.gatech.edu/papertalks/Blind.pdf",
+  "https://arxiv.org/pdf/math-ph/9903007 (Laptev-Weidl 2000)",
+  "https://arxiv.org/pdf/2203.06051 (Schimmer survey)",
+  "https://arxiv.org/pdf/1807.06491 (Schur multipliers and mixed unitary maps)",
+  "https://arxiv.org/pdf/math/0102040 (Clark-Gesztesy)",
+  "https://www.ams.org/journals/tran/2002-354-09/S0002-9947-02-03025-8",
+  "https://web.ma.utexas.edu/mp_arc-bin/mpa?yn=03-435 (Rybkin)",
+  "https://arxiv.org/pdf/0903.0561 (Frank, magnetic LT remarks)",
+  "https://arxiv.org/pdf/1111.2871 ; https://arxiv.org/pdf/hep-th/0011095 (noncommutative field theory traces; negative neighbours)",
+  "https://blog.computationalcomplexity.org/2026/10/conjecture-that-i-thought-would-not-be.html (search hit)",
+  "https://kingy.ai/blog/openai-math-722-manuscripts-results-proofs-compute-costs/ (search hit)"
+ ]
+}
