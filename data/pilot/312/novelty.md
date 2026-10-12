@@ -2,6 +2,20 @@
 
 **Date:** 2026-10-12. **JSON:** `novelty.json` (287/003 keys).
 
+## Full-text re-check (2026-10-12)
+arXiv became reachable through curl (abstract pages plus PDFs, converted with `pdftotext`). Each entry is in `novelty.json` → `verified_checks`.
+- **Lanari 2018, arXiv:1809.07923** (only v1 exists). Read: §1, Thm 3.1, all of §4, Lemma 5.4, §5.3, §5.6, the opening of §6, and Thm 6.10. The "(slightly less than) a path object" is a functorial path object, ev: P ⇒ Id × Id, on models of **C^W**, which is a coherator for n-*categories* with free left and right inverses (Thm 4.4, Rem 4.11). It is built from Lanari's **full** cylinders Cyl(D_k). The weakening is in the ambient theory, not in dimension. The dim-3 case climbs the coherator tower, and its top step is free by truncation (Lemma 6.1: "extending along i3 is automatic"). **There are no index-partial cylinders, no contractibility taken from higher cases, and no descending induction.** It supplies ingredients only, and it supports the template cap on C3.
+- **Taylor, *A Tale of Two Paths*, arXiv:2609.20860.** Read in full (24 pp.). It re-presents Lanari's full cylinder as a colimit of pushouts along F_n(S^n) → F_n(D^{n+1}), built in ascending n. Thm 3.11 gives an isomorphism with Lanari's E. **It has no contractibility, no interpretation of operations, no pushout lemma and no cutoff.** It is a close variant of the bare object only (C2, already N2). **AI disclosure: none.** The paper thanks the author's husband and Simon Henry, and mentions using "Python script" with the algebraic coherator.
+- **Lanari 2020, 1805.00156** (introduction), **Henry–Lanari 1905.05625** (introduction and §2) and **Henry 1609.04622** (§4.2 and §5.3) confirm the ingredient-only reading. These cover full cylinders, coskeletal models (Henry–Lanari: the pushout lemma is "a very plausible conjecture"), and relative path objects taken over a base.
+- **Taylor 2607.28540, the one 2026 citation in 312.** No AI disclosure; its revision is credited to referee reports. Taylor is also confirmed as the author of 2604.09867 and 2510.22326.
+- **Verdict:** none of these papers has partial cylinders in 312's sense, only the ingredients.
+  - **C1 stays an N3 candidate**, with confidence raised from 0.35 to 0.45. It does not go higher because Test 4 is not run, there is no expert verdict, and the IH-strengthening reading is still open.
+  - **family_D stays D3 (provisional)**, with confidence raised from 0.35 to 0.45.
+  - Provenance: **no**.
+  - The `precedent_check` in `downstream.json` is updated.
+
+*The rest of this file is the original pass. Where it says "unread" or "snippet level" about 1809.07923 or 2609.20860, the section above supersedes it.*
+
 **Inputs:**
 - `family.json` and `family.md`. No trace was released and there is no `f1_*` file.
 - Paper: the introduction and §3.1 of `03-partial-cylinders.tex`, plus `references.bib`.
@@ -23,7 +37,7 @@
 ## Final grades
 | id | Item | N | F | conf | Lean-backed |
 |---|---|---|---|---|---|
-| **C1** | **Scheme E1: index-n partial cylinders bootstrapped by descending induction at a fixed coskeletal cutoff (I19+I25+I27→I28)** | **N3 (candidate)** | **F3+F2** | **0.35** | **yes** |
+| **C1** | **Scheme E1: index-n partial cylinders bootstrapped by descending induction at a fixed coskeletal cutoff (I19+I25+I27→I28)** | **N3 (candidate)** | **F3+F2** | **0.45** (was 0.35; full-text re-check) | **yes** |
 | C2 | Partial cylinder objects P_j alone (I25) | N2 | – | 0.6 | yes |
 | C3 | Descending induction at cutoff q (I19 / `expansionContraction_all`) | N2 (template cap) | – | 0.7 | yes |
 | C4 | Cylinder contractibility from higher indices, alone (I27) | N2 (merged into C1) | – | 0.5 | yes |
@@ -60,7 +74,7 @@
 - **Shape.** C1 resembles Cook's device: cheap objects, P_j trivial below n, that open an obstruction stated since 2016/2018. No reuse outside its own theorem is known yet.
 
 ## family_D
-- **D3, provisional, confidence 0.35.** It rests on C1 alone.
+- **D3, provisional, confidence 0.45** (was 0.35; downgrade route (a) checked and not triggered on 2026-10-12). It rests on C1 alone.
 - **It falls to D2 if any of the following holds:**
   - the full text of Lanari 2018, Taylor 2609.20860, Henry 2016 §4 or Henry–Lanari 2023 already has a path object that is partial in the working dimension, with fillers drawn from higher dimensions;
   - Test 4 shows easy rediscovery once Lanari's obstruction is stated;
