@@ -1,6 +1,6 @@
 # A/B buckets v2 and a high-confidence labelling plan
 
-Status: pilot done (2026-10-14; 50 families, κ 0.88–0.98, see `pilot/report.md`); rules below added for the full run. Nothing here changes `docs/PLAN.md` or the argument doc yet.
+Status: full run done (2026-10-14). 372 families × 2 independent passes (κ: matrix 0.89, prefix 0.80, problem 0.88, outcome 0.89), 141 adjudicated. Final labels `labels_v2.json`, report `report.md`. Pilot: `pilot/report.md`. Nothing here changes `docs/PLAN.md` or the argument doc yet.
 
 ## Why v1 is not enough
 
@@ -125,6 +125,13 @@ B1 ≈ O1, B2 ≈ O2/O3, B3 ≈ O5/O6/O7, B4 ≈ O8), so the cheap pass stays co
 19. **Constants are not prefix objects.** An unspecified absolute constant in a bound (∃C, ∃c > 0) belongs to the bound, not the prefix: "∃C ∀n: f(n) ≤ C g(n)" has prefix ∀. Truncated Lean in the input is not evidence for `same`: read the challenge file or say `unknown` in notes.
 20. **Record or question.** Use P2 only when a source explicitly asks the question ("can one beat 2^{n/2}?", "is Ω(n log n) necessary?"); answering it is O1 or O2 by its wording. Without such an explicit question, beating a known exponent, ratio or running time is P4: O7 if it only improves the record, O1 if it determines the optimal value.
 21. **Precedence of problem kinds.** A named conjecture (P1) beats a problem-list entry (P3), which beats an open question (P2). For an already-refuted conjecture whose least counterexample dimension is being lowered, the posed object is that dimension (P4): O7 if lowered, O1 with M9 if determined.
+
+### Conventions the adjudicators converged on (record of practice, 2026-10-14)
+
+- **M12 vs M9 vs M1:** M12 for limits of laws or random systems (scaling limits, convergence in law, universality, statistical-mechanics free energies, weak convergence/equidistribution). Deterministic asymptotic formulas and sharp thresholds stay M9; pointwise a.e. convergence stays M1.
+- **Rule 18 scope:** algebraic complexity, sample/query/memory complexity and competitive or approximation ratios are M10. Combinatorial measures that are not resources (average sensitivity, star height, psd rank) and ω (a tensor-rank exponent) stay M8.
+- **Inner existentials** that are part of a defined property ("contains an AP", "has height ≤ k", "is NP-hard") stay in the matrix; the existence of the object the headline promises ("every J admits a compatible form") is a prefix ∃ with M2. This line was not applied perfectly consistently (e.g. 159, 351 vs 342); expect a few prefix disagreements here.
+- **Known caveats:** 309 (Kervaire at p = 3, O1) and 016 (abelian Zilber–Pink over Q̄, O5) were decided partly from the adjudicator's background knowledge of prior results, not from the input text.
 
 ## High-confidence labelling protocol
 

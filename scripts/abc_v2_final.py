@@ -60,7 +60,7 @@ for fid in sorted(cat):
     c = cat[fid]
     pre = norm_prefix(r.get("A_prefix"))
     final.append({
-        "fid": fid, "title": c["title"], "subject": c["subject"], "lean": bool(c["lean_dirs"]),
+        "fid": fid, "title": c["title"], "subject": c["subject"], "lean": bool(c["lean_dirs"] or c["comparators"]),
         "claim_formal": r.get("claim_formal"), "A_prefix": pre,
         "A_outer": "none" if pre == "none" else pre[0],
         "alternations": 0 if pre == "none" else sum(1 for i in range(1, len(pre)) if (pre[i] in "∀ℙ") != (pre[i - 1] in "∀ℙ") and pre[i] in "∀∃ℙ"),
