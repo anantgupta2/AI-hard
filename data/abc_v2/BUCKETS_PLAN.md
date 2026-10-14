@@ -121,6 +121,7 @@ B1 ≈ O1, B2 ≈ O2/O3, B3 ≈ O5/O6/O7, B4 ≈ O8), so the cheap pass stays co
 15. **Physics predictions.** A prediction from the physics literature that the paper treats as the target (e.g. a conjectured exponent or formula) is P1.
 16. **Which claim is the headline.** The headline is the claim OpenAI's summary leads with. If the paper itself says that claim was already known, the headline is the paper's main new theorem and the outcome is judged for that theorem (usually O8); note the summary's claim.
 17. **Several formulations posed side by side.** If a conjecture is posed jointly in several models or forms and the family settles one of them, that is O5 (rule 6) unless the source singles that form out as the main one.
+18. **Resource bounds in complexity.** Upper or lower bounds on a computational resource (time, space, circuit size or depth, query or communication complexity, approximation ratio achievable in polynomial time) are M10, even when stated as a rate. M8 is for bounds on mathematical quantities.
 
 ## High-confidence labelling protocol
 
