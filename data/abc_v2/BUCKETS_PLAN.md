@@ -59,6 +59,7 @@ So 342 is `∀∃`, 161 is `∃`, 054 is `∀ᵍ` with a negated matrix, 103 is 
 | M9 | exact value / sharp bound with attainment / threshold / asymptotic formula | the critical dimension is 7; the sharp constant is 4/(3√3 π) |
 | M10 | computational status (complexity class, hardness, (un)decidability, algorithm existence) | NP-hard to approximate beyond…; H10 over ℚ is undecidable |
 | M11 | metamathematical (independence, consistency, provability) | the Partition Principle does not imply Choice |
+| M12 | limit law: scaling limit, convergence in law, universality, limiting formula (added at adjudication, rule 13) | uniform random triangle removal leaves ≈ n^{3/2}/(2√2) edges |
 
 Precedence: M10 and M11 override M4 (hardness and independence are impossibility statements of a special kind);
 M9 overrides M8 when the bound is shown attained; M3 overrides M2 when the object refutes a stated conjecture.
@@ -113,6 +114,11 @@ B1 ≈ O1, B2 ≈ O2/O3, B3 ≈ O5/O6/O7, B4 ≈ O8), so the cheap pass stays co
 8. **Problem lists.** P3 only for an explicit numbered list or database (Hilbert, Erdős, Kourovka, OPG). A question that a survey merely repeats stays P2.
 9. **Earlier proofs.** If the paper says the headline was already proved by others, the outcome is O9 (new proof), whatever the problem type.
 10. **Lean coverage.** A new field `lean_vs_headline` ∈ {`same`, `weaker` (special case, one direction or one half), `different` (a secondary or intermediate result), `no_lean`}.
+11. **Operator bounds.** "T is bounded on X" (∃C hidden inside "bounded") → M1, prefix over the main objects only. Use M8 only when the rate, exponent or uniform constant is itself the content (δ^{-ε} losses, explicit growth).
+12. **Completing the remaining cases.** If the family finishes the last open cases of a conjecture whose other cases were already proved, so that the conjecture is now settled in full → O1 with `full_only_with_prior_results`. O5 only if the posed general problem is still open after the family.
+13. **Limit theorems (added at adjudication).** A headline that identifies a limit — scaling limit, convergence in law or distribution, universality of local statistics, a limiting free energy or formula as n → ∞ — gets the new matrix code **M12 limit law**. M12 overrides M7 and M9 for such claims.
+14. **Counterexample prefix.** A counterexample's prefix is the quantifiers over the witness (usually `∃`); the universal quantifiers inside the property it violates stay in the matrix (so `∃`, not `∃∀`).
+15. **Physics predictions.** A prediction from the physics literature that the paper treats as the target (e.g. a conjectured exponent or formula) is P1.
 
 ## High-confidence labelling protocol
 
