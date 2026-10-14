@@ -1,0 +1,107 @@
+FAMILY 118: Bin packing and unbounded configuration-LP gaps
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Disproves the modified integer round-up conjecture of Scheithauer and Terno: the integral bin-packing optimum can exceed its configuration linear-programming value by an arbitrarily large additive constant. Approximating the optimum within any fixed additive constant is also NP-hard, even when every item exceeds 1/6 and each bin holds at most five items.
+
+=== MANUSCRIPT: Additive hardness and unbounded configuration gaps in bin packing (September-24-2026) [preprints/Additive-hardness-and-unbounded-configuration-gaps-in-bin-packing-September-24-2026/build/source/main.tex]
+ABSTRACT: We disprove the Modified Integer Round-Up Conjecture for bin packing by constructing instances with arbitrarily large additive gaps between the configuration-LP value and the integral optimum. We also prove that, for every fixed nonnegative integer c, distinguishing instances that fit in B bins from those requiring more than $`B+c`$ bins is NP-hard. Both results hold with rational item sizes greater than 1/6, so each bin contains at most five items.
+INTRODUCTION (start): \label{sec:introduction} An instance of bin packing is an explicitly listed collection of rational item sizes in $(0,1]$, encoded in binary. A bin may contain any subcollection of total size at most one. Write $\OPT(I)$ for the minimum number of bins needed to pack an instance $I$, and $a_i$ for the size of its $i$th item copy. We consider deterministic algorithms whose running time is polynomial in the length of this explicit encoding. The additive approximation question asks whether one algorithm and one absolute constant $C$ can guarantee at most $\OPT(I)+C$ bins for every instance $I$. Williamson and Shmoys included this constant-additive question among the open problems in their 2011 book on approximation algorithms~\cite[Chapter~17, Problem~3]{WilliamsonShmoys2011}. The configuration linear program assigns nonnegative weights to feasible bin patterns and minimizes their total weight subject to covering the item demands. Its cutting-stock antecedents include Eisemann's formulation and Gilmore and Gomory's column-generation method~\cite[p.~849]{GilmoreGomory1961}. We use the ordinary formulation in numerical size types. We will also prove the same gap for the stronger formulation whose patterns are subsets of the individual item copies. \subsection{Configuration relaxations and integer rounding} \begin{definition}[Configuration relaxations]\label{def:configuration-lp} For the ordinary type formulation, let $\mathcal S$ be the set of distinct numerical sizes and let $n_\sigma$ be the multiplicity of $\sigma\in\mathcal S$. Its configurations are all integer vectors \[ \mathcal C=\left\{(c_\sigma)_{\sigma\in\mathcal S} \in\Z_{\ge0}^{\mathcal S}: \sum_{\sigma\in\mathcal S}\sigma c_\sigma\le1\right\}. \] The Gilmore--Gomory relaxation is \begin{equation}\label{eq:type-configuration-lp} \LP= \min\left\{\sum_{\mathbf c\in\mathcal C}z_{\mathbf c}: z_{\mathbf c}\ge0,\quad \sum_{\mathbf c\in\mathcal C}c_\sigma z_{\mathbf c} \ge n_\sigma\quad(\sigma\in\mathcal S)\right\}. \end{equation} In particular, type configurations may repeat a size; their multiplicities are limited by capacity, rather than by the input multiplicities. Give the input items distinct physical indices in a set $\mathcal I$, with size $a_i$ at index $i$, even when some sizes coincide. An individual-copy configuration is a subset $H\subseteq\mathcal I$ with $\sum_{i\in H}a_i\le1$. Writing $\mathcal H$ for all such subsets, define \begin{equation}\label{eq:individual-configuration-lp} \OPT_{\mathrm{LP,ind}}= \min\left\{\sum_{H\in\mathcal H}y_H: y_H\ge0,\quad \sum_{H\ni i}y_H\ge1\quad(i\in\mathcal I)\right\}. \end{equation} \end{definition} Both programs are lower bounds on $\OPT(I)$. The distinction between patterns that may repeat a size beyond its input multiplicity and patterns limited by available copies is relevant to integer-rounding questions; see Kartak, Ripatti, Scheithauer, and Kurz~\cite{KartakRipattiScheithauerKurz2015}. Here $\LP(I)$ always denotes the unrestricted numerical-type formulation in Equation~\eqref{eq:type-configuration-lp}. We prove its value and the individual-copy value separately for our instances. The integer round-up property asks whether the integral optimum equals the fractional optimum rounded up. Marcotte studied this property for cutting stock and exhibited an instance for which it fails~\cite{Marcotte1985,Marcotte1986}. Scheithauer and Terno investigated the modified bound~\cite{ScheithauerTerno1995,ScheithauerTerno1997} \begin{equation}\label{eq:mirup} \OPT(I)\le \lceil\LP(I)\rceil+1, \end{equation} now known as the \emph{Modified Integer Round-Up Conjecture}. The algorithmic question and this structural question require separate arguments: Equation~\eqref{eq:mirup} concerns the existence of a packing, whereas an approximation algorithm must construct one efficiently. \subsection{Results} Our first result is an unconditional family of gaps for both configuration relaxations. [statement] Taking $c=1$ contradicts Equation~\eqref{eq […]
+[theorem] [Unbounded configuration gap]\label{thm:unbounded-gap} For every integer $c\ge0$, there is a finite rational bin-packing instance $I$ and an integer $B$ such that every item size exceeds $1/6$ and \begin{equation}\label{eq:main-gap} \LP(I)=B, \qquad \OPT(I)>B+c. \end{equation} The equality for the fractional optimum also holds for the configuration LP whose patterns are subsets of the individual item copies.
+[theorem] [Constant-additive hardness]\label{thm:additive-hardness} For every fixed integer $c\ge0$, it is NP-hard to distinguish pairs $(I,B)$ such that $I$ packs into $B$ bins from pairs such that $I$ cannot be packed into $B+c$ bins. Here $B$ is an integer supplied with the instance, the item sizes are rational, and every item size is strictly greater than $1/6$.
+[corollary] \label{cor:complexity-equiv} A deterministic polynomial-time algorithm that always uses at most $\OPT(I)+C$ bins for some absolute constant $C$ exists if and only if $\classP=\classNP$.
+
+=== LEAN COMPARATOR BinPackingGap (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+namespace BinPackingGames.Foundations.Complexity
+def encodeWord (n : Nat) : List Bool := List.replicate n true ++ [false]
+end BinPackingGames.Foundations.Complexity
+namespace BinPackingGames.Foundations.Complexity.MachineFiniteAlphabet
+open Turing
+def FiniteAlphabet (M : FinTM2) : Prop := ∀ k, Finite (M.Γ k)
+end BinPackingGames.Foundations.Complexity.MachineFiniteAlphabet
+namespace BinPackingGames.Foundations.Complexity.CookLevin
+def pairBits (input : List Bool × List Bool) : List Bool :=
+  encodeWord input.1.length ++ input.1 ++ input.2
+structure NPVerifier where
+  witnessBound : Polynomial Nat
+  verify : (List Bool × List Bool) → Bool
+  computation : Turing.TM2ComputableInPolyTime pairBits (fun bit => [bit]) verify
+  finiteAlphabet : (k : computation.tm.K) → Fintype (computation.tm.Γ k)
+def NPVerifier.Accepts (verifier : NPVerifier) (input : List Bool) : Prop :=
+  ∃ witness : List Bool,
+    witness.length ≤ verifier.witnessBound.eval input.length ∧
+    verifier.verify (input, witness) = true
+def InNP (language : List Bool → Prop) : Prop :=
+  ∃ verifier : NPVerifier, ∀ input, language input ↔ verifier.Accepts input
+end BinPackingGames.Foundations.Complexity.CookLevin
+namespace BinPackingCompleteness.BinaryEncoding
+def bitsValue : List Bool → Nat
+  | [] => 0
+  | b :: bits => Nat.bit b (bitsValue bits)
+def frame : List Bool → List Bool
+  | [] => [false]
+  | b :: bits => true :: b :: frame bits
+def parseFrame : List Bool → Option (List Bool × List Bool)
+  | false :: rest => some ([], rest)
+  | true :: b :: rest => do
+      let (bits, trailing) ← parseFrame rest
+      return (b :: bits, trailing)
+  | _ => none
+def nameBits (name : Nat) : List Bool := frame name.bits
+def parseName (input : List Bool) : Option (Nat × List Bool) := do
+  let (digits, rest) ← parseFrame input
+  let name := bitsValue digits
+  if digits = name.bits then some (name, rest) else none
+end BinPackingCompleteness.BinaryEncoding
+namespace BinPackingGap
+open scoped BigOperators
+structure Instance where
+  n : ℕ
+  size : Fin n → ℚ
+  size_pos : ∀ i, 0 < size i
+  size_le_one : ∀ i, size i ≤ 1
+namespace Instance
+abbrev Item (I : Instance) := Fin I.n
+end Instance
+structure Packing (I : Instance) (b : ℕ) where
+  assignment : I.Item → Fin b
+  capacity : ∀ j, (∑ i, if assignment i = j then I.size i else 0) ≤ 1
+def HasPacking (I : Instance) (b : ℕ) : Prop := Nonempty (Packing I b)
+def singletonPacking (I : Instance) : Packing I I.n where
+  assignment i := i
+  capacity j := by
+    have hsum : (∑ i, if i = j then I.size i else 0) = I.size j := by
+      calc
+        (∑ i, if i = j then I.size i else 0) =
+            (if j = j then I.size j else 0) :=
+          Finset.sum_eq_single j (fun i _ hij => ite_eq_right hij)
+            (fun h => False.elim (h (Finset.mem_univ _)))
+        _ = I.size j := ite_eq_left rfl
+    rw [hsum]
+    exact I.size_le_one j
+theorem exists_packing (I : Instance) : ∃ b, HasPacking I b :=
+  ⟨I.n, ⟨singletonPacking I⟩⟩
+noncomputable def opt (I : Instance) : ℕ := by
+  classical
+  exact Nat.find (exists_packing I)
+def IndividualConfiguration (I : Instance) :=
+  {H : Finset I.Item // ∑ i ∈ H, I.size i ≤ 1}
+noncomputable instance (I : Instance) : Fintype (IndividualConfiguration I) :=
+  inferInstanceAs (Fintype {H : Finset I.Item // ∑ i ∈ H, I.size i ≤ 1})
+def NumericalSize (I : Instance) := ↥(Finset.univ.image I.size)
+instance (I : Instance) : Fintype (NumericalSize I) :=
+  inferInstanceAs (Fintype ↥(Finset.univ.image I.size))
+namespace NumericalSize
+variable {I : Instance}
+theorem positive (s : NumericalSize I) : 0 < s.val := by
+  obtain ⟨i, _, hi⟩ := Finset.mem_image.mp s.property
+  rw [← hi]
+  exact I.size_pos i
+def multiplicity (s : NumericalSize I) : ℕ :=
+  (Finset.univ.filter fun i : I.Item => I.size i = s.val).card
+def capacityBound (s : NumericalSize I) : ℕ :=
+  Classical.choose (exists_nat_gt (1 / s.val))
+theorem capacityBound_spec (s : NumericalSize I) : 1 / s.val < (s.capacityBound : ℚ) :=
+  
+[…]

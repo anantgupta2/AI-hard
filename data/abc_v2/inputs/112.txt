@@ -1,0 +1,109 @@
+FAMILY 112: Beyond the square-root exponent for depth-three circuits
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Constructs a single language in deterministic polynomial time whose n-bit membership function requires $`2^{\omega(\sqrt n)}`$ total gates in unbounded-fan-in OR–AND–OR circuits, at every sufficiently large input length. This crosses the square-root-exponent threshold for explicit depth-three Boolean circuit lower bounds.
+
+=== MANUSCRIPT: Beyond the Square-Root Exponent for Depth-Three Boolean Circuits (September-23-2026) [preprints/Beyond-the-Square-Root-Exponent-for-Depth-Three-Boolean-Circuits-September-23-2026/build/latex/main.tex]
+ABSTRACT: We construct a language in deterministic polynomial time whose n-bit membership function requires $`2^{\omega(\sqrt n)}`$ gates in an unbounded-fan-in OR–AND–OR circuit. The bound holds at every sufficiently large input length and counts all gates, including the bottom layer.
+INTRODUCTION (start): \label{sec:introduction} We study depth-three Boolean OR--AND--OR circuits with arbitrary fan-in and fan-out. Such a circuit is a disjunction of CNFs: conjunctions of clauses, each a disjunction of literals. Classical lower bounds for explicit functions have an exponent proportional to the square root of the input length. We ask whether one polynomial-time language can require more than \(2^{A\sqrt n}\) gates for every constant \(A>0\), at every sufficiently large length. The word ``one'' matters: the language and its membership algorithm must be fixed before \(A\) is chosen. Throughout the paper, \(S_3(f)\) denotes the minimum \emph{total} number of AND and OR gates in an OR--AND--OR circuit computing \(f\) exactly. Every bottom gate and the output gate are counted. Input negations are free. The three layers are successive: bottom gates read literals and optional constants, middle gates read bottom outputs, and the top gate reads middle outputs. Unary gates allow smaller-depth functions in this model. [statement] \paragraph{The square-root exponent.} H\aa stad's random-restriction and switching method gives the \(2^{\Omega(\sqrt n)}\) depth-three lower bound for parity~\cite[Theorem~1]{H89}. H\aa stad, Jukna, and Pudl\'ak developed a top-down approach and improved the constants for parity and majority~\cite[Theorems~3.3 and~3.5]{HJP95}. Paturi, Pudl\'ak, and Zane then obtained the sharp parity bound \(\Omega(n^{1/4}2^{\sqrt n})\) through their satisfiability coding lemma, matching the upper bound within a constant factor~\cite[Theorem~6]{PPZ99}. Thus parity itself cannot witness the improvement sought here. A further connection between satisfiability algorithms and isolated solutions led Paturi, Pudl\'ak, Saks, and Zane to a code-membership lower bound with leading exponent \((\pi/\sqrt6)\sqrt n\), under their stated code-parameter conditions~\cite[Theorem~6]{PPSZ05}. These bounds remain at the constant-times-square-root scale. Theorem~\ref{thm:main} makes the ratio of the exponent to \(\sqrt n\) unbounded. This is the depth-three lower-bound problem discussed by Gurumukhani, Paturi, Pudl\'ak, Saks, and Talebanfard~\cite[Section~1.1]{GPPST24} and still identified as open in~\cite[Section~1]{GKPRT26}. It is weaker than a lower bound \(2^{n^{1/2+\varepsilon}}\) for a fixed \(\varepsilon>0\), the question raised in~\cite[Section~5, Problem~2]{HJP95}. The depth remains three throughout. Bounds for restricted bottom fan-in have a different scale. Paturi, Saks, and Zane constructed logspace-uniform \(\mathsf{NC}^1\) functions with \(2^{n-o(n)}\) gate lower bounds when bottom fan-in is at most two~\cite[Corollary~5.4]{PSZ00}. Gurumukhani, Paturi, Pudl\'ak, Saks, and Talebanfard connected local enumeration algorithms to majority lower bounds and obtained an exponential bound for bottom fan-in three~\cite[Proposition~3 and Corollary~5]{GPPST24}. In such bounded-width models, counting the middle CNFs can be useful. For arbitrary bottom fan-in, that count alone cannot measure complexity: every Boolean function has a representation by a single CNF. The total gate count in Theorem~\ref{thm:main} is therefore essential. \paragraph{The proof strategy.} The circuit argument needs a function whose sign has small correlation with every moderately wide CNF. Write \(g\) for its sign, equal to \(+1\) on accepted inputs and \(-1\) on rejected inputs. Correlation with a CNF indicator \(H\) means \(\lvert\E gH\rvert\) under uniform inputs. If a middle CNF feeds an exact OR representation of the function, it accepts only positive inputs, so \(gH=H\). Small correlation then forces that middle gate to accept few inputs. Summing over the middle gates will contradict the function's positive acceptance density. Our main ingredient transfers this correlation problem to CNFs of constant width. Leave each variable live independently with probability \(p\), and assign all other variables uniformly. Lemma~\ref{lem:restriction} expresses each restricted width-\ […]
+[theorem] \label{thm:main} There is a language \(L\subseteq\bits^*\), a deterministic Turing machine deciding \(L\), and fixed positive integers \(C,a\) such that the machine runs in time at most \(C(n+1)^a\) on every input of length \(n\). If \(f_n\) is the membership function of \(L\) on \(\bits^n\), then \[ \lim_{n\to\infty}\frac{\log_2 S_3(f_n)}{\sqrt n}=\infty. \] Equivalently, for every real \(A>0\), there is an integer \(N_A\) such that \[ S_3(f_n)>2^{A\sqrt n}\qquad\text{for every }n\ge N_A. \] No uniformity or bottom fan-in restriction is imposed on the circuits.
+
+=== LEAN COMPARATOR DepthThree (exact formal statement)
+import Mathlib
+namespace OAI
+namespace DepthThreeLowerBound
+universe uV uS uK uGamma uQ
+abbrev Cube (V : Type uV) := V → Bool
+abbrev Literal (V : Type uV) := V × Bool
+variable {V : Type uV}
+namespace Literal
+def eval (l : Literal V) (x : Cube V) : Bool := decide (x l.1 = l.2)
+end Literal
+abbrev GateInput (V : Type uV) := Sum (Literal V) Bool
+abbrev RawClause (V : Type uV) := List (GateInput V)
+namespace GateInput
+def eval : GateInput V → Cube V → Bool
+  | .inl l, x => l.eval x
+  | .inr b, _ => b
+end GateInput
+namespace RawClause
+noncomputable def eval (C : RawClause V) (x : Cube V) : Bool := by
+  classical
+  exact decide (∃ l ∈ C, l.eval x = true)
+end RawClause
+structure Circuit3 (V : Type uV) where
+  bottomCount : ℕ
+  middleCount : ℕ
+  bottom : Fin bottomCount → RawClause V
+  middle : Fin middleCount → Finset (Fin bottomCount)
+  top : Finset (Fin middleCount)
+namespace Circuit3
+def gateCount (C : Circuit3 V) : ℕ := C.bottomCount + C.middleCount + 1
+noncomputable def middleEval (C : Circuit3 V) (j : Fin C.middleCount)
+    (x : Cube V) : Bool := by
+  classical
+  exact decide (∀ i ∈ C.middle j, (C.bottom i).eval x = true)
+noncomputable def eval (C : Circuit3 V) (x : Cube V) : Bool := by
+  classical
+  exact decide (∃ j ∈ C.top, C.middleEval j x = true)
+def Computes (C : Circuit3 V) (f : Cube V → Bool) : Prop := ∀ x, C.eval x = f x
+end Circuit3
+def runSteps {S : Type uS} (step : S → Option S) (n : ℕ) (c : Option S) : Option S :=
+  (fun oc => oc.bind step)^[n] c
+inductive HeadMove
+  | left
+  | stay
+  | right
+def HeadMove.apply {Γ : Type uGamma} [Inhabited Γ] : HeadMove → Turing.Tape Γ → Turing.Tape Γ
+  | .left, t => t.move Turing.Dir.left
+  | .stay, t => t
+  | .right, t => t.move Turing.Dir.right
+structure MultiTapeCfg (K : Type uK) (Γ : Type uGamma) (Q : Type uQ) [Inhabited Γ] where
+  q : Q
+  tapes : K → Turing.Tape Γ
+abbrev MultiTapeCode (K : Type uK) (Γ : Type uGamma) (Q : Type uQ) :=
+  Q → (K → Γ) → Option (Q × (K → Γ) × (K → HeadMove))
+def multiTapeUpdate {K : Type uK} {Γ : Type uGamma} {Q : Type uQ} [Inhabited Γ] (c : MultiTapeCfg K Γ Q)
+    (q : Q) (writes : K → Γ) (moves : K → HeadMove) : MultiTapeCfg K Γ Q :=
+  ⟨q, fun k => (moves k).apply ((c.tapes k).write (writes k))⟩
+def multiTapeStep {K : Type uK} {Γ : Type uGamma} {Q : Type uQ} [Inhabited Γ] (code : MultiTapeCode K Γ Q)
+    (c : MultiTapeCfg K Γ Q) : Option (MultiTapeCfg K Γ Q) :=
+  (code c.q (fun k => (c.tapes k).head)).map fun out =>
+    multiTapeUpdate c out.1 out.2.1 out.2.2
+structure FiniteMultiTapeMachine where
+  K : Type
+  [tapeFinite : Fintype K]
+  [tapeDecidableEq : DecidableEq K]
+  inputTape : K
+  Γ : Type
+  [alphabetInhabited : Inhabited Γ]
+  [alphabetFinite : Fintype Γ]
+  Q : Type
+  [stateFinite : Fintype Q]
+  initialState : Q
+  inputSymbol : Bool → Γ
+  input_injective : Function.Injective inputSymbol
+  input_ne_blank : ∀ b, inputSymbol b ≠ default
+  code : MultiTapeCode K Γ Q
+  accept : Q → Bool
+attribute [instance] FiniteMultiTapeMachine.tapeFinite
+  FiniteMultiTapeMachine.tapeDecidableEq FiniteMultiTapeMachine.alphabetInhabited
+  FiniteMultiTapeMachine.alphabetFinite FiniteMultiTapeMachine.stateFinite
+namespace FiniteMultiTapeMachine
+abbrev Cfg (M : FiniteMultiTapeMachine) := MultiTapeCfg M.K M.Γ M.Q
+abbrev step (M : FiniteMultiTapeMachine) : M.Cfg → Option M.Cfg :=
+  multiTapeStep M.code
+def init (M : FiniteMultiTapeMachine) (input : List Bool) : M.Cfg :=
+  ⟨M.initialState, fun k =>
+    if k = M.inputTape then Turing.Tape.mk₁ (input.map M.inputSymbol)
+    else Turing.Tape.mk₁ []⟩
+end FiniteMultiTapeMachine
+def MultiTapeHaltsIn (M : FiniteMultiTapeMachine) (input : List Bool)
+    (output : Bool) (time : ℕ) : Prop :=
+  ∃ k ≤ time, ∃ c : M.Cfg,
+    runSteps M.step k (some (M.init input)) = some c ∧
+    M.step c = none ∧ M.accept c.q = output
+theorem exists_polynomial_time_language_depth_three_lower_bound :
+    ∃ (L : List Bool → Bool) (M : FiniteMultiTapeMachine) (C a : ℕ),
+      0 < C ∧ 0 < a ∧
+      (∀ w : List Bool, MultiTapeHaltsIn M w (L w) (C * (w.
+[…]

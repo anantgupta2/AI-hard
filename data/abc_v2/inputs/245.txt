@@ -1,0 +1,96 @@
+FAMILY 245: Weak normalization implies strong normalization in pure type systems
+SUBJECT: Mathematical logic
+OPENAI SUMMARY: Proves that weak normalization implies strong normalization for every pure type system: if every legal expression in every valid context has a β-normal form, every β-reduction sequence terminates. This resolves the β-Barendregt–Geuvers–Klop conjecture, including nonfunctional rules and open contexts.
+
+=== MANUSCRIPT: Weak and strong normalization in pure type systems (September-25-2026) [preprints/Weak-and-strong-normalization-in-pure-type-systems-September-25-2026/build/paper.tex]
+ABSTRACT: We prove that every weakly β-normalizing pure type system is strongly β-normalizing. Both properties quantify over all legal expressions in all valid contexts, and reduction acts inside type annotations. No functionality hypothesis is required. This resolves the β-Barendregt–Geuvers–Klop conjecture.
+INTRODUCTION (start): \label{sec:introduction} A pure type system specifies which sorts classify other sorts and which sorts may form dependent function types. A term is \emph{weakly $\beta$-normalizing} if some sequence of $\beta$-reductions reaches a normal form; it is \emph{strongly $\beta$-normalizing} if every such sequence is finite. The distinction is between existence of a terminating computation and termination under every choice of reductions. We use the full annotated syntax: reduction is allowed in the domain of an abstraction and in both components of a dependent product. Contexts may be open. A legal expression is either side of a derivable typing judgment; declaration types are included by context validity. The formal rules and conventions are given below before the main theorem. \subsection{Pure type systems and normalization}\label{pts:setup} We first fix the syntax and the scope of the normalization properties. All contexts in the typing rules are finite, and all reductions include reductions inside annotations. \begin{definition}[Specification and expressions]\label{pts:specification} A \emph{pure type specification} is a triple $\mathcal P=(\mathcal S,\mathcal A,\mathcal R)$, where $\mathcal S$ is a set of \emph{sorts}, $\mathcal A\subseteq\mathcal S^2$ is a relation of \emph{axioms}, and $\mathcal R\subseteq\mathcal S^3$ is a relation of \emph{product rules}. Neither relation is assumed functional. Using a countably infinite set of variables disjoint from $\mathcal S$, form the raw expressions \[ M,N,A,B ::= x\mid s\mid MN\mid\lambda x:A.M\mid\Pi x:A.B, \qquad s\in\mathcal S. \] Expressions are identified up to renaming bound variables. In each binder the variable binds in the body or codomain, but not in its annotation or domain. Application associates to the left. Substitution is capture avoiding; $M[x:=N]$ denotes substitution for one free variable. A raw context is a finite sequence $\Gamma=(x_1:A_1,\ldots,x_n:A_n)$ with distinct declared variables. Its domain is $\operatorname{dom}(\Gamma)=\{x_1,\ldots,x_n\}$. Whenever a rule appends $x:A$, its variable $x$ is fresh for the preceding context and for $A$. \end{definition} \begin{definition}[Full beta reduction]\label{pts:beta} The relation $\to_\beta$ is the compatible closure of \[ (\lambda x:A.M)N\to_\beta M[x:=N]. \] Compatibility permits a step in either child of an application, product, or lambda. In particular, both $\lambda x:A.M\to_\beta\lambda x:A'.M$ when $A\to_\beta A'$ and $\Pi x:A.B\to_\beta\Pi x:A'.B$ are permitted. Write $\to_\beta^*$ for its reflexive-transitive closure and $=_\beta$ for the equivalence relation it generates. A normal expression has no beta redex at any position. An expression is \emph{weakly normalizing} if it reduces to a normal expression, and \emph{strongly normalizing} if it starts no infinite reduction sequence. \end{definition} Typing is the least relation closed under these seven rules, with $s,s_1,s_2,s_3$ literal sorts. \begin{gather*} \frac{(s_1,s_2)\in\mathcal A}{\varnothing\vdash s_1:s_2} \;\textsc{Axiom} \qquad \frac{\Gamma\vdash A:s}{\Gamma,x:A\vdash x:A} \;\textsc{Variable} \\ \frac{\Gamma\vdash M:B\qquad\Gamma\vdash A:s} {\Gamma,x:A\vdash M:B} \;\textsc{Weakening} \\ \frac{\Gamma\vdash A:s_1\qquad \Gamma,x:A\vdash B:s_2\qquad(s_1,s_2,s_3)\in\mathcal R} {\Gamma\vdash\Pi x:A.B:s_3} \;\textsc{Product} \\ \frac{\Gamma,x:A\vdash M:B\qquad\Gamma\vdash\Pi x:A.B:s} {\Gamma\vdash\lambda x:A.M:\Pi x:A.B} \;\textsc{Abstraction} \\ \frac{\Gamma\vdash M:\Pi x:A.B\qquad\Gamma\vdash N:A} {\Gamma\vdash MN:B[x:=N]} \;\textsc{Application} \\ \frac{\Gamma\vdash M:A\qquad\Gamma\vdash B:s\qquad A=_\beta B} {\Gamma\vdash M:B} \;\textsc{Conversion}. \end{gather*} The relation is understood relative to the fixed specification. When two specifications are compared we indicate the system on the judgment. A derivation is always finite, including a finite conversion chain witnessing each use of $=_\beta$. \begin{definition}[Contexts, legality, and syst […]
+[theorem] [The $\beta$-Barendregt--Geuvers--Klop conjecture] \label{thm:main} Let $\mathcal P=(\mathcal S,\mathcal A,\mathcal R)$ be any pure type system. If every legal expression of $\mathcal P$, in every valid context, is weakly $\beta$-normalizing, then every such expression is strongly $\beta$-normalizing. No functionality assumption is imposed on $\mathcal A$ or $\mathcal R$.
+
+=== LEAN COMPARATOR TypeSystemNormalization (exact formal statement)
+import Mathlib
+namespace OAI
+namespace PureTypeSystem
+universe u
+inductive Expr (Sorts : Type u) : Type u
+  | var : Nat → Expr Sorts
+  | sort : Sorts → Expr Sorts
+  | app : Expr Sorts → Expr Sorts → Expr Sorts
+  | lam : Expr Sorts → Expr Sorts → Expr Sorts
+  | pi : Expr Sorts → Expr Sorts → Expr Sorts
+  deriving DecidableEq
+namespace Expr
+variable {S : Type u}
+def liftRen (ρ : Nat → Nat) : Nat → Nat
+  | 0 => 0
+  | n + 1 => ρ n + 1
+def rename (ρ : Nat → Nat) : Expr S → Expr S
+  | var n => var (ρ n)
+  | sort s => sort s
+  | app f a => app (rename ρ f) (rename ρ a)
+  | lam A b => lam (rename ρ A) (rename (liftRen ρ) b)
+  | pi A B => pi (rename ρ A) (rename (liftRen ρ) B)
+def liftSub (σ : Nat → Expr S) : Nat → Expr S
+  | 0 => var 0
+  | n + 1 => rename Nat.succ (σ n)
+def subst (σ : Nat → Expr S) : Expr S → Expr S
+  | var n => σ n
+  | sort s => sort s
+  | app f a => app (subst σ f) (subst σ a)
+  | lam A b => lam (subst σ A) (subst (liftSub σ) b)
+  | pi A B => pi (subst σ A) (subst (liftSub σ) B)
+def single (a : Expr S) : Nat → Expr S
+  | 0 => a
+  | n + 1 => var n
+def instantiate (b a : Expr S) : Expr S := subst (single a) b
+end Expr
+structure Specification (S : Type u) where
+  axioms : S → S → Prop
+  rule : S → S → S → Prop
+inductive Beta {S : Type u} : Expr S → Expr S → Prop
+  | head (A b a) : Beta (.app (.lam A b) a) (b.instantiate a)
+  | app_left {f f' a} : Beta f f' → Beta (.app f a) (.app f' a)
+  | app_right {f a a'} : Beta a a' → Beta (.app f a) (.app f a')
+  | lam_domain {A A' b} : Beta A A' → Beta (.lam A b) (.lam A' b)
+  | lam_body {A b b'} : Beta b b' → Beta (.lam A b) (.lam A b')
+  | pi_domain {A A' B} : Beta A A' → Beta (.pi A B) (.pi A' B)
+  | pi_body {A B B'} : Beta B B' → Beta (.pi A B) (.pi A B')
+def Converts {S : Type u} : Expr S → Expr S → Prop := Relation.EqvGen Beta
+def Normal {S : Type u} (M : Expr S) : Prop := ∀ N, ¬ Beta M N
+def WeaklyNormalizing {S : Type u} (M : Expr S) : Prop :=
+  ∃ N, Relation.ReflTransGen Beta M N ∧ Normal N
+def StronglyNormalizing {S : Type u} (M : Expr S) : Prop :=
+  Acc (fun N M : Expr S => Beta M N) M
+inductive HasType {S : Type u} (P : Specification S) :
+    List (Expr S) → Expr S → Expr S → Prop
+  | ax {s t} : P.axioms s t → HasType P [] (.sort s) (.sort t)
+  | var {Γ A s} : HasType P Γ A (.sort s) →
+      HasType P (A :: Γ) (.var 0) (A.rename Nat.succ)
+  | weaken {Γ M B A s} : HasType P Γ M B → HasType P Γ A (.sort s) →
+      HasType P (A :: Γ) (M.rename Nat.succ) (B.rename Nat.succ)
+  | product {Γ A B s₁ s₂ s₃} : HasType P Γ A (.sort s₁) →
+      HasType P (A :: Γ) B (.sort s₂) → P.rule s₁ s₂ s₃ →
+      HasType P Γ (.pi A B) (.sort s₃)
+  | abstraction {Γ A b B s} : HasType P (A :: Γ) b B →
+      HasType P Γ (.pi A B) (.sort s) →
+      HasType P Γ (.lam A b) (.pi A B)
+  | application {Γ f a A B} : HasType P Γ f (.pi A B) →
+      HasType P Γ a A → HasType P Γ (.app f a) (B.instantiate a)
+  | conversion {Γ M A B s} : HasType P Γ M A → HasType P Γ B (.sort s) →
+      Converts A B → HasType P Γ M B
+inductive ValidContext {S : Type u} (P : Specification S) : List (Expr S) → Prop
+  | nil : ValidContext P []
+  | cons {Γ A s} : ValidContext P Γ → HasType P Γ A (.sort s) →
+      ValidContext P (A :: Γ)
+def Legal {S : Type u} (P : Specification S) (Γ : List (Expr S)) (M : Expr S) : Prop :=
+  ∃ A, HasType P Γ M A ∨ HasType P Γ A M
+def SystemWeaklyNormalizing {S : Type u} (P : Specification S) : Prop :=
+  ∀ Γ, ValidContext P Γ → ∀ M, Legal P Γ M → WeaklyNormalizing M
+def SystemStronglyNormalizing {S : Type u} (P : Specification S) : Prop :=
+  ∀ Γ, ValidContext P Γ → ∀ M, Legal P Γ M → StronglyNormalizing M
+theorem weak_implies_strong {S : Type u} (P : Specification S)
+    (h : SystemWeaklyNormalizing P) : SystemStronglyNormalizing P := by
+  sorry
+end PureTypeSystem
+end OAI
+

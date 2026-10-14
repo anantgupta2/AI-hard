@@ -1,0 +1,134 @@
+FAMILY 272: Entanglement without distillable secret key
+SUBJECT: Mathematical physics
+OPENAI SUMMARY: Constructs an entangled state on $`\mathbb C^{10}\otimes\mathbb C^{10}`$ with zero distillable secret key for the specified local-instrument protocols that complete almost surely. These allow joint local processing and authenticated two-way public communication, with no other shared private resource and an eavesdropper holding the input purification and public record. A trace-preserving PPT channel on $`M_{21}(\mathbb C)`$ whose square is not entanglement breaking disproves Christandl's PPT-square conjecture.
+
+=== MANUSCRIPT: Entanglement with zero distillable secret key in local dimension ten (September-27-2026) [preprints/Entanglement-with-zero-distillable-secret-key-in-local-dimension-ten-September-27-2026/build/source/main.tex]
+ABSTRACT: We construct an entangled state on $`\mathbb C^{10}\otimes\mathbb C^{10}`$ with zero distillable secret key for the local-instrument protocols specified here. They allow joint processing of all copies and unlimited two-way public communication, with the input as the only shared private resource and an eavesdropper holding a purification and the complete public record. The construction also disproves the unrestricted two-map PPT-composition conjecture. A separate trace-preserving PPT channel on $`M_{21}(\mathbb C)`$ has a square that is not entanglement breaking.
+INTRODUCTION (start): Secret-key distillation asks whether two distant laboratories can turn a shared noisy resource into identical random bits that an eavesdropper cannot predict. For a bipartite quantum state $\rho_{AB}$, Alice and Bob act locally and exchange authenticated public classical messages. Eve holds a purification of the input and receives the complete public transcript. An ideal key of length $\ell$ is uniform, agrees at the two laboratories, and is independent of Eve: its joint state has the form \[ 2^{-\ell}\sum_{z\in\{0,1\}^{\ell}} |z,z\rangle\langle z,z|\otimes\sigma_{E'}. \] We use the usual ideal-key security criterion \cite{keyPrivateStates,RennerKonig05}. The input is the only shared private resource. Alice and Bob may process all copies jointly in their respective laboratories and use local auxiliaries and private randomness. They may also begin with a public random variable, independent of the input and its reference and recorded for Eve. Conditional on that public variable, the input-reference state and the two private auxiliary resources form a product, with fixed preparation kernels for every input. An \emph{admitted} protocol has a finite or $\mathbb N$-indexed sequence of measurable local-instrument steps, after any supplied local aggregation. Its histories and terminal readouts must satisfy the reference-compatibility conditions of Definition~\ref{def:protocol}. These include ordinary finite protocols with finite classical records obeying the preceding resource rules, as well as the specified countable processes. Eve retains the initial purification and the full public record, including speaker choices and stopping information. A protocol is \emph{completed on the actual input} when both laboratories produce their prescribed outputs almost surely and the joint output is normalized. The distillable secret key $K_D(\rho)$ is the supremum of $\liminf_n\ell_n/n$ over admitted completed key-output sequences on $\rho^{\otimes n}$ whose error from an ideal key tends to zero (Definition~\ref{def:distillable-key}). All errors use the unhalved trace norm $\norm{X}_1=\tr\sqrt{X^*X}$. We construct an entangled state for which even one approximately secret bit is uniformly out of reach. A density operator is a positive matrix of trace one. It is \emph{separable} if it is a finite sum of positive product matrices, and \emph{entangled} otherwise. [statement] There is no uniform bound on the amount of communication or the number of steps within the admitted model. Proposition~\ref{prop:operational-extensions} also gives separate consequences for public conditioning on an event of positive probability, vanishing abort probability, and trace-norm limits of completed outputs whose Eve registers retain or allow recovery of the purification and complete public record. The state comes from a construction for completely positive maps. A complex-linear map $F:\Mat a\to\Mat b$ is \emph{completely positive} (CP) when $\mathrm{id}_k\otimes F$ preserves positive matrices for every $k\geq1$. We call it \emph{PPT} when both $F$ and $T_b\circ F$ are CP, where $T_b$ is coordinate transposition. Write $J(F)$ for the unnormalized input-first Choi matrix, defined in \eqref{eq:choi-definition}. A CP map is \emph{entanglement breaking} when applying it to one subsystem of any positive bipartite input always gives a separable output. Equivalently, its Choi matrix is separable \cite[Theorem 4]{HSR2003}; this cone formulation does not require trace preservation. [statement] The maps are given by \eqref{eq:phi-pair}, starting from the integer matrices in \eqref{eq:explicit-matrices}. They may differ, and the construction does not impose trace preservation or unitality. The state in Theorem~\ref{thm:main-state} is \begin{equation}\label{eq:main-state-formula} \rho=\frac{Z}{\tr Z}. \end{equation} The denominator is positive because $Z$ is a nonzero positive Choi matrix. A separate construction supplies a trace-preserving example. [statement] The pair in Theorem […]
+[theorem] \label{thm:main-state} There is an explicitly specified entangled density operator $\rho$ on $\C^{10}\otimes\C^{10}$ whose range contains no nonzero product vector and for which $K_D(\rho)=0$. More precisely, let $n\geq1$ and let $\tau_{K_AK_BE'}$ be the normalized output of any admitted completed bit-output protocol of Definition~\ref{def:protocol} on $\rho^{\otimes n}$, where $E'$ retains an initial purification and the complete public transcript. For every state $\sigma_{E'}$, \begin{equation}\label{eq:main-gap} \left\lVert \tau_{K_AK_BE'}- \frac12\sum_{i=0}^1|i,i\rangle\langle i,i|\otimes\sigma_{E'} \right\rVert_1\geq\frac15. \end{equation} Thus the corresponding trace distance, with its conventional factor $1/2$, is at least $1/10$.
+[theorem] \label{thm:main-pair} There are explicitly specified PPT maps $\Phi_1,\Phi_2:\Mat{10}\to\Mat{10}$ for which \[ Z=J(\Phi_2\circ\Phi_1) \] is nonzero and its range contains no nonzero product vector in $\C^{10}\otimes\C^{10}$. In particular, the composition $\Phi_2\circ\Phi_1$ is not entanglement breaking.
+[theorem] \label{thm:main-channel} There is an explicitly specified trace-preserving PPT channel $\Theta:\Mat{21}\to\Mat{21}$ whose square $\Theta\circ\Theta$ is not entanglement breaking.
+
+=== LEAN COMPARATOR DimensionTenChannel (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open scoped BigOperators ComplexOrder Kronecker MatrixOrder
+open Matrix
+namespace ChannelCompletion
+abbrev Mat (n : Type) := Matrix n n ℂ
+abbrev Map (n m : Type) := Mat n →ₗ[ℂ] Mat m
+variable {n m p : Type} [Fintype n] [Fintype m] [Fintype p]
+def amplify (F : Map n m) {k : Type} (X : Mat (k × n)) : Mat (k × m) :=
+  fun a b => F (fun i j => X (a.1, i) (b.1, j)) a.2 b.2
+def CP (F : Map n m) : Prop :=
+  ∀ (k : Type) [Fintype k] (X : Mat (k × n)), X.PosSemidef → (amplify F X).PosSemidef
+def transposeMap : Map n n where
+  toFun := Matrix.transpose
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl
+def PPT (F : Map n m) : Prop := CP F ∧ CP (transposeMap.comp F)
+def TracePreserving (F : Map n m) : Prop := ∀ X, Matrix.trace (F X) = Matrix.trace X
+def Separable (Z : Mat (n × m)) : Prop :=
+  ∃ (r : ℕ) (A : Fin r → Mat n) (B : Fin r → Mat m),
+    (∀ i, (A i).PosSemidef) ∧ (∀ i, (B i).PosSemidef) ∧
+    Z = ∑ i, A i ⊗ₖ B i
+def EntanglementBreaking (F : Map n m) : Prop :=
+  CP F ∧ ∀ (k : Type) [Fintype k] (X : Mat (k × n)),
+    X.PosSemidef → Separable (amplify F X)
+end ChannelCompletion
+namespace DimensionTen
+theorem exists_channel_fin21 :
+    ∃ Θ : ChannelCompletion.Map (Fin 21) (Fin 21),
+      ChannelCompletion.PPT Θ ∧ ChannelCompletion.TracePreserving Θ ∧
+        ¬ ChannelCompletion.EntanglementBreaking (Θ.comp Θ) := by
+  sorry
+end DimensionTen
+end
+end OAI
+
+
+=== LEAN COMPARATOR DimensionTenPair (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open scoped Matrix ComplexOrder
+open Matrix Complex
+namespace DimensionTen
+def blocksZ : Fin 4 → Matrix (Fin 6) (Fin 4) ℤ :=
+  ![ ![ ![6,0,0,0], ![0,6,0,0], ![0,0,6,0], ![0,0,0,6], ![0,0,0,0], ![0,0,0,0] ],
+     ![ ![-12,0,0,0], ![0,-6,0,0], ![0,0,6,0], ![0,0,0,12], ![-6,0,6,6], ![-6,-6,6,0] ],
+     ![ ![0,6,-2,0], ![6,6,0,2], ![-2,0,10,0], ![0,2,0,24], ![0,0,0,6], ![0,-6,6,-6] ],
+     ![ ![0,0,-4,-3], ![0,-2,-3,-4], ![-4,-3,11,6], ![-3,-4,6,25], ![6,6,0,0], ![0,-6,6,6] ] ]
+def blocks (i : Fin 4) : Matrix (Fin 6) (Fin 4) ℂ :=
+  (blocksZ i).map (Int.castRingHom ℂ)
+def pencilMap (A : Matrix (Fin 4) (Fin 4) ℂ) : Matrix (Fin 4) (Fin 4) ℂ :=
+  ∑ i : Fin 4, ∑ j : Fin 4, A i j • ((blocks i)ᵀ * blocks j)
+abbrev Mat (n : ℕ) := Matrix (Fin n) (Fin n) ℂ
+def IsComplexLinear {a b : ℕ} (F : Mat a → Mat b) : Prop :=
+  (∀ A B, F (A + B) = F A + F B) ∧
+  (∀ (c : ℂ) A, F (c • A) = c • F A)
+def amplify {a b : ℕ} (F : Mat a → Mat b) (k : ℕ)
+    (X : Matrix (Fin k × Fin a) (Fin k × Fin a) ℂ) :
+    Matrix (Fin k × Fin b) (Fin k × Fin b) ℂ :=
+  fun u v => F (fun i j => X (u.1, i) (v.1, j)) u.2 v.2
+def CompletelyPositive {a b : ℕ} (F : Mat a → Mat b) : Prop :=
+  ∀ k : ℕ, 0 < k → ∀ X : Matrix (Fin k × Fin a) (Fin k × Fin a) ℂ,
+    X.PosSemidef → (amplify F k X).PosSemidef
+def PPT {a b : ℕ} (F : Mat a → Mat b) : Prop :=
+  IsComplexLinear F ∧ CompletelyPositive F ∧
+    CompletelyPositive (fun X => (F X)ᵀ)
+def separable {a b : ℕ} (X : Matrix (Fin a × Fin b) (Fin a × Fin b) ℂ) : Prop :=
+  ∃ r : ℕ, ∃ A : Fin r → Mat a, ∃ B : Fin r → Mat b,
+    (∀ i, (A i).PosSemidef ∧ (B i).PosSemidef) ∧
+    X = ∑ i, Matrix.kronecker (A i) (B i)
+def EntanglementBreaking {a b : ℕ} (F : Mat a → Mat b) : Prop :=
+  CompletelyPositive F ∧
+  ∀ k : ℕ, 0 < k → ∀ X : Matrix (Fin k × Fin a) (Fin k × Fin a) ℂ,
+    X.PosSemidef → separable (amplify F k X)
+def choi {a b : ℕ} (F : Mat a → Mat b) :
+    Matrix (Fin a × Fin b) (Fin a × Fin b) ℂ :=
+  fun u v => F (Matrix.single u.1 v.1 1) u.2 v.2
+def tensorMap {a b c d : ℕ} (F : Mat a → Mat b) (G : Mat c → Mat d)
+    (X : Matrix (Fin a × Fin c) (Fin a × Fin c) ℂ) :
+    Matrix (Fin b × Fin d) (Fin b × Fin d) ℂ :=
+  ∑ i : Fin c, ∑ j : Fin c,
+    Matrix.kronecker (F (fun a b => X (a, i) (b, j))) (G (Matrix.single i j 1))
+def hsAdjoint {a b : ℕ} (F : Mat a → Mat b) (Y : Mat b) : Mat a :=
+  fun i j => ∑ u : Fin b, ∑ v : Fin b, star (F (Matrix.single i j 1) u v) * Y u v
+def symmetricPairs : Fin 10 → Fin 4 × Fin 4 :=
+  ![(0,0), (0,1), (0,2), (0,3), (1,1), (1,2), (1,3), (2,2), (2,3), (3,3)]
+def exteriorPairs : Fin 6 → Fin 4 × Fin 4 :=
+  ![(0,1), (0,2), (0,3), (1,2), (1,3), (2,3)]
+def symmetricIsometry : Matrix (Fin 4 × Fin 4) (Fin 10) ℂ :=
+  fun ij a =>
+    let p := (symmetricPairs a).1
+    let q := (symmetricPairs a).2
+    if p = q then (if ij = (p,p) then 1 else 0)
+    else ((if ij = (p,q) then 1 else 0) + (if ij = (q,p) then 1 else 0)) /
+      (Real.sqrt 2 : ℂ)
+def exteriorIsometry : Matrix (Fin 4 × Fin 4) (Fin 6) ℂ :=
+  fun ij a =>
+    let p := (exteriorPairs a).1
+    let q := (exteriorPairs a).2
+    ((if ij = (p,q) then 1 else 0) - (if ij = (q,p) then 1 else 0)) /
+      (Real.sqrt 2 : ℂ)
+def hodgeComplement : Mat 6 :=
+  ![ ![0,0,0,0,0,1], ![0,0,0,0,-1,0], ![0,0,0,1,0,0],
+     ![0,0,1,0,0,0], ![0,-1,0,0,0,0], ![1,0,0,0,0,0] ]
+def firstSix : Matrix (Fin 10) (Fin 6) ℂ :=
+  fun i j => if i.val = j.val then 1 else 0
+def exteriorMap (A : Mat 10) : Mat 6 :=
+  exteriorIsometryᴴ *
+    tensorMap pencilMap pencilMap (symmetricIsometry * A * symmetricIsometryᴴ) *
+      exteriorIsometry
+def complementaryMap (A : Mat 10) : Mat 6 :=
+  hodgeComplement * (exteriorMap A)ᵀ * hodgeComplementᴴ
+def phiOne (A : Mat 10) : Mat 10 :=
+  firstSix * exteriorMap Aᵀ * firstSixᴴ
+def phiTwo (B : Mat 10) : Mat 10 :=
+  hsAdjoint complementaryMap (firstSixᴴ * B * firstSix)
+def compositeChoi : Matrix (Fin 10 × Fin 10) (Fin 10 × Fin 10) ℂ :=
+  choi (phiTwo ∘ phiOne)
+def productVector {a b : ℕ} (u : Fin a → ℂ) (v : Fin b → ℂ) : Fin
+[…]

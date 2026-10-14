@@ -1,0 +1,84 @@
+FAMILY 299: The Kirchberg–Rørdam character criterion and infinite tensor-power Jiang–Su stability
+SUBJECT: Operator algebras
+OPENAI SUMMARY: A nonzero unital separable complex C∗-algebra is Jiang–Su stable exactly when its norm central-sequence algebra has no characters, for every free ultrafilter. This answers the Kirchberg–Rørdam character question. Also, the infinite minimal tensor power of every such algebra without characters is Jiang–Su stable, answering the Dadarlat–Toms question.
+
+=== MANUSCRIPT: The Kirchberg–Rørdam character criterion (September-25-2026) [preprints/The-Kirchberg-Rordam-character-criterion-September-25-2026/build/paper.tex]
+ABSTRACT: We prove the Kirchberg–Rørdam character criterion: for every free ultrafilter on ℕ, a nonzero unital separable complex C∗-algebra absorbs the Jiang–Su algebra if and only if its norm central-sequence algebra has no characters. We also prove that the infinite minimal tensor power of every nonzero unital separable complex C∗-algebra without characters is $`\mathcal Z`$-stable and contains a unital copy of $`\mathcal Z`$.
+INTRODUCTION (start): \label{sec:introduction} For a nonzero unital $C^*$-algebra $A$ and a free ultrafilter $\omega$ on $\N$, write \[ A_\omega=\ell^\infty(\N,A)\big/ \{(a_n):\lim_{n\to\omega}\|a_n\|=0\}, \qquad F_\omega(A)=A_\omega\cap A', \] where $A$ is identified with its diagonal image in $A_\omega$. A \emph{character} is a nonzero $*$-homomorphism to $\C$; on a unital algebra it is automatically unital. We write $\Z$ for the Jiang--Su algebra introduced by Jiang and Su \cite{JS}. An algebra is \emph{$\Z$-stable} if it is isomorphic to its minimal tensor product with $\Z$. Tensorial absorption can be recognized through central copies of the absorbed algebra. The theory of strongly self-absorbing algebras developed by Toms and Winter makes this principle precise \cite{TW}. In the case of $\Z$, Kirchberg and R\o rdam proved that a unital separable algebra is $\Z$-stable exactly when its norm central-sequence algebra contains, with the same unit, a separable subhomogeneous algebra without characters \cite[Theorem~2.5]{KR}. Here subhomogeneity means a common finite bound on the dimensions of irreducible representations. The absence of characters on that subalgebra plainly forces the same absence on the whole central-sequence algebra. The question is whether this elementary obstruction is already sufficient. Kirchberg and R\o rdam asked whether the absence of characters on $F_\omega(A)$ characterizes Jiang--Su absorption among unital separable $C^*$-algebras \cite[Question~3.1]{KR}. Their work relates this question to tensor powers of algebras without characters \cite[Question~3.7 and Proposition~3.9]{KR}. The character question also appears as Problem~LXXX in the recent collection of Schafhauser, Tikuisis, and White \cite[Section~22]{STW}. We prove the proposed characterization. [statement] The hypothesis uses the norm central-sequence algebra. The theorem applies to all such $A$, with no nuclearity, simplicity, trace, dimension, or comparison assumption. Its main ingredient is the following finite construction, in which separability is unnecessary. [statement] The exponent depends on $D$. The conclusion is a unital homomorphism, not a claim that this finite tensor power itself absorbs $\Z$. Its image is subhomogeneous and characterless, even if the homomorphism has a kernel. These are precisely the properties needed for the central-sequence application. They also give the following consequence. [statement] Separability is needed for this application of Dadarlat--Toms, but neither nuclearity nor simplicity is assumed. The absorption conclusion concerns the infinite minimal tensor power, not a finite power. \subsection{Earlier results and the remaining construction} Dadarlat and Toms connected Jiang--Su absorption with infinite tensor powers \cite{DT}. Their Theorem~1.1 shows that the infinite minimal tensor power of a unital separable algebra is $\Z$-stable whenever it contains a same-unit subhomogeneous characterless subalgebra. The construction in their Theorem~6.2 gives, for each fixed prime dimension-drop algebra, a unital map into any separable recursive subhomogeneous algebra of finite topological dimension whose minimum matrix size is sufficiently large relative to that dimension. Our finite theorem begins only with absence of characters on $D$ and uses maximal tensor products, so it must construct the required subhomogeneous image without such a structural hypothesis. A positive element is \emph{full} if the closed two-sided ideal it generates is the whole ambient algebra. Several regularity criteria explain why finding the subhomogeneous image is useful. Robert and Tikuisis showed that two full orthogonal positive elements in the central-sequence algebra suffice for absorption when the original separable algebra has finite nuclear dimension \cite[Theorem~1.2]{RT}. More recently, Perera, Thiel, and Vilalta characterized $\Z$-stability of separable algebras by purity of the central-sequence algebra \cite[Theorem~3.6]{PTV}. Purity imposes c […]
+[theorem] \label{thm:main} Let $A$ be a nonzero unital separable complex $C^*$-algebra, and let $\omega$ be any free ultrafilter on $\N$. Then \[ F_\omega(A)\text{ has no characters} \quad\Longleftrightarrow\quad A\cong A\otmin\Z. \]
+[theorem] \label{thm:finite} Let $D$ be a nonzero unital complex $C^*$-algebra without characters. There is an integer $m\ge1$ and a unital $*$-homomorphism \[ I(2,3)\longrightarrow D^{\otimes_{\max}m}, \] where \[ I(2,3)=\{f\in C([0,1],M_2\otimes M_3): f(0)\in M_2\otimes1_3,\ f(1)\in1_2\otimes M_3\}. \]
+[corollary] [Infinite minimal tensor powers]\label{cor:infinite-tensor} Let $D$ be a nonzero unital separable complex $C^*$-algebra without characters, and write \[ B=D^{\otimes_{\min}\infty} :=\varinjlim_{n\ge1} \bigl(D^{\otimes_{\min}n},\,x\longmapsto x\otimes1_D\bigr). \] Then $B\cong B\otmin\Z$, and $B$ contains a unital copy of $\Z$.
+
+=== LEAN COMPARATOR CharacterCriterion (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+section
+open scoped TensorProduct InnerProductSpace BigOperators
+open Set Module
+universe uQuot
+namespace KirchbergRordam.QuotientNormSupport
+@[instance_reducible]
+noncomputable def normedRing {R : Type uQuot} [NormedRing R] (I : Ideal R) [I.IsTwoSided]
+    [IsClosed (I : Set R)] : NormedRing (R ⧸ I) := by
+  classical
+  have h_QuotientNormSupport_distance_eq  {R : Type uQuot} [NormedRing R] (I : Ideal R) [I.IsTwoSided]
+      [IsClosed (I : Set R)] (x y : R ⧸ I) :
+      dist x y = ‖-x + y‖ := dist_eq_norm_neg_add x y
+  have h_QuotientNormSupport_multiplication_bound  {R : Type uQuot} [NormedRing R] (I : Ideal R) [I.IsTwoSided]
+      [IsClosed (I : Set R)] (x y : R ⧸ I) :
+      ‖x * y‖ ≤ ‖x‖ * ‖y‖ := le_of_forall_pos_le_add fun ε hε =>
+    let neighborhood : ∃ radii : ℝ × ℝ, (0 < radii.1 ∧ 0 < radii.2) ∧
+      ∀ point : ℝ × ℝ, (dist point.1 ‖x‖ < radii.1 ∧ dist point.2 ‖y‖ < radii.2) →
+        dist (point.1 * point.2) (‖x‖ * ‖y‖) < ε :=
+      ((Metric.nhds_basis_ball.prod_nhds Metric.nhds_basis_ball).tendsto_iff
+        Metric.nhds_basis_ball).mp (continuous_mul.tendsto (‖x‖, ‖y‖)) ε hε
+    neighborhood.elim fun radii radii_spec =>
+      (Submodule.Quotient.norm_mk_lt x radii_spec.1.1).elim fun representative_x x_spec =>
+        (Submodule.Quotient.norm_mk_lt y radii_spec.1.2).elim fun representative_y y_spec =>
+          let lower_x : ‖x‖ ≤ ‖representative_x‖ :=
+            Eq.mp (congrArg (fun value : R ⧸ I => ‖value‖ ≤ ‖representative_x‖) x_spec.1)
+              (Submodule.Quotient.norm_mk_le I representative_x)
+          let lower_y : ‖y‖ ≤ ‖representative_y‖ :=
+            Eq.mp (congrArg (fun value : R ⧸ I => ‖value‖ ≤ ‖representative_y‖) y_spec.1)
+              (Submodule.Quotient.norm_mk_le I representative_y)
+          let distance_x : dist ‖representative_x‖ ‖x‖ < radii.1 :=
+            Eq.mpr (congrArg (fun distance : ℝ => distance < radii.1)
+              (Real.dist_eq ‖representative_x‖ ‖x‖))
+                (abs_sub_lt_iff.mpr ⟨sub_lt_iff_lt_add'.mpr x_spec.2,
+                  (sub_nonpos.mpr lower_x).trans_lt radii_spec.1.1⟩)
+          let distance_y : dist ‖representative_y‖ ‖y‖ < radii.2 :=
+            Eq.mpr (congrArg (fun distance : ℝ => distance < radii.2)
+              (Real.dist_eq ‖representative_y‖ ‖y‖))
+                (abs_sub_lt_iff.mpr ⟨sub_lt_iff_lt_add'.mpr y_spec.2,
+                  (sub_nonpos.mpr lower_y).trans_lt radii_spec.1.2⟩)
+          let product_distance :=
+            radii_spec.2 (‖representative_x‖, ‖representative_y‖) ⟨distance_x, distance_y⟩
+          let product_bound : ‖x * y‖ ≤ ‖representative_x‖ * ‖representative_y‖ :=
+            Eq.mp (congrArg₂ (fun left right : R ⧸ I =>
+              ‖left * right‖ ≤ ‖representative_x‖ * ‖representative_y‖) x_spec.1 y_spec.1)
+                ((Submodule.Quotient.norm_mk_le I (representative_x * representative_y)).trans
+                  (norm_mul_le representative_x representative_y))
+          product_bound.trans (sub_lt_iff_lt_add'.mp (abs_sub_lt_iff.mp
+            (Eq.mp (congrArg (fun distance : ℝ => distance < ε)
+              (Real.dist_eq (‖representative_x‖ * ‖representative_y‖) (‖x‖ * ‖y‖)))
+                product_distance)).1).le
+  exact {
+    toNorm := inferInstance
+    toRing := inferInstance
+    toMetricSpace := inferInstance
+    dist_eq := h_QuotientNormSupport_distance_eq I
+    norm_mul_le := h_QuotientNormSupport_multiplication_bound I
+  }
+end KirchbergRordam.QuotientNormSupport
+end
+open scoped TensorProduct CStarAlgebra InnerProductSpace Matrix Kronecker ComplexOrder
+open UniformSpace Filter Topology BoundedContinuousFunction
+universe uQuot
+namespace KirchbergRordam.NormUltrapower
+variable {A : Type*} [CStarAlgebra A]
+abbrev BoundedSeq (A : Type*) [CStarAlgebra A] := ℕ →ᵇ A
+def normLimit (ω : Ultrafilter ℕ) (x : OAI.KirchbergRordam.NormUltrapower.BoundedSeq A) : ℝ := by
+  classical
+  have h_NormUltrapower_exists_norm_limit  (ω : Ultrafilter ℕ) (x : OAI.KirchbergRordam.NormU
+[…]

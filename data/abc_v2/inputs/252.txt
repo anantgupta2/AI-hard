@@ -1,0 +1,40 @@
+FAMILY 252: A torsion-free hyperbolic group that is neither residually finite nor linear over any field
+SUBJECT: Group theory
+OPENAI SUMMARY: Constructs a torsion-free word-hyperbolic group that is not residually finite, answering the residual-finiteness question negatively. One fixed nonidentity element is killed by every finite-dimensional linear representation over every commutative field, so the group is not linear over any such field.
+
+=== MANUSCRIPT: A torsion-free hyperbolic group that is not residually finite (September-23-2026) [preprints/a-torsion-free-hyperbolic-group-that-is-not-residually-finite-September-23-2026/build/paper.tex]
+ABSTRACT: We construct a torsion-free word-hyperbolic group that is not residually finite, answering the residual-finiteness question for hyperbolic groups negatively.
+INTRODUCTION (start): \label{sec:introduction} A group $G$ is \emph{residually finite} if each nonidentity element has a nonidentity image under a homomorphism to some finite group. Equivalently, its \emph{finite residual} $R_f(G)$, the intersection of the kernels of all such homomorphisms, is trivial. A finitely generated group is \emph{word-hyperbolic} if a Cayley graph has uniformly thin geodesic triangles: there is a constant such that every point of one side is within that distance of the other two sides. The residual-finiteness question asks whether every word-hyperbolic group is residually finite. The question belongs to the program initiated by Gromov's theory of hyperbolic groups \cite{Gromov1987}; see \cite[\S5]{AGM2009} for its formulation and consequences. It asks whether coarse negative curvature alone forces separation by finite quotients. [statement] The group is the fundamental group of a finite Euclidean triangle complex. We prove that a member of a fixed finite family of nontrivial elements belongs to its finite residual. The argument is existential: it proves that one fixed member works for all finite quotients, without identifying which member. Thus the residual-finiteness question has a negative answer even within the torsion-free class. The same obstruction has a classical consequence for linear representations. A group is \emph{linear over a commutative field $K$} if it admits an injective homomorphism into $\mathrm{GL}_n(K)$ for some finite $n\geq 1$. [statement] \begin{proof} The image $\rho(G)$ is a finitely generated linear group, so it is residually finite by Malcev's theorem over commutative fields of arbitrary characteristic \cite[Theorems~VII and~VIII]{Malcev1940}; see also \cite[Introduction and \S3]{Nica2013}. If $g\in R_f(G)$ had $\rho(g)\ne 1$, a homomorphism from $\rho(G)$ to a finite group would have nonidentity value on $\rho(g)$. Its composition with $\rho$ would contradict the definition of $R_f(G)$. This proves the containment. The nonidentity finite-residual element described above is therefore killed by every such $\rho$, so none is injective. \end{proof} The corollary does not assert that every representation is trivial, and it makes no claim about skew fields or infinite-dimensional representations. Nonlinearity itself was already known among hyperbolic groups. Michael Kapovich constructed an infinite hyperbolic group whose finite-dimensional representations over arbitrary fields all have finite image \cite[Theorem~8.1]{Kapovich2005}. More recently, Tholozan and Tsouvalas constructed residually finite nonlinear hyperbolic groups by amalgamating suitable finite-index subgroups of cocompact quaternionic hyperbolic lattices along maximal cyclic subgroups \cite[Theorem~1.1]{TT2025}. Thus nonlinearity alone does not exclude residual finiteness. Corollary~\ref{cor:nonlinear} records the stronger feature supplied here by a nontrivial finite residual: the kernels of all finite-dimensional representations have a common nonidentity element. The residual-finiteness question has several equivalent class-wide formulations. Ilya Kapovich and Wise proved that all hyperbolic groups are residually finite if and only if every nontrivial hyperbolic group has a nontrivial finite quotient \cite[Theorem~1.2]{KW2000}; they also proved equivalence with the assertion that every hyperbolic group is virtually torsion-free, that is, has a torsion-free subgroup of finite index \cite[Theorem~5.1]{KW2000}. Together with Theorem~\ref{thm:main}, these equivalences imply that some nontrivial hyperbolic group has no nontrivial finite quotient, and that some hyperbolic group is not virtually torsion-free. These are conclusions about the class, not additional properties of the torsion-free group constructed here. Agol, Groves and Manning established a further consequence of a positive answer. A subgroup is \emph{separable} if every element outside it can be distinguished from it in some finite quotient, and a subgroup of a hyperbolic group  […]
+[theorem] \label{thm:main} There exists a torsion-free word-hyperbolic group that is not residually finite.
+[corollary] [Finite-dimensional linear obstruction]\label{cor:nonlinear} Let $G$ be the finitely generated torsion-free word-hyperbolic group constructed in Theorem~\ref{thm:main}. For every commutative field $K$, every integer $n\geq 1$, and every homomorphism $\rho:G\to\mathrm{GL}_n(K)$, \[ R_f(G)\subseteq\ker\rho. \] Consequently, one fixed nonidentity element of $G$ is killed by all these representations, simultaneously over all such fields and dimensions. In particular, $G$ is not linear over any commutative field.
+
+=== LEAN COMPARATOR TorsionFreeHyperbolic (exact formal statement)
+import Mathlib
+namespace OAI
+namespace Release075
+universe u v
+def TorsionFree (G : Type u) [Group G] : Prop :=
+  ∀ (g : G) (n : ℕ), 0 < n → g ^ n = 1 → g = 1
+def Geodesic {V : Type u} (X : SimpleGraph V) {x y : V} (p : X.Walk x y) : Prop :=
+  p.length = X.dist x y
+def SideThin {V : Type u} (X : SimpleGraph V) (δ : ℕ) {x y z : V}
+    (p : X.Walk x y) (q : X.Walk y z) (r : X.Walk z x) : Prop :=
+  ∀ a ∈ p.support, ∃ b, (b ∈ q.support ∨ b ∈ r.support) ∧ X.dist a b ≤ δ
+def WordHyperbolic (G : Type u) [Group G] : Prop :=
+  ∃ S : Set G, S.Finite ∧ (SimpleGraph.mulCayley S).Connected ∧
+    ∃ δ : ℕ, ∀ (x y z : G)
+      (p : (SimpleGraph.mulCayley S).Walk x y)
+      (q : (SimpleGraph.mulCayley S).Walk y z)
+      (r : (SimpleGraph.mulCayley S).Walk z x),
+      Geodesic (SimpleGraph.mulCayley S) p →
+      Geodesic (SimpleGraph.mulCayley S) q →
+      Geodesic (SimpleGraph.mulCayley S) r →
+      SideThin (SimpleGraph.mulCayley S) δ p q r ∧
+      SideThin (SimpleGraph.mulCayley S) δ q r p ∧
+      SideThin (SimpleGraph.mulCayley S) δ r p q
+theorem main : ∃ (G : Type) (_ : Group G),
+    TorsionFree G ∧ WordHyperbolic G ∧ ¬ Group.ResiduallyFinite G := by
+  sorry
+end Release075
+end OAI
+

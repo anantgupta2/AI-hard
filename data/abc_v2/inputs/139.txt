@@ -1,0 +1,75 @@
+FAMILY 139: Subpolynomial query complexity for log-concave sampling
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: For C2 potentials with a supplied minimizer and $`I\preceq\nabla^2V\preceq2I`$, proves that sampling within total variation 1/10 requires only $`C_\varepsilon d^\varepsilon`$ exact value-and-gradient queries for every fixed ε &gt; 0. The bound holds on every run, with unrestricted computation between queries. A logarithmic lower bound also holds, so the optimal power-law exponent in this oracle model is zero.
+
+=== MANUSCRIPT: Subpolynomial query complexity for well-conditioned log-concave sampling (September-26-2026) [preprints/Subpolynomial-query-complexity-for-well-conditioned-log-concave-sampling-September-26-2026/build/main.tex]
+ABSTRACT: For every fixed ε &gt; 0, we give a sampling algorithm using at most $`C_\varepsilon d^\varepsilon`$ exact first-order queries on every execution for C2 potentials on ℝd with a known minimizer and Hessian between Id and $`2I_d`$. The output has total-variation distance at most 1/10 from the target Gibbs law. Computation between queries is unrestricted. We also prove an $`\Omega(\log d)`$ query lower bound for arbitrary randomized adaptive algorithms, determining the optimal dimension exponent to be zero.
+INTRODUCTION (start): \label{sec:introduction} How many evaluations of a potential and its gradient are needed to sample its Gibbs distribution? Even when the potential is uniformly strongly convex and smooth, familiar discretizations incur an error that grows with dimension. The question is particularly sharp when conditioning and accuracy are held fixed: is a positive power of the dimension intrinsically necessary, or is it a feature of the sampling algorithms used? We answer this question in the exact first-order oracle model with unrestricted real computation between queries. The optimal dimension exponent is zero. The construction uses approximation orders that can depend on the desired exponent and is aimed at oracle complexity rather than practical running time. \subsection{Model and result} For \(d\ge2\), let \(\mathcal V_d\) consist of the functions \(V\in C^2(\R^d)\) satisfying \begin{equation}\label{eq:original-class} V(0)=0,\qquad \nabla V(0)=0,\qquad I_d\preceq\nabla^2V(x)\preceq2I_d \quad\text{for every }x\in\R^d. \end{equation} The target law is \[ \pi_V(dx)=Z_V^{-1}e^{-V(x)}\,dx,\qquad Z_V=\int_{\R^d}e^{-V(x)}\,dx. \] An exact first-order query at \(x\) returns \((V(x),\nabla V(x))\). Queries may be adaptive. Random real variables may be generated, and computation between queries is unrestricted. An algorithm may depend on \(d\), but its only information about \(V\) is through the oracle responses. All algorithms are measurable. Write \(\norm{\mu-\eta}_{\TV}=\sup_B|\mu(B)-\eta(B)|\). Let \(Q(d)\) be the smallest integer \(q\) for which an algorithm makes at most \(q\) queries on \emph{every} execution and returns \(X\) satisfying \(\norm{\mathcal L(X)-\pi_V}_{\TV}\le1/10\) for every \(V\in\mathcal V_d\). Thus the budget is not merely an expectation. Define the optimal dimension exponent by \[ \gamma_*=\inf\{\gamma\ge0:Q(d)\le d^{\gamma+o(1)}\} =\limsup_{d\to\infty}\frac{\log Q(d)}{\log d}. \] [statement] The upper assertion is proved in Theorem~\ref{thm:upper} and the lower assertion in Theorem~\ref{thm:lower}. Together they determine the exponent but not the finer growth rate of \(Q(d)\). In particular, the upper bound does not assert a polylogarithmic query count. The constants and the algorithmic approximation orders may depend on \(\varepsilon\). No arithmetic or bit-complexity bound is imposed or deduced. \subsection{Historical context} Sampling by discretizing Langevin or Hamiltonian dynamics turns functional inequalities and smoothness into algorithmic bounds, but it also introduces a dimension-dependent discretization problem. Nonasymptotic analyses of the unadjusted Langevin algorithm were developed by \citet{dalalyan2017langevin} and \citet{durmus2017langevin}; \citet{cheng2018underdamped} analyzed the underdamped method under strong convexity and smoothness. Randomized midpoint discretization further improved the quadratic-Wasserstein guarantees \citep{shen2019randomized}. Wasserstein and total-variation guarantees must be distinguished in comparing these results. The shifted-composition analysis of \citet[Theorem~5.6]{altschuler2026shifted} gives a relative-entropy guarantee that yields a \(\widetilde O(d^{1/3})\) query bound at fixed conditioning and total-variation accuracy. Another gradient-only route, based on rejection sampling on diffusion path space, was developed by \citet[Theorem~3.2(ii)]{chen2026exact}; its stated query-tail bound also gives \(\widetilde O(d^{1/3})\) in this fixed-parameter setting. High-order integration and polynomial collocation already reduce the dimensional dependence of Hamiltonian Monte Carlo under stronger regularity or structural assumptions \citep{mangoubi2017rapid,lee2018odes}. In particular, their high-order results use assumptions beyond the two-sided Hessian bounds in \eqref{eq:original-class}. The obstacle here is to obtain high-order accuracy under those bounds while implementing every conditional mean with finitely many first-order queries. More recently, \citet[Theorem~7.1(i)] […]
+[theorem] \label{thm:main} In the oracle model above, for every \(\varepsilon>0\) there is \(C_\varepsilon<\infty\) such that \[ Q(d)\le C_\varepsilon d^\varepsilon \qquad(d\ge2). \] There are also absolute constants \(c>0\) and \(d_0\) such that \[ Q(d)\ge c\log d\qquad(d\ge d_0). \] The lower bound applies to arbitrary randomized adaptive first-order algorithms. In particular, \(\gamma_*=0\).
+
+=== LEAN COMPARATOR LogConcaveQuery (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open MeasureTheory Filter
+open scoped ENNReal NNReal Topology
+namespace LogConcaveSampling
+abbrev Point (d : ℕ) := EuclideanSpace ℝ (Fin d)
+abbrev Reply (d : ℕ) := ℝ × Point d
+abbrev Transcript (d q : ℕ) := Fin q → Reply d
+structure Admissible {d : ℕ} (V : Point d → ℝ) : Prop where
+  smooth : ContDiff ℝ 2 V
+  value_zero : V 0 = 0
+  gradient_zero : gradient V 0 = 0
+  hessian_bounds : ∀ x v : Point d,
+    ‖v‖ ^ 2 ≤ inner ℝ v (fderiv ℝ (gradient V) x v) ∧
+    inner ℝ v (fderiv ℝ (gradient V) x v) ≤ 2 * ‖v‖ ^ 2
+def gibbsDensity {d : ℕ} (V : Point d → ℝ) (x : Point d) : ℝ≥0∞ :=
+  ENNReal.ofReal (Real.exp (-V x))
+def partition {d : ℕ} (V : Point d → ℝ) : ℝ≥0∞ :=
+  ∫⁻ x, gibbsDensity V x ∂volume
+def gibbs {d : ℕ} (V : Point d → ℝ) : Measure (Point d) :=
+  (partition V)⁻¹ • volume.withDensity (gibbsDensity V)
+def TVAtMost {E : Type*} [MeasurableSpace E]
+    (μ ν : Measure E) (ε : ℝ) : Prop :=
+  ∀ s : Set E, MeasurableSet s → |μ.real s - ν.real s| ≤ ε
+def firstOrderReply {d : ℕ} (V : Point d → ℝ) (x : Point d) : Reply d :=
+  (V x, gradient V x)
+structure OracleAlgorithm (Ω : Type*) [MeasurableSpace Ω] (d q : ℕ) where
+  query : Fin q → Ω × Transcript d q → Point d
+  query_measurable : ∀ i, Measurable (query i)
+  output : Ω × Transcript d q → Point d
+  output_measurable : Measurable output
+def OracleAlgorithm.history {Ω : Type*} [MeasurableSpace Ω] {d q : ℕ}
+    (A : OracleAlgorithm Ω d q) (V : Point d → ℝ) (ω : Ω) : ℕ → Transcript d q
+  | 0 => 0
+  | n + 1 =>
+      let h := A.history V ω n
+      if hn : n < q then
+        Function.update h ⟨n, hn⟩ (firstOrderReply V (A.query ⟨n, hn⟩ (ω, h)))
+      else h
+def OracleAlgorithm.run {Ω : Type*} [MeasurableSpace Ω] {d q : ℕ}
+    (A : OracleAlgorithm Ω d q) (V : Point d → ℝ) (ω : Ω) : Point d :=
+  A.output (ω, A.history V ω q)
+def CanSample (d q : ℕ) : Prop :=
+  ∃ (Ω : Type) (_ : MeasurableSpace Ω) (μ : Measure Ω)
+    (_ : IsProbabilityMeasure μ) (A : OracleAlgorithm Ω d q),
+    ∀ V : Point d → ℝ, Admissible V →
+      Measurable (A.run V) ∧ TVAtMost (μ.map (A.run V)) (gibbs V) (1 / 10)
+def queryComplexity (d : ℕ) : ℕ∞ :=
+  sInf ((fun q : ℕ => (q : ℕ∞)) '' {q | CanSample d q})
+def ExponentBound (γ : ℝ) : Prop :=
+  0 ≤ γ ∧ ∀ ε : ℝ, 0 < ε → ∃ d₀ : ℕ, ∀ d : ℕ, d₀ ≤ d →
+    (queryComplexity d).toENNReal ≤ ENNReal.ofReal ((d : ℝ) ^ (γ + ε))
+def gammaStar : ℝ := sInf {γ : ℝ | ExponentBound γ}
+theorem exact_source_main :
+    (∀ ε : ℝ, 0 < ε → ∃ C : ℝ, ∀ d : ℕ, 2 ≤ d →
+      (queryComplexity d).toENNReal ≤ ENNReal.ofReal (C * (d : ℝ) ^ ε)) ∧
+    (∃ c : ℝ, 0 < c ∧ ∃ d₀ : ℕ, 2 ≤ d₀ ∧ ∀ d : ℕ, d₀ ≤ d →
+      ENNReal.ofReal (c * Real.log (d : ℝ)) ≤ (queryComplexity d).toENNReal) ∧
+    gammaStar = 0 := by
+  sorry
+end LogConcaveSampling
+end
+end OAI
+

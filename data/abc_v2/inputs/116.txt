@@ -1,0 +1,154 @@
+FAMILY 116: Uniform black-box noncommutative identity testing across characteristics
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: For each characteristic, constructs in deterministic polynomial bit time a polynomial-dimensional matrix tuple detecting every nonzero division-free noncommutative formula of bounded size over any field of that characteristic. Rational formulas over ℚ also admit polynomial-size hitting lists whenever they have a defined rational-matrix evaluation.
+
+=== MANUSCRIPT: Uniform Matrix Hitting Points in Every Positive Characteristic (October-4-2026) [preprints/Uniform-Matrix-Hitting-Points-in-Every-Positive-Characteristic-October-4-2026/build/main.tex]
+ABSTRACT: We construct a single matrix substitution that detects every nonzero size-s division-free noncommutative formula in n variables over every field of a given positive characteristic. One deterministic machine, given a promised prime p in binary and n, s in unary, outputs matrices over 𝔽p of dimension $`O(n^3s^6)`$ in polynomial bit time. The same tuple works with arbitrary extension-field coefficients, including in characteristic two. The construction also applies to the stated acyclic algebraic path programs.
+INTRODUCTION (start): \label{sec:introduction} Polynomial identity testing asks whether a polynomial given by arithmetic operations is zero. In the noncommutative setting, variables are evaluated on matrices: scalar substitutions would, for example, erase the nonzero commutator $x_1x_2-x_2x_1$. The question considered here is whether one can construct a single matrix substitution, using only the characteristic, the number of variables, and a formula-size bound, that detects every nonzero formula of that size. We construct such a substitution over the prime field in every positive characteristic. Its dimension and the time needed to print all its entries are polynomially bounded. \subsection{The result} For a field $F$, the free associative algebra $F\langle x_1,\ldots,x_n\rangle$ has as an $F$-basis the finite ordered words in $x_1,\ldots,x_n$, including the empty word $1$; multiplication concatenates words. A \emph{noncommutative formula} is a rooted tree whose leaves are variables or scalars in $F$, and whose internal vertices are binary addition or ordered multiplication gates. Its \emph{size} is the number of all vertices, including scalar leaves. Thus there are no inverse gates and no shared subexpressions. Scalars may be arbitrary elements of $F$. When evaluating at $d\times d$ matrices, a scalar $a$ is interpreted as $aI_d$. [statement] The generator receives no formula or coefficients. In particular, its guarantee is uniform over arbitrary extensions of $\F_p$, and applies to $p=2$ without any relation between the characteristic and the formula size. The required conclusion is matrix nonvanishing. The time to evaluate a formula over an unspecified coefficient field is separate from the bit complexity of constructing the tuple. The proof also applies to an \emph{acyclic algebraic path program}: a finite directed acyclic graph with a designated source and sink, edges labelled by scalars or variables, and value equal to the sum of ordered label products over source--sink paths. Replacing the formula-size parameter by the number of vertices gives the same polynomial construction; see Corollary~\ref{cor:path-programs}. This extension follows from the coefficient representation used in the proof. \subsection{Context and the characteristic obstruction} Noncommutative identity testing has distinct tests that use the internal representation and tests that only evaluate the polynomial. Nisan characterized homogeneous noncommutative branching-program complexity by ranks of coefficient matrices~\cite[Theorem~1]{Nisan1991}. Raz and Shpilka gave a deterministic polynomial-time identity test for noncommutative formulas and algebraic branching programs when their descriptions are available~\cite{RS2005}. Matrix evaluation also underlies randomized black-box tests; Bogdanov and Wee gave such a test for circuits with a supplied degree bound, using polynomial identities of matrix algebras~\cite[Theorem~4.2]{BW2005}. For deterministic black-box testing, Forbes and Shpilka constructed quasipolynomial-size matrix hitting sets for noncommutative algebraic branching programs, under a field-cardinality hypothesis \cite[Corollary~4.7]{FS2013}. A block-diagonal sum can combine a finite hitting set into one tuple, but its dimension grows with the size of that set. Lakhani and Mukhopadhyay constructed one integer matrix tuple for sparsity-bounded polynomials over characteristic-zero fields \cite[Theorem~2.1 and Remark~2.6]{LM2026}; their finite-field formulation also distinguishes a succinct extension-field description from its explicit coordinate cost. Sparsity is a different parameter: a formula of small size can have exponentially many words. These results provide relevant benchmarks, while the construction here is polynomial in formula size and in the binary length of the characteristic. The characteristic-zero companion~\cite[Theorem~1.1]{OAInc} constructs one rational matrix tuple for formulas, with dimension at most $2ns^2$ and polynomial bit complexity. Its pro […]
+[theorem] \label{thm:main} There is a deterministic Turing machine and absolute positive integers $C,k$ with the following property. Given a prime $p$ in binary and positive integers $n,s$ in unary, the machine outputs a positive integer $d=O(n^3s^6)$ and a tuple \[ (T_1,\ldots,T_n)\in\Mat_d(\F_p)^n. \] For every field $F$ of characteristic $p$ and every nonzero $f\in F\langle x_1,\ldots,x_n\rangle$ computed by a formula of size at most $s$, the same tuple, viewed over $F$, satisfies \[ f(T_1,\ldots,T_n)\ne0. \] Writing $L=\lceil\log_2p\rceil$, the total running time and output length are at most $C(n+s+L+1)^k$. All matrix entries are output densely as ordinary binary residues in $\{0,\ldots,p-1\}$, with dimensions and separators included. Primality of $p$ is promised.
+
+=== MANUSCRIPT: One Rational Matrix Hitting Point for Noncommutative Formulas (September-24-2026) [preprints/One-Rational-Matrix-Hitting-Point-for-Noncommutative-Formulas-September-24-2026/build/paper.tex]
+ABSTRACT: We construct, in deterministic polynomial bit time, one tuple of rational matrices that detects every nonzero polynomial computed by a noncommutative division-free formula of a prescribed size. The matrices have dimension $`O(ns^2)`$ for n variables and formula size s, and the same tuple works over every field of characteristic zero.
+INTRODUCTION (start): \label{sec:introduction} Polynomial identity testing asks whether an arithmetic expression computes the zero polynomial. We study this question for noncommuting variables when the expression is accessible through matrix evaluations. The aim is to choose the evaluation matrices before seeing the expression or any of its coefficients. Let $F\langle x_1,\ldots,x_n\rangle$ be the free associative polynomial algebra over a field $F$. A \emph{noncommutative formula} is a rooted tree whose leaves are variables or scalars in $F$, and whose internal gates have two inputs and are labelled $+$ or $\times$. The two inputs to each multiplication gate are ordered. Its \emph{size} counts all gates, including the leaves. Write $\mathsf{Form}_{n,s}(F)$ for the polynomials computed by formulas of size at most $s$ in $n$ variables. For a tuple $\mathbf T=(T_1,\ldots,T_n)\in\Mat_d(F)^n$, the value $f(\mathbf T)$ is the usual ordered matrix evaluation; a scalar $a\in F$ acts as $aI_d$. A \emph{hitting point} for a class of polynomials is one tuple on which every nonzero member of the class has nonzero matrix value. More generally, a hitting set allows several tuples and requires a nonzero value on at least one of them. [statement] Thus a single exact matrix-evaluation query decides whether a polynomial promised to lie in $\mathsf{Form}_{n,s}(F)$ is zero. The bit-time statement concerns construction of the rational tuple. Evaluation over an arbitrary field is understood as an exact oracle operation; no encoding or bit-cost assumption on arbitrary elements of $F$ is needed. In particular, the singleton set $\{\mathbf T_{n,s}\}$ gives a positive solution to the polynomial-size rational-matrix hitting-set problem for characteristic-zero formulas. \subsection{Context and scope} An \emph{acyclic algebraic branching program} is a directed acyclic graph with a designated source and sink, and with affine-linear edge labels over the coefficient field. Its output is the sum of the ordered products of edge labels along source-to-sink paths; here its size is the number of vertices. Formulas admit such path representations of linear size. Linear algebra has long played a central role in noncommutative complexity. Nisan characterized layered homogeneous algebraic branching-program complexity by ranks of coefficient matrices \cite[Theorem~1]{Nisan1991}. Raz and Shpilka gave deterministic polynomial-time identity tests for noncommutative formulas and algebraic branching programs \cite[Theorems~4 and~5]{RazShpilka2005}. These algorithms use the internal structure of the input, which is the white-box model. In the black-box model, Bogdanov and Wee gave a randomized matrix-evaluation identity test with one-sided error and running time polynomial in a supplied degree bound and the other input parameters \cite[Theorem~4.2]{BogdanovWee2005}. Forbes and Shpilka constructed deterministic quasipolynomial-size matrix hitting sets for noncommutative algebraic branching programs over sufficiently large fields \cite[Corollary~4.7]{ForbesShpilka2013}, and hence for formulas. Their field-size condition is automatic in characteristic zero. Arvind, Chatterjee and Mukhopadhyay obtained quasipolynomial black-box tests over $\Q$ for rational formulas of inversion height two \cite[Theorem~1.1]{ArvindChatterjeeMukhopadhyay2022}, and subsequently for unrestricted noncommutative rational formulas \cite[Theorem~2 and Corollary~3]{ArvindChatterjeeMukhopadhyay2026}. Such formulas may have inverse gates, and evaluation requires each inverse operand to be invertible. A separate manuscript \cite[Theorem~1.1]{OpenAIRationalFormulas2026} constructs polynomial-size rational matrix hitting lists for formulas over $\Q$ with a nonempty rational matrix evaluation domain. Whenever such a formula is nonzero on its domain, the list contains a defined evaluation with invertible value, without a bound on inverse nesting or rational constant heights. Here the single tuple works over every characteristic-ze […]
+[theorem] \label{thm:main} There is a deterministic algorithm which, given integers $n,s\ge1$, constructs a tuple \[ \mathbf T_{n,s}\in\Mat_d(\Q)^n, \qquad d\le 2ns^2, \] in time polynomial in $n,s$, measured in bit operations. The numerators and denominators of its entries have bit length $O(\log(ns+1)+ns^2\log(n+1))$. For every field $F$ of characteristic zero and every $0\ne f\in\mathsf{Form}_{n,s}(F)$, \[ f(\mathbf T_{n,s})\ne0, \] where the tuple is viewed over $F$ through the canonical embedding $\Q\hookrightarrow F$. The construction uses $d=2ns^2$ when $ns\ge2$ and $d=1$ when $n=s=1$.
+
+=== MANUSCRIPT: Polynomial Hitting Lists for Noncommutative Rational Formulas (September-24-2026) [preprints/Polynomial-Hitting-Lists-for-Noncommutative-Rational-Formulas-September-24-2026/build/main.tex]
+ABSTRACT: We construct, in deterministic polynomial bit time, a polynomial-size list of rational matrix tuples for noncommutative rational formulas over ℚ of bounded tree size. Every nonzero admissible formula has a defined, invertible value at one tuple, with no separate bounds on inverse nesting or rational constant heights. Matrix dimensions, entry bit lengths, and total output length are polynomially bounded.
+INTRODUCTION (start): \addcontentsline{toc}{section}{References}} \newcommand{\Q}{\mathbb Q} \newcommand{\C}{\mathbb C} \DeclareMathOperator{\Mat}{Mat} \DeclareMathOperator{\rank}{rank} \DeclareMathOperator{\ord}{ord} \DeclareMathOperator{\Span}{span} \setlist{itemsep=3pt,topsep=5pt} \setlength{\emergencystretch}{2em} \numberwithin{equation}{section} \title{Polynomial Hitting Lists for Noncommutative Rational Formulas} \author{OpenAI} \date{September 24, 2026} \hypersetup{pdftitle={Polynomial Hitting Lists for Noncommutative Rational Formulas},pdfauthor={OpenAI},pdfsubject={A uniform construction over the rational numbers}} \begin{document} \maketitle \begin{abstract} We construct, in deterministic polynomial bit time, a polynomial-size list of rational matrix tuples for noncommutative rational formulas over $\Q$ of bounded tree size. Every nonzero admissible formula has a defined, invertible value at one tuple, with no separate bounds on inverse nesting or rational constant heights. Matrix dimensions, entry bit lengths, and total output length are polynomially bounded. \end{abstract}
+[theorem] \label{thm:main} There are a deterministic Turing machine $G$ and fixed positive integers $C,k$ with the following property. Given $1^n,1^s$, where $n,s\geq1$, the machine outputs a finite list $\mathcal H_{n,s}$ of $n$-tuples of rational square matrices, in at most $C(n+s+1)^k$ bit operations. The entire output, with signed binary numerators and positive binary denominators, has at most $C(n+s+1)^k$ bits. For every nonzero admissible rational formula $\Phi$ in $n$ variables of size at most $s$, some tuple in $\mathcal H_{n,s}$ is a defined evaluation of $\Phi$ with invertible value. The same list works for all such formulas, regardless of the bit lengths of their rational constants or their inverse depth. The generator receives no formula, oracle, randomness, or advice.
+[proposition] [Rectangular rank bound] \label{prop:rectangular} Let $1\leq q\leq B$ and $A_0,\ldots,A_n\in\Mat_q(\Q)$. Suppose that, for some extension field $E/\Q$, some integer $e\geq1$, and some $X_1,\ldots,X_n\in\Mat_e(E)$, the matrix \[ A_0\otimes I_e+\sum_{i=1}^n A_i\otimes X_i \] is invertible. Then $\sum_{i=0}^n A_i\otimes T_i$ is injective over $F$, and \begin{equation} \rank_{\Q(t)}\left(\sum_{i=0}^n A_i\otimes R_i(t)\right) \geq qN>(q-1)M. \label{eq:padded-rank} \end{equation}
+[proposition] [Full-rank deformed pencils]\label{prop:pencil-deformation} Fix a primitive $M$th root of unity $\omega\in\C$, and lift the padded matrices $R_0(t),\ldots,R_n(t)$ by Lemma~\ref{lem:division-lift} with $d=M$ and $K=\Q(\omega)(t)$. Let \[ L(x)=A_0+\sum_{i=1}^n A_i x_i, \qquad A_i\in\Mat_q(\Q),\qquad 1\leq q\leq B, \] be an affine pencil admitting an invertible matrix evaluation over some extension field of $\Q$. Then \begin{equation}\label{eq:deformed-pencil-determinant} P_{L,\omega}(t,p,r) :=\det\!\left(\sum_{i=0}^n A_i\otimes R_i^*(t,p,r)\right) \ne0. \end{equation} This is a polynomial in $\Q(\omega)[t,p,r]$ of total degree at most $3BM^2$. In particular $\det R_0^*$ is a nonzero polynomial.
+[proposition] [Pencil certificates for the original formula tree] \label{prop:formula-certificates} Let $\Phi$ be a formula of size at most $s$, and put $B=2s+1$. Form the indexed collection $\mathcal C_\Phi$ consisting of $L_h$ for every inverse-node occurrence $h$ of $\Phi$, together with $J_\Phi$. Then: \begin{enumerate} \item The collection contains at most $s+1$ affine pencils over $\Q$, each of positive order at most $B$. \item At every tuple of matrices of a common positive order over a field extension of $\Q$, all pencils in $\mathcal C_\Phi$ are invertible if and only if the original formula tree $\Phi$ is defined there and its value is invertible. \item If $\Phi$ is admissible and nonzero, there is a single tuple over some field extension of $\Q$ at which every pencil in $\mathcal C_\Phi$ is invertible. \end{enumerate} Adding the order-one constant pencil $1$ for normalization gives at most $s+2$ pencils, still of order at most $B$, with the same simultaneous feasibility property in the third assertion.
+[proposition] \label{prop:generator-hitting} Every nonzero admissible formula of size at most~$s$ has a defined, invertible evaluation at a tuple in~$\mathcal H_{n,s}$.
+[corollary] \label{cor:pencil-hitting} Let $L=A_0+\sum_{i=1}^n A_i x_i$ be a rational affine linear pencil of order $q\le B$ that admits an invertible matrix evaluation over an extension field of~$\Q$. There is a tuple $X\in\mathcal H_{n,s}$ for which $L(X)$ is invertible.
+[proposition] \label{prop:generator-complexity} The list $\mathcal H_{n,s}$ can be constructed and written by one deterministic Turing machine in a number of bit operations bounded by a fixed polynomial in $n+s+1$. Its entire binary encoding has length bounded by a fixed polynomial in the same quantity.
+[corollary] \label{cor:rank-detecting-list} Let $a,b\geq1$ and $k\geq0$, and put $P=a+b+k+1$. From these parameters in unary, a deterministic generator constructs a nonempty finite list $\mathcal R_{a,b,k}$ of pairs \[ (e,X),\qquad e\geq1,\quad X=(X_1,\ldots,X_k)\in\Mat_e(\Q)^k, \] in a fixed polynomial in $P$ bit operations. Its number of entries, total binary encoding length, and every matrix dimension $e$ are bounded by fixed polynomials in $P$. The list depends only on $a,b,k$. For every rectangular rational affine pencil \[ A(x)=A_0+\sum_{i=1}^k A_i x_i,\qquad A_i\in\Q^{a\times b}, \] write $\operatorname{ncrk}A$ for its rank over the free skew field on $x_1,\ldots,x_k$ over $\Q$, with ordinary rational rank when $k=0$. Then the exact identity \begin{equation} \operatorname{ncrk}A =\max_{(e,X)\in\mathcal R_{a,b,k}} \frac{\rank_{\Q}\!\left(A_0\otimes I_e+ \sum_{i=1}^k A_i\otimes X_i\right)}{e} \label{eq:rank-detecting-list} \end{equation} holds for all choices and bit lengths of the coefficients. Suppose that, at each requested pair $(e,X)$, an oracle returns either the complete exact rational $ae$ by $be$ matrix in \eqref{eq:rank-detecting-list}, in binary rational encoding, or its exact  […]
+
+=== LEAN COMPARATOR FormulaHitting (exact formal statement)
+import Mathlib.Data.Matrix.Basic
+import Mathlib.Data.Rat.Defs
+namespace OAI
+namespace NCHitting
+abbrev Word (n : ℕ) := List (Fin n)
+abbrev WordSeries (F : Type*) (n : ℕ) := Word n → F
+def convolution {F : Type*} {n : ℕ} [Semiring F]
+    (f g : WordSeries F n) : Word n → F
+  | [] => f [] * g []
+  | i :: w => f [] * g (i :: w) + convolution (fun v => f (i :: v)) g w
+inductive Formula (F : Type*) (n : ℕ) where
+  | scalar : F → Formula F n
+  | var : Fin n → Formula F n
+  | add : Formula F n → Formula F n → Formula F n
+  | mul : Formula F n → Formula F n → Formula F n
+namespace Formula
+def size {F : Type*} {n : ℕ} : Formula F n → ℕ
+  | scalar _ => 1
+  | var _ => 1
+  | add f g => f.size + g.size + 1
+  | mul f g => f.size + g.size + 1
+noncomputable def coeff {F : Type*} {n : ℕ} [Semiring F] :
+    Formula F n → WordSeries F n
+  | scalar a => fun w => if w = [] then a else 0
+  | var i => fun w => if w = [i] then 1 else 0
+  | add f g => fun w => coeff f w + coeff g w
+  | mul f g => convolution (coeff f) (coeff g)
+def eval {F A : Type*} {n : ℕ} [Semiring A]
+    (scalarMap : F → A) (T : Fin n → A) : Formula F n → A
+  | scalar a => scalarMap a
+  | var i => T i
+  | add f g => eval scalarMap T f + eval scalarMap T g
+  | mul f g => eval scalarMap T f * eval scalarMap T g
+end Formula
+def dimension (n s : ℕ) : ℕ := if n = 1 ∧ s = 1 then 1 else 2 * n * s ^ 2
+def matrixEntry (i r q : ℕ) : ℚ :=
+  if q < r then (-1 : ℚ) ^ (r - q - 1) / ((r : ℚ) * (i : ℚ) ^ (r - q))
+  else 0
+def generator (n s : ℕ) : Fin n → Matrix (Fin (dimension n s)) (Fin (dimension n s)) ℚ :=
+  fun i r q => if n = 1 ∧ s = 1 then 1 else matrixEntry (i.val + 1) r.val q.val
+universe u_2
+theorem universal_hitting (n s : ℕ) (hn : 1 ≤ n) (hs : 1 ≤ s)
+    (F : Type u_2) [Field F] [CharZero F] (f : Formula F n)
+    (hsize : f.size ≤ s) (hf : ∃ w, f.coeff w ≠ 0) :
+    f.eval (Matrix.scalar (Fin (dimension n s)))
+      (fun i r q => (generator n s i r q : F)) ≠ 0 := by
+  sorry
+end NCHitting
+end OAI
+
+
+=== LEAN COMPARATOR RationalHitting (exact formal statement)
+import Mathlib
+namespace OAI
+namespace RationalHitting
+universe u
+inductive Formula (n : ℕ) where
+  | var : Fin n → Formula n
+  | const : ℚ → Formula n
+  | add : Formula n → Formula n → Formula n
+  | mul : Formula n → Formula n → Formula n
+  | inv : Formula n → Formula n
+  deriving DecidableEq
+namespace Formula
+def size {n : ℕ} : Formula n → ℕ
+  | .var _ | .const _ => 1
+  | .add f g | .mul f g => f.size + g.size + 1
+  | .inv f => f.size + 1
+inductive Eval {n : ℕ} {R : Type u} [Ring R]
+    (c : ℚ →+* R) (X : Fin n → R) : Formula n → R → Prop where
+  | var (i) : Eval c X (.var i) (X i)
+  | const (a) : Eval c X (.const a) (c a)
+  | add {f g a b} : Eval c X f a → Eval c X g b → Eval c X (.add f g) (a + b)
+  | mul {f g a b} : Eval c X f a → Eval c X g b → Eval c X (.mul f g) (a * b)
+  | inv {f a b} : Eval c X f a → a * b = 1 → b * a = 1 → Eval c X (.inv f) b
+end Formula
+abbrev Mat (d : ℕ) := Matrix (Fin d) (Fin d) ℚ
+abbrev Tuple (n d : ℕ) := Fin n → Mat d
+def Evaluates {n d : ℕ} (f : Formula n) (X : Tuple n d) (v : Mat d) : Prop :=
+  f.Eval (algebraMap ℚ (Mat d)) X v
+def Admissible {n : ℕ} (f : Formula n) : Prop :=
+  ∃ d, 0 < d ∧ ∃ (X : Tuple n d), ∃ v, Evaluates f X v
+def Nonzero {n : ℕ} (f : Formula n) : Prop :=
+  ∃ d, 0 < d ∧ ∃ (X : Tuple n d), ∃ v, Evaluates f X v ∧ v ≠ 0
+structure Output (n : ℕ) where
+  dimension : ℕ
+  dimension_pos : 0 < dimension
+  tuples : List (Tuple n dimension)
+def encodeNat (a : ℕ) : List Bool :=
+  let ds := (Nat.digits 2 a).map (fun b => b != 0)
+  List.replicate ds.length true ++ [false] ++ ds
+def encodeRat (a : ℚ) : List Bool :=
+  [decide (a.num < 0)] ++ encodeNat a.num.natAbs ++ encodeNat a.den
+def encodeTuple {n d : ℕ} (X : Tuple n d) : List Bool :=
+  (List.finRange n).flatMap fun i =>
+    (List.finRange d).flatMap fun j =>
+      (List.finRange d).flatMap fun k => encodeRat (X i j k)
+def encodeOutput {n : ℕ} (H : Output n) : List Bool :=
+  encodeNat H.dimension ++ encodeNat H.tuples.length ++ H.tuples.flatMap encodeTuple
+abbrev Alphabet := Fin 4
+abbrev Machine (m : ℕ) := Turing.TM0.Machine Alphabet (Fin (m + 1))
+abbrev Config (m : ℕ) := Turing.TM0.Cfg Alphabet (Fin (m + 1))
+def tapeBit (b : Bool) : Alphabet := if b then 2 else 1
+def unaryInput (n s : ℕ) : List Alphabet :=
+  List.replicate n 2 ++ [1] ++ List.replicate s 2
+def run {m : ℕ} (G : Machine m) : ℕ → Config m → Option (Config m)
+  | 0, a => some a
+  | t + 1, a => (Turing.TM0.step G a).bind (run G t)
+def OutputsWithin {m n : ℕ} (G : Machine m) (s bound : ℕ) (H : Output n) : Prop :=
+  ∃ t ≤ bound, ∃ a : Config m,
+    run G t (Turing.TM0.init (unaryInput n s)) = some a ∧
+    Turing.TM0.step G a = none ∧
+    a.Tape.right₀ = Turing.ListBlank.mk ((encodeOutput H).map tapeBit)
+def Hits {n : ℕ} (s : ℕ) (H : Output n) : Prop :=
+  ∀ f : Formula n, f.size ≤ s → Admissible f → Nonzero f →
+    ∃ X ∈ H.tuples, ∃ v, Evaluates f X v ∧ IsUnit v
+def MainStatement : Prop :=
+  ∃ (m : ℕ) (G : Machine m) (C k : ℕ), 0 < C ∧ 0 < k ∧
+    ∀ n s : ℕ, 1 ≤ n → 1 ≤ s → ∃ H : Output n,
+      H.dimension ≤ C * (n + s + 1) ^ k ∧
+      (encodeOutput H).length ≤ C * (n + s + 1) ^ k ∧
+      OutputsWithin G s (C * (n + s + 1) ^ k) H ∧ Hits s H
+theorem main : MainStatement := by
+  sorry
+end RationalHitting
+end OAI
+

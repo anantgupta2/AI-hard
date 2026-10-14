@@ -1,0 +1,54 @@
+FAMILY 369: The hot spots conjecture for simply connected planar domains
+SUBJECT: Partial differential equations
+OPENAI SUMMARY: Proves a strict form of Burdzy's simply connected hot spots conjecture. On every smooth bounded simply connected planar domain, each nonzero eigenfunction for the first positive Neumann eigenvalue has no interior critical point, so all global extrema lie on the boundary. Eigenvalue multiplicity is allowed.
+
+=== MANUSCRIPT: Strict hot spots and absence of interior critical points on smooth simply connected planar domains (September-24-2026) [preprints/Strict-hot-spots-and-absence-of-interior-critical-points-on-smooth-simply-connected-planar-domains-September-24-2026/build/main.tex]
+ABSTRACT: We prove the strict hot spots conjecture for smooth bounded simply connected planar domains. More precisely, every nonzero eigenfunction for the first positive Neumann eigenvalue has nonvanishing gradient in the interior, so all its global maxima and minima lie on the boundary. This holds even when the eigenvalue is multiple.
+INTRODUCTION (start): The hot-spots problem arose from Rauch's discussion of the long-time behavior of heat flow with insulating boundary conditions \cite{Rauch1975}. Its spectral formulation asks whether the extrema of a first-positive Neumann eigenfunction occur on the boundary. Bañuelos and Burdzy distinguished strict and nonstrict formulations, and assertions about every eigenfunction from the existence of one favorable eigenfunction \cite{BanuelosBurdzy1999}. These distinctions matter when the eigenvalue is multiple. Let $\Omega\subset\R^2$ be a nonempty bounded simply connected open set with $C^\infty$ boundary. In particular, $\Omega$ is connected. Set \begin{equation}\label{eq:mu} \mu=\mu_1(\Omega) =\inf_{\substack{0\ne v\in H^1(\Omega)\\ \int_\Omega v=0}} \frac{\int_\Omega|\grad v|^2}{\int_\Omega|v|^2}, \end{equation} and let $\V$ be the real Neumann eigenspace for $\mu$. We count only positive eigenvalues in this notation; sources that count the constant eigenfunction first write $\mu_2$ for this same eigenvalue. [statement] The theorem imposes no convexity or symmetry condition. It applies to every member of the first positive eigenspace, including when the eigenvalue is multiple. The nonvanishing-gradient conclusion is stronger than \eqref{eq:hotspots}, since it also rules out interior saddle points. \paragraph{Background and methods.} Topology matters in the hot-spots problem. Burdzy and Werner constructed a planar counterexample with two holes and a simple first-positive eigenvalue \cite{BurdzyWerner1999}. Bass and Burdzy obtained examples with both extrema strictly in the interior \cite{BassBurdzy2000}, and Burdzy subsequently obtained this behavior with just one hole \cite{Burdzy2005}. The simply connected planar conjecture is stated explicitly in \cite[Conjecture~1.2(ii)]{Burdzy2005}. Important geometric special cases already establish strong gradient conclusions. Jerison and Nadirashvili proved a positive directional derivative for every first-positive eigenfunction on convex planar domains with two orthogonal reflection symmetries, allowing multiple eigenvalues \cite[Theorem~1.4]{JerisonNadirashvili2000}. Probabilistic coupling methods developed by Bañuelos and Burdzy \cite{BanuelosBurdzy1999} led to further results. Pascu proved boundary-only extrema for antisymmetric eigenfunctions on $C^{1,\alpha}$ convex planar domains with one reflection symmetry, where $0<\alpha<1$ \cite{Pascu2002}. Atar and Burdzy treated every first-positive eigenfunction on lip domains, a class of Lipschitz domains bounded between graphs of functions with Lipschitz constants at most one \cite{AtarBurdzy2004}. Miyamoto obtained interior critical-point exclusion under a spectral-diameter condition, giving nonsymmetric nearly circular convex examples \cite[Lemma~1.2 and Theorem~A]{Miyamoto2007}. The polygonal problem has a complementary development. Siudeja proved hot-spots results for a class of acute triangles \cite{Siudeja2015}. Judge and Mondal, with their subsequent erratum, excluded interior critical points for every first-positive Neumann eigenfunction on every Euclidean triangle \cite{JudgeMondal2020,JudgeMondal2022}. Chen, Gui and Yao established the finer classification of nonvertex critical points \cite{ChenGuiYao2026}. These results concern domains with corners; \Cref{thm:main} concerns the full smooth simply connected planar class. Recent quantitative work measures how far the hot-spots conclusion can fail. For general bounded connected Lipschitz domains, de Dios Pont, Hsu and Taylor determined the sharp dimension-dependent upper bound for the ratio of a first-positive Neumann eigenfunction's supremum over the domain to its maximum on the boundary \cite[Definition~1 and Theorem~4]{deDiosPontHsuTaylor2025}. Deng, Jiang and Yang obtained quantitative bounds for convex domains in two-dimensional space forms \cite{DengJiangYang2026}. Such ratios concern extrema; excluding every interior critical point also requires excluding saddle points. Our star […]
+[theorem] \label{thm:main} For every $0\ne u\in\V$, \[ \grad u(x)\ne0\qquad(x\in\Omega). \] In particular, \begin{equation}\label{eq:hotspots} \min_{y\in\partial\Omega}u(y)<u(x)<\max_{y\in\partial\Omega}u(y) \qquad(x\in\Omega). \end{equation}
+
+=== LEAN COMPARATOR HotSpots (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open Set MeasureTheory
+open scoped ContDiff
+namespace StrictHotSpots
+abbrev Plane := EuclideanSpace ℝ (Fin 2)
+def SmoothBoundary (Ω : Set Plane) : Prop :=
+  ∀ p ∈ frontier Ω, ∃ (U : Set Plane) (ρ : Plane → ℝ),
+    IsOpen U ∧ p ∈ U ∧ ContDiffOn ℝ ∞ ρ U ∧
+    fderiv ℝ ρ p ≠ 0 ∧ ρ p = 0 ∧
+    Ω ∩ U = {x | ρ x < 0} ∩ U
+def AdmissibleDomain (Ω : Set Plane) : Prop :=
+  Ω.Nonempty ∧ IsOpen Ω ∧ Bornology.IsBounded Ω ∧
+    IsSimplyConnected Ω ∧ SmoothBoundary Ω
+def HasH1Gradient (Ω : Set Plane) (v : Plane → ℝ) (g : Plane → Plane) : Prop :=
+  MemLp v 2 (volume.restrict Ω) ∧ MemLp g 2 (volume.restrict Ω) ∧
+  ∀ φ : Plane → ℝ, ContDiff ℝ ∞ φ → HasCompactSupport φ → tsupport φ ⊆ Ω →
+    ∀ e : Plane,
+      (∫ x in Ω, v x * (fderiv ℝ φ x) e) =
+        -(∫ x in Ω, (inner ℝ (g x) e) * φ x)
+def rayleighValues (Ω : Set Plane) : Set ℝ :=
+  {r | ∃ (v : Plane → ℝ) (g : Plane → Plane),
+    HasH1Gradient Ω v g ∧ (∫ x in Ω, v x) = 0 ∧
+    0 < (∫ x in Ω, (v x) ^ 2) ∧
+    r = (∫ x in Ω, ‖g x‖ ^ 2) / (∫ x in Ω, (v x) ^ 2)}
+def firstPositiveNeumannValue (Ω : Set Plane) : ℝ := sInf (rayleighValues Ω)
+def InFirstNeumannEigenspace (Ω : Set Plane) (u : Plane → ℝ) : Prop :=
+  ContDiffOn ℝ ∞ u (closure Ω) ∧ HasH1Gradient Ω u (gradient u) ∧
+    (∫ x in Ω, u x) = 0 ∧
+    ∀ (v : Plane → ℝ) (g : Plane → Plane), HasH1Gradient Ω v g →
+      (∫ x in Ω, inner ℝ (gradient u x) (g x)) =
+        firstPositiveNeumannValue Ω * (∫ x in Ω, u x * v x)
+def MainConclusion (Ω : Set Plane) (u : Plane → ℝ) : Prop :=
+  (∀ x ∈ Ω, gradient u x ≠ 0) ∧
+    ∀ x ∈ Ω, sInf (u '' frontier Ω) < u x ∧ u x < sSup (u '' frontier Ω)
+theorem main_theorem (Ω : Set Plane) (hΩ : AdmissibleDomain Ω)
+    (u : Plane → ℝ) (hu : InFirstNeumannEigenspace Ω u)
+    (hne : ∃ x ∈ Ω, u x ≠ 0) : MainConclusion Ω u := by
+  sorry
+end StrictHotSpots
+end
+end OAI
+

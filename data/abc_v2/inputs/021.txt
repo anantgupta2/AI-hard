@@ -1,0 +1,52 @@
+FAMILY 021: A quadratic bound for Jacobsthal’s function
+SUBJECT: Number theory
+OPENAI SUMMARY: Answers Jacobsthal's quadratic-bound question: every interval of $`Ck^2`$ consecutive integers contains an integer coprime to any prescribed positive integer with at most k distinct prime divisors, for an absolute constant C. The bound is uniform over prime sets and interval positions and removes the classical logarithmic loss.
+
+=== MANUSCRIPT: A quadratic bound for Jacobsthal's function (September-25-2026) [preprints/A-quadratic-bound-for-Jacobsthals-function-September-25-2026/build/main.tex]
+ABSTRACT: Let $`h(k)`$ be the least integer such that every interval of $`h(k)`$ consecutive integers contains an integer coprime to any prescribed positive integer having at most k distinct prime divisors. We prove $`h(k)\ll k^2/(\log\log(3k))^2`$, giving an affirmative answer to Jacobsthal's quadratic-bound question.
+INTRODUCTION (start): For a positive integer $n$, let $j(n)$ be the least positive integer $m$ such that every interval of $m$ consecutive integers contains an integer coprime to $n$. Write $\omega(n)$ for the number of distinct prime divisors of $n$, with $\omega(1)=0$, and put \[ h(k)=\sup_{\substack{n\ge1\\\omega(n)\le k}}j(n),\qquad k\ge1. \] The starting point of the interval is arbitrary, and replacing $n$ by the product of its distinct prime divisors does not change $j(n)$. Thus $h(k)-1$ is the greatest length of an interval that can be covered by the divisibility classes of at most $k$ primes. Jacobsthal studied this function in a series of papers beginning in 1960 \cite{Jacobsthal1960}. Erd\H{o}s subsequently recorded Jacobsthal's question whether $h(k)\ll k^2$ \cite[p.~163, equations (1) and (3)]{Erdos1962}. In Erd\H{o}s's notation, $C(k)+1$ is the maximum of $j(n)$ over integers with exactly $k$ distinct prime divisors. This equals our $h(k)$: adjoining prime divisors cannot decrease $j(n)$. We prove the following bound, which gives an affirmative answer and a further iterated-logarithmic saving. [statement] All logarithms are natural. In particular the theorem gives a uniform quadratic bound for arbitrary sets of prime divisors, with no restriction on their sizes or on the interval's translation. \subsection*{Historical context and related work} The development of the upper bound is closely tied to sieve theory. Erd\H{o}s observed that Brun's method gives $h(k)\ll k^{C_0}$ for some absolute exponent $C_0$ \cite[p.~163]{Erdos1962}. Iwaniec's work on the error term in the linear sieve gave an estimate of order $k^2\log^2 k$ when the prime divisors are the first $k$ primes \cite{Iwaniec1971}; this primorial case is distinguished explicitly in \cite[p.~329]{Vaughan1977} and \cite[pp.~225--226]{Iwaniec1978}. Vaughan then proved the uniform estimate \[ j(n)\ll\omega(n)^2\bigl(\log(2\omega(n))\bigr)^4 \qquad(n>1) \] \cite[Theorem, p.~329]{Vaughan1977}. Iwaniec's shifted-sieve argument removed two logarithmic factors and established $h(k)\ll k^2\log^2 k$ for arbitrary prime sets \cite[Theorem and Corollary, p.~226]{Iwaniec1978}. Theorem~\ref{thm:main} improves this bound and, in particular, reaches the quadratic scale asked for by Jacobsthal. Vaughan explained the exponent $2$ through the one-dimensional sieve's restriction to moduli near the square root of the interval length \cite[p.~329]{Vaughan1977}. In the usual linear-sieve notation this appears as the vanishing of the lower function $f$ at sieve parameter $2$. Our proof also reaches this limiting parameter. It keeps a boundary contribution that disappears from the leading linear-sieve term, and then controls the discrepancy between this reference calculation and the actual prescribed classes. The latter comparison requires the inverse estimate and the stopped counts developed below; positivity of the reference calculation alone does not give a lower bound for the original sieve. A separate question concerns which prime sets give the largest gap. Let $p_k$ denote the $k$th prime and $P_k=\prod_{i=1}^k p_i$. Jacobsthal suggested that $j(P_k)=h(k)$ for every $k$. Hajdu and Saradha proved equality for $k\le23$, but found \[ j(P_{24})=234<236=h(24) \] \cite[Theorem~1.2]{HajduSaradha2012}. Thus the primorial extremality conjecture is distinct from the quadratic-bound question, and a theorem only about $j(P_k)$ does not settle the uniform problem. The computational literature reflects this distinction. Costello and Watts obtained recursive lower bounds for the minimum number of integers coprime to $P_k$ in an interval, and used them to compute upper bounds for $j(P_k)$ \cite[Theorem~4.4 and Section~5]{CostelloWatts2015}. Ziller computed the maximum over arbitrary prime sets through $43$ prime factors \cite[Section~3]{Ziller2019}. These finite computations concern explicit values, whereas the constant in Theorem~\ref{thm:main} is not made explicit. Primorials nevertheless give the strongest lowe […]
+[theorem] \label{thm:main} There is an absolute constant $C>0$ such that \[ h(k)\le C\frac{k^2}{(\log\log(3k))^2} \qquad\text{for every integer }k\ge1. \]
+[theorem] \label{thm:survivors} There are absolute constants $c>0$ and $z_0$ with the following property. For every real $z\ge z_0$ and every choice of a residue class $a_p\pmod p$ for each prime $p\le z$, \begin{equation}\label{eq:main-survivors} \#\{1\le n\le Y:n\not\equiv a_p\pmod p\text{ for every }p\le z\} \ge c\frac{YV_0}{B^2}. \end{equation}
+
+=== LEAN COMPARATOR Jacobsthal (exact formal statement)
+import Mathlib
+namespace OAI
+namespace Erdos970
+namespace NumberTheoryLean.Targets
+open Filter
+open scoped Topology
+def IsJacobsthalBound (k m : ℕ) : Prop :=
+  ∀ n : ℕ, 0 < n → n.primeFactors.card ≤ k →
+    ∀ a : ℤ, ∃ i : ℕ, i < m ∧ (a + i).natAbs.Coprime n
+def JacobsthalQuadratic : Prop :=
+  ∃ C : ℝ, 0 < C ∧ ∀ k : ℕ, 0 < k →
+    ∃ m : ℕ, IsJacobsthalBound k m ∧ (m : ℝ) ≤ C * (k : ℝ) ^ 2
+end NumberTheoryLean.Targets
+namespace Erdos970Final
+theorem erdos_970_quadratic : NumberTheoryLean.Targets.JacobsthalQuadratic := by
+  sorry
+end Erdos970Final
+end Erdos970
+end OAI
+
+
+=== LEAN COMPARATOR JacobsthalImproved (exact formal statement)
+import Mathlib
+namespace OAI
+namespace Erdos970
+namespace NumberTheoryLean.Targets
+def IsJacobsthalBound (k m : ℕ) : Prop :=
+  ∀ n : ℕ, 0 < n → n.primeFactors.card ≤ k →
+    ∀ a : ℤ, ∃ i : ℕ, i < m ∧ (a + i).natAbs.Coprime n
+def JacobsthalIteratedLog : Prop :=
+  ∃ C : ℝ, 0 < C ∧ ∀ k : ℕ, 0 < k →
+    ∃ m : ℕ, IsJacobsthalBound k m ∧
+      (m : ℝ) ≤ C * (k : ℝ) ^ 2 / (Real.log (Real.log (3 * (k : ℝ)))) ^ 2
+end NumberTheoryLean.Targets
+namespace Erdos970Final
+theorem erdos_970_iterated_log : NumberTheoryLean.Targets.JacobsthalIteratedLog := by
+  sorry
+end Erdos970Final
+end Erdos970
+end OAI
+

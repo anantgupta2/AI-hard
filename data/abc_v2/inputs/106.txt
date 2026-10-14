@@ -1,0 +1,70 @@
+FAMILY 106: Hardness of coloring three-colorable graphs
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: It is NP-hard to color a three-colorable graph using any fixed number c ≥ 3 of colors. More strongly, for every fixed $`0\lt \delta\lt 1/3`$, a deterministic polynomial-time reduction from 3SAT produces simple unweighted graphs that are three-colorable in the satisfiable case and have no independent set of size $`\delta n`$ otherwise, where n is the number of vertices.
+
+=== MANUSCRIPT: Hardness of finding large independent sets in three-colorable graphs (September-24-2026) [preprints/Hardness-of-finding-large-independent-sets-in-three-colorable-graphs-September-24-2026/build/source/main.tex]
+ABSTRACT: We prove that, for every fixed $`0\lt \delta\lt 1/3`$, it is NP-hard to distinguish three-colorable graphs from graphs in which every independent set has fewer than δ times the number of vertices. Consequently, for every fixed integer c ≥ 3, finding a proper c-coloring of a three-colorable graph is NP-hard.
+INTRODUCTION (start): A proper coloring of a graph assigns different colors to adjacent vertices. An independent set is a set of pairwise nonadjacent vertices. For a nonempty finite graph $G$, write $n=|V(G)|$ and let $\alpha(G)$ be its maximum independent-set size. Every three-colorable graph contains an independent set of size at least $n/3$: one of its three color classes has that size. We prove that distinguishing this structured case from graphs with an arbitrarily small fixed independence ratio is NP-hard. [statement] It suffices to prove Theorem~\ref{thm:main} for rational $\delta$. For a fixed real threshold, choose a fixed rational $0<\delta_0<\delta$ and use $R_{\delta_0}$. We assume $\delta$ rational in the construction and its analysis. The density conclusion is stronger than an arbitrarily large fixed lower bound on chromatic number. Indeed, small independence ratio forces large chromatic number, whereas adjoining isolated vertices preserves chromatic number and can make the independence ratio arbitrarily close to one. Approximate graph coloring asks, for fixed integers $3\le k\le c$, to find a proper $c$-coloring of a graph promised to be $k$-colorable. Its decision version distinguishes $k$-colorable graphs from graphs that are not $c$-colorable. The following consequence recovers the constant-palette hardness theorem. [statement] \begin{proof} Choose a rational $0<\delta<\min\{1/3,1/c\}$ and apply Theorem~\ref{thm:main}. A three-colorable graph is $k$-colorable. A $c$-colorable graph has an independent set of size at least $n/c$, which the soundness bound excludes. \end{proof} \subsection{History and comparison with prior work} The difficulty of approximate coloring persists even with a very small promised palette. Khanna, Linial, and Safra established hardness of four-coloring three-colorable graphs \cite{KhannaLinialSafra2000}; Guruswami and Khanna later gave a different proof and obtained bounded-degree and edge-error variants \cite{GuruswamiKhanna2004}. The algebraic theory of promise constraint satisfaction developed by Barto, Bul\'{\i}n, Krokhin, and Opr\v{s}al gave hardness of $(2k-1)$-coloring $k$-colorable graphs, and hence five colors when $k=3$ \cite[Theorem~6.5]{BartoBulinKrokhinOprsal2021}. Their Example~2.9 records the conjectured hardness for every fixed $3\le k\le c$. Guruswami and Sandeep showed that the ordinary $d$-to-$1$ Games Conjecture with perfect completeness, for any fixed $d\ge2$, implies constant-palette hardness for three-colorable graphs \cite[Theorem~1]{GuruswamiSandeep2020}. Their reduction first gives arbitrarily small independent-set density with a $2d$-colorable completeness promise \cite[Theorem~9]{GuruswamiSandeep2020}. The arc-graph reduction of Krokhin, Opr\v{s}al, Wrochna, and \v{Z}ivn\'y \cite[Theorem~1.8]{KrokhinOprsalWrochnaZivny2023} then reduces the promised palette to three for the coloring conclusion. The resulting three-colorable hardness statement does not include the independent-set guarantee. The companion article~\cite[Theorem~1.1]{OpenAIPerfectCompleteness2026} establishes the ordinary perfect-completeness premise for $d=2$. Fei, Minzer, and Wang have proved the $4$-to-$1$ Games Conjecture with perfect completeness \cite[Theorem~1.6]{FeiMinzerWang2026}. Combining it with the preceding reductions resolves the constant-palette conjecture: their Corollary~1.7 gives the three-colorable versus not $c$-colorable gap for every fixed $c$. Their Corollary~1.9 gives arbitrarily small independent-set density with an eight-colorable completeness promise, corresponding to $2d=8$. Theorem~\ref{thm:main} combines this stronger form of soundness with three-colorability of the entire graph. Our proof starts with ordinary projection Label Cover and does not require a bound on projection-fiber sizes. The distinction between colorability and independence density also appears in earlier conditional results. Dinur, Mossel, and Regev obtained three-colorable completeness and arbitrarily small independent […]
+[theorem] \label{thm:main} For every fixed real $0<\delta<1/3$, there is a deterministic polynomial-time algorithm $R_\delta$ that maps each explicitly encoded Boolean $3$-CNF formula $\phi$ to a nonempty finite simple undirected unweighted graph $G_\phi$ such that \[ \begin{array}{ll} \phi\text{ is satisfiable} &\Longrightarrow G_\phi\text{ is three-colorable},\\[2pt] \phi\text{ is unsatisfiable} &\Longrightarrow \alpha(G_\phi)<\delta\,|V(G_\phi)|. \end{array} \] The running time and explicit output size are polynomial in the ordinary binary encoding length of $\phi$. Their constants and polynomial degree may depend on the fixed $\delta$, but not on $\phi$. The coloring in the first implication covers every vertex and is not supplied with the graph.
+[corollary] \label{cor:coloring} For every fixed pair of integers $3\le k\le c$, it is NP-hard to distinguish $k$-colorable graphs from graphs that are not $c$-colorable.
+
+=== LEAN COMPARATOR IndependentSets (exact formal statement)
+import Mathlib
+namespace OAI
+namespace LargeIndependentSets
+structure Literal where
+  name : ℕ
+  positive : Bool
+  deriving DecidableEq
+structure Formula where
+  clauses : List (List Literal)
+  width : ∀ C ∈ clauses, C.length ≤ 3
+def Formula.Satisfiable (φ : Formula) : Prop :=
+  ∃ assignment : ℕ → Bool, ∀ C ∈ φ.clauses,
+    ∃ l ∈ C, assignment l.name = l.positive
+def frame : List Bool → List Bool
+  | [] => [false]
+  | b :: bs => true :: b :: frame bs
+def nameBits (n : ℕ) : List Bool := frame n.bits
+def literalBits (l : Literal) : List Bool := l.positive :: nameBits l.name
+def clauseBits (C : List Literal) : List Bool :=
+  nameBits C.length ++ C.flatMap literalBits
+def formulaBits (φ : Formula) : List Bool :=
+  nameBits φ.clauses.length ++ φ.clauses.flatMap clauseBits
+structure Graph where
+  vertices : ℕ
+  nonempty : 0 < vertices
+  adj : Fin vertices → Fin vertices → Bool
+  symm : ∀ u v, adj u v = adj v u
+  loopless : ∀ u, adj u u = false
+def Graph.Independent (G : Graph) (S : Finset (Fin G.vertices)) : Prop :=
+  ∀ u ∈ S, ∀ v ∈ S, u ≠ v → G.adj u v = false
+instance (G : Graph) (S : Finset (Fin G.vertices)) : Decidable (G.Independent S) :=
+  inferInstanceAs (Decidable (∀ u ∈ S, ∀ v ∈ S, u ≠ v → G.adj u v = false))
+def Graph.independenceNumber (G : Graph) : ℕ :=
+  ((Finset.univ : Finset (Fin G.vertices)).powerset.filter G.Independent).sup Finset.card
+def Graph.ThreeColorable (G : Graph) : Prop :=
+  ∃ color : Fin G.vertices → Fin 3,
+    ∀ u v, G.adj u v = true → color u ≠ color v
+def graphBits (G : Graph) : List Bool :=
+  nameBits G.vertices ++ (List.finRange G.vertices).flatMap
+    (fun u => (List.finRange G.vertices).map (G.adj u))
+open scoped Classical
+noncomputable section
+structure RealGraphReduction (δ : ℝ) where
+  reduce : List Bool → Graph
+  computation : Turing.TM2ComputableInPolyTime (id : List Bool → List Bool) graphBits reduce
+  finiteAlphabets : ∀ k : computation.tm.K, Finite (computation.tm.Γ k)
+  outputBound : Polynomial ℕ
+  outputSize : ∀ b, (graphBits (reduce b)).length ≤ outputBound.eval b.length
+  completeness : ∀ φ : Formula, φ.Satisfiable → (reduce (formulaBits φ)).ThreeColorable
+  soundness : ∀ φ : Formula, ¬φ.Satisfiable →
+    ((reduce (formulaBits φ)).independenceNumber : ℝ) <
+      δ * (reduce (formulaBits φ)).vertices
+theorem mainTheoremReal :
+    ∀ δ : ℝ, 0 < δ → δ < 1 / 3 → Nonempty (RealGraphReduction δ) := by
+  sorry
+end
+end LargeIndependentSets
+end OAI
+

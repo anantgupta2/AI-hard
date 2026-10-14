@@ -1,0 +1,170 @@
+FAMILY 110: Optimal-order randomized k-server on arbitrary metrics
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Establishes a randomized competitive ratio $`O(\log^2(k+1))`$ for k-server on every metric space, matching the worst-case lower-bound order. One policy serves every finite oblivious request sequence, including on infinite unbounded metrics. On finite rational metrics, a uniform implementation has polynomial preprocessing and per-request bit cost in the input length and $`\log(t+1)`$ at request t, with a finite instance-dependent additive movement constant.
+
+=== MANUSCRIPT: Squared-logarithmic randomized k-server on arbitrary metrics (September-24-2026) [preprints/Squared-logarithmic-randomized-k-server-on-arbitrary-metrics-September-24-2026/build/source/main.tex]
+ABSTRACT: We prove that randomized k-server has competitive ratio $`O((\log(k+1))^2)`$ on every metric space against oblivious request sequences, matching the known worst-case lower bound. For each metric and initial configuration, one policy works for all finite request sequences, including on infinite and unbounded spaces. When the initial server positions are distinct, no additive term is needed.
+INTRODUCTION (start): \label{sec:introduction} The \(k\)-server problem asks how to move \(k\) servers in a metric space when requests arrive one at a time. A request is a point that must be occupied by a server; the cost is the distance moved. The offline optimum knows all future requests, whereas an online policy must decide from the revealed prefix. We determine the sharp worst-case order of the randomized competitive ratio. More precisely, let \((X,d)\) be a metric space and let \(s=(s_1,\ldots,s_k)\in X^k\) be the initial positions of \(k\) labeled servers. Repeated positions are allowed. To serve \(r_t\), a policy chooses one server and moves it to \(r_t\), leaving all others fixed. A server already at \(r_t\) can be chosen at zero cost. For a finite request sequence \(\sigma\), let \(\cost_{A,s}(\sigma)\) be a policy's total movement and let \(\OPT_{X,d,k,s}(\sigma)\) be the minimum such cost with full knowledge of \(\sigma\). Requests are fixed independently of the policy's random choices, the usual oblivious-adversary model. [statement] There is no finiteness, boundedness, or discreteness assumption on \(X\), and no computational-efficiency claim for the policy. Throughout, logarithms are natural. \subsection{Context and previous work} Manasse, McGeoch, and Sleator introduced the \(k\)-server problem as a common framework for online service problems \cite{MMS88,MMS90}. They proved the deterministic lower bound \(k\) on every metric with more than \(k\) points and conjectured that it is attainable. Koutsoupias and Papadimitriou established the \((2k-1)\)-competitive work function algorithm \cite{KP95}. A recent preprint of Coester, Koutsoupias, and Zbysiński announces a \(k\)-competitive analysis of that algorithm \cite{CKZ26}. The present paper concerns the different asymptotic behavior made possible by randomization against oblivious requests. Paging, the case of a uniform metric, gave the basic reason to expect such an improvement. Fiat, Karp, Luby, McGeoch, Sleator, and Young proved a harmonic lower bound and a \(2H_k\)-competitive randomized marking algorithm \cite{FKLMSY91}; McGeoch and Sleator attained the exact bound \(H_k=\sum_{i=1}^k i^{-1}\) \cite{MS91}. For weighted paging, Bansal, Buchbinder, and Naor obtained the optimal order \(O(\log k)\) through a fractional primal-dual algorithm and online rounding \cite{BBN12}. These results formed part of the evidence for the folklore randomized \(k\)-server conjecture, which predicted \(O(\log k)\) on every metric. That conjecture was disproved by Bubeck, Coester, and Rabani \cite[Theorem~11 and Proposition~8]{BCR23}: there exist \((k+1)\)-point metrics requiring competitive ratio \(\Omega(\log^2 k)\), even allowing a fixed additive constant. Their result must be distinguished from a lower bound on every metric. The latter developed through the decomposition and metric Ramsey methods of Karloff, Rabani, and Ravid \cite{KRR94}, Blum, Karloff, Rabani, and Saks \cite{BKRS00}, Bartal, Bollobás, and Mendel \cite{BBM06}, and Bartal, Linial, Mendel, and Naor \cite{BLMN05}; Bubeck, Coester, and Rabani ultimately obtained the sharp universal order \(\Omega(\log k)\) \cite[Corollary~20]{BCR23}. Theorem~\ref{thm:main} matches the larger, worst-case lower bound. It establishes the sharp squared-logarithmic order after the negative resolution of the original logarithmic conjecture. The main upper-bound approach passes through hierarchically separated trees. Bartal introduced probabilistic approximation by these metrics \cite{Bartal96,Bartal98}, and Fakcharoenphol, Rao, and Talwar obtained expected distortion \(O(\log n)\) for \(n\)-point metrics \cite{FRT04}. Recursive allocation methods were developed by Coté, Meyerson, and Poplawski \cite{CMP08} and by Bansal, Buchbinder, and Naor \cite{BBN10}. Bansal, Buchbinder, Mądry, and Naor then gave the first polylogarithmic bound for arbitrary finite metrics, \(O(\log^2 k\,\log^3 n\,\log\log n)\) \cite{BBMN15}. Bubeck, Cohen, Lee, Lee, and Mądry achieved \ […]
+[theorem] \label{thm:main} There is an absolute constant \(C<\infty\) such that, for every integer \(k\ge2\), every metric space \((X,d)\) with at least \(k+1\) points, and every \(s\in X^k\), there exist a randomized online policy \(A\) and a finite \(B\ge0\) satisfying \begin{equation}\label{eq:main} \E\,\cost_{A,s}(\sigma) \le C\bigl(\log(k+1)\bigr)^2\OPT_{X,d,k,s}(\sigma)+B \end{equation} for every finite request sequence \(\sigma\). The constant \(C\) is independent of every property of the metric. The number \(B\) may depend on \((X,d),k,s\), but not on the sequence or its length. The same policy serves all finite sequences and horizons. If the initial positions are distinct, one may take \(B=0\).
+
+=== MANUSCRIPT: Uniform computation of the squared-logarithmic k-server bound (September-24-2026) [preprints/Uniform-computation-of-the-squared-logarithmic-k-server-bound-September-24-2026/build/source/main.tex]
+ABSTRACT: We construct a uniform randomized k-server algorithm on finite rational metrics with competitive ratio $`O(\log^2(k+1))`$ against oblivious request sequences. Preprocessing is polynomial in the input length, and per-request bit complexity is polynomial in that length and the binary request-counter length. The additive movement constant is finite and instance-dependent, but may be enormous. The construction uses the companion squared-logarithmic existence theorem.
+INTRODUCTION (start): \label{sec:introduction} An online \(k\)-server algorithm maintains \(k\) labeled servers in a metric space. Upon receiving a request, it moves one server to the requested point and leaves the others fixed. The movement is charged according to the metric. The offline optimum knows the entire request sequence, whereas an online algorithm must act before seeing the next request. For an initial labeled tuple \(s\) and a finite request word \(\sigma\), write \(\cost_{A,s}(\sigma)\) for an algorithm's total movement and \(\OPT_s(\sigma)\) for the minimum such cost with full knowledge of the word. Requests are fixed independently of the algorithm's random bits, the oblivious-adversary model. We study finite rational metrics and the bit complexity of each online decision. The companion theorem~\cite{SquaredLog2026} supplies a policy with competitive ratio \(O(\log^2(k+1))\), but no procedure for computing its decision probabilities. We ask whether this existence guarantee can be realized by a single uniform algorithm on all finite rational metrics, using finite computations and unbiased random bits. [statement] Here and below \(\log\) is natural, except when the base is displayed. The worst-case bit bounds in Theorem~\ref{thm:main} imply the corresponding conditional expected bounds. The polynomial is uniform in every input parameter and in \(t\). Two features of the statement are essential. First, no bound on the size of \(B_{d,k,s}\) is imposed. Second, the permitted computation grows polynomially with the length of the binary request counter. Our algorithm serves requests immediately, but may serve an enormous initial number of them using one fixed label before the constructed policy takes over. The cost of this initial service enters \(B_{d,k,s}\). Thus polynomial preprocessing does not imply a short delay before activation or a polynomial bound on the additive movement loss. \subsection{History and computational scope} Manasse, McGeoch, and Sleator introduced the \(k\)-server problem as a metric framework for online service problems \cite{MMS1990}. Paging is its uniform metric case: servers represent the \(k\) pages held in a cache, and a request to an absent page costs one move. Fiat, Karp, Luby, McGeoch, Sleator, and Young gave the randomized marking algorithm and the harmonic randomized lower bound for paging \cite{FKLMSY1991}. This logarithmic behavior suggested the classical randomized \(k\)-server conjecture, which proposed an \(O(\log k)\) ratio on every metric. Bubeck, Coester, and Rabani disproved that conjecture by establishing a worst-case lower bound of order \(\log^2 k\) \cite{BCR2023}. The squared-logarithmic scale is therefore necessary for a guarantee uniform over metrics. Our mathematical input is Theorem~1.1 of the companion article \emph{Squared-logarithmic randomized \(k\)-server on arbitrary metrics} \cite{SquaredLog2026}. Its distinct-start clause supplies a single randomized policy for all finite oblivious inputs with zero additive loss. We state this exact finite-metric consequence as Theorem~\ref{thm:existence}. Only the existence of that policy is used, not its probabilities or any procedure for evaluating them. Coester and Cosson address polynomial-time implementation directly \cite[Theorem~1 and Corollary~2]{CoesterCosson2026}. They obtain ratio \(O(\log^2 k)\) on sufficiently separated hierarchically separated trees and ratio \(O(\log n\log^2 k)\) on arbitrary \(n\)-point metrics, with polynomial request-processing time independent of the request-history length. On the trees, they use only \(O(\log k)\) random bits in total; the general-metric algorithm also uses a bounded initial bit budget independent of the request-sequence length. These are stronger time and randomness guarantees than those sought here. Theorem~\ref{thm:main} instead obtains a competitive ratio independent of \(n\), using the companion existence theorem and allowing request-processing time polynomial in \(L+\log(t+1)\), together  […]
+[theorem] \label{thm:main} There are an absolute constant \(C\) and a polynomial \(p\) with the following property. Let \(n\ge3\), \(2\le k<n\), let \(d\) be a rational metric on \(X=\{1,\ldots,n\}\), and let \(s\in X^k\) be an initial labeled tuple, with repetitions allowed. Write \(L\) for the total binary encoding length of \(n,k,d,s\). A single uniform randomized online algorithm preprocesses these data in at most \(p(L)\) bit operations and serves request \(r_t\), for every reachable history and internal state, in at most \[ p\!\left(L+\left\lceil\log_2(t+1)\right\rceil\right) \] additional bit operations. It uses only unbiased random bits and moves exactly one chosen server to each request, permitting a zero-length move. For every fixed finite request sequence \(\sigma\) independent of those bits, \begin{equation}\label{eq:main-bound} \E\cost_{A,s}(\sigma) \le C\bigl(\log(k+1)\bigr)^2\OPT_s(\sigma)+B_{d,k,s}, \end{equation} where \(B_{d,k,s}\) is finite and independent of \(\sigma\) and its length. The algorithm does not need to know that length in advance.
+
+=== LEAN COMPARATOR KServer (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open scoped BigOperators
+namespace KServer
+universe u
+abbrev Configuration (k : ℕ) (X : Type u) := Fin k → X
+def LabelDistribution (k : ℕ) :=
+  {probability : Fin k → ℝ //
+    (∀ label, 0 ≤ probability label) ∧ ∑ label, probability label = 1}
+abbrev Policy (k : ℕ) (X : Type u) :=
+  List (X × Fin k) → X → LabelDistribution k
+def serve {k : ℕ} {X : Type u} (s : Configuration k X)
+    (label : Fin k) (request : X) : Configuration k X :=
+  Function.update s label request
+def serviceCost {k : ℕ} {X : Type u} [MetricSpace X]
+    (s : Configuration k X) : (requests : List X) → (Fin requests.length → Fin k) → ℝ
+  | [], _ => 0
+  | request :: requests, labels =>
+      dist (s (labels 0)) request +
+        serviceCost (serve s (labels 0) request) requests (fun index => labels index.succ)
+def pathProbability {k : ℕ} {X : Type u} (A : Policy k X)
+    (history : List (X × Fin k)) :
+    (requests : List X) → (Fin requests.length → Fin k) → ℝ
+  | [], _ => 1
+  | request :: requests, labels =>
+      (A history request).val (labels 0) *
+        pathProbability A (history ++ [(request, labels 0)]) requests
+          (fun index => labels index.succ)
+def expectedCost {k : ℕ} {X : Type u} [MetricSpace X]
+    (A : Policy k X) (s : Configuration k X) (requests : List X) : ℝ :=
+  ∑ labels : Fin requests.length → Fin k,
+    pathProbability A [] requests labels * serviceCost s requests labels
+def optimalCost {k : ℕ} {X : Type u} [MetricSpace X]
+    (s : Configuration k X) (requests : List X) : ℝ :=
+  sInf (Set.range (serviceCost s requests))
+def MainStatement : Prop :=
+  ∃ C : ℝ, 0 < C ∧ ∀ (k : ℕ), 2 ≤ k →
+    ∀ (X : Type u) (_ : MetricSpace X),
+      (∃ embedding : Fin (k + 1) → X, Function.Injective embedding) →
+      ∀ s : Configuration k X,
+        ∃ A : Policy k X, ∃ B : ℝ,
+          0 ≤ B ∧ (Function.Injective s → B = 0) ∧
+          ∀ requests : List X,
+            expectedCost A s requests ≤
+              C * (Real.log (k + 1)) ^ 2 * optimalCost s requests + B
+theorem main_theorem : MainStatement.{u} := by
+  sorry
+end KServer
+end
+end OAI
+
+
+=== LEAN COMPARATOR UniformKServer (exact formal statement)
+import Mathlib
+namespace OAI
+namespace UniformKServer
+structure RationalMetric (n : ℕ) where
+  distance : Fin n → Fin n → ℚ
+  nonneg : ∀ x y, 0 ≤ distance x y
+  eq_zero : ∀ x y, distance x y = 0 ↔ x = y
+  symm : ∀ x y, distance x y = distance y x
+  triangle : ∀ x y z, distance x z ≤ distance x y + distance y z
+abbrev Configuration (n k : ℕ) := Fin k → Fin n
+abbrev History (n k : ℕ) := List (Fin n × Fin k)
+def serve {n k : ℕ} (s : Configuration n k) (r : Fin n) (j : Fin k) :
+    Configuration n k := Function.update s j r
+def costAlong {n k : ℕ} (d : RationalMetric n) :
+    Configuration n k → History n k → ℝ
+  | _, [] => 0
+  | s, (r, j) :: h => (d.distance (s j) r : ℝ) + costAlong d (serve s r j) h
+noncomputable def offlineCost {n k : ℕ} (d : RationalMetric n) (s : Configuration n k)
+    (w : List (Fin n)) : ℝ :=
+  sInf {c | ∃ h : History n k, h.map Prod.fst = w ∧ c = costAlong d s h}
+inductive HeadMove where
+  | left | stay | right
+  deriving DecidableEq
+structure BitTape where
+  left : List (Option Bool)
+  head : Option Bool
+  right : List (Option Bool)
+namespace BitTape
+def blank : BitTape := ⟨[], none, []⟩
+def ofWord (w : List Bool) : BitTape :=
+  match w with
+  | [] => blank
+  | b :: bs => ⟨[], some b, bs.map some⟩
+def shift (T : BitTape) : HeadMove → BitTape
+  | .stay => T
+  | .left => match T.left with
+    | [] => ⟨[], none, T.head :: T.right⟩
+    | a :: as => ⟨as, a, T.head :: T.right⟩
+  | .right => match T.right with
+    | [] => ⟨T.head :: T.left, none, []⟩
+    | a :: as => ⟨T.head :: T.left, a, as⟩
+end BitTape
+structure BitAction (q m : ℕ) where
+  control : Fin q
+  inputMove : HeadMove
+  write : Fin m → Option Bool
+  workMove : Fin m → HeadMove
+  emit : Option Bool
+  yield : Bool
+structure BitMachine where
+  controls : ℕ
+  tapes : ℕ
+  start : Fin controls
+  transition : Fin controls → Option Bool → (Fin tapes → Option Bool) →
+    Bool → BitAction controls tapes
+structure MachineState (M : BitMachine) where
+  control : Fin M.controls
+  input : BitTape
+  work : Fin M.tapes → BitTape
+  outputRev : List Bool
+  yielded : Bool
+namespace BitMachine
+def initial (M : BitMachine) (input : List Bool) : MachineState M :=
+  ⟨M.start, BitTape.ofWord input, fun _ => BitTape.blank, [], false⟩
+def step (M : BitMachine) (s : MachineState M) (coin : Bool) : MachineState M :=
+  if s.yielded then s else
+  let a := M.transition s.control s.input.head (fun i => (s.work i).head) coin
+  { control := a.control
+    input := s.input.shift a.inputMove
+    work := fun i => ({s.work i with head := a.write i}).shift (a.workMove i)
+    outputRev := match a.emit with
+      | none => s.outputRev
+      | some b => b :: s.outputRev
+    yielded := a.yield }
+def run (M : BitMachine) (s : MachineState M) (coins : List Bool) : MachineState M :=
+  coins.foldl M.step s
+def install (M : BitMachine) (s : MachineState M) (input : List Bool) : MachineState M :=
+  {s with input := BitTape.ofWord input, outputRev := [], yielded := false}
+end BitMachine
+def natCode (a : ℕ) : List Bool :=
+  List.replicate a.bits.length true ++ [false] ++ a.bits
+def rationalCode (a : ℚ) : List Bool :=
+  (a.num < 0) :: (natCode a.num.natAbs ++ natCode a.den)
+def instanceCode {n k : ℕ} (d : RationalMetric n) (s : Configuration n k) : List Bool :=
+  natCode n ++ natCode k ++
+    (List.ofFn fun x : Fin n =>
+      (List.ofFn fun y : Fin n => rationalCode (d.distance x y)).flatten).flatten ++
+    (List.ofFn fun j : Fin k => natCode ((s j).val + 1)).flatten
+def bitValue : List Bool → ℕ
+  | [] => 0
+  | b :: bs => (if b then 1 else 0) + 2 * bitValue bs
+def outputValue {M : BitMachine} (s : MachineState M) : ℕ :=
+  bitValue s.outputRev.reverse
+def polynomialBudget (c e x : ℕ) : ℕ := c * (x + 1)^e
+def requestBudget (c e L t : ℕ) : ℕ :=
+  polynomialBudget c e (L + Nat.clog 2 (t + 1))
+def boot {n k : ℕ} (M : BitMachine) (c e : ℕ)
+    (d : RationalMetric n) (s : Configuration n k) : MachineState M :=
+  M.run (M.initial (instanceCode d s))
+    (List.replicate (polynomialBudget c e (instanceCode d s).
+[…]

@@ -1,0 +1,48 @@
+FAMILY 180: Barnette’s Hamiltonian-cycle conjecture
+SUBJECT: Combinatorics
+OPENAI SUMMARY: Proves that every finite simple cubic bipartite planar 3-vertex-connected graph has a Hamiltonian cycle, resolving Barnette's conjecture. Equivalently, every three-edge path in a finite simple cubic 3-vertex-connected bipartite Pfaffian graph lies in a Hamiltonian cycle.
+
+=== MANUSCRIPT: Paired states and Hamiltonian cycles in cubic bipartite planar graphs (September-24-2026) [preprints/Paired-states-and-Hamiltonian-cycles-in-cubic-bipartite-planar-graphs-September-24-2026/build/paper.tex]
+ABSTRACT: We prove Barnette's conjecture: every finite simple cubic bipartite planar 3-vertex-connected graph has a Hamiltonian cycle.
+INTRODUCTION (start): A graph is \emph{cubic} if every vertex has degree three, and \emph{bipartite} if its vertices can be divided into two classes with no edge inside either class. It is \emph{\(3\)-vertex-connected} if it has at least four vertices and deleting any set of at most two vertices leaves it connected. A \emph{Hamiltonian cycle} visits every vertex exactly once. We consider finite simple undirected graphs throughout the main statement. Barnette's conjecture, recorded by Gr\"unbaum in the 1969 Waterloo proceedings \cite{Barnette1969}, asserts that every cubic bipartite polyhedral graph is Hamiltonian, where polyhedral means planar and \(3\)-vertex-connected. It belongs to the line of questions initiated by Tait's conjecture for cubic polyhedral graphs, disproved by Tutte \cite{Tutte1946}; see \citet{APSW2016,GSW2023} for the history and equivalent formulations. Several partial results explain the role of face structure. Goodey proved the case in which all faces are quadrilaterals or hexagons \cite{Goodey1975}. Feder and Subi allowed arbitrarily large faces in one class of a proper three-coloring of the faces, requiring only quadrilaterals and hexagons in the other two classes \cite{FederSubi2006}. Their argument uses proper quasi spanning trees of faces after contracting a distinguished face class. Kardo\v{s} proved the related Barnette--Goodey conjecture for cubic polyhedral graphs with faces of size at most six, without assuming bipartiteness \cite{Kardos2020}. More recently, Schnieders proved the faces-at-most-eight case of Barnette's conjecture \cite[Corollary~1.13]{Schnieders2025}. We remove the face-size restriction within the full \(3\)-connected bipartite class. [statement] The difficulty is to obtain one spanning cycle. A spanning subgraph of degree two can have several cycle components, and local choices alone need not join them. We instead construct an acyclic edge set in a dual triangulation whose complement becomes one connected spanning cycle. The construction also retains a prescribed local pattern needed when the triangulation is cut into smaller pieces. \subsection{The dual problem and the proof strategy} For a graph satisfying Theorem~\ref{thm:main}, the faces of its sphere dual are triangles. A bipartition of the original graph colors these triangles black and white, with opposite colors across every edge. The dual viewpoint goes back to Stein's region-partition formulation \cite[Theorem~2.2]{Stein1971}. In the form proved by Alt, Payne, Schmidt, and Wood \cite[Lemma~5]{APSW2016}, Hamiltonicity corresponds to a partition of the triangulation's vertices into two sets, each inducing a tree. Here an induced tree includes \emph{every} edge between its vertices, so connectedness alone is insufficient. Theorem~\ref{thm:partition} proves this partition with any chosen facial edge's endpoints in one class and its third vertex in the other. The corresponding Hamiltonian cycle avoids any specified single edge, as shown in Corollary~\ref{cor:edge-avoidance}. This single-edge avoidance property is a known equivalent global strengthening of Barnette's conjecture, through the work of Kelmans as explained by Hertel \cite[Corollary~3]{Hertel2005} and by Gorsky, Steiner, and Wiederrecht \cite[Theorem~4.3]{GSW2023}. Corollary~\ref{cor:pfaffian-paths} records a further consequence through their published equivalence \cite[Theorem~4.16]{GSW2023}: every three-edge path in a finite simple cubic \(3\)-vertex-connected Pfaffian bipartite graph is contained in a Hamiltonian cycle. To explain the construction, choose one black triangle as the outer face and call its three vertices the roots. The remaining black triangles and the nonroot vertices have equal cardinality. A \emph{state} assigns each remaining black triangle one of its vertices, using every nonroot exactly once. These face--vertex incidence matchings are Tutte states, arising in Tutte's theory of trinity \cite{Tutte1975}. Hine and K\'alm\'an give a modern treatment and relate the […]
+[theorem] \label{thm:main} Every finite simple undirected graph that is cubic, bipartite, planar, and \(3\)-vertex-connected has a Hamiltonian cycle.
+
+=== LEAN COMPARATOR BarnetteHamiltonian (exact formal statement)
+import Mathlib
+namespace OAI
+namespace Barnette
+universe u
+structure PlaneEmbedding {V : Type u} (G : SimpleGraph V) where
+  point : V → ℝ × ℝ
+  point_injective : Function.Injective point
+  arc : ∀ (v w : V), G.Adj v w → Path (point v) (point w)
+  arc_injective : ∀ (v w : V) (h : G.Adj v w),
+    Function.Injective (arc v w h)
+  arc_reverse : ∀ (v w : V) (h : G.Adj v w),
+    arc w v h.symm = (arc v w h).symm
+  arc_avoids_vertices : ∀ (v w : V) (h : G.Adj v w)
+    (t : unitInterval) (z : V),
+    arc v w h t = point z →
+      (t = 0 ∧ z = v) ∨ (t = 1 ∧ z = w)
+  interiors_disjoint : ∀ (v w x y : V) (h : G.Adj v w) (k : G.Adj x y)
+    (t s : unitInterval),
+    t ≠ 0 → t ≠ 1 → s ≠ 0 → s ≠ 1 →
+    arc v w h t = arc x y k s →
+      (v = x ∧ w = y) ∨ (v = y ∧ w = x)
+def Planar {V : Type u} (G : SimpleGraph V) : Prop :=
+  Nonempty (PlaneEmbedding G)
+def ThreeVertexConnected {V : Type u} [Fintype V] (G : SimpleGraph V) : Prop :=
+  4 ≤ Fintype.card V ∧
+    ∀ S : Finset V, S.card ≤ 2 → (G.induce {v | v ∉ S}).Connected
+def HasHamiltonianCycle {V : Type u} [DecidableEq V] (G : SimpleGraph V) : Prop :=
+  ∃ v : V, ∃ p : G.Walk v v, p.IsHamiltonianCycle
+def MainStatement : Prop :=
+  ∀ (V : Type u) [Fintype V] [DecidableEq V] (G : SimpleGraph V)
+    [DecidableRel G.Adj],
+    G.IsRegularOfDegree 3 → G.IsBipartite → Planar G →
+      ThreeVertexConnected G → HasHamiltonianCycle G
+theorem main : MainStatement.{u} := by
+  sorry
+end Barnette
+end OAI
+

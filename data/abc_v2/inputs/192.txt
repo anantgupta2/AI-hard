@@ -1,0 +1,48 @@
+FAMILY 192: Boolean functions violate the square-root degree bound by arbitrary factors
+SUBJECT: Combinatorics
+OPENAI SUMMARY: Disproves the proposed square-root bound relating a Boolean function's linear Fourier coefficients to its polynomial degree. For every C &gt; 0, there is a sign-valued Boolean function f with $`\sum_i\widehat f(\{i\})\gt C\sqrt{\deg(f)}`$. Thus its total signed correlation with individual input bits can exceed the proposed bound by an arbitrary factor.
+
+=== MANUSCRIPT: Unbounded Violations of the Square-Root Degree Bound (September-26-2026) [preprints/Unbounded-Violations-of-the-Square-Root-Degree-Bound-September-26-2026/build/main.tex]
+ABSTRACT: We disprove the Gopalan–Servedio square-root conjecture, even up to an arbitrary constant factor. For every real C &gt; 0, there is a nonconstant Boolean function $`f:\{-1,1\}^n\to\{-1,1\}`$ on a finite sign cube such that
+INTRODUCTION (start): The sum of the linear Fourier coefficients of a Boolean function measures its correlation with the sum of its inputs. For a real-valued function \(f:\{-1,1\}^n\to\mathbb R\), with \(X\) uniform on the sign cube, write \[ \widehat f(S)=\E\!\left[f(X)\prod_{i\in S}X_i\right], \qquad \deg(f)=\max\{|S|:\widehat f(S)\ne0\}. \] Constants have degree zero. This is the degree of the real multilinear polynomial representing \(f\), as in the work of Nisan and Szegedy~\cite{NisanSzegedy}. For Boolean \(f\), taking values in \(\{-1,1\}\), Cauchy--Schwarz gives \[ \sum_{i=1}^n\widehat f(\{i\}) =\E\!\left[f(X)\sum_{i=1}^nX_i\right]\le\sqrt n. \] Gopalan and Servedio conjectured that \(\sqrt{\deg(f)}\) could replace \(\sqrt n\); see O'Donnell's problem list~\cite[p.~9]{ODonnell}. We show that no constant multiple of this proposed bound holds. [statement] The universal signed and absolute versions of the conjecture are equivalent. Indeed, the coordinate change \(x_i\mapsto\operatorname{sign}(\widehat f(\{i\}))x_i\), with sign \(+1\) at zero, preserves degree and makes every linear coefficient nonnegative. Our construction produces a large signed sum directly. The dimension and all copy counts in the construction are finite; we do not obtain useful bounds on their growth. \subsection*{The square-root and majority bounds} The conjecture is attributed to Gopalan and Servedio, circa 2009, in O'Donnell's problem list. It also appears as Conjecture 3.17 in the preprint of Filmus, Hatami, Keller and Lifshitz~\cite{FHKL}. Here the singleton coefficients are summed linearly, rather than squared. A sharper proposal in the same problem list uses the majority benchmark \[ B_d=\E|X_1+\cdots+X_d|\le\sqrt d. \] This is the signed singleton sum of majority on \(d\) bits, with either fixed value at ties. Replacing \(\sqrt{\deg(f)}\) by \(B_{\deg(f)}\) gives a stronger inequality, so a counterexample to that inequality need not violate the square-root bound. Jha~\cite[Theorem 2.1]{Jha} gave discrete-derivative reformulations of the majority proposal. Wang~\cite[Theorems 2.2, 3.2 and 3.6]{Wang} gave another equivalent formulation and proved the cases \(d=1\) and \(d=n-1\). Kudin and Pa\v{s}ali\'c~\cite{KudinPasalic} proved the cases \(d=2,3\) and refuted the majority bound at \(d=4\). Theorem~\ref{thm:main} excludes every constant multiple of the weaker square-root bound. Stating both inequalities explicitly distinguishes the questions despite the different names used for them in the literature. A linear degree bound does hold for every Boolean function. Let \(\operatorname{Inf}_i(f)\) be the probability that flipping coordinate \(i\) changes its value, and let \(I(f)=\sum_i\operatorname{Inf}_i(f)\) be the total influence. The discrete derivative in coordinate \(i\), defined as half the difference between the values with that coordinate set to \(+1\) and \(-1\), takes values in \(\{-1,0,1\}\). Its mean is \(\widehat f(\{i\})\), so the absolute value of this mean is at most its second moment, \(\operatorname{Inf}_i(f)\). The Fourier formula for total influence and Parseval's identity therefore give \cite[Lemma~2.4 and Corollary~2.5]{NisanSzegedy} \[ \sum_i|\widehat f(\{i\})| \le I(f)=\sum_{S\subseteq[n]}|S|\widehat f(S)^2 \le\deg(f). \] Theorem~\ref{thm:main} thus separates the conjectured square-root scale from this surviving linear bound. \subsection*{Retaining variance with low-degree observations} Instead of constructing \(f\) immediately, we first construct a finite-valued observation \(F\) of independent signs. If \(H_N=X_1+\cdots+X_N\), the information that \(F\) retains about this sum is measured by \[ T_F=\E[H_N\mid F],\qquad v(F)=\E T_F^2. \] We call \(T_F\) the \emph{score} of \(F\) and \(v(F)\) its retained variance. When \(v(F)>0\), its standardized score is \(T_F/\sqrt{v(F)}\). We call a positive real number \(D\) a \emph{cell degree bound} if every output indicator \(\one_{\{F=a\}}\) has degree at most \(D\). Every function of \(F\) then has degre […]
+[theorem] \label{thm:main} For every real \(C>0\), there are a positive integer \(n\) and a nonconstant Boolean function \(f:\{-1,1\}^n\to\{-1,1\}\) such that \[ \sum_{i=1}^n\widehat f(\{i\})>C\sqrt{\deg(f)}. \] Consequently, \[ \sup_{\substack{n\ge1,\ f:\{-1,1\}^n\to\{-1,1\}\\\deg(f)>0}} \frac{\sum_i|\widehat f(\{i\})|}{\sqrt{\deg(f)}}=\infty. \]
+
+=== LEAN COMPARATOR SquareRootDegree (exact formal statement)
+import Mathlib
+namespace OAI
+open scoped BigOperators
+noncomputable section
+namespace SquareRootDegree
+abbrev Cube (ι : Type*) := ι → Bool
+def sign (b : Bool) : ℝ := if b then -1 else 1
+def average {α : Type*} [Fintype α] (f : α → ℝ) : ℝ :=
+  (Fintype.card α : ℝ)⁻¹ * ∑ x, f x
+def character {ι : Type*} (s : Finset ι) (x : Cube ι) : ℝ :=
+  ∏ i ∈ s, sign (x i)
+def fourierCoeff {ι : Type*} [Fintype ι] (f : Cube ι → ℝ) (s : Finset ι) : ℝ := by
+  classical
+  exact average (fun x => f x * character s x)
+def fourierDegree {ι : Type*} [Fintype ι] (f : Cube ι → ℝ) : ℕ := by
+  classical
+  exact (Finset.univ.filter (fun s : Finset ι => fourierCoeff f s ≠ 0)).sup Finset.card
+def IsBoolean {α : Type*} (f : α → ℝ) : Prop :=
+  ∀ x, f x = -1 ∨ f x = 1
+def Nonconstant {α : Type*} (f : α → ℝ) : Prop :=
+  ∃ x y, f x ≠ f y
+def singletonSum {ι : Type*} [Fintype ι] (f : Cube ι → ℝ) : ℝ :=
+  ∑ i, fourierCoeff f {i}
+def absoluteSingletonSum {ι : Type*} [Fintype ι] (f : Cube ι → ℝ) : ℝ :=
+  ∑ i, |fourierCoeff f {i}|
+def SignedViolations : Prop :=
+  ∀ C : ℝ, 0 < C → ∃ n : ℕ, 0 < n ∧ ∃ f : Cube (Fin n) → ℝ,
+    IsBoolean f ∧ Nonconstant f ∧ C * Real.sqrt (fourierDegree f) < singletonSum f
+def AbsoluteRatios : Set ℝ :=
+  {r | ∃ n : ℕ, 0 < n ∧ ∃ f : Cube (Fin n) → ℝ,
+    IsBoolean f ∧ 0 < fourierDegree f ∧
+      r = absoluteSingletonSum f / Real.sqrt (fourierDegree f)}
+theorem main : SignedViolations ∧ ¬ BddAbove AbsoluteRatios := by
+  sorry
+end SquareRootDegree
+end
+end OAI
+

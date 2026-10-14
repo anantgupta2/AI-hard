@@ -1,0 +1,60 @@
+FAMILY 176: The second Kahn–Kalai conjecture with an edge-count bound
+SUBJECT: Combinatorics
+OPENAI SUMMARY: Proves the second Kahn–Kalai conjecture: for every finite simple graph H with h ≥ 1 edges and at most n vertices, its appearance threshold in $`G(n,p)`$ is at most $`C p_{\mathrm E}(n,H)(1+\log_2 h)`$, with universal C. Here $`p_{\mathrm E}`$ is the least density at which every subgraph of H has expected copy count at least 1/2.
+
+=== MANUSCRIPT: The second Kahn–Kalai conjecture (September-24-2026) [preprints/The-second-Kahn-Kalai-conjecture-September-24-2026/build/source/main.tex]
+ABSTRACT: We prove the second Kahn–Kalai conjecture. For every finite simple graph H with h ≥ 1 edges and at most n vertices, the threshold for $`G(n,p)`$ to contain an ordinary copy of H is at most $`C p_{\mathrm E}(n,H)(1+\log_2 h)`$, where C is universal. Here $`p_{\mathrm E}(n,H)`$ is the least density at which every subgraph of H has expected copy count at least one half.
+INTRODUCTION (start): \label{sec:introduction} When does a random graph contain a prescribed graph? A necessary condition is that each subgraph of the target have a reasonable expected number of copies. Kahn and Kalai~\cite{KK07} conjectured that this elementary obstruction determines the containment threshold within a logarithmic factor, uniformly over the target graph. We prove this conjecture, with the logarithm depending on the number of target edges. For finite simple graphs $G$ and $F$, write $N(G,F)$ for the number of subgraphs of $G$ isomorphic to $F$. These are ordinary copies: additional edges between the chosen vertices are allowed. Let $G(n,p)$ be the random graph on $[n]=\{1,\ldots,n\}$ in which each edge is present independently with probability $p$. For a graph $H$ with at least one edge and at most $n$ vertices, define \begin{align*} \pc(n,H) &=\inf\{p\in[0,1]:\PP(N(G(n,p),H)>0)\ge\tfrac12\},\\ \pE(n,H) &=\inf\{p\in[0,1]:\EE N(G(n,p),F)\ge\tfrac12 \text{ for every subgraph }F\subseteq H\}. \end{align*} The first quantity is the containment threshold; the second is the \emph{graph expectation threshold}. Both infima are attained, since the relevant probabilities and expectations are continuous, there are only finitely many constraints, and $p=1$ satisfies all of them. The single-edge constraint gives $\pE(n,H)>0$. If $H$ appears with probability at least one half, then so does every $F\subseteq H$, and its expected count is at least one half. Thus $\pE(n,H)\le\pc(n,H)$. [statement] Here $\ee$ is the base of the natural logarithm. The constants are explicit and universal; the graph $H$ may vary with $n$. Kahn and Kalai use expected count one in their formulation. Replacing one half by one changes the graph expectation threshold by a factor between one and two: for each subgraph with $r\ge1$ edges its expected count is proportional to $p^r$, so its constraint changes by $2^{1/r}\le2$. This normalization therefore gives the same conjecture. \subsection{History and the obstruction} For a fixed target, threshold questions are part of the classical random-graph theory of Erd\H{o}s and R\'enyi~\cite{ER60}; Bollob\'as~\cite{Bollobas81} treated threshold functions for general fixed subgraphs. Here the target can grow with the host graph. For example, let $H$ be a perfect matching on an even number $n$ of vertices. Then $\pE(n,H)=\Theta(1/n)$, whereas $\pc(n,H)=\Theta(\log n/n)$~\cite{ER66,KK07}. The larger scale is needed to eliminate isolated vertices of the host: a perfect matching must cover every vertex. Hamilton cycles exhibit the same logarithmic gap~\cite{KK07}. These examples show why a uniform comparison must allow a logarithm. Other spanning targets have required different methods: Riordan~\cite{Riordan00}, for example, proved that for every fixed $p>1/4$, $G(2^d,p)$ contains the $d$-dimensional cube with probability tending to one. To distinguish the two Kahn--Kalai conjectures, consider a nonempty proper increasing family $\mathcal F\subseteq2^X$, where $X$ is finite. A \emph{cover} is a family $\mathcal G\subseteq2^X$ such that every $F\in\mathcal F$ contains some $S\in\mathcal G$. Its cost at density $p$ is $\sum_{S\in\mathcal G}p^{|S|}$. The integral expectation threshold $q(\mathcal F)$ is the largest $p$ for which a cover has cost at most $1/2$. A fractional cover assigns weights $w_S\ge0$ to $S\subseteq X$, requires $\sum_{S\subseteq F}w_S\ge1$ for each $F\in\mathcal F$, and has cost $\sum_S w_Sp^{|S|}$. Allowing these covers defines $q_f(\mathcal F)$ with the same budget $1/2$. Union bounds and expectations give $q(\mathcal F)\le q_f(\mathcal F)\le p_{\mathrm c}(\mathcal F)$, where $p_{\mathrm c}(\mathcal F)$ is the density at which an independent random subset belongs to $\mathcal F$ with probability $1/2$. Talagrand~\cite[Section~6]{Tal10} introduced the fractional formulation and its dual description by spread probability measures. Alweiss, Lovett, Wu, and Zhang~\cite{ALWZ21}, building on the regularity viewpoint of Love […]
+[theorem] \label{thm:main} For every $n\ge2$ and every finite simple graph $H$ with $h=e(H)\ge1$ edges and at most $n$ vertices, \begin{equation}\label{eq:stronger} \pc(n,H)\le \min\{1,\;2048\ee^{50}\pE(n,H)(1+\log_2 h)\}. \end{equation} In particular, \[ \pc(n,H)\le6144\ee^{50}\pE(n,H)\log_2 n. \]
+
+=== LEAN COMPARATOR SecondKahnKalai (exact formal statement)
+import Mathlib.Data.Fintype.Powerset
+import Mathlib.Basic.Real.Basic
+import Mathlib.Algebra.BigOperators.Ring.Finset
+import Mathlib.Combinatorics.SimpleGraph.Copy
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+namespace OAI
+noncomputable section
+universe u
+namespace LeanBlast.SecondKahnKalai
+def bernoulliWeight {X : Type u} [Fintype X] [DecidableEq X]
+    (p : ℝ) (W : Finset X) : ℝ :=
+  ∏ x, if x ∈ W then p else 1 - p
+def bernoulliExpectation {X : Type u} [Fintype X] [DecidableEq X]
+    (p : ℝ) (f : Finset X → ℝ) : ℝ :=
+  ∑ W, bernoulliWeight p W * f W
+def bernoulliProbability {X : Type u} [Fintype X] [DecidableEq X]
+    (p : ℝ) (P : Finset X → Prop) : ℝ := by
+  classical
+  exact ∑ W, if P W then bernoulliWeight p W else 0
+abbrev Edge (n : ℕ) := {e : Sym2 (Fin n) // ¬e.IsDiag}
+def graphOfEdges {n : ℕ} (W : Finset (Edge n)) : SimpleGraph (Fin n) :=
+  SimpleGraph.fromEdgeSet (Subtype.val '' (W : Set (Edge n)))
+def edgeCount {V : Type u} (H : SimpleGraph V) : ℕ := Nat.card H.edgeSet
+def expectedCopies {V : Type u} (n : ℕ) (p : ℝ) (H : SimpleGraph V) : ℝ :=
+  bernoulliExpectation p (fun W : Finset (Edge n) =>
+    ((graphOfEdges W).copyCount H : ℝ))
+def containmentProbability {V : Type u} (n : ℕ) (p : ℝ)
+    (H : SimpleGraph V) : ℝ :=
+  bernoulliProbability p (fun W : Finset (Edge n) =>
+    0 < (graphOfEdges W).copyCount H)
+def criticalThreshold {V : Type u} (n : ℕ) (H : SimpleGraph V) : ℝ :=
+  sInf {p : ℝ | p ∈ Set.Icc 0 1 ∧ (1 / 2 : ℝ) ≤ containmentProbability n p H}
+def expectationThreshold {V : Type u} (n : ℕ) (H : SimpleGraph V) : ℝ :=
+  sInf {p : ℝ | p ∈ Set.Icc 0 1 ∧
+    ∀ F : H.Subgraph, (1 / 2 : ℝ) ≤ expectedCopies n p F.coe}
+def logTwo (x : ℝ) : ℝ := Real.log x / Real.log 2
+def SecondKahnKalaiBounds {V : Type u} (n : ℕ) (H : SimpleGraph V) : Prop :=
+  criticalThreshold n H ≤
+      min 1 (2048 * Real.exp 50 * expectationThreshold n H *
+        (1 + logTwo (edgeCount H : ℝ))) ∧
+    criticalThreshold n H ≤
+      6144 * Real.exp 50 * expectationThreshold n H * logTwo (n : ℝ)
+theorem secondKahnKalaiBounds (n : ℕ) (V : Type u) [Fintype V]
+    (H : SimpleGraph V) (hn : 2 ≤ n) (hcard : Fintype.card V ≤ n)
+    (hedge : 1 ≤ edgeCount H) : SecondKahnKalaiBounds n H := by
+  sorry
+end LeanBlast.SecondKahnKalai
+end
+end OAI
+

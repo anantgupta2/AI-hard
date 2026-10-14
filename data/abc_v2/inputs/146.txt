@@ -1,0 +1,203 @@
+FAMILY 146: Positive metric entropy for the standard map
+SUBJECT: Dynamical systems and ergodic theory
+OPENAI SUMMARY: Proves that the standard sine map on the two-dimensional torus has positive metric entropy with respect to area for every sufficiently large positive parameter. This establishes Sinai's positive-parameter-measure conjecture for the original family, with the stronger conclusion of a full parameter tail.
+
+=== MANUSCRIPT: Positive Metric Entropy for the Standard Map at Large Parameters (September-23-2026) [preprints/Positive-Metric-Entropy-for-the-Standard-Map-at-Large-Parameters-September-23-2026/build/paper.tex]
+ABSTRACT: We prove that the standard sine map of the two-dimensional torus has positive metric entropy with respect to normalized area for every sufficiently large positive parameter. This gives a full parameter tail, and hence answers Sinai's positive-parameter-measure conjecture affirmatively.
+INTRODUCTION (start): \label{sec:introduction} Let $m$ be normalized Lebesgue area on $\T^2=\R^2/\Z^2$. The standard sine map is the area-preserving diffeomorphism \begin{equation}\label{main:map} f_k(x,y)=\bigl(x+y+k\sin(2\pi x),\;y+k\sin(2\pi x)\bigr) \pmod{\Z^2},\qquad k\in\R. \end{equation} We consider its Kolmogorov--Sinai entropy $h_m(f_k)$ for this fixed invariant measure. The distinction between topological complexity and chaos visible to area is essential: a hyperbolic set may have zero area, and even full Hausdorff dimension does not imply positive area. [statement] In particular the parameter set with positive metric entropy contains an interval of positive length. Thus \cref{main:entropy} resolves affirmatively Sinai's positive metric entropy conjecture in the formulation of Berger and Turaev \cite[Conjecture~0.4]{BergerTuraev2019}, and gives the stronger all-sufficiently-large-parameter conclusion. This large-parameter formulation is also recorded by Obata \cite{Obata2021}. Berger and Turaev's recurrence $(x,y)\mapsto(2x-y+a\sin(2\pi x),x)$ is conjugate to \cref{main:map} by $(x,y)\mapsto(x,x-y)$, with $a=k$. The assertion concerns both parameter measure and, at each parameter, phase-space area. It makes no claim of ergodicity, almost-everywhere positive exponents, or a uniform positive lower bound on entropy. \subsection*{Context} The standard map arose as a model of conservative instability \cite{Chirikov1979}. Its large-parameter regime combines strong local expansion with recurrent losses of derivative growth. Duarte's large-parameter analysis constructs hyperbolic basic sets and exhibits elliptic-island and tangency phenomena in the standard family \cite{Duarte1994}. Gorodetski \cite{Gorodetski2012} obtained transitive invariant sets of full Hausdorff dimension for a residual set of large parameters. These results reveal extensive deterministic structure, but neither hyperbolic sets nor full dimension imply positive area; residual parameter sets also need not have positive Lebesgue measure. Other entropy results use different measures or notions. Obata \cite{Obata2021} established uniqueness of the measure of maximal entropy for sufficiently large standard-map parameters, without identifying that measure with area. Oliveira \cite[Theorem~5.1]{Oliveira2024} proved positive topological entropy for every $k>0$ with $k\ne2/\pi$ in the normalization of \cref{main:map}. Positive topological entropy does not by itself give positive entropy for the specific invariant measure $m$. Berger and Turaev \cite{BergerTuraev2019} proved Herman's positive-entropy conjecture by conservative perturbations, including perturbations near standard maps; these are not restricted to amplitude changes in \cref{main:map}. Related hyperbolicity is available for Anosov-driven skew products with standard-map fibers \cite{BergerCarrasco2014} and randomly perturbed standard maps \cite{BlumenthalXueYoung2017}. Coupling, noise, and smooth perturbation change the dynamical system or its probability law. The question here concerns Lebesgue area for the exact, fixed sine map at each sufficiently large amplitude. We use the established entropy formula, not a new entropy theory. For a smooth area-preserving diffeomorphism of the compact torus, the multiplicative ergodic theorem \cite{Oseledets1968} gives almost-everywhere Lyapunov exponents. The determinant-one condition makes them $\lambda_+(z)$ and $-\lambda_+(z)$, with $\lambda_+(z)\ge0$. The entropy formula of Pesin, in the absolutely continuous invariant-measure form \cite{Pesin1977,Mane1981,Mane1983Errata}, gives \begin{equation}\label{main:pesin} h_m(f_k)=\int_{\T^2}\lambda_+(z)\dd m(z). \end{equation} The map is $C^\infty$, the manifold is compact without boundary, and $m$ is an absolutely continuous invariant probability. The derivative and inverse-derivative logarithms are bounded at each fixed parameter, so all integrability hypotheses hold. Neither ergodicity nor a prior assumption of nonzero exponents is re […]
+[theorem] \label{main:entropy} There exists $k_0>0$ such that \[ h_m(f_k)>0\qquad\text{for every }k\ge k_0. \] Equivalently, for every such $k$ the largest Lyapunov exponent of $f_k$ is positive on a set of positive $m$-measure.
+[corollary] [Nonuniformly hyperbolic ergodic component] \label{main:components} For each $k\ge k_0$ there is a measurable $f_k$-invariant set $E=E(k)$ with $m(E)>0$ such that $(E,m(E)^{-1}m|_E,f_k)$ is ergodic and $f_k$ has one positive and one negative Lyapunov exponent almost everywhere on $E$. For some integer $N=N(k,E)\ge1$, there is a measurable partition $E=E_0\sqcup\cdots\sqcup E_{N-1}$ such that $f_k(E_j)=E_{j+1\bmod N}$ and $(E_j,m(E_j)^{-1}m|_{E_j},f_k^N)$ is Bernoulli for every $j$. All invariance and partition statements are modulo $m$-null sets; each $E_j$ has area $m(E)/N>0$.
+
+=== LEAN COMPARATOR StandardMapComponents (exact formal statement)
+import Mathlib
+namespace OAI
+open MeasureTheory Set Filter
+open scoped ENNReal Topology
+namespace StandardMapEntropy
+abbrev Circle := AddCircle (1 : ℝ)
+abbrev Torus := Circle × Circle
+lemma sine_periodic : Function.Periodic (fun x : ℝ => Real.sin (2 * Real.pi * x)) 1 := by
+  intro x
+  dsimp only
+  rw [show 2 * Real.pi * (x + 1) = 2 * Real.pi * x + 2 * Real.pi by ring]
+  exact Real.sin_add_two_pi _
+noncomputable def sine (x : Circle) : ℝ := sine_periodic.lift x
+noncomputable def standardMap (k : ℝ) (z : Torus) : Torus :=
+  (z.1 + z.2 + (k * sine z.1 : ℝ), z.2 + (k * sine z.1 : ℝ))
+noncomputable def area : Measure Torus :=
+  (volume : Measure Circle).prod (volume : Measure Circle)
+run_cmd Lean.modifyEnv fun env => Lean.Meta.auxLemmasExt.setState env {}
+lemma cosine_periodic : Function.Periodic (fun x : ℝ => Real.cos (2*Real.pi*x)) 1 := by
+  intro x
+  dsimp only
+  rw [show 2*Real.pi*(x+1)=2*Real.pi*x+2*Real.pi by ring]
+  exact Real.cos_add_two_pi _
+noncomputable def cosine (x : Circle) : ℝ := cosine_periodic.lift x
+noncomputable def torusPotential (k : ℝ) (x : Circle) : ℝ := 2+(2*Real.pi*k)*cosine x
+noncomputable def transferStep (v : ℝ) : ℂ →L[ℝ] ℂ :=
+  { toLinearMap :=
+      { toFun := fun z => ⟨v*z.re-z.im,z.re⟩
+        map_add' := by intro z w; apply Complex.ext <;> simp; ring
+        map_smul' := by intro t z; apply Complex.ext <;> simp; ring }
+    cont := by
+      exact Complex.equivRealProdCLM.symm.continuous.comp
+        (((continuous_const.mul Complex.continuous_re).sub Complex.continuous_im).prodMk Complex.continuous_re) }
+noncomputable def wedge (z w : ℂ) : ℝ := z.re * w.im - z.im * w.re
+noncomputable def tangentCoordinates : ℂ →L[ℝ] ℂ :=
+  { toLinearMap :=
+      { toFun := fun z => ⟨z.re, z.re-z.im⟩
+        map_add' := by intro z w; apply Complex.ext <;> simp; ring
+        map_smul' := by intro t z; apply Complex.ext <;> simp; ring }
+    cont := Complex.equivRealProdCLM.symm.continuous.comp
+      (Complex.continuous_re.prodMk (Complex.continuous_re.sub Complex.continuous_im)) }
+local instance realTangentCompTriple :
+    RingHomCompTriple (RingHom.id ℝ) (RingHom.id ℝ) (RingHom.id ℝ) := inferInstance
+noncomputable def standardDerivative (k : ℝ) (z : Torus) : ℂ →L[ℝ] ℂ :=
+  tangentCoordinates.comp ((transferStep (torusPotential k z.1)).comp tangentCoordinates)
+noncomputable def standardDerivativeProduct (k : ℝ) (z : Torus) (steps : ℕ) : ℂ →L[ℝ] ℂ :=
+  Nat.rec (ContinuousLinearMap.id ℝ ℂ)
+    (fun iteration product => (standardDerivative k ((standardMap k)^[iteration] z)).comp product) steps
+def VectorGrowth (k : ℝ) (z : Torus) (v : ℂ) (l : ℝ) : Prop :=
+  v ≠ 0 ∧ Tendsto (fun n : ℕ => Real.log ‖standardDerivativeProduct k z n v‖ / (n : ℝ))
+    atTop (𝓝 l)
+def LyapunovSpectrumAt (k : ℝ) (z : Torus) (l : ℝ) : Prop :=
+  0 ≤ l ∧ ((l = 0 ∧ ∀ v : ℂ, v ≠ 0 → VectorGrowth k z v 0) ∨
+    (0 < l ∧ ∃ s : ℂ, s ≠ 0 ∧ ∀ v : ℂ, v ≠ 0 →
+      VectorGrowth k z v (if wedge s v = 0 then -l else l)))
+noncomputable def normalizedArea (E : Set Torus) : Measure Torus :=
+  (area E)⁻¹ • area.restrict E
+def IsBernoulli (f : Torus → Torus) (μ : Measure Torus) : Prop :=
+  ∃ (β : Measure ℝ), IsProbabilityMeasure β ∧
+    ∃ (encode : Torus → (ℤ → ℝ)) (decode : (ℤ → ℝ) → Torus),
+      MeasurePreserving encode μ (MeasureTheory.Measure.infinitePi (fun _ : ℤ => β)) ∧
+      MeasurePreserving decode (MeasureTheory.Measure.infinitePi (fun _ : ℤ => β)) μ ∧
+      (∀ᵐ z ∂μ, decode (encode z) = z) ∧
+      (∀ᵐ w ∂MeasureTheory.Measure.infinitePi (fun _ : ℤ => β), encode (decode w) = w) ∧
+      (∀ᵐ z ∂μ, encode (f z) = fun i : ℤ => encode z (i+1))
+def HyperbolicBernoulliComponent (k : ℝ) : Prop :=
+  ∃ E : Set Torus, MeasurableSet E ∧ 0 < area E ∧
+    ((standardMap k) ⁻¹' E =ᵐ[area] E) ∧
+    Ergodic (standardMap k) (normalizedArea E) ∧
+    (∀ᵐ z ∂normalizedArea E, ∃ l : ℝ, 0 < l ∧ LyapunovSpectrumAt k z l) ∧
+    ∃ (N : ℕ) (hN : 0 < N) (P : Fin N → Set Torus),
+      (∀ j, MeasurableSet (P j)) ∧
+      ((⋃ j, P j) =ᵐ[area] E) ∧
+      (∀ i j, i ≠ j → area (P i ∩ P j) = 
+[…]
+
+=== LEAN COMPARATOR StandardMapEntropy (exact formal statement)
+import Mathlib
+namespace OAI
+open MeasureTheory Set
+open scoped ENNReal BigOperators
+namespace StandardMapEntropy
+abbrev Circle := AddCircle (1 : ℝ)
+abbrev Torus := Circle × Circle
+lemma sine_periodic : Function.Periodic (fun x : ℝ => Real.sin (2 * Real.pi * x)) 1 := by
+  intro x
+  dsimp only
+  rw [show 2 * Real.pi * (x + 1) = 2 * Real.pi * x + 2 * Real.pi by ring]
+  exact Real.sin_add_two_pi _
+noncomputable def sine (x : Circle) : ℝ := sine_periodic.lift x
+noncomputable def standardMap (k : ℝ) (z : Torus) : Torus :=
+  (z.1 + z.2 + (k * sine z.1 : ℝ), z.2 + (k * sine z.1 : ℝ))
+noncomputable def area : Measure Torus :=
+  (volume : Measure Circle).prod (volume : Measure Circle)
+def FinitePartition (r : ℕ) := { p : Torus → Fin (r + 1) // Measurable p }
+def blockAtom {r : ℕ} (f : Torus → Torus) (p : FinitePartition r)
+    (n : ℕ) (w : Fin n → Fin (r + 1)) : Set Torus :=
+  { z | ∀ i : Fin n, p.val (f^[i.val] z) = w i }
+noncomputable def blockEntropy {r : ℕ} (μ : Measure Torus) (f : Torus → Torus)
+    (p : FinitePartition r) (n : ℕ) : ℝ :=
+  - ∑ w : Fin n → Fin (r + 1),
+    (μ (blockAtom f p n w)).toReal * Real.log (μ (blockAtom f p n w)).toReal
+noncomputable def partitionEntropy {r : ℕ} (μ : Measure Torus) (f : Torus → Torus)
+    (p : FinitePartition r) : ℝ≥0∞ :=
+  ⨅ n : ℕ, ENNReal.ofReal (blockEntropy μ f p (n + 1) / (n + 1 : ℝ))
+noncomputable def metricEntropy (μ : Measure Torus) (f : Torus → Torus) : ℝ≥0∞ :=
+  ⨆ r : ℕ, ⨆ p : FinitePartition r, partitionEntropy μ f p
+def MainObligation : Prop :=
+  ∃ k₀ : ℝ, 0 < k₀ ∧ ∀ k : ℝ, k₀ ≤ k → 0 < metricEntropy area (standardMap k)
+theorem main_entropy : MainObligation := by
+  sorry
+end StandardMapEntropy
+end OAI
+
+
+=== LEAN COMPARATOR StandardMapLyapunov (exact formal statement)
+import Mathlib
+namespace OAI
+open MeasureTheory Set Filter
+open scoped ENNReal BigOperators Topology
+namespace StandardMapEntropy
+abbrev Circle := AddCircle (1 : ℝ)
+abbrev Torus := Circle × Circle
+lemma sine_periodic : Function.Periodic (fun x : ℝ => Real.sin (2 * Real.pi * x)) 1 := by
+  intro x
+  dsimp only
+  rw [show 2 * Real.pi * (x + 1) = 2 * Real.pi * x + 2 * Real.pi by ring]
+  exact Real.sin_add_two_pi _
+noncomputable def sine (x : Circle) : ℝ := sine_periodic.lift x
+noncomputable def standardMap (k : ℝ) (z : Torus) : Torus :=
+  (z.1 + z.2 + (k * sine z.1 : ℝ), z.2 + (k * sine z.1 : ℝ))
+noncomputable def area : Measure Torus :=
+  (volume : Measure Circle).prod (volume : Measure Circle)
+def FinitePartition (r : ℕ) := { p : Torus → Fin (r + 1) // Measurable p }
+def blockAtom {r : ℕ} (f : Torus → Torus) (p : FinitePartition r)
+    (n : ℕ) (w : Fin n → Fin (r + 1)) : Set Torus :=
+  { z | ∀ i : Fin n, p.val (f^[i.val] z) = w i }
+noncomputable def blockEntropy {r : ℕ} (μ : Measure Torus) (f : Torus → Torus)
+    (p : FinitePartition r) (n : ℕ) : ℝ :=
+  - ∑ w : Fin n → Fin (r + 1),
+    (μ (blockAtom f p n w)).toReal * Real.log (μ (blockAtom f p n w)).toReal
+noncomputable def partitionEntropy {r : ℕ} (μ : Measure Torus) (f : Torus → Torus)
+    (p : FinitePartition r) : ℝ≥0∞ :=
+  ⨅ n : ℕ, ENNReal.ofReal (blockEntropy μ f p (n + 1) / (n + 1 : ℝ))
+noncomputable def metricEntropy (μ : Measure Torus) (f : Torus → Torus) : ℝ≥0∞ :=
+  ⨆ r : ℕ, ⨆ p : FinitePartition r, partitionEntropy μ f p
+run_cmd Lean.modifyEnv fun env => Lean.Meta.auxLemmasExt.setState env {}
+lemma cosine_periodic : Function.Periodic (fun x : ℝ => Real.cos (2*Real.pi*x)) 1 := by
+  intro x
+  dsimp only
+  rw [show 2*Real.pi*(x+1)=2*Real.pi*x+2*Real.pi by ring]
+  exact Real.cos_add_two_pi _
+noncomputable def cosine (x : Circle) : ℝ := cosine_periodic.lift x
+noncomputable def torusPotential (k : ℝ) (x : Circle) : ℝ := 2+(2*Real.pi*k)*cosine x
+noncomputable def transferStep (v : ℝ) : ℂ →L[ℝ] ℂ :=
+  { toLinearMap :=
+      { toFun := fun z => ⟨v*z.re-z.im,z.re⟩
+        map_add' := by intro z w; apply Complex.ext <;> simp; ring
+        map_smul' := by intro t z; apply Complex.ext <;> simp; ring }
+    cont := by
+      exact Complex.equivRealProdCLM.symm.continuous.comp
+        (((continuous_const.mul Complex.continuous_re).sub Complex.continuous_im).prodMk Complex.continuous_re) }
+noncomputable def tangentCoordinates : ℂ →L[ℝ] ℂ :=
+  { toLinearMap :=
+      { toFun := fun z => ⟨z.re, z.re-z.im⟩
+        map_add' := by intro z w; apply Complex.ext <;> simp; ring
+        map_smul' := by intro t z; apply Complex.ext <;> simp; ring }
+    cont := Complex.equivRealProdCLM.symm.continuous.comp
+      (Complex.continuous_re.prodMk (Complex.continuous_re.sub Complex.continuous_im)) }
+local instance realTangentCompTriple :
+    RingHomCompTriple (RingHom.id ℝ) (RingHom.id ℝ) (RingHom.id ℝ) := inferInstance
+noncomputable def standardDerivative (k : ℝ) (z : Torus) : ℂ →L[ℝ] ℂ :=
+  tangentCoordinates.comp ((transferStep (torusPotential k z.1)).comp tangentCoordinates)
+noncomputable def standardDerivativeProduct (k : ℝ) (z : Torus) (n : ℕ) : ℂ →L[ℝ] ℂ :=
+  Nat.rec (ContinuousLinearMap.id ℝ ℂ)
+    (fun i A => (standardDerivative k ((standardMap k)^[i] z)).comp A) n
+noncomputable def wedge (z w : ℂ) : ℝ := z.re * w.im - z.im * w.re
+def VectorGrowth (k : ℝ) (z : Torus) (v : ℂ) (l : ℝ) : Prop :=
+  v ≠ 0 ∧ Tendsto (fun n : ℕ => Real.log ‖standardDerivativeProduct k z n v‖ / (n : ℝ))
+    atTop (𝓝 l)
+def LyapunovSpectrumAt (k : ℝ) (z : Torus) (l : ℝ) : Prop :=
+  0 ≤ l ∧ ((l = 0 ∧ ∀ v : ℂ, v ≠ 0 → VectorGrowth k z v 0) ∨
+    (0 < l ∧ ∃ s : ℂ, s ≠ 0 ∧ ∀ v : ℂ, v ≠ 0 →
+      VectorGrowth k z v (if wedge s v = 0 then -l else l)))
+def PositiveLargestLyapunov (k : ℝ) : Prop :=
+  ∃ E : Set Torus, MeasurableSet E ∧ 0 < area E ∧
+    ∀ z ∈ E, ∃ l : ℝ, 0 < l ∧ LyapunovSpectrumAt k z l ∧
+      Tendsto
+        (fun n : ℕ => Real.log ‖standardDerivativeProduct k z n‖ / (n : ℝ))
+        atTop (𝓝 l)
+theorem main_entr
+[…]

@@ -1,0 +1,83 @@
+FAMILY 085: Endpoint Sobolev regularity of centered disk averages
+SUBJECT: Real and complex analysis
+OPENAI SUMMARY: Resolves the planar centered-disk case of the Hajłasz–Onninen maximal-function regularity problem. For every real $`f\in W^{1,1}(\mathbb R^2)`$, the centered disk maximal function satisfies $`\|\nabla Mf\|_1\le C\|\nabla f\|_1`$ with an absolute constant. It belongs locally to $`W^{1,1}`$ and has a globally integrable weak gradient.
+
+=== MANUSCRIPT: An Endpoint Gradient Bound for the Centered Disk Maximal Operator (September-26-2026) [preprints/An-Endpoint-Gradient-Bound-for-the-Centered-Disk-Maximal-Operator-September-26-2026/build/main.tex]
+ABSTRACT: We prove the endpoint gradient bound $`\|\nabla Mf\|_1\le C\|\nabla f\|_1`$ for every real-valued $`f\in W^{1,1}(\mathbb R^2)`$, where $`Mf(x)`$ is the supremum of the averages of $`|f|`$ over disks centered at x, and C is an absolute constant. The maximal function belongs to $`W^{1,1}_{\mathrm{loc}}(\mathbb R^2)`$ and has a globally integrable weak gradient. This gives a positive resolution of the planar centered-disk case of the endpoint question of Hajłasz and Onninen.
+INTRODUCTION (start): \label{sec:introduction} For $f\in L^1_{\mathrm{loc}}(\R^2)$, the centered disk maximal function is \[ Mf(x)=\sup_{r>0}\frac1{\pi r^2}\int_{B(x,r)}|f(y)|\,\dd y, \qquad B(x,r)=\{y\in\R^2:|y-x|<r\}. \] Every averaging disk is centered at the point of evaluation, and all positive radii are allowed. Kinnunen proved that this operator is bounded on $W^{1,p}$ for $1<p<\infty$ \cite[Theorem~1.4]{Kinnunen1997}. The pointwise control of its gradient by $M(|\nabla f|)$ gives the corresponding norm bound through the strong $L^p$ maximal inequality. At $p=1$ that last step fails. Haj{\l}asz and Onninen asked whether the gradient estimate itself nevertheless survives \cite[Question~1]{HajlaszOnninen2004}. We give a positive resolution of the planar centered-disk case of their endpoint question. [statement] Here $W^{1,1}(\R^2)$ is the inhomogeneous Sobolev space: the input and its weak first derivatives are globally integrable. Vector norms are Euclidean. No radiality or compact-support condition is imposed on the input. The maximal function itself need not be globally integrable, even for a nonzero nonnegative smooth function of compact support. The constant in \eqref{eq:main} is finite and absolute; its optimal value is not determined. The argument below concerns disks in the plane. \subsection{The signed estimate behind the theorem} The intermediate estimate retains the sign of the input. For real $g\in C_c^\infty(\R^2)$, put \[ A_tg(x)=\frac1{\pi t^2}\int_{B(x,t)}g(y)\,\dd y, \qquad S_{a,b}g(x)=\sup_{a\le t\le b}A_tg(x). \] For fixed $0<a\le b<\infty$, this envelope is compactly supported and Lipschitz. The issue is to bound its gradient uniformly as the range of radii grows. [statement] The proof of Proposition~\ref{prop:finite-band} is given in Section~\ref{sec:assembly}, after the local and multiscale estimates described below. A single radius, $a=b$, is covered directly by convolution. The signed form of Proposition~\ref{prop:finite-band} has a specific purpose in the final regularity argument. After extension to Sobolev inputs, one applies it to $g_Q=\chi_Q(g-c_Q)$, where $c_Q$ is a local mean and $\chi_Q$ equals one on the small disks being tested. On those disks, $A_tg_Q=A_tg-c_Q$, so the corresponding envelopes have the same gradient. Poincar\'e's inequality then bounds $\|\nabla g_Q\|_1$ by the gradient of $g$ on a slightly larger square. The function $g_Q$ can take both signs. Signed averages also occur in Weigt's dyadic and uncentered cube estimates \cite{Weigt2023Dyadic,Weigt2025Cubes}; their role here is to permit this local subtraction. \subsection{Earlier endpoint results} In one dimension, Tanaka proved an $L^1$ derivative bound for the uncentered maximal operator \cite[Theorem~1]{Tanaka2002}. Aldaz and P\'erez L\'azaro extended the result to inputs of bounded variation, established absolute continuity of the maximal function, and obtained the sharp variation constant $1$ \cite[Theorem~2.5]{AldazPerezLazaro2007}. Kurka proved a variation bound with an absolute constant for the centered operator on functions of bounded variation, together with local Sobolev regularity and an integrable derivative for Sobolev inputs \cite[Theorem~1.2 and Corollary~1.4]{Kurka2015}. The ordering of intervals used in these arguments does not directly organize a family of centered disks. In higher dimensions, Aldaz and P\'erez L\'azaro proved regularity for block-decreasing inputs, invariant under coordinate sign changes and nonincreasing in each positive coordinate, and uncentered maximal operators over balls of unconditional norms; their weak-gradient conclusion applies, in particular, to block-decreasing $W^{1,1}$ input and Euclidean balls \cite[Theorem~11]{AldazPerezLazaro2009Block}. Luiro proved the $L^1$ gradient estimate for radial Sobolev input and the uncentered ball operator \cite[Theorem~3.12]{Luiro2018Radial}. Weigt established variation bounds for the dyadic maximal operator \cite{Weigt2023Dyadic} and for the uncentered maximal o […]
+[theorem] \label{thm:main} There is an absolute constant $C<\infty$ such that, for every real-valued $f\in W^{1,1}(\R^2)$, the function $Mf$ is locally integrable, belongs to $W^{1,1}_{\mathrm{loc}}(\R^2)$, and satisfies \begin{equation}\label{eq:main} \int_{\R^2}|\nabla Mf|\,\dd x \le C\int_{\R^2}|\nabla f|\,\dd x. \end{equation} In particular, its distributional derivatives are represented by globally integrable functions.
+[proposition] [Signed finite-band estimate]\label{prop:finite-band} There is an absolute constant $C$ such that, for every real $g\in C_c^\infty(\R^2)$ and $0<a\le b$ with $b/a$ a power of two, including one, \begin{equation}\label{eq:intro-band} \int_{\R^2}|\nabla S_{a,b}g|\,\dd x \le C\int_{\R^2}|\nabla g|\,\dd x. \end{equation} The constant is independent of $a$, $b$, and the number of dyadic radius scales between them.
+
+=== LEAN COMPARATOR SignedFiniteBand (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+namespace SignedDisk
+open MeasureTheory Set
+open scoped ENNReal NNReal Topology ContDiff
+namespace CenteredDiskEndpoint
+abbrev Plane := EuclideanSpace ℝ (Fin 2)
+def diskAverage (f : Plane → ℝ) (x : Plane) (r : ℝ) : ℝ :=
+  (∫ y in Metric.ball x r, f y) / (Real.pi * r ^ 2)
+def testPartial (φ : Plane → ℝ) (i : Fin 2) (x : Plane) : ℝ :=
+  fderiv ℝ φ x (EuclideanSpace.single i 1)
+def HasWeakGradient (f : Plane → ℝ) (g : Plane → Plane) : Prop :=
+  ∀ (φ : Plane → ℝ), ContDiff ℝ ∞ φ → HasCompactSupport φ →
+    ∀ i : Fin 2, (∫ x, f x * testPartial φ i x) = -∫ x, g x i * φ x
+def gradientNorm (g : Plane → Plane) : ℝ := ∫ x, ‖g x‖
+def signedBand (f : Plane → ℝ) (a b : ℝ) (x : Plane) : ℝ :=
+  sSup ((fun r => diskAverage f x r) '' Icc a b)
+def SignedFiniteBandStatement : Prop :=
+  ∃ C : ℝ, 0 ≤ C ∧
+    ∀ (f : Plane → ℝ), ContDiff ℝ ∞ f → HasCompactSupport f →
+    ∀ (a : ℝ), 0 < a → ∀ m : ℕ,
+      LocallyIntegrable (signedBand f a ((2 : ℝ)^m * a)) ∧
+      ∃ G : Plane → Plane, Integrable G ∧
+        HasWeakGradient (signedBand f a ((2 : ℝ)^m * a)) G ∧
+        gradientNorm G ≤ C * gradientNorm (gradient f)
+theorem main_signed_finite_band : SignedFiniteBandStatement := by
+  sorry
+end CenteredDiskEndpoint
+end SignedDisk
+end
+end OAI
+
+
+=== LEAN COMPARATOR DiskMaximal (exact formal statement)
+import Mathlib
+namespace OAI
+open MeasureTheory Set
+open scoped ENNReal NNReal Topology ContDiff
+noncomputable section
+namespace CenteredDiskEndpoint
+abbrev Plane := EuclideanSpace ℝ (Fin 2)
+def absoluteDiskAverage (f : Plane → ℝ) (x : Plane) (r : ℝ) : ℝ≥0∞ :=
+  (∫⁻ y in Metric.ball x r, ENNReal.ofReal |f y|) /
+    ENNReal.ofReal (Real.pi * r ^ 2)
+def maximal (f : Plane → ℝ) (x : Plane) : ℝ≥0∞ :=
+  ⨆ (r : ℝ) (_ : 0 < r), absoluteDiskAverage f x r
+def maximalReal (f : Plane → ℝ) (x : Plane) : ℝ := (maximal f x).toReal
+def testPartial (φ : Plane → ℝ) (i : Fin 2) (x : Plane) : ℝ :=
+  fderiv ℝ φ x (EuclideanSpace.single i 1)
+def HasWeakGradient (f : Plane → ℝ) (g : Plane → Plane) : Prop :=
+  ∀ (φ : Plane → ℝ), ContDiff ℝ ∞ φ → HasCompactSupport φ →
+    ∀ i : Fin 2, (∫ x, f x * testPartial φ i x) = -∫ x, g x i * φ x
+def InW11Loc (f : Plane → ℝ) : Prop :=
+  LocallyIntegrable f ∧
+    ∃ g : Plane → Plane, LocallyIntegrable g ∧ HasWeakGradient f g
+def gradientNorm (g : Plane → Plane) : ℝ := ∫ x, ‖g x‖
+def EndpointStatement : Prop :=
+  ∃ C : ℝ, 0 ≤ C ∧
+    ∀ (f : Plane → ℝ) (g : Plane → Plane),
+      Integrable f → Integrable g → HasWeakGradient f g →
+      (∀ᵐ x, maximal f x ≠ ⊤) ∧
+      LocallyIntegrable (maximalReal f) ∧
+      InW11Loc (maximalReal f) ∧
+      ∃ G : Plane → Plane, Integrable G ∧
+        HasWeakGradient (maximalReal f) G ∧ gradientNorm G ≤ C * gradientNorm g
+theorem main_endpoint : EndpointStatement := by
+  sorry
+end CenteredDiskEndpoint
+end
+end OAI
+

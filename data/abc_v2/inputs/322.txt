@@ -1,0 +1,40 @@
+FAMILY 322: Tingley’s sphere-isometry problem
+SUBJECT: Functional analysis
+OPENAI SUMMARY: Resolves Tingley's problem: every surjective isometry between the unit spheres of nonzero real Banach spaces extends uniquely to a surjective real-linear isometry of the whole spaces. No dimension restriction is imposed, so the metric geometry of the unit sphere determines the Banach space up to linear isometry.
+
+=== MANUSCRIPT: A positive solution to Tingley’s problem (September-23-2026) [preprints/A-positive-solution-to-Tingleys-problem-September-23-2026/build/main.tex]
+ABSTRACT: Every surjective isometry between the unit spheres of real Banach spaces extends uniquely to a surjective real-linear isometry, giving an affirmative solution to Tingley's problem. If distances between different radii are not preserved, we realize the positive maximal defect in a possibly enlarged pair of Banach spaces. We then align extremal chords using common supports and Darbo's fixed-point theorem and obtain a contradiction from support and convexity estimates.
+INTRODUCTION (start): \label{sec:intro} For a real normed space $X$, write $S_X=\{x\in X:\norm{x}=1\}$, with the distance inherited from $X$. Tingley's problem asks whether every surjective isometry $f:S_X\to S_Y$ extends to a real-linear isometry of the spaces \cite{Tingley1987}. Any such extension must be the radial map below. This candidate preserves norms and distances at each fixed radius; the difficulty is to recover distances between points at different radii from the metric on a single sphere. We prove the full assertion. [statement] The spaces may have arbitrary dimension and need not be separable, reflexive, smooth, or strictly convex. Applied to complex Banach spaces regarded as real spaces, the conclusion is real linearity; complex linearity is not asserted. The problem belongs to the extension theory of metric isometries. Mazur and Ulam proved that every surjective isometry between real normed spaces is affine \cite{MazurUlam1932}; Mankiewicz obtained an extension theorem for surjective isometries between convex sets with nonempty interiors \cite{Mankiewicz1972}. A unit sphere has empty ambient interior, so this does not directly provide the desired extension. Tingley's original paper established preservation of antipodal points for surjective isometries between finite-dimensional Banach-space spheres \cite{Tingley1987}. Early positive results used the structure of concrete spaces. Wang treated surjective isometries between spheres of complex $C_0$-spaces \cite{Wang1994}, and Ding obtained extension results for $\ell^p(\Gamma)$-type sequence spaces with $p>1$, $p\ne2$ \cite{Ding2003}. It is useful to distinguish results for specified source and target classes from the \emph{Mazur--Ulam property}: every surjective sphere isometry from the given space to an arbitrary real Banach target extends linearly. Cheng and Dong formulated this property explicitly \cite{ChengDong2011}. Tan proved it for real $L^p(\mu)$ on $\sigma$-finite measure spaces when $1<p<\infty$, $p\ne2$ \cite{Tan2012Lp}. Facial geometry provides another route. Following work of Cheng and Dong \cite{ChengDong2011}, Tanaka proved that surjective sphere isometries preserve maximal convex subsets of the sphere \cite[Lemma~3.5]{Tanaka2014}. The operator-algebra program led to extension theorems between arbitrary complex von Neumann algebras, due to Fern\'andez-Polo and Peralta \cite{FernandezPoloPeralta2018VN}, and between their preduals, due to Mori \cite{Mori2018}. Mori and Ozawa subsequently proved the arbitrary-target Mazur--Ulam property for unital complex $C^*$-algebras viewed as real spaces, and for real von Neumann algebras \cite{MoriOzawa2020}. Our common-support propagation has a geometric affinity with facial methods; the invariant set and its return-map estimate are constructed directly below. In finite dimensions, Banakh proved the Mazur--Ulam property for every two-dimensional real Banach space \cite{Banakh2022}. Other recent results concern specific spaces or sphere self-isometries: Fakhoury proved extension results for sphere self-isometries of Schreier spaces and their $p$-convexifications \cite{Fakhoury2025}. Huang and Zhu proved class-to-class extension theorems for Haagerup noncommutative $L_p$-spaces with $1<p<\infty$, $p\ne2$, associated with arbitrary von Neumann algebras \cite{HuangZhu2026Haagerup}, and Schatten $p$-classes for $0<p<\infty$, $p\ne2$, including quasi-Banach cases \cite{HuangZhu2026Schatten}. \paragraph{Proof strategy.} The argument measures the largest error in preserving a distance between two radius levels. Its central geometric step turns a hypothetical positive error into two aligned chords. Extremality propagates through common supports, producing an invariant closed convex set of directions. On this set an opposite-endpoint return map contracts the Kuratowski measure of noncompactness. Darbo's fixed-point theorem then supplies an aligned direction. The proof-specific work is the construction of this invariant set and the quantitativ […]
+[theorem] \label{thm:main} Let $X,Y$ be nonzero real Banach spaces and let $f:S_X\to S_Y$ be a surjective isometry. Then \[ T(0)=0,\qquad T(x)=\norm{x}f\left(\frac{x}{\norm{x}}\right)\quad(x\ne0) \] is a surjective real-linear isometry. It is the unique linear extension of $f$.
+
+=== LEAN COMPARATOR TingleySphereIsometry (exact formal statement)
+import Mathlib.Analysis.Normed.Module.RCLike.Basic
+import Mathlib.Topology.MetricSpace.Isometry
+namespace OAI
+noncomputable section
+namespace Tingley
+universe u v
+abbrev UnitSphere (X : Type u) [NormedAddCommGroup X] := {x : X // ‖x‖ = 1}
+variable {X : Type u} {Y : Type v}
+variable [NormedAddCommGroup X] [NormedSpace ℝ X]
+variable [NormedAddCommGroup Y] [NormedSpace ℝ Y]
+def normalize (x : X) (hx : x ≠ 0) : UnitSphere X :=
+  ⟨‖x‖⁻¹ • x, norm_smul_inv_norm hx⟩
+theorem tingley_sphere_isometry_full
+    {X : Type u} {Y : Type v}
+    [NormedAddCommGroup X] [NormedSpace ℝ X] [CompleteSpace X]
+    [NormedAddCommGroup Y] [NormedSpace ℝ Y] [CompleteSpace Y]
+    [Nontrivial X] [Nontrivial Y]
+    (f : UnitSphere X → UnitSphere Y) (hf : Isometry f) (hs : Function.Surjective f) :
+    ∃ T : X ≃ₗᵢ[ℝ] Y,
+      (∀ u : UnitSphere X, T (u : X) = (f u : Y)) ∧
+      T 0 = 0 ∧
+      (∀ x : X, ∀ hx : x ≠ 0, T x = ‖x‖ • (f (normalize x hx) : Y)) ∧
+      Function.Surjective T ∧
+      (∀ L : X →ₗ[ℝ] Y, (∀ u : UnitSphere X, L (u : X) = (f u : Y)) →
+        L = T.toLinearEquiv.toLinearMap) := by
+  sorry
+end Tingley
+end
+end OAI
+

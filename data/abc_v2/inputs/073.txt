@@ -1,0 +1,41 @@
+FAMILY 073: The Falconer distance conjecture
+SUBJECT: Real and complex analysis
+OPENAI SUMMARY: Resolves the Falconer distance conjecture in every dimension d ≥ 2: every compact set $`E\subset\mathbb R^d`$ with Hausdorff dimension greater than $`d/2`$ determines a set of Euclidean distances of positive Lebesgue measure.
+
+=== MANUSCRIPT: The Falconer distance conjecture in all dimensions (September-23-2026) [preprints/The-Falconer-distance-conjecture-in-all-dimensions-September-23-2026/build/paper.tex]
+ABSTRACT: We resolve the Falconer distance conjecture in every dimension. For every integer d ≥ 2, a compact subset of ℝd with Hausdorff dimension greater than $`d/2`$ determines a set of Euclidean distances of positive Lebesgue measure.
+INTRODUCTION (start): \label{sec:introduction} For \(E\subset\R^d\), its Euclidean distance set is \[ \Delta(E)=\{|x-y|:x,y\in E\}. \] The Falconer distance conjecture asks whether a compact set of Hausdorff dimension greater than half the ambient dimension must determine a set of distances of positive length. We prove this assertion. [statement] Theorem~\ref{thm:main} imposes no regularity beyond the strict Hausdorff dimension assumption. In particular, it does not require equality of Hausdorff and packing dimensions, an Ahlfors regular measure, product structure, or Fourier decay. The assertion concerns positive Lebesgue measure; a distance set of Hausdorff dimension one alone would not suffice. The strict threshold is retained, and no endpoint assertion is made. \subsection{History and scope} The problem originates in Falconer's work~\cite{Falconer1985}, which established the sufficient threshold \((d+1)/2\). His lattice-type examples at dimension \(d/2\) explain the strict inequality in the positive-measure formulation. Mattila's spherical-average criterion~\cite{Mattila1987} made Fourier \(L^2\) estimates a central approach to the problem. Bourgain connected improvements in dimensions two and three to Fourier restriction phenomena on spheres~\cite{Bourgain1994}. Among the subsequent milestones were Wolff's planar threshold \(4/3\)~\cite{Wolff1999} and Erdo\u{g}an's threshold \(d/2+1/3\) for \(d\ge3\)~\cite[Theorem~2]{Erdogan2005}; these positive-measure conclusions require strict dimension inequalities. For the parallel finite point-set problem in \(\R^d\), \(d\ge3\), see the distinct-distances theorem in~\cite[Theorem~1.1]{OpenAIDistinctDistances2026}. Weighted restriction and decoupling led to further improvements. Du, Guth, Ou, Wang, Wilson and Zhang obtained the threshold \(9/5\) in dimension three and improvements in higher dimensions \cite[Theorem~1.2]{DGOWWZ2021}. Du and Zhang obtained the threshold \(d/2+1/4+1/(8d-4)\), improving the preceding bounds for \(d\ge4\) \cite[Theorem~2.6]{DZ2019}. The arguments draw on refined restriction estimates and on the decoupling theory of Bourgain and Demeter~\cite{BD2015}. For a pin \(y\), write \(\Delta_y(E)=\{|x-y|:x\in E\}\). Liu's \(L^2\) identity connects pinned distance measures with spherical extension estimates and transfers spherical-average bounds to pinned conclusions~\cite[Theorems~1.4 and~1.9]{Liu2019}. The two preceding restriction advances also give \(\cL^1(\Delta_y(E))>0\) for some \(y\in E\) under the corresponding strict dimension inequalities; see \cite[Corollary~1.11]{DGOWWZ2021} and \cite[Theorem~2.7]{DZ2019}. For compact \(E\subset\R^2\) with \(\dim_HE>5/4\), Guth, Iosevich, Ou and Wang proved the same pinned conclusion \cite[Theorem~1.2]{GIOW2020}. Their argument combines radial-projection control of discarded wave packets with refined decoupling for the retained part. Du, Iosevich, Ou, Wang and Zhang obtained the analogous pinned conclusion in even dimensions \(d\ge4\) when \(\dim_HE>d/2+1/4\)~\cite[Theorem~1.2]{DIOWZ2021}. For compact \(E\subset\R^d\), \(d\ge3\), Du, Ou, Ren and Zhang obtained the same existential pinned conclusion when \[ \dim_HE>\frac d2+\frac14-\frac1{8d+4} \] \cite[Theorem~1.2]{DORZ2024}. At the critical dimension, Shmerkin and Wang proved that \(\dim_H\Delta(E)=1\) for Borel \(E\subset\R^d\), \(d\ge2\), whose Hausdorff and packing dimensions both equal \(d/2\)~\cite[Theorem~1.4]{SW2025}. For Borel \(E,F\subset\R^2\), Liu proved that \(\dim_HE>1\), \(\dim_HE+\dim_HF>2\), and \(\dim_HF=\dim_PF\) imply \(\cL^1(\Delta_y(E))>0\) for some \(y\in F\) \cite[Theorem~1.1]{Liu2026}. Here \(\dim_P\) denotes packing dimension. Taking \(F=E\) gives the conjectured planar conclusion for sets with equal Hausdorff and packing dimensions greater than one. The regularity of the pin set is a hypothesis of this result, not a consequence of its Hausdorff dimension. Borges, Ou and Pasquariello study positive measure for pinned \(k\)-star distance sets and admissible distance- […]
+[theorem] \label{thm:main} Let \(d\ge2\) be an integer and let \(E\subset\R^d\) be compact. If \(\dim_H E>d/2\), then \[ \cL^1(\Delta(E))>0. \]
+
+=== LEAN COMPARATOR PlanarFalconer (exact formal statement)
+import Mathlib
+namespace OAI
+namespace PlanarFalconer
+open MeasureTheory Set
+abbrev Plane := EuclideanSpace ℝ (Fin 2)
+def distanceSet (E : Set Plane) : Set ℝ :=
+  {r | ∃ x ∈ E, ∃ y ∈ E, dist x y = r}
+def MainTarget : Prop :=
+  ∀ E : Set Plane, IsCompact E → 1 < dimH E → 0 < volume (distanceSet E)
+end PlanarFalconer
+namespace PlanarFalconer
+theorem mainTarget_proved : MainTarget := by
+  sorry
+end PlanarFalconer
+end OAI
+
+
+=== LEAN COMPARATOR FalconerAllDimensions (exact formal statement)
+import Mathlib
+namespace OAI
+namespace Falconer
+open MeasureTheory
+open scoped ENNReal
+theorem falconer_distance_conjecture :
+    ∀ (d : ℕ), 2 ≤ d → ∀ E : Set (EuclideanSpace ℝ (Fin d)), IsCompact E →
+      (d : ℝ≥0∞) / 2 < dimH E →
+        0 < volume {r : ℝ | ∃ x ∈ E, ∃ y ∈ E, dist x y = r} := by
+  sorry
+end Falconer
+end OAI
+

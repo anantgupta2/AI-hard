@@ -1,0 +1,95 @@
+FAMILY 358: A three-manifold without conjugate points or nonpositive curvature
+SUBJECT: Differential geometry
+OPENAI SUMMARY: Constructs a closed connected orientable smooth three-manifold that admits a metric without conjugate points but no metric of nonpositive sectional curvature. This answers negatively, already in dimension three, whether the first metric-existence property implies the second.
+
+=== MANUSCRIPT: A Three-Manifold Without Conjugate Points and Without a Nonpositively Curved Metric (September-24-2026) [preprints/A-Three-Manifold-Without-Conjugate-Points-and-Without-a-Nonpositively-Curved-Metric-September-24-2026/build/main.tex]
+ABSTRACT: We construct a closed connected orientable smooth three-manifold that admits a smooth Riemannian metric without conjugate points but admits no smooth Riemannian metric of nonpositive sectional curvature.
+INTRODUCTION (start): A Riemannian metric has \emph{no conjugate points} if no nonzero Jacobi field along a geodesic vanishes at two distinct times. Nonpositive sectional curvature implies this condition. Gulliver showed that the converse fails for an individual metric: local modifications of negatively curved metrics can produce regions of positive curvature while preserving the absence of conjugate points \cite[Section~3]{Gulliver1975}. Those examples retain a manifold that already admits a negatively curved metric. The existence question is therefore different: must a closed manifold carrying a metric without conjugate points also carry some metric of nonpositive sectional curvature? This question appears in Ivanov and Kapovitch \cite[Questions~1.1 and~8.1]{IvanovKapovitch2014} and in the survey of Burns and Matveev \cite[Question~4.1.2]{BurnsMatveev2021}, which explicitly includes dimension three. A closed surface without conjugate points has universal cover diffeomorphic to $\mathbb R^2$ by the exponential map, and hence has nonpositive Euler characteristic. Uniformization then supplies a flat or negatively curved metric, so the existence problem begins in dimension three. Ivanov and Kapovitch identify graph manifolds as a central three-dimensional test case and ask about gluings of two punctured-torus products \cite[Section~8]{IvanovKapovitch2014}. We give a negative answer in dimension three, using a metric on a two-piece graph manifold whose topology obstructs nonpositive curvature. [statement] The obstruction is stronger than the Riemannian assertion in the theorem. The group $\pi_1(M)$ admits no proper cocompact isometric action on a nonempty proper $\operatorname{CAT}(0)$ space (Theorem~\ref{thm:no-cat0-action}); consequently, $M$ admits no locally $\operatorname{CAT}(0)$ length metric inducing its topology (Corollary~\ref{cor:no-local-cat0}). The same manifold also admits no metric without focal points. Recall that a metric has \emph{no focal points} if, for every nonzero normal Jacobi field $J$ along a unit-speed geodesic with $J(0)=0$, one has $\frac{d}{ds}|J(s)|^2>0$ for $s>0$. This condition is stronger than absence of conjugate points. Ivanov and Kapovitch prove that a closed three-manifold admits a metric without focal points if and only if it admits a metric of nonpositive sectional curvature \cite[Theorem~7.1]{IvanovKapovitch2014}. Their equivalence and Theorem~\ref{thm:main} give the stated additional obstruction. The manifold is obtained by gluing two copies of $\Sigma\times S^1$, where $\Sigma$ is a compact oriented surface of genus one with one boundary component. Write $h_i$ for the surface boundary and $f_i$ for the circle factor in the $i$th boundary torus. The gluing is \[ h_2=h_1+f_1,\qquad f_2=h_1. \] This is an instance of Leeb's two-piece graph-manifold obstruction \cite[Section~4.1, Example~4.1]{Leeb1995}. We include the group-theoretic proof, which also gives the stronger action obstruction above. Under a hypothetical nonpositively curved metric, the common torus group acts by translations on a Euclidean plane. In each product piece, the surface boundary is a commutator of elements commuting with the fiber. The resulting translation vectors must be perpendicular. These two orthogonality conditions are incompatible with the gluing. The main work is the metric construction and its geodesic estimate. Each product piece has nonpositive sectional curvature. Between them we insert a neck $[0,1]\times T^2$ with metric \[ g=dt^2+dx^{\mathsf T}P(t)^{-1}\,dx, \] where $P(t)$ is a smooth path of positive definite matrices. We call $P$ the \emph{cometric}, since it is the inverse torus metric. We choose it concave, meaning that $-P''$ is positive semidefinite, with exact product formulas near the ends. A small parameter $\delta$ controls its derivatives; a shear of size $\delta^2$ realizes the integral gluing after the torus periods are chosen. Convex warped collars then join the endpoints smoothly to punctured-torus cores. Fo […]
+[theorem] \label{thm:main} There exists a closed connected orientable smooth three-manifold $M$ with a $C^\infty$ Riemannian metric without conjugate points, such that $M$ admits no $C^\infty$ Riemannian metric whose sectional curvature is everywhere at most zero.
+
+=== LEAN COMPARATOR ConjugatePoints (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open Set Manifold Bundle
+open scoped ContDiff
+namespace ThreeManifold
+abbrev E3 := Fin 3 → ℝ
+abbrev I3 := 𝓘(ℝ, E3)
+variable {M : Type} [TopologicalSpace M] [ChartedSpace E3 M]
+def OrientedAtlas : Prop :=
+  ∀ (c d : OpenPartialHomeomorph M E3), c ∈ atlas E3 M → d ∈ atlas E3 M →
+    ∀ x ∈ c.target, c.symm x ∈ d.source →
+      0 < LinearMap.det (fderiv ℝ (d ∘ c.symm) x).toLinearMap
+variable [IsManifold I3 ∞ M]
+abbrev SmoothMetric (M : Type) [TopologicalSpace M] [ChartedSpace E3 M]
+    [IsManifold I3 ∞ M] :=
+  ContMDiffRiemannianMetric I3 ∞ E3 (fun x : M => TangentSpace I3 x)
+def basisVector (i : Fin 3) : E3 := Pi.single i 1
+def metricMatrix (g : SmoothMetric M) (c : OpenPartialHomeomorph M E3) (x : E3) :
+    Matrix (Fin 3) (Fin 3) ℝ :=
+  fun i j => g.inner (c.symm x)
+    (mfderiv I3 I3 c.symm x (basisVector i))
+    (mfderiv I3 I3 c.symm x (basisVector j))
+def coordPartial (f : E3 → ℝ) (x : E3) (i : Fin 3) : ℝ :=
+  fderiv ℝ f x (basisVector i)
+def christoffel (g : SmoothMetric M) (c : OpenPartialHomeomorph M E3)
+    (x : E3) (i j k : Fin 3) : ℝ :=
+  (1 / 2 : ℝ) * ∑ l : Fin 3, (metricMatrix g c x)⁻¹ i l *
+    (coordPartial (fun y => metricMatrix g c y l k) x j +
+     coordPartial (fun y => metricMatrix g c y l j) x k -
+     coordPartial (fun y => metricMatrix g c y j k) x l)
+def connectionTerm (g : SmoothMetric M) (c : OpenPartialHomeomorph M E3)
+    (x u v : E3) : E3 :=
+  fun i => ∑ j : Fin 3, ∑ k : Fin 3, christoffel g c x i j k * u j * v k
+def curvatureCoefficient (g : SmoothMetric M) (c : OpenPartialHomeomorph M E3)
+    (x : E3) (l k i j : Fin 3) : ℝ :=
+  coordPartial (fun y => christoffel g c y l j k) x i -
+  coordPartial (fun y => christoffel g c y l i k) x j +
+    ∑ a : Fin 3, (christoffel g c x l i a * christoffel g c x a j k -
+      christoffel g c x l j a * christoffel g c x a i k)
+def curvatureTerm (g : SmoothMetric M) (c : OpenPartialHomeomorph M E3)
+    (x u v w : E3) : E3 :=
+  fun l => ∑ k : Fin 3, ∑ i : Fin 3, ∑ j : Fin 3,
+    curvatureCoefficient g c x l k i j * w k * u i * v j
+def NonpositiveSectionalCurvature (g : SmoothMetric M) : Prop :=
+  ∀ (c : OpenPartialHomeomorph M E3), c ∈ atlas E3 M →
+    ∀ x ∈ c.target, ∀ u v : E3,
+      (∑ i : Fin 3, ∑ j : Fin 3,
+        metricMatrix g c x i j * curvatureTerm g c x u v v i * u j) ≤ 0
+def alongDerivative (g : SmoothMetric M) (c : OpenPartialHomeomorph M E3)
+    (x w : ℝ → E3) (s : ℝ) : E3 :=
+  deriv w s + connectionTerm g c (x s) (deriv x s) (w s)
+def IsGeodesicOn (g : SmoothMetric M) (γ : ℝ → M) (U : Set ℝ) : Prop :=
+  ContMDiffOn 𝓘(ℝ, ℝ) I3 ∞ γ U ∧
+    ∀ (c : OpenPartialHomeomorph M E3), c ∈ atlas E3 M →
+      ∀ s ∈ U, γ s ∈ c.source →
+        alongDerivative g c (c ∘ γ) (deriv (c ∘ γ)) s = 0
+def fieldCoordinates (γ : ℝ → M) (J : ∀ s, TangentSpace I3 (γ s))
+    (c : OpenPartialHomeomorph M E3) (s : ℝ) : E3 :=
+  mfderiv I3 I3 c (γ s) (J s)
+def IsJacobiFieldOn (g : SmoothMetric M) (γ : ℝ → M)
+    (J : ∀ s, TangentSpace I3 (γ s)) (U : Set ℝ) : Prop :=
+  ∀ (c : OpenPartialHomeomorph M E3), c ∈ atlas E3 M →
+    ContDiffOn ℝ ∞ (fieldCoordinates γ J c) (U ∩ γ ⁻¹' c.source) ∧
+    ∀ s ∈ U, γ s ∈ c.source →
+      alongDerivative g c (c ∘ γ)
+        (alongDerivative g c (c ∘ γ) (fieldCoordinates γ J c)) s +
+      curvatureTerm g c (c (γ s)) (fieldCoordinates γ J c s)
+        (deriv (c ∘ γ) s) (deriv (c ∘ γ) s) = 0
+def NoConjugatePoints (g : SmoothMetric M) : Prop :=
+  ∀ (U : Set ℝ), IsOpen U → OrdConnected U →
+    ∀ (γ : ℝ → M), IsGeodesicOn g γ U →
+      ∀ (J : ∀ s, TangentSpace I3 (γ s)), IsJacobiFieldOn g γ J U →
+        ∀ a ∈ U, ∀ b ∈ U, a ≠ b → J a = 0 → J b = 0 → ∀ s ∈ U, J s = 0
+def MainStatement : Prop :=
+  ∃ (M : Type) (top : TopologicalSpace M),
+    letI := top
+    ∃ (_ : T2Space M) (_ : SecondCountableTopology M) (_ : CompactSpace M)
+      (_ : ConnectedSpace M) (charts : ChartedSpace E3 M),
+      letI := charts
+      ∃ (smooth : IsManifold I3 ∞ M),
+        letI := smooth
+        OrientedAtlas (M := M) ∧
+          (∃ g
+[…]

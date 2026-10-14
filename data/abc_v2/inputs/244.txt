@@ -1,0 +1,177 @@
+FAMILY 244: The Partition Principle does not imply Choice
+SUBJECT: Mathematical logic
+OPENAI SUMMARY: Assuming ZF is consistent, constructs a model in which every surjective image of a set injects into that set, yet the axiom of choice fails. Choice for ordinal-indexed families still holds. From any countable transitive model of ZFC, a separate construction gives a transitive symmetric extension with these properties and no new countable sequences of ground-model elements.
+
+=== MANUSCRIPT: The Partition Principle does not imply Choice (September-24-2026) [preprints/The-Partition-Principle-does-not-imply-Choice-September-24-2026/build/main.tex]
+ABSTRACT: We prove that the Partition Principle does not imply the Axiom of Choice: if ZF is consistent, then so is ZF with the Partition Principle, Choice for ordinal-indexed families, and the negation of the Axiom of Choice. Separately, over every countable transitive model of ZFC, we construct a transitive symmetric model of this theory with the same ordinals and no new countable sequences of ground elements.
+INTRODUCTION (start): \label{sec:introduction} The \emph{Partition Principle} asserts that a surjection between two sets implies the existence of an injection in the reverse direction: \[ \PP:\qquad \forall X\,\forall Y\, \bigl[(\exists f:X\twoheadrightarrow Y) \Longrightarrow(\exists j:Y\hookrightarrow X)\bigr]. \] Equivalently, every partition of a set admits an injection into that set. The Axiom of Choice implies this principle by choosing one element of each fiber. The converse is less direct: the injection supplied by $\PP$ need not take a part to one of its members. In particular, it need not satisfy $f\circ j=\id_Y$. The problem is whether this cardinal comparison alone can recover choice for arbitrary families. Write $\ACwo$ for Choice for wellorderable families: for every ordinal $\eta$ and every family $(X_\xi)_{\xi<\eta}$ of nonempty sets, there is a function $c$ with $c(\xi)\in X_\xi$ for all $\xi<\eta$. Our principal result is the following ordinary relative-consistency statement. [statement] The construction also has a separate transitive-model form. [statement] Here $\ZF$ is classical first-order set theory with pure sets, Foundation, and the full Separation and Replacement schemata. Theorem~\ref{thm:main-consistency} gives a negative answer to the Partition Principle versus Choice problem under ordinary syntactic consistency. It permits externally ill-founded models, whereas Theorem~\ref{thm:main-transitive} starts with a transitive ground and preserves transitivity. In either conclusion the reverse injections and the family without a choice function belong to the same model. Section~\ref{sec:metatheory} gives the two deductions separately. The consequences for the dual Cantor--Schr\"oder--Bernstein principle and the Weak Partition Principle are developed in Remark~\ref{rem:dual-csb-wpp}. \subsection{History and related methods} The distinction between comparing the sizes of a partition and its underlying set, and actually choosing representatives, is longstanding. Da Silva traces the Partition Principle to Beppo Levi in 1902 \cite[Section~2, p.~787]{daSilva2021}. Banaschewski and Moore studied its relation to the dual Cantor--Bernstein theorem and the surrounding cardinal-comparison principles \cite{BanaschewskiMoore1990}. These questions concern what remains of cardinal arithmetic when sets need not be wellorderable. For example, Blass and Kulshreshtha distinguish several forms of cardinal well-foundedness and show that they become equivalent under $\PP$; their August 2026 version still lists $\PP\Rightarrow\AC$ as open \cite[Introduction and Section~9]{BlassKulshreshtha2026}. Gilson's September 2026 corrections withdraw the model-construction claims of three earlier approaches \cite{GilsonSheafCorrection2026,GilsonExternalCorrection2026,GilsonIterationCorrection2026}. There is already substantial choice in $\PP$. The implication $\PP\Rightarrow\ACwo$ is classical: Ryan-Smith records the argument attributed to Pincus by Pelc \cite[Proposition~3.17, proof and footnote~4]{RyanSmith2025}. Thus $\ACwo$ in our main statements is not an additional strength beyond $\PP$. Its separate appearance records the order of the construction: we establish ordinal-indexed choice first and then use it to assemble reverse injections for arbitrary sets. The difficulty of preserving a principle quantified over all sets can be reduced to a fixed set of parameters. Blass introduced small violations of choice \cite{Blass1979}. For a nonempty set $A$, $\mathrm{SVC}(A)$ says that every nonempty set is a surjective image of $A\times\eta$ for some ordinal $\eta$. The injective version, $\mathrm{SVC}^{+}(A)$, says that every set embeds into some $A\times\eta$. See also \cite[Definition~3.13 and Theorem~3.14]{Usuba2021}. These presentations let a construction on one set control objects of arbitrary rank, but their different directions cannot be interchanged without proof. Ryan-Smith makes the local-to-global step precise. Under $\mathrm{SVC}^{+}(A)$, full $\PP$ […]
+[theorem] \label{thm:main-consistency} If $\ZF$ is consistent, then so is $\ZF+\PP+\ACwo+\neg\AC$.
+[theorem] \label{thm:main-transitive} Let $V$ be a countable transitive model of $\ZFC$. There are a set forcing $\mathbb Q\in V$, a $V$-generic filter $G$, and a transitive symmetric submodel $W$ of $V[G]$ such that \[ V\subseteq W\subseteq V[G],\qquad \Ord^W=\Ord^V,\qquad W\models\ZF+\PP+\ACwo+\neg\AC. \] Every countable sequence of elements of $V$ that belongs to $W$ already belongs to $V$.
+
+=== LEAN COMPARATOR PartitionPrinciple (exact formal statement)
+import Mathlib
+namespace OAI
+namespace PartitionPilot.Forcing
+universe u
+inductive SetFormula : Nat → Type
+  | equal {n} : Fin n → Fin n → SetFormula n
+  | mem {n} : Fin n → Fin n → SetFormula n
+  | neg {n} : SetFormula n → SetFormula n
+  | conj {n} : SetFormula n → SetFormula n → SetFormula n
+  | all {n} : SetFormula (n + 1) → SetFormula n
+namespace SetFormula
+def extend {A : Type u} {n : Nat} (x : A) (env : Fin n → A) : Fin (n + 1) → A :=
+  Fin.cases x env
+def Realize (U : Set ZFSet.{u}) : {n : Nat} → SetFormula n → (Fin n → ZFSet.{u}) → Prop
+  | _, .equal i j, env => env i = env j
+  | _, .mem i j, env => env i ∈ env j
+  | _, .neg φ, env => ¬ Realize U φ env
+  | _, .conj φ ψ, env => Realize U φ env ∧ Realize U ψ env
+  | _, .all φ, env => ∀ x ∈ U, Realize U φ (extend x env)
+def ex {n : Nat} (φ : SetFormula (n + 1)) : SetFormula n := .neg (.all (.neg φ))
+def disj {n : Nat} (φ ψ : SetFormula n) : SetFormula n := .neg (.conj (.neg φ) (.neg ψ))
+def imp {n : Nat} (φ ψ : SetFormula n) : SetFormula n := .neg (.conj φ (.neg ψ))
+end SetFormula
+inductive BoundedFormula : Nat → Type
+  | equal {n} : Fin n → Fin n → BoundedFormula n
+  | mem {n} : Fin n → Fin n → BoundedFormula n
+  | neg {n} : BoundedFormula n → BoundedFormula n
+  | conj {n} : BoundedFormula n → BoundedFormula n → BoundedFormula n
+  | allMem {n} : Fin n → BoundedFormula (n + 1) → BoundedFormula n
+namespace BoundedFormula
+open SetFormula
+def imp {n} (φ ψ : BoundedFormula n) : BoundedFormula n := .neg (.conj φ (.neg ψ))
+def disj {n} (φ ψ : BoundedFormula n) : BoundedFormula n := .neg (.conj (.neg φ) (.neg ψ))
+def exMem {n} (b : Fin n) (φ : BoundedFormula (n + 1)) : BoundedFormula n :=
+  .neg (.allMem b (.neg φ))
+def toFormula : {n : Nat} → BoundedFormula n → SetFormula n
+  | _, .equal i j => .equal i j
+  | _, .mem i j => .mem i j
+  | _, .neg φ => .neg φ.toFormula
+  | _, .conj φ ψ => .conj φ.toFormula ψ.toFormula
+  | _, .allMem b φ => .all (SetFormula.imp (.mem 0 b.succ) φ.toFormula)
+def singletonFormula {n} (z x : Fin n) : BoundedFormula n :=
+  .conj (.mem x z) (.allMem z (.equal 0 x.succ))
+def unorderedPairFormula {n} (z x y : Fin n) : BoundedFormula n :=
+  .conj (.mem x z) (.conj (.mem y z) (.allMem z (disj (.equal 0 x.succ) (.equal 0 y.succ))))
+def orderedPairFormula {n} (z x y : Fin n) : BoundedFormula n :=
+  exMem z (.conj (singletonFormula 0 x.succ)
+    (exMem z.succ (.conj (unorderedPairFormula 0 x.succ.succ y.succ.succ)
+      (unorderedPairFormula z.succ.succ 1 0))))
+def pairMembershipFormula {n} (x y r : Fin n) : BoundedFormula n :=
+  exMem r (orderedPairFormula 0 x.succ y.succ)
+def relationBetweenFormula {n} (a b f : Fin n) : BoundedFormula n :=
+  .allMem f (exMem a.succ (exMem b.succ.succ (orderedPairFormula 2 1 0)))
+def functionFormula {n} (a b f : Fin n) : BoundedFormula n :=
+  .conj (relationBetweenFormula a b f)
+    (.allMem a (exMem b.succ (.conj (pairMembershipFormula 1 0 f.succ.succ)
+      (.allMem b.succ.succ (imp (pairMembershipFormula 2 0 f.succ.succ.succ) (.equal 0 1))))))
+def nonemptyFormula {n} (x : Fin n) : BoundedFormula n := exMem x (.equal 0 0)
+def choiceFunctionFormula {n} (a f : Fin n) : BoundedFormula n :=
+  .conj (.allMem f (exMem a.succ (exMem 0 (orderedPairFormula 2 1 0))))
+    (.allMem a (exMem 0 (.conj (pairMembershipFormula 1 0 f.succ.succ)
+      (.allMem 1 (imp (pairMembershipFormula 2 0 f.succ.succ.succ) (.equal 0 1))))))
+end BoundedFormula
+structure TransitiveGround where
+  sets : Set ZFSet.{u}
+  transitive : ∀ {x y}, x ∈ sets → y ∈ x → y ∈ sets
+structure InjectionCode (D N f : ZFSet.{u}) : Prop where
+  function : ZFSet.IsFunc D N f
+  injective : ∀ x y z, ZFSet.pair x z ∈ f → ZFSet.pair y z ∈ f → x = y
+namespace TransitiveGround
+open SetFormula
+variable (M : TransitiveGround.{u})
+def groundEmbeddable (D N : ZFSet.{u}) : Prop := ∃ f ∈ M.sets, InjectionCode D N f
+end TransitiveGround
+def setTransitive (x : ZFSet.{u}) : Prop := ∀ y ∈ x, ∀ z ∈ y, z ∈ x
+def ordinalSetProperty (x : ZFSet.{u}) : Prop :=
+  setTransitive x ∧ ∀ y ∈ x, setTransit
+[…]
+
+=== LEAN COMPARATOR PartitionConsistency (exact formal statement)
+import Mathlib
+namespace OAI
+namespace PartitionConsistency
+inductive Formula : ℕ → Type where
+  | bot {n} : Formula n
+  | mem {n} (x y : Fin n) : Formula n
+  | equal {n} (x y : Fin n) : Formula n
+  | imp {n} (p q : Formula n) : Formula n
+  | conj {n} (p q : Formula n) : Formula n
+  | disj {n} (p q : Formula n) : Formula n
+  | all {n} (p : Formula (n + 1)) : Formula n
+  | ex {n} (p : Formula (n + 1)) : Formula n
+namespace Formula
+abbrev neg {n} (p : Formula n) : Formula n := p.imp .bot
+abbrev iff {n} (p q : Formula n) : Formula n := (p.imp q).conj (q.imp p)
+def liftRen {n m} (r : Fin n → Fin m) : Fin (n + 1) → Fin (m + 1) :=
+  Fin.lastCases (Fin.last m) (fun i => (r i).castSucc)
+def rename {n m} (r : Fin n → Fin m) : Formula n → Formula m
+  | .bot => .bot
+  | .mem x y => .mem (r x) (r y)
+  | .equal x y => .equal (r x) (r y)
+  | .imp p q => .imp (rename r p) (rename r q)
+  | .conj p q => .conj (rename r p) (rename r q)
+  | .disj p q => .disj (rename r p) (rename r q)
+  | .all p => .all (rename (liftRen r) p)
+  | .ex p => .ex (rename (liftRen r) p)
+abbrev raise {n} (p : Formula n) : Formula (n + 1) := rename Fin.castSucc p
+def instantiate {n} (p : Formula (n + 1)) (x : Fin n) : Formula n :=
+  rename (Fin.lastCases x id) p
+def close : {n : ℕ} → Formula n → Formula 0
+  | 0, p => p
+  | _ + 1, p => close (.all p)
+end Formula
+abbrev Sentence := Formula 0
+abbrev Theory := Set Sentence
+inductive Derives : {n : ℕ} → Set (Formula n) → Formula n → Prop where
+  | hyp {n} {Γ : Set (Formula n)} {p} : p ∈ Γ → Derives Γ p
+  | weaken {n} {Γ Δ : Set (Formula n)} {p} :
+      Γ ⊆ Δ → Derives Γ p → Derives Δ p
+  | impI {n} {Γ : Set (Formula n)} {p q} :
+      Derives (insert p Γ) q → Derives Γ (.imp p q)
+  | impE {n} {Γ : Set (Formula n)} {p q} :
+      Derives Γ (.imp p q) → Derives Γ p → Derives Γ q
+  | botE {n} {Γ : Set (Formula n)} {p} : Derives Γ .bot → Derives Γ p
+  | classical {n} {Γ : Set (Formula n)} {p} :
+      Derives (insert p.neg Γ) .bot → Derives Γ p
+  | conjI {n} {Γ : Set (Formula n)} {p q} :
+      Derives Γ p → Derives Γ q → Derives Γ (.conj p q)
+  | conjL {n} {Γ : Set (Formula n)} {p q} :
+      Derives Γ (.conj p q) → Derives Γ p
+  | conjR {n} {Γ : Set (Formula n)} {p q} :
+      Derives Γ (.conj p q) → Derives Γ q
+  | disjL {n} {Γ : Set (Formula n)} {p q} :
+      Derives Γ p → Derives Γ (.disj p q)
+  | disjR {n} {Γ : Set (Formula n)} {p q} :
+      Derives Γ q → Derives Γ (.disj p q)
+  | disjE {n} {Γ : Set (Formula n)} {p q r} :
+      Derives Γ (.disj p q) → Derives (insert p Γ) r →
+      Derives (insert q Γ) r → Derives Γ r
+  | allI {n} {Γ : Set (Formula n)} {p : Formula (n + 1)} :
+      Derives (Formula.raise '' Γ) p → Derives Γ (.all p)
+  | allE {n} {Γ : Set (Formula n)} {p : Formula (n + 1)} (t : Fin n) :
+      Derives Γ (.all p) → Derives Γ (p.instantiate t)
+  | exI {n} {Γ : Set (Formula n)} {p : Formula (n + 1)} (t : Fin n) :
+      Derives Γ (p.instantiate t) → Derives Γ (.ex p)
+  | exE {n} {Γ : Set (Formula n)} {p : Formula (n + 1)} {q : Formula n} :
+      Derives Γ (.ex p) → Derives (insert p (Formula.raise '' Γ)) q.raise →
+      Derives Γ q
+  | eqRefl {n} {Γ : Set (Formula n)} (t : Fin n) : Derives Γ (.equal t t)
+  | eqSubst {n} {Γ : Set (Formula n)} {s t : Fin n} (p : Formula (n + 1)) :
+      Derives Γ (.equal s t) → Derives Γ (p.instantiate s) →
+      Derives Γ (p.instantiate t)
+  | rename {n m} {Γ : Set (Formula n)} {p : Formula n} (r : Fin n → Fin m) :
+      Derives Γ p → Derives (Formula.rename r '' Γ) (Formula.rename r p)
+def Theory.at (T : Theory) (n : ℕ) : Set (Formula n) :=
+  Formula.rename Fin.elim0 '' T
+def Consistent (T : Theory) : Prop := ∀ n, ¬ Derives (T.at n) .bot
+namespace SetLanguage
+open Formula
+def subset {n} (a b : Fin n) : Formula n :=
+  rename ![a, b] (Formula.all ((Formula.mem 2 0).imp (Formula.mem 2 1)) : Formula 2)
+def empty {n} (a : Fin n) : Formula n :=
+  rename ![a] (Formula.all (Formula.mem 1 0).neg : Formula 1)
+def nonempty {n} (a : Fin n) : Formula n :=
+  rename ![a] (Formula.ex (Formula.mem 1 
+[…]

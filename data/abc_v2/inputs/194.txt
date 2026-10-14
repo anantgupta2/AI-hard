@@ -1,0 +1,68 @@
+FAMILY 194: Lech’s multiplicity conjecture
+SUBJECT: Algebra
+OPENAI SUMMARY: Proves $`e(R)\le e(S)`$ for every flat local homomorphism of nonzero Noetherian local rings, where e is Hilbert–Samuel multiplicity. This resolves Lech's conjecture in every dimension and characteristic.
+
+=== MANUSCRIPT: Lech's multiplicity conjecture (September-23-2026) [preprints/Lechs-multiplicity-conjecture-September-23-2026/build/main.tex]
+ABSTRACT: We prove Lech's multiplicity conjecture: Hilbert–Samuel multiplicity cannot decrease under a flat local homomorphism of nonzero Noetherian local rings. The result holds in arbitrary dimension, with no restrictions on the residue fields or characteristics.
+INTRODUCTION (start): For a nonzero Noetherian local ring $(A,\mathfrak a)$ of dimension $d$, its Hilbert--Samuel multiplicity is \[ e(A)=\lim_{N\longrightarrow\infty} \frac{d!\,\length_A(A/\mathfrak a^N)}{N^d}. \] In dimension zero this is simply the length of $A$. Multiplicity measures the leading-order growth of the infinitesimal neighborhoods of the closed point. Lech asked whether this invariant can decrease under a flat local homomorphism~\cite{Lech,Lech64}. We prove that it cannot. [statement] Flatness compares the quotients by $\mathfrak m^N S$, whereas $e(S)$ is defined by the powers of $\mathfrak n$. Even when the closed fiber is zero-dimensional, so that both filtrations have finite colength, this difference prevents a direct comparison of their leading terms from giving the asserted lower bound for $e(S)$. \paragraph{Previous work.} Lech's original work established the inequality when the source has dimension at most two and in important cases with complete-intersection closed fiber~\cite{Lech,Lech64}. His original equal-dimensional formulation leads to the general one by the reductions recalled in Section~\ref{sec:reductions}. Ma proved the conjecture for equal-characteristic sources of dimension three and established the general bound \[ e(R)\leq \max\{1,d!/2^d\}\,e(S),\qquad d=\dim R, \] in equal characteristic~\cite[Theorems~1.2 and~1.3]{Ma}. His use of Cohen factorizations and Hilbert--Kunz multiplicity is also central to the characteristic-$p$ argument here. \paragraph{Ulrich methods and their limits.} An Ulrich module is a nonzero finitely generated maximal Cohen--Macaulay module whose multiplicity equals its minimal number of generators. Such modules turn multiplicity into a generator count that can be compared across a flat map. Hanes developed this approach, including its asymptotic form: maximal Cohen--Macaulay modules of positive rank whose generator-to-multiplicity ratios tend to one also suffice. He obtained graded special cases by this method \cite[Chapter~IV, especially Proposition~4.1.5]{Hanes}. Ma's weakly lim Ulrich sequences allow the modules themselves to fail to be Cohen--Macaulay: their multiplicity-to-generator ratios tend to one, while their first higher parameter Koszul Euler characteristics are negligible relative to the generator counts \cite[Definitions~2.2 and~2.9]{MaUlrich}. For a local domain, existence of such a sequence implies the multiplicity inequality for every flat local target \cite[Theorem~2.11]{MaUlrich}. In arbitrary dimension, Ma proved the conjecture when the source is a standard graded algebra over a perfect field, localized at its homogeneous maximal ideal; the flat local target need not be graded~\cite[Theorem~3.8]{MaUlrich}. The proof constructs weakly lim Ulrich sequences in positive characteristic and uses specialization in characteristic zero. Passing to associated graded rings does not extend this result to every flat map, because the induced map of associated graded rings need not remain flat \cite[Remark~3.9]{MaUlrich}. A complementary graded case was proved by Meng: for an equal-dimensional flat local map, the inequality holds when, up to completion, the target is standard graded over a field and the extended source maximal ideal is homogeneous \cite[Theorem~5.13]{Meng}. Nor can one require weakly lim Ulrich sequences over every domain: Yhee constructed complete two-dimensional local domains admitting no such sequence~\cite[Theorem~6.2]{Yhee}. These examples are nonnormal. A different obstruction, within normal domains, is supplied by a companion construction of a complete three-dimensional Noetherian normal local $\mathbb C$-domain, with residue field $\mathbb C$, admitting no nonzero finitely generated maximal Cohen--Macaulay module \cite[Theorem~1.1]{SmallCM}. Thus approaches requiring such a module over every source ring itself cannot be universal; this finite-module obstruction does not rule out weakly lim Ulrich sequences. \paragraph{From modules to complexes.} Over a $d$-dim […]
+[theorem] [Lech's conjecture]\label{thm:main} Let $(R,\mathfrak m)\longrightarrow(S,\mathfrak n)$ be a flat local homomorphism of nonzero Noetherian local rings. Then \[ e(R)\leq e(S). \] There is no restriction on the dimensions, the residue fields, or the characteristics of the rings.
+
+=== LEAN COMPARATOR DuttaDomain (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+namespace Lech
+noncomputable def dimension (A : Type*) [CommRing A] : ℕ :=
+  (WithBot.unbotD 0 (ringKrullDim A)).toNat
+noncomputable def colength (A : Type*) [CommRing A] [IsLocalRing A]
+    (N : ℕ) : ℕ :=
+  (Module.length A (A ⧸ (IsLocalRing.maximalIdeal A) ^ N)).toNat
+noncomputable def normalizedColength (A : Type*) [CommRing A] [IsLocalRing A]
+    (N : ℕ) : ℝ :=
+  (Nat.factorial (dimension A) : ℝ) * (colength A N : ℝ) /
+    (N : ℝ) ^ dimension A
+noncomputable def multiplicity (A : Type*) [CommRing A] [IsLocalRing A] : ℝ :=
+  Filter.limUnder Filter.atTop (normalizedColength A)
+end Lech
+noncomputable section
+namespace Lech
+open CategoryTheory CategoryTheory.Limits HomologicalComplex Filter
+open scoped Topology
+universe u
+variable (R : Type u) [CommRing R] [IsNoetherianRing R] [IsLocalRing R]
+structure IsShortComplex (F : CochainComplex (ModuleCat.{u} R) ℤ) : Prop where
+  term_free : ∀ i, Module.Free R (F.X i)
+  term_finite : ∀ i, Module.Finite R (F.X i)
+  bounded : ∀ i, i < -(dimension R : ℤ) ∨ 0 < i → IsZero (F.X i)
+  homology_finite_length : ∀ i, IsFiniteLength R (F.homology i)
+  homology_zero_nonzero : ¬ IsZero (F.homology 0)
+def frobeniusComplex (p : ℕ) [Fact p.Prime] [CharP R p] (n : ℕ)
+    (F : CochainComplex (ModuleCat.{u} R) ℤ) : CochainComplex (ModuleCat.{u} R) ℤ :=
+  ((ModuleCat.extendScalars (iterateFrobenius R p n)).mapHomologicalComplex (.up ℤ)).obj F
+def shortEuler (F : CochainComplex (ModuleCat.{u} R) ℤ) : ℝ :=
+  ∑ i∈Finset.range (dimension R+1),(-1:ℝ)^i*
+    ((Module.length R (F.homology (-(i:ℤ)))).toNat : ℝ)
+def duttaSequence (p : ℕ) [Fact p.Prime] [CharP R p]
+    (F : CochainComplex (ModuleCat.{u} R) ℤ) (n : ℕ) : ℝ :=
+  (p:ℝ)^(-(n*dimension R : ℤ)) * shortEuler R (frobeniusComplex R p n F)
+def duttaMultiplicity (p : ℕ) [Fact p.Prime] [CharP R p]
+    (F : CochainComplex (ModuleCat.{u} R) ℤ) : ℝ :=
+  limUnder atTop (duttaSequence R p F)
+def DuttaDomainClaim : Prop :=
+  ∀ (D : Type u) [CommRing D] [IsNoetherianRing D] [IsLocalRing D] [IsDomain D]
+    [IsAdicComplete (IsLocalRing.maximalIdeal D) D]
+    (p : ℕ) [Fact p.Prime] [CharP D p]
+    (F : CochainComplex (ModuleCat.{u} D) ℤ), IsShortComplex D F →
+      (∀ n i,IsFiniteLength D ((frobeniusComplex D p n F).homology i)) ∧
+      Tendsto (duttaSequence D p F) atTop (𝓝 (duttaMultiplicity D p F)) ∧
+      multiplicity D ≤ duttaMultiplicity D p F
+end Lech
+namespace Lech
+universe u
+theorem dutta_domain : DuttaDomainClaim.{u} := by
+  sorry
+end Lech
+end
+end
+end OAI
+

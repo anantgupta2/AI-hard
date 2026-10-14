@@ -1,0 +1,74 @@
+FAMILY 343: Symplectic ball packing in higher dimensions
+SUBJECT: Differential geometry
+OPENAI SUMMARY: Resolves the Siegel–Yao conjecture for arbitrary capacities in every dimension $`2n\ge6`$. Finitely many closed symplectic balls of capacities $`R_1,\ldots,R_k`$ embed disjointly into an open ball of capacity R exactly when $`\sum_iR_i^n\lt R^n`$ and $`R_i+R_j\lt R`$ for every distinct pair i, j.
+
+=== MANUSCRIPT: Symplectic Ball Packings in Higher Dimensions (September-23-2026) [preprints/Symplectic-Ball-Packings-in-Higher-Dimensions-September-23-2026/build/main.tex]
+ABSTRACT: We prove that, for all integers n ≥ 3 and k ≥ 1 and all positive real capacities $`R_1,\ldots,R_k`$, the closed standard symplectic $`2n`$-balls of these capacities embed disjointly into the interior of a ball of capacity R &gt; 0 if and only if
+INTRODUCTION (start): \label{intro:section} Symplectic ball packing asks how much of a volume-preserving embedding problem is constrained by symplectic rigidity. For \(R>0\), write \[ B^{2n}(R)= \left\{z\in\C^n:\pi\sum_{j=1}^n|z_j|^2\le R\right\}, \qquad \omega_0=\sum_{j=1}^n\dd x_j\wedge\dd y_j. \] Thus \(R\) is the capacity, the Euclidean radius is \(\sqrt{R/\pi}\), and \(\vol B^{2n}(R)=R^n/n!\). We ask when finitely many such balls can be embedded symplectically into the interior of a target ball. An embedding of a closed ball is understood to be a symplectic embedding defined on an open neighborhood of it. For a finite disjoint union, the compact images of the closed balls must be pairwise disjoint. [statement] The first inequality is the volume obstruction. The second is Gromov's two-ball obstruction~\cite{Gromov1985}; it expresses a restriction invisible to volume alone. Theorem~\ref{intro:main} proves that these obstructions are complete in every real dimension at least six, resolving Siegel and Yao's Conjecture~A positively~\cite{SiegelYao2025}. For one ball the pairwise condition is vacuous. The strict inequalities reflect the closed-source, open-target convention. \subsection{Packing rigidity and stability} Gromov's pseudoholomorphic-curve method gives the two-ball obstruction in every dimension, and further packing obstructions in dimension four~\cite[Section~0.3.B]{Gromov1985}. McDuff and Polterovich developed the connection with algebraic geometry~\cite{McDuffPolterovich}. Explicit constructions form a complementary strand: Traynor developed symplectic packing constructions~\cite{Traynor}, and Schlenk developed planar constructions and higher-dimensional folding methods~\cite{SchlenkHand,SchlenkBook}. In real dimension four, additional obstructions remain essential, so the two inequalities in Theorem~\ref{intro:main} do not give a criterion there. Biran's work~\cite{Biran1997,Biran1999} established packing stability: on a closed symplectic four-manifold with rational symplectic class, every sufficiently large number of equal balls can fill an arbitrarily large fraction of the volume. Buse and Hind extended equal-ball stability to higher-dimensional balls and projective spaces and then to all closed rational symplectic manifolds~\cite{BuseHind2011,BuseHind2013}. For unequal balls, Buse, Hind, and Opshtein proved strong packing stability on every closed symplectic four-manifold, with all capacities required to be sufficiently small~\cite{BuseHindOpshtein2016}. These results identify regimes in which volume suffices; the question here concerns every finite collection of arbitrary capacities in a ball. Siegel and Yao formulate this higher-dimensional question and also study stabilized packing problems~\cite{SiegelYao2025}. Their theorems on products of four-dimensional balls with a fixed closed symplectic surface retain four-dimensional packing obstructions. Theorem~\ref{intro:main} concerns balls themselves, with arbitrary unequal capacities and arbitrary finite numbers of components. \subsection{From a mean area inequality to ball embeddings} Normalize the target capacity to one. The common construction uses a surface of positive genus as a base and a toric domain in \(\C^m\), where \(m=n-1\), as a fiber. The fiber is specified by a downward polytope \(\Delta\subset\R_{\ge0}^m\) in the moment coordinates \(p_j=\pi|z_j|^2\): lowering any coordinate keeps a point in \(\Delta\). Write \(H(p)>0\) for the limiting total area of the base at fixed moment \(p\), obtained by exhausting a punctured surface by compact bordered pieces. A ball of auxiliary capacity \(r_i\), chosen strictly larger than the corresponding requested capacity, requires the area profile \[ \left(r_i-\sum_{j=1}^m p_j\right)_+, \qquad x_+=\max(x,0). \] The models contain each auxiliary simplex \(\sum_jp_j\le r_i\) strictly away from their noncoordinate boundary faces. The volume inequality becomes positivity of the integral of the unused-area profile \[ P(p)=H(p)-\sum_i\left […]
+[theorem] \label{intro:main} Let \(n\ge3\) and \(k\ge1\) be integers. For positive real numbers \(R,R_1,\ldots,R_k\), there exists a symplectic embedding \[ \bigsqcup_{i=1}^k B^{2n}(R_i) \hookrightarrow \Int B^{2n}(R) \] if and only if \begin{equation}\label{intro:inequalities} \sum_{i=1}^k R_i^n<R^n, \qquad R_i+R_j<R\quad (1\le i<j\le k). \end{equation}
+
+=== LEAN COMPARATOR BallPacking (exact formal statement)
+import Mathlib
+namespace OAI
+namespace HigherDimensionalBallPacking
+open scoped ContDiff
+abbrev Phase (n : ℕ) := Fin n → ℂ
+noncomputable def capacity {n : ℕ} (z : Phase n) : ℝ :=
+  Real.pi * ∑ j, Complex.normSq (z j)
+def closedBall (n : ℕ) (r : ℝ) : Set (Phase n) := {z | capacity z ≤ r}
+def openBall (n : ℕ) (r : ℝ) : Set (Phase n) := {z | capacity z < r}
+noncomputable def standardForm {n : ℕ} (u v : Phase n) : ℝ :=
+  ∑ j, ((u j).re * (v j).im - (u j).im * (v j).re)
+def SymplecticOn {n : ℕ} (U : Set (Phase n)) (f : Phase n → Phase n) : Prop :=
+  IsOpen U ∧ ContDiffOn ℝ ∞ f U ∧
+    Topology.IsEmbedding (fun x : U => f x) ∧
+    ∀ x ∈ U, ∀ u v : Phase n,
+      standardForm (fderiv ℝ f x u) (fderiv ℝ f x v) = standardForm u v
+def HasPacking (n k : ℕ) (R : ℝ) (r : Fin k → ℝ) : Prop :=
+  ∃ (U : Fin k → Set (Phase n)) (f : Fin k → Phase n → Phase n),
+    (∀ i, closedBall n (r i) ⊆ U i ∧ SymplecticOn (U i) (f i) ∧
+      Set.MapsTo (f i) (closedBall n (r i)) (openBall n R)) ∧
+    (∀ i j, i ≠ j →
+      Disjoint (f i '' closedBall n (r i)) (f j '' closedBall n (r j)))
+def PackingInequalities (n k : ℕ) (R : ℝ) (r : Fin k → ℝ) : Prop :=
+  (∑ i, r i ^ n) < R ^ n ∧ ∀ i j, i ≠ j → r i + r j < R
+theorem main_theorem (n k : ℕ) (hn : 3 ≤ n) (hk : 1 ≤ k)
+    (R : ℝ) (r : Fin k → ℝ) (hR : 0 < R) (hr : ∀ i, 0 < r i) :
+    HasPacking n k R r ↔ PackingInequalities n k R r := by
+  sorry
+end HigherDimensionalBallPacking
+end OAI
+
+
+=== LEAN COMPARATOR BallPackingNecessity (exact formal statement)
+import Mathlib
+namespace OAI
+namespace HigherDimensionalBallPacking
+open scoped ContDiff
+abbrev Phase (n : ℕ) := Fin n → ℂ
+noncomputable def capacity {n : ℕ} (z : Phase n) : ℝ :=
+  Real.pi * ∑ j, Complex.normSq (z j)
+def closedBall (n : ℕ) (r : ℝ) : Set (Phase n) := {z | capacity z ≤ r}
+def openBall (n : ℕ) (r : ℝ) : Set (Phase n) := {z | capacity z < r}
+noncomputable def standardForm {n : ℕ} (u v : Phase n) : ℝ :=
+  ∑ j, ((u j).re * (v j).im - (u j).im * (v j).re)
+def SymplecticOn {n : ℕ} (U : Set (Phase n)) (f : Phase n → Phase n) : Prop :=
+  IsOpen U ∧ ContDiffOn ℝ ∞ f U ∧
+    Topology.IsEmbedding (fun x : U => f x) ∧
+    ∀ x ∈ U, ∀ u v : Phase n,
+      standardForm (fderiv ℝ f x u) (fderiv ℝ f x v) = standardForm u v
+def HasPacking (n k : ℕ) (R : ℝ) (r : Fin k → ℝ) : Prop :=
+  ∃ (U : Fin k → Set (Phase n)) (f : Fin k → Phase n → Phase n),
+    (∀ i, closedBall n (r i) ⊆ U i ∧ SymplecticOn (U i) (f i) ∧
+      Set.MapsTo (f i) (closedBall n (r i)) (openBall n R)) ∧
+    (∀ i j, i ≠ j →
+      Disjoint (f i '' closedBall n (r i)) (f j '' closedBall n (r j)))
+def PackingInequalities (n k : ℕ) (R : ℝ) (r : Fin k → ℝ) : Prop :=
+  (∑ i, r i ^ n) < R ^ n ∧ ∀ i j, i ≠ j → r i + r j < R
+theorem packing_necessity (n k : ℕ) (hn : 3 ≤ n) (hk : 1 ≤ k)
+    (R : ℝ) (r : Fin k → ℝ) (hR : 0 < R) (hr : ∀ i, 0 < r i)
+    (hp : HasPacking n k R r) : PackingInequalities n k R r := by
+  sorry
+end HigherDimensionalBallPacking
+end OAI
+

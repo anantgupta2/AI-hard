@@ -1,0 +1,46 @@
+FAMILY 094: Subpolynomial dimension reduction in Lp
+SUBJECT: Convex and metric geometry
+OPENAI SUMMARY: For every fixed $`1\lt p\lt \infty`$ and distortion D &gt; 1, every n-point subset of real Lp embeds into $`\ell_p^d`$ with distortion at most D and dimension $`d=n^{o(1)}`$, answering Naor's sublinear-dimension question for p ≠ 2. In contrast, exact embeddings require worst-case dimension $`\Theta(n^2)`$ when p ≠ 2.
+
+=== MANUSCRIPT: Subpolynomial dimension reduction in Lp (September-23-2026) [preprints/Subpolynomial-dimension-reduction-in-Lp-September-23-2026/build/paper.tex]
+ABSTRACT: For every fixed $`1\lt p\lt \infty`$ and D &gt; 1, every n-point subset of a real Lp space embeds into $`\ell_p^d`$ with distortion at most D and subpolynomial dimension $`d=n^{o(1)}`$. The target has the same exponent p, and the embedding need not be linear.
+INTRODUCTION (start): The Johnson--Lindenstrauss lemma places every $n$-point subset of a Hilbert space in $O_D(\log n)$ Euclidean dimensions with any prescribed distortion $D>1$~\cite[Lemma~1]{JohnsonLindenstrauss1984}. Johnson and Lindenstrauss also asked what analogues of their lemma hold in other Banach spaces~\cite[Problem~3]{JohnsonLindenstrauss1984}. For other $L_p$ spaces, the corresponding finite-metric question must be distinguished both from discretizing an entire linear subspace and from requiring the embedding itself to be linear. We study the coordinate-target version: the points may be repositioned freely, but their images must lie in $\ell_p^d$ with the same exponent $p$. For the broader dimension-reduction landscape and the distinction between coordinate targets and arbitrary subspaces, see Naor~\cite{Naor2018}. All spaces and maps in this paper are real. For $1<p<\infty$, an integer $n\ge2$, and $D\ge1$, let $d_p(n,D)$ be the least integer $d$ such that every $n$-point subset $\{x_1,\ldots,x_n\}$ of any $L_p$ space admits images $y_1,\ldots,y_n\in\ell_p^d$ and a number $s>0$ satisfying \begin{equation}\label{eq:distortion} s\|x_i-x_j\|_p\le \|y_i-y_j\|_p \le Ds\|x_i-x_j\|_p\qquad(i,j\in\{1,\ldots,n\}). \end{equation} The maps are unrestricted; in particular, they need not extend linearly to the ambient space. Lemma~\ref{lem:exact-upper} below shows that the same quantity results if the input sets are restricted to finite coordinate spaces $\ell_p^m$. [statement] The constants in the upper bound depend on the fixed parameters $p,D$; no uniformity as $p$ approaches an endpoint or $D$ approaches $1$ is asserted. For $p=2$, the classical Hilbert result gives the stronger bound $d_2(n,D)=O_D(\log n)$ for every fixed $D>1$. The theorem is existential and does not assert an efficient embedding algorithm. \subsection{Earlier results and the exact-distortion contrast} Ball proved the exact-coordinate upper bound $\binom n2$ and its quadratic-order sharpness for $1\le p<2$~\cite{Ball1990}. Lemma~\ref{lem:exact-upper} recalls the distance-cone and Carath\'eodory argument for that upper bound. The lower bound in \eqref{eq:exact-bounds} uses an antipodal row-and-column configuration. Its disjoint-support test is the classical equality criterion for the $p$-parallelogram defect~\cite[Corollary~2.1]{Lamperti1958}; in particular, the argument includes even integers $p>2$. Approximate finite-set bounds and linear-subspace discretization have different dimension parameters. Below $2$, Schechtman's finite-set estimates progressed from $O_D(n\log n)$ coordinates to $O_{p,D}(n)$~\cite{Schechtman1987,Schechtman2011}. The subspace results of Bourgain--Lindenstrauss--Milman and Talagrand instead preserve all vectors in a given $r$-dimensional subspace by a linear map~\cite{BourgainLindenstraussMilman1989,Talagrand1995}. Applying such a theorem to the span of the translated data gives $r\le n-1$; it does not give the present subpolynomial bound in cardinality. Bourgain's embedding of arbitrary finite metrics into Hilbert space allows distortion growing with $n$~\cite{Bourgain1985}, another different guarantee. The absence of a linearity requirement is essential: fixed-distortion linear maps on selected $L_p$ configurations can require dimension proportional to their cardinality when $p\ne2$ \cite[Section~3]{LeeMendelNaor2005}. At the endpoint $p=1$, the obstruction of Brinkman--Charikar applies even to nonlinear maps; see also Lee--Naor's proof \cite{BrinkmanCharikar2005,LeeNaor2004}. For $p>2$, Naor--Ren's recent lower bound \cite[Section~1.1, equation~(2)]{NaorRen2026Threshold} rules out $O_{p,D}(\log n)$ coordinate dimension: along arbitrarily large cardinalities it requires dimension of order at least $(\log n/(\log\log n)^2)^{p/2}$ at fixed distortion. This is compatible with \eqref{eq:main-bounds}; neither its upper exponent nor its elementary logarithmic lower bound is asserted to be optimal. The dependence on cardinality also distinguishes this pr […]
+[theorem] \label{thm:main} Fix $1<p<\infty$, $p\ne2$, and put \[ \gamma(p)= \begin{cases} 2-p,&1<p<2,\\ 1-2/p,&2<p<\infty. \end{cases} \] For every $D>1$ there is a constant $C_{p,D}<\infty$ such that, for every integer $n\ge2$, \begin{equation}\label{eq:main-bounds} \frac{\log n}{\log(1+2D)} \le d_p(n,D) \le \exp\!\bigl(C_{p,D}(\log n)^{\gamma(p)}\bigr). \end{equation} For exact embeddings, \begin{equation}\label{eq:exact-bounds} \left\lfloor\frac{n-1}{4}\right\rfloor^2 \le d_p(n,1)\le\binom n2\qquad(n\ge9). \end{equation} Consequently, \[ \lim_{n\to\infty}\frac{\log d_p(n,D)}{\log n} =\begin{cases}0,&D>1,\\2,&D=1.\end{cases} \]
+
+=== LEAN COMPARATOR SubpolynomialLp (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open MeasureTheory Filter
+open scoped BigOperators Topology
+universe u
+namespace SubpolynomialLp
+def coordinateDistance (p : ℝ) {d : ℕ} (x y : Fin d → ℝ) : ℝ :=
+  (∑ a, |x a - y a| ^ p) ^ (1 / p)
+def GoodDimension (p : ℝ) (n : ℕ) (D : ℝ) (d : ℕ) : Prop :=
+  ∀ (Ω : Type u) (mΩ : MeasurableSpace Ω) (μ : @Measure Ω mΩ)
+    (x : Fin n → @Lp Ω ℝ mΩ _ (ENNReal.ofReal p) μ),
+    Function.Injective x →
+    ∃ (y : Fin n → Fin d → ℝ) (s : ℝ), 0 < s ∧
+      ∀ i j, s * ‖x i - x j‖ ≤ coordinateDistance p (y i) (y j) ∧
+        coordinateDistance p (y i) (y j) ≤ D * s * ‖x i - x j‖
+def dimension (p : ℝ) (n : ℕ) (D : ℝ) : ℕ :=
+  sInf {d : ℕ | GoodDimension.{u} p n D d}
+def gamma (p : ℝ) : ℝ := if p < 2 then 2 - p else 1 - 2 / p
+theorem source_main (p : ℝ) (hp : 1 < p) (hp2 : p ≠ 2) :
+    (∀ D : ℝ, 1 < D → ∃ C : ℝ, ∀ n : ℕ, 2 ≤ n →
+      GoodDimension.{u} p n D (dimension.{u} p n D) ∧
+      Real.log (n : ℝ) / Real.log (1 + 2 * D) ≤ (dimension.{u} p n D : ℝ) ∧
+      (dimension.{u} p n D : ℝ) ≤ Real.exp (C * Real.log (n : ℝ) ^ gamma p)) ∧
+    (∀ n : ℕ, 9 ≤ n →
+      GoodDimension.{u} p n 1 (dimension.{u} p n 1) ∧
+      ((n - 1) / 4) ^ 2 ≤ dimension.{u} p n 1 ∧
+      dimension.{u} p n 1 ≤ n.choose 2) ∧
+    (∀ D : ℝ, 1 ≤ D →
+      Tendsto (fun n : ℕ => Real.log (dimension.{u} p n D : ℝ) / Real.log (n : ℝ))
+        atTop (𝓝 (if 1 < D then 0 else 2))) := by
+  sorry
+end SubpolynomialLp
+end
+end OAI
+

@@ -1,0 +1,159 @@
+FAMILY 174: Deterministic construction of strong thin spanning trees
+SUBJECT: Combinatorics
+OPENAI SUMMARY: Resolves the strong thin-tree conjecture constructively. Every finite loopless k-edge-connected multigraph on at least two vertices has a spanning tree containing at most a universal $`C/k`$ fraction of the edges of every cut. Such a tree can be found deterministically in polynomial time, even with binary-encoded parallel-edge multiplicities.
+
+=== MANUSCRIPT: The strong thin tree conjecture (September-23-2026) [preprints/The-strong-thin-tree-conjecture-September-23-2026/build/source/main.tex]
+ABSTRACT: We prove that every finite loopless k-edge-connected multigraph on at least two vertices, with k ≥ 1, has a spanning tree meeting each cut in at most $`C/k`$ times the size of the cut, where C is a universal constant. This resolves the strong thin tree conjecture.
+INTRODUCTION (start): \label{sec:introduction} For a finite loopless undirected multigraph \(G=(V,E)\) and a nonempty proper subset \(S\subset V\), write \(\delta_G(S)\) for the edges with exactly one endpoint in \(S\). Parallel edges are counted separately. A graph is \(k\)-edge-connected if \(|\delta_G(S)|\ge k\) for every nonempty proper \(S\). A spanning tree \(T\) is \(\alpha\)-thin if \[ |\delta_T(S)|\le\alpha|\delta_G(S)| \qquad(\varnothing\ne S\subsetneq V). \] A spanning tree retains connectivity using only \(|V|-1\) edges. Thinness asks that these edges occupy a small fraction of every cut simultaneously. The question is whether high edge connectivity alone forces such a tree, with a bound independent of the number of vertices. [statement] \subsection*{The conjecture and its history} Goddyn's thin tree conjecture asks whether, for every \(\varepsilon>0\), a sufficiently high edge connectivity guarantees an \(\varepsilon\)-thin spanning tree~\cite{Goddyn}. The strong thin tree conjecture asks for the quantitative rate \(C/k\). Theorem~\ref{thm:main} resolves this stronger conjecture positively. The order \(1/k\) is necessary: with two vertices and \(k\) parallel edges, every spanning tree uses exactly one of the \(k\) edges of the only cut. Thin trees connect this graph-theoretic question with approximation algorithms. In the asymmetric traveling salesman problem, one seeks a minimum-cost tour through all vertices of a directed metric. Asadpour, Goemans, M\k{a}dry, Oveis Gharan, and Saberi used maximum-entropy distributions on spanning trees to round the standard linear-programming relaxation, obtaining an \(O(\log n/\log\log n)\)-approximation, where \(n\) is the number of vertices~\cite{AsadpourSODA,Asadpour}. Their method explains the usefulness of controlling every cut: together with control of the tree's cost, cut bounds permit an inexpensive Eulerian augmentation of a suitable oriented tree. For the underlying thin-tree problem, Oveis Gharan and Saberi established the inverse-connectivity bound for planar graphs and, with constants depending on the surface, for graphs of bounded orientable genus~\cite[Theorem~5.1]{OveisGharanSaberi2011}. For general multigraphs, Anari and Oveis Gharan developed effective-resistance-reducing flows and the geometry of locally connected hierarchies. They proved the existence of a spanning tree with thinness \(\operatorname{poly}(\log\log n)/k\) \cite[Corollary~1.8]{AOG}. Their work provides the principal geometric foundation of the present proof. Progress for specified families of cuts gives a complementary view of the problem. Klein and Olver obtained inverse-connectivity thinness for every prescribed laminar family~\cite{KleinOlver2023}. Klein, Olver, and Yeoh constructed a spanning tree crossing every cut of size less than \((1+1/40)k\) at most \(88\) times \cite[Theorem~1]{KleinOlverYeoh}. Theorem~\ref{thm:main} controls all cuts simultaneously and removes the dependence on \(n\). The thin-tree approach to asymmetric traveling salesman remains structurally useful, although constant-factor approximation for that problem has already been obtained by other methods. Svensson, Tarnawski, and V\'egh proved the first such guarantee \cite{SvenssonTarnawskiVegh2020}; Traub and Vygen subsequently improved it~\cite{TraubVygen2022}. Our objective here is the underlying all-cut spanning-tree theorem. \subsection*{The two main deductions} High edge connectivity supplies many edge-disjoint spanning trees through the Nash--Williams--Tutte theorem~\cite{NashWilliams,Tutte}. For any fixed cut, the average number of edges used by the trees in such a packing is small. This averaging does not select one tree that is small on every cut. We maintain a large packing throughout a sequence of sparsifications: each step reduces cut sizes and the packing size by almost the same factor, and the accumulated relative loss remains bounded. The first deduction extracts a large tree packing on edges of small resistance. For a graph  […]
+[theorem] \label{thm:main} There is a universal constant \(C>0\) such that, for every integer \(k\ge1\), every finite \(k\)-edge-connected undirected multigraph without loops and with at least two vertices has a spanning tree \(T\) satisfying \[ |\delta_T(S)|\le\frac Ck\,|\delta_G(S)| \qquad\text{for every }\varnothing\ne S\subsetneq V. \]
+
+=== MANUSCRIPT: A polynomial-time construction of strong thin trees (September-23-2026) [preprints/A-polynomial-time-construction-of-strong-thin-trees-September-23-2026/build/source/main.tex]
+ABSTRACT: We give a deterministic polynomial-time construction of strong thin trees. Given a finite k-edge-connected loopless multigraph on at least one vertex, the algorithm constructs a spanning tree meeting every cut in at most a $`C/k`$ fraction of its edges, for a universal constant C. The running time is polynomial in the binary input length, including when parallel-edge multiplicities are encoded in binary.
+INTRODUCTION (start): \label{sec:introduction} A spanning tree retains connectivity with only $n-1$ edges. A thin spanning tree must also use a small fraction of every cut, with the same tree serving all cuts simultaneously. We give a deterministic polynomial-bit construction at the inverse-connectivity scale. Throughout, graphs are finite undirected loopless multigraphs, and every parallel copy counts separately. For $S\subseteq V(G)$, let $\delta_G(S)$ be the multiset of edges with one endpoint in $S$ and the other in its complement. The graph is $k$-edge-connected if $|\delta_G(S)|\ge k$ for every nonempty proper $S$. A spanning tree $T$ is \emph{$\alpha$-thin} in $G$ if \[ |\delta_T(S)|\le\alpha|\delta_G(S)| \qquad(\varnothing\ne S\subsetneq V(G)). \] We consider two input representations: an explicit list of labelled edge copies, or a list of endpoint pairs with nonnegative integer multiplicities written in binary. In the second representation, the number of edge copies may be exponential in the input length. The universal $C/k$ bound is the strong thin-tree conjecture. The companion article \emph{The strong thin tree conjecture} \cite{ThinTreesCompanion} proves the existence statement and supplies the complete hierarchy geometry used here. Theorem~\ref{thm:tt-algorithm} gives the positive algorithmic resolution in both finite input models. Its order in $k$ is necessary: for two vertices joined by $k$ parallel edges, the unique cut contains exactly one tree edge. The construction also gives simultaneous cost-and-cut rounding. Given nonnegative rational edge weights whose mass on every cut is at least one, and any nonnegative rational edge costs, we find a tree in the positive support with every cut load and its total cost bounded by constant multiples of the corresponding fractional quantities (Corollary~\ref{cor:ta-fractional-rounding}). No metric assumption on the costs is needed. \subsection{Context and prior work} Goddyn's qualitative conjecture asks whether every positive thinness bound follows from sufficiently large edge connectivity, independently of graph order \cite[Problem~4]{Goddyn2004}. The strong form specifies the rate $C/k$; the distinction is made explicitly in \cite[Conjecture~1.3 and the following discussion]{AnariOveisGharan2015}. One source of algorithmic interest is the asymmetric traveling salesman problem, which asks for a minimum-cost tour through the vertices of a directed metric. Asadpour, Goemans, M\k{a}dry, Oveis Gharan, and Saberi used maximum-entropy spanning-tree distributions to obtain an $O(\log n/\log\log n)$ approximation \cite{AsadpourEtAl2017}. Their rounding method also gives the constructive $O(\log n/(k\log\log n))$ thin-tree scale; see \cite[Section~1]{AnariOveisGharan2015}. For planar graphs, and more generally on each fixed orientable surface, Oveis Gharan and Saberi obtained constructive inverse-connectivity bounds \cite[Theorem~5.1]{OveisGharanSaberi2011}. For general multigraphs, Anari and Oveis Gharan introduced effective-resistance-reducing flows and locally connected hierarchies, and proved the existence of $\operatorname{poly}(\log\log n)/k$-thin trees \cite[Corollary~1.8]{AnariOveisGharan2015}. Their geometric method is the principal foundation of the hierarchy argument in the companion and its extension below. The existence theorem does not itself give a polynomial-time construction of those trees. Recent work has obtained inverse-connectivity bounds for structured families of cuts. Klein and Olver treat every prescribed laminar family \cite{KleinOlver2023}. Klein, Olver, and Yeoh construct a tree crossing each cut of size less than $(1+1/40)k$ at most $88$ times \cite[Theorem~1]{KleinOlverYeoh2026}. Our conclusion controls all cuts of an arbitrary multigraph. Thin trees remain an independent structural problem: constant-factor approximation for asymmetric traveling salesman was already established by Svensson, Tarnawski, and V\'egh and subsequently improved by Traub and Vygen \cite{Svensson […]
+[theorem] [Hierarchy bound for the metric test cone] \label{thm:tg-hierarchy} There is an absolute integer $h_0$ such that, for every integer $h\ge h_0$, every locally $h$-connected hierarchy of $G$, and every collection $\mathcal M$ of nonroot nodes satisfying $|O(A)|\ge |P(A)|/h$, there is a matrix $D\succ0$ on $\mathsf E$ with \begin{align} \ip{D}{Z}&\le\ip{L_G}{Z} &&(Z\in\mathcal N),\label{tg:shortcut}\\ \frac1{|O(A)|}\sum_{e\in O(A)}b_e^TD^{-1}b_e &\le h^{-31/40} &&(A\in\mathcal M).\label{tg:hierarchy-resistance} \end{align} The cutoff is independent of the graph and the hierarchy depth.
+[proposition] [Simultaneous response]\label{prop:tg-response} Let $H$ be connected and let $G\subseteq H$ be a spanning subgraph. Let $r$ be a sufficiently large integer, put $h=\lfloor r/2\rfloor$, and suppose $G$ and the subgraphs induced by all parts of a nested sequence of partitions are $h$-edge-connected, with the singleton condition vacuous. If $0<s\le r^{1/4}$, there is $Y\in\mathcal K_H$ such that, at every partition $\mathcal P$ in the sequence, all but at most $r^{-1/3}|E_G(\mathcal P)|$ crossing edges satisfy \begin{equation}\label{tg:response-edge} Y\succeq6s\,b_eb_e^T. \end{equation} Here $E_G(\mathcal P)$ denotes the edges whose endpoints lie in different parts of $\mathcal P$.
+[proposition] [Constructive shortcut extraction] \label{prop:ta-extraction} There are absolute constants $A$ and $r_0$ such that the following holds. If an explicit multigraph $H$ on at least two vertices contains $r\ge r_0$ edge-disjoint spanning trees, one can deterministically compute a rational $X\in\mathcal K_H$ and at least \[ (1-Ar^{-1/16})r \] edge-disjoint spanning trees, every edge $e$ of which satisfies $b_e^TX^{-1}b_e\le r^{-1/4}$. The running time and output encoding length are polynomial in $|V(H)|+|E(H)|$.
+[corollary] [Thin and cheap rounding of fractional cuts] \label{cor:ta-fractional-rounding} Fix once and for all an integer $B\ge\max\{1,C\}$, where $C$ is the constant in Theorem~\ref{thm:tt-algorithm}. Let $G=(V,E)$ be a finite undirected graph on $n\ge2$ vertices, given by an explicit list of edge records; in this corollary, loops and parallel records are allowed. Given nonnegative rational numbers $x_e,c_e$ in binary, suppose that \[ x(\delta_G(S)):=\sum_{e\in\delta_G(S)}x_e\ge1 \qquad(\varnothing\ne S\subsetneq V). \] There is a deterministic algorithm, polynomial in the total binary input length, that returns a spanning tree $T\subseteq\{e\in E:x_e>0\}$ satisfying simultaneously \begin{align} |\delta_T(S)|&\le24B\,x(\delta_G(S)) &&(\varnothing\ne S\subsetneq V), \label{eq:ta-fractional-cuts}\\ c(T):=\sum_{e\in T}c_e&\le24B\sum_{e\in E}c_ex_e. \label{eq:ta-fractional-cost} \end{align} The cut inequalities are a promise on the input; no metric assumption on the costs is required.
+[theorem] [Rational rank-one signing] \label{thm:rational-signing} Given rational Hermitian matrices $H_1,\ldots,H_N$ of rank at most one, a deterministic algorithm returns signs $\sigma_i\in\{-1,1\}$ such that \[ \left\|\sum_i\sigma_iH_i\right\| \le40\left\|\sum_iH_i^2\right\|^{1/2}. \] Its running time is polynomial in the total binary encoding length. Consequently, for rational columns $v_i$ with $\sum_i v_iv_i^*=I$, the same algorithm gives discrepancy at most $40\sqrt{\max_i\|v_i\|^2}$.
+
+=== LEAN COMPARATOR StrongThinTree (exact formal statement)
+import Mathlib
+namespace OAI
+namespace StrongThinTree
+structure MultiGraph (n m : ℕ) where
+  left : Fin m → Fin n
+  right : Fin m → Fin n
+  loopless : ∀ e, left e ≠ right e
+namespace MultiGraph
+def cut {n m : ℕ} (G : MultiGraph n m) (T : Finset (Fin m))
+    (S : Finset (Fin n)) : Finset (Fin m) :=
+  T.filter fun e => (G.left e ∈ S ∧ G.right e ∉ S) ∨
+    (G.right e ∈ S ∧ G.left e ∉ S)
+def Connected {n m : ℕ} (G : MultiGraph n m) (T : Finset (Fin m)) : Prop :=
+  ∀ S : Finset (Fin n), S.Nonempty → S ≠ Finset.univ → (G.cut T S).Nonempty
+def SpanningTree {n m : ℕ} (G : MultiGraph n m) (T : Finset (Fin m)) : Prop :=
+  G.Connected T ∧ ∀ e ∈ T, ¬ G.Connected (T.erase e)
+def EdgeConnected {n m : ℕ} (G : MultiGraph n m) (k : ℕ) : Prop :=
+  ∀ S : Finset (Fin n), S.Nonempty → S ≠ Finset.univ →
+    k ≤ (G.cut Finset.univ S).card
+end MultiGraph
+def MainStatement : Prop :=
+  ∃ C : ℝ, 0 < C ∧ ∀ (k : ℕ), 1 ≤ k → ∀ (n m : ℕ), 2 ≤ n →
+    ∀ G : MultiGraph n m, G.EdgeConnected k →
+      ∃ T : Finset (Fin m), G.SpanningTree T ∧
+        ∀ S : Finset (Fin n), S.Nonempty → S ≠ Finset.univ →
+          ((G.cut T S).card : ℝ) ≤ (C / (k : ℝ)) * (G.cut Finset.univ S).card
+theorem strongThinTree : MainStatement := by
+  sorry
+end StrongThinTree
+end OAI
+
+
+=== LEAN COMPARATOR AlgorithmicThinTrees (exact formal statement)
+import Mathlib
+namespace OAI
+namespace StrongThinTree
+structure MultiGraph (n m : ℕ) where
+  left : Fin m → Fin n
+  right : Fin m → Fin n
+  loopless : ∀ e, left e ≠ right e
+namespace MultiGraph
+def cut {n m : ℕ} (G : MultiGraph n m) (T : Finset (Fin m))
+    (S : Finset (Fin n)) : Finset (Fin m) :=
+  T.filter fun e => (G.left e ∈ S ∧ G.right e ∉ S) ∨
+    (G.right e ∈ S ∧ G.left e ∉ S)
+def Connected {n m : ℕ} (G : MultiGraph n m) (T : Finset (Fin m)) : Prop :=
+  ∀ S : Finset (Fin n), S.Nonempty → S ≠ Finset.univ → (G.cut T S).Nonempty
+def SpanningTree {n m : ℕ} (G : MultiGraph n m) (T : Finset (Fin m)) : Prop :=
+  G.Connected T ∧ ∀ e ∈ T, ¬ G.Connected (T.erase e)
+def EdgeConnected {n m : ℕ} (G : MultiGraph n m) (k : ℕ) : Prop :=
+  ∀ S : Finset (Fin n), S.Nonempty → S ≠ Finset.univ →
+    k ≤ (G.cut Finset.univ S).card
+end MultiGraph
+end StrongThinTree
+namespace CurrentKS
+def frame : List Bool → List Bool
+  | [] => [true]
+  | b :: bs => false :: b :: frame bs
+def encodeNat (n : ℕ) : List Bool := frame (Computability.encodeNat n)
+inductive StackAction where
+  | stay
+  | pop
+  | push (bit : Bool)
+  deriving DecidableEq
+def StackAction.apply : StackAction → List Bool → List Bool
+  | .stay, xs => xs
+  | .pop, xs => xs.tail
+  | .push b, xs => b :: xs
+structure Instruction (k q : ℕ) where
+  next : Option (Fin q)
+  actions : Fin k → StackAction
+def Instruction.halt (k q : ℕ) : Instruction k q := ⟨none, fun _ => .stay⟩
+structure Machine where
+  stackCount : ℕ
+  states : ℕ
+  initial : Fin states
+  inputStack : Fin stackCount
+  outputStack : Fin stackCount
+  table : List (Instruction stackCount states)
+structure Config (k q : ℕ) where
+  state : Option (Fin q)
+  «stacks» : Fin k → List Bool
+def topCode : List Bool → ℕ
+  | [] => 0
+  | false :: _ => 1
+  | true :: _ => 2
+def headsCode : (k : ℕ) → (Fin k → List Bool) → ℕ
+  | 0, _ => 0
+  | k + 1, s => topCode (s 0) + 3 * headsCode k (fun j => s j.succ)
+def Machine.step (M : Machine) (c : Config M.stackCount M.states) :
+    Config M.stackCount M.states :=
+  match c.state with
+  | none => c
+  | some q =>
+    let instruction := M.table.getD
+      (3 ^ M.stackCount * q.val + headsCode M.stackCount c.stacks)
+      (Instruction.halt M.stackCount M.states)
+    ⟨instruction.next, fun j => (instruction.actions j).apply (c.stacks j)⟩
+def Machine.init (M : Machine) (input : List Bool) : Config M.stackCount M.states :=
+  ⟨some M.initial, fun j => if j = M.inputStack then input else []⟩
+def Machine.run (M : Machine) (input : List Bool) (fuel : ℕ) :
+    Config M.stackCount M.states := (M.step^[fuel]) (M.init input)
+end CurrentKS
+namespace AlgorithmicThinTrees
+open StrongThinTree
+structure ExplicitInput where
+  n : ℕ
+  m : ℕ
+  k : ℕ
+  graph : MultiGraph n m
+structure BinaryInput where
+  n : ℕ
+  p : ℕ
+  k : ℕ
+  left : Fin p → Fin n
+  right : Fin p → Fin n
+  ordered : ∀ i, left i < right i
+  distinct : Function.Injective (fun i => (left i, right i))
+  multiplicity : Fin p → ℕ
+abbrev BinaryInput.Edge (x : BinaryInput) := Σ i : Fin x.p, Fin (x.multiplicity i)
+noncomputable def BinaryInput.edgeEquiv (x : BinaryInput) :
+    x.Edge ≃ Fin (Fintype.card x.Edge) := Fintype.equivFin x.Edge
+noncomputable def BinaryInput.graph (x : BinaryInput) :
+    MultiGraph x.n (Fintype.card x.Edge) where
+  left e := x.left (x.edgeEquiv.symm e).1
+  right e := x.right (x.edgeEquiv.symm e).1
+  loopless e := ne_of_lt (x.ordered (x.edgeEquiv.symm e).1)
+inductive Input where
+  | explicit (x : ExplicitInput)
+  | binary (x : BinaryInput)
+def ExplicitInput.encode (x : ExplicitInput) : List Bool :=
+  CurrentKS.encodeNat x.n ++ CurrentKS.encodeNat x.m ++ CurrentKS.encodeNat x.k ++
+    (List.ofFn fun i : Fin x.m =>
+      CurrentKS.encodeNat (x.graph.left i).val ++
+      CurrentKS.encodeNat (x.graph.right i).val).flatten
+def BinaryInput.encode (x : BinaryInput) : List Bool :=
+  CurrentKS.encodeNat x.n ++ CurrentKS.encodeNat x.p ++ CurrentKS.encodeNat x.k ++
+    (List.ofFn fun i : Fin x.p =>
+      CurrentKS.encodeNat (x.left i).val ++ CurrentKS.enc
+[…]

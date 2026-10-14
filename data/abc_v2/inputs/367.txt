@@ -1,0 +1,67 @@
+FAMILY 367: The critical dimension for the one-phase Bernoulli problem
+SUBJECT: Partial differential equations
+OPENAI SUMMARY: Establishes seven as the first dimension admitting a nonflat, one-homogeneous global minimizer of the one-phase Bernoulli energy. Consequently, minimizing free boundaries are smooth through dimension six, and their singular sets have dimension at most $`n-7`$ in higher dimensions.
+
+=== MANUSCRIPT: The critical dimension for one-phase Bernoulli minimizers (September-24-2026) [preprints/The-critical-dimension-for-one-phase-Bernoulli-minimizers-September-24-2026/build/paper.tex]
+ABSTRACT: We prove that seven is the critical dimension for the one-phase Bernoulli problem: every nonzero one-homogeneous global minimizer in dimensions at most six is flat, while a nonflat one-homogeneous global minimizer exists in dimension seven. It follows that the interior free boundary of a local minimizer is smooth in dimensions at most six. In dimension n ≥ 7, its singular set has Hausdorff dimension at most $`n-7`$, and this bound is sharp. In dimension seven, the singular set is locally finite.
+INTRODUCTION (start): \label{sec:introduction} For a nonnegative function \(v\in H^1(B)\), where \(B\subset\R^d\) is a ball, the one-phase Bernoulli energy is \begin{equation}\label{eq:energy} J(v;B)=\int_B\bigl(|\nabla v|^2+\mathbf 1_{\{v>0\}}\bigr)\,dx. \end{equation} A nonnegative \(u\in H^1_{\mathrm{loc}}(\R^d)\) is a \emph{global minimizer} if \(J(u;B)\leq J(v;B)\) for every ball \(B\) and every nonnegative \(v\in H^1(B)\) with \(v-u\in H^1_0(B)\). The competitors in these comparisons are arbitrary Sobolev functions with the prescribed trace. A function is \emph{one-homogeneous} if \(u(rx)=r u(x)\) for every \(r>0\), almost everywhere in \(x\). The nonzero flat solutions are \[ u(x)=(x\cdot e)_+,\qquad |e|=1. \] Let \(d_*\) be the least dimension containing a nonzero, nonflat, one-homogeneous global minimizer. [statement] A nonnegative $u\in H^1_{\mathrm{loc}}(D)$ is a local minimizer in an open set $D\subset\R^n$ if it satisfies the same comparison on every ball compactly contained in $D$. At an interior free-boundary point $x_0$, a \emph{blowup} is a locally uniform limit of $u(x_0+rx)/r$ along radii tending to zero. A point is regular if one such limit is a flat solution, and singular otherwise. Write $\operatorname{Sing}(u)$ for the set of singular points in $D$. [statement] The upper bound is the standard dimension-reduction consequence of the critical dimension, and sharpness follows by taking Cartesian products of the De Silva--Jerison cone with Euclidean space. We verify these deductions in Section~\ref{sec:consequences}. The variational theory of the one-phase Bernoulli problem begins with Alt and Caffarelli's existence and regularity theory \cite{AltCaffarelli1981}. Weiss's monotonicity formula and dimension reduction \cite{Weiss1999} connect the singularities of general minimizers to homogeneous global minimizers; see also \cite[Theorem~1.4 and Chapters~9--10]{Velichkov2023}. Thus the first dimension admitting a nonflat minimizing cone determines both the threshold for singular free boundaries and the codimension bound furnished by this theory. Our main result answers positively the critical-dimension question whether $d_*=7$. A second strand of the theory passes from weak free boundaries to classical ones. Caffarelli's Harnack-inequality approach established regularity for Lipschitz free boundaries \cite{Caffarelli1987}. De Silva developed a different improvement-of-flatness argument allowing a nonzero right-hand side \cite[Theorems~1.1--1.2]{DeSilva2011}; this is the approach presented in the regularity chapters of \cite{Velichkov2023}. Higher regularity has classical antecedents in Kinderlehrer and Nirenberg \cite[Theorem~2]{KinderlehrerNirenberg1977}. The version used here, for Lipschitz viscosity solutions, is due to De Silva, Ferrari and Salsa \cite[Theorem~1.1 and Corollary~1.2]{DeSilvaFerrariSalsa2019}. These results make a classification of homogeneous minimizing blowups applicable to general local minimizers. As recalled by Jerison and Savin \cite[Introduction]{JerisonSavin2015}, the dimension-three rigidity result for stable homogeneous solutions with smooth cross-section is due to Caffarelli, Jerison and Kenig \cite{CaffarelliJerisonKenig2004}. Jerison and Savin proved that stable homogeneous solutions with smooth cross-section are flat in dimensions at most four \cite[Theorem~1.1]{JerisonSavin2015}; their regularity consequence for minimizers \cite[Corollary~1.2]{JerisonSavin2015} gives $d_*\geq5$. Their argument constructs functions of the Hessian satisfying inequalities for the linearized free-boundary problem. In the other direction, De Silva and Jerison constructed a nonflat homogeneous global minimizer in dimension seven \cite[Theorem~1.1]{DeSilvaJerison2009}, proving $d_*\leq7$. The minimizing property in that construction is with respect to all Sobolev competitors with the prescribed boundary trace. Firester, Tsiamis and Wang also construct further symmetric minimizing one-phase cones, including a second example  […]
+[theorem] \label{thm:main} Every nonzero one-homogeneous global minimizer of \eqref{eq:energy} in \(\R^d\), \(1\leq d\leq6\), is flat. There is a nonflat one-homogeneous global minimizer in \(\R^7\). Consequently, \[ d_*=7. \]
+[corollary] [Sharp singular-set bound]\label{cor:singular-set} Let $n\ge2$, let $D\subset\R^n$ be open, and let $u\in H^1_{\mathrm{loc}}(D)$ be a nonnegative local minimizer of the one-phase Bernoulli energy in $D$. Its interior free boundary is smooth outside $\operatorname{Sing}(u)$. This set is empty when $n\le6$, is locally finite when $n=7$, and satisfies \[ \dim_{\mathrm H}\operatorname{Sing}(u)\le n-7\qquad(n\ge7). \] For every $n\ge7$, a global minimizer attains this dimension bound.
+
+=== LEAN COMPARATOR BernoulliNonflatInSeven (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open MeasureTheory Set Filter
+open scoped ENNReal Topology ContDiff
+namespace Bernoulli
+open scoped _root_.Bernoulli
+abbrev Space (d : ℕ) := EuclideanSpace ℝ (Fin d)
+def Test {d : ℕ} (D : Set (Space d)) (φ : Space d → ℝ) : Prop :=
+  ContDiff ℝ ∞ φ ∧ HasCompactSupport φ ∧ tsupport φ ⊆ D
+def WeakGradient {d : ℕ} (D : Set (Space d))
+    (u : Space d → ℝ) (G : Space d → Space d) : Prop :=
+  ∀ φ, Test D φ → ∀ h : Space d,
+    (∫ x in D, u x * (fderiv ℝ φ x) h) =
+      -(∫ x in D, inner ℝ (G x) h * φ x)
+def H1 {d : ℕ} (D : Set (Space d))
+    (u : Space d → ℝ) (G : Space d → Space d) : Prop :=
+  MemLp u 2 (volume.restrict D) ∧
+  MemLp G 2 (volume.restrict D) ∧ WeakGradient D u G
+def H10 {d : ℕ} (D : Set (Space d))
+    (u : Space d → ℝ) (G : Space d → Space d) : Prop :=
+  H1 D u G ∧ ∀ ε : ℝ, 0 < ε → ∃ φ : Space d → ℝ,
+    Test D φ ∧
+    eLpNorm (fun x => u x - φ x) 2 (volume.restrict D) < ENNReal.ofReal ε ∧
+    eLpNorm (fun x => G x - gradient φ x) 2 (volume.restrict D) < ENNReal.ofReal ε
+def H1Loc {d : ℕ} (D : Set (Space d))
+    (u : Space d → ℝ) (G : Space d → Space d) : Prop :=
+  ∀ c : Space d, ∀ r : ℝ, 0 < r → Metric.closedBall c r ⊆ D →
+    H1 (Metric.ball c r) u G
+def energy {d : ℕ} (D : Set (Space d))
+    (u : Space d → ℝ) (G : Space d → Space d) : ℝ :=
+  ∫ x in D, ‖G x‖ ^ 2 + if 0 < u x then (1 : ℝ) else 0
+def LocalMinimizer {d : ℕ} (D : Set (Space d)) (u : Space d → ℝ) : Prop :=
+  IsOpen D ∧ ∃ G : Space d → Space d,
+    H1Loc D u G ∧ (∀ᵐ x ∂volume.restrict D, 0 ≤ u x) ∧
+    ∀ c : Space d, ∀ r : ℝ, 0 < r → Metric.closedBall c r ⊆ D →
+      ∀ (v : Space d → ℝ) (V : Space d → Space d),
+        H1 (Metric.ball c r) v V →
+        (∀ᵐ x ∂volume.restrict (Metric.ball c r), 0 ≤ v x) →
+        H10 (Metric.ball c r) (fun x => v x - u x) (fun x => V x - G x) →
+        energy (Metric.ball c r) u G ≤ energy (Metric.ball c r) v V
+def GlobalMinimizer {d : ℕ} (u : Space d → ℝ) : Prop :=
+  LocalMinimizer Set.univ u
+def OneHomogeneous {d : ℕ} (u : Space d → ℝ) : Prop :=
+  ∀ r : ℝ, 0 < r → ∀ᵐ x ∂volume, u (r • x) = r * u x
+def Nonzero {d : ℕ} (u : Space d → ℝ) : Prop :=
+  ¬ (u =ᵐ[volume] fun _ => 0)
+def Flat {d : ℕ} (u : Space d → ℝ) : Prop :=
+  ∃ e : Space d, ‖e‖ = 1 ∧ ∀ᵐ x ∂volume, u x = max (inner ℝ x e) 0
+theorem nonflat_in_seven : ∃ u : Space 7 → ℝ,
+    GlobalMinimizer u ∧ Nonzero u ∧ OneHomogeneous u ∧ ¬ Flat u := by
+  sorry
+end Bernoulli
+end
+end OAI
+

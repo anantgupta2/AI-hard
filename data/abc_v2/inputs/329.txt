@@ -1,0 +1,53 @@
+FAMILY 329: A counterexample to metric-entropy duality
+SUBJECT: Functional analysis
+OPENAI SUMMARY: Disproves Pietsch's dimension-free duality conjecture for metric entropy. Origin-symmetric convex bodies violate every proposed choice of universal constants in the conjectured comparison between covering numbers and those of the polar bodies, even when the covering body is a cube.
+
+=== MANUSCRIPT: Counterexamples to the duality conjecture for metric entropy (September-24-2026) [preprints/Counterexamples-to-the-duality-conjecture-for-metric-entropy-September-24-2026/build/paper.tex]
+ABSTRACT: We disprove Pietsch's dimension-free duality conjecture for metric entropy. For every proposed pair of universal constants, we construct origin-symmetric convex bodies that violate the corresponding covering-entropy inequality, already when the covering body is a cube.
+INTRODUCTION (start): \label{sec:introduction} For bounded sets $A,B$ in a finite-dimensional real vector space, with $B$ having nonempty interior, let $N(A,B)$ denote the least number of translates of $B$ that cover $A$. The translation vectors may lie anywhere in the ambient space. For an origin-symmetric convex body $K\subset\R^n$, its polar is \[ K^\circ=\{y\in\R^n:\langle x,y\rangle\le1 \text{ for every }x\in K\}. \] Here a convex body is compact and has nonempty interior. All logarithms are natural. The duality conjecture for metric entropy, originating in Pietsch's operator-theoretic work in 1972, asks whether there are absolute constants $a,b\ge1$ such that \begin{equation}\label{eq:duality-conjecture} \frac1b\log N(L^\circ,aK^\circ) \le \log N(K,L) \le b\log N(L^\circ,a^{-1}K^\circ) \end{equation} for every dimension and every pair of origin-symmetric convex bodies $K,L$; see \cite[Conjecture~1]{AMSTJ2004}. It asks whether passing to the polar pair preserves covering complexity up to universal changes of scale and multiplicative constants. We disprove the full conjecture. [statement] Thus the upper bound in \eqref{eq:duality-conjecture} fails for every proposed pair of absolute constants. In particular, the two-sided duality conjecture has a negative answer. The bodies in Theorem~\ref{thm:main} have nonempty interior in the full ambient dimension. Their dimensions grow with the parameters; no assertion about a fixed dimension is intended. \subsection{Related work} The question developed from the duality problem for entropy numbers of operators; Artstein, Milman and Szarek give the geometric and operator formulations in \cite[pp.~1314--1315]{AMS2004} and attribute the original problem to Pietsch's 1972 work. Early progress already showed that polarity controls covering numbers in several regimes. K\"onig and Milman proved a comparison of the $n$th roots of the two covering numbers \cite[Theorem~1]{KonigMilman1987}; on the logarithmic scale this allows an additive error proportional to $n$. Bourgain, Pajor, Szarek and Tomczak-Jaegermann established entropy-number comparisons under geometric and sequence-regularity assumptions, as well as estimates with losses depending on the rank \cite{BPSTJ1989}. Artstein, Milman and Szarek proved the dimension-free conjecture when one body is a Euclidean ball, and hence when either body is an ellipsoid \cite[Theorem~1]{AMS2004}. Artstein, Milman, Szarek and Tomczak-Jaegermann proved universal duality for \emph{convexified packing} \cite[Theorem~2]{AMSTJ2004}. This quantity uses an ordered sequence of points: the interior of the translate centered at each new point must avoid the convex hull of its predecessors. That requirement is stronger than pairwise separation and differs from the ordinary covering number in \eqref{eq:duality-conjecture}. They also announced ordinary entropy duality for spaces whose K-convexity constant is bounded, with the comparison constants depending on that bound \cite[Theorem~5]{AMSTJ2004}; see also the later derivation in \cite[Section~2]{Milman2007}. A bound for each individual finite-dimensional space does not provide one pair of constants for all spaces and dimensions. For arbitrary symmetric convex bodies, Emanuel Milman obtained a comparison with logarithmic losses in both the scale and the entropy factor \cite[Corollary~1.2]{Milman2007}. Connections with learning theory provide another perspective: Hu, Peale and Reingold study dual covering numbers of function classes, obtaining a comparison with an explicit prefactor depending on the approximation scale and the uniform bounds of the function classes \cite[Theorem~11]{HuPealeReingold2022}. These dimension- or scale-dependent estimates are compatible with the failure of a universal pair $a,b$. The column approximation in this paper also belongs to the broader study of entropy of convex hulls. For example, Mendelson develops finite-set convex-hull estimates in $L_2(\mu)$ using Maurey's approximation method \cite[Section~2.1 […]
+[theorem] \label{thm:main} For every $a,b\ge1$, there are a positive integer $n$ and an origin-symmetric convex body $K\subset\R^n$ such that, with $L=[-1,1]^n$, \[ \log N(K,L)>b\log N(L^\circ,a^{-1}K^\circ). \]
+
+=== LEAN COMPARATOR MetricEntropyDuality (exact formal statement)
+import Mathlib.Analysis.Convex.Topology
+import Mathlib.Analysis.Normed.Group.Constructions
+import Mathlib.Order.Lattice.Nat
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+namespace OAI
+universe u
+noncomputable section
+namespace MetricEntropyDuality
+open Filter Topology
+open scoped BigOperators Pointwise
+abbrev RealSpace (ι : Type u) := ι → ℝ
+def pairing {ι : Type u} [Fintype ι] (x y : RealSpace ι) : ℝ :=
+  ∑ i, x i * y i
+def cube (ι : Type u) : Set (RealSpace ι) :=
+  {x | ∀ i, |x i| ≤ 1}
+def polar {ι : Type u} [Fintype ι] (K : Set (RealSpace ι)) : Set (RealSpace ι) :=
+  {y | ∀ x ∈ K, pairing x y ≤ 1}
+def Covers {ι : Type u} {M : ℕ} (A B : Set (RealSpace ι))
+    (centers : Fin M → RealSpace ι) : Prop :=
+  ∀ x ∈ A, ∃ j, x - centers j ∈ B
+def Coverable {ι : Type u} (A B : Set (RealSpace ι)) : Prop :=
+  ∃ M : ℕ, ∃ centers : Fin M → RealSpace ι, Covers A B centers
+def coveringNumber {ι : Type u} (A B : Set (RealSpace ι)) : ℕ :=
+  sInf {M : ℕ | ∃ centers : Fin M → RealSpace ι, Covers A B centers}
+structure IsSymmetricConvexBody {ι : Type u} [Fintype ι]
+    (K : Set (RealSpace ι)) : Prop where
+  isCompact : IsCompact K
+  convex : Convex ℝ K
+  symmetric : ∀ x, x ∈ K ↔ -x ∈ K
+  interior_nonempty : (interior K).Nonempty
+theorem exists_entropy_duality_counterexample_with_covers
+    (a b : ℝ) (ha : 1 ≤ a) (hb : 1 ≤ b) :
+    ∃ n : ℕ, 0 < n ∧ ∃ K : Set (RealSpace (Fin n)),
+      IsSymmetricConvexBody K ∧
+      Coverable K (cube (Fin n)) ∧
+      Coverable (polar (cube (Fin n))) (a⁻¹ • polar K) ∧
+      b * Real.log (coveringNumber (polar (cube (Fin n))) (a⁻¹ • polar K) : ℝ) <
+        Real.log (coveringNumber K (cube (Fin n)) : ℝ) := by
+  sorry
+end MetricEntropyDuality
+end
+end OAI
+

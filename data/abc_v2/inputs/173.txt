@@ -1,0 +1,37 @@
+FAMILY 173: Seymour’s second-neighborhood conjecture
+SUBJECT: Combinatorics
+OPENAI SUMMARY: Proves Seymour's second-neighborhood conjecture: every nonempty finite oriented graph has a vertex with at least as many vertices at directed distance exactly two as at directed distance one. Oriented graphs may be arbitrary apart from the exclusion of loops and oppositely directed edge pairs.
+
+=== MANUSCRIPT: A proof of Seymour’s second-neighborhood conjecture (September-23-2026) [preprints/A-proof-of-Seymours-second-neighborhood-conjecture-September-23-2026/build/source/main.tex]
+ABSTRACT: We prove that every nonempty finite oriented graph has a vertex with at least as many vertices at directed distance two as at directed distance one. This resolves Seymour's second neighborhood conjecture positively.
+INTRODUCTION (start): \label{sec:introduction} An \emph{oriented graph} is a finite directed graph with no loops, no multiple arcs, and no pair of opposite arcs. Its underlying undirected graph need not be complete or connected. For a vertex \(v\), write \[ N_1^+(v)=\{u:v\to u\},\qquad N_2^+(v)=\{w\notin\{v\}\cup N_1^+(v): \text{ there is a vertex }u\text{ with }v\to u\to w\}. \] Thus \(N_2^+(v)\) consists of the vertices at directed distance exactly two from \(v\). Each vertex is counted once, regardless of the number of paths reaching it. Seymour's second neighborhood conjecture asserts that some vertex satisfies \(\abs{N_1^+(v)}\leq\abs{N_2^+(v)}\). [statement] Theorem~\ref{thm:main} resolves the conjecture positively, without a connectivity or degree hypothesis. In particular, a sink already satisfies the conclusion. The conjecture is a basic comparison between the first two out-neighborhoods: removing vertices already reached in one step is essential to its assertion. The theorem also gives the established vertex- and arc-weighted forms of the conjecture through Seacrest's equivalences~\cite{Seacrest2015}. The vertex-weighted conclusions have two different quantifier orders: for every nonnegative weighting there is a suitable vertex, and there is a weighting of total mass one for which every vertex is suitable. Section~\ref{sec:weighted-consequences} states these forms precisely. Section~\ref{sec:directed-cycle-consequences} records consequences for short directed cycles. In particular, a graph with minimum in- and outdegree at least one third of its order contains a directed triangle. The conjecture was recorded by Dean and Latka~\cite{DeanLatka1995}. A \emph{tournament} is an oriented graph with an arc between every pair of distinct vertices. This case, also known as Dean's conjecture, was proved by Fisher~\cite{Fisher1996} using a probability distribution obtained from Farkas' lemma. Havet and Thomass\'e gave a combinatorial proof using local median orders~\cite{HavetThomasse2000}. Fidler and Yuster~\cite{FidlerYuster2007} extended the tournament theorem to tournaments missing a matching, a star, or a clique. Ghazal corrected the star-case proof and treated generalized stars~\cite{Ghazal2012}. Subsequent advances include a matching together with a star~\cite{DaraFrancisJacobNarayanan2022} and two stars~\cite{DaamouchAlMninyGhazal2025}. Other approaches impose degree conditions or weaken the desired ratio. Kaneko and Locke established the conjecture for minimum outdegree at most six~\cite{KanekoLocke2001}; a recent computer-assisted preprint treats minimum outdegree seven~\cite{SadhukhanSandeepSen2026}. Chen, Shen and Yuster proved a universal second-to-first neighborhood ratio of approximately $0.657298$~\cite{ChenShenYuster2003}. Huang and Peng raise this to approximately $0.715538$ and additionally report a computational bound of $0.74530$~\cite{HuangPeng2024}. Botler, Moura and Naia~\cite{BotlerMouraNaia2023}, followed by Espuny D\'iaz, Gir\~ao, Granet and Kronenberg~\cite{EspunyDiazEtAl2025}, studied every orientation of binomial random graphs; the latter result covers every fixed edge probability below $1/2$, with probability tending to one as the order tends to infinity. Brukhman's recent dense-case preprint concerns graphs of order $n\leq 2\delta+2$, where $\delta$ is the minimum outdegree~\cite{Brukhman2026}. Our proof builds on the minimal-counterexample and graph-product methods of Brantner, Brockman, Kay and Snively~\cite{BrantnerBrockmanKaySnively2009} and on Seacrest's subset perspective~\cite{Seacrest2019}. We adapt the edge-deletion idea in the proof of Seacrest's Lemma~4 to obtain the stronger subset inequality needed here, and give that argument in full. The exact set-image convention and inequality are stated below. The main additional ingredient is a pruning bound for arbitrary finite binary relations. Its deletion cost depends on the points left uncovered after pruning; this dependence makes the final extremal argument p […]
+[theorem] \label{thm:main} Every nonempty finite oriented graph has a vertex \(v\) such that \[ \abs{N_1^+(v)}\leq \abs{N_2^+(v)}. \]
+
+=== LEAN COMPARATOR SeymourSecondNeighborhood (exact formal statement)
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Finset.Union
+namespace OAI
+namespace SeymourSecondNeighborhood
+variable {V : Type*}
+structure IsOriented (r : V → V → Prop) : Prop where
+  loopless : ∀ v, ¬ r v v
+  asymmetric : ∀ {u v}, r u v → ¬ r v u
+variable [Fintype V] [DecidableEq V]
+noncomputable section
+def firstNeighbors (r : V → V → Prop) (v : V) : Finset V := by
+  classical
+  exact Finset.univ.filter (r v)
+def secondNeighbors (r : V → V → Prop) (v : V) : Finset V := by
+  classical
+  exact Finset.univ.filter (fun w =>
+    w ≠ v ∧ ¬ r v w ∧ ∃ u, r v u ∧ r u w)
+def GoodVertex (r : V → V → Prop) (v : V) : Prop :=
+  (firstNeighbors r v).card ≤ (secondNeighbors r v).card
+end
+variable [Nonempty V]
+theorem exists_goodVertex (r : V → V → Prop) (hr : IsOriented r) :
+    ∃ v, GoodVertex r v := by
+  sorry
+end SeymourSecondNeighborhood
+end OAI
+

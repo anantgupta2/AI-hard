@@ -1,0 +1,141 @@
+FAMILY 294: Kaplansky's quasitrace conjecture and failure of tensor-product stable finiteness
+SUBJECT: Operator algebras
+OPENAI SUMMARY: Disproves Kaplansky's quasitrace conjecture by constructing a separable unital complex C∗-algebra admitting normalized 2-quasitraces, all of which are nonadditive. As a consequence, two unital simple stably finite C∗-algebras can have a properly infinite minimal tensor product, with one factor $`C_r^*(\mathbb F_2)`$.
+
+=== MANUSCRIPT: A counterexample to Kaplansky's quasitrace conjecture and failure of tensor-product stable finiteness (September-23-2026) [preprints/A-counterexample-to-Kaplanskys-quasitrace-conjecture-September-23-2026/build/paper.tex]
+ABSTRACT: We refute Kaplansky's quasitrace conjecture by constructing a separable unital complex C∗-algebra that admits normalized 2-quasitraces but has no tracial state. As a consequence, we show that the minimal tensor product of two unital simple stably finite complex C∗-algebras can be properly infinite, even when one factor is the reduced free-group algebra $`C_r^*(\mathbb F_2)`$.
+INTRODUCTION (start): \label{sec:introduction} A unital \(C^*\)-algebra is \emph{stably finite} when every matrix algebra over it has no nonunitary isometry, and is \emph{properly infinite} when it contains two isometries with orthogonal ranges. Milh{\o}j and R{\o}rdam asked whether the minimal tensor product of two unital simple stably finite \(C^*\)-algebras must again be stably finite \cite[Question~2.5]{MR}. They proved that this question is equivalent to the quasitrace problem and that a negative answer to that problem would yield a properly infinite tensor product with \(C_r^*(\mathbb F_\infty)\) \cite[Section~2 and Theorem~3.1]{MR}. We construct the required quasitrace counterexample. The resulting tensor product can be properly infinite with one factor equal to the reduced \(C^*\)-algebra \(C_r^*(\mathbb F_2)\) of the free group on two generators. A quasitrace retains positivity and the identity \(\tau(x^*x)=\tau(xx^*)\), but is required to be linear only on commutative subalgebras, together with compatibility with real and imaginary parts. A \(2\)-quasitrace must also extend to the two-by-two matrix algebra. Whether this extra condition forces full linearity is the general quasitrace problem. It is equivalent to Kaplansky's question whether every \(AW^*\)-factor of type \(\mathrm{II}_1\) is a von Neumann algebra; see \cite[Section~2]{MR} and \cite[Conjectures~1.1--1.2 and Theorem~4.11]{Gow}. Here the term \emph{von Neumann algebra} has its abstract \(W^*\) meaning: the \(C^*\)-algebra admits a Banach-space predual. Gow's historical account explains that Kaplansky introduced \(AW^*\)-algebras in 1951 to characterize \(W^*\)-algebras by intrinsic algebraic conditions, independent of a chosen Hilbert-space representation. The factor types have different outcomes: every type \(\mathrm{I}\) \(AW^*\)-factor is a \(W^*\)-algebra, whereas type \(\mathrm{III}\) counterexamples exist. The type \(\mathrm{II}_1\) factor question is the finite case addressed here \cite[Introduction]{Gow}. Quasitraces also connect the projection-theoretic origins of the question to dimension theory for general \(C^*\)-algebras. Cuntz developed dimension functions for simple algebras \cite{Cuntz1978}, and Blackadar and Handelman established the correspondence between \(2\)-quasitraces and lower semicontinuous dimension functions \cite{BH}. Haagerup credits Blackadar and Handelman with proving that a positive answer to Kaplansky's factor question would imply that every \(2\)-quasitrace on a unital \(C^*\)-algebra is a trace. He also recalls their realization of such quasitraces as pullbacks of quasitraces on finite \(AW^*\)-algebras along unital \(*\)-homomorphisms \cite[Introduction and Proposition~3.3]{Haagerup}. Blackadar and R{\o}rdam later developed the extension of states on preordered semigroups that underlies the general existence criterion \cite{BR}. The exact case was settled by Haagerup: every \(2\)-quasitrace on a unital exact \(C^*\)-algebra is a trace \cite[Theorem~5.11]{Haagerup}. A first draft was completed in 1991 and circulated thereafter; the paper was published in 2014. Without exactness, the existence of quasitraces is governed by a different condition. The Cuntz--Blackadar--Handelman existence theorem provides a normalized \(2\)-quasitrace whenever no matrix algebra over the given unital algebra is properly infinite \cite[Theorem~2.3]{MR}. Thus a unital algebra with that property but without tracial states would answer the general question negatively. We construct such an algebra and obtain a fixed positive pair witnessing nonadditivity. Throughout, a normalized \(2\)-quasitrace has value one on the unit of its domain; its corner-preserving extension to \(M_2\) has value two on the matrix identity. The definitions are recalled in Section~\ref{sec:preliminaries}. \Needspace{10\baselineskip} [statement] Theorem~\ref{thm:main} refutes the conjecture that every normalized \(2\)-quasitrace on every unital complex \(C^*\)-algebra is a tracial state. By the […]
+[theorem] \label{thm:main} There exist a separable unital complex \(C^*\)-algebra \(A\), admitting a normalized \(2\)-quasitrace, and positive contractions \(a,b\in A\) such that every normalized \(2\)-quasitrace \(\tau\) on \(A\) satisfies \[ \tau(a+b)-\tau(a)-\tau(b)\ge\frac1{144}. \]
+[corollary] [Tensor products and stable finiteness] \label{cor:stable-finiteness} \leavevmode \begin{enumerate}[label=\textup{(\roman*)}] \item There are two unital simple stably finite complex \(C^*\)-algebras whose minimal tensor product is properly infinite. One factor can be taken to be \(C_r^*(\mathbb F_2)\). \item There is a separable unital complex \(C^*\)-algebra \(B\) admitting a normalized \(2\)-quasitrace such that \(B\otimes_{\min}C_r^*(\mathbb F_2)\) is properly infinite and admits no normalized \(2\)-quasitrace. \item There is a separable unital stably finite complex \(C^*\)-algebra with no tracial state. \end{enumerate}
+
+=== LEAN COMPARATOR KaplanskyQuasitrace (exact formal statement)
+import Mathlib.Algebra.Order.Star.Basic
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.CStarAlgebra.CStarMatrix
+namespace OAI
+noncomputable section
+open scoped ComplexOrder
+namespace Kaplansky
+variable {A : Type*} [CStarAlgebra A]
+structure OneQuasitrace (A : Type*) [CStarAlgebra A] where
+  toFun : A → ℂ
+  square_nonneg : ∀ x, 0 ≤ toFun (star x * x)
+  square_swap : ∀ x, toFun (star x * x) = toFun (x * star x)
+  real_imag : ∀ h k, IsSelfAdjoint h → IsSelfAdjoint k →
+    toFun (h + Complex.I • k) = toFun h + Complex.I * toFun k
+  abelian_linear : ∀ S : NonUnitalStarSubalgebra ℂ A,
+    IsClosed (S : Set A) → (∀ x y : S, x * y = y * x) →
+    ∃ f : S →ₗ[ℂ] ℂ, ∀ x : S, f x = toFun x
+instance : CoeFun (OneQuasitrace A) (fun _ => A → ℂ) := ⟨OneQuasitrace.toFun⟩
+def OneQuasitrace.Normalized (τ : OneQuasitrace A) : Prop := τ 1 = 1
+attribute [local instance] CStarAlgebra.spectralOrder CStarAlgebra.spectralOrderedRing
+def upperLeft (a : A) : CStarMatrix (Fin 2) (Fin 2) A :=
+  CStarMatrix.ofMatrix fun i j => if i = 0 ∧ j = 0 then a else 0
+def OneQuasitrace.IsTwo (τ : OneQuasitrace A) : Prop :=
+  ∃ σ : OneQuasitrace (CStarMatrix (Fin 2) (Fin 2) A), ∀ a, σ (upperLeft a) = τ a
+def PositiveContraction (a : A) : Prop := (∃ x, a = star x * x) ∧ ‖a‖ ≤ 1
+def MainTarget : Prop :=
+  ∃ (A : Type) (inst : CStarAlgebra A),
+    letI := inst
+    TopologicalSpace.SeparableSpace A ∧
+    (∃ τ : OneQuasitrace A, τ.Normalized ∧ τ.IsTwo) ∧
+    ∃ a b : A, PositiveContraction a ∧ PositiveContraction b ∧
+      ∀ τ : OneQuasitrace A, τ.Normalized → τ.IsTwo →
+        (1 : ℝ) / 144 ≤ (τ (a+b) - τ a - τ b).re
+theorem kaplansky_quasitrace_counterexample : MainTarget := by
+  sorry
+end Kaplansky
+end
+end OAI
+
+
+=== LEAN COMPARATOR KaplanskyStableFiniteness (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+namespace KaplanskyConsequences
+open scoped ComplexOrder InnerProductSpace BigOperators ENNReal
+namespace Regular
+variable {ι : Type*} {H : Type*} [NormedAddCommGroup H]
+abbrev HilbertSum (ι H : Type*) [NormedAddCommGroup H] := lp (fun _ : ι => H) 2
+lemma reindex_mem (e : ι ≃ ι) (x : HilbertSum ι H) :
+    Memℓp (fun i => x (e i)) 2 := by
+  apply memℓp_gen
+  exact e.summable_iff.2 ((memℓp_gen_iff (by norm_num)).1 (lp.memℓp x))
+variable [InnerProductSpace ℂ H]
+def reindex (e : ι ≃ ι) : HilbertSum ι H ≃ₗᵢ[ℂ] HilbertSum ι H where
+  toFun x := ⟨fun i => x (e.symm i), reindex_mem e.symm x⟩
+  invFun x := ⟨fun i => x (e i), reindex_mem e x⟩
+  left_inv x := by ext; simp
+  right_inv x := by ext; simp
+  map_add' x y := by ext; rfl
+  map_smul' r x := by ext; rfl
+  norm_map' x := by
+    rw [lp.norm_eq_tsum_rpow (by norm_num),lp.norm_eq_tsum_rpow (by norm_num)]
+    congr 1
+    exact e.symm.tsum_eq (fun i => ‖x i‖ ^ (2 : ℝ≥0∞).toReal)
+@[simp] lemma reindex_apply (e : ι ≃ ι) (x : HilbertSum ι H) (i : ι) :
+    reindex e x i = x (e.symm i) := rfl
+variable {G : Type*} [Group G]
+def left (g : G) : HilbertSum G H →L[ℂ] HilbertSum G H :=
+  (reindex (Equiv.mulLeft g)).toLinearIsometry.toContinuousLinearMap
+@[simp] lemma left_apply (g h : G) (x : HilbertSum G H) : left g x h = x (g⁻¹*h) := rfl
+lemma left_one : left (H := H) (1 : G) = 1 := by ext x h; simp
+lemma left_mul (g h : G) : left (H := H) (g*h) = left g * left h := by
+  ext x k
+  simp [mul_assoc]
+variable [CompleteSpace H]
+lemma left_star (g : G) : star (left (H := H) g) = left g⁻¹ := by
+  symm
+  apply (ContinuousLinearMap.eq_adjoint_iff _ _).2
+  intro x y
+  change inner ℂ (left g⁻¹ x) y = inner ℂ x (left g y)
+  rw [lp.inner_eq_tsum,lp.inner_eq_tsum]
+  simpa [left_apply,mul_assoc] using
+    (Equiv.mulLeft g).tsum_eq (fun i => inner ℂ (x i) (y (g⁻¹*i)))
+def Algebra (G : Type*) [Group G] : StarSubalgebra ℂ (HilbertSum G ℂ →L[ℂ] HilbertSum G ℂ) :=
+  (StarAlgebra.adjoin ℂ (Set.range (left (H := ℂ) (G := G)))).topologicalClosure
+instance : IsClosed (Algebra G : Set (HilbertSum G ℂ →L[ℂ] HilbertSum G ℂ)) :=
+  StarSubalgebra.isClosed_topologicalClosure _
+instance : CStarAlgebra (Algebra G) := inferInstance
+def generator (g : G) : Algebra G :=
+  ⟨left g,StarSubalgebra.le_topologicalClosure _
+    (StarAlgebra.subset_adjoin ℂ _ ⟨g,rfl⟩)⟩
+end Regular
+end KaplanskyConsequences
+namespace KaplanskyConsequences.Regular
+abbrev F2 := FreeGroup (Fin 2)
+open scoped ComplexOrder InnerProductSpace BigOperators ENNReal
+attribute [local instance] Classical.propDecidable
+variable {G H : Type*} [Group G] [NormedAddCommGroup H]
+  [InnerProductSpace ℂ H] [CompleteSpace H]
+def diagonal (T : H →L[ℂ] H) : HilbertSum G H →L[ℂ] HilbertSum G H :=
+  lp.mapCLM 2 (fun _ => T) (norm_nonneg T) (fun _ => le_rfl)
+end KaplanskyConsequences.Regular
+namespace Kaplansky
+section
+section
+open scoped ComplexOrder IsMulCommutative
+variable {A : Type*} [CStarAlgebra A]
+structure OneQuasitrace (A : Type*) [CStarAlgebra A] where
+  toFun : A → ℂ
+  square_nonneg : ∀ x, 0  ≤  toFun (star x * x)
+  square_swap : ∀ x, toFun (star x * x) = toFun (x * star x)
+  real_imag : ∀ h k, IsSelfAdjoint h → IsSelfAdjoint k →
+    toFun (h + Complex.I • k) = toFun h + Complex.I * toFun k
+  abelian_linear : ∀ S : NonUnitalStarSubalgebra ℂ A,
+    IsClosed (S : Set A) → (∀ x y : S, x * y = y * x) →
+    ∃ f : S →ₗ[ℂ] ℂ, ∀ x : S, f x = toFun x
+instance : CoeFun (OneQuasitrace A) (fun _ => A → ℂ) := ⟨OneQuasitrace.toFun⟩
+def OneQuasitrace.Normalized (τ : OneQuasitrace A) : Prop := τ 1 = 1
+end
+open scoped ComplexOrder CStarAlgebra
+attribute [local instance] CStarAlgebra.spectralOrder CStarAlgebra.spectralOrderedRing
+variable {A : Type*} [CStarAlgebra A]
+def ProperlyInfinite (A : Type*) [CStarAlgebra A] : Prop :=
+  ∃ s t : A, star s*s = 1 ∧ star t*t = 1 ∧ star s*t = 0
+end
+attribute [local instance] CStarAlgebra.spectralOrder CStarAlgebra.spectralOrderedRing
+variable {A : Type*} [CStarAlgebra A]
+def upperLeft (a : A) : CS
+[…]

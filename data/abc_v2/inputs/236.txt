@@ -1,0 +1,80 @@
+FAMILY 236: The exact factor-of-IID threshold for free Ising spins on trees
+SUBJECT: Probability and statistical mechanics
+OPENAI SUMMARY: Determines when the free zero-field ferromagnetic Ising state on the infinite d-regular tree is a factor of independent vertex labels: exactly when $`\tanh\beta\le(d-1)^{-1/2}`$, including equality, for d ≥ 3 and β ≥ 0. The construction uses no root and is almost surely equivariant for each fixed tree automorphism, resolving the ferromagnetic case of Lyons's question.
+
+=== MANUSCRIPT: The sharp factor-of-IID threshold for the free Ising model on regular trees (September-26-2026) [preprints/The-sharp-factor-of-IID-threshold-for-the-free-Ising-model-on-regular-trees-September-26-2026/build/main.tex]
+ABSTRACT: For every integer d ≥ 3 and inverse temperature β ≥ 0, the free zero-field ferromagnetic Ising measure on the infinite d-regular tree is a factor of IID exactly when $`\tanh\beta\le(d-1)^{-1/2}`$. We prove the positive implication, including equality, resolving the conjecture of Nam, Sly and Zhang; the strict converse is known. The spin factor can be chosen to commute with every tree automorphism on every label input.
+INTRODUCTION (start): \label{sec:introduction} Can the free Ising state on a regular tree be generated from independent vertex labels without choosing a root? The broadcast description of the state begins at a vertex and propagates a random spin along the edges. Its law does not depend on that vertex. A factor construction must also remove the distinguished vertex from the rule that generates the spins. Let $T_d=(\mathcal V,\mathcal E)$ be the infinite $d$-regular tree, $d\ge3$, and put $b=d-1$ and $\theta=\tanh\beta$ for $\beta\ge0$. The free zero-field Ising law $\mu_{d,\beta}$ is obtained by choosing a fair spin at one vertex and, independently along edges directed away from it, letting a child agree with its parent with probability $(1+\theta)/2$. Its marginal on any finite connected subtree $D$ is \[ \mu_{d,\beta}(\sigma|_D=\eta) =\frac12\prod_{\{u,v\}\in\mathcal E(D)} \frac{1+\theta\eta_u\eta_v}{2}. \] This expression also verifies that the law is invariant under all tree automorphisms and independent of the chosen broadcast root. We call a spin law a \emph{factor of IID} if it is the law of $\Phi(U)$ for independent uniform labels $(U_v)_{v\in\mathcal V}$ and a measurable map $\Phi:[0,1]^{\mathcal V}\to\{-1,1\}^{\mathcal V}$ satisfying \begin{equation}\label{eq:equivariance} \Phi(gU)=g\Phi(U)\quad\text{almost surely for each fixed } g\in\Aut(T_d),\qquad (gx)_v=x_{g^{-1}v}. \end{equation} The exceptional null set may depend on $g$. For spin laws this convention is equivalent to requiring a Borel factor equivariant on every input: Lemma~\ref{lem:pointwise-spin-factor} constructs such a version. The input contains no distinguished root or end. Measurability does not require a spin to be determined by finitely many labels; no finitary coding or coding-radius estimate is asserted. [statement] The construction proves the positive implication, including equality. The strict converse is known: the obstruction beyond the reconstruction threshold is due to Sly, as recorded and proved in Lyons~\cite[Section~3 and Corollary~3.2]{Lyons}. We use the quantitative correlation bound of Backhausz, Szegedy and Vir\'ag~\cite[Theorem~3.1 in arXiv:1305.6784v1]{BSV} to give that implication below. The map is obtained for each fixed $d$ and $\beta$ in the permitted range; no parameter-uniform or computational bound is asserted. For the free state on $T_d$, reconstruction from distant levels is possible exactly when $b\theta^2>1$; equivalently, the free Gibbs state is extremal exactly when $b\theta^2\le1$. For the regular-tree result, including equality, see the Bethe-lattice work of Bleher, Ruiz, and Zagrebnov~\cite{BleherRuizZagrebnov1995} and Ioffe~\cite{Ioffe1996Bethe}. Ioffe~\cite{Ioffe1996GeneralTrees} and Evans, Kenyon, Peres, and Schulman~\cite{EvansKenyonPeresSchulman2000} developed branching-number criteria on general trees away from equality. Pemantle and Peres~\cite[Theorem~2.1]{PemantlePeres} later gave an electrical-capacity criterion for free-state extremality for couplings bounded above and away from zero, which also covers critical cases. Reconstruction asks whether distant spins retain information about a fixed spin. The factor question asks for a rule that generates the entire law from independent labels. Nonreconstruction supplies no such rule, and a weak limit of factor laws need not itself be a factor \cite[Corollary~3.3]{Lyons}. Thus equality requires a construction that retains measurable dependence on its independent input. In the uniqueness range $\theta\le b^{-1}$, including equality, a finite-cluster construction gives the factor; see Lyons~\cite[Section~3]{Lyons}. Nam, Sly and Zhang~\cite[Theorem~1 and Section~2.2 in arXiv:2012.09484v2]{NSZ} used posterior-drift stochastic differential equations driven by IID Brownian motions to construct the free Ising law as a factor for $d\ge d_0$ and $\theta\le c/\sqrt{d-1}$, for unspecified absolute constants $c,d_0>0$. Their construction takes root-independent limits of finite-volume solutions. The […]
+[theorem] \label{thm:main}\label{thm:sharp} For every integer $d\ge3$ and every $\beta\ge0$, the free zero-field Ising law $\mu_{d,\beta}$ is a factor of IID in the sense of \eqref{eq:equivariance} if and only if \[ \tanh\beta\le(d-1)^{-1/2}. \] In this range the factor can be chosen to commute with every automorphism on every label input.
+
+=== LEAN COMPARATOR FreeIsing (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open MeasureTheory
+namespace Problem367
+abbrev TreeVertex (d : ℕ) :=
+  {word : List (Fin d) // List.IsChain (fun first second : Fin d => first ≠ second) word}
+def treeAdj {d : ℕ} (u v : TreeVertex d) : Prop :=
+  (∃ c : Fin d, v.1 = u.1 ++ [c]) ∨
+  (∃ c : Fin d, u.1 = v.1 ++ [c])
+structure TreeAut (d : ℕ) where
+  toEquiv : TreeVertex d ≃ TreeVertex d
+  map_adj : ∀ u v, treeAdj (toEquiv u) (toEquiv v) ↔ treeAdj u v
+def relabel {d : ℕ} {α : Type*} (g : TreeAut d)
+    (x : TreeVertex d → α) : TreeVertex d → α :=
+  fun v => x (g.toEquiv.symm v)
+inductive IsingSpin where
+  | neg
+  | pos
+  deriving DecidableEq
+protected abbrev IsingSpin.enumList : List IsingSpin := [.neg, .pos]
+protected theorem IsingSpin.enumList_getElem?_ctorIdx_eq (x : IsingSpin) :
+    IsingSpin.enumList[x.ctorIdx]? = some x := by
+  cases x <;> rfl
+protected theorem IsingSpin.enumList_nodup : IsingSpin.enumList.Nodup := by decide
+instance : Fintype IsingSpin where
+  elems := ⟨IsingSpin.enumList, IsingSpin.enumList_nodup⟩
+  complete x := by cases x <;> decide
+instance isingSpinMeasurable : MeasurableSpace IsingSpin := ⊤
+def uniform01 : Measure ℝ :=
+  volume.restrict (Set.Icc (0 : ℝ) 1)
+instance uniform01Probability : IsProbabilityMeasure uniform01 where
+  measure_univ := by simp [uniform01]
+def labelMeasure (d : ℕ) : Measure (TreeVertex d → ℝ) := by
+  classical
+  exact Measure.infinitePi (fun _ : TreeVertex d => uniform01)
+def ConnectedFinset {d : ℕ} (D : Finset (TreeVertex d)) : Prop :=
+  D.Nonempty ∧
+    ∀ u ∈ D, ∀ v ∈ D,
+      Relation.ReflTransGen
+        (fun x y : TreeVertex d => x ∈ D ∧ y ∈ D ∧ treeAdj x y) u v
+def inducedEdges {d : ℕ} (D : Finset (TreeVertex d)) :
+    Finset (TreeVertex d × TreeVertex d) := by
+  classical
+  exact (D.product D).filter (fun e =>
+    treeAdj e.1 e.2 ∧ e.1.1.length < e.2.1.length)
+def freeCylinderWeight {d : ℕ} (theta : ℝ)
+    (D : Finset (TreeVertex d)) (eta : TreeVertex d → IsingSpin) : ENNReal :=
+  ENNReal.ofReal
+    ((1 / 2 : ℝ) *
+      Finset.prod (inducedEdges D) (fun e =>
+        (1 + (if eta e.1 = eta e.2 then theta else -theta)) / 2))
+def HasFreeIsingLaw {d : ℕ} (theta : ℝ)
+    (mu : Measure (TreeVertex d → IsingSpin)) : Prop :=
+  ∀ (D : Finset (TreeVertex d)), ConnectedFinset D →
+    ∀ eta : TreeVertex d → IsingSpin,
+      mu {x | ∀ v ∈ D, x v = eta v} = freeCylinderWeight theta D eta
+def IsFactorOfIID (d : ℕ) (theta : ℝ) : Prop :=
+  ∃ Phi : (TreeVertex d → ℝ) → (TreeVertex d → IsingSpin),
+    Measurable Phi ∧
+    HasFreeIsingLaw theta (Measure.map Phi (labelMeasure d)) ∧
+    ∀ g : TreeAut d,
+      ∀ᵐ U ∂labelMeasure d, Phi (relabel g U) = relabel g (Phi U)
+theorem free_ising_factor_iff_threshold :
+    ∀ (d : ℕ) (beta : ℝ), 3 ≤ d → 0 ≤ beta → (IsFactorOfIID d (Real.tanh beta) ↔ Real.tanh beta ≤ 1 / Real.sqrt ((d : ℝ) - 1)) := by
+  sorry
+end Problem367
+end
+end OAI
+

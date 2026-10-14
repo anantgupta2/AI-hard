@@ -1,0 +1,50 @@
+FAMILY 012: Independent largest prime factors of consecutive integers
+SUBJECT: Number theory
+OPENAI SUMMARY: Resolves the Erdős–Pomerance joint Dickman conjecture: the logarithmic sizes of the largest prime factors of n and $`n+1`$ are asymptotically independent in ordinary natural density. In particular, the integers satisfying $`P^+(n)\lt P^+(n+1)`$ have density 1/2.
+
+=== MANUSCRIPT: The joint Dickman law for consecutive integers (September-24-2026) [preprints/The-joint-Dickman-law-for-consecutive-integers-September-24-2026/build/main.tex]
+ABSTRACT: Let $`P^+(n)`$ denote the largest prime factor of n. We prove that $`\log P^+(n)/\log n`$ and $`\log P^+(n+1)/\log n`$ are asymptotically independent in ordinary natural density, with Dickman marginals. This resolves the Erdős–Pomerance joint Dickman conjecture positively and implies that the ordering $`P^+(n)\lt P^+(n+1)`$ has natural density 1/2.
+INTRODUCTION (start): \label{sec:introduction} For an integer $n\geq2$, let $\Pplus(n)$ denote its largest prime divisor, and put $\Pplus(1)=1$. The Dickman--de Bruijn function $\rho$ is the continuous function on $[0,\infty)$ determined by \[ \rho(u)=1\quad(0\leq u\leq1),\qquad u\rho'(u)=-\rho(u-1)\quad(u>1). \] The classical theory of smooth numbers, beginning with Dickman and developed by Ramaswami and de Bruijn~\cite{Dickman1930,Ramaswami1949,deBruijn1951}, gives \[ \frac1X\#\{n\leq X:\Pplus(n)\leq X^a\} \longrightarrow \rho(1/a)\qquad(0<a\leq1). \] Our result identifies the joint law at two consecutive integers. [statement] Thus $\log\Pplus(n)/\log n$ and $\log\Pplus(n+1)/\log n$ have, in natural density, independent limiting distributions with distribution function $a\mapsto\rho(1/a)$, continuously extended to $[0,1]$. Section~\ref{sec:distribution} proves the corresponding law with fixed thresholds $X^a,X^b$, derives the displayed moving-threshold statement, and identifies this continuous limiting law. Inclusion--exclusion using the fixed-threshold law and its marginals gives the upper-tail independence conjecture of Erd\H{o}s and Pomerance~\cite[p.~311]{ErdosPomerance1978}. The comparison conjecture usually attributed to Erd\H{o}s and Tur\'an is a consequence, rather than a separate main theorem. [statement] The limiting marginal is continuous, so its product measure gives zero mass to the diagonal; symmetry then gives the corollary. In particular, no quantitative separation estimate is needed for this deduction. \subsection{Previous work} Erd\H{o}s and Pomerance~\cite{ErdosPomerance1978} formulated the joint independence problem and proved that each ordering has positive lower natural density. Their explicit lower bound was $0.0099$. They also proved that for every $\varepsilon>0$, some $\delta>0$ makes the number of integers $n<X$ satisfying $X^{-\delta}<\Pplus(n)/\Pplus(n+1)<X^\delta$ less than $\varepsilon X$ for all sufficiently large $X$~\cite[Theorem~1]{ErdosPomerance1978}. The lower-density bound was increased to $0.05544$ by de la Bret\`eche, Pomerance and Tenenbaum~\cite[Section~3]{BretechePomeranceTenenbaum2005}, and to $0.05866$ by an observation of Fouvry recorded in the same section. Wang~\cite{Wang2017,Wang2018} obtained $0.1063$ and $0.1356$, and L\"u and Wang~\cite{LuWang2025} obtained $0.2017$. Yang's recent preprint~\cite[Theorem~1.4]{Yang2026} gives $0.280$ for both orderings. These are bounds on lower natural densities; they do not assert that a natural density exists. For the joint law itself, Ter\"av\"ainen~\cite[Theorem~1.14]{Teravainen2018} proved the predicted product in logarithmic density. That is, for fixed $0<a,b<1$, the indicator in Theorem~\ref{thm:main}, averaged with weight $1/n$ and normalization $1/\log X$, tends to $\rho(1/a)\rho(1/b)$. His Theorem~1.16 gives logarithmic density $1/2$ for the ordering, while Theorem~1.19 proves positive lower natural density for every nondegenerate rectangle of normalized largest-prime-factor values inside $(0,1)^2$. Tao and Ter\"av\"ainen~\cite[Remark~3.3, equation~(50)]{TaoTeravainen2019} then obtained the joint product law for ordinary averages outside an exceptional set of scales of logarithmic density zero; their Corollary~1.16 gives the corresponding ordering result. Wang~\cite{Wang2021Conditional} proved the ordinary joint law under the Elliott--Halberstam conjecture for friable integers. Jiang, L\"u and Wang~\cite{JiangLuWang2022} established averaged-over-shift forms of the conjectures, a different conclusion from a result at the fixed shift one. The more recent work of Tao and Ter\"av\"ainen~\cite[Theorem~1.8]{TaoTeravainen2026Quantitative} gives a quantitative joint law outside an exceptional set of scales, with uniformity in the smoothness parameters and a power saving in $\log X$. Theorem~\ref{thm:main} concerns fixed parameters and has no exceptional scales; it does not assert their quantitative error term or their uniformity for growing parameters. Relativ […]
+[theorem] [Joint Dickman law]\label{thm:main} For every fixed $a,b\in(0,1)$, \[ \lim_{X\to\infty}\frac1X \#\{2\leq n\leq X:\Pplus(n)\leq n^a, \ \Pplus(n+1)\leq n^b\} =\rho(1/a)\rho(1/b). \] Here the limit is taken over all real $X$, with ordinary, unweighted counting.
+[corollary] \label{cor:comparison} One has \[ \lim_{X\to\infty}\frac1X \#\{2\leq n\leq X:\Pplus(n)<\Pplus(n+1)\}=\frac12. \] The reverse ordering has the same natural density.
+
+=== LEAN COMPARATOR JointDickman (exact formal statement)
+import Mathlib
+namespace OAI
+namespace Erdos970.NumberTheoryLean.DelayConstruction
+noncomputable def kernel (f : ℝ → ℝ) (t : ℝ) : ℝ := f (t - 1) / max 1 t
+noncomputable def stepApprox (σ : ℝ) : ℕ → ℝ → ℝ
+  | 0 => fun _ => 1
+  | n + 1 => fun u => 1 + σ * ∫ t in (1 : ℝ)..max 1 u, kernel (stepApprox σ n) t
+noncomputable def delay (σ u : ℝ) : ℝ := stepApprox σ ⌈u⌉₊ u
+end Erdos970.NumberTheoryLean.DelayConstruction
+namespace Erdos970.NumberTheoryLean.Dickman
+noncomputable def rho : ℝ → ℝ := DelayConstruction.delay (-1)
+end Erdos970.NumberTheoryLean.Dickman
+namespace JointDickman
+noncomputable def empiricalCount (P : ℕ → Prop) (N : ℕ) : ℕ := by
+  classical
+  exact ((Finset.Icc 2 N).filter P).card
+noncomputable def realDensity (P : ℕ → Prop) (X : ℝ) : ℝ :=
+  (empiricalCount P ⌊X⌋₊ : ℝ) / X
+end JointDickman
+namespace JointDickmanPaper
+open Filter JointDickman
+open scoped Topology
+theorem joint_law (a b : ℝ) (ha : 0 < a) (ha1 : a < 1) (hb : 0 < b) (hb1 : b < 1) :
+    Tendsto (realDensity (fun n =>
+      (n.maxPrimeFac : ℝ) ≤ (n : ℝ) ^ a ∧ ((n + 1).maxPrimeFac : ℝ) ≤ (n : ℝ) ^ b))
+      atTop (𝓝 (Erdos970.NumberTheoryLean.Dickman.rho (1 / a) *
+        Erdos970.NumberTheoryLean.Dickman.rho (1 / b))) := by
+  sorry
+theorem increasing_order :
+    Tendsto (realDensity (fun n => n.maxPrimeFac < (n + 1).maxPrimeFac))
+      atTop (𝓝 (1 / 2)) := by
+  sorry
+theorem decreasing_order :
+    Tendsto (realDensity (fun n => (n + 1).maxPrimeFac < n.maxPrimeFac))
+      atTop (𝓝 (1 / 2)) := by
+  sorry
+end JointDickmanPaper
+end OAI
+

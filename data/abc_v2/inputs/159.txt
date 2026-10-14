@@ -1,0 +1,33 @@
+FAMILY 159: Erdős’s reciprocal-sum conjecture and quasipolynomial Szemerédi bounds
+SUBJECT: Combinatorics
+OPENAI SUMMARY: Proves Erdős's conjecture that every set of positive integers with divergent reciprocal sum contains arithmetic progressions of every finite length. Quantitatively, for each fixed k ≥ 3, every subset of $`\{1,\ldots,N\}`$ with no nonconstant k-term progression has size at most $`C_kN\exp[-c_k(\log N)^{\varepsilon_k}]`$, with positive constants depending only on k.
+
+=== MANUSCRIPT: Quasipolynomial Bounds for Arithmetic Progressions (September-23-2026) [preprints/Quasipolynomial-Bounds-for-Arithmetic-Progressions-September-23-2026/build/main.tex]
+ABSTRACT: We prove Erdős's conjecture that every set of positive integers with divergent reciprocal sum contains arithmetic progressions of every finite length. More quantitatively, for every fixed k ≥ 3, we show
+INTRODUCTION (start): \label{ap:introduction} Erd\H{o}s asked whether every set $A$ of positive integers for which $\sum_{a\in A}1/a$ diverges contains arithmetic progressions of every finite length~\cite[Problem~4.33.6]{Erdos1974}. We prove a quantitative density bound that implies this assertion. For integers $k\ge3$ and $N\ge1$, let $r_k(N)$ be the largest cardinality of a subset of $[N]=\{1,\ldots,N\}$ containing no nonconstant $k$-term arithmetic progression $a,a+d,\ldots,a+(k-1)d$, with $d>0$. All logarithms are natural. [statement] The constants may depend on the fixed length $k$; the exponent is not optimized. The reciprocal-sum consequence follows immediately from summing the density bound over dyadic intervals. [statement] \begin{proof} Fix $k\ge3$, and suppose that $A$ contains no nonconstant $k$-term progression. For $m\ge0$, translation identifies $[2^m,2^{m+1})\cap\mathbb Z$ with an interval of length $2^m$. Thus $|A\cap[2^m,2^{m+1})|\le r_k(2^m)$. Theorem~\ref{ap:main} implies, for $m\ge1$, \[ \sum_{a\in A\cap[2^m,2^{m+1})}\frac1a \le 2^{-m}r_k(2^m) \le C_k\exp\bigl(-c_k(m\log2)^{\varepsilon_k}\bigr). \] For every $d,\varepsilon>0$, the sequence $e^{-dm^\varepsilon}$ is summable: since $m^\varepsilon/\log m\to\infty$, its terms are at most $m^{-2}$ for all sufficiently large $m$. The $m=0$ interval contributes at most one. The reciprocal sum of $A$ is therefore finite, a contradiction. Divergence also implies that $A$ is infinite, which supplies lengths one and two. \end{proof} \subsection{Density thresholds and summability} The threshold in \eqref{ap:threshold} is quasipolynomial in $1/\alpha$: the logarithm of a sufficient interval length is a fixed power of $2+\log(1/\alpha)$. The inversion between the two forms of Theorem~\ref{ap:main}, including the endpoints, is proved in Section~\ref{ap:iteration}. The infinite-set consequence depends on more than a density tending to zero. Divergence of a reciprocal sum allows zero-density sets, and the qualitative estimate $r_k(N)=o(N)$ does not by itself settle Erd\H{o}s's question. The proof of Corollary~\ref{ap:reciprocal} uses the stronger condition \[ \sum_{m\ge1}\frac{r_k(2^m)}{2^m}<\infty. \] Our bound also gives a stronger divergence criterion: for every fixed $B\ge0$, a set $A\subseteq\mathbb N$ satisfying \[ \sum_{a\in A}\frac{(\log(2+a))^B}{a}=\infty \] contains progressions of every finite length. Section~\ref{ap:weighted} proves this criterion, uniform harmonic bounds and tails, and estimates for larger weights whose parameters depend on $k$. It also recovers the theorem of Green and Tao that every subset of the primes of positive relative upper density contains infinitely many progressions of every finite length~\cite[Theorem~1.2]{GreenTaoPrimes2008}. \subsection{Prior density bounds} Van der Waerden's theorem concerns a partition: every finite coloring of the positive integers has a monochromatic arithmetic progression of each finite length~\cite{vanDerWaerden1927}. The density problem asks for a condition on a prescribed set. Erd\H{o}s and Tur\'an began the study of the corresponding extremal functions in 1936 and explicitly conjectured that $r_3(N)=o(N)$~\cite{ErdosTuran1936}. The all-length positive-density conjecture appears explicitly in Erd\H{o}s's later account~\cite[Section~I.19]{Erdos1961}. Roth proved the three-term case by Fourier-analytic methods~\cite{Roth1953}; Szemer\'edi proved the four-term case in 1969 and the general theorem in 1975~\cite{Szemeredi1969,Szemeredi1975}. Furstenberg's subsequent proof recast the assertion as multiple recurrence in a measure-preserving system~\cite{Furstenberg1977}. The reciprocal-sum conjecture extends this density problem to sparser sets, including the primes~\cite[Problem~4.33.6]{Erdos1974}. For three terms, successive quantitative advances sharpened Roth's density-increment method: a shortage of progressions forces a density increase on a smaller structured set. Roth obtained $r_3(N)\ll N/\log\log N$. Heath-Brown and Szemer\ […]
+[theorem] \label{ap:main} For each fixed integer $k\ge3$ there are constants $C_k,c_k,\varepsilon_k>0$ such that, for every $N\ge2$, \begin{equation}\label{ap:density-bound} r_k(N)\le C_kN\exp\bigl(-c_k(\log N)^{\varepsilon_k}\bigr). \end{equation} Equivalently, there is $A_k\ge1$ such that an $\alpha$-dense subset of $[N]$ contains a nonconstant $k$-term progression whenever \begin{equation}\label{ap:threshold} \log N\ge A_k\bigl(2+\log(1/\alpha)\bigr)^{A_k}, \qquad 0<\alpha\le1. \end{equation}
+[corollary] [Divergent reciprocal sums]\label{ap:reciprocal} Every set $A\subseteq\mathbb N$ with $\sum_{a\in A}a^{-1}=\infty$ contains nonconstant arithmetic progressions of every finite length.
+
+=== LEAN COMPARATOR ErdosReciprocal (exact formal statement)
+import Mathlib
+namespace OAI
+namespace Erdos3
+def HasAP (A : Set ℕ) (k : ℕ) : Prop :=
+  ∃ a d : ℕ, 0 < d ∧ ∀ i < k, a + i * d ∈ A
+end Erdos3
+open scoped BigOperators
+namespace Erdos3
+noncomputable def reciprocalTerm (A : Set ℕ) (n : ℕ) : ℝ := by
+  classical
+  exact if n ∈ A then (n : ℝ)⁻¹ else 0
+end Erdos3
+namespace Erdos3
+def ReciprocalProgressionTheorem : Prop :=
+  ∀ A : Set ℕ, ¬ Summable (reciprocalTerm A) → ∀ k : ℕ, HasAP A k
+end Erdos3
+namespace Erdos3
+theorem manuscriptReciprocalProgressionTheorem : ReciprocalProgressionTheorem := by
+  sorry
+end Erdos3
+end OAI
+

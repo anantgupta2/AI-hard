@@ -1,0 +1,88 @@
+FAMILY 124: Polynomial-time scheduling on three identical machines
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Resolves the three-processor unit-job scheduling problem of Garey and Johnson: a deterministic polynomial-time algorithm minimizes makespan for nonpreemptive unit-length jobs with arbitrary precedence constraints on three identical parallel machines. For an explicitly given precedence graph, it decides deadline feasibility exactly and constructs a feasible schedule.
+
+=== MANUSCRIPT: A Polynomial-Time Algorithm for Three-Machine Unit-Job Scheduling (September-24-2026) [preprints/A-polynomial-time-algorithm-for-three-machine-unit-job-scheduling-September-24-2026/build/paper.tex]
+ABSTRACT: We give a uniform deterministic polynomial-time algorithm for scheduling unit-length jobs with arbitrary precedence constraints on three identical parallel machines. The algorithm constructs a schedule of minimum makespan and decides exactly whether all jobs can finish by a specified deadline. The proof reorganizes feasible schedules into intervals whose job sets have descriptions of bounded size. A dynamic program searches a family containing polynomially many such descriptions. Global boundary conditions and simplification of inherited information keep the descriptions bounded throughout the decomposition.
+INTRODUCTION (start): \label{sec:introduction} A precedence-constrained schedule must respect two kinds of restrictions: jobs related by precedence must run in order, while unrelated jobs compete for the available machines. Even when every job takes one unit of time, the interaction between these restrictions is subtle. The two-processor case was treated by Fujii, Kasami, and Ninomiya \citep{FujiiKasamiNinomiya1969,FujiiKasamiNinomiya1971Erratum}, and Coffman and Graham gave an optimal list-scheduling algorithm \citep{CG1972}. Allowing the number of machines to be part of the input yields an NP-complete problem \citep[Theorem~1]{Ullman1975}. The fixed-three decision problem appears as OPEN8 in Appendix~A13 of Garey and Johnson \citep{GJ1979} and has remained a central complexity question in scheduling \citep{NSW2025}. We consider the following precise decision problem. The input is an explicitly listed directed acyclic graph \(G=(V,E)\), with \(V=\{1,\ldots,n\}\), and an integer \(T\) satisfying \(1\le T\le n\). Every vertex is a nonpreemptive job of processing time one. The question is whether there is a function \[ \tau:V\longrightarrow\{1,\ldots,T\} \] such that each value is taken at most three times and \(\tau(u)<\tau(v)\) for every \((u,v)\in E\). There are no release dates, communication delays, eligibility restrictions, or additional resources. Slot \(t\) means execution during \([t-1,t)\), and the makespan is the last completion time. Allowing nonnegative real start times would not improve the optimum: fix the machine assignment and within-machine order of a feasible schedule. The graph augmented by machine-order arcs is acyclic, as witnessed by the original schedule. In a topological order of this graph, set each start time to the maximum of zero and its predecessors' completion times. Induction gives integer start times, and no completion time increases. The standard notation for the problem is \(P3\mid\mathrm{prec},p_j=1\mid C_{\max}\) \citep{GrahamLawlerLenstraRinnooyKan1979}. \begin{samepage} [statement] \end{samepage} The theorem resolves the polynomial-time side of this three-machine complexity question. Its scope is the explicit model just stated. The polynomial supplied by the proof has a very large constant exponent; no practical running-time claim is made. \paragraph{Prior work and the point of departure.} Structural restrictions on precedence yield important intermediate results. Garey, Johnson, Tarjan, and Yannakakis gave a linear-time algorithm on three processors for opposing forests, which are disjoint unions of an in-forest and an out-forest \citep[Section~4]{GareyJohnsonTarjanYannakakis1983}. Dolev and Warmuth obtained a running time \(O(n^{h(m-1)+1})\) when the precedence graph has height \(h\), measured in arcs, and at most \(m\) processors are available in each slot \citep[Theorem~3]{DW1984}. The available number may vary over time. This is polynomial when both \(h\) and \(m\) are fixed. Their normalized optimal schedules, called zero-adjusted, have a slot whose at most \(m-1\) jobs with successors determine the prefix and the remaining subproblem, the latter up to isomorphism. When the graph has positive height, both recursive pieces have smaller height \citep[Theorem~2]{DW1984}. Nederlof, Swennenhuis, and Węgrzycki developed this structural approach into an exact algorithm with running time \((1+n/m)^{O(\sqrt{nm})}\) for \(n\) jobs on \(m\) machines, hence \(2^{O(\sqrt n\log n)}\) for three machines \citep[Theorem~1.1]{NSW2025}. Their decomposition at selected slots and memoization of subproblems described by source and sink sets already control the number of subproblems despite potentially linear recursion depth \citep[Sections~5--6]{NSW2025}. Their proper-decomposition theorem assumes at most \(m\) sources \citep[Definition~1 and Theorem~3.1]{NSW2025}; their full algorithm handles arbitrary precedence graphs. The marked intervals below build on this decomposition viewpoint. We prove the required separator statement […]
+[theorem] \label{thm:main} Let an explicitly listed finite directed acyclic graph specify the precedence constraints on \(n\ge1\) nonpreemptive unit-length jobs on three identical machines. There is a uniform deterministic algorithm that constructs a feasible schedule of minimum makespan. Given also an integer deadline \(1\le T\le n\), it decides feasibility exactly and returns a schedule whenever the answer is affirmative. Both tasks can be performed in \(O((L+2)^{150020})\) steps on a deterministic multitape Turing machine, where \(L\) is the total binary input length.
+
+=== LEAN COMPARATOR ThreeMachine (exact formal statement)
+import Mathlib
+namespace OAI
+namespace ThreeMachine
+structure Instance (n : ℕ) where
+  edges : List (Fin n × Fin n)
+def Instance.edge {n : ℕ} (G : Instance n) (u v : Fin n) : Prop :=
+  (u, v) ∈ G.edges
+def Instance.acyclic {n : ℕ} (G : Instance n) : Prop :=
+  ∀ v, ¬Relation.TransGen G.edge v v
+def Feasible {n : ℕ} (G : Instance n) (T : ℕ) (τ : Fin n → ℕ) : Prop :=
+  (∀ v, 1 ≤ τ v ∧ τ v ≤ T) ∧
+  (∀ t, ((Finset.univ : Finset (Fin n)).filter (fun v => τ v = t)).card ≤ 3) ∧
+  ∀ u v, G.edge u v → τ u < τ v
+def encodeNat (n : ℕ) : List Bool :=
+  let b := Computability.encodeNat n
+  List.replicate b.length true ++ false :: b
+def encodeList {α : Type} (f : α → List Bool) (xs : List α) : List Bool :=
+  encodeNat xs.length ++ xs.flatMap f
+def encodeInput {n : ℕ} (G : Instance n) (deadline : Option ℕ) : List Bool :=
+  (match deadline with
+    | none => [false]
+    | some T => true :: encodeNat T) ++
+  encodeList encodeNat ((List.range n).map (· + 1)) ++
+  encodeList (fun (e : Fin n × Fin n) => encodeNat (e.1.val + 1) ++
+    encodeNat (e.2.val + 1)) G.edges
+def encodeAnswer : Option (List ℕ) → List Bool
+  | none => [false]
+  | some slots => true :: encodeList encodeNat slots
+def slots {n : ℕ} (τ : Fin n → ℕ) : List ℕ := List.ofFn τ
+def CorrectOutput {n : ℕ} (G : Instance n) (deadline : Option ℕ)
+    (out : List Bool) : Prop :=
+  match deadline with
+  | none => ∃ T τ, Feasible G T τ ∧
+      (∀ T' τ', Feasible G T' τ' → T ≤ T') ∧
+      out = encodeAnswer (some (slots τ))
+  | some T =>
+      (out = encodeAnswer none ∧ ¬∃ τ, Feasible G T τ) ∨
+      ∃ τ, Feasible G T τ ∧ out = encodeAnswer (some (slots τ))
+structure Machine (k q g : ℕ) where
+  transition : Fin (q + 1) → (Fin (k + 1) → Fin (g + 3)) →
+    Option (Fin (q + 1) × (Fin (k + 1) → Fin (g + 3) × Option Turing.Dir))
+structure Configuration (k q g : ℕ) where
+  state : Fin (q + 1)
+  tapes : Fin (k + 1) → Turing.Tape (Fin (g + 3))
+def bitSymbol {g : ℕ} (b : Bool) : Fin (g + 3) :=
+  if b then ⟨2, by omega⟩ else ⟨1, by omega⟩
+def Machine.step {k q g : ℕ} (M : Machine k q g)
+    (c : Configuration k q g) : Option (Configuration k q g) := do
+  let (state, action) ← M.transition c.state (fun i => (c.tapes i).head)
+  return { state := state, tapes := fun i =>
+    let tape := (c.tapes i).write (action i).1
+    match (action i).2 with
+    | none => tape
+    | some d => tape.move d }
+def Machine.initial {k q g : ℕ} (_M : Machine k q g)
+    (input : List Bool) : Configuration k q g :=
+  { state := 0, tapes := fun i =>
+      Turing.Tape.mk₁ (if i = 0 then input.map bitSymbol else []) }
+def Machine.run {k q g : ℕ} (M : Machine k q g) (input : List Bool)
+    (t : ℕ) : Configuration k q g :=
+  (fun c => (M.step c).getD c)^[t] (M.initial input)
+def Machine.Produces {k q g : ℕ} (M : Machine k q g)
+    (input out : List Bool) (timeBound : ℕ) : Prop :=
+  ∃ t ≤ timeBound, M.step (M.run input t) = none ∧
+    ((M.run input t).tapes 0).right₀ = Turing.ListBlank.mk (out.map bitSymbol)
+def ReleaseTheorem : Prop :=
+  ∃ (k q g : ℕ) (M : Machine k q g) (C : ℕ), 0 < C ∧
+    ∀ n (G : Instance n), 1 ≤ n → G.acyclic →
+      ∀ deadline : Option ℕ,
+        (∀ T ∈ deadline, 1 ≤ T ∧ T ≤ n) →
+        ∃ out, CorrectOutput G deadline out ∧
+          M.Produces (encodeInput G deadline) out
+            (C * ((encodeInput G deadline).length + 2) ^ 150020)
+theorem main_theorem : ReleaseTheorem := by
+  sorry
+end ThreeMachine
+end OAI
+

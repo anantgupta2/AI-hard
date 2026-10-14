@@ -1,0 +1,747 @@
+FAMILY 140: Memory–sample lower bounds for noiseless Gaussian regression
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: For fixed A &gt; 0, a one-pass learner with $`Ad^2`$ persistent bits needs $`\Omega_A(d\log(1/\epsilon))`$ noiseless Gaussian samples to recover a unit vector to angular error $`0\lt \epsilon\le1/10`$ with probability 2/3, uniformly in accuracy for large d. Computation and randomized updates are unrestricted, but output uses only the terminal state, stopping index and fresh randomness.
+
+=== MANUSCRIPT: Memory and precision in noiseless Gaussian regression (September-27-2026) [preprints/Memory-and-precision-in-noiseless-Gaussian-regression-September-27-2026/build/main.tex]
+ABSTRACT: For every fixed A &gt; 0, a learner that retains at most $`Ad^2`$ bits between fresh exact Gaussian linear measurements needs $`\Omega_A(d\log(1/\epsilon))`$ measurements to estimate a uniformly random unit vector to angular error at most ϵ, for any $`0\lt \epsilon\le 1/10`$, with probability at least 2/3. The constant is absolute for $`o(d^2)`$ memory.
+INTRODUCTION (start): \label{h:introduction} An exact linear equation carries arbitrarily fine information. Indeed, \(d\) independent Gaussian equations determine an unknown vector in \(\R^d\) almost surely if all the equations can be retained. A learner that reads the equations once and remembers only a finite state faces a different problem. Increasing the required accuracy can force it to read more equations even when every equation is noiseless. \begin{definition}[Finite-state Gaussian regression]\label{h:model} Fix integers \(d\ge2\), \(M\ge0\), and \(T\ge0\). A data-independent shared seed may choose the learner's rules; the descriptions of its transitions and output below are conditional on that seed. A signal \(s\in S^{d-1}\) is chosen before sampling. At sample index \(t\in\{1,\ldots,T\}\), the observation is \[ x_t\sim N(0,I_d),\qquad y_t=\ip{x_t}{s}, \] where the rows \(x_1,\ldots,x_T\) are independent. A learner reads the pairs once, in order. After each number of samples its persistent state belongs to a prescribed set of at most \(2^M\) elements. The initial state and shared seed are jointly independent of the signal and all rows, but may depend on each other. Conditional on the seed and state, a transition may use the entire current pair and fresh randomness, with unrestricted computation, but only the next finite state is retained. The learner may stop, including before the first sample, but must stop by the prescribed deterministic finite horizon \(T\). At a stopping index its unit output \(\widehat s\in S^{d-1}\) is generated from the terminal state, the stopping index, and fresh randomness only. In particular, a discarded observation cannot be read again by the output rule. The transitions and stopping rules may depend on \(d\), the requested accuracy \(\epsilon\), and the index, but not on \(s\). The experiment must be jointly measurable in the signal, the complete pre-generated rows, the shared seed, the initial state, and all fresh transition and output randomness. Conditional on the seed, each fixed state/index transition and stopping probability must be Borel in \((x,y)\), or measurable in the completion of \(\lambda_1(dx,dy)=\gamma_1(dx)\,dy\), where \(\gamma_1\) is standard Gaussian probability on \(\R^d\). Fresh randomness supplies no information about the signal or samples beyond the permitted rule arguments. Accuracy means \[ \arccos\ip{\widehat s}{s}\le\epsilon. \] \end{definition} The state bound measures bits, not real registers. The rules can be nonuniform in the dimension and sample index, and randomization is allowed both in choosing the rules and during the run. The model fixes the rows in advance through their independent Gaussian law: it does not allow a learner to choose a row or revisit an earlier one. Write \(\sigma_d\) for uniform probability on \(S^{d-1}\). Our main statement assumes success only after averaging over this prior. [statement] Here and throughout the paper logarithms are natural unless a base is shown. The constants in Theorem~\ref{h:main} may depend on the fixed number \(A\). The statement makes no uniform claim when \(A=A(d)\) tends to infinity. No relation between \(\epsilon\) and \(M\) is assumed. [statement] [statement] The every-signal consequence follows by averaging the same learner over \(\sigma_d\); it does not say that every individual signal is hard for every learner. We prove Theorem~\ref{h:main} and both corollaries after completing the backward argument in Section~\ref{h:end:section}. \paragraph{The original experiment and measurable versions.} All success probabilities refer to the original jointly measurable experiment. Joint independence of the initial state and seed from the signal and rows permits conditioning on the seed without changing the prior or supplying information through initialization. Section~\ref{h:stream:section} replaces completed-measurable rules by Borel versions separately for almost every seed, preserving the corresponding prior success probabilities. Th […]
+[theorem] [Memory and precision]\label{h:main} For every fixed finite \(A>0\), there are constants \(c_A>0\) and \(d_A\) such that the following holds. Let \(d\ge d_A\), let \(0\le M\le Ad^2\) be an integer, and let \(0<\epsilon\le1/10\). For any learner in Definition~\ref{h:model}, draw \(S\sim\sigma_d\) independently of the rows and the learner's data-independent randomness. If \[ \Prob\{\arccos\ip{\widehat s}{S}\le\epsilon\}\ge\frac23, \] then its prescribed horizon satisfies \[ T\ge c_A\,d\log(1/\epsilon). \]
+[corollary] [Subquadratic memory]\label{h:subquadratic} Let \(M(d)\ge0\) be integer-valued with \(M(d)=o(d^2)\), and let \(0<\epsilon(d)\le1/10\) be any accuracy sequence. A family of learners in Definition~\ref{h:model} with uniform-sphere average success at least \(2/3\) satisfies \[ T(d)\ge c\,d\log(1/\epsilon(d)) \] for all sufficiently large \(d\), where \(c>0\) is absolute. The dimension threshold may depend on the memory sequence.
+[corollary] [A guarantee for every signal]\label{h:worst-signal} The conclusions of Theorem~\ref{h:main} and Corollary~\ref{h:subquadratic} also hold when their average-success assumption is replaced by \[ \Prob\{\arccos\ip{\widehat s}{s}\le\epsilon\}\ge\frac23 \qquad\text{for every }s\in S^{d-1}, \] where this probability is over the rows and the learner's randomness.
+
+=== MANUSCRIPT: Posterior replicas and conditional information in Gaussian regression (September-27-2026) [preprints/Posterior-replicas-and-conditional-information-in-Gaussian-regression-September-27-2026/build/main.tex]
+ABSTRACT: For a signal with density bounded by L relative to uniform probability on $`S^{d-1}`$, we bound the information in a finite message W formed from exact Gaussian measurements, conditional on an independent projection revealed only to the analyst. For explicit row counts proportional to d, the bound is $`O(H(W)/d+d+\log(2+\log L))`$. Consequently, a finite-state learner with $`o(d^2)`$ persistent bits and a deterministic sample horizon needs $`\Omega(d\log(1/\epsilon))`$ fresh noiseless Gaussian measurements for constant-probability angular accuracy $`0\lt \epsilon\le1/10`$ under the uniform spherical prior.
+INTRODUCTION (start): \label{sec:introduction} Consider an unknown unit vector $s\in S^{d-1}$ and a stream of independent Gaussian rows $X_j\sim N(0,I_d)$ with exact labels $Y_j=\langle X_j,s\rangle$. If all raw observations can be retained, $d$ rows determine $s$ almost surely, because their matrix is invertible. A learner with finite persistent memory must instead replace each observed pair by an update of its state. The question is how this restriction changes the number of observations needed for a prescribed angular accuracy. Exact labels make the question particularly delicate: an individual real label has no prescribed bit precision. We study this problem through a conditional information bound. A finite message is formed from one block of exact observations, and a separate, independent projection of the signal is then revealed to the analyst. We bound the information that remains in the message after this revelation. The projection is an analysis variable throughout; it is not available to the learner or to the rule forming the message. \subsection*{Related memory--sample bounds} Steinhardt and Duchi established memory and communication lower bounds for noisy sparse regression, including a minimax squared-error lower bound $\Omega(\sigma^2\min\{kd/(Bn),1\})$ in their model with sparsity $k$, noise scale $\sigma$, and $n$ observations. Here $B$ bounds memory in bits or average communication per observation \cite[Theorem~2]{SteinhardtDuchi2015}. For learning over finite fields, Raz proved that learning a parity requires either quadratic memory or exponentially many samples, and extended the branching-program method to classes of finite learning problems defined by spectral conditions~\cite[Theorem~1]{Raz2016}\cite[Theorem~1]{Raz2017}. These results distinguish persistent memory from unrestricted computation on a newly observed sample. A closely related continuous regression result is due to Sharan, Sidford, and Valiant~\cite[Theorem~1 and Section~2]{SSV2019}. With Gaussian rows, independent uniform noise in $[-2^{-d/5},2^{-d/5}]$, and at most $d^2/4$ bits, their bound is $\Omega(d\log r)$ observations for Euclidean accuracy $\epsilon=d^{-r}$ in the stated range $r\le O(d/\log d)$. Their $\Omega(d\log\log(1/\epsilon))$ consequence is stated for $\epsilon\le d^{-\Omega(\log d)}$ within that range. Their model already permits nonuniform finite-width branching programs on real-valued data. The result here concerns exact labels and $o(d^2)$ memory, and gives the single-logarithmic precision cost $\Omega(d\log(1/\epsilon))$. These memory and noise hypotheses differ: a lower bound with noisy labels alone does not imply a lower bound with exact labels, since a learner receiving exact labels can add noise itself. Dagan, Kur, and Shamir proved quadratic-space lower bounds for finding an approximate null vector of independent Gaussian rows and for achieving small empirical residual on a random-order consistent linear system \cite[Theorems~3 and~10]{DKS2019}. Their tasks explain another way that linear algebra can demand quadratic storage, but use different recovery criteria and observation laws from the fixed-signal stream considered here. Two companion papers give complementary treatments of exact observations. \emph{Memory and precision in noiseless Gaussian regression} \cite[Theorem~1.2]{OpenAIMemoryPrecision2026} obtains the same precision scale for every fixed $A>0$ and memory $M\le Ad^2$, with a constant depending on $A$, by propagating bounds on future success backward through blocks. \emph{Replacing Gaussian observations in memory-constrained inference} \cite[Proposition~7.1 and Lemma~7.2]{OpenAIReplacing2026} develops a conditional-information comparison based on a finite two-point fiber measure. The present paper instead develops the multi-replica block comparisons stated below and proves its streaming consequence from them. \subsection*{Conditional information from one block} Let $\sigma_d$ denote uniform probability on $S^{d-1}$. In a block  […]
+[theorem] [Gaussian replica block bound]\label{thm:gaussian-block} For all sufficiently large $d$, set \[ k=2\lfloor d/16\rfloor,\qquad m=k,\qquad t=m+1,\qquad \ell=4k. \] Suppose $p=f\sigma_d$ is a probability with $0\le f\le L<\infty$. In the block experiment above, let $A$ have $k$ rows and let $B$ have $\ell$ rows. There is an absolute constant $C$ such that \begin{equation}\label{eq:gaussian-block} I(S;W\mid B,BS) \le \frac{H(W)}{t}+Cd+C\log(2+\log L). \end{equation} The bound is uniform over the prior, the density bound $L$, and the message kernel. The labels used to produce $W$ are the exact values $AS$.
+[theorem] [Uniform-prior sample lower bound]\label{thm:streaming} Let $M(d)=o(d^2)$ be nonnegative integer-valued, and let $0<\epsilon(d)\le1/10$. Suppose a family of learners in Definition~\ref{def:streaming-model} satisfies \[ \Prob\{\arccos\langle\widehat S,S\rangle\le\epsilon(d)\}\ge\frac23 \qquad\text{when }S\sim\sigma_d, \] where the probability includes the signal, samples, and learner randomness. Then there is an absolute $c>0$ such that \[ T(d)\ge c\,d\log\frac1{\epsilon(d)} \] for all sufficiently large $d$. The eventual threshold may depend on the memory sequence.
+
+=== MANUSCRIPT: Localization costs and information growth for exact Gaussian observations (September-27-2026) [preprints/Localization-costs-and-information-growth-for-exact-Gaussian-observations-September-27-2026/build/main.tex]
+ABSTRACT: For the image of a uniform cube under a spherical coordinate map, we prove that finite messages from t blocks of $`\Theta(d)`$ exact Gaussian measurements reveal only $`O_A(dt)`$ information when each message has at most $`\exp(Ad^2)`$ values, for fixed A. The same bound holds when each message is supplemented with a nested cell that restores the required geometric spread.
+INTRODUCTION (start): \label{l:introduction} An exact linear observation can convey arbitrarily many bits about a real-valued signal. A finite message computed from several observations need not convey that much, but its information is not controlled by the number of observations alone: the prior distribution matters. If earlier messages have concentrated the signal in a small region, the next message may exploit that concentration. This paper studies how to restore a useful geometric spread condition while accounting for the information revealed in doing so. The observation model is noiseless Gaussian regression. The unknown signal is a unit vector \(S\in S^{d-1}\). A row \(x\sim N(0,I_d)\), independent of the signal and previous rows, arrives together with its exact label \(\langle x,S\rangle\). A learner processes these pairs in order. Between observations it retains one of at most \(2^M\) states; arbitrary computation and fresh randomness are allowed during a transition. It stops by a deterministic finite horizon \(T\), and its unit-vector output uses its terminal state, stopping index, and fresh randomness. The precise measurable model, including data-independent shared randomness, is given in Section~\ref{l:model}. Angular accuracy \(\epsilon\) means \(\arccos\langle S,\widehat S\rangle\le\epsilon\). Our first information theorem concerns a prior for which the localization cost can be seen directly. Put \(n=d-1\), take \(Z\) uniformly in the cube \[ [-1/(2\sqrt n),1/(2\sqrt n))^n, \qquad S=\phi(Z)=(Z,\sqrt{1-\|Z\|^2}), \] and group observations into blocks of \(k=\lfloor n/16\rfloor\) rows. A message from a block may depend on all its rows and labels and on preceding messages. If each message has at most \(\exp(Ad^2)\) possible values, with \(A\) fixed, then the first \(t\) messages contain at most \(C_A dt\) nats of mutual information about \(Z\). Theorem~\ref{ld:thm:main} proves a stronger statement: the same bound holds after each message is supplemented with a nested dyadic cell containing \(Z\) that restores the required spread condition. The constant depends on \(A\), and the theorem gives the exact alphabet condition. The prior is the image of uniform cube volume, rather than uniform area on the spherical patch. This theorem serves as a complete first example; each later route establishes its own information estimate from its stated assumptions. \subsection{Why localization can pay for itself} Suppose the current posterior is supported in a dyadic parent cell. It is sufficiently spread for our projection estimate when each descendant at relative depth \(j\) has probability at most \(B2^{-nj/2}\). A fresh block then carries at most \(Cd+\log B+(2/m+e^{-ck})\log N\) information in a message with \(N\) possible values, where \(m=\lfloor n/8\rfloor\). The proof first inserts arbitrary \(L^2\) weights into the posterior, bounds the exact projected density in \(L^m\), and then uses duality to control the message likelihoods. After the message, we reveal the deepest cell on the sampled point's dyadic chain whose posterior mass is at least \(2^{-nj/2}\). At depth \(j\) there are at most \(2^{nj/2}\) such cells. Naming the selected cell therefore costs about \(nj/2\) bits, plus the entropy of its depth. In contrast, confinement to any depth-\(j\) cell certifies \(nj\) bits relative to the initial uniform cube. This difference pays for the extra revelations. The normalization is by the probability of selecting the cell, not merely the probability of lying in it. Controlling that selection probability is what also pays for the next value of \(\log B\). Section~\ref{l:dyadic} completes this argument and its finite-state application. The next eight arguments change the localization or geometric input, with the distinct estimates in Table~\ref{l:routes}. The final two routes instead correct the information itself. Each route has its own hypotheses and parameters. \newpage \begin{table}[!ht] \centering \small \begin{tabular}{@{}p{0.28\linewidth}p{0.6 […]
+[theorem] [Repeated localization]\label{ld:thm:main} There is an absolute constant $c>0$ with the following property. For any fixed $C_0>0$, consider the experiment above with $t\ge0$ blocks and $N\ge1$ possible message values, and suppose \begin{equation}\label{ld:eq:alphabet} \bigl(2/m+e^{-ck}\bigr)\log N\le C_0d. \end{equation} One can reveal nested dyadic cells $Q_0\supset Q_1\supset\cdots\supset Q_t$ containing $Z$, where $Q_i$ is a finite-valued measurable function of $Z$, the preceding revelations, and $W_1,\ldots,W_i$, so that the augmented transcript \[ \Pi_t=(W_1,Q_1,\ldots,W_t,Q_t) \] satisfies \begin{equation}\label{ld:eq:main} I(Z;\Pi_t)\le Cdt. \end{equation} Here $C$ is a constant depending only on $C_0$. If $J_t$ is the level of $Q_t$, the construction also gives $\E J_t\le Ct$.
+[corollary] \label{ld:cor:streaming} Suppose \(M(d)=o(d^2)\) and \(0<\epsilon(d)\le1/10\). If a family of learners in the model of Section~\ref{l:model} satisfies \[ \Prob\{\arccos\langle\widehat s,s\rangle\le\epsilon(d)\} \ge2/3\qquad\text{for every }s\in S^{d-1}, \] then \(T(d)\ge c d\log(1/\epsilon(d))\) for an absolute \(c>0\) and all sufficiently large \(d\). The dimension threshold may depend on the memory sequence.
+[proposition] [Maximum-score information bound] \label{l:maxscore:iteration} Suppose \(M\le d^2\). For \(N=\lceil T/k\rceil\), the learner under \(Z\sim\tau\) has an augmented discrete history \(\mathcal H_N\) satisfying \begin{equation}\label{l:maxscore:total-information} I(Z;\mathcal H_N)\le C_6dN,\qquad I(Z;\widehat S)\le C_6dN \end{equation} for an absolute \(C_6\) and all sufficiently large \(d\). If a data-independent shared seed selects the rules, the first inequality holds conditional on that seed with the same constant; the displayed output bound holds after averaging over it. The statement holds for every finite \(T\).
+[proposition] [Information after finite splitting] \label{l:bounded-split:iteration} Let \(z\sim\tau\), and let \(B\ge0\) and \(W\ge1\) be integers with \(\log W\le n^2\). Independently of \(z\), draw independent standard Gaussian \(k\times d\) matrices \(X_1,\ldots,X_B\), with \(k\) as fixed above. Consider a computation with a fixed initial state \(u_0\) and at most \(W\) states at each block boundary. At block \(b\), the outgoing state \(u_b\) is an everywhere-defined Borel function of \((u_{b-1},X_b,X_bs(z))\). Before each block one can reveal a finite partition label \(i_b\), determined by \(z\) and the preceding analysis history, such that the complete history \[ \mathcal H=(i_1,u_1,\ldots,i_B,u_B) \] has finite range and satisfies \(I(z;\mathcal H)\le4C'nB\) for an absolute constant \(C'>0\) and all sufficiently large \(n\). The labels indicate nested dyadic cells containing \(z\); they do not alter the computation's state rules.
+[theorem] [Precision lower bound from likelihood truncation] \label{thm:l-lt-precision} Let $M(d)=o(d^2)$ be a nonnegative integer-valued memory bound, and let $0<\epsilon(d)\le1/10$. Suppose a family of learners in the model above satisfies \[ \mathbb P\!\left\{\arccos\langle\widehat s,s\rangle \le\epsilon(d)\right\}\ge\frac23 \qquad\text{for every }s\in S^{d-1}. \] There is an absolute $c>0$ such that, for all sufficiently large $d$, \[ T(d)\ge c\,d\log_2\frac1{\epsilon(d)}. \] The eventual dimension threshold may depend on the memory sequence.
+[proposition] [The finite-horizon cube success bound] \label{prop:l-lt-forward} For sufficiently large $d$, consider a deterministic Borel computation padded to $m\ge0$ blocks of $n$ rows as above. Suppose its boundary alphabet has size at most $N$, where $N^{1/k}\le2^d$, and its final boundary state fixes its unit output. Its average success under \eqref{l:lt:chart} is at most \begin{equation}\label{l:lt:forward-bound} \Delta_m+2^{2Ddm}(5\epsilon)^p,\qquad \Delta_m=3m2^{-c_1d} +2^{-d}\sum_{t=0}^{m-1}(\lfloor J_t\rfloor+1). \end{equation} The sum is empty when $m=0$. In particular, $\Delta_m=o(1)$ for any sequence $m=o(d)$.
+[proposition] [Iteration of the grid information balance] \label{l:grid:iteration} Let $S\sim\sigma$, and start from a fixed state. Let $B\ge0$ be an integer. Consider $B$ blocks, each consisting of $k$ fresh standard Gaussian rows and their exact labels. In each block, the outgoing state is a measurable kernel of the incoming state and that block's data, and its alphabet has logarithm at most $m\ge0$. There is a countable analysis history $G_B$ of finite entropy that contains the final state and satisfies \begin{equation}\label{l:grid:final-information} I(S;G_B)\le C\{d+B(d+m/p)\}. \end{equation}
+[corollary] [Precision under the uniform spherical prior] \label{l:grid:precision} Let $M(d)=o(d^2)$ and $0<\epsilon(d)\le1/10$. For learners in the finite-state model of Section~\ref{l:model}, uniform-sphere average angular success at least $2/3$ requires \[ T(d)\ge c\,d\log\frac1{\epsilon(d)} \] for an absolute $c>0$ and all sufficiently large $d$. The dimension threshold may depend on the memory sequence.
+[proposition] [The controlled-horizon recurrence] \label{l:sep:recurrence} Suppose the outgoing message has at most \(e^b\) values, with \(b\le d^2\). For the localization update above, there are absolute \(\gamma,C_1,C_2>0\) such that \begin{equation} P_++\gamma d\Lambda_+ \le(1+C_1/d)(P+\gamma d\Lambda)+C_2d. \label{l:sep:recurrence-formula} \end{equation} Starting with radius one and signal-independent initial information, after \(m\le d\) blocks whose messages have at most \(e^{d^2}\) values, \begin{equation} P_m+\gamma d\Lambda_m\le C d(m+1),\qquad I(S;K_m)\le C d(m+1). \label{l:sep:horizon} \end{equation}
+[theorem] [The sample bound by separated-tuple localization] \label{l:sep:theorem} Let \(M(d)=o(d^2)\) be integer-valued and let \(0<\epsilon(d)\le1/10\). Every learner of Section~\ref{l:model} with uniform-sphere angular success probability at least \(2/3\) must satisfy \[ T(d)\ge c\,d\log(1/\epsilon(d)) \] for all sufficiently large \(d\), with an absolute \(c>0\). The eventual dimension threshold may depend on the memory sequence. Success at least \(2/3\) for every fixed signal implies the same conclusion by averaging.
+
+=== MANUSCRIPT: Projection moments, positive cap domination, and Riesz estimates on the sphere (September-27-2026) [preprints/Projection-moments-positive-cap-domination-and-Riesz-estimates-on-the-sphere-September-27-2026/build/main.tex]
+ABSTRACT: We prove moment estimates for exact random projections of finite measures whose mass is controlled on Euclidean balls, and derive positive domination by countable sums of spherical cap measures. For learners with $`M=o(d^2)`$ bits of memory, these estimates give three proofs that uniform-sphere average success at least 2/3 at angular accuracy $`0\lt \epsilon\le1/10`$ requires $`\Omega(d\log(1/\epsilon))`$ noiseless Gaussian observations. The three proofs keep their different stopping and accuracy costs explicit.
+INTRODUCTION (start): \label{p:introduction} A linear projection can concentrate a measure even when the original measure has no atoms. The amount of concentration depends on how much mass can lie near the affine subspaces that a projection collapses. This paper studies that dependence for random exact projections and uses it to analyze what a finite memory state can retain from noiseless Gaussian equations. We consider three questions. The first asks for an integrated moment of a projected density. Let \(\nu\) be a finite positive measure in \(\R^d\) whose mass on every ball of radius \(r\) is at most \(Kr^\beta\), and let \(P\) be a random matrix with \(k\) orthonormal rows. When \(P_\#\nu\) has density \(g_P\), an integrated estimate controls the average over \(P\) of \(\int g_P^q\). Such an estimate measures concentration throughout the label space. Theorem~\ref{p:frame-moment} proves a bound with explicit dependence on the dimension, support radius, and local-mass exponent. The second question asks for an actual positive dominating measure after a finite routing decision. Let \(\sigma\) be uniform probability on \(S^{d-1}\), and let \(\mu_B\) be \(\sigma\) conditioned on a spherical cap \(B\). A routing rule observes a Gaussian matrix \(X\) and the exact label \(Xs\), and selects an output \(w\) with probability \(K_w(X,Xs)\). Its average likelihood \(f_w(s)=\E_XK_w(X,Xs)\) weights the parent measure to \(f_w\mu_B\). We seek a positive sum of normalized cap measures that dominates this measure, with a controlled cost for small child radii. The positive-domination theorem in Section~\ref{p:cap-section} constructs a countable such sum and bounds its cost by a power of a reference routing probability. The third question concerns evaluation at a specified label. For a measurable function \(h:S^{d-1}\to[0,1]\), the ambient Riesz functional \[ V(h)=\sup_{z\in\R^d}\int h(s)\norm{s-z}^{-d/2}\,d\sigma(s) \] is the supremum of the raw Riesz potentials of \(h\sigma\) over ambient centers, and it controls mass near every center. If \(h\sigma\) is restricted to a ball about \(z\), Section~\ref{p:riesz-section} estimates a Gaussian projected density at \(Xz+b\) for every fixed offset \(b\). It uses one explicitly chosen density version for all offsets. This qualification matters: an integrated density norm is unchanged by modifications on a matrix-dependent graph, so it cannot by itself assign or bound the values on that graph. All three estimates give a precision bound for finite-state regression. The signal is uniform on \(S^{d-1}\), and each fresh observation is a standard Gaussian feature together with its exact inner product with the signal. Write \(T\) for the learner's deterministic sample horizon. In the bit-memory model of Section~\ref{p:geometry-model}, a learner with \(M(d)=o(d^2)\) retained bits that achieves angular error at most \(\epsilon(d)\), where \(0<\epsilon(d)\le1/10\), with average probability at least \(2/3\) requires \[ T(d)\ge c\,d\log(1/\epsilon(d)) \] for an absolute \(c>0\) and all sufficiently large \(d\), as stated in Theorem~\ref{p:regression}. The dimension threshold may depend on the memory sequence. Under the same accuracy and success requirements, the integrated projection argument also gives the explicit tradeoff \[ T\ge \frac{c\,d\log(1/\epsilon)}{1+M/d^2} \] for every nonnegative integer \(M\) and all \(d\) above an absolute threshold (Corollary~\ref{p:finite-memory-tradeoff}). In particular, the same precision bound holds with absolute constants throughout \(M\le d^2\). The underlying success-probability bounds \eqref{p:haar-success}, \eqref{p:cap-fixed-stop-explicit}, and Proposition~\ref{p:riesz-success} retain explicit dependence on arbitrary \(M\). \subsection{Projection geometry and earlier methods} The local growth condition belongs to classical potential theory. Mattila's work on Hausdorff dimension and orthogonal projections uses inverse-distance energy averaging and compares positive-dimensional Hausdorff meas […]
+[theorem] [Finite-memory precision bound]\label{p:regression} Let \(M(d)=o(d^2)\) be a sequence of nonnegative integers and let \(0<\epsilon(d)\le1/10\). There is an absolute \(c>0\) such that, for all sufficiently large \(d\), every learner in the experiment above whose uniform-sphere average success satisfies \[ \Prob\{\arccos\inner{\widehat S}{S}\le\epsilon(d)\}\ge\frac23 \] must use \[ T(d)\ge c\,d\log\frac1{\epsilon(d)}. \] The dimension threshold may depend on the memory sequence. In particular, the conclusion holds when the same success probability is required separately for every \(s\in S^{d-1}\).
+[corollary] [Finite-dimensional memory dependence] \label{p:finite-memory-tradeoff} There are absolute constants \(c>0\) and \(d_0\) such that, for every integer \(d\ge d_0\), every nonnegative integer \(M\), and every \(0<\epsilon\le1/10\), a learner in the experiment above with uniform-sphere average success at least \(2/3\) and deterministic finite horizon \(T\) satisfies \[ T\ge \frac{c\,d\log(1/\epsilon)}{1+M/d^2}. \]
+[theorem] [Integrated orthonormal-projection moment] \label{p:frame-moment} Let \(d,k,q\) be integers and \(\beta\) a real number with \(k\ge1\), \(q\ge2\), and \begin{equation}\label{p:frame-margins} k+q\le d,\qquad 0<\beta\le d,\qquad \beta-k-(q-2)\ge1. \end{equation} Let \(\nu\) be a finite positive Borel measure supported in \(B(z,R)\), \(R>0\), satisfying \eqref{p:all-ball-mass} for some \(K\ge0\). Assume that \(P_\#\nu\) is absolutely continuous with respect to Lebesgue measure for \(\vartheta_{d,k}\)-almost every \(P\). There is a jointly measurable version \(g(P,u)\) of its density such that \begin{equation}\label{p:frame-moment-bound} \left(\int_{\mathcal V_{d,k}}\int_{\R^k}g(P,u)^q\,du\, d\vartheta_{d,k}(P)\right)^{1/q} \le C^d(C\sqrt d)^{k(1-1/q)} K R^{\beta-k(1-1/q)}. \end{equation} For every \(P\), this version vanishes when \(\norm{u-Pz}>R\).
+[corollary] [All-radii projection of spherical local mass] \label{p:frame-n30} For sufficiently large \(d\), put \[ n=d-1,\qquad k=q=\lfloor d/4\rfloor,\qquad \beta=n-q. \] Let \(0\le f\le1\) be Borel on \(S^{d-1}\), and suppose for \(K\ge0\) that \[ \int_{B(b,t)}f\,d\sigma\le Kt^\beta \qquad(b\in\R^d,\ t>0). \] For \(z\in\R^d\), \(R>0\), and \(E=B(z,R)\), the projection of \(\1_E f\sigma\) by \(P\sim\vartheta_{d,k}\) has a jointly measurable Lebesgue density \(g(P,u)\) satisfying \begin{equation}\label{p:frame-n30-bound} \norm g_{L^q(\vartheta_{d,k}\,du)} \le C^d(C\sqrt d)^{k(1-1/q)} K R^{\beta-k(1-1/q)}. \end{equation}
+[theorem] [Normalized moment for unit-ball measures] \label{p:frame-positive} For sufficiently large \(d\), put \[ k=p=\lfloor d/16\rfloor,\qquad \lambda=(d-1)/2. \] Let \(X\) be a \(k\)-by-\(d\) standard Gaussian matrix and define \[ H=(XX^{\mathsf T})^{1/2},\qquad P=H^{-1}X \] on its probability-one full-row-rank event, and set \(P\) to a fixed frame on the null complement. Let \(m_k\) be uniform probability on the unit ball of \(\R^k\). Suppose \(\nu\) is a finite positive Borel measure fixed independently of \(X\), of mass at most one, supported in the unit ball of \(\R^d\), such that for a fixed \(D>0\), \[ \nu(B(b,t))\le D^d t^\lambda \qquad(b\in\R^d,\ t>0). \] Assume \(P_\#\nu\) is absolutely continuous for almost every \(X\). There is a jointly measurable nonnegative \(g_X(z)\) such that, for almost every \(X\), \(P_\#\nu(dz)=g_X(z)\,dz/v_k\). This version vanishes when \(\norm z>1\) and satisfies \begin{equation}\label{p:frame-positive-bound} \E_X\int g_X(z)^p\,dm_k(z)\le \exp(C_Ddp). \end{equation}
+[proposition] [One-block all-radii propagation]\label{p:haar-block} For sufficiently large \(d\), use \(k=q=\lfloor d/4\rfloor\) and \(\beta=d-1-q\). Let \(f_1,\ldots,f_N:S^{d-1}\to[0,1]\) be Borel functions satisfying \[ \int_{B(b,t)}f_w\,d\sigma\le Kt^\beta \qquad(b\in\R^d,\ t>0,\ 1\le w\le N). \] Let \(Q_w(X,y)\) be nonnegative Borel functions on \(\R^{k\times d}\times\R^k\) with \(\sum_wQ_w\le1\), and define \[ f_{\mathrm{in}}(s)=\E_X\sum_{w=1}^N Q_w(X,Xs)f_w(s). \] Then \begin{equation}\label{p:haar-block-bound} \int_{B(z,R)}f_{\mathrm{in}}\,d\sigma \le C^dN^{1/q}K R^\beta \qquad(z\in\R^d,\ R>0). \end{equation}
+[proposition] [Success bound from orthonormal projections] \label{p:haar-success-proposition} There are absolute constants \(C\ge1\) and \(d_0\) such that the following holds for every integer \(d\ge d_0\), every nonnegative integer \(M\), every \(0<\epsilon\le1/10\), and every learner of deterministic finite horizon \(T\) in Section~\ref{p:geometry-model}. Put \[ k=q=\lfloor d/4\rfloor,\qquad b=\lceil T/k\rceil,\qquad N_*=(k+2)2^M. \] Then \begin{equation}\label{p:haar-success} \Prob\{\text{success}\}\le C^d\epsilon^q\bigl[C^dN_*^{1/q}\bigr]^b. \end{equation} The constant and dimension threshold are independent of \(M,\epsilon,T\) and the learner's rules.
+[proposition] [Positive domination after one block] \label{p:cap-domination} For each $w\in\mathcal W$, there are countably many caps $B(c_i,\rho_i)$ with $0<\rho_i\le r$ and coefficients $a_i\ge0$ such that \begin{equation}\label{p:cap-domination-bound} f_w\mu_{c,r}\le\sum_i a_i\mu_{c_i,\rho_i}, \qquad \sum_i a_i(r/\rho_i)^\alpha\le\exp(Cd)q_w^\theta. \end{equation} The first inequality is an inequality of finite positive measures on $S^{d-1}$: it holds after evaluating both sides on every measurable set. The constant $C$ is independent of the parent cap and of the kernels.
+[proposition] [A fixed stopping index]\label{p:cap-fixed-stop} For all sufficiently large $d$, let a learner obey the observation and information restrictions in Section~\ref{p:geometry-model}, with $0<\epsilon\le1/10$, any nonnegative integer $M$ bits of state, and horizon $T$, and let $\mathsf T$ be its stopping index. For every fixed integer $0\le t\le T$, \begin{equation}\label{p:cap-fixed-stop-explicit} \Prob\{\mathsf T=t\text{ and }\arccos\inner{\widehat S}{S}\le\epsilon\} \le\exp(Cd)(\epsilon/2)^\alpha \left[\exp(Cd)2^{M/p}\right]^{\lceil t/k\rceil}. \end{equation} In particular, for a sequence $M(d)=o(d^2)$ the right side is eventually at most \begin{equation}\label{p:cap-fixed-stop-asymptotic} \exp\bigl(Cd(1+\lceil t/k\rceil)\bigr)(\epsilon/2)^\alpha, \end{equation} with an absolute $C$ and a dimension threshold that may depend on the memory sequence.
+[proposition] [Riesz success estimate]\label{p:riesz-success} There is an absolute constant $C_0\ge1$ such that every learner just specified satisfies \begin{equation}\label{p:riesz-success-bound} p_{\mathrm{succ}}\le B J^N,\qquad B=C_0^d\epsilon^{\,d/2-1},\qquad J=1+C_0^d(1+L)W^{1/q}. \end{equation} This includes $T=0$. No asymptotic assumption on $M$ is needed for this estimate.
+
+=== MANUSCRIPT: Replacing Gaussian observations in memory-constrained inference (September-27-2026) [preprints/Replacing-Gaussian-observations-in-memory-constrained-inference-September-27-2026/build/main.tex]
+ABSTRACT: Replacing the Gaussian rows used to select a finite message by independent rows increases the remaining conditional information by at most $`Cd`$, for a uniform spherical signal, message entropy at most d2, and the specified row dimensions proportional to d. As an application, we prove that learners with $`M=o(d^2)`$ persistent bits need $`T=\Omega(d\log(1/\epsilon))`$ exact observations to attain uniform-sphere angular success at least 3/5, for $`0\lt \epsilon\le1/10`$ and a deterministic finite horizon.
+INTRODUCTION (start): \label{sec:r-introduction} A finite message chosen from data changes the conditional distribution of those data. This elementary fact becomes a central issue in memory-constrained inference. Suppose a signal \(S\) is observed through exact Gaussian equations and a learner retains a finite state \(W\). After conditioning on \(W\), the rows used to select that state are generally biased. An independent Gaussian matrix has the same unconditional row law, but it need not leave the same information about \(S\) once its labels are revealed. This paper quantifies that change. We compare information beyond a wholly independent auxiliary projection with information beyond a projection containing the actual rows used by the learner. The two experiments keep the signal--message marginal and the signal--matrix marginal fixed. Their full joint laws differ. At suitable row dimensions proportional to \(d\), the comparison cost is \(O(d)\) when the message entropy is at most \(d^2\). We also prove the projection moment that makes this possible and develop two further comparisons based on replacing one row at a time and on a two-signal fiber measure. Here is one precise comparison. Write \(H\) for discrete entropy in nats, \(h\) for differential entropy, and \(I(\cdot;\cdot\mid\cdot)\) for conditional mutual information. Let \(S\) be uniform on \(S^{d-1}\), put \(m=\lfloor d/10\rfloor\) and \(\ell=\lfloor d/2\rfloor\), and let \(A\) be an \(m\)-row standard Gaussian matrix independent of \(S\). A countable message \(W\) may have arbitrary joint dependence on \((S,A)\), subject to \(H(W)\le d^2\). Draw an \((\ell-m)\)-row Gaussian matrix \(C\) independently of \((S,A,W)\), and an \(\ell\)-row Gaussian matrix \(G\) independently of \((S,W)\). Theorem~\ref{thm:r-critical-comparison} proves \[ I(S;W\mid G,GS) \le I(S;W\mid A,C,AS,CS)+Kd \] for all sufficiently large \(d\), with an absolute threshold and an absolute constant \(K\). Thus replacing rows that helped select the message by fresh rows costs only \(O(d)\) additional conditional information, despite the possible bias of \(A\) given \(W\). \subsection*{Memory, exact equations, and prior methods} Memory restrictions affect statistical estimation even when computation is unrestricted. Steinhardt and Duchi established memory-dependent minimax bounds for sparse noisy regression \cite{SteinhardtDuchi2015}. Raz's branching-program lower bounds for parity learning and broader discrete learning tasks showed how finite width can force a large sample cost \cite{Raz2016,Raz2017}. Sharan, Sidford, and Valiant developed a closely related finite-state framework for continuous regression \cite{SSV2019}. Their precision theorem uses isotropic Gaussian covariates with independent uniform additive noise of half-width \(2^{-d/5}\). For Euclidean accuracy \(d^{-r}\), with \(r\le O(d/\log d)\), at most \(d^2/4\) bits of memory, and success probability at least \(2/3\), it gives an \(\Omega(d\log r)\) sample lower bound \cite[Theorem~1]{SSV2019}. The present observation law has exact labels, which contain more information than noisy labels. Accordingly, our proof needs an estimate for exact projection densities. Sharan, Sidford, and Valiant's expansion of a projection moment into independent signal copies is a direct method precedent \cite[Section~7, Lemma~12]{SSV2019}; their one-row interval estimate uses a positive noise scale and global \(L^2\) control, while the mixed multirow estimate below is proved from local mass bounds. Dagan, Kur, and Shamir give related space lower bounds for an approximate-nullvector task with independent Gaussian rows and for empirical regression on a randomly ordered finite data set with exactly consistent labels \cite[Theorems~3 and~10]{DKS2019}. The latter result bounds the empirical residual under a hard joint data distribution; our recovery problem uses independent Gaussian rows and a fixed signal. Information-theoretic analyses of adaptive selection also compare a selected sta […]
+[proposition] [The information identity and its density bound] \label{prop:r-information-comparison} In the two experiments just defined, all quantities below are finite, and \begin{align} J_0(W)-J_1(W) &=h_0(Y\mid G,W)-h_1(Y\mid G,W)-I_1(S;G\mid W) \label{eq:r-information-identity}\\ &\le h_0(Y\mid G,W)+\E_1\log p_{\nu_W}(G,Y). \label{eq:r-information-density-bound} \end{align} If \(E=E(S,W)\) is countable and \(H(E\mid W)<\infty\), and the same deterministic refinement \(W'=(W,E)\) is used in both laws, then \begin{equation}\label{eq:r-refinement-charge} J_0(W)-J_1(W) \le J_0(W')-J_1(W')+H(E\mid W). \end{equation}
+[theorem] [Mixed projection moment and exact density version] \label{thm:r-mixed-moment} Let \(n=d-1\), let \(m,r,q\ge1\) be integers, and put \(\ell=m+r\). Suppose \begin{equation}\label{eq:r-mixed-dimensions} \ell<n,\qquad \ell-m-(q-1)\ge1. \end{equation} Let \(\rho\) be a finite nonnegative Borel measure on \(S^{d-1}\). Suppose that \(B,D>0\) and, for every \(z\in\R^d\) and \(t>0\), \begin{equation}\label{eq:r-mixed-growth} \rho(B(z,t))\le Bt^\ell,\qquad \rho(B(z,t))\le Dt^n. \end{equation} Let \(X\sim\gamma_m\) and \(Z\sim\gamma_r\) be independent, and set \(G=(X;Z)\). For \(\delta>0\), define the cube average \[ p_{\rho,\delta}(g,y) =(2\delta)^{-\ell}\int \ind_{\{\norm{gu-y}_\infty\le\delta\}}\,d\rho(u). \] There is an absolute \(C\) such that, for every fixed \(s\in S^{d-1}\) and every \(\delta>0\), \begin{equation}\label{eq:r-mixed-smoothed} \left[\E_X \left(\E_Z p_{\rho,\delta}((X;Z),(X;Z)s)\right)^q \right]^{1/q} \le e^{Cd}B\bigl(1+\log^+(D/B)\bigr). \end{equation} If in addition \(\rho\ll\sigma\), use the jointly Borel density \(p_\rho\) in \eqref{eq:r-density-version}. There is a measurable set \(E_\rho\subset S^{d-1}\), with \(\rho(E_\rho)=0\), such that for every \(s\notin E_\rh […]
+[proposition] [Actual-row tilt and exact-label limit] \label{prop:r-actual-row-limit} Keep the dimensions of Theorem~\ref{thm:r-mixed-moment}. Let \(\nu\le H\sigma\), \(H<\infty\), be a probability measure. Let \(S\sim\nu\) and \(X\sim\gamma_m\) be independent, let \(W\) be countable with \(H(W)<\infty\) and any joint law with \((S,X)\), and let \(Z\sim\gamma_r\) be independent of \((S,X,W)\). Put \(G=(X;Z)\) and \(Y=GS\). For every positive-probability \(w\), let \(\rho_w\ll\sigma\) be a finite nonnegative measure satisfying \eqref{eq:r-mixed-growth} with constants \(B_w,D_w>0\), and set \[ C_w=e^{Cd}B_w\bigl(1+\log^+(D_w/B_w)\bigr), \] where \(C\) is the constant in the theorem. Assume \(\E\log(1+C_W)<\infty\). The actual conditional law of \(Y\) given \((G,W)\) has a Lebesgue density. With the versions \eqref{eq:r-density-version}, \[ p_{\rho_W,1/j}(G,Y)\longrightarrow p_{\rho_W}(G,Y) \quad\text{almost surely under the actual law}. \] For every \(\delta>0\), and also for the exact density, \begin{align} \E\log\bigl(1+p_{\rho_W,\delta}(G,Y)\bigr) &\le \frac{I(X;W\mid S)}q+\E\log(1+C_W), \label{eq:r-actual-smoothed}\\ \E\log\bigl(1+p_{\rho_W}(G,Y)\bigr) &\le \frac{I(X;W\mid S)}q+\E\log(1+C_W) \ […]
+[theorem] [Critical-radius comparison]\label{thm:r-critical-comparison} In the two experiments of Subsection~\ref{subsec:r-two-experiments}, use the dimensions \eqref{eq:r-critical-parameters}. Thus \(S\sim\sigma\), \(A\sim\gamma_m\) is independent of \(S\), and \(W\) is countable with an arbitrary joint dependence on \((S,A)\). The aligned law retains \((S,A,W)\) and appends independent \(r\)-row \(C\), whereas the independent law retains \((S,W)\) and draws an independent \(\ell\)-row matrix \(G\). If \(H(W)\le d^2\), then, for an absolute constant \(K\), \begin{equation}\label{eq:r-critical-comparison} I_0(S;W\mid G,GS)\le I_1(S;W\mid G,GS)+Kd. \end{equation}
+[proposition] [One-level auxiliary-row comparison] \label{rlevels:one-comparison} For the preceding experiments and parameters, \begin{equation}\label{rlevels:one-comparison-bound} \mathcal D(U)\le\widetilde{\mathcal D}(U) +C\left(d+\log(1+d+H(U))+\frac{H(U)}d\right). \end{equation} The proposition applies to every finite \(U\) with the specified joint law.
+[proposition] [Two-label auxiliary-row comparison] \label{rlevels:two-comparison} If \(V\) is finite and \(H(V)\le d^2\) in the preceding actual experiment, then \begin{equation}\label{rlevels:two-comparison-bound} \mathcal J(V)\le I_{\mathrm{act}}(S;V\mid D,DS)+Cd. \end{equation}
+[proposition] [Averaged information increase per block] \label{rhyb:block} For the block above, with \(1\le m\le h_0\) and \(H(V)\le B\), \begin{equation}\label{rhyb:block-cost} \overline J(V)-\overline J(U) \le Cm+\frac{m}{N_k}\left(C+\frac{B}{h_0}\right)+\frac{B}{q}. \end{equation} When \(B\le d^2\), the right side is at most \(C'd\) for an absolute constant \(C'\).
+[proposition] [Information through a Gaussian block]\label{rfib:block} Let \(S\sim\sigma\), let \(V\) be finite-valued, and let \(A\) have \(n\) independent standard Gaussian rows, independently of \((S,V)\). Suppose \(W\) takes at most \(N\) values, where \(N\ge1\) is an integer, and is obtained from \((V,A,AS)\) by a Borel transition kernel. If \(\log N\le d^2\), then for the dimensions in \eqref{rfib:parameters} and all sufficiently large \(d\), \begin{equation}\label{rfib:drift} \Phi(W)\le\Phi(V)+Kd . \end{equation} The auxiliary matrix in each occurrence of \(\Phi\) is independent of the pair consisting of the signal and the state in that occurrence.
+[theorem] [Streaming consequence of the critical radius] \label{thm:r-critical-streaming} Let \(M(d)\) be a nonnegative integer sequence with \(M(d)=o(d^2)\), and let \(0<\epsilon(d)\le1/10\). For each \(d\), consider a learner in Definition~\ref{def:r-streaming-model} with deterministic finite horizon \(T(d)\). If its uniform-sphere angular success probability, including all learner randomness, is at least \(3/5\), then \[ T(d)\ge c\,d\log\frac1{\epsilon(d)} \] for an absolute \(c>0\) and all sufficiently large \(d\). The eventual dimension threshold may depend on the memory sequence.
+
+=== MANUSCRIPT: Subsphere methods for memory-sample lower bounds in noiseless Gaussian regression (September-27-2026) [preprints/Subsphere-methods-for-memory-sample-lower-bounds-in-noiseless-Gaussian-regression-September-27-2026/build/main.tex]
+ABSTRACT: Let a finite-state streaming learner estimate a uniformly random unit vector from independent exact Gaussian linear measurements. We prove that $`o(d^2)`$ bits of persistent memory and angular success probability at least 2/3 require at least $`2^{-16}d\log_2(1/\epsilon)`$ samples for all sufficiently large d, uniformly for $`0\lt \epsilon\le1/10`$. The proof conditions each batch on its observed projection and controls the resulting random residual subsphere.
+INTRODUCTION (start): \label{s:introduction} An exact linear equation may contain arbitrarily fine real information. Indeed, \(d\) independent Gaussian equations determine a vector in \(\R^d\) almost surely, because their coefficient matrix has full rank. A streaming learner with finitely many persistent states cannot retain the equations themselves at arbitrary precision. We study how many fresh equations it needs to estimate a direction when the information passed from one observation to the next is bounded in bits. \begin{definition}[Finite-state Gaussian stream]\label{s:model} Fix integers \(d\ge2\), \(M\ge0\), and \(T\ge0\), and an accuracy \(0<\epsilon\le1/10\). For a signal \(s\in S^{d-1}\), the observations are \[ X_t\sim N(0,I_d),\qquad Y_t=\ip{X_t}{s},\qquad 1\le t\le T, \] with the \(X_t\) independent. The learner reads these pairs in order. At every sample index its persistent state has at most \(2^M\) possible values. Its transition and stopping rules may depend on the index, \(d,M,T,\epsilon\), the current state, the entire current pair, and fresh randomness. Computation within a transition is unrestricted. All information retained for a later sample must be in the finite state. The learner stops at an index \(\tau\in\{0,\ldots,T\}\) and returns \(\widehat s\in S^{d-1}\). Its output law depends only on the terminal state, \(\tau\), and fresh randomness. Thus the last pair affects the output only through the terminal state. A shared random seed may choose the rules before the stream starts. The pair consisting of this seed and the initial state is jointly independent of the signal and all sample rows; in particular, conditional on the seed, initialization carries no signal or sample information. Conditional on the seed, fresh transition and output randomness has no additional signal or sample information, and the rules have only the arguments just listed. The original randomized experiment is required to be jointly measurable in the signal, pre-generated rows, seed, initialization, and fresh transition and output randomness. For almost every fixed seed, pair-input probabilities may be Borel measurable, or measurable in the completion of \(\gamma_d(dx)\,dy\), where \(\gamma_d=N(0,I_d)\) and \(dy\) is Lebesgue measure. Joint measurability of the original experiment is required also in the latter case; separate measurability assertions for individual seeds do not by themselves define its mixture. The sample bound \(T\) is a deterministic finite horizon. \end{definition} The model charges persistent bits rather than real registers. It permits a different rule at every index and does not limit the work performed on the current sample. [statement] [statement] \begin{proof} Integrate the displayed guarantee over a uniform signal, then apply Theorem~\ref{s:main}. \end{proof} The dimension threshold is uniform in the accuracy; no relation between accuracy and memory is assumed. For example, when \(\epsilon=d^{-r}\le1/10\), the conclusion is \(T\ge2^{-16}r d\log_2 d\). \subsection*{Context and ancestry} Memory restrictions affect statistical risk already in sparse noisy regression, as shown by Steinhardt and Duchi \cite[Section~1.1, equation~(2)]{SteinhardtDuchi2015}. Steinhardt, Valiant, and Wager related bounded-memory inference to communication and statistical-query models and posed a quadratic-memory versus exponential-sample question for parity learning \cite[Section~1.1, Conjecture~1]{SVW2016}. Raz established the qualitative separation through finite-width branching programs \cite[Theorem~1]{Raz2016}. These works make explicit the distinction between information in a current observation and information that a finite state can carry forward. The closest continuous-regression comparison among these sources is Sharan, Sidford, and Valiant \cite{SSV2019}. Their Theorem~1 uses independent isotropic Gaussian covariates and independent uniform additive noise of half-width \(2^{-d/5}\). At Euclidean accuracy \(\epsilon=d^{-r}\), for \(r\le O(d/\l […]
+[theorem] [Explicit noiseless precision bound]\label{s:main} Let \(M:\mathbb N\to\mathbb Z_{\ge0}\) satisfy \(M(d)=o(d^2)\). There is a dimension threshold depending only on this memory sequence such that, for every larger \(d\), every \(0<\epsilon\le1/10\), and every learner in Definition~\ref{s:model}, the following implication holds. If \(S\) is uniform on \(S^{d-1}\), independently of the Gaussian rows and learner randomness, and \[ \Prob\{\arccos\ip{\widehat s}{S}\le\epsilon\}\ge\frac23, \] then \begin{equation}\label{s:main-bound} T\ge 2^{-16}d\log_2(1/\epsilon). \end{equation}
+[corollary] [Guarantees for every signal]\label{s:worst-signal} Under the memory assumption of Theorem~\ref{s:main}, suppose a learner satisfies \[ \Prob_s\{\arccos\ip{\widehat s}{s}\le\epsilon\}\ge\frac23 \qquad\text{for every }s\in S^{d-1}, \] where \(\Prob_s\) averages its observations and randomness at the fixed signal \(s\). Then \eqref{s:main-bound} holds at the same dimension threshold.
+
+=== LEAN COMPARATOR MemoryPrecision (exact formal statement)
+import Mathlib
+namespace OAI
+open MeasureTheory ProbabilityTheory Set Filter EuclideanGeometry
+open scoped ENNReal NNReal RealInnerProductSpace Topology Pointwise
+noncomputable section
+universe u v
+namespace MemoryPrecision.Kernel
+abbrev Vector (d : ℕ) := EuclideanSpace ℝ (Fin d)
+abbrev Sphere (d : ℕ) := Metric.sphere (0 : Vector d) 1
+abbrev State (M : ℕ) := Fin (2^M)
+abbrev Action (M : ℕ) := Bool × State M
+abbrev Observations (d k : ℕ) := Fin k → (Vector d × ℝ)
+abbrev Rows (d k : ℕ) := Fin k → Vector d
+def UniformSphere (d : ℕ) : Measure (Sphere d) :=
+  let euclideanGroup : NormedAddCommGroup (Vector d) :=
+    PiLp.normedAddCommGroup
+      (@OfNat.ofNat ℝ≥0∞ 2
+        (@instOfNatAtLeastTwo ℝ≥0∞ 2 ENNReal.instAddCommMonoidWithOne.toNatCast inferInstance))
+      (fun _ : Fin d => ℝ)
+  let euclideanInner := PiLp.innerProductSpace (𝕜 := ℝ) (fun _ : Fin d => ℝ)
+  let σ := @Measure.toSphere (Vector d) euclideanGroup
+    (@InnerProductSpace.toNormedSpace ℝ (Vector d) _
+      euclideanGroup.toSeminormedAddCommGroup euclideanInner) inferInstance
+    (@volume (Vector d) (@measureSpaceOfInnerProductSpace (Vector d)
+      euclideanGroup euclideanInner inferInstance inferInstance inferInstance))
+  (σ Set.univ)⁻¹ • σ
+def RowLaw (d k : ℕ) : @Measure (Rows d k)
+    (@MeasurableSpace.pi (Fin k) (fun _ => Vector d)
+      (fun _ => @WithLp.measurableSpace
+        (@OfNat.ofNat ℝ≥0∞ 2
+          (@instOfNatAtLeastTwo ℝ≥0∞ 2 ENNReal.instAddCommMonoidWithOne.toNatCast inferInstance))
+        (Fin d → ℝ) inferInstance)) :=
+  let euclideanMeasurable := @WithLp.measurableSpace
+    (@OfNat.ofNat ℝ≥0∞ 2
+      (@instOfNatAtLeastTwo ℝ≥0∞ 2 ENNReal.instAddCommMonoidWithOne.toNatCast inferInstance))
+    (Fin d → ℝ) inferInstance
+  @Measure.pi (Fin k) (fun _ => Vector d) inferInstance (fun _ => euclideanMeasurable)
+    (fun _ => @stdGaussian (Vector d)
+    (PiLp.normedAddCommGroup
+      (@OfNat.ofNat ℝ≥0∞ 2
+        (@instOfNatAtLeastTwo ℝ≥0∞ 2 ENNReal.instAddCommMonoidWithOne.toNatCast inferInstance))
+      (fun _ : Fin d => ℝ))
+    (PiLp.innerProductSpace (𝕜 := ℝ) (fun _ : Fin d => ℝ)) inferInstance euclideanMeasurable)
+def ObservationReference (d : ℕ) : Measure (Vector d × ℝ) :=
+  (stdGaussian (Vector d)).prod volume
+structure Policy (d M T : ℕ) where
+  initial : Action M → ℝ≥0∞
+  initial_sum : ∑ a, initial a = 1
+  transition : ℕ → State M → (Vector d × ℝ) → Action M → ℝ≥0∞
+  transition_sum : ∀ t j obs, ∑ a, transition t j obs a = 1
+  output : ℕ → State M → Measure (Sphere d)
+  output_probability : ∀ t j, IsProbabilityMeasure (output t j)
+namespace Policy
+def Completed {d M T : ℕ} (K : Policy d M T) : Prop :=
+  ∀ t j a, AEMeasurable (fun obs => K.transition t j obs a) (ObservationReference d)
+def eval {d M T : ℕ} {X : Type*} (K : Policy d M T)
+    (w : ℕ → State M → X → ℝ≥0∞) (n : ℕ) :
+    (k : ℕ) → State M → X → Observations d k → ℝ≥0∞
+  | 0, j, s, _ => w n j s
+  | k+1, j, s, obs => ∑ a : Action M, K.transition (n+1) j (obs 0) a *
+      if a.1 then w (n+1) a.2 s else K.eval w (n+1) k a.2 s (Fin.tail obs)
+def pathValue {d M T : ℕ} {X : Type*} (K : Policy d M T)
+    (w : ℕ → State M → X → ℝ≥0∞) (s : X) (obs : Observations d T) : ℝ≥0∞ :=
+  ∑ a : Action M, K.initial a * if a.1 then w 0 a.2 s else K.eval w 0 T a.2 s obs
+def records {d T : ℕ} (s : Sphere d) (A : Rows d T) : Observations d T :=
+  fun index => (A index, @inner ℝ (EuclideanSpace ℝ (Fin d))
+    (@InnerProductSpace.toInner ℝ (EuclideanSpace ℝ (Fin d)) _
+      (PiLp.seminormedAddCommGroup
+        (@OfNat.ofNat ℝ≥0∞ 2
+          (@instOfNatAtLeastTwo ℝ≥0∞ 2 ENNReal.instAddCommMonoidWithOne.toNatCast inferInstance))
+        (fun _ : Fin d => ℝ))
+      (PiLp.innerProductSpace (𝕜 := ℝ) (fun _ : Fin d => ℝ))) s.val (A index))
+def outputTest {d M T : ℕ} (K : Policy d M T) (f : Sphere d × Sphere d → ℝ≥0∞)
+    (t : ℕ) (j : State M) (s : Sphere d) : ℝ≥0∞ :=
+  ∫⁻ v, f (s,v) ∂K.output t j
+def angleTest {d : ℕ} (ε : ℝ)
+    (point : MemoryPrecision.Kernel.Sphere d × MemoryPrecision.Kernel.Sphere d) : ℝ≥0∞ :=
+  @it
+[…]
+
+=== LEAN COMPARATOR NoiselessRegression (exact formal statement)
+import Mathlib
+namespace OAI
+open MeasureTheory ProbabilityTheory Set Filter
+open scoped ENNReal NNReal RealInnerProductSpace
+noncomputable section
+universe u
+namespace NoiselessRegression
+abbrev Vector (d : ℕ) := EuclideanSpace ℝ (Fin d)
+abbrev UnitSphere (d : ℕ) := Metric.sphere (0 : Vector d) 1
+abbrev State (M : ℕ) := Fin (2 ^ M)
+abbrev Samples (d T : ℕ) := Fin T → Vector d
+def uniformSphere (d : ℕ) : Measure (UnitSphere d) :=
+  let σ := (volume : Measure (Vector d)).toSphere
+  (σ Set.univ)⁻¹ • σ
+def sampleLaw (d T : ℕ) : Measure (Samples d T) :=
+  Measure.pi fun _ => stdGaussian (Vector d)
+def observationReference (d : ℕ) : Measure (Vector d × ℝ) :=
+  (stdGaussian (Vector d)).prod volume
+structure Learner (d M T : ℕ) (Ω : Type u) where
+  initialChoice : Ω → Bool × State M
+  transition : ℕ → Ω → State M → (Vector d × ℝ) → Bool × State M
+  output : ℕ → Ω → State M → UnitSphere d
+namespace Learner
+abbrev RunStatus (M : ℕ) := Sum (State M) (ℕ × State M)
+def start {d M T : ℕ} {Ω : Type u} (L : Learner d M T Ω) (ω : Ω) :
+    RunStatus M :=
+  let a := L.initialChoice ω
+  if a.1 then .inr (0, a.2) else .inl a.2
+def run {d M T : ℕ} {Ω : Type u} (L : Learner d M T Ω)
+    (s : UnitSphere d) (ω : Ω) (x : Samples d T) : ℕ → RunStatus M
+  | 0 => L.start ω
+  | n + 1 =>
+    match L.run s ω x n with
+    | .inr done => .inr done
+    | .inl state =>
+      if hn : n < T then
+        let row := x ⟨n, hn⟩
+        let a := L.transition (n + 1) ω state (row, ⟪row, s.val⟫)
+        if a.1 then .inr (n + 1, a.2) else .inl a.2
+      else .inl state
+def terminal {d M T : ℕ} {Ω : Type u} (L : Learner d M T Ω)
+    (s : UnitSphere d) (ω : Ω) (x : Samples d T) : ℕ × State M :=
+  match L.run s ω x T with
+  | .inl state => (T, state)
+  | .inr done => done
+def estimate {d M T : ℕ} {Ω : Type u} (L : Learner d M T Ω)
+    (s : UnitSphere d) (ω : Ω) (x : Samples d T) : UnitSphere d :=
+  let a := L.terminal s ω x
+  L.output a.1 ω a.2
+structure Admissible {d M T : ℕ} {Ω : Type u} [MeasurableSpace Ω]
+    (L : Learner d M T Ω) (ρ : Measure Ω) : Prop where
+  initialChoice : AEMeasurable L.initialChoice ρ
+  transition : ∀ t a, AEMeasurable (fun z : Ω × (Vector d × ℝ) =>
+    L.transition t z.1 a z.2) (ρ.prod (observationReference d))
+  output : ∀ t a, AEMeasurable (fun ω => L.output t ω a) ρ
+  fixed_experiment : ∀ s, AEMeasurable (fun z : Ω × Samples d T =>
+    L.estimate s z.1 z.2) (ρ.prod (sampleLaw d T))
+  uniform_experiment : AEMeasurable
+    (fun z : UnitSphere d × (Ω × Samples d T) => L.estimate z.1 z.2.1 z.2.2)
+    ((uniformSphere d).prod (ρ.prod (sampleLaw d T)))
+def angularError {d : ℕ} (s ŝ : UnitSphere d) : ℝ :=
+  Real.arccos ⟪ŝ.val, s.val⟫
+def success {d M T : ℕ} {Ω : Type u} [MeasurableSpace Ω]
+    (L : Learner d M T Ω) (ρ : Measure Ω) (ε : ℝ) (s : UnitSphere d) : ℝ≥0∞ :=
+  (ρ.prod (sampleLaw d T))
+    {z | angularError s (L.estimate s z.1 z.2) ≤ ε}
+def uniformSuccess {d M T : ℕ} {Ω : Type u} [MeasurableSpace Ω]
+    (L : Learner d M T Ω) (ρ : Measure Ω) (ε : ℝ) : ℝ≥0∞ :=
+  ((uniformSphere d).prod (ρ.prod (sampleLaw d T)))
+    {z | angularError z.1 (L.estimate z.1 z.2.1 z.2.2) ≤ ε}
+end Learner
+def SubquadraticMemory : Prop :=
+  ∃ c : ℝ, 0 < c ∧ ∀ M : ℕ → ℕ,
+    Asymptotics.IsLittleO atTop (fun d => (M d : ℝ)) (fun d => (d : ℝ) ^ 2) →
+    ∃ d₀ : ℕ, ∀ d : ℕ, d₀ ≤ d → ∀ T : ℕ, ∀ ε : ℝ,
+    0 < ε → ε ≤ 1 / 10 →
+    ∀ (Ω : Type u) [MeasurableSpace Ω] (ρ : Measure Ω), IsProbabilityMeasure ρ →
+    ∀ L : Learner d (M d) T Ω, L.Admissible ρ →
+    (((2 : ℕ) / (3 : ℕ) : ℝ≥0∞) ≤ L.uniformSuccess ρ ε ∨
+      ∀ s, ((2 : ℕ) / (3 : ℕ) : ℝ≥0∞) ≤ L.success ρ ε s) →
+    c * (d : ℝ) * Real.log (1 / ε) ≤ (T : ℝ)
+def FixedQuadraticMemory : Prop :=
+  ∀ A₀ : ℝ, 0 < A₀ → ∃ c : ℝ, 0 < c ∧ ∃ d₀ : ℕ,
+    ∀ d : ℕ, d₀ ≤ d → ∀ M T : ℕ, (M : ℝ) ≤ A₀ * (d : ℝ) ^ 2 →
+    ∀ ε : ℝ, 0 < ε → ε ≤ 1 / 10 →
+    ∀ (Ω : Type u) [MeasurableSpace Ω] (ρ : Measure Ω), IsProbabilityMeasure ρ →
+    ∀ L : Learner d M T Ω, L.Admissible ρ →
+    ((2 : ℕ) / (3 : ℕ) : ℝ≥0∞) ≤ L.uniformSuccess ρ ε →
+    c * (d :
+[…]
+
+=== LEAN COMPARATOR PosteriorReplicas (exact formal statement)
+import Mathlib
+namespace OAI
+section
+open MeasureTheory ProbabilityTheory InformationTheory Set Matrix
+open scoped ENNReal NNReal RealInnerProductSpace Classical
+noncomputable section
+namespace PosteriorReplicas
+abbrev Vec (d : ℕ) := EuclideanSpace ℝ (Fin d)
+abbrev Rows (d k : ℕ) := Fin k → Vec d
+abbrev Labels (k : ℕ) := Fin k → ℝ
+abbrev Data (d k : ℕ) := Rows d k × Labels k
+abbrev Tuple (d m : ℕ) := Fin (m + 1) → Vec d
+def sphereLaw (d : ℕ) : Measure (Vec d) :=
+  let σ := (volume : Measure (Vec d)).toSphere
+  ((σ univ)⁻¹ • σ).map Subtype.val
+def gaussianRows (d k : ℕ) : Measure (Rows d k) :=
+  Measure.pi fun _ => stdGaussian (Vec d)
+instance (d k : ℕ) : IsProbabilityMeasure (gaussianRows d k) := by
+  unfold gaussianRows
+  infer_instance
+def labels {d k : ℕ} (A : Rows d k) (s : Vec d) : Labels k :=
+  fun i => ⟪A i, s⟫
+lemma measurable_labels {d k : ℕ} :
+    Measurable (fun z : Rows d k × Vec d => labels z.1 z.2) := by
+  unfold labels
+  fun_prop
+def messageKernel {d k N : ℕ} (κ : Kernel (Data d k) (Fin N)) :
+    Kernel (Vec d × Rows d k) (Fin N) :=
+  κ.comap (fun z => (z.2, labels z.2 z.1)) (by
+    unfold labels
+    fun_prop)
+instance {d k N : ℕ} (κ : Kernel (Data d k) (Fin N)) [IsMarkovKernel κ] :
+    IsMarkovKernel (messageKernel κ) := by
+  unfold messageKernel
+  infer_instance
+def signalMessageLaw {d k N : ℕ} (p : Measure (Vec d))
+    (κ : Kernel (Data d k) (Fin N)) : Measure (Vec d × Fin N) :=
+  ((p.prod (gaussianRows d k)) ⊗ₘ messageKernel κ).map
+    (fun z => (z.1.1, z.2))
+instance {d k N : ℕ} (p : Measure (Vec d)) [IsProbabilityMeasure p]
+    (κ : Kernel (Data d k) (Fin N)) [IsMarkovKernel κ] :
+    IsProbabilityMeasure (signalMessageLaw p κ) := by
+  unfold signalMessageLaw
+  infer_instance
+def sideLaw {d N : ℕ} (ℓ : ℕ) (q : Measure (Vec d × Fin N)) :
+    Measure (Data d ℓ × (Vec d × Fin N)) :=
+  ((gaussianRows d ℓ).prod q).map
+    (fun z => ((z.1, labels z.1 z.2.1), z.2))
+instance {d N : ℕ} (ℓ : ℕ) (q : Measure (Vec d × Fin N)) [IsProbabilityMeasure q] :
+    IsProbabilityMeasure (sideLaw ℓ q) := by
+  unfold sideLaw
+  infer_instance
+def messageEntropy {d N : ℕ} (q : Measure (Vec d × Fin N)) : ℝ :=
+  ∑ w : Fin N, -(q.snd.real {w}) * Real.log (q.snd.real {w})
+def conditionalInformation {d ℓ N : ℕ} [NeZero N]
+    (μ : Measure (Data d ℓ × (Vec d × Fin N))) [IsFiniteMeasure μ] : ℝ≥0∞ :=
+  klDiv μ (μ.fst ⊗ₘ (μ.condKernel.fst ×ₖ μ.condKernel.snd))
+def GaussianReplicaBlock : Prop :=
+  ∃ C : ℝ, 0 < C ∧ ∃ d₀ : ℕ, ∀ d : ℕ, d₀ ≤ d →
+    let k := 2 * (d / 16)
+    let t := k + 1
+    let ℓ := 4 * k
+    ∀ (p : Measure (Vec d)) [IsProbabilityMeasure p]
+      (f : Vec d → ℝ) (L : ℝ),
+      Measurable f → (∀ x, 0 ≤ f x ∧ f x ≤ L) →
+      p = (sphereLaw d).withDensity (fun x => ENNReal.ofReal (f x)) →
+      ∀ (N : ℕ) [NeZero N] (κ : Kernel (Data d k) (Fin N)) [IsMarkovKernel κ],
+        conditionalInformation (sideLaw ℓ (signalMessageLaw p κ)) ≤
+          ENNReal.ofReal (messageEntropy (signalMessageLaw p κ) / (t : ℝ) +
+            C * (d : ℝ) + C * Real.log (2 + Real.log L))
+inductive BaseLaw where
+  | spherical
+  | gaussian
+  deriving DecidableEq
+def BaseLaw.measure (base : BaseLaw) (d : ℕ) : Measure (Vec d) :=
+  match base with
+  | .spherical => sphereLaw d
+  | .gaussian => stdGaussian (Vec d)
+def rowGram {d k : ℕ} (A : Rows d k) : Matrix (Fin k) (Fin k) ℝ :=
+  fun i j => ⟪A i, A j⟫
+def liftLabel {d k : ℕ} (A : Rows d k) (y : Labels k) : Vec d :=
+  ∑ i, ((rowGram A)⁻¹ *ᵥ y) i • A i
+def kernelComponent {d k : ℕ} (A : Rows d k) (x : Vec d) : Vec d :=
+  x - liftLabel A (labels A x)
+def baseFiber {d k : ℕ} (base : BaseLaw) (A : Rows d k) (y : Labels k) :
+    Measure (Vec d) :=
+  match base with
+  | .gaussian => (stdGaussian (Vec d)).map
+      (fun x => liftLabel A y + kernelComponent A x)
+  | .spherical => (stdGaussian (Vec d)).map
+      (fun x => liftLabel A y +
+        (Real.sqrt (1 - ‖liftLabel A y‖ ^ 2) / ‖kernelComponent A x‖) •
+          kernelComponent A x)
+def baseDensity {d k : ℕ} (base : BaseLaw) (A : Rows d k) (y : Labels k) : ℝ≥0∞
+[…]
+
+=== LEAN COMPARATOR GaussianFiniteEntropy (exact formal statement)
+import Mathlib
+namespace OAI
+open MeasureTheory ProbabilityTheory Set
+open scoped BigOperators ENNReal
+namespace RepeatedLocalization
+abbrev Coordinate (n : ℕ) := Fin n → ℝ
+abbrev GaussianBlock (n : ℕ) := Fin (n / 16) → Fin (n + 1) → ℝ
+abbrev Label (n : ℕ) := Fin (n / 16) → ℝ
+abbrev History (N t : ℕ) := Fin t → Fin N
+abbrev Cell (n : ℕ) := Σ J : ℕ, Fin n → Fin (2 ^ J)
+instance cellMeasurableSpace (n : ℕ) : MeasurableSpace (Cell n) := ⊤
+noncomputable def initialCube (n : ℕ) : Set (Coordinate n) :=
+  Set.pi Set.univ (fun _ => Set.Ico (-1 / (2 * Real.sqrt n)) (1 / (2 * Real.sqrt n)))
+noncomputable def cubePrior (n : ℕ) : Measure (Coordinate n) :=
+  ProbabilityTheory.cond volume (initialCube n)
+noncomputable def chart {n : ℕ} (z : Coordinate n) : Fin (n + 1) → ℝ :=
+  Fin.lastCases (Real.sqrt (1 - ∑ a, (z a) ^ 2)) z
+noncomputable def cellSet {n : ℕ} (Q : Cell n) : Set (Coordinate n) :=
+  {z | ∀ a, -1 / (2 * Real.sqrt n) + (Q.2 a : ℝ) / (Real.sqrt n * (2 : ℝ) ^ Q.1) ≤ z a ∧
+    z a < -1 / (2 * Real.sqrt n) + ((Q.2 a : ℝ) + 1) / (Real.sqrt n * (2 : ℝ) ^ Q.1)}
+def rootCell (n : ℕ) : Cell n := ⟨0, fun _ => 0⟩
+noncomputable def gaussianBlockLaw (n : ℕ) : Measure (GaussianBlock n) :=
+  Measure.pi (fun _ => Measure.pi (fun _ => gaussianReal 0 1))
+noncomputable def exactLabel {n : ℕ} (X : GaussianBlock n) (z : Coordinate n) : Label n :=
+  fun row => ∑ a, X row a * chart z a
+structure BlockRule (n N : ℕ) where
+  prob : (GaussianBlock n × Label n) → Fin N → ℝ
+  measurable_prob : ∀ w, Measurable (fun data => prob data w)
+  nonneg : ∀ data w, 0 ≤ prob data w
+  sum_one : ∀ data, ∑ w, prob data w = 1
+abbrev Rules (n N t : ℕ) := ∀ i : Fin t, History N i.val → BlockRule n N
+def past {N t : ℕ} (w : History N t) (i : Fin t) : History N i.val :=
+  fun j => w ⟨j.val, Nat.lt_trans j.isLt i.isLt⟩
+def through {N t : ℕ} (w : History N t) (i : Fin t) : History N (i.val + 1) :=
+  fun j => w ⟨j.val, Nat.lt_of_lt_of_le j.isLt i.isLt⟩
+noncomputable def blockProbability {n N : ℕ} (rule : BlockRule n N)
+    (z : Coordinate n) (w : Fin N) : ℝ :=
+  ∫ X, rule.prob (X, exactLabel X z) w ∂gaussianBlockLaw n
+noncomputable def historyLikelihood {n N t : ℕ} (rules : Rules n N t)
+    (z : Coordinate n) (w : History N t) : ℝ :=
+  ∏ i, blockProbability (rules i (past w i)) z (w i)
+noncomputable def experimentLaw {n N t : ℕ} (rules : Rules n N t) :
+    Measure (Coordinate n × History N t) :=
+  ∑ w : History N t,
+    ((cubePrior n).withDensity (fun z => ENNReal.ofReal (historyLikelihood rules z w))).map
+      (fun z => (z, w))
+abbrev Disclosure (n N t : ℕ) := ∀ i : Fin t, Coordinate n → History N (i.val + 1) → Cell n
+def ValidDisclosure {n N t : ℕ} (Q : Disclosure n N t) : Prop :=
+  (∀ i, Measurable (fun zh : Coordinate n × History N (i.val + 1) => Q i zh.1 zh.2)) ∧
+  (∀ i, (Set.range (fun zh : Coordinate n × History N (i.val + 1) => Q i zh.1 zh.2)).Finite) ∧
+  (∀ z ∈ initialCube n, ∀ w : History N t, ∀ i,
+    z ∈ cellSet (Q i z (through w i)) ∧ cellSet (Q i z (through w i)) ⊆ initialCube n) ∧
+  (∀ z ∈ initialCube n, ∀ w : History N t, ∀ i j : Fin t, i ≤ j →
+    cellSet (Q j z (through w j)) ⊆ cellSet (Q i z (through w i)))
+noncomputable def transcriptMap {n N t : ℕ} (Q : Disclosure n N t)
+    (zw : Coordinate n × History N t) : Coordinate n × (History N t × (Fin t → Cell n)) :=
+  (zw.1, (zw.2, fun i => Q i zw.1 (through zw.2 i)))
+noncomputable def augmentedLaw {n N t : ℕ} (rules : Rules n N t) (Q : Disclosure n N t) :=
+  (experimentLaw rules).map (transcriptMap Q)
+noncomputable def mutualInformation {α β : Type*} [MeasurableSpace α] [MeasurableSpace β]
+    (μ : Measure (α × β)) : ℝ≥0∞ :=
+  InformationTheory.klDiv μ ((μ.map Prod.fst).prod (μ.map Prod.snd))
+noncomputable def finalLevel {n N t : ℕ} (Q : Disclosure n N t)
+    (zw : Coordinate n × History N t) : ℕ :=
+  if ht : 0 < t then
+    let i : Fin t := ⟨t - 1, by omega⟩
+    (Q i zw.1 (through zw.2 i)).1
+  else 0
+def MainStatement : Prop :=
+  ∃ c : ℝ, 0 < c ∧ ∃ n₀ : ℕ, ∀ C₀ : ℝ, 0 < C₀ →
+    ∃ C : ℝ, 0 < C ∧ ∀ (n N t : ℕ), 
+[…]
+
+=== LEAN COMPARATOR GaussianInformation (exact formal statement)
+import Mathlib
+namespace OAI
+open MeasureTheory ProbabilityTheory Set
+open scoped BigOperators ENNReal
+namespace RepeatedLocalization
+abbrev Coordinate (n : ℕ) := Fin n → ℝ
+abbrev GaussianBlock (n : ℕ) := Fin (n / 16) → Fin (n + 1) → ℝ
+abbrev Label (n : ℕ) := Fin (n / 16) → ℝ
+abbrev History (N t : ℕ) := Fin t → Fin N
+abbrev Cell (n : ℕ) := Σ J : ℕ, Fin n → Fin (2 ^ J)
+instance cellMeasurableSpace (n : ℕ) : MeasurableSpace (Cell n) := ⊤
+noncomputable def initialCube (n : ℕ) : Set (Coordinate n) :=
+  Set.pi Set.univ (fun _ => Set.Ico (-1 / (2 * Real.sqrt n)) (1 / (2 * Real.sqrt n)))
+noncomputable def cubePrior (n : ℕ) : Measure (Coordinate n) :=
+  ProbabilityTheory.cond volume (initialCube n)
+noncomputable def chart {n : ℕ} (z : Coordinate n) : Fin (n + 1) → ℝ :=
+  Fin.lastCases (Real.sqrt (1 - ∑ a, (z a) ^ 2)) z
+noncomputable def cellSet {n : ℕ} (Q : Cell n) : Set (Coordinate n) :=
+  {z | ∀ a, -1 / (2 * Real.sqrt n) + (Q.2 a : ℝ) / (Real.sqrt n * (2 : ℝ) ^ Q.1) ≤ z a ∧
+    z a < -1 / (2 * Real.sqrt n) + ((Q.2 a : ℝ) + 1) / (Real.sqrt n * (2 : ℝ) ^ Q.1)}
+def rootCell (n : ℕ) : Cell n := ⟨0, fun _ => 0⟩
+noncomputable def gaussianBlockLaw (n : ℕ) : Measure (GaussianBlock n) :=
+  Measure.pi (fun _ => Measure.pi (fun _ => gaussianReal 0 1))
+noncomputable def exactLabel {n : ℕ} (X : GaussianBlock n) (z : Coordinate n) : Label n :=
+  fun row => ∑ a, X row a * chart z a
+structure BlockRule (n N : ℕ) where
+  prob : (GaussianBlock n × Label n) → Fin N → ℝ
+  measurable_prob : ∀ w, Measurable (fun data => prob data w)
+  nonneg : ∀ data w, 0 ≤ prob data w
+  sum_one : ∀ data, ∑ w, prob data w = 1
+abbrev Rules (n N t : ℕ) := ∀ i : Fin t, History N i.val → BlockRule n N
+def past {N t : ℕ} (w : History N t) (i : Fin t) : History N i.val :=
+  fun j => w ⟨j.val, Nat.lt_trans j.isLt i.isLt⟩
+def through {N t : ℕ} (w : History N t) (i : Fin t) : History N (i.val + 1) :=
+  fun j => w ⟨j.val, Nat.lt_of_lt_of_le j.isLt i.isLt⟩
+noncomputable def blockProbability {n N : ℕ} (rule : BlockRule n N)
+    (z : Coordinate n) (w : Fin N) : ℝ :=
+  ∫ X, rule.prob (X, exactLabel X z) w ∂gaussianBlockLaw n
+noncomputable def historyLikelihood {n N t : ℕ} (rules : Rules n N t)
+    (z : Coordinate n) (w : History N t) : ℝ :=
+  ∏ i, blockProbability (rules i (past w i)) z (w i)
+noncomputable def experimentLaw {n N t : ℕ} (rules : Rules n N t) :
+    Measure (Coordinate n × History N t) :=
+  ∑ w : History N t,
+    ((cubePrior n).withDensity (fun z => ENNReal.ofReal (historyLikelihood rules z w))).map
+      (fun z => (z, w))
+abbrev Disclosure (n N t : ℕ) := ∀ i : Fin t, Coordinate n → History N (i.val + 1) → Cell n
+def ValidDisclosure {n N t : ℕ} (Q : Disclosure n N t) : Prop :=
+  (∀ i, Measurable (fun zh : Coordinate n × History N (i.val + 1) => Q i zh.1 zh.2)) ∧
+  (∀ i, (Set.range (fun zh : Coordinate n × History N (i.val + 1) => Q i zh.1 zh.2)).Finite) ∧
+  (∀ z ∈ initialCube n, ∀ w : History N t, ∀ i,
+    z ∈ cellSet (Q i z (through w i)) ∧ cellSet (Q i z (through w i)) ⊆ initialCube n) ∧
+  (∀ z ∈ initialCube n, ∀ w : History N t, ∀ i j : Fin t, i ≤ j →
+    cellSet (Q j z (through w j)) ⊆ cellSet (Q i z (through w i)))
+noncomputable def transcriptMap {n N t : ℕ} (Q : Disclosure n N t)
+    (zw : Coordinate n × History N t) : Coordinate n × (History N t × (Fin t → Cell n)) :=
+  (zw.1, (zw.2, fun i => Q i zw.1 (through zw.2 i)))
+noncomputable def augmentedLaw {n N t : ℕ} (rules : Rules n N t) (Q : Disclosure n N t) :=
+  (experimentLaw rules).map (transcriptMap Q)
+noncomputable def mutualInformation {α β : Type*} [MeasurableSpace α] [MeasurableSpace β]
+    (μ : Measure (α × β)) : ℝ≥0∞ :=
+  InformationTheory.klDiv μ ((μ.map Prod.fst).prod (μ.map Prod.snd))
+noncomputable def finalLevel {n N t : ℕ} (Q : Disclosure n N t)
+    (zw : Coordinate n × History N t) : ℕ :=
+  if ht : 0 < t then
+    let i : Fin t := ⟨t - 1, by omega⟩
+    (Q i zw.1 (through zw.2 i)).1
+  else 0
+def MainStatement : Prop :=
+  ∃ c : ℝ, 0 < c ∧ ∃ n₀ : ℕ, ∀ C₀ : ℝ, 0 < C₀ →
+    ∃ C : ℝ, 0 < C ∧ ∀ (n N t : ℕ), 
+[…]
+
+=== LEAN COMPARATOR ProjectionMoments (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open MeasureTheory ProbabilityTheory Set Filter InnerProductSpace
+open scoped ENNReal NNReal RealInnerProductSpace Topology
+universe u
+namespace NoiselessRegression
+section
+abbrev Vector (d : ℕ) := EuclideanSpace ℝ (Fin d)
+abbrev UnitSphere (d : ℕ) := Metric.sphere (0 : Vector d) 1
+abbrev State (M : ℕ) := Fin (2 ^ M)
+abbrev Samples (d T : ℕ) := Fin T → Vector d
+def uniformSphere (d : ℕ) : Measure (UnitSphere d) :=
+  let σ := (volume : Measure (Vector d)).toSphere
+  (σ Set.univ)⁻¹ • σ
+def sampleLaw (d T : ℕ) : Measure (Samples d T) :=
+  Measure.pi fun _ => stdGaussian (Vector d)
+def observationReference (d : ℕ) : Measure (Vector d × ℝ) :=
+  (stdGaussian (Vector d)).prod volume
+structure Learner (d M T : ℕ) (Ω : Type u) where
+  initialChoice : Ω → Bool × State M
+  transition : ℕ → Ω → State M → (Vector d × ℝ) → Bool × State M
+  output : ℕ → Ω → State M → UnitSphere d
+namespace Learner
+abbrev RunStatus (M : ℕ) := Sum (State M) (ℕ × State M)
+def start {d M T : ℕ} {Ω : Type u} (L : Learner d M T Ω) (ω : Ω) :
+    RunStatus M :=
+  let a := L.initialChoice ω
+  if a.1 then .inr (0, a.2) else .inl a.2
+def run {d M T : ℕ} {Ω : Type u} (L : Learner d M T Ω)
+    (s : UnitSphere d) (ω : Ω) (x : Samples d T) : ℕ → RunStatus M
+  | 0 => L.start ω
+  | n + 1 =>
+    match L.run s ω x n with
+    | .inr done => .inr done
+    | .inl state =>
+      if hn : n < T then
+        let row := x ⟨n, hn⟩
+        let a := L.transition (n + 1) ω state (row, ⟪row, s.val⟫)
+        if a.1 then .inr (n + 1, a.2) else .inl a.2
+      else .inl state
+def terminal {d M T : ℕ} {Ω : Type u} (L : Learner d M T Ω)
+    (s : UnitSphere d) (ω : Ω) (x : Samples d T) : ℕ × State M :=
+  match L.run s ω x T with
+  | .inl state => (T, state)
+  | .inr done => done
+def estimate {d M T : ℕ} {Ω : Type u} (L : Learner d M T Ω)
+    (s : UnitSphere d) (ω : Ω) (x : Samples d T) : UnitSphere d :=
+  let a := L.terminal s ω x
+  L.output a.1 ω a.2
+structure Admissible {d M T : ℕ} {Ω : Type u} [MeasurableSpace Ω]
+    (L : Learner d M T Ω) (ρ : Measure Ω) : Prop where
+  initialChoice : AEMeasurable L.initialChoice ρ
+  transition : ∀ t a, AEMeasurable (fun z : Ω × (Vector d × ℝ) =>
+    L.transition t z.1 a z.2) (ρ.prod (observationReference d))
+  output : ∀ t a, AEMeasurable (fun ω => L.output t ω a) ρ
+  fixed_experiment : ∀ s, AEMeasurable (fun z : Ω × Samples d T =>
+    L.estimate s z.1 z.2) (ρ.prod (sampleLaw d T))
+  uniform_experiment : AEMeasurable
+    (fun z : UnitSphere d × (Ω × Samples d T) => L.estimate z.1 z.2.1 z.2.2)
+    ((uniformSphere d).prod (ρ.prod (sampleLaw d T)))
+def angularError {d : ℕ} (s ŝ : UnitSphere d) : ℝ :=
+  Real.arccos ⟪ŝ.val, s.val⟫
+def uniformSuccess {d M T : ℕ} {Ω : Type u} [MeasurableSpace Ω]
+    (L : Learner d M T Ω) (ρ : Measure Ω) (ε : ℝ) : ℝ≥0∞ :=
+  ((uniformSphere d).prod (ρ.prod (sampleLaw d T)))
+    {z | angularError z.1 (L.estimate z.1 z.2.1 z.2.2) ≤ ε}
+end Learner
+open scoped Topology
+open InnerProductSpace
+section SphereBounds
+open scoped Pointwise
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+  [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E]
+def sphereLaw : Measure (Metric.sphere (0 : E) 1) :=
+  let σ := (volume : Measure E).toSphere
+  (σ Set.univ)⁻¹ • σ
+end SphereBounds
+open scoped Pointwise
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+  [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E]
+def ambientSphereLaw : Measure E := (sphereLaw (E := E)).map Subtype.val
+end
+section
+section
+variable {d M T : ℕ} {Ω : Type u}
+abbrev Learner.TaggedState (M T : ℕ) := Sum (State M) (Fin (T+1) × State M)
+instance Learner.taggedMeasurableSpace : MeasurableSpace (TaggedState M T) := ⊤
+def Learner.taggedStart (a : Bool × State M) : TaggedState M T :=
+  if a.1 then .inr (⟨0,by omega⟩,a.2) else .inl a.2
+end
+open MeasureTheory ProbabilityTheory Set Filter
+open scoped ENNReal NNReal RealInnerProductSpace
+variable {d M T : ℕ} {Ω : Type u} [MeasurableSpace Ω]
+struc
+[…]
+
+=== LEAN COMPARATOR GaussianReplacement (exact formal statement)
+import Mathlib
+namespace OAI
+open MeasureTheory ProbabilityTheory Set Filter InformationTheory
+open scoped ENNReal NNReal RealInnerProductSpace Topology
+noncomputable section
+namespace CurrentProjection
+abbrev Vector (d : ℕ) := EuclideanSpace ℝ (Fin d)
+abbrev Sphere (d : ℕ) := Metric.sphere (0 : Vector d) 1
+abbrev Rows (k d : ℕ) := Fin k → Vector d
+def uniformSphere (d : ℕ) : Measure (Sphere d) :=
+  let σ := (volume : Measure (Vector d)).toSphere
+  (σ Set.univ)⁻¹ • σ
+def gaussianRows (k d : ℕ) : Measure (Rows k d) :=
+  Measure.pi fun _ => stdGaussian (Vector d)
+def label {k d : ℕ} (g : Rows k d) (s : Vector d) : Fin k → ℝ :=
+  fun i => ⟪s, g i⟫
+def LocalGrowth {d : ℕ} (ρ : Measure (Sphere d)) (a : ℕ) (B : ℝ) : Prop :=
+  ∀ z : Vector d, ∀ t : ℝ, 0 < t →
+    ρ {u | dist (u : Vector d) z ≤ t} ≤ ENNReal.ofReal (B * t ^ a)
+def cubeAverage {k d : ℕ} (ρ : Measure (Sphere d)) (g : Rows k d)
+    (y : Fin k → ℝ) (δ : ℝ) : ℝ≥0∞ :=
+  ENNReal.ofReal ((2 * δ)⁻¹ ^ k) *
+    ρ {u | ∀ i, |label g (u : Vector d) i - y i| ≤ δ}
+def exactDensity {k d : ℕ} (ρ : Measure (Sphere d)) (g : Rows k d)
+    (y : Fin k → ℝ) : ℝ≥0∞ := by
+  classical
+  let f := fun j : ℕ => (cubeAverage ρ g y (1 / (j : ℝ))).toReal
+  exact if h : ∃ L : ℝ, Tendsto f atTop (𝓝 L) then ENNReal.ofReal h.choose else 0
+def AdmissibleDimensions (d m r q : ℕ) : Prop :=
+  1 ≤ m ∧ 1 ≤ r ∧ 1 ≤ q ∧ m + r < d - 1 ∧ m + r - m - (q - 1) ≥ 1
+def momentConstant (C : ℝ) (d : ℕ) (B D : ℝ) : ℝ≥0∞ :=
+  ENNReal.ofReal (Real.exp (C * d) * B * (1 + max (Real.log (D / B)) 0))
+def MixedMomentMain : Prop :=
+  ∃ C : ℝ, 0 < C ∧ ∀ (d m r q : ℕ), AdmissibleDimensions d m r q →
+    ∀ (ρ : Measure (Sphere d)), IsFiniteMeasure ρ →
+    ∀ (B D : ℝ), 0 < B → 0 < D → LocalGrowth ρ (m+r) B → LocalGrowth ρ (d-1) D →
+    (∀ (s : Sphere d) (δ : ℝ), 0 < δ →
+      (∫⁻ X, (∫⁻ Z, cubeAverage ρ (Fin.append X Z)
+        (label (Fin.append X Z) (s : Vector d)) δ ∂gaussianRows r d)^q
+          ∂gaussianRows m d) ≤ (momentConstant C d B D)^q) ∧
+    (ρ ≪ uniformSphere d → ∃ E : Set (Sphere d), MeasurableSet E ∧ ρ E = 0 ∧
+      ∀ s ∉ E,
+        (∀ᵐ G ∂gaussianRows (m+r) d,
+          Tendsto (fun δ : ℝ => cubeAverage ρ G (label G (s : Vector d)) δ)
+            (𝓝[>] 0) (𝓝 (exactDensity ρ G (label G (s : Vector d))))) ∧
+        ((∫⁻ X, (∫⁻ Z, exactDensity ρ (Fin.append X Z)
+          (label (Fin.append X Z) (s : Vector d)) ∂gaussianRows r d)^q
+            ∂gaussianRows m d) ≤ (momentConstant C d B D)^q) ∧
+        (ρ ≠ 0 → ∀ᵐ G ∂gaussianRows (m+r) d,
+          0 < exactDensity ρ G (label G (s : Vector d)) ∧
+          exactDensity ρ G (label G (s : Vector d)) < ∞))
+instance gaussianRows_isProbabilityMeasure (k d : ℕ) : IsProbabilityMeasure (gaussianRows k d) := by
+  unfold gaussianRows
+  infer_instance
+lemma measurable_own_label {k d : ℕ} :
+    Measurable (fun z : Rows k d × Sphere d => label z.1 (z.2:Vector d)) := by
+  apply Measurable.of_eval
+  intro i
+  exact (continuous_inner.comp <| (continuous_subtype_val.comp continuous_snd).prodMk
+    ((continuous_apply i).comp continuous_fst)).measurable
+def swapLast {A B C : Type*} [MeasurableSpace A] [MeasurableSpace B] [MeasurableSpace C] :
+    (A × B) × C ≃ᵐ (A × C) × B where
+  toFun p := ((p.1.1,p.2),p.1.2)
+  invFun p := ((p.1.1,p.2),p.1.2)
+  left_inv _ := rfl
+  right_inv _ := rfl
+  measurable_toFun := (measurable_fst.fst.prodMk measurable_snd).prodMk measurable_fst.snd
+  measurable_invFun := (measurable_fst.fst.prodMk measurable_snd).prodMk measurable_fst.snd
+def rowInformation {S W X : Type*} [MeasurableSpace S] [MeasurableSpace W]
+    [MeasurableSpace X] (P : Measure ((S×W)×X)) (γ : Measure X) : ℝ≥0∞ :=
+  klDiv P (P.fst.prod γ)
+noncomputable def shannonEntropy {W : Type*} [MeasurableSpace W] (π : Measure W) : ℝ≥0∞ :=
+  ∫⁻ w, ENNReal.ofReal (-Real.log (π {w}).toReal) ∂π
+def conditionalMutualInformation {Z A B : Type*} [MeasurableSpace Z]
+    [MeasurableSpace A] [MeasurableSpace B] [StandardBorelSpace A] [StandardBorelSpace B]
+    (P : Measure (Z×(A×B))) [IsFiniteMeasure P] : ℝ≥0∞ := by
+[…]
+
+=== LEAN COMPARATOR SubsphereCurrent (exact formal statement)
+import Mathlib
+namespace OAI
+open MeasureTheory ProbabilityTheory Set Filter
+open scoped ENNReal NNReal RealInnerProductSpace
+noncomputable section
+universe u
+namespace SubsphereCurrent
+abbrev Vector (d : ℕ) := EuclideanSpace ℝ (Fin d)
+abbrev UnitSphere (d : ℕ) := Metric.sphere (0 : Vector d) 1
+abbrev State (M : ℕ) := Fin (2 ^ M)
+abbrev Samples (d T : ℕ) := Fin T → Vector d
+def uniformSphere (d : ℕ) : Measure (UnitSphere d) :=
+  let σ := (volume : Measure (Vector d)).toSphere
+  (σ Set.univ)⁻¹ • σ
+def sampleLaw (d T : ℕ) : Measure (Samples d T) :=
+  Measure.pi fun _ => stdGaussian (Vector d)
+def observationReference (d : ℕ) : Measure (Vector d × ℝ) :=
+  (stdGaussian (Vector d)).prod volume
+structure KernelLearner (d M T : ℕ) where
+  initial : PMF (Bool × State M)
+  transition : ℕ → State M → (Vector d × ℝ) → PMF (Bool × State M)
+  output : ℕ → State M → Measure (UnitSphere d)
+  output_probability : ∀ t q, IsProbabilityMeasure (output t q)
+namespace KernelLearner
+abbrev RunStatus (M : ℕ) := Sum (State M) (ℕ × State M)
+def tagged (M t : ℕ) (a : Bool × State M) : RunStatus M :=
+  if a.1 then .inr (t, a.2) else .inl a.2
+def run {d M T : ℕ} (L : KernelLearner d M T) (s : UnitSphere d)
+    (x : Samples d T) : ℕ → PMF (RunStatus M)
+  | 0 => L.initial.map (tagged M 0)
+  | n + 1 => (L.run s x n).bind fun status =>
+      match status with
+      | .inr done => PMF.pure (.inr done)
+      | .inl q => if hn : n < T then
+          (L.transition (n + 1) q (x ⟨n, hn⟩, ⟪x ⟨n, hn⟩, s.val⟫)).map (tagged M (n + 1))
+        else PMF.pure (.inl q)
+def terminal {d M T : ℕ} (L : KernelLearner d M T) (s : UnitSphere d)
+    (x : Samples d T) : PMF (ℕ × State M) :=
+  (L.run s x T).map fun status =>
+    match status with
+    | .inl q => (T, q)
+    | .inr done => done
+def estimateLaw {d M T : ℕ} (L : KernelLearner d M T) (s : UnitSphere d)
+    (x : Samples d T) : Measure (UnitSphere d) :=
+  (L.terminal s x).toMeasure.bind fun a => L.output a.1 a.2
+def angularError {d : ℕ} (s u : UnitSphere d) : ℝ :=
+  Real.arccos ⟪u.val, s.val⟫
+def conditionalSuccess {d M T : ℕ} (L : KernelLearner d M T) (ε : ℝ)
+    (s : UnitSphere d) (x : Samples d T) : ℝ≥0∞ :=
+  L.estimateLaw s x {u | angularError s u ≤ ε}
+def CompletedRules {d M T : ℕ} (L : KernelLearner d M T) : Prop :=
+  ∀ t q dest, AEMeasurable (fun obs => L.transition t q obs dest) (observationReference d)
+end KernelLearner
+structure SeededLearner (d M T : ℕ) (Ω : Type u) where
+  rules : Ω → KernelLearner d M T
+namespace SeededLearner
+structure Admissible {d M T : ℕ} {Ω : Type u} [MeasurableSpace Ω]
+    (L : SeededLearner d M T Ω) (ρ : Measure Ω) : Prop where
+  completed_rules : ∀ᵐ ω ∂ρ, (L.rules ω).CompletedRules
+  fixed_experiment : ∀ s ε, AEMeasurable
+    (fun z : Ω × Samples d T => (L.rules z.1).conditionalSuccess ε s z.2)
+    (ρ.prod (sampleLaw d T))
+  uniform_experiment : ∀ ε, AEMeasurable
+    (fun z : UnitSphere d × (Ω × Samples d T) =>
+      (L.rules z.2.1).conditionalSuccess ε z.1 z.2.2)
+    ((uniformSphere d).prod (ρ.prod (sampleLaw d T)))
+def success {d M T : ℕ} {Ω : Type u} [MeasurableSpace Ω]
+    (L : SeededLearner d M T Ω) (ρ : Measure Ω) (ε : ℝ) (s : UnitSphere d) : ℝ≥0∞ :=
+  ∫⁻ z : Ω × Samples d T, (L.rules z.1).conditionalSuccess ε s z.2
+    ∂(ρ.prod (sampleLaw d T))
+def uniformSuccess {d M T : ℕ} {Ω : Type u} [MeasurableSpace Ω]
+    (L : SeededLearner d M T Ω) (ρ : Measure Ω) (ε : ℝ) : ℝ≥0∞ :=
+  ∫⁻ z : UnitSphere d × (Ω × Samples d T),
+    (L.rules z.2.1).conditionalSuccess ε z.1 z.2.2
+      ∂((uniformSphere d).prod (ρ.prod (sampleLaw d T)))
+end SeededLearner
+def ExplicitPrecision : Prop :=
+  ∀ M : ℕ → ℕ,
+    Asymptotics.IsLittleO atTop (fun d => (M d : ℝ)) (fun d => (d : ℝ) ^ 2) →
+    ∃ d₀ : ℕ, ∀ d : ℕ, d₀ ≤ d → ∀ T : ℕ, ∀ ε : ℝ,
+    0 < ε → ε ≤ 1 / 10 →
+    ∀ (Ω : Type u) [MeasurableSpace Ω] (ρ : Measure Ω), IsProbabilityMeasure ρ →
+    ∀ L : SeededLearner d (M d) T Ω, L.Admissible ρ →
+    ((2 / 3 : ℝ≥0∞) ≤ L.uniformSuccess ρ ε ∨
+      ∀ s, (2 / 3 : ℝ≥0∞) ≤ L.success ρ ε s) →
+    (2 : ℝ)⁻¹ ^ 16 * 
+[…]

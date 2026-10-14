@@ -1,0 +1,40 @@
+FAMILY 096: The Gaussian propeller conjecture in every dimension
+SUBJECT: Convex and metric geometry
+OPENAI SUMMARY: Proves that the sum of squared Gaussian first moments of any finite measurable partition is at most $`9/(8\pi)`$. In dimension at least two, three planar sectors of angle $`2\pi/3`$, extended orthogonally, attain the bound. Combined with the separate Unique Games theorem, this proves NP-hardness of improving the loss factor $`(8\pi/9)(1-1/k)`$ for identity-target kernel clustering with fixed k ≥ 3 on rational centered positive semidefinite inputs.
+
+=== MANUSCRIPT: The Gaussian propeller bound in every dimension (September-24-2026) [preprints/The-Gaussian-Propeller-Bound-in-Every-Dimension-September-24-2026/build/main.tex]
+ABSTRACT: We prove the Gaussian propeller conjecture: for every finite measurable partition of a Euclidean space, the sum of the squared lengths of its Gaussian first moments is at most $`9/(8\pi)`$. For dimension at least two and at least three cells, three planar sectors of angle $`2\pi/3`$, extended by an orthogonal Euclidean factor, attain the bound.
+INTRODUCTION (start): \label{sec:introduction} Let $\gamma_n$ denote the standard Gaussian probability measure on $\mathbb R^n$, with density $(2\pi)^{-n/2}\exp(-\|x\|^2/2)$. For a measurable set $A\subseteq\mathbb R^n$, its Gaussian first moment is $z(A)=\int_A x\,d\gamma_n(x)$. We call this unnormalized vector its \emph{centroid}. Thus a centroid is not divided by the measure of its cell. For positive integers $d,k$ and a measurable partition $\mathcal A=(A_1,\ldots,A_k)$ of $\mathbb R^d$, define \[ \mathcal F(\mathcal A)=\sum_{i=1}^k\|z(A_i)\|^2. \] Partitions are understood up to Gaussian null sets, and empty cells are allowed. The cell probabilities are unrestricted. All norms and inner products below are Euclidean. The propeller conjecture asks whether three planar sectors meeting at angles $2\pi/3$, extended by an orthogonal Euclidean factor, maximize this functional whenever $d\ge2$ and $k\ge3$. It arose in Khot and Naor's study of approximate kernel clustering~\cite{KhotNaor}, where Gaussian first moments govern approximation and Unique Games hardness. Their formulation uses $k$ cells in $\mathbb R^{k-1}$, with unused cells permitted. They proved that a maximizer can be chosen to be a conical partition in the span of its centroids and determined the three-cell value~\cite[Theorem~1.2 and Corollary~3.4]{KhotNaor}. Heilman, Jagannath, and Naor proved the bound for every finite partition of $\mathbb R^3$~\cite[Theorem~1.1]{HJN}. Their computer-assisted argument treats the remaining four-cell conical configurations through spherical geometry and a finite verification. We use that theorem as an established input. The new estimates below show that an extremizer with five or more active cells cannot have value greater than $9/(8\pi)$. Here an active cell has positive Gaussian measure. This proves the conjecture in all remaining dimensions. [statement] \subsection{The attaining propeller} \label{sec:example} The attaining partition illustrates an important feature of the problem: in every dimension at least two, only three cells are needed once at least three labels are available. Consider a sector $P$ in $\mathbb R^2$ of opening $2\alpha$, symmetric about the first coordinate axis. Polar integration gives \[ \int_P x\,d\gamma_2(x) =\frac1{2\pi}\left(\int_0^\infty r^2e^{-r^2/2}\,dr\right) \left(\int_{-\alpha}^{\alpha}(\cos\theta,\sin\theta)\,d\theta\right) =\frac{\sin\alpha}{\sqrt{2\pi}}(1,0). \] For $\alpha=\pi/3$, three such sectors partition the plane and their squared centroid lengths sum to $3\sin^2(\pi/3)/(2\pi)=9/(8\pi)$. An orthogonal Gaussian factor contributes zero to every centroid, so the construction has the same value in every dimension at least two. The construction proves the attainment assertion in Theorem~\ref{thm:main}. Figure~\ref{fig:propeller-sectors} shows the planar partition and its centroid directions. \begin{figure}[htbp] \centering \begin{tikzpicture}[x=1cm,y=1cm,line cap=round,line join=round, font=\small] \begin{scope} \clip (-2.35,-1.95) rectangle (2.35,1.95); \fill[blue!9] (0,0) -- (-60:8) -- (60:8) -- cycle; \fill[orange!13] (0,0) -- (60:8) -- (180:8) -- cycle; \fill[green!10!white] (0,0) -- (180:8) -- (300:8) -- cycle; \end{scope} \draw[->,thin] (0,0) -- (60:2.17); \draw[->,thin] (0,0) -- (180:2.30); \draw[->,thin] (0,0) -- (300:2.17); \draw[thick,->] (0,0) -- (0:1.20) node[above=3pt] {$\widehat z_1$}; \draw[thick,->] (0,0) -- (120:1.20) node[left=3pt] {$\widehat z_2$}; \draw[thick,->] (0,0) -- (240:1.20) node[left=3pt] {$\widehat z_3$}; \draw[thin] (-60:.47) arc[start angle=-60,end angle=60,radius=.47]; \node at (.91,-.69) {$2\pi/3$}; \node at (1.79,.60) {$S_1$}; \node at (-1.50,1.32) {$S_2$}; \node at (-1.50,-1.32) {$S_3$}; \fill (0,0) circle[radius=1.2pt]; \end{tikzpicture} \caption{The attaining planar partition consists of three unbounded sectors $S_1,S_2,S_3$ of angle $2\pi/3$; only a finite window is shown. The bold arrows show the unit centroid directions $\widehat z_i=z(S_i)/\|z(S_i)\|$. Each unnormalized […]
+[theorem] \label{thm:main} For all positive integers $d$ and $k$, every measurable partition $(A_1,\ldots,A_k)$ of $\mathbb R^d$ satisfies \[ \sum_{i=1}^k\left\|\int_{A_i}x\,d\gamma_d(x)\right\|^2 \le\frac9{8\pi}. \] Empty cells are allowed. The constant is sharp whenever $d\ge2$ and $k\ge3$: three planar sectors of angle $2\pi/3$, multiplied by the orthogonal complement of their plane, attain equality, with any further cells empty.
+
+=== LEAN COMPARATOR GaussianPropeller (exact formal statement)
+import Mathlib
+namespace OAI
+open MeasureTheory ProbabilityTheory
+open scoped ENNReal
+namespace GaussianPropeller
+abbrev Space (d : ℕ) := EuclideanSpace ℝ (Fin d)
+noncomputable def gaussian (d : ℕ) : Measure (Space d) := stdGaussian (Space d)
+def IsPartition {d k : ℕ} (A : Fin k → Set (Space d)) : Prop :=
+  (∀ i, MeasurableSet (A i)) ∧ ∀ᵐ x ∂gaussian d, ∃! i, x ∈ A i
+noncomputable def centroid {d : ℕ} (A : Set (Space d)) : Space d :=
+  ∫ x in A, x ∂gaussian d
+noncomputable def value {d k : ℕ} (A : Fin k → Set (Space d)) : ℝ :=
+  ∑ i, ‖centroid (A i)‖ ^ 2
+def coord {d : ℕ} (j : ℕ) (x : Space d) : ℝ :=
+  if h : j < d then x ⟨j, h⟩ else 0
+noncomputable def propeller (d k : ℕ) (i : Fin k) : Set (Space d) :=
+  if i.val = 0 then {x | |coord 1 x| ≤ Real.sqrt 3 * coord 0 x}
+  else if i.val = 1 then {x | 0 ≤ coord 1 x ∧ Real.sqrt 3 * coord 0 x ≤ coord 1 x}
+  else if i.val = 2 then {x | coord 1 x ≤ 0 ∧ Real.sqrt 3 * coord 0 x ≤ -coord 1 x}
+  else ∅
+def AllPartitions : Prop :=
+  (∀ (d k : ℕ), 0 < d → 0 < k → ∀ A : Fin k → Set (Space d),
+    IsPartition A → value A ≤ 9 / (8 * Real.pi)) ∧
+  (∀ (d k : ℕ), 2 ≤ d → 3 ≤ k →
+    IsPartition (propeller d k) ∧ value (propeller d k) = 9 / (8 * Real.pi))
+theorem all_partitions : AllPartitions := by
+  sorry
+end GaussianPropeller
+end OAI
+

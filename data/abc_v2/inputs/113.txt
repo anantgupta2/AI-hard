@@ -1,0 +1,440 @@
+FAMILY 113: Approximate counting and entropy of perfect matchings
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Gives a fully polynomial randomized approximation scheme for counting perfect matchings in arbitrary finite simple graphs, with exact detection of zero counts. Also proves the perfect-matching entropy conjecture of Anari, Oveis Gharan, and Vinzant, bounding the maximum entropy of a matching law at every feasible edge-marginal vector in a loopless labelled multigraph, including boundary points.
+
+=== MANUSCRIPT: A Fully Polynomial Randomized Approximation Scheme for Perfect Matchings in General Graphs (September-23-2026) [preprints/A-Fully-Polynomial-Randomized-Approximation-Scheme-for-Perfect-Matchings-in-General-Graphs-September-23-2026/build/main.tex]
+ABSTRACT: We give a fully polynomial randomized approximation scheme (FPRAS) for counting perfect matchings in arbitrary finite simple undirected graphs, resolving the general-graph perfect-matching approximation problem. The algorithm returns zero with certainty when no perfect matching exists. Otherwise, it achieves relative error ε with failure probability at most δ in worst-case bit time polynomial in the input length, $`\varepsilon ^{-1}`$, and $`\log\delta^{-1}`$.
+INTRODUCTION (start): \label{sec:introduction} Let $G=(V,E)$ be a finite simple undirected graph. A perfect matching is a set of edges incident to each vertex exactly once. Write \[ Z(G)=\#\{M\subseteq E:M\text{ is a perfect matching of }G\}. \] A fully polynomial randomized approximation scheme approximates $Z(G)$ within a prescribed relative error, with a prescribed success probability, in time polynomial in the input length and the reciprocal error. The confidence parameter enters through its logarithm. We prove the following theorem, including a bound on the time of every execution. [statement] As consequences, \cref{sec:prescribed-degree} gives counting schemes for edge subsets with prescribed vertex degrees and for matchings of a specified size. On feasible inputs, its samplers always return a feasible object and approximate the corresponding uniform law in total variation. \subsection{History and significance} Perfect matchings illustrate the distinction between finding a combinatorial structure and counting its realizations. Edmonds gave a polynomial-time algorithm for finding a maximum matching in a general graph~\cite{Edmonds1965}. Valiant proved that exact counting is \#P-complete even for bipartite graphs, where it is the permanent of a zero--one matrix~\cite{Valiant1979}. Pfaffian methods give polynomial-time exact counting for planar graphs~\cite{Kasteleyn1963}. For approximation, three problems must be distinguished: counting all matchings, counting bipartite perfect matchings, and counting perfect matchings in general graphs. Jerrum and Sinclair gave an FPRAS for the total number of matchings in an arbitrary graph, summed over all cardinalities~\cite[Corollary~4.5]{JerrumSinclair1989}. Their perfect-matching algorithm applied when the ratio of near-perfect matchings, which leave exactly two vertices unmatched, to perfect matchings was bounded by a fixed polynomial~\cite[Theorem~5.3]{JerrumSinclair1989}. Without such a bound, perfect matchings can carry too little stationary mass for this sampling approach. Approximating the total number of matchings therefore does not isolate its perfect-matching contribution with relative accuracy. Jerrum, Sinclair, and Vigoda removed the ratio restriction in the bipartite setting and obtained an FPRAS for the permanent of every nonnegative matrix~\cite[Theorem~1.1]{JerrumSinclairVigoda2004}. Their method assigns weights to near-perfect states according to their two unmatched vertices and learns suitable weights while gradually changing edge activities. The general-graph question was explicitly raised by Jerrum and Sinclair~\cite[Section~7(i)]{JerrumSinclair1989} and remained a benchmark for approximate counting. Cai and Liu relate it to approximation for the eight-vertex model~\cite{CaiLiu2020}; Fei, Goldberg, and Lu distinguish the spin-system parameter line equivalent to general perfect-matching approximation from the region covered by their FPRAS~\cite[Proposition~1.2 and Theorem~1.5]{FeiGoldbergLu2025}. \Cref{thm:main} answers the general-graph perfect-matching approximation problem affirmatively. A direct extension of the bipartite chain faces a precise obstruction. \v{S}tefankovi\v{c}, Vigoda, and Wilmes constructed graphs on which every JSV-type chain has either exponentially small stationary probability of perfect matchings or exponentially slow mixing, even with arbitrary weights depending on the hole pattern~\cite[Definition~2.1 and Theorem~2.2 in the full version]{StefankovicVigodaWilmes2018}. Here JSV type means the perfect-and-near-perfect state space with the specified Broder proposals and a Metropolis acceptance rule. The sampler below uses a different state space: a product of perfect-matching spaces on an enlarged colored graph, with exchanges of alternating cycles between coordinates. Its energy comparison is proved for these states and moves. Subsequent permanent algorithms sharpen the bipartite result. Bez\'{a}kov\'{a}, \v{S}tefankovi\v{c}, Vazirani, and Vigoda accelerated the  […]
+[theorem] \label{thm:main} There is a uniform classical randomized algorithm which, given $G$ and rational parameters $0<\eps<1$ and $0<\delta<1/2$, returns a nonnegative rational number $\widehat Z$ such that \[ \Prb\bigl[(1-\eps)Z(G)\le \widehat Z\le(1+\eps)Z(G)\bigr] \ge 1-\delta. \] If $Z(G)=0$, the output is zero with certainty. The worst-case bit running time is polynomial in the input encoding length, $\eps^{-1}$, and $\log\delta^{-1}$.
+
+=== MANUSCRIPT: Entropy and Face Dimension of the Perfect-Matching Polytope (September-23-2026) [preprints/Entropy-and-Face-Dimension-of-the-Perfect-Matching-Polytope-September-23-2026/build/main.tex]
+ABSTRACT: We prove the perfect-matching entropy conjecture of Anari, Oveis Gharan, and Vinzant. For every feasible vector x of perfect-matching edge marginals in a loopless labelled multigraph on $`2m\ge2`$ vertices, the maximum entropy $`H(x)`$ of a matching law with marginals x satisfies
+INTRODUCTION (start): Prescribing the probability that each edge belongs to a random perfect matching does not prescribe the distribution of the whole matching. The largest possible entropy of such a distribution measures how many matching choices can coexist with those edge probabilities. We bound this entropy by explicit sums of one-coordinate functions, at every feasible mean. The result yields lower counts from uniform marginals and additive estimates for weighted partition functions. Throughout, a graph is finite, undirected and loopless. Parallel edges are distinguished both as coordinates and as choices in a matching. A perfect matching covers each vertex by exactly one edge. Write $\mathcal M(G)$ for the set of perfect matchings, $N(G)=|\mathcal M(G)|$, and \[ P(G)=\conv\{\mathbf1_M:M\in\mathcal M(G)\}\subseteq\R^{E(G)} \] for their polytope. Thus a point $x\in P(G)$ is exactly a feasible vector of edge probabilities. For a probability law $p$ on the matching family, put $\Ent(p)=-\sum_M p_M\log p_M$, and define \begin{align} H(x)&=\max\left\{\Ent(p):p\text{ is a probability law on }\mathcal M(G),\ \sum_Mp_M\mathbf1_M=x\right\},\label{intro:H}\\ F(x)&=-\sum_{e\in E(G)}x_e\log x_e,\qquad B(x)=-\sum_{e\in E(G)}(1-x_e)\log(1-x_e). \label{intro:FB} \end{align} All unqualified logarithms are natural, and $0\log0=0$. The maximum in Equation~\eqref{intro:H} is attained by compactness of the feasible set of laws. No connectedness or bipartiteness is assumed. [statement] In particular, $H\ge F-2B$ throughout the polytope, including its boundary. When $m=1$, each matching is one of the distinguished edges between two vertices, and the bounds give the exact identity $H=F$. For the empty vertex set the unique empty matching gives $F=B=H=0$; the formula involving $1/m$ is not used. The upper bound $H\le F$ is a direct instance of Shearer's entropy inequality~\citep{ChungGrahamFranklShearer1986}: each edge occurs in two vertex stars, and a matching chooses exactly one edge at each vertex. Our contribution to Equation~\eqref{intro:main-bound} is its lower comparison. The coefficient there is obtained from a geometric rank estimate followed by a covariance calculation, with no assumption that the mean is interior to the full polytope. Edmonds' matching-polytope theorem~\citep{Edmonds1965} describes feasible matching means by degree equations, nonnegativity and odd-cut inequalities. The odd cuts distinguish general graphs from bipartite graphs and are also central to the entropy bound here. Bipartite graphs admit an order-independent coefficient-one comparison: Schrijver's inequality~\citep{Schrijver1998Counting} and the weighted Bethe inequality of Gurvits~\citep[expanded version, Theorem~2.2]{Gurvits2011SchrijverBethe}, together with entropy duality, imply $H(x)\ge F(x)-B(x)$. Their permanent setting is essential to this comparison. In Section~\ref{ex:sec-triangle-expansions} we give a simple eight-vertex nonbipartite graph with a feasible mean for which $H<F-B$. \subsection{Entropy and structural consequences} Anari, Oveis Gharan and Vinzant~\citep[FOCS version, Conjecture~6]{AnariOveisGharanVinzant2018} proposed a convex-optimization framework for approximate counting and asked whether the maximum binary-coordinate entropy of a perfect matching mean exceeds $\log N(G)$ by only a linear function of the number of vertices. In our notation their objective is $F+B$. Theorem~\ref{ent:main} gives the explicit positive answer \[ \log N(G)\le\max_{x\in P(G)}(F(x)+B(x)) \le\log N(G)+3m-2. \] The pointwise statement also controls arbitrary finite edge weights, through the Gibbs variational formula. The proposed linear-error estimate is therefore an optimized consequence of the prescribed-mean inequality, rather than its definition. Corollary~\ref{cons:entropy-count} proves the optimized bounds, and Section~\ref{cons:weighted-section} derives the weighted form. If $G$ contains $k\ge2$ edge-disjoint perfect matchings, their uniform mixture has marginal $1/k$ on the […]
+[theorem] [Pointwise entropy bounds]\label{ent:main} Let $G$ be a loopless multigraph on $2m\ge2$ vertices with at least one perfect matching. For every $x\in P(G)$, \begin{equation}\label{intro:main-bound} F(x)-\left(2-\frac2m\right)B(x) \le H(x)\le F(x). \end{equation}
+[theorem] [Deterministic approximate counting] \label{thm:main}\label{thm:algorithm-guarantee} There is one uniform deterministic algorithm which, on a graph on $n$ vertices with nonnegative binary integer pair multiplicities, returns an integer $A\ge0$ satisfying \[ N(G)/512^n\le A\le N(G). \] Its running time and output length are polynomial in the input bit length. In particular, $A=0$ exactly when $N(G)=0$. The guarantee includes a compact input consisting of binary $n$ and a list of positive pair records.
+
+=== LEAN COMPARATOR MatchingFPRAS (exact formal statement)
+import Mathlib
+namespace OAI
+namespace MatchingFPRAS
+structure GraphInput where
+  n : ℕ
+  edges : Finset (Fin n × Fin n)
+  increasing : ∀ e ∈ edges, e.1 < e.2
+def Perfect (G : GraphInput) (M : Finset (Fin G.n × Fin G.n)) : Prop :=
+  M ⊆ G.edges ∧ ∀ v : Fin G.n, ∃! e, e ∈ M ∧ (e.1 = v ∨ e.2 = v)
+noncomputable def perfectMatchings (G : GraphInput) : Finset (Finset (Fin G.n × Fin G.n)) :=
+  by
+    classical
+    exact G.edges.powerset.filter (Perfect G)
+noncomputable def Z (G : GraphInput) : ℕ := (perfectMatchings G).card
+abbrev Symbol := Fin 8
+def encodeNat (n : ℕ) : List Symbol :=
+  (Nat.bits n).map (fun b => if b then 2 else 1) ++ [3]
+def encodeInt (z : ℤ) : List Symbol :=
+  (if z < 0 then [5] else [4]) ++ encodeNat z.natAbs
+def encodeRat (q : ℚ) : List Symbol := encodeInt q.num ++ encodeNat q.den
+def encodeInput (G : GraphInput) (ε δ : ℚ) : List Symbol :=
+  encodeNat G.n ++ encodeNat G.edges.card ++
+    (((G.edges.map toLex.toEmbedding).sort (· ≤ ·)).flatMap fun e =>
+      encodeNat (ofLex e).1.val ++ encodeNat (ofLex e).2.val) ++
+    encodeRat ε ++ encodeRat δ
+structure RandomMachine where
+  states : ℕ
+  transition : Fin (states + 1) → Symbol → Bool →
+    Option (Fin (states + 1) × Turing.TM0.Stmt Symbol)
+structure Configuration (A : RandomMachine) where
+  state : Option (Fin (A.states + 1))
+  tape : Turing.Tape Symbol
+def tick (A : RandomMachine) (c : Configuration A) (bit : Bool) : Configuration A :=
+  match c.state with
+  | none => c
+  | some s => match A.transition s c.tape.head bit with
+    | none => ⟨none, c.tape⟩
+    | some (s', action) =>
+      ⟨some s', match action with
+        | .move d => c.tape.move d
+        | .write a => c.tape.write a⟩
+def initial (A : RandomMachine) (input : List Symbol) : Configuration A :=
+  ⟨some 0, Turing.Tape.mk₁ input⟩
+def run (A : RandomMachine) (input : List Symbol) {t : ℕ}
+    (bits : Fin t → Bool) : Configuration A :=
+  (List.ofFn bits).foldl (tick A) (initial A input)
+def Outputs (A : RandomMachine) (input : List Symbol) {t : ℕ}
+    (bits : Fin t → Bool) (q : ℚ) : Prop :=
+  (run A input bits).state = none ∧
+    (run A input bits).tape.right₀ = Turing.ListBlank.mk (encodeRat q)
+def timeBound (C d : ℕ) (G : GraphInput) (ε δ : ℚ) : ℕ :=
+  C * ((encodeInput G ε δ).length + ⌈ε⁻¹⌉₊ + Nat.clog 2 ⌈δ⁻¹⌉₊ + 1) ^ d
+noncomputable def goodTapes (A : RandomMachine) (G : GraphInput) (ε δ : ℚ)
+    (t : ℕ) : Finset (Fin t → Bool) := by
+  classical
+  exact Finset.univ.filter fun bits => ∃ q : ℚ,
+    Outputs A (encodeInput G ε δ) bits q ∧
+    (1 - ε) * (Z G : ℚ) ≤ q ∧ q ≤ (1 + ε) * (Z G : ℚ)
+def MainStatement : Prop :=
+  ∃ (A : RandomMachine) (C d : ℕ), 0 < C ∧
+    ∀ (G : GraphInput) (ε δ : ℚ), 0 < ε → ε < 1 → 0 < δ → δ < 1 / 2 →
+      let t := timeBound C d G ε δ
+      (∀ bits : Fin t → Bool, ∃ q : ℚ, 0 ≤ q ∧ Outputs A (encodeInput G ε δ) bits q) ∧
+      (Z G = 0 → ∀ bits : Fin t → Bool, Outputs A (encodeInput G ε δ) bits 0) ∧
+      ((goodTapes A G ε δ t).card : ℚ) / (2 : ℚ) ^ t ≥ 1 - δ
+theorem thm_main : MainStatement := by
+  sorry
+end MatchingFPRAS
+end OAI
+
+
+=== LEAN COMPARATOR MatchingEntropy (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open scoped BigOperators
+namespace MatchingEntropy
+def probabilitySimplex (Index : Type*) [Fintype Index] : Set (Index → ℝ) :=
+  {weights | (∀ index, 0 ≤ weights index) ∧ ∑ index, weights index = 1}
+structure LooplessGraph (V E : Type*) where
+  left : E → V
+  right : E → V
+  loopless : ∀ e, left e ≠ right e
+variable {V E : Type*} [Fintype V] [Fintype E] [DecidableEq V] [DecidableEq E]
+namespace LooplessGraph
+def Incident (G : LooplessGraph V E) (v : V) (e : E) : Prop :=
+  G.left e = v ∨ G.right e = v
+def IsPerfectMatching (G : LooplessGraph V E) (M : Finset E) : Prop :=
+  ∀ v, ∃! e, e ∈ M ∧ G.Incident v e
+abbrev Matching (G : LooplessGraph V E) := {M : Finset E // G.IsPerfectMatching M}
+instance matchingFintype (G : LooplessGraph V E) : Fintype G.Matching :=
+  Fintype.ofFinite _
+def indicator (G : LooplessGraph V E) (M : G.Matching) (e : E) : ℝ :=
+  if e ∈ M.val then 1 else 0
+def polytope (G : LooplessGraph V E) : Set (E → ℝ) :=
+  convexHull ℝ (Set.range G.indicator)
+def mean (G : LooplessGraph V E) (p : G.Matching → ℝ) (e : E) : ℝ :=
+  ∑ M, p M * G.indicator M e
+def feasibleLaws (G : LooplessGraph V E) (y : E → ℝ) : Set (G.Matching → ℝ) :=
+  {p | p ∈ probabilitySimplex G.Matching ∧ G.mean p = y}
+end LooplessGraph
+def entropy {ι : Type*} [Fintype ι] (p : ι → ℝ) : ℝ :=
+  ∑ i, Real.negMulLog (p i)
+def marginalEntropy (y : E → ℝ) : ℝ := entropy y
+def maxMatchingEntropy (G : LooplessGraph V E) (y : E → ℝ) : ℝ :=
+  sSup (entropy '' G.feasibleLaws y)
+theorem entropy_main (G : LooplessGraph V E) (m : ℕ)
+    (hm : 0 < m) (hV : Fintype.card V = 2 * m)
+    (hPM : Nonempty G.Matching) (y : E → ℝ) (hy : y ∈ G.polytope) :
+    marginalEntropy y - maxMatchingEntropy G y ≤
+      8 * (m : ℝ) * (1 - Real.exp (-marginalEntropy y / (m : ℝ))) := by
+  sorry
+end MatchingEntropy
+end
+end OAI
+
+
+=== LEAN COMPARATOR BinaryMatching (exact formal statement)
+import Mathlib
+namespace OAI
+universe u_1 u_2
+namespace MatchingEntropy
+structure LooplessGraph (V : Type u_1) (E : Type u_2) where
+  left : E → V
+  right : E → V
+  loopless : ∀ e, left e ≠ right e
+namespace LooplessGraph
+variable {V : Type u_1} {E : Type u_2} [Fintype V] [Fintype E] [DecidableEq V] [DecidableEq E]
+def Incident (G : LooplessGraph V E) (v : V) (e : E) : Prop :=
+  G.left e=v ∨ G.right e=v
+def IsPerfectMatching (G : LooplessGraph V E) (M : Finset E) : Prop :=
+  ∀ v, ∃! e, e∈M ∧ G.Incident v e
+abbrev Matching (G : LooplessGraph V E) := {M : Finset E // G.IsPerfectMatching M}
+noncomputable instance matchingFintype (G : LooplessGraph V E) : Fintype G.Matching :=
+  Fintype.ofFinite _
+end LooplessGraph
+end MatchingEntropy
+namespace BinaryMatching
+abbrev Pair (n : ℕ) := {ij : Fin n × Fin n // ij.1 < ij.2}
+def completeGraph (n : ℕ) : MatchingEntropy.LooplessGraph (Fin n) (Pair n) where
+  left e := e.val.1
+  right e := e.val.2
+  loopless e := ne_of_lt e.property
+structure Record where
+  left : ℕ
+  right : ℕ
+  multiplicity : ℕ
+  deriving DecidableEq
+structure Input where
+  n : ℕ
+  records : List Record
+  valid : ∀ e∈records, e.left < e.right ∧ e.right < n
+  unique : (records.map (fun e => (e.left,e.right))).Nodup
+def multiplicity (G : Input) (e : Pair G.n) : ℕ :=
+  match G.records.find? (fun r => r.left=e.val.1.val && r.right=e.val.2.val) with
+  | none => 0
+  | some r => r.multiplicity
+noncomputable def count (G : Input) : ℕ :=
+  ∑ M : (completeGraph G.n).Matching, ∏ e∈M.val, multiplicity G e
+def encodeNat (n : ℕ) : List Bool :=
+  List.replicate n.bits.length false ++ true :: n.bits
+def encodeRecord (r : Record) : List Bool :=
+  encodeNat r.left ++ encodeNat r.right ++ encodeNat r.multiplicity
+def encodeInput (G : Input) : List Bool :=
+  encodeNat G.n ++ encodeNat G.records.length ++ G.records.flatMap encodeRecord
+theorem deterministic_approximate_counting :
+    ∃ A : Input → ℕ,
+      ∃ machine : Turing.TM2ComputableInPolyTime encodeInput Nat.bits A,
+        (∀ k, Finite (machine.tm.Γ k)) ∧
+        (∃ P : Polynomial ℕ, ∀ G,(A G).bits.length≤P.eval (encodeInput G).length) ∧
+        ∀ G,A G≤count G ∧ count G≤2^(9*G.n)*A G ∧ (A G=0 ↔ count G=0) := by
+  sorry
+end BinaryMatching
+end OAI
+
+
+=== LEAN COMPARATOR SingletonLoopMatching (exact formal statement)
+import Mathlib
+namespace OAI
+universe u_1 u_2
+namespace MatchingEntropy
+structure LooplessGraph (V : Type u_1) (E : Type u_2) where
+  left : E → V
+  right : E → V
+  loopless : ∀ e, left e ≠ right e
+namespace LooplessGraph
+variable {V : Type u_1} {E : Type u_2} [Fintype V] [Fintype E] [DecidableEq V] [DecidableEq E]
+def Incident (G : LooplessGraph V E) (v : V) (e : E) : Prop :=
+  G.left e=v ∨ G.right e=v
+end LooplessGraph
+end MatchingEntropy
+namespace BinaryMatching
+abbrev Pair (n : ℕ) := {ij : Fin n × Fin n // ij.1 < ij.2}
+def completeGraph (n : ℕ) : MatchingEntropy.LooplessGraph (Fin n) (Pair n) where
+  left e := e.val.1
+  right e := e.val.2
+  loopless e := ne_of_lt e.property
+structure Record where
+  left : ℕ
+  right : ℕ
+  multiplicity : ℕ
+  deriving DecidableEq
+structure Input where
+  n : ℕ
+  records : List Record
+  valid : ∀ e∈records, e.left < e.right ∧ e.right < n
+  unique : (records.map (fun e => (e.left,e.right))).Nodup
+def multiplicity (G : Input) (e : Pair G.n) : ℕ :=
+  match G.records.find? (fun r => r.left=e.val.1.val && r.right=e.val.2.val) with
+  | none => 0
+  | some r => r.multiplicity
+def encodeNat (n : ℕ) : List Bool :=
+  List.replicate n.bits.length false ++ true :: n.bits
+def encodeRecord (r : Record) : List Bool :=
+  encodeNat r.left ++ encodeNat r.right ++ encodeNat r.multiplicity
+def encodeInput (G : Input) : List Bool :=
+  encodeNat G.n ++ encodeNat G.records.length ++ G.records.flatMap encodeRecord
+end BinaryMatching
+open scoped BigOperators
+namespace LoopMatching
+structure LoopRecord where
+  vertex : ℕ
+  multiplicity : ℕ
+  deriving DecidableEq
+structure Input where
+  ordinary : BinaryMatching.Input
+  loops : List LoopRecord
+  valid : ∀ e ∈ loops, e.vertex < ordinary.n
+  unique : (loops.map LoopRecord.vertex).Nodup
+abbrev Input.n (G : Input) : ℕ := G.ordinary.n
+def loopMultiplicity (G : Input) (v : Fin G.n) : ℕ :=
+  match G.loops.find? (fun r => r.vertex == v.val) with
+  | none => 0
+  | some r => r.multiplicity
+def IsPartialMatching (n : ℕ) (M : Finset (BinaryMatching.Pair n)) : Prop :=
+  ∀ v : Fin n, ∀ e ∈ M, ∀ f ∈ M,
+    (BinaryMatching.completeGraph n).Incident v e →
+    (BinaryMatching.completeGraph n).Incident v f → e = f
+abbrev PartialMatching (n : ℕ) :=
+  { M : Finset (BinaryMatching.Pair n) // IsPartialMatching n M }
+noncomputable instance partialMatchingFintype (n : ℕ) : Fintype (PartialMatching n) :=
+  Fintype.ofFinite _
+noncomputable def loopVertices {n : ℕ} (M : PartialMatching n) : Finset (Fin n) := by
+  classical
+  exact Finset.univ.filter (fun v =>
+    ∀ e ∈ M.val, ¬ (BinaryMatching.completeGraph n).Incident v e)
+noncomputable def weight (G : Input) (M : PartialMatching G.n) : ℕ :=
+  (∏ e ∈ M.val, BinaryMatching.multiplicity G.ordinary e) *
+    ∏ v ∈ loopVertices M, loopMultiplicity G v
+noncomputable def count (G : Input) : ℕ := ∑ M : PartialMatching G.n, weight G M
+def encodeLoopRecord (r : LoopRecord) : List Bool :=
+  BinaryMatching.encodeNat r.vertex ++ BinaryMatching.encodeNat r.multiplicity
+def encodeInput (G : Input) : List Bool :=
+  BinaryMatching.encodeInput G.ordinary ++
+    BinaryMatching.encodeNat G.loops.length ++ G.loops.flatMap encodeLoopRecord
+def encodeOutput (a : ℕ × ℕ) : List Bool :=
+  BinaryMatching.encodeNat a.1 ++ BinaryMatching.encodeNat a.2
+def FullEndpoint : Prop :=
+  ∃ A : Input → ℕ × ℕ,
+    ∃ machine : Turing.TM2ComputableInPolyTime encodeInput encodeOutput A,
+      (∀ k, Finite (machine.tm.Γ k)) ∧
+      (∃ P : Polynomial ℕ, ∀ G,
+        (encodeOutput (A G)).length ≤ P.eval (encodeInput G).length) ∧
+      ∀ G, 0 < (A G).2 ∧
+        (A G).1 ≤ (A G).2 * count G ∧
+        (A G).2 * count G ≤ 2 ^ (18 * G.n) * (A G).1 ∧
+        ((A G).1 = 0 ↔ count G = 0)
+end LoopMatching
+namespace LoopMatching
+theorem fullEndpoint : FullEndpoint := by
+  sorry
+end LoopMatching
+end OAI
+
+
+=== LEAN COMPARATOR MatchingEntropyBounds (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open scoped BigOperators Topology
+open Filter
+universe uV uE uIndex uι
+namespace MatchingEntropyBounds
+structure LooplessGraph (V : Type uV) (E : Type uE) where
+  left : E → V
+  right : E → V
+  loopless : ∀ e, left e ≠ right e
+variable {V : Type uV} {E : Type uE}
+  [Fintype V] [Fintype E] [DecidableEq V] [DecidableEq E]
+namespace LooplessGraph
+def Incident (G : LooplessGraph V E) (v : V) (e : E) : Prop :=
+  G.left e = v ∨ G.right e = v
+instance incidentDecidable (G : LooplessGraph V E) (v : V) (e : E) :
+    Decidable (G.Incident v e) := inferInstanceAs (Decidable (G.left e = v ∨ G.right e = v))
+def IsPerfectMatching (G : LooplessGraph V E) (M : Finset E) : Prop :=
+  ∀ v, ∃! e, e ∈ M ∧ G.Incident v e
+abbrev Matching (G : LooplessGraph V E) := {M : Finset E // G.IsPerfectMatching M}
+instance matchingFintype (G : LooplessGraph V E) : Fintype G.Matching :=
+  Fintype.ofFinite _
+def indicator (G : LooplessGraph V E) (M : G.Matching) (e : E) : ℝ :=
+  if e ∈ M.val then 1 else 0
+def polytope (G : LooplessGraph V E) : Set (E → ℝ) :=
+  convexHull ℝ (Set.range G.indicator)
+def mean (G : LooplessGraph V E) (p : G.Matching → ℝ) (e : E) : ℝ :=
+  ∑ M, p M * G.indicator M e
+end LooplessGraph
+def probabilitySimplex (Index : Type uIndex) [Fintype Index] : Set (Index → ℝ) :=
+  {weights | (∀ index, 0 ≤ weights index) ∧ ∑ index, weights index = 1}
+def LooplessGraph.feasibleLaws (G : LooplessGraph V E) (y : E → ℝ) : Set (G.Matching → ℝ) :=
+  {p | p ∈ probabilitySimplex G.Matching ∧ G.mean p = y}
+def entropy {ι : Type uι} [Fintype ι] (p : ι → ℝ) : ℝ :=
+  ∑ i, Real.negMulLog (p i)
+def maxMatchingEntropy (G : LooplessGraph V E) (y : E → ℝ) : ℝ :=
+  sSup (entropy '' G.feasibleLaws y)
+namespace Refined
+def complementEntropy (x : E → ℝ) : ℝ := entropy (fun e => 1 - x e)
+end Refined
+open Module Matrix
+variable {V : Type uV} {E : Type uE} [Fintype V] [Fintype E] [DecidableEq V] [DecidableEq E]
+open LooplessGraph
+theorem Refined.pointwise_entropy (G : LooplessGraph V E) (m : ℕ)
+    (hm : 0 < m) (hV : Fintype.card V = 2 * m) (hPM : Nonempty G.Matching)
+    (x : E → ℝ) (hx : x ∈ G.polytope) :
+    entropy x - (2 - 2 / (m : ℝ)) * complementEntropy x ≤ maxMatchingEntropy G x ∧
+      maxMatchingEntropy G x ≤ entropy x := by
+  sorry
+end MatchingEntropyBounds
+end
+end OAI
+
+
+=== LEAN COMPARATOR TriangleFace (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open scoped BigOperators Topology
+open Filter
+universe uV uE uIndex uι
+namespace MatchingEntropyBounds
+structure LooplessGraph (V : Type uV) (E : Type uE) where
+  left : E → V
+  right : E → V
+  loopless : ∀ e, left e ≠ right e
+variable {V : Type uV} {E : Type uE}
+  [Fintype V] [Fintype E] [DecidableEq V] [DecidableEq E]
+namespace LooplessGraph
+def Incident (G : LooplessGraph V E) (v : V) (e : E) : Prop :=
+  G.left e = v ∨ G.right e = v
+instance incidentDecidable (G : LooplessGraph V E) (v : V) (e : E) :
+    Decidable (G.Incident v e) := inferInstanceAs (Decidable (G.left e = v ∨ G.right e = v))
+def IsPerfectMatching (G : LooplessGraph V E) (M : Finset E) : Prop :=
+  ∀ v, ∃! e, e ∈ M ∧ G.Incident v e
+abbrev Matching (G : LooplessGraph V E) := {M : Finset E // G.IsPerfectMatching M}
+instance matchingFintype (G : LooplessGraph V E) : Fintype G.Matching :=
+  Fintype.ofFinite _
+def indicator (G : LooplessGraph V E) (M : G.Matching) (e : E) : ℝ :=
+  if e ∈ M.val then 1 else 0
+def polytope (G : LooplessGraph V E) : Set (E → ℝ) :=
+  convexHull ℝ (Set.range G.indicator)
+end LooplessGraph
+end MatchingEntropyBounds
+end
+noncomputable section
+open scoped BigOperators Topology
+open Filter
+universe uV uE uI uJ uA uB uC uW uF uD uι
+namespace MatchingEntropyBounds.LooplessGraph
+variable {V : Type uV} {E : Type uE} [Fintype V] [Fintype E] [DecidableEq V] [DecidableEq E]
+def Crosses (G : LooplessGraph V E) (S : Finset V) (e : E) : Prop :=
+  (G.left e ∈ S ∧ G.right e ∉ S) ∨ (G.left e ∉ S ∧ G.right e ∈ S)
+instance crossesDecidable (G : LooplessGraph V E) (S : Finset V) (e : E) :
+    Decidable (G.Crosses S e) := inferInstanceAs (Decidable
+      ((G.left e ∈ S ∧ G.right e ∉ S) ∨ (G.left e ∉ S ∧ G.right e ∈ S)))
+def cut (G : LooplessGraph V E) (S : Finset V) : Finset E :=
+  Finset.univ.filter (G.Crosses S)
+def degree (G : LooplessGraph V E) (x : E → ℝ) (v : V) : ℝ :=
+  ∑ e, if G.Incident v e then x e else 0
+def cutMass (G : LooplessGraph V E) (x : E → ℝ) (S : Finset V) : ℝ :=
+  ∑ e ∈ G.cut S, x e
+end MatchingEntropyBounds.LooplessGraph
+end
+noncomputable section
+open scoped BigOperators Topology
+open Filter
+universe uV uE uI uJ uA uB uC uW uF uD uι
+namespace MatchingEntropyBounds.Refined
+section TriangleExpansion
+variable {V : Type uV} {E : Type uE} [Fintype V] [Fintype E] [DecidableEq V] [DecidableEq E]
+def triangleTip (v : V) (i : Fin 3) : V ⊕ Fin 2 := ![Sum.inl v, Sum.inr 0, Sum.inr 1] i
+def triangleCollapse (v : V) : V ⊕ Fin 2 → V := Sum.elim id (fun _ => v)
+def reattach (v : V) (i : Fin 3) (w : V) : V ⊕ Fin 2 :=
+  if w = v then triangleTip v i else Sum.inl w
+omit [Fintype V] [Fintype E] [DecidableEq E] in
+theorem collapse_reattach (v : V) (i : Fin 3) (w : V) :
+    triangleCollapse v (reattach v i w) = w := by
+  by_cases h : w = v
+  · subst w
+    fin_cases i <;> simp [reattach,triangleTip,triangleCollapse]
+  · simp [reattach,h,triangleCollapse]
+def triangleExpansion (G : LooplessGraph V E) (c : E → Fin 3) (v : V) :
+    LooplessGraph (V ⊕ Fin 2) (E ⊕ Fin 3) where
+  left := Sum.elim (fun e => reattach v (c e) (G.left e)) (fun i => triangleTip v (i + 1))
+  right := Sum.elim (fun e => reattach v (c e) (G.right e)) (fun i => triangleTip v (i + 2))
+  loopless := by
+    intro e h
+    rcases e with e | i
+    · have hh := congrArg (triangleCollapse v) h
+      exact G.loopless e ((collapse_reattach v (c e) (G.left e)).symm.trans
+        (hh.trans (collapse_reattach v (c e) (G.right e))))
+    · fin_cases i <;> simp [triangleTip] at h
+def triangleVertices (v : V) : Finset (V ⊕ Fin 2) := Finset.univ.image (triangleTip v)
+end TriangleExpansion
+end MatchingEntropyBounds.Refined
+end
+namespace CanonicalFace198
+variable {A B : Type*} [AddCommGroup A] [Module ℝ A]
+  [AddCommGroup B] [Module ℝ B]
+def facesThrough (P : Set A) (x : A) : Set (Set A) :=
+  {F | Convex ℝ F ∧ IsExtreme ℝ P F ∧ x ∈ F}
+def minFace (P : Set A) (x : A) : Set A := ⋂₀ facesThrough P x
+end CanonicalFace198
+noncomputable section
+open scoped BigOper
+[…]

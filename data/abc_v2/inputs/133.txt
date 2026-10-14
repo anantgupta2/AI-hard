@@ -1,0 +1,414 @@
+FAMILY 133: The computational complexity of Weisfeiler–Leman refinement
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Proves unconditional $`n^{\Omega(k)}`$ deterministic time lower bounds for joint and separate k-dimensional Weisfeiler–Leman equivalence, for sufficiently large fixed k in the specified sequential adjacency-matrix models. With dimension as input, joint equivalence is EXPTIME-complete even on subcubic graphs; deciding whether refinement identifies a graph is also EXPTIME-complete.
+
+=== MANUSCRIPT: Parity lifts and bounded-treewidth witnesses for Weisfeiler–Leman equivalence (September-25-2026) [preprints/Parity-lifts-and-bounded-treewidth-witnesses-for-Weisfeiler-Leman-equivalence-September-25-2026/build/main.tex]
+ABSTRACT: For k ≥ 4, we construct two uncolored graphs that are k-dimensional Weisfeiler–Leman equivalent exactly when a prescribed finite-domain choice system has no compatible choice. The system has $`k+1`$ domains for joint refinement and k for separate-coordinate refinement. A successful choice is detected after two joint rounds or one separate round. Applied to sparse satisfiability, the reduction gives fixed-dimension $`n^{\Omega(k)}`$ time exclusions under positive-rate ETH, even for deciding equality of these early histograms.
+INTRODUCTION (start): \label{sec:introduction} The Weisfeiler--Leman method compares graphs by repeatedly refining colors of vertex tuples. Its dimension controls how much of a graph each tuple can describe. A useful way to study this refinement is to count graph homomorphisms from graphs of bounded treewidth: those counts connect local information in a tree decomposition to the global color distribution of the target graph. We give an explicit reduction from compatible choices in finite domains to Weisfeiler--Leman equivalence. Its main ingredients are two parity lifts of one base graph and a procedure that extracts compatible choices from any distinguishing homomorphism test with sufficiently small bags. All output graphs are finite, simple, undirected and uncolored. The construction is independent of the computational applications in the last section. \subsection{Refinement and simultaneous choices} Fix an integer \(k\ge4\). Initially, an ordered tuple \(\mathbf x\in V(X)^k\) has its \emph{atomic type} as color: the equalities and adjacencies between all positions. Write \(\mathbf x[i\leftarrow y]\) for replacement of coordinate \(i\) by \(y\). In \emph{joint} refinement, also called the correlated replacement-vector convention, a round records the old color \(C_r(\mathbf x)\) and \[ \{\!\{\,\bigl(C_r(\mathbf x[1\leftarrow y]),\ldots, C_r(\mathbf x[k\leftarrow y])\bigr): y\in V(X)\,\}\!\}. \] In \emph{separate} refinement it records the old color and the \(k\) multisets \(\{\!\{C_r(\mathbf x[i\leftarrow y]):y\in V(X)\}\!\}\), one for each coordinate \(i\). Colors are these data, with common names across graphs. Two graphs are \(k\)-WL equivalent when their tuple-color histograms agree at every round. Because each round retains the old color, it suffices to compare until the common color partition on the two tuple sets stabilizes. We also consider refinement of all tuples in a disjoint union \(X_0\sqcup X_1\), comparing the histograms on its two pure tuple sets \(V(X_0)^k\) and \(V(X_1)^k\). The parameter used throughout the construction is \begin{equation}\label{eq:bag-parameter} t=\begin{cases} k+1,&\text{joint refinement},\\ k,&\text{separate refinement}. \end{cases} \end{equation} \begin{definition}[Simultaneous choices]\label{def:choice} A \emph{choice system} consists of finite domains \(D_1,\ldots,D_t\) and, for every \(i<j\), a finite label set \(L_{ij}\) and maps \[ \lambda_{ij}^i:D_i\longrightarrow L_{ij}, \qquad \lambda_{ij}^j:D_j\longrightarrow L_{ij}. \] A \emph{successful choice} is a tuple \((d_1,\ldots,d_t)\in\prod_iD_i\) satisfying \(\lambda_{ij}^i(d_i)=\lambda_{ij}^j(d_j)\) for every \(i<j\). Empty domains are allowed. \end{definition} For example, let \(D_i\) be a set of Boolean assignments on a finite variable scope \(V_i\), and let both pair maps record restriction to \(V_i\cap V_j\), with label set \(\{0,1\}^{V_i\cap V_j}\). A successful choice is then a family of allowed partial assignments that joins to one assignment on \(\bigcup_i V_i\). Thus each pair of chosen elements must give the same answer to its shared label test. The labels are input data for the construction; they will not become vertex colors in the output. Write \(X_0\equiv_k X_\star\) for equivalence under the chosen convention. [statement] The order bound is a bound on the actual uncolored graphs; no promise about distinguished fibers or preserved types is supplied to a decider. \subsection{Context and the main ideas} Weisfeiler and Leman introduced the refinement method in their study of graph canonization~\citep{WL1968}. The parity examples of Cai, F\"urer and Immerman~\citep{CFI1992} are pairs of nonisomorphic vertex-colored graphs of maximum degree three that require WL dimension linear in their order to distinguish. The present construction also compares parity constraints, but its purpose is to make a successful selection from prescribed finite domains exactly equivalent to a detectable homomorphism-count difference. Encoding local solutions of binary […]
+[theorem] [Parity reduction]\label{thm:choice-reduction} Fix \(k\ge4\), either refinement convention, and the corresponding \(t\) in \eqref{eq:bag-parameter}. From every choice system on \(t\) domains one can explicitly construct two uncolored simple graphs \(X_0,X_\star\) of equal order such that \[ X_0\equiv_k X_\star \quad\Longleftrightarrow\quad \text{the choice system has no successful choice}. \] The assertion holds both with common color names on separate graphs and with pure-tuple comparison in their disjoint union. If every domain and label set has size at most \(A\), where \(A\ge1\), their common order is at most \(A M_t\), where \[ M_t=t\,2^{\,t-2+3\binom{t-1}{2}}+12\binom t3. \] When a successful choice exists, the two graphs already have different histograms after at most two joint rounds, or one separate round.
+[theorem] [Fixed-dimension ETH consequence]\label{thm:eth} Assume positive exponential-rate ETH. There are constants \(c>0\) and \(K\ge4\) such that, for every fixed integer \(k\ge K\), no deterministic algorithm decides \(k\)-WL equivalence of two \(n\)-vertex graphs in time \(O(n^{ck})\). This holds for both joint and separate refinement. The inputs are explicit adjacency matrices of uncolored simple undirected graphs, and time is measured on a multitape Turing machine.
+
+=== MANUSCRIPT: The complexity of identifying a graph by Weisfeiler–Leman refinement (September-25-2026) [preprints/The-complexity-of-identifying-a-graph-by-Weisfeiler-Leman-refinement-September-25-2026/build/paper.tex]
+ABSTRACT: We prove that deciding whether Weisfeiler–Leman refinement of an input dimension identifies a given graph is EXPTIME-complete. The input is a nonempty finite simple uncolored graph in adjacency-matrix form and a positive binary-encoded dimension. Identification quantifies over every comparison graph.
+INTRODUCTION (start): \label{sec:introduction} The Weisfeiler--Leman algorithm refines the colors of tuples of vertices to test graph isomorphism. A graph's Weisfeiler--Leman dimension measures how much tuple information is needed to identify a particular graph among all graphs. This differs from testing whether a specified pair of graphs survives refinement: identification quantifies over every possible comparison graph. We determine the complexity of identification when the dimension is part of the input. Increasing the dimension exposes more information, but also increases the number of tuples on which refinement operates. This makes the least sufficient dimension a natural measure of the strength needed on an individual graph. The decision problem studied here asks for that threshold, rather than for the number of refinement rounds or the cost of one particular implementation of refinement. All graphs in this paper are finite, simple, undirected, and uncolored. For $k\ge2$ we use the joint-update convention: a $k$-tuple starts with its equality and adjacency type, and each refinement adjoins the multiset, over vertices $z$, of the vectors of colors obtained by replacing each coordinate by that same $z$. At $k=1$ we use ordinary neighbor color refinement. Colors are shared between the graphs being compared. Write $G\equiv_k H$ when their tuple-color histograms agree at every round. We say that $k$-WL \emph{identifies} $G$ if $G\equiv_k H$ implies $G\cong H$ for every graph $H$. The \emph{Weisfeiler--Leman dimension} $\WLdim(G)$ is the least positive integer $k$ that identifies $G$. Section~\ref{sec:wl} gives the formal refinement rule and proves the monotonicity needed for this definition. Our decision problem has as input a nonempty graph $G$, given by its binary adjacency matrix, and a positive integer $k$, given in binary. It asks whether $\WLdim(G)\le k$. Malformed inputs are rejected. [statement] The problem remains EXPTIME-complete when $k$ is encoded in unary (Corollary~\ref{cor:unary}). Thus the hardness does not require a dimension whose numerical value is exponentially larger than its encoding. \subsection{Context and contribution} The refinement method originates in Weisfeiler and Leman's work on graph canonization and its associated algebra~\cite{WL1968}. The relation between Weisfeiler--Leman refinement, counting logic, and pebble games is a central tool in finite model theory and graph isomorphism; see Cai, F\"urer, and Immerman~\cite{CFI1992} and the game formulation in Kiefer and Neuen~\cite{KN2019}. Arvind, K\"obler, Rattan, and Verbitsky proved P-hardness for dimension-one identification~\cite{AKRV2017}. Lichter, Ra\ss mann, and Schweitzer extended fixed-dimension P-hardness to every $k\ge2$ and proved NP-hardness when the dimension is part of the input, including simple uncolored graphs \cite[Theorems~3--4]{LRS2025}. Those results distinguish identification from equivalence of a given pair. Variable-dimension pair equivalence was shown coNP-hard by Seppelt~\cite[Theorem~5]{Seppelt2024} and independently by Lichter, Ra\ss mann, and Schweitzer~\cite[Theorem~19]{LRS2025}. The identification arguments of Lichter, Ra\ss mann, and Schweitzer already analyze every equivalent mate of their colored CFI graphs, using local recognition of gadget incidences \cite[Lemma~8 and Claim~9]{LRS2024full}. The issue here is therefore not the all-mates quantifier by itself. Our incidence encoding admits an entire family of shifted constraints, and we must prove that every shift arising from an equivalent mate lifts to one global isomorphism on an accepting instance. This requires more than recognizing the allowed constraint pattern one incidence piece at a time. At the level of graph encodings, local parity constraints and a global twist obstruction are central features of the Cai--F\"urer--Immerman construction~\cite{CFI1992}. Compressed CFI graphs provide a related method for retaining game obstructions in smaller representations \cite{GLNS2025}. […]
+[theorem] \label{thm:main} The following problem is EXPTIME-complete under deterministic polynomial-time many-one reductions: given a nonempty finite simple undirected uncolored graph $G$ by its adjacency matrix and a positive integer $k$ in binary, decide whether $\WLdim(G)\le k$. Here dimension one uses ordinary neighbor color refinement, and dimensions at least two use the joint-update rule described above.
+
+=== MANUSCRIPT: Unconditional time lower bounds for Weisfeiler–Leman equivalence (September-25-2026) [preprints/Unconditional-time-lower-bounds-for-Weisfeiler-Leman-equivalence-September-25-2026/build/main.tex]
+ABSTRACT: For every sufficiently large fixed k, deciding whether two n-vertex graphs are k-Weisfeiler–Leman equivalent requires $`n^{\Omega(k)}`$ deterministic sequential time in the worst case. The bound holds at every sufficiently large graph order, even for simple connected uncolored graphs of diameter at most two, without a complexity assumption. Inputs are explicit adjacency matrices; the models are multitape Turing machines and sequential logarithmic-word RAMs with fixed polynomial-bit-time instructions. Both joint and separate replacement conventions are covered.
+INTRODUCTION (start): \label{sec:introduction} The refinement method originates in Weisfeiler and Leman's work on graph canonization \cite{WL1968}. Its higher-dimensional form assigns colors to tuples of vertices by repeatedly recording their local extension patterns. For each fixed dimension $k$, stabilization gives a polynomial-time test of $k$-Weisfeiler--Leman equivalence. The direct algorithms have running time $n^{O(k)}$: there are $n^k$ tuples, at most polynomially many refinement rounds in their number, and each round can be implemented in polynomial time in the tuple table. The question considered here is whether a growing exponent is necessary for \emph{any} sequential algorithm deciding the equivalence relation, rather than just for an implementation of refinement. For $k\ge2$, initial tuple colors record coordinate equalities and adjacencies. Each refinement step retains the old color and counts replacement colors. The \emph{joint} convention counts a multiset of $k$-component replacement-color vectors, one vector for each new vertex used in every coordinate; the \emph{separate} convention counts a replacement multiset for each coordinate independently. With common color names on the two graphs, equivalence means equality of their stable $k$-tuple color histograms. Section~\ref{game:section} gives the full formulas and their game characterizations. We give an unconditional lower bound for this decision problem. Input graphs are represented by explicit adjacency matrices. A decider is uniform in the input size; it may depend arbitrarily on the fixed dimension $k$. For a decider $A$, let $T_A(n)$ be its worst-case running time on pairs of graphs having $n$ vertices each. [statement] Theorem~\ref{thm:main} is unconditional; in particular, it does not assume the Exponential Time Hypothesis. It rules out a uniform running-time bound $f(k)n^{g(k)}$ with $g(k)=o(k)$, for any function $f$ independent of $n$: fix a sufficiently large $k$ for which $g(k)<ck$ and then let $n$ grow. The theorem concerns deterministic computation, not randomized algorithms, nonuniform advice, or unit-cost operations on unbounded integers. The quantifiers in the theorem are important. The exponent constant $c$ is independent of both $k$ and the program. The threshold $n_0$ need not be uniform in either. A lower bound at infinitely many graph orders would not suffice: the conclusion excludes an algorithm that is unusually fast at even a sparse sequence of arbitrarily large orders. \paragraph{Historical and methodological context.} The parity constructions of Cai, F\"urer, and Immerman established fundamental limitations of bounded-variable graph identification \cite{CFI1992}. Their local parity constraints and global twist obstruction provide a basic setting for understanding why a bounded game can fail to distinguish two globally different graphs. Grohe, Lichter, Neuen, and Schweitzer developed compressed Cai--F\"urer--Immerman constructions and proved, for each fixed $k\ge2$, families requiring $\Omega_k(n^{k/2})$ rounds of $k$-dimensional refinement \cite[Theorem~33 and Corollary~34]{CFICompression}. Such a bound concerns the refinement process itself and does not exclude a faster algorithm that decides its final equivalence relation by another method. Our construction shares the use of compressed addresses and bounded-pebble obstructions, but its individual scalar-image consistency and exact extension properties are proved here. Recent upper bounds on refinement iterations, including the linear bound for classical $2$-WL of D\"oring and Neuen \cite[Main Theorem~1]{DoeringNeuen2026}, likewise concern the refinement procedure rather than the complexity of every equivalence decider. A companion finite-choice reduction uses parity lifts and bounded-treewidth homomorphism witnesses~\cite[Theorem~1.2 and Sections~2--4]{ParityLiftsWL2026}. When the dimension is part of the input, Seppelt \cite[Theorem~5]{Seppelt2024} and Lichter, Ra\ss mann, and Schweitzer \cite[arXiv v2 […]
+[theorem] \label{thm:main} There are absolute constants $c>0$ and $k_0$ with the following property. For every fixed integer $k\ge k_0$ and every correct deterministic decider $A$ for $k$-Weisfeiler--Leman equivalence, there is an integer $n_0=n_0(A,k)$ such that \[ T_A(n)\ge n^{ck} \qquad\text{for every integer }n\ge n_0. \] This holds for multitape Turing machines and for sequential random-access machines with $O(\log(n+2))$-bit addresses and words, boundedly many memory accesses per instruction, and fixed instructions computable in time polynomial in the word length. The same bound holds if $A$ is required to decide correctly only on pairs of simple connected uncolored graphs of diameter at most two, with $T_A(n)$ maximized over that class. It applies both to the joint replacement-multiset convention for $k$-dimensional refinement and to the separate-multiset convention defined below.
+
+=== MANUSCRIPT: Variable-dimension Weisfeiler–Leman equivalence on general and subcubic graphs (September-25-2026) [preprints/Variable-dimension-Weisfeiler-Leman-equivalence-on-general-and-subcubic-graphs-September-25-2026/build/main.tex]
+ABSTRACT: Deciding joint-update k-dimensional Weisfeiler–Leman equivalence is $`\mathsf{EXPTIME}`$-complete when the two graphs are given by explicit adjacency matrices and k ≥ 2 is encoded in binary. The result holds even for connected simple uncolored graphs of equal positive order and maximum degree at most three.
+INTRODUCTION (start): \label{sec:introduction} Weisfeiler--Leman refinement compares graphs by repeatedly refining colors of ordered vertex tuples. For every fixed dimension, this procedure is computable in polynomial time. When the dimension is part of the input, however, the familiar \(n^{O(k)}\) tuple computation is no longer a polynomial-time algorithm. We determine the complexity of deciding its answer, both on general graphs and on connected graphs of maximum degree three. We use the \emph{joint-update} convention. Initially a \(k\)-tuple records the equalities and adjacencies among its entries. For each possible replacement vertex \(z\), form the vector of \(k\) old colors obtained by replacing, in turn, each coordinate by that same \(z\). The new color records the old color and the multiset of these entire vectors. Color names are common to the two graphs. Write \(G\equiv_k H\) if their \(k\)-tuple color histograms agree at every round. \Cref{def:joint-wl} gives the recursive definition. The language \(\WL\) consists of the encodings \((G,H,k)\) with \(G\equiv_k H\), where \(G,H\) are finite simple uncolored undirected graphs represented by explicit adjacency matrices and \(k\ge2\) is encoded in binary. Its restricted version \(\SubWL\) additionally requires the two graphs to be connected, of the same positive order, and of maximum degree at most three. Malformed encodings or failures of the specified graph and dimension conditions are excluded. [statement] The degree condition is an upper bound: the constructed subcubic graphs are not required to be regular. The two problems concern equivalence of a supplied pair at the supplied dimension, rather than finding the least dimension that identifies one graph among all possible mates. The companion \citep[Theorem~1.1]{CompanionIdentification} proves \(\EXPTIME\)-completeness for deciding whether a supplied dimension identifies one graph among all mates, using our uniform computation interface together with a separate all-mates reconstruction. The dimension may exceed the graph order; the upper bound proves that it can be capped before any tuple table is allocated. \subsection{History and the role of the degree restriction} The refinement method originates in Weisfeiler and Leman's work on graph canonization and its associated algebra \citep{WeisfeilerLeman1968}. Cai, F{\"u}rer and Immerman established linear lower bounds on the number of variables required for graph identification. Their examples include nonisomorphic degree-three graphs with color classes of size at most four that remain indistinguishable with linearly many counting variables \citep[Theorem~5.2 and Corollary~6.5]{CaiFurerImmerman1992}. These are dimension lower bounds, not lower bounds on every algorithm deciding the outcome of refinement. The joint-update convention and its bijective \((k+1)\)-pair game characterization are recorded explicitly by Kiefer and Neuen \citep[Section~2.2 and Theorem~1]{KieferNeuen2019}. We include the complete histogram-to-empty-game proof because the extra pair and the timing of the announced bijection are essential. For dimension supplied as input, Seppelt proved coNP-hardness of pair equivalence and recorded Berkholz's question of \(\EXPTIME\)-completeness \citep[Theorem~5 and the preceding question, p.~82:3]{Seppelt2024}. Lichter, Ra{\ss}mann and Schweitzer independently obtained coNP-hardness for simple uncolored graphs \citep[Theorem~19]{LichterRassmannSchweitzer2025}. Their work also studies the distinct identification-dimension problem. \Cref{thm:main} answers the equivalence question for the joint-update convention and, in addition, for the connected subcubic restriction. The latter restriction is instructive because Luks proved that isomorphism of graphs of every fixed maximum degree is decidable in polynomial time \citep{Luks1982}. Refinement at a prescribed dimension asks a different question: nonisomorphic graphs can still be equivalent. Our degree-three result concerns that query, not […]
+[theorem] \label{thm:main} Both \(\WL\) and \(\SubWL\) are \(\EXPTIME\)-complete under deterministic polynomial-time many-one reductions.
+
+=== LEAN COMPARATOR ParityLifts (exact formal statement)
+import Mathlib
+namespace OAI
+namespace ParityWL
+open scoped BigOperators
+abbrev Bit := ZMod 2
+abbrev MainPair (t : ℕ) := {p : Fin t × Fin t // p.1 < p.2}
+abbrev Helper (t : ℕ) :=
+  {q : MainPair t × Fin t // q.2 ≠ q.1.1.1 ∧ q.2 ≠ q.1.1.2}
+abbrev TemplateVertex (t : ℕ) := Fin t ⊕ Helper t
+structure ChoiceSystem (t : ℕ) where
+  Domain : Fin t → Type
+  domainFintype : ∀ i, Fintype (Domain i)
+  Label : MainPair t → Type
+  labelFintype : ∀ p, Fintype (Label p)
+  leftLabel : (p : MainPair t) → Domain p.1.1 → Label p
+  rightLabel : (p : MainPair t) → Domain p.1.2 → Label p
+attribute [instance] ChoiceSystem.domainFintype ChoiceSystem.labelFintype
+def ChoiceSystem.Successful {t : ℕ} (C : ChoiceSystem t) : Prop :=
+  ∃ d : (i : Fin t) → C.Domain i,
+    ∀ p : MainPair t, C.leftLabel p (d p.1.1) = C.rightLabel p (d p.1.2)
+def ChoiceSystem.SizeAtMost {t : ℕ} (C : ChoiceSystem t) (A : ℕ) : Prop :=
+  (∀ i, Fintype.card (C.Domain i) ≤ A) ∧ (∀ p, Fintype.card (C.Label p) ≤ A)
+def helperIncident {t : ℕ} (h : Helper t) (i : Fin t) : Prop :=
+  i = h.1.1.1.1 ∨ i = h.1.1.1.2 ∨ i = h.1.2
+def templateAdj {t : ℕ} : TemplateVertex t → TemplateVertex t → Prop
+  | .inl i, .inl j => i ≠ j
+  | .inl i, .inr h => helperIncident h i
+  | .inr h, .inl i => helperIncident h i
+  | .inr _, .inr _ => False
+def template (t : ℕ) : SimpleGraph (TemplateVertex t) where
+  Adj := templateAdj
+  symm := ⟨by
+    intro x y h
+    cases x <;> cases y <;> simp_all [templateAdj, ne_comm]⟩
+  loopless := ⟨by
+    intro x
+    cases x <;> simp [templateAdj]⟩
+abbrev BaseVertex {t : ℕ} (C : ChoiceSystem t) :=
+  ((i : Fin t) × C.Domain i) ⊕ ((h : Helper t) × C.Label h.1.1)
+def baseType {t : ℕ} {C : ChoiceSystem t} : BaseVertex C → TemplateVertex t
+  | .inl x => .inl x.1
+  | .inr x => .inr x.1
+inductive BaseArc {t : ℕ} (C : ChoiceSystem t) : BaseVertex C → BaseVertex C → Prop
+  | main (p : MainPair t) (d : C.Domain p.1.1) (e : C.Domain p.1.2)
+      (h : C.leftLabel p d = C.rightLabel p e) :
+      BaseArc C (.inl ⟨p.1.1, d⟩) (.inl ⟨p.1.2, e⟩)
+  | left (h : Helper t) (d : C.Domain h.1.1.1.1) :
+      BaseArc C (.inr ⟨h, C.leftLabel h.1.1 d⟩) (.inl ⟨h.1.1.1.1, d⟩)
+  | right (h : Helper t) (e : C.Domain h.1.1.1.2) :
+      BaseArc C (.inr ⟨h, C.rightLabel h.1.1 e⟩) (.inl ⟨h.1.1.1.2, e⟩)
+  | third (h : Helper t) (q : C.Label h.1.1) (f : C.Domain h.1.2) :
+      BaseArc C (.inr ⟨h, q⟩) (.inl ⟨h.1.2, f⟩)
+def baseGraph {t : ℕ} (C : ChoiceSystem t) : SimpleGraph (BaseVertex C) :=
+  SimpleGraph.fromRel (BaseArc C)
+def baseProjection {t : ℕ} (C : ChoiceSystem t) : baseGraph C →g template t where
+  toFun := baseType
+  map_rel' := by
+    intro x y h
+    have arc : ∀ u v, BaseArc C u v → (template t).Adj (baseType u) (baseType v) := by
+      intro u v huv
+      cases huv with
+      | main p d e he => exact ne_of_lt p.property
+      | left h d => exact Or.inl rfl
+      | right h e => exact Or.inr (Or.inl rfl)
+      | third h q f => exact Or.inr (Or.inr rfl)
+    rcases h.2 with hxy | hyx
+    · exact arc x y hxy
+    · exact (arc y x hyx).symm
+section Lifts
+variable {A V : Type} [Fintype A] (T : SimpleGraph A) (G : SimpleGraph V)
+noncomputable def Tag (b : A → Bit) (a : A) := by
+  classical
+  exact {z : T.neighborSet a → Bit // ∑ v, z v = b a}
+noncomputable instance tagFintype (b : A → Bit) (a : A) : Fintype (Tag T b a) := by
+  classical
+  unfold Tag
+  infer_instance
+abbrev LiftVertex (τ : G →g T) (b : A → Bit) := (u : V) × Tag T b (τ u)
+noncomputable def liftGraph (τ : G →g T) (b : A → Bit) :
+    SimpleGraph (LiftVertex T G τ b) where
+  Adj u v := ∃ h : G.Adj u.1 v.1,
+    u.2.1 ⟨τ v.1, τ.map_adj h⟩ = v.2.1 ⟨τ u.1, τ.map_adj h.symm⟩
+  symm := ⟨by
+    intro u v h
+    rcases h with ⟨h, e⟩
+    exact ⟨h.symm, e.symm⟩⟩
+  loopless := ⟨by
+    intro u h
+    exact G.irrefl h.1⟩
+end Lifts
+noncomputable def starParity (t : ℕ) : TemplateVertex t → Bit :=
+  fun a => if ∃ i : Fin t, i.val = 0 ∧ a = .inl i then 1 else 0
+noncomputable def zeroLift {t : ℕ} (C : ChoiceSystem t) :=
+  liftGraph (template t) (baseGraph C) (basePr
+[…]
+
+=== LEAN COMPARATOR WLIdentification (exact formal statement)
+import Mathlib
+namespace OAI
+namespace WLIdentification
+structure Graph where
+  order : ℕ
+  edge : Fin order → Fin order → Bool
+  symmetric : ∀ u v, edge u v = edge v u
+  loopless : ∀ u, edge u u = false
+def Isomorphic (G H : Graph) : Prop :=
+  ∃ e : Fin G.order ≃ Fin H.order, ∀ u v, G.edge u v = H.edge (e u) (e v)
+def NeighborColor : ℕ → Type
+  | 0 => Unit
+  | s + 1 => NeighborColor s × Multiset (NeighborColor s)
+def neighborColor (G : Graph) : (s : ℕ) → Fin G.order → NeighborColor s
+  | 0, _ => ()
+  | s + 1, v => (neighborColor G s v,
+      (Finset.univ.filter (fun w => G.edge v w = true)).val.map (neighborColor G s))
+def neighborHistogram (G : Graph) (s : ℕ) : Multiset (NeighborColor s) :=
+  Finset.univ.val.map (neighborColor G s)
+def TupleColor (k : ℕ) : ℕ → Type
+  | 0 => (Fin k → Fin k → Bool) × (Fin k → Fin k → Bool)
+  | s + 1 => TupleColor k s × Multiset (Fin k → TupleColor k s)
+def tupleColor (G : Graph) (k : ℕ) : (s : ℕ) → (Fin k → Fin G.order) → TupleColor k s
+  | 0, v => (fun i j => decide (v i = v j), fun i j => G.edge (v i) (v j))
+  | s + 1, v => (tupleColor G k s v,
+      Finset.univ.val.map (fun z => fun i => tupleColor G k s (Function.update v i z)))
+def tupleHistogram (G : Graph) (k s : ℕ) : Multiset (TupleColor k s) :=
+  Finset.univ.val.map (tupleColor G k s)
+def Equivalent (k : ℕ) (G H : Graph) : Prop :=
+  if k = 1 then ∀ s, neighborHistogram G s = neighborHistogram H s
+  else ∀ s, tupleHistogram G k s = tupleHistogram H k s
+def Identifies (k : ℕ) (G : Graph) : Prop :=
+  ∀ H : Graph, Equivalent k G H → Isomorphic G H
+noncomputable def WLdim (G : Graph) : ℕ :=
+  sInf {k : ℕ | 0 < k ∧ Identifies k G}
+abbrev Word := List Bool
+abbrev BinaryLanguage := Set Word
+def binaryValue (bits : Word) : ℕ :=
+  bits.foldl (fun z b => 2 * z + if b then 1 else 0) 0
+def matrixWord (G : Graph) : Word :=
+  (List.ofFn (fun i : Fin G.order => List.ofFn (G.edge i))).flatten
+def inputWord (G : Graph) (bits : Word) : Word :=
+  List.replicate G.order true ++ [false] ++ matrixWord G ++ bits
+def dimensionLanguage : BinaryLanguage :=
+  {w | ∃ (G : Graph) (bits : Word),
+    0 < G.order ∧ (∃ tail, bits = true :: tail) ∧ 0 < binaryValue bits ∧
+    w = inputWord G bits ∧ WLdim G ≤ binaryValue bits}
+inductive Move where
+  | left | stay | right
+  deriving DecidableEq
+def Move.displacement : Move → ℤ
+  | .left => -1
+  | .stay => 0
+  | .right => 1
+structure Machine where
+  extraSymbols : ℕ
+  extraStates : ℕ
+  transition : Fin (extraStates + 3) → Fin (extraSymbols + 3) →
+    Fin (extraStates + 3) × Fin (extraSymbols + 3) × Move
+structure Configuration (M : Machine) where
+  state : Fin (M.extraStates + 3)
+  head : ℤ
+  tape : ℤ → Fin (M.extraSymbols + 3)
+def inputSymbol (M : Machine) (b : Bool) : Fin (M.extraSymbols + 3) :=
+  if b then 2 else 1
+def initial (M : Machine) (w : Word) : Configuration M where
+  state := 0
+  head := 0
+  tape z := if 0 ≤ z then (w[z.toNat]?).elim 0 (inputSymbol M) else 0
+def Halted {M : Machine} (c : Configuration M) : Prop :=
+  c.state = 1 ∨ c.state = 2
+def step (M : Machine) (c : Configuration M) : Configuration M :=
+  if c.state = 1 ∨ c.state = 2 then c else
+    let t := M.transition c.state (c.tape c.head)
+    { state := t.1, head := c.head + t.2.2.displacement,
+      tape := Function.update c.tape c.head t.2.1 }
+def run (M : Machine) (w : Word) (t : ℕ) : Configuration M :=
+  (step M)^[t] (initial M w)
+def Output {M : Machine} (c : Configuration M) (w : Word) : Prop :=
+  (∀ i : Fin w.length, c.tape (i.val : ℤ) = inputSymbol M w[i]) ∧
+    c.tape (w.length : ℤ) = 0
+def DecidesWithin (M : Machine) (L : BinaryLanguage) (bound : ℕ → ℕ) : Prop :=
+  ∀ w, ∃ t ≤ bound w.length, Halted (run M w t) ∧ ((run M w t).state = 1 ↔ w ∈ L)
+def InEXPTIME (L : BinaryLanguage) : Prop :=
+  ∃ (M : Machine) (C d : ℕ),
+    DecidesWithin M L (fun n => 2 ^ (C * (n + 1) ^ d))
+def ComputesWithin (M : Machine) (f : Word → Word) (bound : ℕ → ℕ) : Prop :=
+  ∀ w, ∃ t ≤ bound w.length, (run M w t).state = 1 ∧ Output (run M w t) (f w)
+def PolytimeManyOne
+[…]
+
+=== LEAN COMPARATOR WeisfeilerLeman (exact formal statement)
+import Mathlib
+namespace OAI
+namespace WLTime
+inductive Convention where
+  | joint | separate
+  deriving DecidableEq
+def Graph (n : ℕ) :=
+  { a : Fin n → Fin n → Bool //
+    (∀ x y, a x y = a y x) ∧ (∀ x, a x x = false) }
+namespace Graph
+def adj {n : ℕ} (G : Graph n) : Fin n → Fin n → Bool := G.val
+def diameterTwo {n : ℕ} (G : Graph n) : Prop :=
+  0 < n ∧ ∀ x y, x = y ∨ G.adj x y = true ∨
+    ∃ z, G.adj x z = true ∧ G.adj z y = true
+noncomputable instance (n : ℕ) : Fintype (Graph n) := by
+  classical
+  unfold Graph
+  infer_instance
+end Graph
+abbrev AtomicColor (k : ℕ) :=
+  (Fin k → Fin k → Bool) × (Fin k → Fin k → Bool)
+def Color (c : Convention) (k : ℕ) : ℕ → Type
+  | 0 => AtomicColor k
+  | t + 1 => match c with
+    | .joint => Color c k t × Multiset (Fin k → Color c k t)
+    | .separate => Color c k t × (Fin k → Multiset (Color c k t))
+noncomputable def tupleColor {n : ℕ} (c : Convention) (k : ℕ) (G : Graph n) :
+    (t : ℕ) → (Fin k → Fin n) → Color c k t
+  | 0, v => (fun i j => decide (v i = v j), fun i j => G.adj (v i) (v j))
+  | t + 1, v => match c with
+    | .joint => (tupleColor .joint k G t v,
+        Finset.univ.val.map (fun z => fun i =>
+          tupleColor .joint k G t (Function.update v i z)))
+    | .separate => (tupleColor .separate k G t v,
+        fun i => Finset.univ.val.map (fun z =>
+          tupleColor .separate k G t (Function.update v i z)))
+noncomputable def histogram {n : ℕ} (c : Convention) (k : ℕ) (G : Graph n)
+    (t : ℕ) : Multiset (Color c k t) :=
+  Finset.univ.val.map (tupleColor c k G t)
+def Equivalent {n : ℕ} (c : Convention) (k : ℕ) (G H : Graph n) : Prop :=
+  ∀ t, histogram c k G t = histogram c k H t
+def encodeNat (n : ℕ) : List Bool :=
+  let bits := (Nat.digits 2 n).map (fun b => decide (b = 1))
+  List.replicate bits.length true ++ [false] ++ bits
+def matrixBits {n : ℕ} (G : Graph n) : List Bool :=
+  (List.ofFn fun i : Fin n => List.ofFn fun j : Fin n => G.adj i j).flatten
+def encodePair {n : ℕ} (G H : Graph n) : List Bool :=
+  encodeNat n ++ matrixBits G ++ matrixBits H
+inductive Move where
+  | left | stay | right
+  deriving DecidableEq
+def Move.displacement : Move → ℤ
+  | .left => -1
+  | .stay => 0
+  | .right => 1
+structure TM where
+  tapes : ℕ
+  states : ℕ
+  symbols : ℕ
+  tapes_pos : 0 < tapes
+  states_ge : 3 ≤ states
+  symbols_ge : 3 ≤ symbols
+  transition : Fin states → (Fin tapes → Fin symbols) →
+    Fin states × (Fin tapes → Fin symbols) × (Fin tapes → Move)
+namespace TM
+structure Config (M : TM) where
+  state : Fin M.states
+  head : Fin M.tapes → ℤ
+  tape : Fin M.tapes → ℤ → Fin M.symbols
+def symbol (M : TM) (b : Bool) : Fin M.symbols :=
+  if b then ⟨2, by have := M.symbols_ge; omega⟩ else
+    ⟨1, by have := M.symbols_ge; omega⟩
+def initial (M : TM) (w : List Bool) : M.Config where
+  state := ⟨0, by have := M.states_ge; omega⟩
+  head := fun _ => 0
+  tape := fun a z => if a.val = 0 ∧ 0 ≤ z ∧ z.toNat < w.length then
+    M.symbol (w.getD z.toNat false) else ⟨0, by have := M.symbols_ge; omega⟩
+def halted (M : TM) (C : M.Config) : Prop := C.state.val = 1 ∨ C.state.val = 2
+instance (M : TM) (C : M.Config) : Decidable (M.halted C) := inferInstanceAs
+  (Decidable (C.state.val = 1 ∨ C.state.val = 2))
+def step (M : TM) (C : M.Config) : M.Config :=
+  if M.halted C then C else
+  let tr := M.transition C.state (fun a => C.tape a (C.head a))
+  { state := tr.1
+    head := fun a => C.head a + (tr.2.2 a).displacement
+    tape := fun a z => if z = C.head a then tr.2.1 a else C.tape a z }
+def run (M : TM) (w : List Bool) (t : ℕ) : M.Config := M.step^[t] (M.initial w)
+def halts (M : TM) (w : List Bool) : Prop := ∃ t, M.halted (M.run w t)
+noncomputable def time (M : TM) (w : List Bool) : ℕ := by
+  classical
+  exact if h : M.halts w then Nat.find h else 0
+def accepts (M : TM) (w : List Bool) : Prop :=
+  ∃ t, (M.run w t).state.val = 1
+def outputs (M : TM) (input output : List Bool) : Prop :=
+  M.halts input ∧ ∀ i : Fin output.length,
+    (M.run input (M.time input)).tape ⟨0, M.tapes_pos⟩ (i.val : ℤ) =
+    
+[…]
+
+=== LEAN COMPARATOR VariableWL (exact formal statement)
+import Mathlib
+namespace OAI
+namespace VariableWL
+abbrev Word := List Bool
+inductive Motion where
+  | left | stay | right
+  deriving DecidableEq
+def Motion.displacement : Motion → ℤ
+  | .left => -1
+  | .stay => 0
+  | .right => 1
+structure Machine where
+  states : ℕ
+  workSymbols : ℕ
+  extraTapes : ℕ
+  transition : Fin (states + 1) →
+    (Fin (extraTapes + 1) → Fin (workSymbols + 3)) →
+    Option (Fin (states + 1) ×
+      (Fin (extraTapes + 1) → Fin (workSymbols + 3) × Motion))
+structure Configuration (M : Machine) where
+  control : Fin (M.states + 1)
+  heads : Fin (M.extraTapes + 1) → ℤ
+  cells : Fin (M.extraTapes + 1) → ℤ → Fin (M.workSymbols + 3)
+def wordCells (a : ℕ) (w : Word) (i : ℤ) : Fin (a + 3) :=
+  if 0 ≤ i then
+    match w[i.toNat]? with
+    | none => 0
+    | some false => 1
+    | some true => 2
+  else 0
+def initial (M : Machine) (w : Word) : Configuration M where
+  control := 0
+  heads := fun _ => 0
+  cells := fun j => if j = 0 then wordCells M.workSymbols w else fun _ => 0
+def scanned {M : Machine} (c : Configuration M) :
+    Fin (M.extraTapes + 1) → Fin (M.workSymbols + 3) :=
+  fun j => c.cells j (c.heads j)
+def step (M : Machine) (c : Configuration M) : Option (Configuration M) :=
+  (M.transition c.control (scanned c)).map fun data =>
+    { control := data.1
+      heads := fun j => c.heads j + (data.2 j).2.displacement
+      cells := fun j i => if i = c.heads j then (data.2 j).1 else c.cells j i }
+def run (M : Machine) (w : Word) : ℕ → Configuration M
+  | 0 => initial M w
+  | n + 1 => (step M (run M w n)).getD (run M w n)
+def OutputsWithin (M : Machine) (w out : Word) (bound : ℕ) : Prop :=
+  ∃ t ≤ bound, step M (run M w t) = none ∧
+    (run M w t).cells 0 = wordCells M.workSymbols out
+abbrev Language := Set Word
+def InEXPTIME (L : Language) : Prop :=
+  ∃ M : Machine, ∃ c d : ℕ, ∀ w : Word,
+    ∃ b : Bool, (b = true ↔ w ∈ L) ∧
+      OutputsWithin M w [b] (2 ^ (c * (w.length + 1) ^ d))
+def PolytimeReduces (L R : Language) : Prop :=
+  ∃ M : Machine, ∃ c d : ℕ, ∀ w : Word,
+    ∃ out : Word, OutputsWithin M w out (c * (w.length + 1) ^ d) ∧
+      (w ∈ L ↔ out ∈ R)
+def EXPTIMEComplete (L : Language) : Prop :=
+  InEXPTIME L ∧ ∀ R : Language, InEXPTIME R → PolytimeReduces R L
+structure Graph where
+  order : ℕ
+  graph : SimpleGraph (Fin order)
+abbrev Tuple (G : Graph) (k : ℕ) := Fin k → Fin G.order
+def Color (k : ℕ) : ℕ → Type
+  | 0 => Fin k → Fin k → Bool × Bool
+  | s + 1 => Color k s × Multiset (Fin k → Color k s)
+noncomputable def color (G : Graph) (k : ℕ) : (s : ℕ) → Tuple G k → Color k s
+  | 0, v => by
+      classical
+      exact fun i j => (decide (v i = v j), decide (G.graph.Adj (v i) (v j)))
+  | s + 1, v => (color G k s v,
+      Finset.univ.val.map (fun z => fun i => color G k s (Function.update v i z)))
+noncomputable def histogram (G : Graph) (k s : ℕ) : Multiset (Color k s) :=
+  Finset.univ.val.map (color G k s)
+def Equivalent (G H : Graph) (k : ℕ) : Prop :=
+  ∀ s : ℕ, histogram G k s = histogram H k s
+def integerCode (n : ℕ) : Word :=
+  List.replicate (Nat.bits n).length true ++ [false] ++ Nat.bits n
+noncomputable def graphCode (G : Graph) : Word := by
+  classical
+  exact integerCode G.order ++
+    (List.ofFn fun i : Fin G.order =>
+      List.ofFn fun j : Fin G.order => decide (G.graph.Adj i j)).flatten
+noncomputable def pairCode (G H : Graph) (k : ℕ) : Word :=
+  graphCode G ++ graphCode H ++ integerCode k
+def WL : Language :=
+  { w | ∃ G H : Graph, ∃ k : ℕ, w = pairCode G H k ∧ 2 ≤ k ∧ Equivalent G H k }
+noncomputable def Subcubic (G : Graph) : Prop := by
+  classical
+  exact ∀ v : Fin G.order, G.graph.degree v ≤ 3
+def SubWL : Language :=
+  { w | ∃ G H : Graph, ∃ k : ℕ, w = pairCode G H k ∧ 2 ≤ k ∧
+    0 < G.order ∧ G.order = H.order ∧ G.graph.Connected ∧ H.graph.Connected ∧
+    Subcubic G ∧ Subcubic H ∧ Equivalent G H k }
+theorem main : EXPTIMEComplete WL ∧ EXPTIMEComplete SubWL := by
+  sorry
+end VariableWL
+end OAI
+

@@ -1,0 +1,66 @@
+FAMILY 327: Markov type characterizes superreflexivity
+SUBJECT: Functional analysis
+OPENAI SUMMARY: Proves that every real Banach space with Markov type p for some p &gt; 1 admits an equivalent uniformly convex norm, answering Naor's renorming question. Together with the known converse, this characterizes superreflexivity by nontrivial Markov type.
+
+=== MANUSCRIPT: Nontrivial Markov Type Forces Superreflexivity (September-23-2026) [preprints/Nontrivial-Markov-Type-Forces-Superreflexivity-September-23-2026/build/main.tex]
+ABSTRACT: We prove that every real Banach space with Markov type p &gt; 1 is superreflexive. Together with the known converse, this characterizes superreflexivity by nontrivial Markov type. This answers Naor's question: every real Banach space with nontrivial Markov type admits an equivalent uniformly smooth norm.
+INTRODUCTION (start): A finite Markov chain $(Z_t)_{t\geq0}$ on a set $S$, with transition matrix $P$ and initial distribution $\pi$, is \emph{stationary and reversible} if \[ \pi_iP_{ij}=\pi_jP_{ji}\qquad(i,j\in S). \] A normed space $X$ has \emph{Markov type $p>0$ with constant $0<K<\infty$} if, for every such chain, every $f:S\to X$, and every integer $t\geq1$, \begin{equation}\label{eq:markov-type} \E\norm{f(Z_t)-f(Z_0)}^p \leq K^p t\,\E\norm{f(Z_1)-f(Z_0)}^p. \end{equation} A Banach space is \emph{superreflexive} if it admits an equivalent uniformly convex norm. Here a norm $|\cdot|$ is equivalent to $\|\cdot\|$ if $a\|x\|\leq|x|\leq b\|x\|$ for some $a,b>0$; it is uniformly convex if, for every $\epsilon\in(0,2]$, there is $\delta>0$ such that \[ |x|,|y|\leq1,\quad |x-y|\geq\epsilon \quad\Longrightarrow\quad \left|\frac{x+y}{2}\right|\leq1-\delta. \] [statement] \paragraph{Context and result.} Ball introduced Markov type to study Lipschitz extension from metric spaces \cite{Ball}. The inequality tests every finite reversible walk, so it is a metric property even when the target is a Banach space. Superreflexivity, by contrast, is defined through an equivalent norm; its metric characterizations are central examples in the Ribe program, which seeks metric descriptions of linear-geometric properties. Bourgain characterized it by the distortion of finite complete binary trees \cite{Bourgain}; finite diamonds provide another metric test \cite{JohnsonSchechtman}. Lee, Naor, and Peres introduced Markov convexity in their study of tree distortion \cite{LeeNaorPeres}. Mendel and Naor later characterized superreflexivity through \emph{Markov convexity}, an inequality comparing walks that share their past and then evolve independently \cite{MendelNaor}. Theorem~\ref{thm:main} identifies what ordinary Markov type alone detects for Banach spaces. Ordinary Rademacher type, which controls sums with independent random signs, does not suffice for this conclusion: James constructed nonreflexive spaces of Rademacher type $2$ \cite{JamesType2}. Naor, Peres, Schramm, and Sheffield showed that uniform smoothness of power type $p$ implies Markov type $p$ for $1<p\leq2$ \cite{NPSS}. Pisier's power-type renorming theorem \cite{Pisier} therefore gives nontrivial Markov type to every superreflexive space; Markov type is invariant under equivalent norms. Naor asked whether a Banach space could have nontrivial Markov type without an equivalent uniformly smooth norm \cite[Question~4]{Naor}. Since equivalent uniformly smooth and uniformly convex renormings exist for precisely the superreflexive spaces \cite{Pisier}, Theorem~\ref{thm:main} answers this question negatively and completes the characterization for real Banach spaces. The classical structural input is the James--Enflo characterization: \begin{equation}\label{eq:superreflexive-characterization} \begin{gathered} X\text{ admits an equivalent uniformly convex norm}\\ \Longleftrightarrow\\ \text{every Banach space finitely representable in }X \text{ is reflexive}. \end{gathered} \end{equation} Here $Y$ is \emph{finitely representable} in $X$ if, for every finite-dimensional $E\subseteq Y$ and every $\eta>0$, there is an injective linear $T:E\to X$ with $\norm{T}\norm{T^{-1}}<1+\eta$. We use \eqref{eq:superreflexive-characterization} in its standard form \cite{James,Enflo}; the other background tools are Hahn--Banach and the finite Ramsey theorem. The finite-dimensional form of Goldstine's theorem needed below is included in the proof. \paragraph{Proof strategy.} We argue by contradiction. The James--Enflo characterization supplies a nonreflexive space finitely representable in a nonsuperreflexive one. From it we construct a spreading norm $N$ on finite sequences for which summing consecutive entries is contractive. This is a concrete version of the equal-sign-additive construction of Brunel and Sucheston \cite{BrunelSucheston1974,BrunelSucheston1975,BrunelSucheston}. Equal-sign additivity means that merging adjacent  […]
+[theorem] \label{thm:main} Every real Banach space with Markov type $p$ for at least one $p>1$ is superreflexive.
+
+=== LEAN COMPARATOR MarkovType (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open scoped BigOperators
+namespace MarkovSuperreflexivity
+structure FiniteReversibleChain (S : Type*) [Fintype S] where
+  π : S → ℝ
+  P : S → S → ℝ
+  π_nonneg : ∀ s, 0 ≤ π s
+  sum_π : ∑ s, π s = 1
+  P_nonneg : ∀ s t, 0 ≤ P s t
+  sum_P : ∀ s, ∑ t, P s t = 1
+  balance : ∀ s t, π s * P s t = π t * P t s
+abbrev StatePath (S : Type*) (n : ℕ) := Fin (n + 1) → S
+def pathWeight {S : Type*} [Fintype S]
+    (C : FiniteReversibleChain S) (n : ℕ) (ω : StatePath S n) : ℝ :=
+  C.π (ω 0) * ∏ i : Fin n, C.P (ω i.castSucc) (ω i.succ)
+def stateCost {S X : Type*} [Fintype S] [NormedAddCommGroup X]
+    (C : FiniteReversibleChain S) (f : S → X) (p : ℝ) (n : ℕ) : ℝ :=
+  ∑ ω : StatePath S n,
+    pathWeight C n ω * Real.rpow (‖f (ω (Fin.last n)) - f (ω 0)‖) p
+def MarkovTypeWith (p K : ℝ) (X : Type*) [NormedAddCommGroup X] : Prop :=
+  0 < p ∧ 0 < K ∧
+    ∀ (m : ℕ) (C : FiniteReversibleChain (Fin m)) (f : Fin m → X) (n : ℕ),
+      1 ≤ n → stateCost C f p n ≤ Real.rpow K p * (n : ℝ) * stateCost C f p 1
+def HasMarkovType (p : ℝ) (X : Type*) [NormedAddCommGroup X] : Prop :=
+  ∃ K : ℝ, MarkovTypeWith p K X
+def HasNontrivialMarkovType (X : Type*) [NormedAddCommGroup X] : Prop :=
+  ∃ p : ℝ, 1 < p ∧ HasMarkovType p X
+section
+universe u
+variable (X : Type u) [NormedAddCommGroup X] [NormedSpace ℝ X]
+structure EquivalentNorm where
+  p : Seminorm ℝ X
+  lower : ℝ
+  upper : ℝ
+  lower_pos : 0 < lower
+  upper_pos : 0 < upper
+  lower_bound : ∀ x, lower * ‖x‖ ≤ p x
+  upper_bound : ∀ x, p x ≤ upper * ‖x‖
+variable {X}
+def UniformConvex (p : Seminorm ℝ X) : Prop :=
+  ∀ ε : ℝ, 0 < ε → ε ≤ 2 → ∃ δ : ℝ, 0 < δ ∧
+    ∀ x y : X, p x ≤ 1 → p y ≤ 1 → ε ≤ p (x - y) →
+      p ((1 / 2 : ℝ) • (x + y)) ≤ 1 - δ
+def HasEquivalentUCNorm (X : Type u) [NormedAddCommGroup X] [NormedSpace ℝ X] : Prop :=
+  ∃ N : EquivalentNorm X, UniformConvex N.p
+end
+variable {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
+theorem hasNontrivialMarkovType_iff_hasEquivalentUCNorm [CompleteSpace X] :
+    HasNontrivialMarkovType X ↔ HasEquivalentUCNorm X := by
+  sorry
+end MarkovSuperreflexivity
+end
+end OAI
+

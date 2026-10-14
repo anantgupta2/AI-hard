@@ -1,0 +1,52 @@
+FAMILY 179: The circulant Hadamard and Barker-sequence conjectures
+SUBJECT: Combinatorics
+OPENAI SUMMARY: Proves that real circulant Hadamard matrices exist exactly in orders 1 and 4, resolving the circulant Hadamard conjecture. Together with classical Barker-sequence results, this shows that binary sequences whose nontrivial aperiodic autocorrelations have magnitude at most 1 exist at lengths n &gt; 1 exactly when $`n\in\{2,3,4,5,7,11,13\}`$.
+
+=== MANUSCRIPT: The circulant Hadamard conjecture (September-23-2026) [preprints/The-circulant-Hadamard-conjecture-September-23-2026/build/main.tex]
+ABSTRACT: We prove the circulant Hadamard conjecture: a real circulant Hadamard matrix has order 1 or 4. As a consequence, Barker sequences of length greater than one exist exactly at lengths 2, 3, 4, 5, 7, 11, 13, proving the Barker-sequence conjecture.
+INTRODUCTION (start): A real Hadamard matrix of order \(n\) is a matrix \(H\) with entries in \(\{-1,1\}\) such that \(HH^{\mathsf T}=nI_n\). It is \emph{circulant} if there are signs \(h_0,\ldots,h_{n-1}\) for which \[ H_{ij}=h_{j-i\bmod n}\qquad(0\leq i,j<n). \] Thus every row is a cyclic shift of the first. For such a sign matrix, define the periodic autocorrelations by \[ P_h(t)=\sum_{j=0}^{n-1}h_jh_{j+t\bmod n} \qquad(0\leq t<n). \] Here \(P_h(0)=n\), and the Hadamard condition is equivalent to \(P_h(t)=0\) for every \(1\leq t<n\). The circulant Hadamard conjecture, traditionally attributed to Ryser \cite{Ryser1963,LeungSchmidt2012}, asserts that the only possible orders are \(1\) and \(4\). We prove this conjecture. [statement] The theorem also completes the classification of Barker-sequence lengths. For an integer \(n>1\), a sign sequence \(a=(a_0,\ldots,a_{n-1})\in\{-1,1\}^n\) is a \emph{Barker sequence} if its nontrivial aperiodic autocorrelations satisfy \[ |C_a(t)|\leq1\quad(1\leq t<n),\qquad C_a(t)=\sum_{j=0}^{n-t-1}a_ja_{j+t}. \] The Barker-sequence conjecture asserts that no such sequence has length greater than \(13\). Turyn and Storer established the odd-length nonexistence theorem \cite{TurynStorer1961}; we use the later proof of Schmidt and Willms \cite{SchmidtWillms2016} for the exact list. For even length greater than two, the Barker inequalities imply that all nontrivial periodic autocorrelations vanish \cite{TurynStorer1961,Turyn1965}. Theorem~\ref{thm:main} therefore settles the remaining even case. [statement] Section~\ref{sec:barker} gives the short periodic-autocorrelation argument and records examples at every listed length. \subsection*{Context and prior work} The sign and cyclic conditions connect the problem to cyclic difference sets. Let \(D=\{j:h_j=-1\}\subseteq\Z/n\Z\), and put \(k=|D|\). If \(N_D(t)\) counts ordered pairs \((a,b)\in D^2\) with \(a-b=t\), then \[ P_h(t)=n-4k+4N_D(t). \] A cyclic \((v,k,\lambda)\) difference set is a \(k\)-element subset of a cyclic group of order \(v\) for which every nonzero difference occurs exactly \(\lambda\) times. For a circulant Hadamard row, the identity \((\sum_jh_j)^2=\sum_{t=0}^{n-1}P_h(t)=n\) shows that the row sum is \(\pm2u\) when \(n=4u^2\). Complementing \(D\) when necessary makes that sum \(2u\), and hence \(k=2u^2-u\). The autocorrelation identity then says precisely that \(D\) is a cyclic difference set with parameters \[ (v,k,\lambda)=(4u^2,\,2u^2-u,\,u^2-u). \] Conversely, such a difference set supplies a circulant Hadamard row by assigning a negative sign to its elements. This equivalence holds for every positive \(u\); the restriction to odd \(u\) is an additional arithmetic conclusion. Turyn studied these cyclic difference sets through the arithmetic of cyclotomic character sums and the Fourier relations imposed by their common coefficient array \cite[pp.~319--323]{Turyn1965}. His nonexistence results show that an order greater than four must be \(4u^2\), where \(u\) is odd and not a prime power \cite[Corollary~2 to Theorem~6, p.~333, and Theorem~8 with its Corollary, pp.~335--336]{Turyn1965}. The proof in Section~\ref{sec:reduction} gives a streamlined group-ring form of his descent for the \(2\)-primary coefficients. Later work sharpened the arithmetic restrictions. For a positive integer \(M\), let \(\zeta_M\) be a primitive \(M\)-th root of unity. For \(X\in\Z[\zeta_M]\) with \(X\overline X=m\in\Z_{>0}\), Bernhard Schmidt's field descent places a multiple of \(X\) by a root of unity in a cyclotomic subfield determined explicitly by the ambient conductor \(M\) and \(m\) \cite{Schmidt1999}. Leung and Schmidt developed group-ring decompositions that refine these restrictions \cite{LeungSchmidt2005}, followed by further exclusions in their 2012 work and their anti-field-descent method \cite{LeungSchmidt2012,LeungSchmidt2016}. Logan and Mossinghoff's 2017 computation, using searches for double Wieferich prime pairs, excluded all but \(4\,489\) integers \(n\) w […]
+[theorem] \label{thm:main} For a positive integer \(n\), a real circulant Hadamard matrix of order \(n\) exists if and only if \(n\in\{1,4\}\).
+[corollary] [Barker-sequence lengths]\label{cor:barker} For an integer \(n>1\), a Barker sequence of length \(n\) exists if and only if \[ n\in\{2,3,4,5,7,11,13\}. \]
+
+=== LEAN COMPARATOR CirculantHadamard (exact formal statement)
+import Mathlib
+namespace OAI
+namespace CirculantHadamard
+universe u
+def IsSign {R : Type u} [One R] [Neg R] (x : R) : Prop :=
+  x = 1 ∨ x = -1
+abbrev RealMatrix (n : ℕ) := Matrix (Fin n) (Fin n) ℝ
+def IsCirculant {n : ℕ} (H : RealMatrix n) : Prop :=
+  ∃ h : Fin n → ℝ, ∀ i j, H i j = h (j - i)
+def IsSignHadamard {n : ℕ} (H : RealMatrix n) : Prop :=
+  (∀ i j, IsSign (H i j)) ∧
+    H * H.transpose = (n : ℝ) • (1 : RealMatrix n)
+def ExistsRealCirculantHadamard (n : ℕ) : Prop :=
+  ∃ H : RealMatrix n, IsCirculant H ∧ IsSignHadamard H
+theorem exists_iff_order_one_or_four (n : ℕ) (hn : 0 < n) :
+    ExistsRealCirculantHadamard n ↔ n = 1 ∨ n = 4 := by
+  sorry
+end CirculantHadamard
+end OAI
+
+
+=== LEAN COMPARATOR EvenBarker (exact formal statement)
+import Mathlib
+namespace OAI
+namespace CirculantHadamard
+universe u
+def IsSign {R : Type u} [One R] [Neg R] (x : R) : Prop :=
+  x = 1 ∨ x = -1
+namespace Barker
+open scoped BigOperators
+def aperiodic {n : ℕ} (h : Fin n → ℤ) (k : ℕ) : ℤ :=
+  ∑ j : Fin (n - k), h ⟨j.val, by omega⟩ * h ⟨j.val + k, by omega⟩
+def IsBarker {n : ℕ} (h : Fin n → ℤ) : Prop :=
+  (∀ j, IsSign (h j)) ∧ ∀ k : ℕ, 0 < k → k < n → |aperiodic h k| ≤ 1
+theorem even_length_eq_two_or_four {n : ℕ} (h : Fin n → ℤ)
+    (hnpos : 0 < n) (hn : Even n) (hb : IsBarker h) : n = 2 ∨ n = 4 := by
+  sorry
+end Barker
+end CirculantHadamard
+end OAI
+

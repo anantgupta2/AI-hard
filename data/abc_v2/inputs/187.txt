@@ -1,0 +1,201 @@
+FAMILY 187: Snaky in 21 Maker moves
+SUBJECT: Combinatorics
+OPENAI SUMMARY: Settles the Snaky achievement problem: Maker can force the six-cell Snaky shape within 21 of its own moves on the initially empty infinite square board. Maker moves first, each player claims one free cell per turn, and translations, rotations and reflections count as wins.
+
+=== MANUSCRIPT: Snaky in 21 Maker moves (September-25-2026) [preprints/Snaky-in-21-Maker-moves-September-25-2026/build/paper.tex]
+ABSTRACT: We prove that Maker can achieve the Snaky hexomino within 21 actual Maker moves against arbitrary legal Breaker play on the initially empty infinite square board. The same bound holds on a $`17\times17`$ square; in fact, Maker can confine its claims to a fixed 251-cell board.
+INTRODUCTION (start): \label{sec:introduction} Polyomino achievement games ask whether one player can obtain a fixed shape despite an opponent's attempts to obstruct it. In the weak achievement game, usually called the Maker--Breaker game, only Maker seeks to complete the shape. The opponent need not make a competing copy. Snaky is the six-cell target \begin{equation}\label{eq:target} S=\{(0,0),(1,0),(2,0),(3,0),(3,1),(4,1)\}\subset\Z^2. \end{equation} Let $\G$ be the eight $2\times2$ signed permutation matrices: each row and column has one nonzero entry, equal to $1$ or $-1$. An allowed copy is $t+R(S)$ with $t\in\Z^2$ and $R\in\G$. Thus reflections and quarter turns are permitted, and scaling is not. Figure~\ref{fig:target} shows the target in the coordinates of \eqref{eq:target}. The board is all of $\Z^2$, initially empty. Maker moves first, and thereafter Maker and Breaker alternate, each claiming one previously unclaimed cell. Ownership is permanent. Maker wins immediately upon owning every cell of an allowed copy, and may own additional cells. There are no initially owned cells or additional handicap moves. A strategy chooses a legal cell from the complete finite history. [statement] The bound counts Maker's actual claims, including any replacement moves used in the proof. It corresponds to a win no later than the $41$st individual turn of the alternating game. Corollary~\ref{cor:finite-board} also gives the same bound on a finite $17\times17$ board. We do not assert optimal move counts or board sizes, or a result for the strong game in which both players seek a copy. \begin{figure}[tb] \centering \begin{tikzpicture}[x=8mm,y=8mm] \foreach \x/\y in {0/0,1/0,2/0,3/0,3/1,4/1} {\filldraw[fill=gray!18] (\x,\y) rectangle +(1,1);} \node[below] at (.5,0) {$(0,0)$}; \node[below] at (3.5,0) {$(3,0)$}; \node[above] at (4.5,2) {$(4,1)$}; \draw[->] (6,0)--(7,0) node[right] {$x$}; \draw[->] (6,0)--(6,1) node[above] {$y$}; \end{tikzpicture} \caption{The six cells of Snaky. A cell is indexed by the coordinates of its lower left corner. Every integral translation and signed coordinate permutation of this shape is an allowed target.} \label{fig:target} \end{figure} \paragraph{Earlier results and methods.} Sieben attributes the introduction of polyomino achievement games to Frank Harary \cite[Section~1]{Sieben2004}. His account records handicap-two strategies of Harary, Harborth and Seemann and the nonexistence of a pairing defense for Snaky, and proves victory in $41$ dimensions \cite[Section~4 and Proposition~4.1]{Sieben2004}. Csernenszky, Martin and Pluh\'ar later gave a computer-free proof of the nonexistence of a pairing defense \cite[Theorem~10]{CsernenszkyMartinPluhar2011}. This rules out a class of Breaker strategies, but does not by itself give Maker a winning strategy. Halupczok and Schlage-Puchta proved that Snaky wins in three dimensions, loses on an $8\times8$ board, and has planar handicap number at most one \cite[Theorem~1]{HSP2007}. A handicap of one allows Maker two stones on the opening turn, before Breaker's first reply. Ito and Miyagawa also presented a handicap-one construction \cite{ItoMiyagawa2007}. Sieben subsequently gave a finite proof sequence for that handicap and described the ordinary planar problem as undecided at the time \cite[Section~1 and Appendix~B]{Sieben2008}. Theorem~\ref{thm:main} treats the empty planar board without a handicap. We give three complete constructions, with bounds of $21$, $25$, and $35$ Maker moves. They share a composition rule but retain different information and different openings. The $21$-move certificate ends directly with no required Maker stones. The $25$-move construction removes already-owned cells from each Breaker-free region and uses required cells as placement anchors. The $35$-move construction supplies four explicit conditional statements at arbitrary positions and an opening that reaches one of them. We keep these methods explicit because their content is not determined by the empty-board […]
+[theorem] \label{thm:main} In this game, there is one globally legal Maker policy that completes an allowed copy of $S$ within at most $21$ actual Maker claims against every legal continuation of Breaker. Equivalently, extend the policy by fresh claims after an earlier win: its Maker set after claim $21$ contains a target whenever the first $20$ Breaker replies are legal.
+
+=== LEAN COMPARATOR SnakyCertificate (exact formal statement)
+import Mathlib
+namespace OAI
+namespace SnakyCertificate
+instance rotationModulus_neZero : NeZero 8 := @Nat.instNeZeroSucc 7
+instance digitModulus_neZero : NeZero 10 := @Nat.instNeZeroSucc 9
+abbrev Cell := ℤ × ℤ
+def origin : Cell := (0, 0)
+def snaky : Finset Cell := {(0, 0), (1, 0), (2, 0), (3, 0), (3, 1), (4, 1)}
+def orient (r : Fin 8) (p : Cell) : Cell :=
+  match r.val with
+  | 0 => (p.1, p.2)
+  | 1 => (p.2, p.1)
+  | 2 => (p.1, -p.2)
+  | 3 => (-p.2, p.1)
+  | 4 => (-p.1, p.2)
+  | 5 => (p.2, -p.1)
+  | 6 => (-p.1, -p.2)
+  | _ => (-p.2, -p.1)
+def placement (r : Fin 8) (t p : Cell) : Cell := orient r p + t
+def basePoint (i : Fin 6) : Cell := ![(0,0),(1,0),(2,0),(3,0),(3,1),(4,1)] i
+def baseEnvelope (i : Fin 6) : Finset Cell :=
+  snaky.image (placement 0 (-basePoint i))
+def baseRequired (i : Fin 6) : Finset Cell := (baseEnvelope i).erase origin
+structure Term where
+  child : ℕ
+  rotation : Fin 8
+  xDigit : Fin 10
+  yDigit : Fin 10
+  deriving DecidableEq, Repr
+def Term.shift (t : Term) : Cell := ((t.xDigit.val : ℤ) - 4, (t.yDigit.val : ℤ) - 4)
+structure Entry where
+  index : ℕ
+  terms : List Term
+  deriving DecidableEq, Repr
+def emptyEntry : Entry := ⟨0, []⟩
+def entry_6 : Entry := ⟨6, [⟨0, 0, 0, 3⟩]⟩
+def entry_7 : Entry := ⟨7, [⟨4, 0, 3, 4⟩, ⟨6, 0, 5, 4⟩]⟩
+def entry_8 : Entry := ⟨8, [⟨0, 4, 8, 3⟩, ⟨6, 4, 3, 4⟩]⟩
+def entry_9 : Entry := ⟨9, [⟨0, 4, 5, 4⟩, ⟨6, 4, 0, 5⟩]⟩
+def entry_10 : Entry := ⟨10, [⟨2, 0, 2, 3⟩, ⟨2, 6, 2, 4⟩]⟩
+def entry_11 : Entry := ⟨11, [⟨6, 4, 2, 5⟩, ⟨6, 6, 2, 3⟩]⟩
+def entry_12 : Entry := ⟨12, [⟨0, 6, 5, 4⟩, ⟨0, 0, 0, 3⟩]⟩
+def entry_13 : Entry := ⟨13, [⟨6, 6, 0, 3⟩, ⟨6, 4, 0, 5⟩]⟩
+def entry_14 : Entry := ⟨14, [⟨0, 6, 5, 4⟩, ⟨3, 6, 1, 4⟩]⟩
+def entry_15 : Entry := ⟨15, [⟨0, 6, 6, 4⟩, ⟨3, 6, 2, 4⟩]⟩
+def entry_16 : Entry := ⟨16, [⟨3, 6, 3, 4⟩, ⟨0, 6, 7, 4⟩]⟩
+def entry_17 : Entry := ⟨17, [⟨0, 6, 5, 4⟩, ⟨3, 0, 3, 3⟩]⟩
+def entry_18 : Entry := ⟨18, [⟨3, 6, 2, 4⟩, ⟨3, 0, 4, 3⟩]⟩
+def entry_19 : Entry := ⟨19, [⟨6, 4, 1, 5⟩, ⟨6, 0, 6, 5⟩]⟩
+def entry_20 : Entry := ⟨20, [⟨6, 4, 0, 5⟩, ⟨6, 0, 5, 5⟩]⟩
+def entry_21 : Entry := ⟨21, [⟨4, 6, 2, 3⟩, ⟨6, 0, 6, 5⟩]⟩
+def entry_22 : Entry := ⟨22, [⟨0, 6, 7, 5⟩, ⟨3, 0, 5, 4⟩]⟩
+def entry_23 : Entry := ⟨23, [⟨0, 6, 6, 4⟩, ⟨0, 0, 1, 3⟩]⟩
+def entry_24 : Entry := ⟨24, [⟨0, 0, 0, 3⟩, ⟨17, 0, 5, 4⟩]⟩
+def entry_25 : Entry := ⟨25, [⟨0, 0, 0, 3⟩, ⟨14, 0, 5, 4⟩]⟩
+def entry_26 : Entry := ⟨26, [⟨0, 4, 6, 4⟩, ⟨6, 0, 6, 5⟩]⟩
+def entry_27 : Entry := ⟨27, [⟨0, 6, 5, 4⟩, ⟨6, 4, 0, 5⟩]⟩
+def entry_28 : Entry := ⟨28, [⟨6, 1, 4, 5⟩, ⟨0, 6, 6, 4⟩]⟩
+def entry_29 : Entry := ⟨29, [⟨1, 4, 7, 3⟩, ⟨6, 3, 4, 5⟩]⟩
+def entry_30 : Entry := ⟨30, [⟨0, 0, 1, 3⟩, ⟨14, 0, 6, 4⟩]⟩
+def entry_31 : Entry := ⟨31, [⟨0, 0, 1, 4⟩, ⟨17, 0, 6, 5⟩]⟩
+def entry_32 : Entry := ⟨32, [⟨0, 4, 8, 3⟩, ⟨6, 3, 4, 5⟩]⟩
+def entry_33 : Entry := ⟨33, [⟨0, 0, 2, 4⟩, ⟨17, 0, 7, 5⟩]⟩
+def entry_34 : Entry := ⟨34, [⟨6, 1, 4, 5⟩, ⟨1, 6, 5, 4⟩]⟩
+def entry_35 : Entry := ⟨35, [⟨0, 0, 2, 4⟩, ⟨14, 0, 7, 5⟩]⟩
+def entry_36 : Entry := ⟨36, [⟨0, 0, 3, 4⟩, ⟨17, 0, 8, 5⟩]⟩
+def entry_37 : Entry := ⟨37, [⟨6, 3, 4, 5⟩, ⟨2, 4, 6, 3⟩]⟩
+def entry_38 : Entry := ⟨38, [⟨3, 0, 3, 3⟩, ⟨16, 0, 2, 4⟩]⟩
+def entry_39 : Entry := ⟨39, [⟨0, 0, 1, 3⟩, ⟨17, 0, 6, 4⟩]⟩
+def entry_40 : Entry := ⟨40, [⟨3, 0, 4, 3⟩, ⟨16, 0, 3, 4⟩]⟩
+def entry_41 : Entry := ⟨41, [⟨6, 3, 3, 5⟩, ⟨1, 4, 6, 3⟩]⟩
+def entry_42 : Entry := ⟨42, [⟨0, 6, 6, 4⟩, ⟨6, 4, 1, 5⟩]⟩
+def entry_43 : Entry := ⟨43, [⟨2, 4, 5, 3⟩, ⟨6, 3, 3, 5⟩]⟩
+def entry_44 : Entry := ⟨44, [⟨4, 4, 1, 5⟩, ⟨7, 0, 4, 5⟩]⟩
+def entry_45 : Entry := ⟨45, [⟨6, 4, 0, 5⟩, ⟨7, 0, 4, 5⟩]⟩
+def entry_46 : Entry := ⟨46, [⟨6, 6, 0, 3⟩, ⟨7, 0, 4, 5⟩]⟩
+def entry_47 : Entry := ⟨47, [⟨6, 3, 3, 5⟩, ⟨6, 2, 7, 3⟩]⟩
+def entry_48 : Entry := ⟨48, [⟨6, 3, 4, 5⟩, ⟨6, 2, 8, 3⟩]⟩
+def entry_49 : Entry := ⟨49, [⟨4, 7, 3, 1⟩, ⟨7, 1, 5, 4⟩]⟩
+def entry_50 : Entry := ⟨50, [⟨6, 3, 3, 5⟩, ⟨7, 1, 5, 4⟩]⟩
+def entry_51 : Entry := ⟨51, [⟨10, 2, 5, 3⟩, ⟨10, 0, 5, 4⟩, ⟨26, 2, 3, 4⟩, ⟨26, 0, 3, 3⟩]⟩
+def entry_52 : Entry := ⟨52, [⟨0, 0, 0, 3⟩, ⟨0, 4, 7, 3⟩]⟩
+def entry_53 : Entry := ⟨53, [⟨6, 4,
+[…]
+
+=== LEAN COMPARATOR SnakyConditional (exact formal statement)
+import Mathlib
+namespace OAI.SnakyConditional
+abbrev Cell := ℤ × ℤ
+def snaky : Finset Cell := {(0, 0), (1, 0), (2, 0), (3, 0), (3, 1), (4, 1)}
+def orient (r : Fin 8) (p : Cell) : Cell :=
+  match r.val with
+  | 0 => (p.1, p.2)
+  | 1 => (p.2, p.1)
+  | 2 => (p.1, -p.2)
+  | 3 => (-p.2, p.1)
+  | 4 => (-p.1, p.2)
+  | 5 => (p.2, -p.1)
+  | 6 => (-p.1, -p.2)
+  | _ => (-p.2, -p.1)
+def placement (r : Fin 8) (t p : Cell) : Cell := orient r p + t
+def HasSnaky (M : Finset Cell) : Prop :=
+  ∃ (r : Fin 8) (t : Cell), snaky.image (placement r t) ⊆ M
+namespace OrdinaryStrategy
+variable {α : Type*} [DecidableEq α]
+abbrev Policy (α : Type*) := ℕ → Finset α → Finset α → α
+def playState (σ : Policy α) (N : ℕ) (β : ℕ → α) (M₀ B₀ : Finset α) :
+    ℕ → Finset α × Finset α
+  | 0 => (M₀, B₀)
+  | k + 1 =>
+      let state := playState σ N β M₀ B₀ k
+      (insert (σ (N - k) state.1 state.2) state.1, insert (β k) state.2)
+def makerAt (σ : Policy α) (N : ℕ) (β : ℕ → α) (M₀ B₀ : Finset α) (k : ℕ) : α :=
+  let state := playState σ N β M₀ B₀ k
+  σ (N - k) state.1 state.2
+def LegalRepliesBeforeFinal (σ : Policy α) (N : ℕ) (β : ℕ → α)
+    (M₀ B₀ : Finset α) : Prop :=
+  ∀ k, k + 1 < N →
+    β k ∉ insert (makerAt σ N β M₀ B₀ k) (playState σ N β M₀ B₀ k).1 ∧
+    β k ∉ (playState σ N β M₀ B₀ k).2
+end OrdinaryStrategy
+open OrdinaryStrategy
+theorem snaky_winning_strategy_with_legal_states :
+    ∃ σ : Policy Cell,
+      (∀ r M B, σ r M B ∉ M ∧ σ r M B ∉ B) ∧
+      ∀ β : ℕ → Cell, LegalRepliesBeforeFinal σ 35 β ∅ ∅ →
+        HasSnaky (playState σ 35 β ∅ ∅ 35).1 ∧
+        (playState σ 35 β ∅ ∅ 35).1.card = 35 ∧
+        Disjoint (playState σ 35 β ∅ ∅ 35).1 (playState σ 35 β ∅ ∅ 34).2 ∧
+        ∀ k, k < 35 →
+          Disjoint (playState σ 35 β ∅ ∅ k).1 (playState σ 35 β ∅ ∅ k).2 ∧
+          (playState σ 35 β ∅ ∅ k).2.card = k := by
+  sorry
+end OAI.SnakyConditional
+
+
+=== LEAN COMPARATOR SnakyTwentyOne (exact formal statement)
+import Mathlib
+namespace OAI
+namespace SnakyPrototype
+variable {α : Type*} [DecidableEq α]
+abbrev Cell := ℤ × ℤ
+def snaky : Finset Cell := {(0, 0), (1, 0), (2, 0), (3, 0), (3, 1), (4, 1)}
+def orient (r : Fin 8) (p : Cell) : Cell :=
+  match r.val with
+  | 0 => (p.1, p.2)
+  | 1 => (p.2, p.1)
+  | 2 => (p.1, -p.2)
+  | 3 => (-p.2, p.1)
+  | 4 => (-p.1, p.2)
+  | 5 => (p.2, -p.1)
+  | 6 => (-p.1, -p.2)
+  | _ => (-p.2, -p.1)
+def placement (r : Fin 8) (t p : Cell) : Cell := orient r p + t
+def HasSnaky (M : Finset Cell) : Prop :=
+  ∃ (r : Fin 8) (t : Cell), snaky.image (placement r t) ⊆ M
+end SnakyPrototype
+namespace SnakyPrototype.OrdinaryStrategy
+variable {α : Type*} [DecidableEq α] [Infinite α]
+abbrev Policy (α : Type*) := ℕ → Finset α → Finset α → α
+def playState (σ : Policy α) (N : ℕ) (β : ℕ → α) (M₀ B₀ : Finset α) :
+    ℕ → Finset α × Finset α
+  | 0 => (M₀, B₀)
+  | k + 1 =>
+      let state := playState σ N β M₀ B₀ k
+      (insert (σ (N - k) state.1 state.2) state.1, insert (β k) state.2)
+def makerAt (σ : Policy α) (N : ℕ) (β : ℕ → α) (M₀ B₀ : Finset α) (k : ℕ) : α :=
+  let state := playState σ N β M₀ B₀ k
+  σ (N - k) state.1 state.2
+def LegalRepliesBeforeFinal (σ : Policy α) (N : ℕ) (β : ℕ → α)
+    (M₀ B₀ : Finset α) : Prop :=
+  ∀ k, k + 1 < N →
+    β k ∉ insert (makerAt σ N β M₀ B₀ k) (playState σ N β M₀ B₀ k).1 ∧
+    β k ∉ (playState σ N β M₀ B₀ k).2
+end SnakyPrototype.OrdinaryStrategy
+namespace SnakyPrototype
+open OrdinaryStrategy
+theorem snaky_winning_strategy_21_with_legal_states :
+    ∃ σ : Policy Cell,
+      (∀ r M B, σ r M B ∉ M ∧ σ r M B ∉ B) ∧
+      ∀ β : ℕ → Cell, LegalRepliesBeforeFinal σ 21 β ∅ ∅ →
+        HasSnaky (playState σ 21 β ∅ ∅ 21).1 ∧
+        (playState σ 21 β ∅ ∅ 21).1.card = 21 ∧
+        Disjoint (playState σ 21 β ∅ ∅ 21).1 (playState σ 21 β ∅ ∅ 20).2 ∧
+        ∀ k, k < 21 →
+          Disjoint (playState σ 21 β ∅ ∅ k).1 (playState σ 21 β ∅ ∅ k).2 ∧
+          (playState σ 21 β ∅ ∅ k).2.card = k := by
+  sorry
+end SnakyPrototype
+end OAI
+

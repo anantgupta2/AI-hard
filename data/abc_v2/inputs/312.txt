@@ -1,0 +1,102 @@
+FAMILY 312: The Grothendieck homotopy hypothesis
+SUBJECT: Topology
+OPENAI SUMMARY: Proves the Grothendieck homotopy hypothesis for ∞-groupoids associated with every Grothendieck coherator in the Ara–Henry convention: these algebraic objects recover the homotopy theory of spaces.
+
+=== MANUSCRIPT: The Grothendieck homotopy hypothesis via elementary expansions (September-24-2026) [preprints/The-Grothendieck-homotopy-hypothesis-via-elementary-expansions-September-24-2026/build/paper.tex]
+ABSTRACT: We prove the Grothendieck homotopy hypothesis for every Grothendieck coherator in the Ara–Henry convention: its weak globular infinity-groupoids recover the homotopy theory of spaces. We also resolve Henry's pushout conjecture, showing that elementary expansions preserve components and all homotopy groups of cellular infinity-groupoids.
+INTRODUCTION (start): \label{sec:introduction} Grothendieck's homotopy hypothesis asks whether weak globular infinity-groupoids describe the homotopy theory of spaces. In \emph{Pursuing Stacks}, the operations on paths and higher homotopies are specified by freely adjoining coherence operations to globular pasting diagrams \cite[Sections~9 and~12--13]{Grothendieck1983}. A \emph{coherator} records these choices. Maltsiniotis gave a precise formulation in terms of coherators and their models, together with realization and fundamental-infinity-groupoid functors \cite{Maltsiniotis2007,Maltsiniotis2010}. The resulting categories depend on the chosen coherator; the hypothesis asserts that their homotopy theory recovers that of spaces. We establish it for every coherator in the Ara--Henry convention specified below. The choice of algebraic model is substantive. Simplicial sets already model spaces through the classical realization--singular-complex Quillen equivalence \cite[Theorem~3.6.7]{Hovey1999}. For strict globular infinity-groupoids, however, the simply connected homotopy types represented under a realization preserving homotopy groups are precisely products of Eilenberg--Mac~Lane spaces \cite[Theorem~5.4]{AraStrict2013}. The passage from strict identities to weak coherence is therefore substantive. Here weak equivalences are defined inside the chosen globular algebraic category, using components and based homotopy groups. Henry isolated a concrete obstruction to constructing their canonical semi-model structure \cite[Conjecture~5.3.3]{Henry2016}. Suppose that \(X\) is built by attaching globular cells. Select an \(n\)-cell \(a\) of \(X\), adjoin a new parallel \(n\)-cell \(a'\), and adjoin an \((n+1)\)-cell from \(a\) to \(a'\). The conjecture asserts that this free extension is a weak equivalence. Although the extension has an elementary retraction, its free algebraic construction also creates composites and higher coherence cells. Controlling the homotopy classes of all those cells is the issue. We use Grothendieck coherators in the convention of Ara \cite[Sections~2.3 and~2.9--2.11]{Ara2013}, fixed by Henry in \cite[Section~5.3]{Henry2016}; the precise definition appears in Section~\ref{sec:preliminaries}. Thus generating fillers of output dimension \(j\) have pasting-scheme arity of dimension at most \(j\). Write \(D_j\) for the free model on a \(j\)-globe and \(\partial D_j\) for its boundary, with \(\partial D_0=\varnothing\). A model is \emph{cellular} if it is obtained from the initial model by a possibly transfinite sequence of boundary attachments. Weak equivalences induce a bijection on components and isomorphisms on all based homotopy groups. \begin{samepage} [statement] \end{samepage} The pushout is taken in models of the fixed theory \(\mathcal C\). The selected cell \(a\) can be any composite or coherence cell. For \(n=0\), the extension adjoins an object and an arrow from the selected object to it. In particular, Theorem~\ref{thm:main} resolves Henry's pushout conjecture affirmatively. Henry already showed how its finitely cellular case extends to transfinite cellular objects and their cofibrant retracts \cite[Lemma~5.3.4]{Henry2016}; the proof here treats arbitrary cellular objects directly. The canonical semi-model structure and its equivalence with the homotopy theory of spaces follow in Section~\ref{sec:consequences}. The algebraic and homotopical sides of this question developed together. Berger's globular theories organize operations by tree-shaped pasting arities \cite[Definition~1.5]{Berger2002}. Ara constructed the homotopy-group calculus and fixed-boundary tests for weak equivalences used here \cite[Section~4]{Ara2013}. Bourke described cellular globular theories through iterated algebraic injectivity and proved faithfulness of their free stages \cite[Theorems~3.12 and~5.2]{Bourke2020}. These results make the algebraic models and their weak equivalences precise; the remaining task is to show that elementary expansions have […]
+[theorem] \label{thm:main} Fix any Grothendieck coherator \(\mathcal C\). Let \(X\) be a cellular \(\mathcal C\)-infinity-groupoid, let \(n\ge0\), and let \(a:D_n\to X\) be any cell. In the pushout square \[ \begin{tikzpicture}[baseline=(current bounding box.center), node distance=1.25cm and 2.2cm,>=Stealth] \node (a) {\(D_n\)}; \node (b) [right=of a] {\(D_{n+1}\)}; \node (c) [below=of a] {\(X\)}; \node (d) at (b |- c) {\(X^+\)}; \draw[->] (a) -- node[above] {\(s_n\)} (b); \draw[->] (a) -- node[left] {\(a\)} (c); \draw[->] (b) -- (d); \draw[->] (c) -- node[below] {\(i\)} (d); \end{tikzpicture} \] where \(s_n\) is the source inclusion, the map \(i:X\to X^+\) is a weak equivalence.
+
+=== LEAN COMPARATOR GrothendieckElementaryExpansion (exact formal statement)
+import Mathlib
+namespace OAI
+universe u v w
+namespace Grothendieck
+structure GlobularSet where
+  Cell : ℕ → Type u
+  source : ∀ n, Cell (n + 1) → Cell n
+  target : ∀ n, Cell (n + 1) → Cell n
+  source_source : ∀ n x, source n (source (n + 1) x) = source n (target (n + 1) x)
+  target_source : ∀ n x, target n (source (n + 1) x) = target n (target (n + 1) x)
+namespace GlobularSet
+@[ext]
+structure Hom (X Y : GlobularSet.{u}) where
+  app : ∀ n, X.Cell n → Y.Cell n
+  source_app : ∀ n x, app n (X.source n x) = Y.source n (app (n + 1) x)
+  target_app : ∀ n x, app n (X.target n x) = Y.target n (app (n + 1) x)
+def Parallel (X : GlobularSet.{u}) : ∀ n, X.Cell n → X.Cell n → Prop
+  | 0, _, _ => True
+  | n + 1, x, y => X.source n x = X.source n y ∧ X.target n x = X.target n y
+def Joined (X : GlobularSet.{u}) (n : ℕ) (x y : X.Cell n) : Prop :=
+  ∃ h : X.Cell (n + 1), X.source n h = x ∧ X.target n h = y
+def Boundary (X : GlobularSet.{u}) : ℕ → Type u
+  | 0 => PUnit
+  | n + 1 => { p : X.Cell n × X.Cell n // X.Parallel n p.1 p.2 }
+def boundary (X : GlobularSet.{u}) : ∀ n, X.Cell n → X.Boundary n
+  | 0, _ => PUnit.unit
+  | n + 1, x => ⟨(X.source n x, X.target n x), by
+      cases n with
+      | zero => trivial
+      | succ n => exact ⟨X.source_source n x, X.target_source n x⟩⟩
+def Hom.boundaryMap {X Y : GlobularSet.{u}} (f : Hom X Y) : ∀ n, X.Boundary n → Y.Boundary n
+  | 0, _ => PUnit.unit
+  | n + 1, b => ⟨(f.app n b.1.1, f.app n b.1.2), by
+      cases n with
+      | zero => trivial
+      | succ n =>
+        exact ⟨by rw [← f.source_app, ← f.source_app, b.2.1],
+          by rw [← f.target_app, ← f.target_app, b.2.2]⟩⟩
+end GlobularSet
+open CategoryTheory CategoryTheory.Limits Opposite
+@[ext]
+structure Globe where
+  dim : ℕ
+namespace Globe
+inductive Face : ℕ → ℕ → Type
+  | id (n : ℕ) : Face n n
+  | face {m n : ℕ} (lt : m < n) (side : Bool) : Face m n
+namespace Face
+def comp {m n k : ℕ} : Face m n → Face n k → Face m k
+  | .id _, g => g
+  | .face h b, .id _ => .face h b
+  | .face h b, .face h' _ => .face (h.trans h') b
+end Face
+instance : Category Globe where
+  Hom m n := Face m.dim n.dim
+  id m := .id m.dim
+  comp := Face.comp
+  id_comp _ := rfl
+  comp_id {X Y} f := by cases X; cases Y; cases f <;> rfl
+  assoc {W X Y Z} f g h := by
+    cases W; cases X; cases Y; cases Z
+    cases f <;> cases g <;> cases h <;> rfl
+def face {m n : ℕ} (h : m < n) (side : Bool) : Globe.mk m ⟶ Globe.mk n :=
+  Face.face h side
+def source (n : ℕ) : Globe.mk n ⟶ Globe.mk (n + 1) := face (Nat.lt_succ_self n) false
+def target (n : ℕ) : Globe.mk n ⟶ Globe.mk (n + 1) := face (Nat.lt_succ_self n) true
+end Globe
+abbrev GlobularPresheaf := Globeᵒᵖ ⥤ Type u
+namespace GlobularPresheaf
+def underlying (X : GlobularPresheaf.{u}) : GlobularSet.{u} where
+  Cell n := X.obj (op (Globe.mk n))
+  source n := X.map (Globe.source n).op
+  target n := X.map (Globe.target n).op
+  source_source n x := by
+    have h := congrArg (fun f => X.map f) (congrArg Quiver.Hom.op (show Globe.source n ≫ Globe.source (n + 1) = Globe.source n ≫ Globe.target (n + 1) from rfl))
+    simpa only [op_comp, X.map_comp, types_comp_apply] using ConcreteCategory.congr_hom h x
+  target_source n x := by
+    have h := congrArg (fun f => X.map f) (congrArg Quiver.Hom.op (show Globe.target n ≫ Globe.source (n + 1) = Globe.target n ≫ Globe.target (n + 1) from rfl))
+    simpa only [op_comp, X.map_comp, types_comp_apply] using ConcreteCategory.congr_hom h x
+def underlyingMap {X Y : GlobularPresheaf.{u}} (f : X ⟶ Y) : X.underlying.Hom Y.underlying where
+  app n := f.app (op (Globe.mk n))
+  source_app n x := by
+    exact ConcreteCategory.congr_hom (f.naturality (Globe.source n).op) x
+  target_app n x := by
+    exact ConcreteCategory.congr_hom (f.naturality (Globe.target n).op) x
+def disk (n : ℕ) : GlobularPresheaf.{u} := uliftYoneda.{u}.obj (Globe.mk n)
+def face {m n : ℕ} (h : m < n) (side : Bool) : disk.{u} m ⟶ disk.{u} n :=
+  uliftYoneda.{u}.map (Globe.face h side)
+end GlobularPresheaf
+inductive Table : ℕ → Type
+  | globe (n :
+[…]

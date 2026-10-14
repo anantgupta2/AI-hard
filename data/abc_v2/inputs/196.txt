@@ -1,0 +1,40 @@
+FAMILY 196: A counterexample to Kaplansky’s zero-divisor conjecture
+SUBJECT: Algebra
+OPENAI SUMMARY: Constructs a finitely presented torsion-free group G whose group algebra $`\mathbb F_2[G]`$ has nonzero zero divisors, disproving Kaplansky's zero-divisor conjecture. The group has a finite two-dimensional classifying space.
+
+=== MANUSCRIPT: A Torsion-Free Group Algebra with Zero Divisors (September-23-2026) [preprints/A-Torsion-Free-Group-Algebra-with-Zero-Divisors-September-23-2026/build/paper.tex]
+ABSTRACT: We disprove Kaplansky's zero-divisor conjecture by constructing a finitely presented torsion-free group G for which $`\mathbb F_2[G]`$ has nonzero zero divisors. The group admits a finite two-dimensional classifying space.
+INTRODUCTION (start): \label{sec:introduction} Kaplansky's zero-divisor conjecture asserts that \(K[G]\) has no nonzero zero divisors whenever \(K\) is a field and \(G\) is torsion-free. Here \(K[G]\) is the algebra of finite formal sums of elements of \(G\), with multiplication extended bilinearly from the group law. We prove the following negative resolution. [statement] \subsection*{History and related constructions} The question goes back to Higman's 1940 thesis~\cite{Higman1940Thesis}; its conjectural formulation is reproduced by Sandling~\cite[p.~112]{Sandling1981}. It was also posed in Kaplansky's 1956 conference contribution, published in 1957~\cite[Problem~6]{Kaplansky1957}; see the historical discussion in~\cite{Gardam2021}. Finite-order elements give elementary zero divisors: if \(g\) has order \(m>1\), then \((1-g)(1+g+\cdots+g^{m-1})=0\). The conjecture asks whether removing this obstruction suffices. Substantial positive results explain why torsion-freeness is a natural dividing line. Higman proved the domain conclusion for groups in which every nontrivial subgroup maps onto \(\mathbb Z\)~\cite[Section~4, Theorems~12--13]{Higman1940}. Kropholler, Linnell, and Moody established it for torsion-free elementary amenable groups, even with division-ring coefficients~\cite[Theorem~1.4]{KrophollerLinnellMoody1988}. More recently, Fisher and S\'anchez-Peralta obtained division-ring embeddings for group algebras of torsion-free virtually compact special groups and torsion-free compact \(3\)-manifold groups, and the domain conclusion for torsion-free \(3\)-manifold groups without a finite-generation assumption~\cite[Theorem~1.3 and Corollary~1.5]{FisherSanchezPeralta2026}. These results concern particular classes of groups; our construction uses a different geometric mechanism. A group has the \emph{unique-product property} if, for every pair of finite nonempty subsets \(P,Q\), some element of \(PQ\) has exactly one expression \(pq\) with \(p\in P\), \(q\in Q\). Applying this property to the supports of two nonzero group-algebra elements gives a nonzero product coefficient. Rips and Segev constructed torsion-free groups without unique product~\cite{RipsSegev1987}; Steenbock supplied a graphical small-cancellation treatment of their construction~\cite{Steenbock2015}. Mian and Siddique report a machine-checked non-unique-product witness for Gardam's \(\widetilde A_2\) lattice, taking torsion-freeness from Gardam rather than formalizing it~\cite[Sections~1 and~7]{MianSiddique2026}. Failure of unique product alone does not produce a zero divisor: over \(\mathbb F_2\), the relevant representation counts must be even, not merely greater than one. The distinct \emph{unit conjecture} asks whether, for a torsion-free group \(G\) and a field \(K\), every unit of \(K[G]\) is a nonzero scalar multiple of a group element. Gardam disproved it over \(\mathbb F_2\)~\cite{Gardam2021} and subsequently over \(\mathbb C\)~\cite{Gardam2024}; a nontrivial unit is not a zero divisor. Mineyev developed product structures and sufficient geometric criteria for obtaining nontrivial zero divisors or units in torsion-free group algebras over \(\mathbb F_2\)~\cite[Theorem~27]{Mineyev2024}. Garg and Mineyev study these criteria through finite-support combinatorics and computation~\cite[Theorems~1--3 and~16]{GargMineyev2025}. Shin proves that the orientable no-fold, triple-girth route cannot succeed when both support sizes are at least two~\cite[Theorem~1.1 and Corollary~1.2]{Shin2026}; this obstruction does not address the arrangement-exclusion argument here. Our construction supplies its own coefficient cancellation, root separation, and torsion-freeness proofs rather than applying those geometric criteria. \subsection*{The cancellation mechanism and the two safeguards} We use two finite graphs \(\Gamma_A,\Gamma_B\) immersed into one rose \(F\), a graph with one vertex and one edge for each generator. Every edge is read with a signed label, reversed when its orientation is r […]
+[theorem] \label{thm:main} There exist a finitely presented torsion-free group \(G\) and nonzero elements \(\alpha,\beta\in\mathbb F_2[G]\) such that \(\alpha\beta=0\). Moreover, \(G\) admits a finite two-dimensional classifying space.
+
+=== LEAN COMPARATOR TorsionFreeZeroDivisors (exact formal statement)
+import Mathlib
+namespace OAI
+namespace TorsionFreeZeroDivisors
+def TorsionFree (G : Type) [Group G] : Prop :=
+  ∀ (g : G) (n : ℕ), 0 < n → g ^ n = 1 → g = 1
+def HasFiniteTwoDimensionalClassifyingSpace (G : Type) [Group G] : Prop :=
+  ∃ (X : Type) (topX : TopologicalSpace X),
+    letI : TopologicalSpace X := topX
+    ∃ (_hausdorff : T2Space X) (_connected : PathConnectedSpace X)
+      (cw : Topology.CWComplex (Set.univ : Set X)),
+      letI : Topology.CWComplex (Set.univ : Set X) := cw
+      Topology.CWComplex.Finite (Set.univ : Set X) ∧
+      (∀ n : ℕ, 2 < n → IsEmpty (Topology.CWComplex.cell (Set.univ : Set X) n)) ∧
+      Nonempty (Topology.CWComplex.cell (Set.univ : Set X) 2) ∧
+      ∃ (x : X), Nonempty (G ≃* FundamentalGroup X x) ∧
+        ∃ (E : Type) (topE : TopologicalSpace E),
+          letI : TopologicalSpace E := topE
+          ContractibleSpace E ∧
+          ∃ p : E → X, IsCoveringMap p ∧ Function.Surjective p
+def MainTheorem : Prop :=
+  ∃ (G : Type) (inst : Group G),
+    letI : Group G := inst
+    Group.IsFinitelyPresented G ∧ TorsionFree G ∧
+    HasFiniteTwoDimensionalClassifyingSpace G ∧
+    ∃ α β : MonoidAlgebra (ZMod 2) G, α ≠ 0 ∧ β ≠ 0 ∧ α * β = 0
+theorem main : MainTheorem := by
+  sorry
+end TorsionFreeZeroDivisors
+end OAI
+

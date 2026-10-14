@@ -1,0 +1,223 @@
+FAMILY 172: Classification of finite Euclidean Ramsey configurations
+SUBJECT: Combinatorics
+OPENAI SUMMARY: Classifies finite point configurations that occur monochromatically, at their original scale, in every finite coloring of sufficiently high-dimensional Euclidean space. The characterization is an algebraic condition over the coordinate field. It also disproves the Leader–Russell–Walters conjecture that every such configuration is a subset of a finite transitive set.
+
+=== MANUSCRIPT: A classification of finite Euclidean Ramsey configurations (September-23-2026) [preprints/A-classification-of-finite-Euclidean-Ramsey-configurations-September-23-2026/build/main.tex]
+ABSTRACT: We classify finite Euclidean Ramsey configurations by a necessary and sufficient tensor condition over their coordinate fields. The Ramsey property here concerns monochromatic congruent copies at the original scale under arbitrary finite colorings. The criterion shows that every nonempty subtransitive set and every nonempty set of at most five points on a circle is Ramsey. In particular, some Ramsey cyclic quadrilaterals are not subtransitive, disproving the necessity direction of the Leader–Russell–Walters conjectured characterization.
+INTRODUCTION (start): A finite nonempty set $A$ in a Euclidean space is \emph{Ramsey} if, for every integer $r\ge2$, there is an integer $D\ge1$ such that every map $c:\R^D\to\{1,\ldots,r\}$ is constant on a congruent copy of $A$. Congruence means preservation of every pairwise distance, at the original scale. The coloring is an arbitrary function. In particular, no measurability or other regularity is assumed. Erd\H{o}s, Graham, Montgomery, Rothschild, Spencer and Straus introduced Euclidean Ramsey theory and proved that every finite Ramsey set is spherical~\cite[Theorem~13]{egm-rss}. Graham later conjectured that sphericity is also sufficient~\cite{graham-survey}. Major positive results established the Ramsey property for nondegenerate triangles and then all nondegenerate simplices, by Frankl and R\"odl~\cite{frankl-rodl-triangles,frankl-rodl-simplices}; finite sets with a soluble transitive isometry group and cyclic trapezoids, by K\v{r}\'i\v{z}~\cite{kriz-permutation,kriz-trapezoids}; and vertex sets of regular polytopes, by Cantwell~\cite{cantwell-polytopes}. Leader, Russell and Walters proposed a different characterization: a finite set is Ramsey exactly when it embeds in a finite transitive Euclidean set~\cite[Conjecture~A]{lrw-transitive}. Transitivity means that the isometries of the finite set act transitively on its points. An isometric subset of such a set is called \emph{subtransitive}. Their group-theoretic and Hales--Jewett formulations led to the Block Sets Conjecture; subsequent work studies the possible block sizes~\cite{ilw-blocks}. The link with soluble symmetry has also expanded: Karamanlis embedded every simplex in a finite product of regular polygons~\cite{karamanlis-tori}, and Behague constructed soluble transitive extensions for many known Ramsey classes and further permutation configurations~\cite{behague-subsoluble}. Ivan, Leader and Walters developed generalized-prism constructions, with Ramsey conclusions under a soluble symmetry hypothesis~\cite{ilw-prisms}. Moore and, independently, Mirabi proved that adjoining a point outside the affine span of a Ramsey set preserves the Ramsey property~\cite{moore-pyramid,mirabi-extensions}. The affine-span restriction leaves the case of arbitrary coplanar circle points beyond this extension theorem. P\'alv\"olgyi has recently given a seven-point circle configuration that is not Ramsey, disproving the spherical conjecture~\cite[Theorem~1]{palvolgyi-heptagon}. The appendix to that version also states that generic seven-point circle configurations are not Ramsey. Its author's note announces a proof that all finite transitive sets are Ramsey and says that its exposition is still being prepared.\footnote{P\'alv\"olgyi attributes the writing, proofs, and ideas in that manuscript to ChatGPT. He labels the additional appendix claims as unchecked by him.} Our main theorem gives a necessary and sufficient algebraic condition for an arbitrary finite Euclidean configuration. \subsection{The exact tensor criterion} The problem is to characterize these finite sets up to congruence. A singleton is Ramsey. For any other set, let $d\ge1$ be its affine dimension, and choose a congruent representative $A=\{a_1,\ldots,a_s\}\subset\R^d$ whose affine span is $\R^d$. The points are distinct and $s\ge2$. Define \[ p_i=\begin{pmatrix}1\\a_i\end{pmatrix},\qquad F=\Q\bigl((a_i)_\alpha:1\le i\le s,\ 1\le\alpha\le d\bigr), \qquad B=F\otimes_{\Q}F. \] The commutative ring $B$ has a multiplication homomorphism \[ m_F:B\longrightarrow F,\qquad m_F(x\otimes y)=xy. \] An equality in $B$ is stronger than the equality obtained by applying $m_F$; this map need not be injective. Index the entries of $p_i$ and the rows and columns of a $(d+1)$-by-$(d+1)$ matrix by $0,1,\ldots,d$. Thus index $0$ is the constant coordinate. [statement] The condition is independent of the chosen congruent representative in its affine dimension; we also prove this directly through its tensor formulation. It uses exact relations in the coord […]
+[theorem] [Classification]\label{thm:classification} Let $A=\{a_1,\ldots,a_s\}\subset\R^d$ be a finite set of at least two points with affine span $\R^d$, and define $p_i,F,B,m_F$ as above. Then $A$ is Ramsey if and only if there is a matrix $P\in\operatorname{Mat}_{d+1}(B)$ such that \begin{align} (p_i\otimes1)^T P(1\otimes p_i)&=0 &&(1\le i\le s),\label{eq:field-evaluations}\\ m_F(P_{\alpha\beta})&=\delta_{\alpha\beta} &&(1\le\alpha,\beta\le d).\label{eq:field-spatial} \end{align} Here the entries of $p_i\otimes1$ and $1\otimes p_i$ are formed componentwise. There are no separate conditions on the multiplied constant row or constant column of $P$.
+
+=== LEAN COMPARATOR EuclideanRamsey (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open scoped TensorProduct
+namespace EuclideanRamsey
+abbrev Space (d : ℕ) := EuclideanSpace ℝ (Fin d)
+def Congruent {s d D : ℕ} (a : Fin s → Space d) (b : Fin s → Space D) : Prop :=
+  ∀ i j, dist (b i) (b j) = dist (a i) (a j)
+def Ramsey {s d : ℕ} (a : Fin s → Space d) : Prop :=
+  ∀ r : ℕ, 2 ≤ r → ∃ D : ℕ, 1 ≤ D ∧
+    ∀ c : Space D → Fin r, ∃ b : Fin s → Space D,
+      Congruent a b ∧ ∃ k : Fin r, ∀ i, c (b i) = k
+def coordinateField {s d : ℕ} (a : Fin s → Space d) : IntermediateField ℚ ℝ :=
+  IntermediateField.adjoin ℚ (Set.range (fun ij : Fin s × Fin d => a ij.1 ij.2))
+abbrev Coeff {s d : ℕ} (a : Fin s → Space d) := ↥(coordinateField a)
+abbrev TensorRing {s d : ℕ} (a : Fin s → Space d) := Coeff a ⊗[ℚ] Coeff a
+def coordinate {s d : ℕ} (a : Fin s → Space d) (i : Fin s) (j : Fin d) : Coeff a :=
+  ⟨a i j, IntermediateField.subset_adjoin ℚ _ (Set.mem_range_self (i, j))⟩
+def augmented {s d : ℕ} (a : Fin s → Space d) (i : Fin s) : Option (Fin d) → Coeff a
+  | none => 1
+  | some j => coordinate a i j
+def multiply {s d : ℕ} (a : Fin s → Space d) : TensorRing a →ₐ[ℚ] Coeff a :=
+  Algebra.TensorProduct.lmul' ℚ
+def FieldCriterion {s d : ℕ} (a : Fin s → Space d) : Prop :=
+  ∃ P : Matrix (Option (Fin d)) (Option (Fin d)) (TensorRing a),
+    (∀ i : Fin s, ∑ α, ∑ β,
+      ((augmented a i α) ⊗ₜ[ℚ] (1 : Coeff a)) * P α β *
+      ((1 : Coeff a) ⊗ₜ[ℚ] (augmented a i β)) = 0) ∧
+    (∀ α β : Fin d, multiply a (P (some α) (some β)) = if α = β then 1 else 0)
+theorem classification {s d : ℕ} (a : Fin s → Space d)
+    (hs : 2 ≤ s) (hd : 1 ≤ d) (ha : Function.Injective a)
+    (hspan : affineSpan ℝ (Set.range a) = ⊤) :
+    Ramsey a ↔ FieldCriterion a := by
+  sorry
+end EuclideanRamsey
+end
+end OAI
+
+
+=== LEAN COMPARATOR GrahamSpherical (exact formal statement)
+import Mathlib.Analysis.InnerProductSpace.PiL2
+import Mathlib.Topology.Algebra.InfiniteSum.Real
+namespace OAI
+noncomputable section
+namespace GrahamSpherical
+abbrev Point (n : ℕ) := EuclideanSpace ℝ (Fin n)
+abbrev Label := Fin 3 × Fin 4
+def parameter : ℝ := ∑' m : ℕ, 1 / (10 : ℝ) ^ ((m + 1).factorial)
+def u : ℝ := (1 - parameter ^ 2) / (1 + parameter ^ 2)
+def v : ℝ := (2 * parameter) / (1 + parameter ^ 2)
+def squareCoordinate (q : Fin 4) : Fin 2 → ℝ :=
+  if q = 0 then ![1, 0] else
+  if q = 1 then ![-1, 0] else
+  if q = 2 then ![0, 1] else ![0, -1]
+def coordinates (i : Label) : Fin 2 → ℝ :=
+  let q := squareCoordinate i.2
+  if i.1 = 0 then ![u * q 0 - v * q 1, v * q 0 + u * q 1] else
+  if i.1 = 1 then ![u * q 0 + v * q 1, -v * q 0 + u * q 1] else q
+def vertex (i : Label) : Point 2 := WithLp.toLp 2 (coordinates i)
+def witness : Set (Point 2) := Set.range vertex
+def AvoidsCopy {d n r : ℕ} (X : Set (Point d)) (color : Point n → Fin r) : Prop :=
+  ¬ ∃ f : X → Point n, Isometry f ∧ ∃ c : Fin r, ∀ x, color (f x) = c
+def EuclideanRamsey {d : ℕ} (X : Set (Point d)) : Prop :=
+  ∀ r : ℕ, 0 < r → ∃ n : ℕ, 0 < n ∧
+    ∀ color : Point n → Fin r,
+      ∃ f : X → Point n, Isometry f ∧ ∃ c : Fin r, ∀ x, color (f x) = c
+end GrahamSpherical
+end
+namespace GrahamSpherical.Specification
+def FullAuthoredResult : Prop :=
+  witness.ncard = 12 ∧
+  witness ⊆ Metric.sphere (0 : Point 2) 1 ∧
+  (∀ n : ℕ, 0 < n → ∃ color : Point n → Fin 50, AvoidsCopy witness color) ∧
+  ¬ EuclideanRamsey witness
+end GrahamSpherical.Specification
+noncomputable section
+namespace GrahamSpherical
+theorem full_main : Specification.FullAuthoredResult := by
+  sorry
+end GrahamSpherical
+end
+end OAI
+
+
+=== LEAN COMPARATOR EuclideanRamseyCircle (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+namespace EuclideanRamsey
+abbrev Space (d : ℕ) := EuclideanSpace ℝ (Fin d)
+def Congruent {s d D : ℕ} (a : Fin s → Space d) (b : Fin s → Space D) : Prop :=
+  ∀ i j, dist (b i) (b j) = dist (a i) (a j)
+def Ramsey {s d : ℕ} (a : Fin s → Space d) : Prop :=
+  ∀ r : ℕ, 2 ≤ r → ∃ D : ℕ, 1 ≤ D ∧
+    ∀ c : Space D → Fin r, ∃ b : Fin s → Space D,
+      Congruent a b ∧ ∃ k : Fin r, ∀ i, c (b i) = k
+namespace CircleConsequence
+theorem at_most_five_circle_points_ramsey {s : ℕ} (a : Fin s → Space 2)
+    (hs : 0 < s) (hs5 : s ≤ 5) (ha : Function.Injective a)
+    (hsphere : ∃ c : Space 2, ∃ r : ℝ, ∀ i, dist (a i) c = r) : Ramsey a := by
+  sorry
+end CircleConsequence
+end EuclideanRamsey
+end
+end OAI
+
+
+=== LEAN COMPARATOR EuclideanRamseyNine (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+namespace EuclideanRamsey
+abbrev Space (d : ℕ) := EuclideanSpace ℝ (Fin d)
+def Congruent {s d D : ℕ} (a : Fin s → Space d) (b : Fin s → Space D) : Prop :=
+  ∀ i j, dist (b i) (b j) = dist (a i) (a j)
+def Ramsey {s d : ℕ} (a : Fin s → Space d) : Prop :=
+  ∀ r : ℕ, 2 ≤ r → ∃ D : ℕ, 1 ≤ D ∧
+    ∀ c : Space D → Fin r, ∃ b : Fin s → Space D,
+      Congruent a b ∧ ∃ k : Fin r, ∀ i, c (b i) = k
+namespace NineStatement
+def literalCircleConfig (t : Fin 9 → ℝ) (i : Fin 9) : Space 2 :=
+  WithLp.toLp 2 ![(1 - (t i)^2) / (1 + (t i)^2),
+    (2 * t i) / (1 + (t i)^2)]
+theorem nine_circle_configuration (t : Fin 9 → ℝ)
+    (ht : AlgebraicIndependent ℚ t) :
+    Function.Injective (literalCircleConfig t) ∧
+      (∀ i, dist (literalCircleConfig t i) 0 = 1) ∧
+      ¬ Ramsey (literalCircleConfig t) := by
+  sorry
+end NineStatement
+end EuclideanRamsey
+end
+end OAI
+
+
+=== LEAN COMPARATOR EuclideanRamseyQuadratic (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+namespace EuclideanRamsey
+abbrev Space (d : ℕ) := EuclideanSpace ℝ (Fin d)
+def Congruent {s d D : ℕ} (a : Fin s → Space d) (b : Fin s → Space D) : Prop :=
+  ∀ i j, dist (b i) (b j) = dist (a i) (a j)
+def Ramsey {s d : ℕ} (a : Fin s → Space d) : Prop :=
+  ∀ r : ℕ, 2 ≤ r → ∃ D : ℕ, 1 ≤ D ∧
+    ∀ c : Space D → Fin r, ∃ b : Fin s → Space D,
+      Congruent a b ∧ ∃ k : Fin r, ∀ i, c (b i) = k
+def coordinateField {s d : ℕ} (a : Fin s → Space d) : IntermediateField ℚ ℝ :=
+  IntermediateField.adjoin ℚ (Set.range (fun ij : Fin s × Fin d => a ij.1 ij.2))
+abbrev Coeff {s d : ℕ} (a : Fin s → Space d) := ↥(coordinateField a)
+def coordinate {s d : ℕ} (a : Fin s → Space d) (i : Fin s) (j : Fin d) : Coeff a :=
+  ⟨a i j, IntermediateField.subset_adjoin ℚ _ (Set.mem_range_self (i, j))⟩
+def augmented {s d : ℕ} (a : Fin s → Space d) (i : Fin s) : Option (Fin d) → Coeff a
+  | none => 1
+  | some j => coordinate a i j
+theorem spherical_quadraticIndependent_ramsey_all {s d : ℕ}
+    (a : Fin s → Space d) (ha : Function.Injective a)
+    (hspan : affineSpan ℝ (Set.range a) = ⊤)
+    (hsphere : ∃ c : Space d, ∃ r : ℝ, ∀ i, dist (a i) c = r)
+    (hrows : LinearIndependent (Coeff a)
+      (fun i : Fin s => fun q : Option (Fin d) × Option (Fin d) =>
+        augmented a i q.1 * augmented a i q.2)) : Ramsey a := by
+  sorry
+end EuclideanRamsey
+end
+end OAI
+
+
+=== LEAN COMPARATOR EuclideanRamseySpherical (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open scoped TensorProduct
+namespace EuclideanRamsey
+abbrev Space (d : ℕ) := EuclideanSpace ℝ (Fin d)
+def Congruent {s d D : ℕ} (a : Fin s → Space d) (b : Fin s → Space D) : Prop :=
+  ∀ i j, dist (b i) (b j) = dist (a i) (a j)
+def Ramsey {s d : ℕ} (a : Fin s → Space d) : Prop :=
+  ∀ r : ℕ, 2 ≤ r → ∃ D : ℕ, 1 ≤ D ∧
+    ∀ c : Space D → Fin r, ∃ b : Fin s → Space D,
+      Congruent a b ∧ ∃ k : Fin r, ∀ i, c (b i) = k
+theorem ramsey_cospherical {s d : ℕ} (a : Fin s → Space d)
+    (ha : Function.Injective a) (hR : Ramsey a) :
+    EuclideanGeometry.Cospherical (Set.range a) := by
+  sorry
+end EuclideanRamsey
+end
+end OAI
+
+
+=== LEAN COMPARATOR EuclideanRamseyTransitive (exact formal statement)
+import Mathlib
+namespace OAI
+namespace EuclideanRamsey
+abbrev Space (d : ℕ) := EuclideanSpace ℝ (Fin d)
+def Congruent {s d D : ℕ} (a : Fin s → Space d) (b : Fin s → Space D) : Prop :=
+  ∀ i j, dist (b i) (b j) = dist (a i) (a j)
+def Ramsey {s d : ℕ} (a : Fin s → Space d) : Prop :=
+  ∀ r : ℕ, 2 ≤ r → ∃ D : ℕ, 1 ≤ D ∧
+    ∀ c : Space D → Fin r, ∃ b : Fin s → Space D,
+      Congruent a b ∧ ∃ k : Fin r, ∀ i, c (b i) = k
+namespace TransitiveConsequence
+theorem subset_of_finite_transitive_ramsey {s t D : ℕ}
+    (a : Fin s → Space D) (y : Fin t → Space D)
+    (hs : 0 < s) (ha : Function.Injective a) (_hy : Function.Injective y)
+    (htrans : ∀ i j : Fin t, ∃ σ : Equiv.Perm (Fin t),
+      (∀ k l : Fin t, dist (y (σ k)) (y (σ l)) = dist (y k) (y l)) ∧ σ i = j)
+    (hsub : Set.range a ⊆ Set.range y) : Ramsey a := by
+  sorry
+end TransitiveConsequence
+end EuclideanRamsey
+end OAI
+

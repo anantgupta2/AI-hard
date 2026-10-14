@@ -1,0 +1,95 @@
+FAMILY 287: Isomorphism of the free group factors
+SUBJECT: Operator algebras
+OPENAI SUMMARY: Resolves the free group factor isomorphism problem: $`L(\mathbb F_2)\cong L(\mathbb F_3)`$, and hence all interpolated free group factors, including $`L(\mathbb F_\infty)`$, are isomorphic. Their common factor has fundamental group $`\mathbb R_{\gt 0}`$.
+
+=== MANUSCRIPT: An isomorphism of the free group factors (September-23-2026) [preprints/An-isomorphism-of-the-free-group-factors-September-23-2026/build/main.tex]
+ABSTRACT: We solve the free group factor isomorphism problem affirmatively by proving that $`L(\mathbb F_2)`$ and $`L(\mathbb F_3)`$ are isomorphic as tracial von Neumann algebras. The classical free group factor alternative then implies that all interpolated free group factors, including $`L(\mathbb F_\infty)`$, are isomorphic and have fundamental group $`\mathbb R_{\gt 0}`$.
+INTRODUCTION (start): For a discrete group $G$, its group von Neumann algebra is \[ L(G)=\{\lambda(g):g\in G\}'',\qquad (\lambda(g)\xi)(h)=\xi(g^{-1}h),\quad \xi\in\ell^2(G), \] with canonical trace $\tau(x)=\langle x\delta_e,\delta_e\rangle$. Write $\F_n$ for the free group on $n$ generators and $\F_\infty$ for the free group on countably infinitely many generators. The free group factors arose in Murray and von Neumann's foundational work \cite{murray_vonneumann1943}. Their nonhyperfiniteness distinguished them from the hyperfinite factor, but did not distinguish their ranks; see the historical account in \cite[p.~518]{radulescu1992}. The question whether $L(\F_m)$ and $L(\F_n)$ are isomorphic for distinct $m,n\geq2$ became a central problem in the classification of finite factors. Dykema's introduction \cite[p.~123]{dykema1994} records the early history and credits Kadison with raising the rank-isomorphism question. Free probability supplied a way to study these factors through their generating distributions. Voiculescu developed the reduced-free-product framework \cite{voiculescu1985} and its semicircular and circular models \cite{voiculescu1990}. His compression results showed that the fundamental group of $L(\F_\infty)$ contains every positive rational, and R\u adulescu extended this to every positive real number \cite{radulescu1992}. Dykema and R\u adulescu independently constructed the interpolated factors $L(\F_r)$ for real $r>1$ and established their amplification calculus \cite{dykema1994,radulescu1994}. These results relate changes of rank to normalized corners. They also give a dichotomy: the interpolated free group factors are either all isomorphic or pairwise nonisomorphic. The version including the infinite parameter is due to R\u adulescu \cite[Corollary~4.7]{radulescu1994}; see also the precise restatement in \cite[Theorem~1.1]{goldbring_pi2025}. The amplification calculus thus links rank to corner size, while the dichotomy reduces the classification to two alternatives. To choose the isomorphic alternative, it suffices to construct an isomorphism between two distinct finite ranks. Our constructive result is the following rank comparison. [statement] The construction gives a freely generating Haar $n$-tuple inside $L(\F_{n+1})$. Applying it at ranks three and four, and then using the established amplification formula, gives the headline conclusion. [statement] This gives an affirmative solution to the free group factor isomorphism problem. Together with the classical dichotomy, this proves that all interpolated free group factors, including the infinite-rank factor, are isomorphic. Their fundamental groups are therefore $\R_{>0}$. We state and prove these consequences in Corollary~\ref{cor:all-interpolated}; the constructive rank comparison itself does not use interpolation. Free entropy offered another approach to distinguishing ranks. A free semicircular $n$-tuple generates $L(\F_n)$ \cite[Remarks~1.10--1.11]{voiculescu1990} and has free entropy dimension $\delta=n$ \cite[Section~2.4(c),(d)]{voiculescu2002entropy}. Voiculescu asked whether $\delta$ of a finite self-adjoint tuple depends only on the tracial von Neumann algebra it generates \cite[Section~2.6]{voiculescu2002entropy}. Such invariance would distinguish the finite ranks. Our isomorphisms give the opposite conclusion: Corollary~\ref{cor:entropy-dimensions} gives a negative answer and proves the same failure for $\delta_0,\delta^*$, and $\delta^\star$. Each of the four dimensions attains every integer value $n\geq2$ on finite self-adjoint generating tuples of $L(\F_2)$. The proof transports semicircular tuples for the microstates dimensions $\delta,\delta_0$ and group-algebra tuples for the nonmicrostates dimensions $\delta^*,\delta^\star$; the two tuple families need not coincide. Fix $n\geq3$. We begin with a freely generating Haar tuple $(A_1,\ldots,A_n,C)$ in $L(\F_{n+1})$ and set $S=\arg(C)$ using bounded Borel functional calculus. For $g\in\F_n$, let $A_g$ denote  […]
+[theorem] [Isomorphism of consecutive ranks] \label{thm:rank-step} For every integer $n\geq3$ there is a unital trace-preserving normal $*$-isomorphism \[ L(\F_n)\cong L(\F_{n+1}). \]
+[theorem] \label{thm:main} There exists a unital normal trace-preserving $*$-isomorphism \[ \Phi:L(\F_2)\longrightarrow L(\F_3). \]
+
+=== LEAN COMPARATOR InterpolatedFactors (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+namespace FreeGroupFactorMain
+universe u uG
+open scoped ENNReal
+abbrev GroupHilbert (G : Type u) := lp (fun _ : G => ℂ) 2
+abbrev GroupOperator (G : Type u) := GroupHilbert G →L[ℂ] GroupHilbert G
+def leftTranslations (G : Type u) [Group G] : Set (GroupOperator G) :=
+  {T | ∃ g : G, ∀ (ξ : GroupHilbert G) (h : G), (T ξ) h = ξ (g⁻¹ * h)}
+def groupVonNeumann (G : Type u) [Group G] : StarSubalgebra ℂ (GroupOperator G) :=
+  StarSubalgebra.centralizer ℂ
+    (StarSubalgebra.centralizer ℂ (leftTranslations G) : Set (GroupOperator G))
+def canonicalTrace {G : Type u} [Group G] (T : groupVonNeumann G) : ℂ := by
+  classical
+  exact ((T : GroupOperator G) (lp.single 2 (1 : G) (1 : ℂ))) 1
+@[instance_reducible] def ultraweakOperatorTopology (G : Type u) : TopologicalSpace (GroupOperator G) :=
+  ⨅ (ξ : lp (fun _ : ℕ => GroupHilbert G) 2)
+    (η : lp (fun _ : ℕ => GroupHilbert G) 2),
+    TopologicalSpace.induced
+      (fun T : GroupOperator G => ∑' k : ℕ, inner ℂ (η k) (T (ξ k)))
+      inferInstance
+@[instance_reducible] def groupUltraweakTopology (G : Type u) [Group G] :
+    TopologicalSpace (groupVonNeumann G) :=
+  TopologicalSpace.induced (fun T : groupVonNeumann G => (T : GroupOperator G))
+    (ultraweakOperatorTopology G)
+abbrev FreeGroupRank (n : ℕ) := FreeGroup (Fin n)
+instance groupVN_isClosed (G : Type uG) [Group G] :
+    IsClosed (groupVonNeumann G : Set (GroupOperator G)) := by
+  unfold groupVonNeumann
+  rw [StarSubalgebra.coe_centralizer]
+  exact Set.isClosed_centralizer _
+instance groupVN_CStarAlgebra (G : Type uG) [Group G] :
+    CStarAlgebra (groupVonNeumann G) := inferInstance
+end FreeGroupFactorMain
+universe u_1 u_2 u_3 u_4 u_5 u_6 u_7 u_8 u_9 u_10 u_11 u_42 u_43
+namespace FreeGroupFactorMain.Amplification
+open scoped ENNReal
+section
+variable {A : Type u_1} {B : Type u_2} [CStarAlgebra A] [CStarAlgebra B]
+def cornerSubalgebra (p : A) (hp : IsStarProjection p) : NonUnitalStarSubalgebra ℂ A where
+  carrier := {x | p*x=x ∧ x*p=x}
+  zero_mem' := by simp
+  add_mem' hx hy := by constructor <;> simp [mul_add,add_mul,hx.1,hx.2,hy.1,hy.2]
+  mul_mem' hx hy := by
+    constructor
+    · rw [← mul_assoc,hx.1]
+    · rw [mul_assoc,hy.2]
+  smul_mem' c x hx := by
+    constructor
+    · rw [mul_smul_comm,hx.1]
+    · rw [smul_mul_assoc,hx.2]
+  star_mem' hx := by
+    constructor
+    · simpa only [star_mul,hp.isSelfAdjoint.star_eq] using congrArg star hx.2
+    · simpa only [star_mul,hp.isSelfAdjoint.star_eq] using congrArg star hx.1
+abbrev Corner (p : A) (hp : IsStarProjection p) := ↥(cornerSubalgebra p hp)
+instance cornerClosed (p : A) (hp : IsStarProjection p) :
+    IsClosed (cornerSubalgebra p hp : Set A) :=
+  (isClosed_eq (continuous_const.mul continuous_id) continuous_id).inter
+    (isClosed_eq (continuous_id.mul continuous_const) continuous_id)
+instance cornerSemiring (p : A) (hp : IsStarProjection p) : Semiring (Corner p hp) where
+  __ : NonUnitalSemiring (Corner p hp) := inferInstance
+  one := ⟨p,hp.isIdempotentElem.eq,hp.isIdempotentElem.eq⟩
+  one_mul x := Subtype.ext x.property.1
+  mul_one x := Subtype.ext x.property.2
+instance cornerRing (p : A) (hp : IsStarProjection p) : Ring (Corner p hp) where
+  __ : Semiring (Corner p hp) := inferInstance
+  __ : NonUnitalRing (Corner p hp) := inferInstance
+instance cornerAlgebra (p : A) (hp : IsStarProjection p) : Algebra ℂ (Corner p hp) :=
+  Algebra.ofModule smul_mul_assoc mul_smul_comm
+instance cornerNormedRing (p : A) (hp : IsStarProjection p) : NormedRing (Corner p hp) where
+  __ : Ring (Corner p hp) := inferInstance
+  __ : NonUnitalNormedRing (Corner p hp) := inferInstance
+instance cornerCStarAlgebra (p : A) (hp : IsStarProjection p) : CStarAlgebra (Corner p hp) where
+  __ : NonUnitalCStarAlgebra (Corner p hp) := inferInstance
+  __ : NormedRing (Corner p hp) := inferInstance
+  __ : Algebra ℂ (Corner p hp) := inferInstance
+  norm_smul_le := norm_smul_le
+end
+section
+variable {A : Type u_3} {B : Type u_4} [CStarAlgebra A] [CStarAlgebra B]
+@[instance
+[…]

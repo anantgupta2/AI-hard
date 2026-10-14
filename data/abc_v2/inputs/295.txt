@@ -1,0 +1,40 @@
+FAMILY 295: The Kadison–Ringrose cohomology conjecture
+SUBJECT: Operator algebras
+OPENAI SUMMARY: Proves that every bounded Hochschild cocycle of degree at least two on a complex von Neumann algebra, with coefficients in the algebra itself, has a bounded primitive. Equivalently, all higher bounded Hochschild cohomology groups vanish, resolving the Kadison–Ringrose conjecture.
+
+=== MANUSCRIPT: Vanishing of higher bounded Hochschild cohomology (September-23-2026) [preprints/Vanishing-of-higher-bounded-Hochschild-cohomology-September-23-2026/build/paper.tex]
+ABSTRACT: We prove that every bounded Hochschild cocycle of degree at least two on a complex von Neumann algebra, with values in the algebra itself, has a bounded primitive. Together with the established degree-one inner-derivation theorem, this resolves the Kadison–Ringrose cohomology conjecture positively.
+INTRODUCTION (start): \label{sec:introduction} The continuous Hochschild cohomology of an operator algebra measures the obstruction to solving its bounded cocycle equations. The theory also connects these equations with stability of multiplication under small perturbations~\cite[Chapter~7]{SinclairSmith1995}. For a von Neumann algebra acting on itself by multiplication, the degree-one equation is the derivation equation, and its vanishing is the inner-derivation theorem of Kadison and Sakai~\cite{Kadison1966,Sakai1966}. The higher-degree theory was developed by Johnson, Kadison, and Ringrose~\cite{KadisonRingrose1971,KadisonRingrose1971II,JKR1972}. Throughout, boundedness means ordinary operator-norm boundedness of a multilinear map. No complete-boundedness condition is imposed. For a complex von Neumann algebra \(M\), let \(C_b^k(M,M)\) be the Banach space of bounded complex \(k\)-linear maps \(M^k\to M\), with norm $\norm{f}=\sup_{\norm{a_1},\ldots,\norm{a_k}\leq1} \norm{f(a_1,\ldots,a_k)}$, and put \(C_b^0(M,M)=M\). For \(k\geq1\), the differential is \begin{align} (df)(a_1,\ldots,a_{k+1}) ={}&a_1f(a_2,\ldots,a_{k+1})\notag\\ &+\sum_{j=1}^k(-1)^j f(a_1,\ldots,a_ja_{j+1},\ldots,a_{k+1})\notag\\ &+(-1)^{k+1}f(a_1,\ldots,a_k)a_{k+1}. \label{eq:differential} \end{align} In degree zero, \((db)(a)=ab-ba\). As usual, \(d^2=0\). We use the notation \[ H_b^k(M,M)= \ker\bigl(d:C_b^k(M,M)\to C_b^{k+1}(M,M)\bigr) \big/ \operatorname{im}\bigl(d:C_b^{k-1}(M,M)\to C_b^k(M,M)\bigr). \] The denominator is the actual image, without a closure. The Kadison--Ringrose cohomology conjecture asks whether \(H_b^k(M,M)=0\) for every complex von Neumann algebra \(M\) and every positive integer \(k\). Sinclair and Smith trace this self-coefficient formulation to 1967~\cite[p.~3376]{SinclairSmith1998}. Our main result settles the higher degrees. [statement] Together with the inner-derivation theorem, Theorem~\ref{thm:main} resolves the Kadison--Ringrose cohomology conjecture positively. \subsection{Prior work} Kadison and Ringrose proved vanishing for type~I and hyperfinite von Neumann algebras~\cite[Theorem~4.4]{KadisonRingrose1971} \cite[Theorem~3.1]{KadisonRingrose1971II}. Their extended-cobounding theorem also gives a primitive for an $M$-valued cocycle on a general concrete von Neumann algebra $M\subset B(H)$ when the primitive may take values in $B(H)$~\cite[Theorem~2.4]{KadisonRingrose1971II}; keeping the values in the original algebra is the essential self-coefficient problem here. Johnson, Kadison, and Ringrose then identified continuous cohomology with separately normal cohomology~\cite[Theorem~5.6]{JKR1972}. The completely bounded methods of Christensen, Effros, and Sinclair~\cite{CES1987} established vanishing whenever the type $\mathrm{II}_1$ central summand absorbs the hyperfinite $\mathrm{II}_1$ factor, including all algebras without a type $\mathrm{II}_1$ summand; see the precise restatement in~\cite[p.~636, equation~(1.1)]{CPSS2003}. The remaining finite-algebra problem has several substantial positive cases. Sinclair and Smith proved vanishing for algebras with separable predual and a Cartan subalgebra~\cite{SinclairSmith1998Cartan}; Cameron removed the separability hypothesis for type~$\mathrm{II}_1$ factors with a Cartan maximal abelian subalgebra~\cite[Theorem~3.2]{Cameron2009}. Christensen, Pop, Sinclair, and Smith proved vanishing for all type~$\mathrm{II}_1$ factors with property~$\Gamma$, including nonseparable ones~\cite[Theorem~7.2]{CPSS2003}. Qian and Shen extended this direction to type~$\mathrm{II}_1$ algebras with separable predual and their generalized property~$\Gamma$~\cite[Theorem~6.4]{QianShen2015}. In degree two, Pop and Smith proved vanishing for the tensor product of any two type~$\mathrm{II}_1$ von Neumann algebras, with no separability assumption~\cite[Theorem~4.5]{PopSmith2010}. Theorem~\ref{thm:main} removes the structural restrictions on the finite algebra in every degree $k\geq2$. The Cartan argument of Sinclair and Smith also pr […]
+[theorem] \label{thm:main} Let \(M\) be a complex von Neumann algebra and let \(k\geq2\). Every \(f\in C_b^k(M,M)\) satisfying \(df=0\) has the form \(f=dg\) for some \(g\in C_b^{k-1}(M,M)\). Consequently \(H_b^k(M,M)=0\).
+[proposition] [Classical reductions]\label{prop:classical} Let \(M\) be a von Neumann algebra and \(k\geq2\). \begin{enumerate}[label=\textup{(\roman*)}] \item If \(f\in C_b^k(M,M)\) is a cocycle, there are a separately normal bounded cocycle \(f_0\) and a bounded \((k-1)\)-cochain \(b\) such that \(f=f_0+db\). \item If \(M\) has no type \(\mathrm{II}_1\) central summand, then \(H_b^k(M,M)=0\). \end{enumerate}
+
+=== LEAN COMPARATOR KadisonRingrose (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+namespace BoundedHochschild
+abbrev Cochain (M : Type*) [NormedAddCommGroup M] [NormedSpace ℂ M] (n : ℕ) :=
+  ContinuousMultilinearMap ℂ (fun _ : Fin n => M) M
+def mergeInputs {M : Type*} [Mul M] {n : ℕ}
+    (v : Fin (n + 1) → M) (j : Fin n) : Fin n → M :=
+  fun i => if i < j then v i.castSucc
+    else if i = j then v i.castSucc * v i.succ else v i.succ
+noncomputable def differentialValue {M : Type*} [NormedRing M] [NormedAlgebra ℂ M]
+    {n : ℕ} (f : Cochain M n) (v : Fin (n + 1) → M) : M :=
+  v 0 * f (fun i => v i.succ) +
+    ∑ j : Fin n, ((-1 : ℂ) ^ (j.val + 1)) • f (mergeInputs v j) +
+    ((-1 : ℂ) ^ (n + 1)) • (f (fun i => v i.castSucc) * v (Fin.last n))
+namespace KadisonRingrose
+universe u
+theorem main_result
+    {M : Type u} [CStarAlgebra M] [PartialOrder M] [StarOrderedRing M] [WStarAlgebra M]
+    (n : ℕ) (f : Cochain M (n + 2))
+    (hf : ∀ x : Fin (n + 3) → M, differentialValue f x = 0) :
+    ∃ g : Cochain M (n + 1), ∀ x : Fin (n + 2) → M,
+      differentialValue g x = f x := by
+  sorry
+end KadisonRingrose
+end BoundedHochschild
+end
+end OAI
+

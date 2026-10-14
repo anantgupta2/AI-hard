@@ -1,0 +1,320 @@
+FAMILY 125: The metric k-median approximation threshold and recovery
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Gives a deterministic polynomial-time $`(1+2/e+\varepsilon)`$-approximation for finite rational metric k-median with specified candidate facilities, for every fixed ε &gt; 0. Assuming $`P\ne NP`$, the optimal infimum approximation factor is $`1+2/e`$.
+
+=== MANUSCRIPT: Single-exponential recovery and bounded-price strictness for metric k-median (September-24-2026) [preprints/Single-Exponential-Recovery-and-Bounded-Price-Strictness-for-Metric-k-Median-September-24-2026/build/paper.tex]
+ABSTRACT: We give an exact-budget recovery algorithm for metric k-median with single-exponential dependence on the number of comparison clusters without accurate, distinct proxies in a supplied anchor solution. On positive integral metrics of polynomially bounded diameter, a sufficiently small total proxy error and logarithmically many such clusters yield a $`(1+2/e+\varepsilon)`$ approximation in polynomial time with arbitrarily high success probability. We also prove bounded-price strictness for one compatible execution of the logarithmic-surplus construction. Together the recovery and payment arguments give a randomized $`(2-\sigma)`$ approximation, for an absolute σ &gt; 0, on arbitrary finite rational metrics, both with high probability and in expectation, while opening at most k facilities on every output.
+INTRODUCTION (start): \label{main:introduction} Metric $k$-median asks for a small set of facilities serving a finite set of clients. The input consists of finite sets $D$ of clients and $F$ of available facilities, distances given by a finite rational metric on their locations, and a positive integer $k$. For a nonempty $S\subseteq F$ set \[ \operatorname{cost}(S)=\sum_{p\in D}d(p,S),\qquad d(p,S)=\min_{s\in S}d(p,s), \qquad \operatorname{opt}_k=\min_{1\le|S|\le k}\operatorname{cost}(S). \] A feasible solution opens at most $k$ facilities. Clients and candidate facilities are specified separately; they may share locations. We write $n=|D|$ and $N=|D|+|F|$. This paper develops two tools for respecting that budget. The first recovers a good solution from an anchor that represents all but a small number of comparison clusters accurately. Its running time is single-exponential in the number of exceptions, making logarithmically many exceptions tractable. The second gives an elementary proof of bounded-price strictness for one fixed execution of a facility-opening process. The recovery and execution arguments combine into a randomized approximation below $2$ on arbitrary finite rational metrics. \subsection{Recovery from an anchor} Fix a comparison solution $O\subseteq F$ of size $h$ and cost $P>0$. Assign every client to a nearest member of $O$, using fixed priorities for ties, and write $C_i$ for the clients assigned to $i\in O$ and $P_i=\sum_{p\in C_i}d(p,i)$. Clusters may be empty. An \emph{anchor} is a supplied feasible set $S\subseteq F$ of the same size $h$. Partition $O$ into good and bad centers. For each good center $i$, a \emph{proxy} is a facility $\phi_i\in S$, with the proxies pairwise distinct. Put $P_g=\sum_{i\text{ good}}P_i$. The recovery promise bounds the total proxy-assignment cost by $P_g+\mu P$, where $\mu$ is a fixed accuracy parameter. The comparison solution, its partition and the proxy map certify this promise; the algorithm is not given any of them. The precise recovery theorem uses a normalized representation: clients and facilities have disjoint indices, distances between distinct indices are positive integers, and their maximum is bounded by a fixed polynomial in $N$. The fixed polynomial and accuracy parameters may affect the running-time degree. [statement] The running time is single-exponential in the allowed number of bad centers. In particular, Theorem~\ref{comp:recovery} gives factor $1.97$ with proxy error $P/100$ and at most $M_0$ bad centers in time \[ \exp(O(M_0))\operatorname{poly}(N)\log(2/\zeta). \] Local optimality of the anchor is not part of either recovery promise. Section~\ref{loc:section} proves one way to produce such proxies from local optimality and separation. Declaring all centers bad also gives the promise when $h=O(\log N)$. The normalized promise matters. Theorem~\ref{ref:recovery} does not assert that the proxies of an arbitrary original metric retain their accuracy after distances are capped and rounded. The general-metric application below instead constructs its anchors \emph{after} normalization and proves a separate transfer of the final cost bound. \subsection{A compatible execution and its global application} The other tool concerns client budgets produced by the logarithmic-surplus construction of Cohen-Addad, Grandoni, Lee, Schwiegelshohn and Svensson \cite{CGLSS2026}. At target cardinality $h$, that construction uses $h$ paid regular facilities and $O(\log N)$ free copies, apart from a small-price endpoint handled separately. A free copy is a labeled leaf attached to an available facility. Replacing each copy by its underlying facility produces a real solution without increasing connection cost. The analysis must use one final price, one set of final copy lengths, and the budgets of one actual replay. Let $\lambda$ be its regular opening payment and $\alpha_p$ the final budget of client $p$. For a client set $C$ served by a comparison facility $i$, put $P_C=\sum_{p\in C}d(i,p)$. The us […]
+[theorem] [Refined recovery]\label{ref:recovery} Let $D$ and $F$ be disjoint indexed sets in a metric whose distances between distinct indices are positive integers bounded by a fixed polynomial in $N=|D|+|F|$. Fix $\varepsilon>0$ and $0<L_0<\infty$, and choose a fixed rational parameter \[ 0<\mu\le \min\{1/4,\varepsilon/12\}. \] Let $S\subseteq F$ have cardinality $h\ge1$. Suppose there exists a comparison solution $O\subseteq F$ of cardinality $h$ and cost $P>0$, with a partition into good and bad centers and distinct proxies $\phi_i\in S$ for the good centers, such that \begin{equation}\label{ref:proxy-hypothesis} \sum_{i\ \mathrm{good}}\sum_{p\in C_i}d(p,\phi_i) \le P_g+\mu P, \qquad m:=|\{i:i\ \mathrm{bad}\}|\le L_0\log N. \end{equation} Given $S$, $\mu$, $L_0$, and a failure parameter $\zeta\in(0,1)$, a randomized algorithm returns $\widehat S\subseteq F$ with \[ |\widehat S|\le h \quad\text{always},\qquad \operatorname{cost}(\widehat S) \le (1+2/e+\varepsilon)P \quad\text{with probability at least }1-\zeta. \] Its running time is polynomial in $N$ and $\log(1/\zeta)$ for the fixed parameters. The algorithm is not given $O$, $P$, the partition, or its proxies.
+[theorem] [Global application]\label{main:theorem} There is an absolute constant $\sigma>0$ with the following property. For every fixed $a>0$, a randomized polynomial-time algorithm for metric $k$-median always returns a set $S\subseteq F$ with $|S|\le k$ and satisfies \[ \Pr\!\left\{\operatorname{cost}(S) \le(2-\sigma)\operatorname{opt}_k\right\} \ge 1-(|D|+|F|+2)^{-a}. \] The same algorithm can be chosen to satisfy $\mathbb E\operatorname{cost}(S)\le(2-\sigma)\operatorname{opt}_k$. The running time is polynomial in the bit length of the finite rational metric input. Its degree may depend on the fixed constants.
+
+=== MANUSCRIPT: The approximation threshold for metric k-median (September-24-2026) [preprints/The-Approximation-Threshold-for-Metric-k-Median-September-24-2026/build/main.tex]
+ABSTRACT: For every fixed ε &gt; 0, we give a deterministic polynomial-time $`(1+2/e+\varepsilon)`$-approximation for finite rational metric k-median with specified candidate facilities, opening at most k facilities. Under $`P\ne NP`$, the infimum approximation factor in this model is therefore $`1+2/e`$.
+INTRODUCTION (start): \addcontentsline{toc}{section}{\refname}} \newtheorem{theorem}{Theorem}[section] \newtheorem{lemma}[theorem]{Lemma} \newtheorem{proposition}[theorem]{Proposition} \newtheorem{corollary}[theorem]{Corollary} \theoremstyle{definition} \newtheorem{definition}[theorem]{Definition} \theoremstyle{remark} \newtheorem{remark}[theorem]{Remark} \newcommand{\E}{\mathbb E} \newcommand{\Prob}{\mathbb P} \DeclareMathOperator{\Var}{Var} \DeclareMathOperator{\OPT}{OPT} \DeclareMathOperator{\cost}{cost} \newcommand{\ind}{\mathbf 1} \newcommand{\R}{\mathbb R} \newcommand{\N}{\mathbb N} \newcommand{\eps}{\varepsilon} \newcommand{\abs}[1]{\lvert#1\rvert} \newcommand{\norm}[1]{\lVert#1\rVert} \setlist[itemize]{topsep=4pt,itemsep=3pt} \setlist[enumerate]{topsep=4pt,itemsep=3pt} \setlength{\emergencystretch}{2em} \numberwithin{equation}{section} \title{The approximation threshold for metric \(k\)-median} \author{OpenAI} \date{September 24, 2026} \begin{document} \maketitle \begin{abstract} For every fixed \(\varepsilon>0\), we give a deterministic polynomial-time \((1+2/e+\varepsilon)\)-approximation for finite rational metric \(k\)-median with specified candidate facilities, opening at most \(k\) facilities. Under \(P\ne NP\), the infimum approximation factor in this model is therefore \(1+2/e\). \end{abstract}
+[theorem] \label{thm:main} For every fixed \(\varepsilon>0\), there is a deterministic algorithm which, given a finite rational metric \(k\)-median instance with \(1\le k\le |F|\), returns \(S\subseteq F\), \(|S|\le k\), such that \[ \sum_{j\in J}d(j,S)\le \left(1+\frac2e+\varepsilon\right)\OPT_k. \] Its running time is polynomial in the binary encoding length of the instance. The polynomial may depend on \(\varepsilon\).
+[corollary] \label{cor:threshold} If \(P\ne NP\), the infimum of deterministic polynomial-time approximation factors for metric \(k\)-median with specified candidate facilities is \(1+2/e\).
+[theorem] [Li--Svensson~\cite{LiSvensson2016}, Theorem~4 of the 2014 manuscript] \label{thm:li-svensson} Let \(\alpha>1\), and suppose \(\mathcal A\) is a \(c\)-additive \(\alpha\)-approximation algorithm for metric \(k\)-median. For every \(\eta>0\), there is an ordinary \((\alpha+\eta)\)-approximation algorithm with running time \(n^{O(c/\eta)}\) times the running time of \(\mathcal A\). For fixed \(\alpha,c,\eta\), this is polynomial overhead.
+[theorem] \label{thm:preparation} For every $\eta>0$, there is a constant $\Delta_0$ with the following property. Given a finite rational metric instance and feasible rational openings $0\le y_i\le1$ with a nearest-unit assignment of cost $V_j$ for each client $j$, fix any constant even integer $\Delta\ge\Delta_0$ and let $g=1/\Delta$. There is a randomized procedure, running in expected polynomial time on rational inputs, that produces openings $\widetilde y_i\in[0,1]\cap g\mathbb Z$, allowing polynomially many co-located labeled facility pieces, such that \[ 1\le\sum_i\widetilde y_i\le\sum_i y_i+3g \] for every output, and the expected nearest-unit assignment cost of every client $j$ is at most $(1+\eta)V_j$. In particular the grid can be required to satisfy any additional positive instance-independent upper bound on $g$.
+[theorem] [Finite comparison inequality] \label{thm:finite-inequality} Let $I$ be a finite index set with probability weights $(\pi_i)_{i\in I}$, and let $D_i\ge0$ satisfy $\E_iD_i=1$. Both $\E_i$ and $\E_t$ denote expectation with these weights; in a double expectation the two indices are sampled independently. Fix $0\le x\le1$ and $0<y\le1$, and set \[ \Theta=\frac{P(y-x)^2}{y}. \] Suppose $q_{ti}\in[0,1]$ and $R_i\ge0$ satisfy \begin{equation} \label{eq:finite-comparison} R_i(1-Pq_{ti})\le D_i+D_t\qquad\text{whenever }q_{ti}<1. \end{equation} No symmetry is assumed for $q$. For any $s_i\in[0,1]$, put $r_i=\E_tq_{ti}$ and $C_i=1-Ps_i$. Then \begin{equation} \label{eq:finite-inequality} \begin{aligned} \E_i\Big[&C_i(1-r_i)R_i +r_i\{mD_i+(2-s_i)Py(D_i+1)\}-C_i(D_i+1)\\ &\hspace{12mm} -\E_t(1-q_{ti})\bigl(D_t-(1+m+2Py)D_i\bigr)_+\Big] \le2\Theta. \end{aligned} \end{equation} Here $u_+=\max(u,0)$.
+[theorem] [Rounding a grid solution]\label{thm:grid-rounding} For every fixed $\tau>0$ and all sufficiently large constant integers $\Delta$, put $g=1/\Delta$. Suppose a finite rational metric instance has openings $\widetilde y_i\in[0,1]\cap g\mathbb Z$ of total mass $M\ge1$. For a client $j$, let $V_{j,0}$ be the cost of its nearest unit of this mass. There is a constant $C=C(\tau,\Delta)$ and a randomized algorithm of expected polynomial running time that outputs a set $O$ of facilities with \[ |O|\le M+C, \qquad \E d(j,O)\le(1+2/e+\tau)V_{j,0}\quad\text{for every client }j. \] All parameters and the additive constant are independent of the instance. In particular, an initial mass at most $k+c_0$, for a fixed constant $c_0$, gives at most $k+c_0+C$ facilities. The deterministic implementation of the resulting total-cost guarantee is given in Section~\ref{sec:derandomization}.
+[theorem] [Deterministic additive approximation] \label{thm:pseudo} For every fixed \(\varepsilon>0\), there is an instance-independent integer \(c\ge0\) and a deterministic polynomial-time algorithm for metric \(k\)-median that opens at most \(k+c\) facilities and has total connection cost at most \[ \left(1+\frac2e+\varepsilon\right)\operatorname{LP}, \] where \(\operatorname{LP}\) is the optimum value of the assignment relaxation. In particular, its cost is at most the same factor times \(\OPT_k\).
+
+=== LEAN COMPARATOR KMedianRecovery (exact formal statement)
+import Mathlib
+namespace OAI
+namespace MetricKMedianRecovery
+structure RationalMetricInput where
+  pointCount : ℕ
+  distance : Fin pointCount → Fin pointCount → ℚ
+  clients : Finset (Fin pointCount)
+  facilities : Finset (Fin pointCount)
+  budget : ℕ
+  facilities_nonempty : facilities.Nonempty
+  budget_pos : 0 < budget
+  covered : clients ∪ facilities = Finset.univ
+  distance_nonneg : ∀ x y, 0 ≤ distance x y
+  distance_self : ∀ x, distance x x = 0
+  distance_symm : ∀ x y, distance x y = distance y x
+  distance_triangle : ∀ x y z, distance x z ≤ distance x y + distance y z
+namespace RationalMetricInput
+def size (I : RationalMetricInput) : ℕ := I.clients.card + I.facilities.card
+def Feasible (I : RationalMetricInput) (S : Finset (Fin I.pointCount)) : Prop :=
+  S ⊆ I.facilities ∧ S.card ≤ I.budget ∧ (I.clients.Nonempty → S.Nonempty)
+def cost (I : RationalMetricInput) (S : Finset (Fin I.pointCount)) : ℚ :=
+  if hS : S.Nonempty then ∑ p ∈ I.clients, S.inf' hS (I.distance p) else 0
+def comparisonSets (I : RationalMetricInput) : Finset (Finset (Fin I.pointCount)) :=
+  I.facilities.powerset.filter (fun S => S.Nonempty ∧ S.card ≤ I.budget)
+lemma comparisonSets_nonempty (I : RationalMetricInput) : I.comparisonSets.Nonempty := by
+  obtain ⟨i, hi⟩ := I.facilities_nonempty
+  refine ⟨{i}, ?_⟩
+  simp only [comparisonSets, Finset.mem_filter, Finset.mem_powerset,
+    Finset.singleton_subset_iff, Finset.singleton_nonempty, Finset.card_singleton, true_and]
+  exact ⟨hi, I.budget_pos⟩
+def optimum (I : RationalMetricInput) : ℚ :=
+  I.comparisonSets.inf' I.comparisonSets_nonempty I.cost
+def natBits (n : ℕ) : List Bool :=
+  List.replicate (Nat.bits n).length true ++ [false] ++ Nat.bits n
+def rationalBits (r : ℚ) : List Bool :=
+  [decide (r < 0)] ++ natBits r.num.natAbs ++ natBits r.den
+def bits (I : RationalMetricInput) : List Bool :=
+  natBits I.pointCount ++ natBits I.budget ++
+    List.ofFn (fun i : Fin I.pointCount => decide (i ∈ I.clients)) ++
+    List.ofFn (fun i : Fin I.pointCount => decide (i ∈ I.facilities)) ++
+    (List.ofFn (fun i : Fin I.pointCount =>
+      (List.ofFn (fun j : Fin I.pointCount => rationalBits (I.distance i j))).flatten)).flatten
+def decodeOutput (I : RationalMetricInput) (out : List Bool) : Finset (Fin I.pointCount) :=
+  I.facilities.filter (fun i => out[i.val]?.getD false = true)
+end RationalMetricInput
+def pairBits (p : List Bool × List Bool) : List Bool :=
+  p.1.flatMap (fun b => [true, b]) ++ [false] ++ p.2
+structure BinaryRandomizedAlgorithm where
+  randomBits : Polynomial ℕ
+  run : List Bool × List Bool → List Bool
+  computation : Turing.TM2ComputableInPolyTime pairBits id run
+  finiteWorkAlphabet : ∀ k : computation.tm.K, Finite (computation.tm.Γ k)
+namespace BinaryRandomizedAlgorithm
+def bitCount (A : BinaryRandomizedAlgorithm) (I : RationalMetricInput) : ℕ :=
+  A.randomBits.eval I.bits.length
+abbrev Seed (A : BinaryRandomizedAlgorithm) (I : RationalMetricInput) :=
+  Fin (A.bitCount I) → Bool
+def output (A : BinaryRandomizedAlgorithm) (I : RationalMetricInput) (s : A.Seed I) :
+    Finset (Fin I.pointCount) :=
+  I.decodeOutput (A.run (I.bits, List.ofFn s))
+noncomputable def successProbability (A : BinaryRandomizedAlgorithm) (I : RationalMetricInput)
+    (bound : ℝ) : ℝ := by
+  classical
+  exact ((Finset.univ.filter (fun s : A.Seed I => (I.cost (A.output I s) : ℝ) ≤ bound)).card : ℝ) /
+    2 ^ (A.bitCount I)
+noncomputable def expectedCost (A : BinaryRandomizedAlgorithm) (I : RationalMetricInput) : ℝ :=
+  (∑ s : A.Seed I, (I.cost (A.output I s) : ℝ)) / 2 ^ (A.bitCount I)
+end BinaryRandomizedAlgorithm
+def globalApplicationClaim : Prop :=
+  ∃ σ : ℝ, 0 < σ ∧ ∀ a : ℝ, 0 < a → ∃ A : BinaryRandomizedAlgorithm,
+    (∀ (I : RationalMetricInput) (s : A.Seed I), I.Feasible (A.output I s)) ∧
+    (∀ I : RationalMetricInput,
+      1 - Real.rpow ((I.size : ℝ) + 2) (-a) ≤
+        A.successProbability I ((2 - σ) * (I.optimum : ℝ))) ∧
+    (∀ I : RationalMetricInput, A.expectedCost I ≤ (2 - σ) * (I.optimum : ℝ))
+theorem global_applica
+[…]
+
+=== LEAN COMPARATOR KMedianRefinedRecovery (exact formal statement)
+import Mathlib
+namespace OAI
+namespace MetricKMedianRecovery
+structure RationalMetricInput where
+  pointCount : ℕ
+  distance : Fin pointCount → Fin pointCount → ℚ
+  clients : Finset (Fin pointCount)
+  facilities : Finset (Fin pointCount)
+  budget : ℕ
+  facilities_nonempty : facilities.Nonempty
+  budget_pos : 0 < budget
+  covered : clients ∪ facilities = Finset.univ
+  distance_nonneg : ∀ x y, 0 ≤ distance x y
+  distance_self : ∀ x, distance x x = 0
+  distance_symm : ∀ x y, distance x y = distance y x
+  distance_triangle : ∀ x y z, distance x z ≤ distance x y + distance y z
+namespace RationalMetricInput
+def size (I : RationalMetricInput) : ℕ := I.clients.card + I.facilities.card
+def Feasible (I : RationalMetricInput) (S : Finset (Fin I.pointCount)) : Prop :=
+  S ⊆ I.facilities ∧ S.card ≤ I.budget ∧ (I.clients.Nonempty → S.Nonempty)
+def cost (I : RationalMetricInput) (S : Finset (Fin I.pointCount)) : ℚ :=
+  if hS : S.Nonempty then ∑ p ∈ I.clients, S.inf' hS (I.distance p) else 0
+def natBits (n : ℕ) : List Bool :=
+  List.replicate (Nat.bits n).length true ++ [false] ++ Nat.bits n
+def rationalBits (r : ℚ) : List Bool :=
+  [decide (r < 0)] ++ natBits r.num.natAbs ++ natBits r.den
+def bits (I : RationalMetricInput) : List Bool :=
+  natBits I.pointCount ++ natBits I.budget ++
+    List.ofFn (fun i : Fin I.pointCount => decide (i ∈ I.clients)) ++
+    List.ofFn (fun i : Fin I.pointCount => decide (i ∈ I.facilities)) ++
+    (List.ofFn (fun i : Fin I.pointCount =>
+      (List.ofFn (fun j : Fin I.pointCount => rationalBits (I.distance i j))).flatten)).flatten
+def decodeOutput (I : RationalMetricInput) (out : List Bool) : Finset (Fin I.pointCount) :=
+  I.facilities.filter (fun i => out[i.val]?.getD false = true)
+end RationalMetricInput
+def pairBits (p : List Bool × List Bool) : List Bool :=
+  p.1.flatMap (fun b => [true, b]) ++ [false] ++ p.2
+structure BinaryRandomizedAlgorithm where
+  randomBits : Polynomial ℕ
+  run : List Bool × List Bool → List Bool
+  computation : Turing.TM2ComputableInPolyTime pairBits id run
+  finiteWorkAlphabet : ∀ k : computation.tm.K, Finite (computation.tm.Γ k)
+end MetricKMedianRecovery
+run_elab Lean.modifyEnv fun environment => Lean.Meta.auxLemmasExt.setState environment {}
+namespace MetricKMedianRecovery.RefinedRecovery
+structure Input where
+  metric : RationalMetricInput
+  disjoint : Disjoint metric.clients metric.facilities
+  integral : ∀ x y, ∃ z : ℕ, metric.distance x y = (z : ℚ)
+  positive : ∀ x y, x ≠ y → 0 < metric.distance x y
+  anchor : Finset (Fin metric.pointCount)
+  anchor_subset : anchor ⊆ metric.facilities
+  anchor_card : anchor.card = metric.budget
+namespace Input
+abbrev Point (I : Input) := Fin I.metric.pointCount
+def size (I : Input) : ℕ := I.metric.size
+def Bounded (I : Input) (bound : Polynomial ℕ) : Prop :=
+  ∀ x y, I.metric.distance x y ≤ ((bound.eval I.size : ℕ) : ℚ)
+noncomputable def assign (I : Input) (O : Finset I.Point) (p : I.Point) : I.Point :=
+  if h : O.Nonempty then
+    Classical.choose (Finset.exists_min_image O
+      (fun i => toLex (I.metric.distance p i, i)) h)
+  else p
+noncomputable def cluster (I : Input) (O : Finset I.Point) (i : I.Point) : Finset I.Point :=
+  I.metric.clients.filter (fun p => I.assign O p = i)
+noncomputable def clusterCost (I : Input) (O : Finset I.Point) (i : I.Point) : ℝ :=
+  ∑ p ∈ I.cluster O i, (I.metric.distance p i : ℝ)
+def anchorBits (I : Input) : List Bool :=
+  List.ofFn (fun i : I.Point => decide (i ∈ I.anchor))
+end Input
+structure Certificate (I : Input) (μ : ℚ) (L₀ : ℝ) where
+  centers : Finset I.Point
+  centers_subset : centers ⊆ I.metric.facilities
+  same_card : centers.card = I.anchor.card
+  positive_cost : 0 < (I.metric.cost centers : ℝ)
+  good : Finset I.Point
+  good_subset : good ⊆ centers
+  proxy : I.Point → I.Point
+  proxy_mem : ∀ i ∈ good, proxy i ∈ I.anchor
+  proxy_inj : Set.InjOn proxy (↑good)
+  proxy_cost : (∑ i ∈ good, ∑ p ∈ I.cluster centers i,
+      (I.metric.distance p (proxy i) : ℝ)) ≤
+    (∑ i ∈ good, I.clusterCost centers i) + (
+[…]
+
+=== LEAN COMPARATOR KMedianThreshold (exact formal statement)
+import Mathlib
+namespace OAI
+section
+section
+namespace MetricKMedian
+structure Instance where
+  n : ℕ
+  distance : Fin n → Fin n → ℚ
+  clients : Finset (Fin n)
+  facilities : Finset (Fin n)
+  k : ℕ
+  distance_nonneg : ∀ i j, 0 ≤ distance i j
+  distance_eq_zero : ∀ i j, distance i j = 0 ↔ i = j
+  distance_symm : ∀ i j, distance i j = distance j i
+  distance_triangle : ∀ i j h, distance i h ≤ distance i j + distance j h
+  k_pos : 1 ≤ k
+  k_le : k ≤ facilities.card
+def encodeNat (n : ℕ) : List Bool :=
+  List.replicate n.bits.length true ++ [false] ++ n.bits
+def encodeRat (q : ℚ) : List Bool :=
+  [decide (q.num < 0)] ++ encodeNat q.num.natAbs ++ encodeNat q.den
+def encodeInstance (I : Instance) : List Bool :=
+  encodeNat I.n ++ encodeNat I.k ++
+    List.ofFn (fun i : Fin I.n => decide (i ∈ I.clients)) ++
+    List.ofFn (fun i : Fin I.n => decide (i ∈ I.facilities)) ++
+    (List.ofFn (fun i : Fin I.n =>
+      (List.ofFn (fun j : Fin I.n => encodeRat (I.distance i j))).flatten)).flatten
+noncomputable def nearest (I : Instance) (j : Fin I.n) (S : Finset (Fin I.n)) : ℝ :=
+  if h : S.Nonempty then
+    (S.image (fun i => (I.distance j i : ℝ))).min' (h.image _)
+  else 0
+noncomputable def cost (I : Instance) (S : Finset (Fin I.n)) : ℝ :=
+  ∑ j ∈ I.clients, nearest I j S
+def feasibleSets (I : Instance) : Finset (Finset (Fin I.n)) :=
+  I.facilities.powerset.filter (fun S => S.Nonempty ∧ S.card ≤ I.k)
+noncomputable def optimum (I : Instance) : ℝ :=
+  if h : (feasibleSets I).Nonempty then
+    ((feasibleSets I).image (cost I)).min' (h.image _)
+  else 0
+def Correct (epsilon : ℝ) (I : Instance) (output : List Bool) : Prop :=
+  ∃ S : Finset (Fin I.n), S ⊆ I.facilities ∧ S.Nonempty ∧ S.card ≤ I.k ∧
+    output = List.ofFn (fun i : Fin I.n => decide (i ∈ S)) ∧
+    cost I S ≤ (1 + 2 / Real.exp 1 + epsilon) * optimum I
+end MetricKMedian
+end
+end
+namespace MetricKMedian
+namespace Complexity
+def FinitePolyTime {α β : Type} (ea : α → List Bool) (eb : β → List Bool)
+    (f : α → β) : Prop :=
+  ∃ p : Turing.TM2ComputableInPolyTime ea eb f,
+    ∀ k : p.tm.K, Finite (p.tm.Γ k)
+abbrev Word := List Bool
+abbrev Language := Set Word
+def encodeBit (b : Bool) : Word := [b]
+def encodePair (x : Word × Word) : Word :=
+  encodeNat x.1.length ++ x.1 ++ x.2
+def P : Set Language := {L | ∃ decideL : Word → Bool,
+  FinitePolyTime id encodeBit decideL ∧ ∀ x, decideL x = true ↔ x ∈ L}
+def NP : Set Language := {L | ∃ (verify : Word × Word → Bool) (p : Polynomial ℕ),
+  FinitePolyTime encodePair encodeBit verify ∧
+  ∀ x, x ∈ L ↔ ∃ w : Word, w.length ≤ p.eval x.length ∧ verify (x, w) = true}
+def PNeNP : Prop := P ≠ NP
+end Complexity
+def FactorCorrect (α : ℝ) (I : Instance) (output : List Bool) : Prop :=
+  ∃ S : Finset (Fin I.n), S ⊆ I.facilities ∧ S.Nonempty ∧ S.card ≤ I.k ∧
+    output = List.ofFn (fun i : Fin I.n => decide (i ∈ S)) ∧
+    cost I S ≤ α * optimum I
+def approximationFactors : Set ℝ := {α | ∃ algorithm : Instance → List Bool,
+  Complexity.FinitePolyTime encodeInstance id algorithm ∧
+  ∀ I, FactorCorrect α I (algorithm I)}
+end MetricKMedian
+namespace MetricKMedian
+theorem threshold (h : Complexity.PNeNP) :
+    sInf approximationFactors=1+2/Real.exp 1 := by
+  sorry
+end MetricKMedian
+end OAI
+
+
+=== LEAN COMPARATOR MetricKMedian (exact formal statement)
+import Mathlib
+namespace OAI
+section
+section
+namespace MetricKMedian
+structure Instance where
+  n : ℕ
+  distance : Fin n → Fin n → ℚ
+  clients : Finset (Fin n)
+  facilities : Finset (Fin n)
+  k : ℕ
+  distance_nonneg : ∀ i j, 0 ≤ distance i j
+  distance_eq_zero : ∀ i j, distance i j = 0 ↔ i = j
+  distance_symm : ∀ i j, distance i j = distance j i
+  distance_triangle : ∀ i j h, distance i h ≤ distance i j + distance j h
+  k_pos : 1 ≤ k
+  k_le : k ≤ facilities.card
+def encodeNat (n : ℕ) : List Bool :=
+  List.replicate n.bits.length true ++ [false] ++ n.bits
+def encodeRat (q : ℚ) : List Bool :=
+  [decide (q.num < 0)] ++ encodeNat q.num.natAbs ++ encodeNat q.den
+def encodeInstance (I : Instance) : List Bool :=
+  encodeNat I.n ++ encodeNat I.k ++
+    List.ofFn (fun i : Fin I.n => decide (i ∈ I.clients)) ++
+    List.ofFn (fun i : Fin I.n => decide (i ∈ I.facilities)) ++
+    (List.ofFn (fun i : Fin I.n =>
+      (List.ofFn (fun j : Fin I.n => encodeRat (I.distance i j))).flatten)).flatten
+noncomputable def nearest (I : Instance) (j : Fin I.n) (S : Finset (Fin I.n)) : ℝ :=
+  if h : S.Nonempty then
+    (S.image (fun i => (I.distance j i : ℝ))).min' (h.image _)
+  else 0
+noncomputable def cost (I : Instance) (S : Finset (Fin I.n)) : ℝ :=
+  ∑ j ∈ I.clients, nearest I j S
+def feasibleSets (I : Instance) : Finset (Finset (Fin I.n)) :=
+  I.facilities.powerset.filter (fun S => S.Nonempty ∧ S.card ≤ I.k)
+noncomputable def optimum (I : Instance) : ℝ :=
+  if h : (feasibleSets I).Nonempty then
+    ((feasibleSets I).image (cost I)).min' (h.image _)
+  else 0
+def Correct (epsilon : ℝ) (I : Instance) (output : List Bool) : Prop :=
+  ∃ S : Finset (Fin I.n), S ⊆ I.facilities ∧ S.Nonempty ∧ S.card ≤ I.k ∧
+    output = List.ofFn (fun i : Fin I.n => decide (i ∈ S)) ∧
+    cost I S ≤ (1 + 2 / Real.exp 1 + epsilon) * optimum I
+theorem main_finite_work : ∀ ε : ℝ, 0 < ε →
+    ∃ (algorithm : Instance → List Bool) (P : Turing.TM2ComputableInPolyTime encodeInstance id algorithm),
+      (∀ k : P.tm.K, Finite (P.tm.Γ k)) ∧ ∀ I, Correct ε I (algorithm I) := by
+  sorry
+end MetricKMedian
+end
+end
+end OAI
+

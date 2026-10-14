@@ -1,0 +1,39 @@
+FAMILY 091: Logarithmic and Lp Brunn–Minkowski inequalities and the B-conjecture
+SUBJECT: Convex and metric geometry
+OPENAI SUMMARY: Proves the logarithmic Brunn–Minkowski inequality for origin-symmetric convex bodies in every dimension, and the scalar-dilation B-conjecture for all even log-concave Radon measures. For Lebesgue volume it also proves the additive Lp Brunn–Minkowski inequality for full-dimensional origin-symmetric convex bodies throughout $`0\lt p\lt 1`$.
+
+=== MANUSCRIPT: The logarithmic Brunn–Minkowski conjecture (September-23-2026) [preprints/The-logarithmic-Brunn-Minkowski-conjecture-September-23-2026/build/main.tex]
+ABSTRACT: We prove the logarithmic Brunn–Minkowski conjecture for arbitrary origin-symmetric convex bodies in every dimension. The theorem also gives the symmetric Lp Brunn–Minkowski inequality for every $`0\lt p\lt 1`$. Combined with Saroglou's transfer theorem and a support-subspace reduction, it yields the logarithmic inequality for every even log-concave Radon measure and the scalar-dilation $`(B)`$-conjecture.
+INTRODUCTION (start): \label{sec:introduction} A convex body in $\R^n$ is a compact convex set with nonempty interior. If $K=-K$, then $0$ lies in its interior. Its support function is \[ h_K(u)=\max_{x\in K}\langle x,u\rangle,\qquad u\in S^{n-1}. \] For an origin-symmetric body this function is strictly positive. For a positive continuous function $f$ on the unit sphere, its \emph{Wulff body} is \[ \mathcal W[f]=\bigcap_{u\in S^{n-1}} \{x\in\R^n:\langle x,u\rangle\le f(u)\}. \] It is a convex body: it contains the ball of radius $\min f>0$ and is contained in the ball of radius $\max f$. Write $|K|$ for $n$-dimensional Lebesgue measure. Our main result is the following. [statement] The interpolation in \eqref{eq:main} takes the geometric mean of the support bounds before intersecting the half-spaces. This gives a strengthening, in the symmetric setting, of the multiplicative form of the classical Brunn--Minkowski inequality: the arithmetic--geometric mean inequality gives \[ \mathcal W[h_K^{1-\lambda}h_L^\lambda] \subset (1-\lambda)K+\lambda L. \] In general $h_K^{1-\lambda}h_L^\lambda$ need not itself be a support function. The intersection defining $\mathcal W$ is essential throughout the argument. For $0<p<1$, the $L_p$ interpolation replaces the geometric mean of the support bounds by the weighted power mean $((1-\lambda)h_K^p+\lambda h_L^p)^{1/p}$, still taking the Wulff body. The logarithmic endpoint implies the full symmetric volume inequality in this intermediate range. B\"or\"oczky, Lutwak, Yang and Zhang record this monotone implication \cite[equation~(1.10) and the following paragraph, p.~1977]{BLZY2012}. The additive volume-power form below follows by normalizing the bodies and reweighting the interpolation parameter. [statement] The proof of Corollary~\ref{cor:lp} is given in Section~\ref{subsec:lp-proof}. The logarithmic volume theorem has a separate measure-theoretic consequence. An even log-concave density has the form $e^{-V}$, where $V$ is an even convex function with values in $\R\cup\{+\infty\}$; no probability normalization is required. Saroglou proved that the Lebesgue inequality in dimension $n$ implies the same Wulff inequality for every such density in that same dimension \cite[Theorem~3.1]{Saroglou2016}. Taking two scalar dilates of a single body then gives the $(B)$-conjecture: for the measure $d\mu=e^{-V(x)}\,dx$ and every origin-symmetric convex body $K$, the function $t\mapsto\mu(e^tK)$ is log-concave on $\R$ \cite[Corollary~3.2]{Saroglou2016}. Section~\ref{sec:measure} applies this transfer and also treats even log-concave Radon measures supported on proper subspaces. \subsection*{Context and prior work} Theorem~\ref{thm:main} resolves the origin-symmetric logarithmic Brunn--Minkowski conjecture of B\"or\"oczky, Lutwak, Yang and Zhang \cite[Problem~1.1]{BLZY2012}. Stancu \cite[Theorem~2, p.~3264]{Stancu2018} announced the all-dimensional logarithmic Minkowski inequality and explicitly concluded the equivalent logarithmic Brunn--Minkowski inequality; the report deferred details of the flow asymptotics. The conjecture belongs to the $L_p$ Brunn--Minkowski theory initiated by Firey's $p$-means of convex bodies \cite{Firey1962} and developed by Lutwak through $L_p$ mixed volumes and the $L_p$ Minkowski problem \cite{Lutwak1993}. For $p>0$, the support bounds are interpolated by the weighted power mean appearing in Corollary~\ref{cor:lp}; the geometric mean is its limit as $p\downarrow0$. This endpoint has a particularly close connection with cone-volume measures and the logarithmic Minkowski problem. The cone-volume measure records the volumes of cones from the origin to boundary patches, indexed by their outer normals. B\"or\"oczky, Lutwak, Yang and Zhang established the equivalence between the corresponding logarithmic volume and mixed-volume inequalities \cite[Lemma~3.2]{BLZY2012}; their subsequent work characterized which even measures arise as cone-volume measures \cite[Theorem~1.1]{BLYZ2013}. The latter is an exist […]
+[theorem] [Even logarithmic Brunn--Minkowski inequality] \label{thm:main} Let $n\ge1$ and let $K,L\subset\R^n$ be convex bodies satisfying $K=-K$ and $L=-L$. For every $0\le\lambda\le1$, \begin{equation}\label{eq:main} \left|\mathcal W[h_K^{1-\lambda}h_L^\lambda]\right| \ge |K|^{1-\lambda}|L|^\lambda. \end{equation}
+[corollary] [Symmetric $L_p$ Brunn--Minkowski inequality] \label{cor:lp} Let $n\ge1$, let $K,L\subset\R^n$ be full-dimensional origin-symmetric convex bodies, and let $0<p<1$. For every $0\le\lambda\le1$, \begin{equation}\label{eq:lp} \left|\mathcal W\!\left[ \bigl((1-\lambda)h_K^p+\lambda h_L^p\bigr)^{1/p} \right]\right|^{p/n} \ge (1-\lambda)|K|^{p/n}+\lambda|L|^{p/n}. \end{equation}
+
+=== LEAN COMPARATOR LogBrunnMinkowski (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open Set MeasureTheory
+open scoped ENNReal InnerProductSpace
+namespace LogBrunnMinkowski
+abbrev Space (n : ℕ) := EuclideanSpace ℝ (Fin n)
+def IsConvexBody {n : ℕ} (K : Set (Space n)) : Prop :=
+  IsCompact K ∧ Convex ℝ K ∧ (interior K).Nonempty
+def OriginSymmetric {n : ℕ} (K : Set (Space n)) : Prop :=
+  ∀ x, x ∈ K ↔ -x ∈ K
+def support {n : ℕ} (K : Set (Space n)) (u : Space n) : ℝ :=
+  sSup ((fun x : Space n => ⟪x, u⟫_ℝ) '' K)
+def wulff {n : ℕ} (f : Space n → ℝ) : Set (Space n) :=
+  {x | ∀ u, ‖u‖ = 1 → ⟪x, u⟫_ℝ ≤ f u}
+def logCombination {n : ℕ} (K L : Set (Space n)) (t : ℝ) :
+    Set (Space n) :=
+  wulff (fun u => (support K u) ^ (1 - t) * (support L u) ^ t)
+theorem main (n : ℕ) (hn : 1 ≤ n) (K L : Set (Space n))
+    (hK : IsConvexBody K) (hL : IsConvexBody L)
+    (hsK : OriginSymmetric K) (hsL : OriginSymmetric L)
+    (t : ℝ) (ht0 : 0 ≤ t) (ht1 : t ≤ 1) :
+    (volume K) ^ (1 - t) * (volume L) ^ t ≤ volume (logCombination K L t) := by
+  sorry
+end LogBrunnMinkowski
+end
+end OAI
+

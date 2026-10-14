@@ -1,0 +1,111 @@
+FAMILY 135: Homogeneous depth-five lower bounds for iterated matrix multiplication
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Over every characteristic-zero field, the $`(1,1)`$ entry of a product of n independent $`n\times n`$ variable matrices requires $`n^{\Theta(\sqrt n)}`$ gates in homogeneous depth-five sum–product circuits. This sharp bound allows shared gates and bottom linear forms involving all variables.
+
+=== MANUSCRIPT: Homogeneous depth-five lower bounds for iterated matrix multiplication (September-25-2026) [preprints/Homogeneous-depth-five-lower-bounds-for-iterated-matrix-multiplication-September-25-2026/build/paper.tex]
+ABSTRACT: Let $`\mathop{\mathrm{IMM}}\nolimits _{n,n}`$ be the $`(1,1)`$ entry of a product of n independent $`n\times n`$ matrices of variables. Over every field of characteristic zero, every syntactically homogeneous $`\Sigma\Pi\Sigma\Pi\Sigma`$ circuit computing $`\mathop{\mathrm{IMM}}\nolimits _{n,n}`$ has at least $`n^{\sqrt n/400}`$ gates for all sufficiently large n, with an absolute threshold independent of the field. Bottom linear forms may have arbitrary support, and arbitrary finite fan-in, fan-out, and gate sharing are allowed. Over every field, a block expansion gives such circuits with at most $`n^{\sqrt n+4}`$ gates for n ≥ 2. Thus the gate complexity over characteristic-zero fields is $`n^{\Theta(\sqrt n)}`$.
+INTRODUCTION (start): \label{sec:introduction} We study how many gates are needed to compute iterated matrix multiplication with five homogeneous arithmetic layers. For integers $w,d\geq 1$, let $X^{(1)},\ldots,X^{(d)}$ be $w\times w$ matrices whose entries are distinct commuting variables. Define \begin{equation} \label{eq:imm-definition} \IMM_{w,d} =\bigl(X^{(1)}\cdots X^{(d)}\bigr)_{1,1} =\sum_{i_1,\ldots,i_{d-1}\in[w]} x^{(1)}_{1,i_1}x^{(2)}_{i_1,i_2}\cdots x^{(d)}_{i_{d-1},1}. \end{equation} For $d=1$, the expression means $x^{(1)}_{1,1}$. The first index denotes matrix width and the second denotes degree. We retain all $dw^2$ matrix-entry variables as ambient variables, including entries absent from the polynomial. Our target is $\IMM_{n,n}$, of degree $n$ in $n^3$ ambient variables. \subsection{Circuit model and main result} An arithmetic circuit over a field $K$ is a finite directed acyclic graph. Its leaves are variables or elements of $K$. A sum gate computes a $K$-linear combination of its inputs, and a product gate computes their product. Fan-in and fan-out are arbitrary and finite. Gates may be shared, and a gate may occur repeatedly among another gate's inputs; repeated occurrences at a product gate are counted with their multiplicities. Scalar coefficients on sum inputs are part of the circuit and do not require additional gates. A $\Sigma\Pi\Sigma\Pi\Sigma$ circuit has five computational layers, listed from output to leaves, with respective gate types $+,\times,+,\times,+$ and a single output gate. Edges between computational gates join consecutive layers, and the bottom sums read leaves. Unary gates are allowed. In particular, no bound is placed on the number of variables in a bottom linear form. The circuit is \emph{syntactically homogeneous} if it has the following formal-degree assignment: variables have degree $1$, constants have degree $0$, product gates add their input degrees with multiplicity, and all inputs of a sum gate have the same degree, which is assigned to that gate. Empty sums and products, if present, compute $0$ and $1$ and have formal degree $0$. Thus a zero polynomial at a gate still carries its assigned formal degree; cancellation does not reset that degree. All computations and equalities below concern formal polynomials. We define \emph{size} to be the number of vertices, including leaves. The number of computational gates excludes leaves, whereas wire size counts input occurrences. These quantities are not identified: our lower bound is on gates, and the circuit analysis also bounds the number of computational gates alone. [statement] The model permits unrestricted bottom fan-in and support, constants, and shared subcircuits. Corollary~\ref{cor:characteristic-zero} extends the $n^{\sqrt n/400}$ lower bound to every field of characteristic zero, with the same absolute threshold. Proposition~\ref{prop:upper} gives an elementary block construction of size at most $n^{\sqrt n+4}$ over every field for $n\geq2$. It is homogeneous of depth four; inserting unary bottom sums makes it depth five, so the lower bound has the matching scale. Iterated matrix multiplication nevertheless has polynomial-size circuits when depth is unrestricted. \subsection{Historical context and previous bounds} Iterated matrix multiplication has long served as a test of the cost of restricting arithmetic depth. Its path expansion connects matrix products with reachability, while its polynomial-size unrestricted circuits make it a natural target for lower bounds on weaker circuit models. Nisan and Wigderson used dimensions of partial-derivative spaces to prove lower bounds for homogeneous depth-three circuits and for constant-depth set-multilinear circuits. They asked for an explicit homogeneous polynomial requiring superpolynomial size at constant depth, even at depth five \cite[Section~2.2 of the linked author journal manuscript]{NisanWigderson1995}. Depth reduction gave this program a further motivation. Agrawal and Vinay reduced general […]
+[theorem] \label{thm:main} There exist absolute constants $c>0$ and $n_0$ such that, for every integer $n\geq n_0$, every syntactically homogeneous $\Sigma\Pi\Sigma\Pi\Sigma$ circuit over $\C$ computing $\IMM_{n,n}$ has size at least \[ n^{c\sqrt n}. \] One may take $c=1/400$.
+
+=== LEAN COMPARATOR DepthFive (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open scoped BigOperators
+universe u
+namespace Problem335
+inductive D5Leaf (K : Type u) (n : ℕ) where
+  | scalar : K → D5Leaf K n
+  | variable : (Fin n × Fin n × Fin n) → D5Leaf K n
+def d5LeafDegree {K : Type u} {n : ℕ} : D5Leaf K n → ℕ
+  | D5Leaf.scalar _ => 0
+  | D5Leaf.variable _ => 1
+structure Depth5Circuit (K : Type u) [CommSemiring K] (n : ℕ) where
+  leafCount : ℕ
+  leaves : Fin leafCount → D5Leaf K n
+  bottomCount : ℕ
+  bottomInputs : Fin bottomCount → List (K × Fin leafCount)
+  bottomDegree : Fin bottomCount → ℕ
+  bottomHomogeneous :
+    ∀ i entry, entry ∈ bottomInputs i → d5LeafDegree (leaves entry.2) = bottomDegree i
+  bottomEmpty :
+    ∀ i, bottomInputs i = [] → bottomDegree i = 0
+  lowerCount : ℕ
+  lowerInputs : Fin lowerCount → List (Fin bottomCount)
+  middleCount : ℕ
+  middleInputs : Fin middleCount → List (K × Fin lowerCount)
+  middleDegree : Fin middleCount → ℕ
+  middleHomogeneous :
+    ∀ i entry, entry ∈ middleInputs i →
+      ((lowerInputs entry.2).map bottomDegree).sum = middleDegree i
+  middleEmpty :
+    ∀ i, middleInputs i = [] → middleDegree i = 0
+  upperCount : ℕ
+  upperInputs : Fin upperCount → List (Fin middleCount)
+  outputInputs : List (K × Fin upperCount)
+  outputDegree : ℕ
+  outputHomogeneous :
+    ∀ entry, entry ∈ outputInputs →
+      ((upperInputs entry.2).map middleDegree).sum = outputDegree
+  outputEmpty :
+    outputInputs = [] → outputDegree = 0
+def d5LeafValue {K : Type u} [CommSemiring K] {n : ℕ}
+    (x : D5Leaf K n) : MvPolynomial (Fin n × Fin n × Fin n) K :=
+  match x with
+  | D5Leaf.scalar a => MvPolynomial.C a
+  | D5Leaf.variable i => MvPolynomial.X i
+def bottomValue {K : Type u} [CommSemiring K] {n : ℕ}
+    (c : Depth5Circuit K n) (i : Fin c.bottomCount) :
+    MvPolynomial (Fin n × Fin n × Fin n) K := by
+  classical
+  exact ((c.bottomInputs i).map (fun entry =>
+    MvPolynomial.C entry.1 * d5LeafValue (c.leaves entry.2))).sum
+def lowerValue {K : Type u} [CommSemiring K] {n : ℕ}
+    (c : Depth5Circuit K n) (i : Fin c.lowerCount) :
+    MvPolynomial (Fin n × Fin n × Fin n) K := by
+  classical
+  exact ((c.lowerInputs i).map (fun j => bottomValue c j)).prod
+def middleValue {K : Type u} [CommSemiring K] {n : ℕ}
+    (c : Depth5Circuit K n) (i : Fin c.middleCount) :
+    MvPolynomial (Fin n × Fin n × Fin n) K := by
+  classical
+  exact ((c.middleInputs i).map (fun entry =>
+    MvPolynomial.C entry.1 * lowerValue c entry.2)).sum
+def upperValue {K : Type u} [CommSemiring K] {n : ℕ}
+    (c : Depth5Circuit K n) (i : Fin c.upperCount) :
+    MvPolynomial (Fin n × Fin n × Fin n) K := by
+  classical
+  exact ((c.upperInputs i).map (fun j => middleValue c j)).prod
+def circuitValue {K : Type u} [CommSemiring K] {n : ℕ}
+    (c : Depth5Circuit K n) : MvPolynomial (Fin n × Fin n × Fin n) K := by
+  classical
+  exact (c.outputInputs.map (fun entry =>
+    MvPolynomial.C entry.1 * upperValue c entry.2)).sum
+def circuitSize {K : Type u} [CommSemiring K] {n : ℕ}
+    (c : Depth5Circuit K n) : ℕ :=
+  c.leafCount + c.bottomCount + c.lowerCount + c.middleCount + c.upperCount + 1
+def immLayer (K : Type u) [CommSemiring K] (n : ℕ) (t : Fin n) :
+    Matrix (Fin n) (Fin n) (MvPolynomial (Fin n × Fin n × Fin n) K) :=
+  fun i j => MvPolynomial.X (t, i, j)
+def imm (K : Type u) [CommSemiring K] (n : ℕ) :
+    MvPolynomial (Fin n × Fin n × Fin n) K := by
+  classical
+  by_cases h : 0 < n
+  · let matrices :
+        List (Matrix (Fin n) (Fin n)
+          (MvPolynomial (Fin n × Fin n × Fin n) K)) :=
+      List.ofFn (fun t : Fin n => immLayer K n t)
+    exact matrices.prod ⟨0, h⟩ ⟨0, h⟩
+  · exact 0
+def ceilSqrt (n : ℕ) : ℕ :=
+  Nat.sqrt n + if (Nat.sqrt n) ^ 2 = n then 0 else 1
+def ceilDiv (n t : ℕ) : ℕ :=
+  (n + t - 1) / t
+def upperGateBound (n : ℕ) : ℕ :=
+  let t := ceilSqrt n
+  let r := ceilDiv n t
+  2 * n ^ 3 + r * n ^ 2 + r * n ^ (t + 1) + n ^ (r - 1) + 1
+theorem main :
+    (∃ threshold : ℕ, ∀ size : ℕ, threshold ≤ size →
+      ∀ circuit : Depth5Circuit ℂ size, circuitValue circui
+[…]

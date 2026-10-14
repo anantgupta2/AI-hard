@@ -1,0 +1,152 @@
+FAMILY 330: A uniformly discrete counterexample to bounded approximation in Lipschitz-free spaces
+SUBJECT: Functional analysis
+OPENAI SUMMARY: Constructs a countable uniformly discrete metric space whose real Lipschitz-free Banach space has the approximation property but not the bounded approximation property, answering Kalton's question negatively. Finite-rank operators approximate the identity on every compact set, but their norms cannot share a finite bound.
+
+=== MANUSCRIPT: A uniformly discrete counterexample to bounded approximation in Lipschitz-free spaces (September-26-2026) [preprints/Failure-of-Bounded-Approximation-in-a-Lipschitz-Free-Space-over-a-Uniformly-Discrete-Metric-Space-September-26-2026/build/main.tex]
+ABSTRACT: We construct a countable uniformly discrete metric space whose real Lipschitz-free space has the approximation property but fails the bounded approximation property, answering Kalton's question negatively. The identity can be approximated on every compact set by finite-rank operators, but no uniform bound on their norms is possible.
+INTRODUCTION (start): \label{sec:introduction} Uniform discreteness keeps distinct points of a metric space a fixed positive distance apart. For its Lipschitz-free space, this separation guarantees the approximation property: the identity can be approximated on each compact set by finite-rank operators. Kalton asked whether the approximating operators can always be chosen with one bound on their norms \cite[Proposition~4.4 and following remarks, p.~185]{Kalton04}. The question was restated by Godefroy and Ozawa \cite[Question~1]{GodefroyOzawa14} and in Godefroy's survey \cite[Problem~6.2]{Godefroy15}. We construct a countable uniformly discrete space for which no such bound exists. We work over the real scalars. For a pointed metric space $(M,d,o)$, let $\Lip_0(M)$ be the Banach space of real Lipschitz functions vanishing at $o$, with the Lipschitz constant as norm. Its \emph{Lipschitz-free space} is \[ \F(M)=\overline{\operatorname{span}}\{\delta_x:x\in M\} \subseteq\Lip_0(M)^*,\qquad \delta_x(f)=f(x). \] Thus $\delta_o=0$ and $\norm{\delta_x-\delta_y}=d(x,y)$. The latter identity follows from the Lipschitz inequality and the test function $z\mapsto d(z,y)-d(o,y)$. The construction originates in the molecular spaces of Arens and Eells \cite[\S2]{ArensEells56}; its linearization properties and complemented free subspaces are central to the work of Godefroy and Kalton \cite[\S2]{GodefroyKalton03}. A Banach space $X$ has the \emph{approximation property} (AP) if for every norm-compact set $C\subseteq X$ and every $\varepsilon>0$ there is a bounded finite-rank linear operator $T:X\to X$ with $\sup_{u\in C}\norm{Tu-u}<\varepsilon$. For $\lambda\ge1$, it has $\lambda$-BAP if these operators can always be chosen with $\norm{T}\le\lambda$. The bounded approximation property (BAP) means $\lambda$-BAP for some finite $\lambda$, and the metric approximation property (MAP) means $1$-BAP. In AP the norm may depend on $C$ and $\varepsilon$; in BAP one bound must work for all of them. A metric space is \emph{proper} if its closed bounded balls are compact. [statement] The distinction between discrete and uniformly discrete matters here. Smith gives countable complete discrete spaces whose free spaces have AP and fail BAP, without asserting a common positive lower bound on all nonzero distances \cite[Theorem~1.3 and the surrounding discussion]{Smith26}. \Cref{thm:main} supplies that lower bound. The example is necessarily outside the countable proper case: Dalet proved MAP for free spaces over countable proper metric spaces \cite[Theorem~2.6]{Dalet15}. Our example contains an infinite separated subset in a bounded ball. Uniform discreteness also imposes strong sequential structure: C\'uth and Kalenda prove a quantitative strengthening of the Schur property for these free spaces \cite[Theorem~1.1]{CuthKalenda26}, so weakly convergent sequences converge in norm. Their April 2026 introduction still records the BAP question addressed here. The same example has a nonlinear consequence. Kalton asked whether every separable Banach space is \emph{approximable} \cite[Problem~1, p.~1260]{Kalton12}. For such a space $X$, this means that there is an equi-uniformly continuous sequence of maps $\psi_n:X\to X$, each with relatively compact range, such that $\psi_n(x)\to x$ for every $x\in X$. Equi-uniform continuity means that the choice of $\delta$ for a given $\varepsilon$ in the uniform-continuity condition works for every $\psi_n$. The space $X=\F(M)$ in \Cref{thm:main} is not approximable, although it has AP. \Cref{sec:nonlinear} explains the short implication from Kalton's net theorem that gives this consequence. \subsection{A finite obstruction in each bounded block} The main construction concerns a prescribed operator norm bound $p$. It produces a bounded metric space and a finite set of points, called anchors, at which every finite-rank operator of norm at most $p$ makes a definite error. The distinction from earlier finite extension obstructions is important. For a fi […]
+[theorem] \label{thm:main} There is a countable, unbounded, nonproper pointed metric space $(M,d,o)$ such that $d(x,y)\ge1$ for distinct points and $\F(M)$ has AP but fails $\lambda$-BAP for every finite $\lambda\ge1$.
+[theorem] \label{thm:blocks} For each integer $p\ge1$, there are a bounded countably infinite pointed metric space $(M_p,d_p,o)$ and a finite set $A_p\subseteq M_p$ containing $o$ such that \[ d_p(x,y)\ge1\quad(x\ne y),\qquad \operatorname{diam}M_p\le B_p:=300p^2+150p+5, \] and every bounded finite-rank linear operator $T_0:\F(M_p)\to\F(M_p)$ with $\norm{T_0}\le p$ satisfies \[ \max_{a\in A_p}\norm{T_0\delta_a-\delta_a}\ge\frac12. \]
+[corollary] \label{cor:renorming} For each integer $p\ge1$, real $\ell_1$ has an equivalent norm $\norm{\cdot}_p$ such that \[ \tfrac12\norm{c}_1\le\norm{c}_p\le B_p\norm{c}_1, \] and $(\ell_1,\norm{\cdot}_p)$ has $2B_p$-BAP but fails $p$-BAP. For $p=1$, this norm fails MAP.
+
+=== LEAN COMPARATOR RealL1Renorming (exact formal statement)
+import Mathlib.Analysis.Normed.Lp.lpSpace
+import Mathlib.Analysis.Normed.Operator.Basic
+import Mathlib.RingTheory.Finiteness.Defs
+namespace OAI
+noncomputable section
+open scoped BigOperators ENNReal
+namespace DiscreteFree
+variable {M : Type*} [MetricSpace M]
+def HasBAP (X : Type*) [NormedAddCommGroup X] [NormedSpace ℝ X] (Λ : ℝ) : Prop :=
+  ∀ C : Set X, IsCompact C → ∀ ε : ℝ, 0 < ε →
+    ∃ T : X →L[ℝ] X, Module.Finite ℝ (LinearMap.range T.toLinearMap) ∧
+      ‖T‖ ≤ Λ ∧ ∃ η : ℝ, η < ε ∧ ∀ u ∈ C, ‖T u - u‖ ≤ η
+def blockBound (p : ℕ) : ℝ := 300 * (p : ℝ)^2 + 150 * (p : ℝ) + 5
+open scoped BigOperators ENNReal
+def RealL1 : Type := lp (fun _ : ℕ => ℝ) (1 : ENNReal)
+noncomputable instance : NormedAddCommGroup RealL1 :=
+  inferInstanceAs (NormedAddCommGroup (lp (fun _ : ℕ => ℝ) (1 : ENNReal)))
+noncomputable instance : NormedSpace ℝ RealL1 :=
+  inferInstanceAs (NormedSpace ℝ (lp (fun _ : ℕ => ℝ) (1 : ENNReal)))
+def RealL1RenormingStatement : Prop :=
+  ∀ p : ℕ, 1 ≤ p → ∃ N : AddGroupNorm RealL1,
+    (∀ (r : ℝ) (c : RealL1), N (r • c) = |r| * N c) ∧
+    (∀ c : RealL1, (1 / 2 : ℝ) * ‖c‖ ≤ N c ∧ N c ≤ blockBound p * ‖c‖) ∧
+    (let m : Module ℝ RealL1 := inferInstance
+     letI : NormedAddCommGroup RealL1 := N.toNormedAddCommGroup
+     ∃ s : NormedSpace ℝ RealL1, s.toModule = m ∧
+       letI := s
+       CompleteSpace RealL1 ∧
+       HasBAP RealL1 (2 * blockBound p) ∧ ¬ HasBAP RealL1 (p : ℝ) ∧
+         (p = 1 → ¬ HasBAP RealL1 1))
+theorem real_l1_quantitative_renorming : RealL1RenormingStatement := by
+  sorry
+end DiscreteFree
+end
+end OAI
+
+
+=== LEAN COMPARATOR DiscreteLipschitzFree (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open scoped BigOperators ENNReal
+namespace DiscreteFree
+variable {M : Type*} [MetricSpace M]
+def lipSubmodule (o : M) : Submodule ℝ (M → ℝ) where
+  carrier := {f | f o = 0 ∧ ∃ C : ℝ, 0 ≤ C ∧
+    ∀ x y, |f x - f y| ≤ C * dist x y}
+  zero_mem' := by
+    refine ⟨rfl, 0, le_rfl, ?_⟩
+    intro x y
+    simp
+  add_mem' := by
+    rintro f g ⟨hfo, C, hC, hf⟩ ⟨hgo, D, hD, hg⟩
+    refine ⟨by simpa using congrArg₂ (· + ·) hfo hgo,
+      C + D, add_nonneg hC hD, ?_⟩
+    intro x y
+    change |f x + g x - (f y + g y)| ≤ (C + D) * dist x y
+    calc
+      _ = |(f x - f y) + (g x - g y)| := by ring_nf
+      _ ≤ |f x - f y| + |g x - g y| := abs_add_le _ _
+      _ ≤ C * dist x y + D * dist x y := add_le_add (hf x y) (hg x y)
+      _ = _ := by ring
+  smul_mem' := by
+    rintro c f ⟨hfo, C, hC, hf⟩
+    refine ⟨by simp [hfo], |c| * C, mul_nonneg (abs_nonneg c) hC, ?_⟩
+    intro x y
+    change |c * f x - c * f y| ≤ (|c| * C) * dist x y
+    calc
+      _ = |c| * |f x - f y| := by rw [← mul_sub, abs_mul]
+      _ ≤ |c| * (C * dist x y) := mul_le_mul_of_nonneg_left (hf x y) (abs_nonneg c)
+      _ = _ := by ring
+def Lip0 (o : M) := ↥(lipSubmodule o)
+namespace Lip0
+variable {o : M}
+instance : AddCommGroup (Lip0 o) := inferInstanceAs (AddCommGroup ↥(lipSubmodule o))
+instance : Module ℝ (Lip0 o) := inferInstanceAs (Module ℝ ↥(lipSubmodule o))
+instance : CoeFun (Lip0 o) (fun _ => M → ℝ) := ⟨fun f => f.val⟩
+def slope (o : M) : Lip0 o →ₗ[ℝ] lp (fun _ : M × M => ℝ) ∞ where
+  toFun f := ⟨fun z : M × M => (f z.1 - f z.2) / dist z.1 z.2, by
+    obtain ⟨C, hC, hf⟩ := f.property.2
+    apply memℓp_infty
+    refine ⟨C, ?_⟩
+    rintro r ⟨⟨x, y⟩, rfl⟩
+    change ‖(f x - f y) / dist x y‖ ≤ C
+    rw [Real.norm_eq_abs, abs_div, abs_of_nonneg dist_nonneg]
+    by_cases hxy : x = y
+    · simp [hxy, hC]
+    · exact (div_le_iff₀ (dist_pos.mpr hxy)).2 (hf x y)⟩
+  map_add' f g := by
+    apply lp.ext
+    funext z
+    change ((f z.1 + g z.1) - (f z.2 + g z.2)) / dist z.1 z.2 =
+      (f z.1 - f z.2) / dist z.1 z.2 + (g z.1 - g z.2) / dist z.1 z.2
+    ring
+  map_smul' c f := by
+    apply lp.ext
+    funext z
+    change (c * f z.1 - c * f z.2) / dist z.1 z.2 =
+      c * ((f z.1 - f z.2) / dist z.1 z.2)
+    ring
+instance (o : M) : NormedAddCommGroup (Lip0 o) :=
+  NormedAddCommGroup.induced _ _ (slope o).toAddMonoidHom (by
+    intro f g h
+    apply Subtype.ext
+    funext x
+    have hx := congrArg (fun q : lp (fun _ : M × M => ℝ) ∞ => q (x, o)) h
+    change (f x - f o) / dist x o = (g x - g o) / dist x o at hx
+    rw [f.property.1, g.property.1, sub_zero, sub_zero] at hx
+    by_cases hxo : x = o
+    · rw [hxo, f.property.1, g.property.1]
+    · exact (div_left_inj' (ne_of_gt (dist_pos.mpr hxo))).mp hx)
+instance (o : M) : NormedSpace ℝ (Lip0 o) :=
+  NormedSpace.induced ℝ _ _ (slope o)
+end Lip0
+def evaluation (o x : M) : (Lip0 o →L[ℝ] ℝ) :=
+  LinearMap.mkContinuous
+    ({ toFun := fun f : Lip0 o => f x
+       map_add' := fun _ _ => rfl
+       map_smul' := fun _ _ => rfl } : Lip0 o →ₗ[ℝ] ℝ)
+    (dist x o) (fun f => by
+      change ‖f x‖ ≤ dist x o * ‖f‖
+      rw [mul_comm]
+      have hx := lp.norm_apply_le_norm (by simp : (∞ : ℝ≥0∞) ≠ 0)
+        (Lip0.slope o f) (x, o)
+      change ‖(f x - f o) / dist x o‖ ≤ ‖f‖ at hx
+      rw [f.property.1, sub_zero, norm_div, Real.norm_of_nonneg dist_nonneg] at hx
+      by_cases hxo : x = o
+      · rw [hxo, f.property.1, norm_zero, dist_self, mul_zero]
+      · exact (div_le_iff₀ (dist_pos.mpr hxo)).mp hx)
+def freeSubmodule (o : M) : Submodule ℝ ((Lip0 o →L[ℝ] ℝ)) :=
+  (Submodule.span ℝ (Set.range (evaluation o))).topologicalClosure
+def FreeSpace (o : M) := ↥(freeSubmodule o)
+instance (o : M) : NormedAddCommGroup (FreeSpace o) :=
+  inferInstanceAs (NormedAddCommGroup ↥(freeSubmodule o))
+instance (o : M) : NormedSpace ℝ (FreeSpace o) :=
+  inferInstanceAs (NormedSpace ℝ ↥(freeSubmodule o))
+def delta (o x : M) : FreeSpace o :=
+  ⟨evaluation o x, Submodule.le_topologicalClosure _
+    (Submodule.subset_span ⟨x, rfl
+[…]

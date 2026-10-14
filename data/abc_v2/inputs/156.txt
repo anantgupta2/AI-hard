@@ -1,0 +1,35 @@
+FAMILY 156: Borsuk's conjecture fails in dimension nine
+SUBJECT: Combinatorics
+OPENAI SUMMARY: Constructs a compact subset of ℝ9 that cannot be covered by ten sets of strictly smaller diameter, disproving Borsuk's covering assertion already in dimension nine. The example consists of rank-one orthogonal projectors onto lines in ℝ4, with the Frobenius metric.
+
+=== MANUSCRIPT: A nine-dimensional counterexample to Borsuk's covering assertion (September-23-2026) [preprints/A-nine-dimensional-counterexample-to-Borsuks-covering-assertion-September-23-2026/build/main.tex]
+ABSTRACT: The compact set of rank-one orthogonal projectors on ℝ4, with the Frobenius metric, cannot be covered by ten sets of strictly smaller diameter. It therefore gives a counterexample to Borsuk's conjecture in dimension nine.
+INTRODUCTION (start): \label{sec:introduction} Borsuk's partition problem asks whether every bounded set of positive diameter in $\mathbb R^d$ can be covered by $d+1$ subsets of strictly smaller diameter. For a bounded set $Y$ of positive diameter, write $b(Y)$ for the least number of such subsets needed to cover $Y$. Covers and partitions give the same number: overlaps may be removed without increasing diameters. We prove that $b(Y)>10$ for a compact set in $\mathbb R^9$. Let $\operatorname{Sym}_4(\mathbb R)$ be the space of real symmetric $4\times4$ matrices, with Frobenius norm $\|A\|_F^2=\operatorname{tr}(A^2)$. Its trace-one affine hyperplane is a nine-dimensional Euclidean space. For a unit vector $u\in\mathbb R^4$, the matrix $uu^{\mathsf T}$ is the orthogonal projector onto the line spanned by $u$. [statement] Thus Borsuk's assertion fails in dimension nine. The theorem does not determine the smallest dimension in which it fails or the exact value of $b(X)$. Its witness is the full compact projector image of real projective three-space. Corollary~\ref{cor:higher-dimensions} extends the construction to compact counterexamples in every dimension $d\geq9$. \subsection*{History and the method} Borsuk posed the partition question in 1933 \cite{Borsuk1933}. Kahn and Kalai disproved it in high dimensions \cite{KahnKalai1993}, using a forbidden-intersection theorem of Frankl and Wilson \cite{FranklWilson1981} to force many smaller-diameter parts. Early reductions in counterexample dimension include $946$ by Nilli \cite{Nilli1994}, the announced bound $903$ of Grey and Weissbach \cite{GreyWeissbach1997}, $561$ by Raigorodskii \cite{Raigorodskii1997}, and $560$ by Weissbach \cite{Weissbach2000}. Spherical codes led to a further series of reductions. Hinrichs obtained dimension $323$ using vectors of the Leech lattice \cite{Hinrichs2002}. Pikhurko reduced the bound to $321$ and credited an independent discovery by Hinrichs and Richter \cite{Pikhurko2002}; Hinrichs and Richter published their bound $298$ in 2003 \cite{HinrichsRichter2003}. A different series of advances used strongly regular graphs. Bondarenko constructed a two-distance counterexample in dimension $65$ \cite{Bondarenko2014}; Jenrich and Brouwer obtained dimension $64$ \cite{JenrichBrouwer2014}. Grinsztajn's public proof note gives a finite counterexample in dimension $63$ \cite{Grinsztajn2026}. Theorem~\ref{thm:main} improves this dimension bound using the full compact image of projective space rather than a finite configuration. The projector embedding itself is classical. Kalai describes the map $x\mapsto x\otimes x$ and the full rank-one positive semidefinite configuration in his account of the Kahn--Kalai construction \cite[Section~2.3]{Kalai2015}. Conway, Hardin, and Sloane use the same projection-matrix model for Grassmannian packing and its Euclidean metric \cite[Section~5, Theorem~2]{ConwayHardinSloane1996}. Our contribution is the covering obstruction for the projector set associated with $\mathbb R^4$. The relevant topological antecedents include Walkup's eleven-vertex minimum for triangulations of $\mathbb{RP}^3$ \cite[Theorem~3]{Walkup1970} and the projective-space vertex bounds of Arnoux and Marin \cite{ArnouxMarin1991}. These results cannot be applied directly to the complex here: its faces are positive coordinate supports of a map, not simplices in a triangulation of projective space. The central difficulty is to derive enough of its face structure from the map itself. We do this through an odd map on symmetric matrices, mod-two degree, and local preimage counts, and then give the finite combinatorial obstruction in full. \subsection*{Proof overview} Two projectors in $X$ are at diameter distance precisely when their underlying lines are orthogonal. A hypothetical cover by ten sets of strictly smaller diameter can be enlarged to an open cover. A smooth partition of unity then gives nonnegative functions $f_1,\ldots,f_{10}$ on $\mathbb{RP}^3$, with sum one, such that orth […]
+[theorem] \label{thm:main} The compact set \[ X=\{uu^{\mathsf T}:u\in\mathbb R^4,\ \|u\|=1\} \subset\{A\in\operatorname{Sym}_4(\mathbb R):\operatorname{tr}A=1\}, \] with the Frobenius metric, has diameter $\sqrt2$ and cannot be covered by ten subsets of diameter strictly less than $\sqrt2$.
+
+=== LEAN COMPARATOR BorsukNine (exact formal statement)
+import Mathlib
+namespace OAI
+namespace BorsukNine
+abbrev Vector4 := EuclideanSpace ℝ (Fin 4)
+abbrev Matrix4 := EuclideanSpace ℝ (Fin 4 × Fin 4)
+def projector (u : Vector4) : Matrix4 :=
+  WithLp.toLp 2 (fun ij => u ij.1 * u ij.2)
+def projectorSet : Set Matrix4 :=
+  projector '' {u : Vector4 | ‖u‖ = 1}
+def traceOneSymmetric : Set Matrix4 :=
+  {A | (∀ i j : Fin 4, A (i, j) = A (j, i)) ∧ ∑ i : Fin 4, A (i, i) = 1}
+def HasTenSmallCover : Prop :=
+  ∃ C : Fin 10 → Set Matrix4,
+    (∀ i, C i ⊆ projectorSet) ∧
+    projectorSet ⊆ ⋃ i, C i ∧
+    ∀ i, Metric.diam (C i) < Real.sqrt 2
+theorem main_theorem :
+    IsCompact projectorSet ∧
+    projectorSet ⊆ traceOneSymmetric ∧
+    Metric.diam projectorSet = Real.sqrt 2 ∧
+    ¬ HasTenSmallCover := by
+  sorry
+end BorsukNine
+end OAI
+

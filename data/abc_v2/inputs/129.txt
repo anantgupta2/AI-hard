@@ -1,0 +1,177 @@
+FAMILY 129: Exponential state costs for two-way automata
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Proves exponential lower bounds both for complementing two-way nondeterministic finite automata and for simulating one-way nondeterministic automata by two-way deterministic ones. The latter resolves the Sakoda–Sipser state-succinctness conjecture over growing finite alphabets; both results rule out polynomial state bounds independent of alphabet size.
+
+=== MANUSCRIPT: An exponential state lower bound for two-way nondeterministic complementation (September-25-2026) [preprints/An-exponential-state-lower-bound-for-two-way-nondeterministic-complementation-September-25-2026/build/paper.tex]
+ABSTRACT: We prove that two-way nondeterministic finite automata cannot be complemented with a polynomial number of states independent of the alphabet. For each n ≥ 4 we construct an n-state automaton over a finite alphabet whose complement requires at least $`\tfrac12 2^{\lfloor(n-4)/127\rfloor}-1`$ states.
+INTRODUCTION (start): \label{sec:introduction} A two-way nondeterministic finite automaton (2NFA) has a finite set of states and a single read-only head, which may move in either direction along an input bounded by endmarkers. It accepts when some finite computation reaches an accepting state. The complementation problem asks whether every $n$-state 2NFA over a finite alphabet $\Sigma$ has a 2NFA for the complementary language with at most $p(n)$ states, for one polynomial $p$ independent of $\Sigma$. We answer this question negatively. For exact state counts, there is one initial state and a set of accepting states. Each transition depends only on the current state and scanned symbol, updates the state, and moves the head left, right, or not at all. We start the head on the left endmarker and forbid moves beyond either endmarker. Missing transitions reject that branch; infinite nonaccepting computations do not accept. An accepting initial configuration counts as acceptance. All states, including initial and accepting states, are counted. A deterministic two-way automaton (2DFA) has at most one successor for each state and scanned symbol. For a finite set $H$, let $\mathcal R_H$ denote all binary relations on $H$. Products are composed in path order: $(p,r)\in AB$ if and only if $(p,q)\in A$ and $(q,r)\in B$ for some $q$. Use $\Sigma_H=\mathcal R_H$ as an input alphabet. The product $r(w)$ of a word $w=R_1\cdots R_k$ is $R_1\cdots R_k$, and the empty product is $r(\varepsilon)=I_H=\{(p,p):p\in H\}$. Define the relation-product liveness language \[ L_H=\{w\in\Sigma_H^*:r(w)\ne\varnothing\}. \] In particular, $L_H$ contains the empty word when $H$ is nonempty. For nonempty words, this is Sakoda and Sipser's family $B_h$, where $h=|H|$ \cite[Section~2.1 and Theorem~2.3]{SakodaSipser1978}; the name \emph{one-way liveness} is used in \cite[Section~2.2]{Kapoutsis2006}. [statement] The alphabet $\Sigma_n$ consists of all binary relations on a set of $n-2$ points, so $|\Sigma_n|=2^{(n-2)^2}$. The parameter is the number of states, not the size of the transition table. Theorem~\ref{main:theorem} concerns bounds uniform over finite alphabets; it does not assert a lower bound over one fixed alphabet. \paragraph{History and significance.} Sakoda and Sipser's work on nondeterminism and two-way finite automata \cite{SakodaSipser1978} initiated the central state-succinctness problem of simulating two-way nondeterministic automata deterministically. Complementation is a separate question: here the target remains nondeterministic. Vardi's construction gives an exponential-state one-way nondeterministic automaton for the complement of a two-way nondeterministic automaton \cite[Theorem~3.2]{Vardi1989}. It certifies nonacceptance by locally consistent sets of states. For sweeping automata, whose head can reverse direction only at the endmarkers, Kapoutsis proved that the complement of one-way liveness requires exponentially many states in every sweeping 2NFA \cite[Theorem~1]{Kapoutsis2006}. Theorem~\ref{main:theorem} allows unrestricted two-way motion in the complementing automaton. For deterministic two-way automata, complementation has a linear state bound independent of the alphabet \cite{GeffertMereghettiPighizzini2007}. Guillon, Prigioniero, and Taheri describe polynomial 2NFA complementation as open \cite[Section~1]{GuillonPrigionieroTaheri2026} and give polynomial complementation by 1-limited automata \cite[Theorem~4.1]{GuillonPrigionieroTaheri2026}. These automata may rewrite a tape cell on its first visit; this resource is absent from the read-only model considered here. Theorem~\ref{main:theorem} resolves the alphabet-uniform polynomial complementation question negatively. The same growing-alphabet family also requires exponentially many states in every equivalent deterministic two-way automaton: a smaller deterministic simulator could be complemented with linear state overhead. Corollary~\ref{auto:determinization} makes this implication explicit, including  […]
+[theorem] \label{main:theorem} For every integer $n\ge4$, set $H=\{1,\ldots,n-2\}$ and $\Sigma_n=\mathcal R_H$. There is an $n$-state 2NFA $A_n$ recognizing $L_H$ such that every 2NFA recognizing $\Sigma_n^*\setminus L(A_n)$ has at least \[ \frac12\,2^{\lfloor(n-4)/127\rfloor}-1 \] states. In particular, there is no polynomial state bound for complementation that is independent of the finite alphabet.
+
+=== MANUSCRIPT: An exponential two-way deterministic state lower bound for one-way liveness (September-25-2026) [preprints/An-exponential-two-way-deterministic-state-lower-bound-for-one-way-liveness-September-25-2026/build/main.tex]
+ABSTRACT: One-way liveness on h points accepts a word of binary relations when their ordered product is nonempty. For every h ≥ 2, it has a nondeterministic automaton with $`h+3`$ states and no left moves, whereas every equivalent s-state two-way deterministic automaton satisfies $`4(s+2)^2\ge2^{\lfloor(h-2)/31\rfloor}`$. Partial transition rules, stay moves, and nonaccepting infinite computations are allowed. The alphabets are finite and grow with h, so the result rules out an alphabet-independent polynomial state bound for deterministic two-way simulation, already for one-way nondeterministic sources.
+INTRODUCTION (start): Two-way deterministic automata recognize the same languages as one-way finite automata, as established by Rabin and Scott and by Shepherdson~\cite{RabinScott1959,Shepherdson1959}. Allowing the head to return to a symbol can nevertheless change the amount of finite control needed to recognize a language. How much finite control is needed to replace nondeterministic choices by deterministic head motion? Sakoda and Sipser posed the state cost of converting one-way and two-way nondeterministic finite automata to two-way deterministic automata in 1978~\cite{SakodaSipser1978}. The question concerns succinctness: the simulator may revisit the input, but must store all information other than the head position in its finite state. A polynomial simulation would make nondeterminism inexpensive in this measure even when the source machine itself moves in both directions. The witness used here is Sakoda and Sipser's complete family $B_h$, now called \emph{one-way liveness}: each letter specifies a binary relation on an $h$-element set, and a word is live when the product of its letters is nonempty. Their Theorem~2.3 establishes this family's completeness for one-way-nondeterministic to two-way-deterministic state conversion~\cite{SakodaSipser1978}. Our proof below gives the small source automaton and the context-separation property directly, with the conventions and exact state counts used here. Earlier exponential lower bounds restrict the motion of the deterministic target. Sipser proved an exponential separation for sweeping automata, whose head changes direction only at an endmarker~\cite{Sipser1980}. Kapoutsis extended this phenomenon to deterministic machines constrained to make sublinearly many reversals as a function of input length~\cite{Kapoutsis2013}. An unrestricted target can instead reverse at an interior cell and make arbitrarily many reversals as the input length grows. Quadratic lower bounds against unrestricted two-way deterministic targets already occur in Chrobak's work on unary languages~\cite{Chrobak1986Unary,Chrobak2003Errata}. For the promise restriction of one-way liveness to words of exactly three relation letters, Kapoutsis proved the optimal order $\Theta(h^2/\log h)$~\cite{Kapoutsis2018ShortLiveness}; the alphabet there is still the full relation alphabet. Adeogun and Kapoutsis~\cite{AdeogunKapoutsis2026} prove a quadratic lower bound for unrestricted deterministic two-way automata against one-way liveness. We prove an exponential bound for that unrestricted target model. The source automata use no left moves, whereas the lower bound permits stay moves, partial transition rules, and nonaccepting infinite computations in the target. The main representation difficulty is to account for repeated visits to a cell while assigning each input symbol a fixed object independent of its neighbors. We use the Brauer diagram monoid, whose matchings underlie Brauer's algebras~\cite{Brauer1937,Auinger2012}: its elements are perfect matchings on two equally sized sets of ports, and multiplication glues the adjoining sets and contracts paths. Determinism makes the configurations reaching a designated accepting sink form a tree. A tour of that tree gives the required matching representation, with separate leaves for unused transition candidates ensuring that each cell's wiring depends only on its own symbol. The algebraic part then proves an exponential lower bound on the number of ports whenever matching products retain all the information in arbitrary relation products. All diagram and relation-monoid facts needed for this argument are proved below. \subsection{Model and statement} An automaton has a finite state set and one read-only head on a finite word over an alphabet $\Sigma$, bracketed by two distinct endmarkers outside $\Sigma$. Its head starts at the left endmarker in a designated initial state. A transition changes the state and moves the head left, right, or not at all; the head cannot cross an endmarker. A transiti […]
+[theorem] \label{thm:main} For every integer $h\ge2$, the language $\OWL_h$ is recognized by a nondeterministic automaton with $h+3$ states using no left moves. Every equivalent deterministic two-way automaton with $s$ states satisfies \begin{equation} \label{eq:main-bound} 4(s+2)^2\ge 2^{\lfloor(h-2)/31\rfloor}. \end{equation} If an initially accepting configuration counts as acceptance, $s+2$ in \eqref{eq:main-bound} may be replaced by $s+1$.
+[corollary] \label{cor:no-polynomial} There are no absolute constants $C,c>0$ such that every $n$-state two-way nondeterministic automaton over every finite alphabet has an equivalent two-way deterministic automaton with at most $Cn^c$ states.
+
+=== LEAN COMPARATOR TwoWayComplementation (exact formal statement)
+import Mathlib
+namespace OAI
+namespace TwoWayComplementation
+open scoped SetRel
+def relStar {α : Type*} (R : SetRel α α) : SetRel α α :=
+  {(x, y) | Relation.ReflTransGen (fun a b => (a, b) ∈ R) x y}
+structure TwoNFA (Sigma Q : Type*) where
+  initial : Q
+  accepting : Set Q
+  transition : Q → (Fin 2 ⊕ Sigma) → Set (Q × Fin 3)
+def tapeSymbol {Sigma : Type*} (w : List Sigma) (p : Fin (w.length + 2)) : Fin 2 ⊕ Sigma :=
+  if hleft : p.val = 0 then .inl 0
+  else if hright : p.val = w.length + 1 then .inl 1
+  else .inr (w[p.val - 1]'(by omega))
+namespace TwoNFA
+def step {Sigma Q : Type*} (A : TwoNFA Sigma Q) (w : List Sigma) :
+    SetRel (Q × Fin (w.length + 2)) (Q × Fin (w.length + 2)) :=
+  {(c, d) | ∃ move : Fin 3,
+    (d.1, move) ∈ A.transition c.1 (tapeSymbol w c.2) ∧
+    (d.2.val : ℤ) = (c.2.val : ℤ) + (move.val : ℤ) - 1}
+def language {Sigma Q : Type*} (A : TwoNFA Sigma Q) : Set (List Sigma) :=
+  {w | ∃ c, c.1 ∈ A.accepting ∧
+    ((A.initial, ⟨0, by omega⟩), c) ∈ relStar (A.step w)}
+end TwoNFA
+theorem complementation_lower_bound_finite (n : ℕ) (hn : 4 ≤ n) :
+    ∃ A : TwoNFA (SetRel (Fin (n - 2)) (Fin (n - 2))) (Fin n),
+      ∀ (Q : Type*) [Fintype Q], ∀ B : TwoNFA (SetRel (Fin (n - 2)) (Fin (n - 2))) Q,
+        B.language = A.languageᶜ →
+          (1 / 2 : ℝ) * 2 ^ ((n - 4) / 127) - 1 ≤ (Fintype.card Q : ℝ) := by
+  sorry
+end TwoWayComplementation
+end OAI
+
+
+=== LEAN COMPARATOR TwoWayDeterminization (exact formal statement)
+import Mathlib
+namespace OAI
+namespace TwoWayComplementation
+open scoped SetRel
+def relStar {α : Type*} (R : SetRel α α) : SetRel α α :=
+  {(x, y) | Relation.ReflTransGen (fun a b => (a, b) ∈ R) x y}
+structure TwoNFA (Sigma Q : Type*) where
+  initial : Q
+  accepting : Set Q
+  transition : Q → (Fin 2 ⊕ Sigma) → Set (Q × Fin 3)
+def tapeSymbol {Sigma : Type*} (w : List Sigma) (p : Fin (w.length + 2)) : Fin 2 ⊕ Sigma :=
+  if hleft : p.val = 0 then .inl 0
+  else if hright : p.val = w.length + 1 then .inl 1
+  else .inr (w[p.val - 1]'(by omega))
+namespace TwoNFA
+def step {Sigma Q : Type*} (A : TwoNFA Sigma Q) (w : List Sigma) :
+    SetRel (Q × Fin (w.length + 2)) (Q × Fin (w.length + 2)) :=
+  {(c, d) | ∃ move : Fin 3,
+    (d.1, move) ∈ A.transition c.1 (tapeSymbol w c.2) ∧
+    (d.2.val : ℤ) = (c.2.val : ℤ) + (move.val : ℤ) - 1}
+def language {Sigma Q : Type*} (A : TwoNFA Sigma Q) : Set (List Sigma) :=
+  {w | ∃ c, c.1 ∈ A.accepting ∧
+    ((A.initial, ⟨0, by omega⟩), c) ∈ relStar (A.step w)}
+end TwoNFA
+def TwoNFA.Deterministic {Sigma Q : Type*} (A : TwoNFA Sigma Q) : Prop :=
+  ∀ q symbol, (A.transition q symbol).Subsingleton
+def relationProduct {H : Type*} (w : List (SetRel H H)) : SetRel H H :=
+  w.foldr SetRel.comp SetRel.id
+def sourceLanguage (H : Type*) : Set (List (SetRel H H)) :=
+  {w | (relationProduct w).Nonempty}
+theorem explicit_family_main (n : ℕ) (hn : 4 ≤ n) :
+    ∃ A : TwoNFA (SetRel (Fin (n - 2)) (Fin (n - 2))) (Fin n),
+      A.language = sourceLanguage (Fin (n - 2)) ∧
+      (∀ (Q : Type*) [Fintype Q],
+        ∀ B : TwoNFA (SetRel (Fin (n - 2)) (Fin (n - 2))) Q,
+        B.language = A.languageᶜ →
+          (1 / 2 : ℝ) * 2 ^ ((n - 4) / 127) - 1 ≤ (Fintype.card Q : ℝ)) ∧
+      (131 ≤ n → ∀ (Q : Type*) [Fintype Q],
+        ∀ D : TwoNFA (SetRel (Fin (n - 2)) (Fin (n - 2))) Q,
+        D.Deterministic → D.language = A.language →
+          (1 / 2 : ℝ) * 2 ^ ((n - 4) / 127) ≤ (Fintype.card Q : ℝ)) := by
+  sorry
+end TwoWayComplementation
+end OAI
+
+
+=== LEAN COMPARATOR OneWayLiveness (exact formal statement)
+import Mathlib
+namespace OAI
+namespace OneWayLiveness
+@[ext] structure BRel (H : Type*) where
+  holds : H → H → Prop
+namespace BRel
+variable {H : Type*}
+instance : One (BRel H) := ⟨⟨Eq⟩⟩
+instance : Mul (BRel H) := ⟨fun a b => ⟨fun x z => ∃ y, a.holds x y ∧ b.holds y z⟩⟩
+instance : Monoid (BRel H) where
+  mul_assoc a b c := by
+    ext x z
+    change (∃ y, (∃ w, a.holds x w ∧ b.holds w y) ∧ c.holds y z) ↔
+      ∃ w, a.holds x w ∧ ∃ y, b.holds w y ∧ c.holds y z
+    aesop
+  one_mul a := by ext x z; change (∃ y, x = y ∧ a.holds y z) ↔ a.holds x z; simp
+  mul_one a := by ext x z; change (∃ y, a.holds x y ∧ y = z) ↔ a.holds x z; simp
+def live (w : List (BRel H)) : Prop := ∃ x y, w.prod.holds x y
+end BRel
+abbrev Alphabet (h : ℕ) := BRel (Fin h)
+def OWL (h : ℕ) : Set (List (Alphabet h)) := {w | BRel.live w}
+inductive Symbol (Alpha : Type*) where
+  | left : Symbol Alpha
+  | letter : Alpha → Symbol Alpha
+  | right : Symbol Alpha
+inductive Move where
+  | left | stay | right
+  deriving DecidableEq
+def Move.Rel : Move → ℕ → ℕ → Prop
+  | .left, i, j => j + 1 = i
+  | .stay, i, j => j = i
+  | .right, i, j => j = i + 1
+def scanned {Alpha : Type*} (w : List Alpha) (i : Fin (w.length + 2)) : Symbol Alpha :=
+  if h0 : i.val = 0 then .left
+  else if hi : i.val < w.length + 1 then .letter (w[i.val - 1]'(by omega))
+  else .right
+abbrev Configuration {Alpha : Type*} (w : List Alpha) (n : ℕ) := Fin (w.length + 2) × Fin n
+structure DMachine (Alpha : Type*) (s : ℕ) where
+  initial : Fin s
+  accepting : Set (Fin s)
+  transition : Fin s → Symbol Alpha → Option (Fin s × Move)
+  left_boundary : ∀ q q', transition q .left ≠ some (q', .left)
+  right_boundary : ∀ q q', transition q .right ≠ some (q', .right)
+structure NMachine (Alpha : Type*) (n : ℕ) where
+  initial : Fin n
+  accepting : Set (Fin n)
+  transition : Fin n → Symbol Alpha → Set (Fin n × Move)
+  left_boundary : ∀ q q', (q', .left) ∉ transition q .left
+  right_boundary : ∀ q q', (q', .right) ∉ transition q .right
+def DMachine.Step {Alpha : Type*} {s : ℕ} (M : DMachine Alpha s) (w : List Alpha)
+    (c c' : Configuration w s) : Prop :=
+  ∃ d, M.transition c.2 (scanned w c.1) = some (c'.2, d) ∧ d.Rel c.1.val c'.1.val
+def NMachine.Step {Alpha : Type*} {n : ℕ} (M : NMachine Alpha n) (w : List Alpha)
+    (c c' : Configuration w n) : Prop :=
+  ∃ d, (c'.2, d) ∈ M.transition c.2 (scanned w c.1) ∧ d.Rel c.1.val c'.1.val
+def FiniteRun {C : Type*} (positive : Bool) (step : C → C → Prop) (c c' : C) : Prop :=
+  if positive then Relation.TransGen step c c' else Relation.ReflTransGen step c c'
+def DMachine.Accepts {Alpha : Type*} {s : ℕ} (M : DMachine Alpha s)
+    (positive : Bool) (w : List Alpha) : Prop :=
+  ∃ c, FiniteRun positive (M.Step w) (⟨0, by omega⟩, M.initial) c ∧ c.2 ∈ M.accepting
+def NMachine.Accepts {Alpha : Type*} {n : ℕ} (M : NMachine Alpha n)
+    (positive : Bool) (w : List Alpha) : Prop :=
+  ∃ c, FiniteRun positive (M.Step w) (⟨0, by omega⟩, M.initial) c ∧ c.2 ∈ M.accepting
+def NMachine.NoLeft {Alpha : Type*} {n : ℕ} (M : NMachine Alpha n) : Prop :=
+  ∀ q a q', (q', Move.left) ∉ M.transition q a
+def NMachine.Recognizes {Alpha : Type*} {n : ℕ} (M : NMachine Alpha n)
+    (positive : Bool) (L : Set (List Alpha)) : Prop := ∀ w, M.Accepts positive w ↔ w ∈ L
+def DMachine.Recognizes {Alpha : Type*} {s : ℕ} (M : DMachine Alpha s)
+    (positive : Bool) (L : Set (List Alpha)) : Prop := ∀ w, M.Accepts positive w ↔ w ∈ L
+theorem main_theorem (h : ℕ) (hh : 2 ≤ h) :
+    (∃ N : NMachine (Alphabet h) (h + 3), N.NoLeft ∧
+      ∀ positive : Bool, N.Recognizes positive (OWL h)) ∧
+    (∀ (positive : Bool) (s : ℕ) (D : DMachine (Alphabet h) s),
+      D.Recognizes positive (OWL h) →
+      2 ^ ((h - 2) / 31) ≤ 4 * (s + if positive then 2 else 1) ^ 2) := by
+  sorry
+end OneWayLiveness
+end OAI
+

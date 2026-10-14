@@ -1,0 +1,150 @@
+FAMILY 137: One-tape time simulation in two-fifths-power space
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Determines the halting and finite-control outcome of a fixed deterministic one-writable-tape machine up to time T using $`O(T^{2/5}\log^C(T+2))`$ space, improving the square-root exponent. Heads move at most one cell per step; finitely many read-only input heads are allowed. Initial contents are independent of T, and contents and input symbols have polylogarithmic-space access. Simulation time is unrestricted.
+
+=== MANUSCRIPT: Simulating One-Tape Time in Two-Fifths-Power Space (September-25-2026) [preprints/Simulating-One-Tape-Time-in-Two-Fifths-Power-Space-September-25-2026/build/source/main.tex]
+ABSTRACT: We show that a fixed deterministic Turing machine with one writable tape and head can be simulated in $`O(T^{2/5}\mathop{\mathrm{polylog}}\nolimits (T+2))`$ work-space bits when a binary time cap T ≥ 2 is supplied. The simulator computes the finite-control and halting outcome by time T; its running time is unrestricted. The result allows a fixed number of read-only input heads and requires a fixed accessor that supplies every initial writable and read-only symbol within distance T of the relevant head origin in polylogarithmic space. This improves the square-root space exponent for one-tape machines, answering Williams's question for this model.
+INTRODUCTION (start): \label{sec:introduction} How much work space is needed to reproduce a time-bounded computation when the simulator may take arbitrarily long? The classical one-read/write-tape \(O(\sqrt t)\) simulation is attributed to Hopcroft and Ullman in Williams's account~\cite[Section~2.1]{Williams2025}. Related work studied time--space tradeoffs for single-tape and offline Turing machines~\cite{Paterson1972,IbarraMoran1983,LiskiewiczLorys1990}. We use the supplied-cap model stated below. Williams proved that deterministic multitape time \(t(n)\), for \(t(n)\ge n\), can be simulated in \(O(\sqrt{t(n)\log t(n)})\) space~\cite[Theorem~1.1]{Williams2025}. His proof uses the additive dependence on value length and tree height in the tree-evaluation algorithm of Cook and Mertz~\cite[Theorem~7]{CookMertz2024}. Goldreich's 2024 exposition explains this algorithm through univariate interpolation and global storage~\cite{Goldreich2024}. In Section~5 of his full version, Williams asks whether the classical square-root space exponent for \emph{one-tape} machines can be reduced by a fixed positive constant. We answer this question affirmatively for the model below. \paragraph{Model and output.} The simulated machine is fixed and deterministic, with a finite state set and finite alphabet. It has one writable tape, indexed by the integers, with one head; a transition reads and writes the current cell and then moves that head by at most one position. A fixed number of additional read-only input heads may move by at most one position per step. All heads start at fixed origins. The writable tape initially contains the input in the usual fixed encoding, or is blank with the input on a separate read-only tape. The following uniform interface also permits other initial encodings. For the initial writable tape and for each read-only head, let a fixed tag \(h\) identify its symbol source and starting origin. Write \(\sigma_h(x,q)\) for the symbol at displacement \(q\) from that origin on public input \(x\). Tags for heads on the same tape refer to the same underlying contents, with the corresponding coordinate shifts. These symbol functions are fixed independently of every cap. Fix one deterministic accessor \(\mathsf{Sym}\) and constants \(C_0,C_1\ge1\). We say that the \emph{access condition holds for \((x,T)\)} if, for every tag \(h\) and integer \(|q|\le T\), \(\mathsf{Sym}(x,h,T,q)\) halts with \(\sigma_h(x,q)\) using at most \(C_0\log^{C_1}(T+2)\) work-space bits. The program and constants are independent of \(x,T,q\), with dependence allowed on the fixed machine and symbol interface. The condition covers every coordinate in the numerical range, including coordinates inspected by proposed local computations. A capped invocation assumes it only for its own pair \((x,T)\). Ordinary input access satisfies it for every cap by storing the requested coordinate and rescanning to that position or an endmarker. The simulator is given the original input and a binary time cap \(T\). The simulator and accessor use ordinary endmarked read-only access to the public input, with the input head confined between the endmarkers. The simulator's output is the finite-control and halting outcome after at most \(T\) simulated steps, with halting states made absorbing. Input storage is not charged to work space. The simulator does not have to store the entire final tape. All space bounds count bits; constants may depend on the fixed machine and accessor. We write \(\softO(f(T))\) for \(O(f(T)\log^C(T+2))\), with a fixed constant \(C\). [statement] The ordinary one-sided one-tape decision model is included: the machine can enforce a left boundary, ordinary input symbols are obtained by rescanning, and acceptance or rejection is part of finite control. In particular, every fixed exponent \(\epsilon>2/5\) suffices. For any fixed \(0<\delta<1/10\), the bound in Theorem~\ref{thm:main} is \(O(T^{1/2-\delta})\), as requested by Williams's one-tape question. No log-free endpoint at exp […]
+[theorem] \label{thm:main} Fix a deterministic machine with one writable tape and head, a fixed number of read-only input heads, unit movement and fixed origins for all heads, cap-independent symbol functions, and a fixed accessor as above. For every public input \(x\) and supplied binary cap \(T\ge2\) for which the access condition holds, its finite-control and halting outcome by time \(T\) can be computed deterministically in \(\softO(T^{2/5})\) work-space bits, excluding storage for the read-only input. Simulation time is unrestricted, and the final writable tape need not be materialized. If the access condition holds for \((x,T)\) at every \(T\ge2\), and the machine halts on \(x\) after \(t\) steps without a supplied running time, its outcome can be computed in \(\softO((t+2)^{2/5})\) work-space bits.
+
+=== LEAN COMPARATOR OneTapeSpace (exact formal statement)
+import Mathlib
+namespace OAI
+namespace Fifths
+inductive Dir
+  | L | N | R
+  deriving DecidableEq
+instance : Fintype Dir := ⟨{.L, .N, .R}, by intro d; cases d <;> simp⟩
+namespace Dir
+@[simp] def delta : Dir → ℤ
+  | L => -1
+  | N => 0
+  | R => 1
+end Dir
+inductive Mark (A : Type)
+  | left
+  | sym (a : A)
+  | right
+  deriving DecidableEq, Fintype
+namespace Mark
+variable {A : Type}
+def see (w : List A) : ℕ → Mark A
+  | 0 => left
+  | p+1 =>
+    match w[p]? with
+    | some a => sym a
+    | none => right
+def walk (w : List A) (p : ℕ) : Dir → ℕ
+  | .N => p
+  | .L => p - 1
+  | .R => if w.length < p then p else p + 1
+end Mark
+inductive Runs {σ Y : Type} (f : σ → Y ⊕ σ) (P : σ → Prop) :
+    σ → σ → Y → Prop
+  | stop {s y} (ok : P s) (eqn : f s = Sum.inl y) : Runs f P s s y
+  | step {s s' t y} (ok : P s) (eqn : f s = Sum.inr s')
+      (tail : Runs f P s' t y) : Runs f P s t y
+structure Inputs (X J : Type) where
+  publicWord : List X
+  arg : J → List Bool
+structure Readers (J : Type) where
+  px : ℕ := 0
+  parg : J → ℕ := fun _ => 0
+structure Reads (X J : Type) where
+  sx : Mark X
+  sarg : J → Mark Bool
+structure Advances (J : Type) where
+  dx : Dir := .N
+  darg : J → Dir := fun _ => .N
+namespace Readers
+variable {X J : Type}
+def home : Readers J := {}
+def see (r : Readers J) (i : Inputs X J) : Reads X J :=
+  ⟨Mark.see i.publicWord r.px, fun j => Mark.see (i.arg j) (r.parg j)⟩
+def walk (r : Readers J) (i : Inputs X J) (a : Advances J) : Readers J :=
+  ⟨Mark.walk i.publicWord r.px a.dx, fun j => Mark.walk (i.arg j) (r.parg j) (a.darg j)⟩
+end Readers
+structure Tape (A : Type) where
+  pos : ℤ
+  sym : ℤ → A
+structure WriteMove (A : Type) where
+  sym : A
+  dir : Dir
+namespace Tape
+variable {A : Type}
+def init (a : A) : Tape A := ⟨0, fun _ => a⟩
+def see (w : Tape A) : A := w.sym w.pos
+def perform (w : Tape A) (m : WriteMove A) : Tape A :=
+  ⟨w.pos + m.dir.delta, Function.update w.sym w.pos m.sym⟩
+end Tape
+structure TAction (Q J K : Type) (W : K → Type) where
+  next : Q
+  advance : Advances J
+  moves : ∀ k : K, WriteMove (W k)
+structure TM (X J Y : Type) where
+  Q : Type
+  [finiteQ : Finite Q]
+  K : Type
+  [tapes : Fintype K]
+  W : K → Type
+  [symbols : ∀ k, Fintype (W k)]
+  blank : ∀ k, W k
+  start : Q
+  table : Q → Reads X J → ((k : K) → W k) → Y ⊕ TAction Q J K W
+attribute [instance] TM.finiteQ TM.tapes TM.symbols
+namespace TM
+variable {X J Y : Type} (M : TM X J Y)
+structure Cfg where
+  state : M.Q
+  ro : Readers J
+  work : ∀ k, Tape (M.W k)
+def initial : M.Cfg :=
+  ⟨M.start, .home, fun k => .init (M.blank k)⟩
+def step (i : Inputs X J) (s : M.Cfg) : Y ⊕ M.Cfg :=
+  match M.table s.state (s.ro.see i) (fun k => (s.work k).see) with
+  | Sum.inl y => .inl y
+  | Sum.inr a =>
+    .inr ⟨a.next, s.ro.walk i a.advance, fun k => (s.work k).perform (a.moves k)⟩
+structure Window where
+  l : M.K → ℕ
+  h : M.K → ℕ
+def width (k : M.K) : ℕ := max 1 (Fintype.card (M.W k) - 1).size
+namespace Window
+variable {M}
+def ok (w : M.Window) (s : M.Cfg) : Prop :=
+  ∀ k, -(w.l k : ℤ) ≤ (s.work k).pos ∧ (s.work k).pos ≤ (w.h k : ℤ)
+open BigOperators
+def bits (w : M.Window) : ℕ :=
+  ∑ k, (w.l k + w.h k + 1) * M.width k
+end Window
+def Within (i : Inputs X J) (y : Y) (S : ℕ) : Prop :=
+  ∃ w : M.Window, w.bits ≤ S ∧ ∃ t, Runs (M.step i) w.ok M.initial t y
+end TM
+end Fifths
+namespace Fifths
+structure SingleAct (Q A : Type) (r : ℕ) where
+  out : Q
+  write : WriteMove A
+  others : Fin r → Dir
+structure Single (X : Type) where
+  Q : Type
+  [states : Fintype Q]
+  A : Type
+  [symbols : Fintype A]
+  beginState : Q
+  halted : Q → Bool
+  heads : ℕ
+  program : Q → A → (Fin heads → A) → SingleAct Q A heads
+  sensor : List X → Option (Fin heads) → ℤ → A
+attribute [instance] Single.states Single.symbols
+namespace Single
+variable {X : Type} (M : Single X)
+instance : Nonempty M.A := ⟨M.sensor [] none 0⟩
+instance : Nonempty M.Q := ⟨M.beginState⟩
+abbrev Tag := Option (Fin M.heads)
+structure At where
+  state : M.Q
+  tape : Tape M.A
+  ro : Fin M.heads → ℤ
+def move (q : M.Q) (s : M.A) (r : Fin M.he
+[…]

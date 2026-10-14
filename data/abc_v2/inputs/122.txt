@@ -1,0 +1,80 @@
+FAMILY 122: Quantitative trace-reconstruction bounds with a uniform decoder
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: At every fixed deletion probability in $`(0,1)`$, reconstructing an arbitrary length-n binary string requires $`n^{\Omega(\log\log n)}`$ independent traces, ruling out polynomial-sample reconstruction. A uniform decoder achieves quasipolynomial sample and running-time bounds for known fixed rational retention probabilities. When the deletion probability is at most $`n^{-\varepsilon}`$ for fixed ε &gt; 0, both bounds become polynomial in the input and parameter encoding.
+
+=== MANUSCRIPT: Uniform quasipolynomial-time trace reconstruction (October-5-2026) [preprints/Uniform-quasipolynomial-time-trace-reconstruction-October-5-2026/build/manuscript/main.tex]
+ABSTRACT: We give a uniform algorithm that reconstructs every binary string from independent deletion traces when its length and rational retention probability are known. For each fixed retention probability, both the number of traces and the bit complexity are quasipolynomial in the string length. More generally, we give an explicit sample bound uniform over all rational retention probabilities, with running time polynomial in the sample budget and the binary input length. If the deletion probability is at most $`n^{-\varepsilon}`$ for fixed ε &gt; 0, the sample and running-time bounds are polynomial. Reconstruction succeeds with probability at least 2/3 for each input string.
+INTRODUCTION (start): A deletion trace of a binary string is obtained by retaining each position independently with probability $p$ and concatenating the retained bits in order. The trace contains its length and its bits, but does not identify their original positions. Trace reconstruction asks for the original string from independent repetitions of this experiment. We consider the worst case: the unknown string is arbitrary, and the recovery probability must hold separately for each string. Knowing that a collection of statistics distinguishes every pair of strings gives a sample bound, but an efficient decoder needs a way to find the unknown string. We obtain such a decoder by extending separation to a convex family of moment arrays. The resulting tests determine one bit at a time and can be implemented using rational arithmetic. \subsection{The uniform guarantee} Let $n\ge2$ be the known original length and let $p=a/b\in(0,1]$ be known, where $a,b$ are positive integers in lowest terms. Write $L$ for the total binary length of $a$ and $b$, and put $q=1-p$. All logarithms are natural unless a base is displayed. Define \begin{equation}\label{eq:budget} \begin{split} \mathsf X(n,p)&= \begin{cases} 1+\dfrac{\log n}{1+\log(1/q)},&q>0,\\[3pt] 1,&q=0, \end{cases}\\ B(n,p)&=p^{-1}(\log n)\mathsf X(n,p)^2 (1+\log\mathsf X(n,p))^6. \end{split} \end{equation} [statement] For fixed $p$, the budget in \eqref{eq:budget} is $O_p((\log n)^3(1+\log\log n)^6)$ as $n\to\infty$. Thus both resources in Theorem~\ref{thm:main} are quasipolynomial. The theorem also controls channels whose retention probability varies with $n$, including probabilities arbitrarily close to zero or one. Its running-time guarantee is polynomial in the permitted sample budget. For every fixed $\kappa>0$, the regime $q\le n^{-\kappa}$ has polynomial sample complexity in $n$ and polynomial bit complexity in $n+L$: indeed, $\mathsf X(n,p)\le1+1/\kappa$ and $p^{-1}$ is bounded by a constant depending only on $\kappa$, so $B(n,p)=O_\kappa(\log n)$. \subsection{History and relation to earlier work} Reconstructing a sequence from corrupted copies has a broad information-theoretic history; Levenshtein studied reconstruction under several combinatorial and probabilistic channel models~\cite{Levenshtein2001}. Batu, Kannan, Khanna, and McGregor formulated reconstruction from independent random deletion traces in theoretical computer science, motivated in part by sequence alignment~\cite{BKKM2004}. The missing positions make the problem different from coordinatewise denoising: the same trace rank can originate at many input positions. For a fixed deletion probability, Holenstein, Mitzenmacher, Panigrahy, and Wieder obtained a worst-case sample bound $\exp(\widetilde O(\sqrt n))$~\cite{HMPW2008}. In independent papers published at STOC 2017, De, O'Donnell, and Servedio, and Nazarov and Peres, obtained $\exp(O(n^{1/3}))$ bounds and matching limitations for methods using only trace means~\cite{DOS2019,NP2017}. Their complex-analytic approach connects deletion statistics to bounded-coefficient polynomials; analytic inequalities of Borwein and Erd\'elyi are part of the background to this method~\cite{BE1997}. The mean-based lower bound is a restriction on that method, not on arbitrary trace algorithms. Chase improved the general sample upper bound to $\exp(O(n^{1/5}\log^5n))$~\cite{Chase2021Upper}. On the lower-bound side, Holden and Lyons proved an almost-$n^{5/4}$ bound, and Chase strengthened it to $\Omega(n^{3/2}/\log^7n)$ for fixed deletion probability~\cite{HoldenLyons2020,Chase2021Lower}. Burudgunte, Valiant, and Wang subsequently proved the sample bound \[ \exp\bigl(p^{-7/3}(\log_2n)^{c_0}\bigr) \] for an absolute $c_0$, using nonlocal low-order statistics and a multiscale propagation argument~\cite[Theorem~43]{BVW2026}. This bound is quasipolynomial when $p^{-1}$ is polylogarithmic in $n$. Theorem~\ref{thm:main} builds on this strategy and provides an explicit uniform reconstruction algorithm with  […]
+[theorem] [Uniform trace reconstruction]\label{thm:main} There exist absolute constants $C,c\ge1$ and one randomized multitape Turing machine $\mathcal A$ with the following property. For every $n\ge2$, every rational $p\in(0,1]$, and every $x\in\{0,1\}^n$, given $n,p$ in binary and access to independent ordinary deletion traces of $x$, the machine requests at most \[ M_C(n,p)=\left\lceil\exp\bigl(CB(n,p)\bigr)\right\rceil \] traces, outputs an element of $\{0,1\}^n$, and returns $x$ with probability at least $2/3$. For every internal random-bit sequence and every well-formed trace stream of strings of length at most $n$, it halts within \[ \bigl(n+L+M_C(n,p)\bigr)^c \] bit operations. This bound includes preprocessing, all parameter and finite-precision calculations, every received trace bit and delimiter, and the output. The only oracle operation is the external generation of the independent deletion traces.
+
+=== MANUSCRIPT: A latest-anchor induction with spectrally compact masks for worst-case trace reconstruction (October-5-2026) [preprints/A-latest-anchor-induction-with-spectrally-compact-masks-for-worst-case-trace-reconstruction-October-5-2026/build/main.tex]
+ABSTRACT: We give an improved worst-case sample bound for reconstructing a string from independent deletion traces, with its length and retention probability known. For each fixed retention probability, the number of traces is quasipolynomial: the logarithm of the sample budget is $`O((\log n)^3(1+\log\log(2n))^6)`$. If the deletion probability is at most $`n^{-\varepsilon}`$ for fixed ε &gt; 0, polynomially many traces suffice. These bounds apply to binary strings and to strings of general symbols observed exactly. They concern sample complexity and do not assert an efficient reconstruction algorithm or matching optimality.
+INTRODUCTION (start): \begin{document} \includepdf[pages=-,pagecommand={},addtotoc={1,section,1,{Summary},s-summary}]{summary.pdf} \includepdf[pages=-,pagecommand={},addtotoc={1,section,1,{Report},s-part-1}]{part-1.pdf} \end{document}
+
+=== MANUSCRIPT: Quantitative lower bounds for trace reconstruction (September-24-2026) [preprints/quantitative-lower-bounds-for-trace-reconstruction-September-24-2026/build/main.tex]
+ABSTRACT: Exact worst-case reconstruction of a binary word from independent deletion traces requires $`n^{\Omega(\log\log n)}`$ samples for every fixed deletion probability $`q\in(0,1)`$, even with unrestricted computation and any fixed positive success probability. This gives a negative answer to the polynomial-sample question for binary trace reconstruction. More generally, when $`q^3\log n\to\infty`$, we prove a lower bound of $`n^{c\log(q^3\log n)}`$ samples for every fixed $`0\lt c\lt 1/(4\log2)`$. Here q is the known deletion probability, and all logarithms are natural.
+INTRODUCTION (start): \label{sec:introduction} For a binary word $x$ and a known deletion probability $q\in(0,1)$, let $\Dcal_q(x)$ denote the law obtained by deleting each bit independently with probability $q$ and concatenating the surviving bits in their original order. The retention probability is $p=1-q$. A sample from this law is a \emph{complete trace}: its length and all surviving bits are observed, without the positions they occupied in $x$. For $s\in(0,1]$, let $T_{q,s}(n)$ be the least nonnegative integer $m$ for which an estimator, given $n,q$ and $m$ independent complete traces, recovers every $x\in\{0,1\}^n$ with probability at least $s$. The estimator may be randomized and its computation is unrestricted. If no finite $m$ suffices, set $T_{q,s}(n)=+\infty$. Write $T_q(n)=T_{q,2/3}(n)$. Our lower bounds concern this fixed sample budget. [statement] The varying-channel statement keeps the requested channel fixed throughout the construction for each instance; it is allowed to change only when the instance changes. The result gives a negative answer to the polynomial-sample question for deterministic binary inputs at every fixed deletion probability. A separate consequence concerns one-trace indistinguishability itself. For laws on the countable set of finite binary words, write \[ \TV(P,Q)=\frac12\sum_w|P(w)-Q(w)|. \] [statement] The channel is fixed independently of $A$. The proof of \eqref{eq:min-tv} uses an explicit score and approximation bound. Since the minimum is attained at every $n$, a single sequence of minimizing pairs realizes all the limits simultaneously. \subsection{History and comparison with earlier results} Reconstructing a sequence from repeated corrupted observations has a long history. Levenshtein studied both combinatorial and memoryless channel formulations \citep{Levenshtein2001}. Batu, Kannan, Khanna, and McGregor studied the independent-deletion trace problem in connection with multiple sequence alignment and outlined a linear sample obstruction at fixed deletion probability \citep[Section 4.2]{Batu2004}. Later lower bounds for complete traces focused on the difficulty of locating a small discrepancy within a long background. McGregor, Price, and Vorotnikova analyzed neighboring positions of a single one among zeros, using Hellinger distance and common mass \citep{MPV2014}. Holden and Lyons used a defect in an alternating background to prove $\Omega(n^{5/4}/\sqrt{\log n})$ \citep{HoldenLyons2020,HoldenLyonsErratum2022}, and Chase obtained $\Omega(n^{3/2}/\log^7 n)$ by a direct Hellinger calculation for a related pair \citep{Chase2021Lower}. The displayed Holden--Lyons and Chase rates fix the channel and a reconstruction success greater than $1/2$. Our seed starts from the periodic defect family used by Chase and makes signed choices across many periods; it also supplies the overlap and score estimates needed for repeated amplification. For fixed deletion probability, Holenstein, Mitzenmacher, Panigrahy, and Wieder obtained a worst-case upper bound of $\exp(\widetilde O(\sqrt n))$ \citep{HMPW2008}, where $\widetilde O$ suppresses polylogarithmic factors. Independently, De, O'Donnell, and Servedio and Nazarov and Peres improved it to $\exp(O(n^{1/3}))$ \citep{DOS2017,NP2017}, and Chase obtained $\exp(O(n^{1/5}\log^5 n))$ \citep{Chase2021Upper}. The 2026 preprint of Burudgunte, Valiant, and Wang gives $\exp(p^{-7/3}(\log_2 n)^{C_0})$ samples for a universal constant $C_0$ and every positive retention probability $p=1-q$ \citep{BVW2026}. At fixed $p$ this is a quasipolynomial sample upper bound; the cited preprint does not give a quasipolynomial-time reconstruction algorithm. The logarithm of this sample bound is a fixed power of $\log n$, whereas the logarithm of our lower bound at a fixed channel has order $(\log n)(\log\log n)$, leaving a gap between the rates. The companion paper \emph{Uniform quasipolynomial-time trace reconstruction} proves such a time bound for every fixed known rational retention probabilit […]
+[theorem] [Quantitative sample lower bound]\label{thm:main} Fix $s\in(0,1]$ and $0<c<1/(4\log2)$. Along every sequence of instances $(n,q)$ with $n\to\infty$, $q\in(0,1)$, and $q^3\log n\to\infty$, \begin{equation}\label{eq:main-bound} T_{q,s}(n)\ge n^{c\log(q^3\log n)} \end{equation} eventually. All logarithms are natural. In particular, for each fixed deletion probability $q\in(0,1)$ and fixed positive success probability $s$, the required sample number is $n^{\Omega(\log\log n)}$.
+[theorem] [Superpolynomial one-trace indistinguishability]\label{thm:tv} For every fixed deletion probability $q\in(0,1)$, \begin{equation}\label{eq:min-tv} \lim_{n\to\infty}n^A \min_{\substack{x,y\in\{0,1\}^n\\x\ne y}} \TV\bigl(\Dcal_q(x),\Dcal_q(y)\bigr)=0 \qquad\text{for every }A>0. \end{equation} At this same channel $T_{q,s}(n)/n^A\to\infty$ for every fixed $A>0$ and $s\in(0,1]$.
+
+=== LEAN COMPARATOR TraceReconstruction (exact formal statement)
+import Mathlib
+namespace OAI
+open scoped ENNReal
+noncomputable section
+namespace TraceReconstruction
+abbrev Word (n : ℕ) := Fin n → Bool
+abbrev Mask (n : ℕ) := Fin n → Bool
+abbrev Trace := List Bool
+def traceOfMask {n : ℕ} (x : Word n) (a : Mask n) : Trace :=
+  ((List.finRange n).filter fun i => a i).map x
+def maskWeight {n : ℕ} (q : ℝ) (a : Mask n) : ℝ :=
+  ∏ i, if a i then 1 - q else q
+def traceMass {n : ℕ} (q : ℝ) (x : Word n) (w : Trace) : ℝ :=
+  ∑ a : Mask n, if traceOfMask x a = w then maskWeight q a else 0
+def traceSpace (n : ℕ) : Finset Trace :=
+  Finset.univ.biUnion fun k : Fin (n + 1) =>
+    Finset.univ.image fun x : Word k.val => List.ofFn x
+def traceTV {n : ℕ} (q : ℝ) (x y : Word n) : ℝ :=
+  (1 / 2 : ℝ) * ∑ w ∈ traceSpace n, |traceMass q x w - traceMass q y w|
+def IsEstimator {n m : ℕ} (A : (Fin m → Trace) → Word n → ℝ) : Prop :=
+  (∀ z x, 0 ≤ A z x) ∧ (∀ z, ∑ x : Word n, A z x = 1)
+def reconstructionSuccess {n m : ℕ} (q : ℝ)
+    (A : (Fin m → Trace) → Word n → ℝ) (x : Word n) : ℝ :=
+  ∑ a : Fin m → Mask n,
+    (∏ j, maskWeight q (a j)) * A (fun j => traceOfMask x (a j)) x
+def SufficientBudget (n : ℕ) (q s : ℝ) (m : ℕ) : Prop :=
+  ∃ A : (Fin m → Trace) → Word n → ℝ,
+    IsEstimator A ∧ ∀ x, s ≤ reconstructionSuccess q A x
+noncomputable def sampleComplexity (n : ℕ) (q s : ℝ) : ℝ≥0∞ :=
+  sInf {t | ∃ m : ℕ, SufficientBudget n q s m ∧ t = (m : ℝ≥0∞)}
+noncomputable def minTraceTV (n : ℕ) (q : ℝ) : ℝ :=
+  sInf {t | ∃ x y : Word n, x ≠ y ∧ t = traceTV q x y}
+open Filter
+open scoped Topology Classical ENNReal
+theorem quantitative_sample_lower_bound
+    (s c : ℝ) (hs : s ∈ Set.Ioc 0 1)
+    (hc : c ∈ Set.Ioo 0 (1 / (4 * Real.log 2)))
+    (n : ℕ → ℕ) (q : ℕ → ℝ)
+    (hn : Tendsto n atTop atTop)
+    (hq : ∀ k, q k ∈ Set.Ioo 0 1)
+    (hscale : Tendsto (fun k => (q k) ^ 3 * Real.log (n k)) atTop atTop) :
+    ∀ᶠ k in atTop,
+      ENNReal.ofReal ((n k : ℝ) ^ (c * Real.log ((q k) ^ 3 * Real.log (n k)))) ≤
+        sampleComplexity (n k) (q k) s := by
+  sorry
+theorem superpolynomial_one_trace
+    (q : ℝ) (hq : q ∈ Set.Ioo 0 1) (C : ℝ) (hC : 0 < C) :
+    Tendsto (fun n : ℕ => (n : ℝ) ^ C * minTraceTV n q) atTop (𝓝 0) := by
+  sorry
+theorem superpolynomial_sample_complexity
+    (q : ℝ) (hq : q ∈ Set.Ioo 0 1) (s : ℝ) (hs : s ∈ Set.Ioc 0 1)
+    (C : ℝ) (hC : 0 < C) :
+    Tendsto
+      (fun n : ℕ => sampleComplexity n q s / ENNReal.ofReal ((n : ℝ) ^ C))
+      atTop (𝓝 ⊤) := by
+  sorry
+end TraceReconstruction
+end
+end OAI
+

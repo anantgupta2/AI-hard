@@ -1,0 +1,470 @@
+FAMILY 102: The Unique Games Conjecture and optimal approximation thresholds
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Proves Khot's Unique Games Conjecture. Independent direct reductions also establish NP-hardness, on unweighted graphs, of approximation beyond the Goemans–Williamson ratio for Max-Cut, below factor two for Vertex Cover, and within any fixed constant factor for Min-UnCut and directed feedback vertex set. These direct proofs use established PCP and Label Cover hardness results.
+
+=== MANUSCRIPT: The Unique Games Theorem (September-23-2026) [preprints/The-Unique-Games-Theorem-September-23-2026/build/main.tex]
+ABSTRACT: We prove the Unique Games Conjecture. For every fixed $`\varepsilon,\delta\in(0,1/2)`$, we give a deterministic polynomial-time reduction from 3SAT to Unique Games over a fixed finite alphabet, with completeness at least $`1-\varepsilon`$ and soundness at most δ.
+INTRODUCTION (start): \label{sec:introduction} A permutation constraint prescribes exactly one label at one endpoint for each label at the other. The Unique Games Conjecture asserts that systems of such constraints can be hard to approximate even when almost all constraints can be satisfied. We resolve this conjecture positively, with an explicit unweighted reduction from \(\mathrm{3SAT}\). \subsection{The theorem} A \emph{Unique Games instance} has a finite vertex set, a finite alphabet \(K\), and a nonempty list of oriented constraints \(e=(u_e,v_e,\pi_e)\), where \(\pi_e\) is a permutation of \(K\). A labeling \(a\) satisfies \(e\) when \(a(v_e)=\pi_e(a(u_e))\). Its value is the fraction of satisfied constraints, and \(\val(G)\) is the maximum value of a labeling. The instance is \emph{explicit and unweighted} when the entire vertex and constraint lists are written out, including the table of each permutation. A simple bipartite instance has two disjoint vertex sets and at most one constraint on each pair of opposite vertices. [statement] Thus the result resolves the Unique Games Conjecture positively in its usual edge-value formulation~\cite[Conjecture~2.5]{Khot10}. The two errors are prescribed independently, before the alphabet is chosen. Binary translation constraints are a known equivalent formulation of the conjecture~\cite[Corollary~13 and Section~11.1]{KKMO07}; the reduction here produces that form directly. Theorem~\ref{thm:ugc} supplies the Unique Games hypothesis in earlier hardness reductions for cut, covering, constraint-satisfaction, ordering, deletion, and clustering problems \cite{KKMO07,KhotRegev2008,Raghavendra08,GuruswamiEtAl2011OrderingCSP,CKKRS2006,DemaineEtAl2006Clustering}. The reductions and the resulting approximation thresholds are due to those authors. Section~\ref{sec:consequences} gives the precise problem formulations, strict thresholds, and reduction qualifications, together with proofs of the consequences. \subsection{Proofs, codes, and the quantifiers} The central difficulty is to retain completeness near one when every label permits only one reply. The earlier connection between proof verification and approximation hardness was developed by Feige, Goldwasser, Lov\'asz, Safra, and Szegedy~\cite{FGLSS96}, by Arora and Safra through proof composition~\cite{AroraSafra98}, and by Arora, Lund, Motwani, Sudan, and Szegedy through the constant-query PCP theorem~\cite{ALMSS98}. Bellare, Goldreich, and Sudan introduced the long code and folding for verifier composition~\cite[Section~3.3]{BGS98}. The long code of an answer \(a\) is the table \(f\mapsto f(a)\), indexed by Boolean functions on the answer set. In H\aa stad's parity-hardness proof, Fourier analysis recovers an outer-game strategy from arbitrary proof tables that make his verifier accept sufficiently often, without first recovering nearby codewords. His nearly satisfiable parity gap is our starting hardness input~\cite{Hastad01}. Khot introduced the Unique Games Conjecture in 2002 and gave an algorithm based on semidefinite rounding~\cite{Khot02}. Several algorithmic guarantees explain why its order of quantifiers matters. For a fixed target error, Trevisan combines semidefinite rounding with graph decomposition to obtain a polynomial-time guarantee when the input error shrinks at the reciprocal-logarithmic rate in the instance size~\cite{Trevisan08}. Charikar, Makarychev, and Makarychev use randomized semidefinite rounding to obtain expected value \(1-O(\sqrt{\epsilon\log q})\) from a \(q\)-label instance of value at least \(1-\epsilon\)~\cite{CMM06}; this guarantee loses accuracy as the alphabet grows, whereas the conjecture permits a large fixed alphabet after the errors are chosen. Kolla's spectral enumeration gives a running-time bound in terms of the dimension of a suitable spectral subspace of the label-extended graph, whose vertices are variable--label pairs~\cite{Kolla11}. Arora, Barak, and Steurer use spectral decomposition and enumeration to obtain n […]
+[theorem] [Unique Games Theorem]\label{thm:ugc} For every fixed \(\varepsilon,\delta\in(0,1/2)\), there are an integer \(s\ge1\) and a deterministic polynomial-time reduction from \(\mathrm{3SAT}\) to explicit unweighted Unique Games instances \(G_\varphi\) over \(K=\F_2^s\) such that \[ \begin{aligned} \varphi\text{ satisfiable} &\quad\Longrightarrow\quad \val(G_\varphi)\ge1-\varepsilon,\\ \varphi\text{ unsatisfiable} &\quad\Longrightarrow\quad \val(G_\varphi)\le\delta. \end{aligned} \] The graph is simple and bipartite, and every constraint is a translation \(a(v_e)=a(u_e)+c_e\) of \(K\). The alphabet, the degree of the running-time polynomial, and its constants depend only on \(\varepsilon,\delta\).
+
+=== MANUSCRIPT: A Direct Proof of Optimal Max-Cut Hardness (September-23-2026) [preprints/A-Direct-Proof-of-Optimal-Max-Cut-Hardness-September-23-2026/build/main.tex]
+ABSTRACT: We prove that approximating Max-Cut on simple unweighted graphs within any fixed factor greater than the Goemans–Williamson constant is NP-hard.
+INTRODUCTION (start): For a graph with nonnegative edge weights, Max-Cut asks for a partition of the vertices maximizing the weight of edges crossing the partition. A cut is encoded by signs on vertices, and an edge contributes exactly when its signs differ. For a maximization problem, an $\alpha$-approximation returns a feasible solution worth at least $\alpha$ times the optimum. Unless stated otherwise, the graph and its rational weights are given explicitly. We write $\operatorname{MaxCut}(G)$ for the maximum crossing weight and, when the edge weights sum to one, also denote this value by $\Val(G)$. The decision problem of whether a weighted graph has a cut of at least a given weight appears among Karp's original NP-complete problems~\cite{Karp72}. Approximation asks how much of this optimum can still be guaranteed in polynomial time. Goemans and Williamson~\cite{GW95} gave a semidefinite programming algorithm with random-hyperplane rounding for Max-Cut, with expected approximation ratio approaching \begin{equation}\label{eq:gw-constant} \GW=\min_{-1\le \rho<1} \frac{2\arccos\rho}{\pi(1-\rho)} =0.878567\ldots. \end{equation} The expression compares two contributions of an edge whose endpoint vectors have inner product $\rho$: its semidefinite objective value is $(1-\rho)/2$, whereas a random hyperplane separates the vectors with probability $\arccos(\rho)/\pi$. The minimum ratio over $\rho$ is the uniform guarantee of this rounding rule. Determining whether this ratio is optimal under ordinary NP-hardness has been a central question in approximation algorithms. H\aa stad's hardness theorem~\cite{Hastad01}, combined with the gadgets of Trevisan, Sorkin, Sudan, and Williamson~\cite{TSSW00}, rules out ratios greater than $16/17$. Khot, Kindler, Mossel, and O'Donnell~\cite{KKMO07} established optimality of $\GW$ assuming the Unique Games Conjecture~\cite{Khot02}; the analytic input is the Majority Is Stablest theorem of Mossel, O'Donnell, and Oleszkiewicz~\cite{MOO10}. We resolve the unconditional optimality question for Max-Cut. [statement] The statement means that a polynomial-time algorithm which always returns a cut of weight at least $\alpha$ times the maximum would imply $\mathrm P=\mathrm{NP}$. We prove the following more precise gap theorem. Write \begin{equation}\label{eq:B} B(t)=\frac{2}{\pi}\arcsin t,\qquad 0<t<1. \end{equation} [statement] \subsection*{Prior work and the direct route} The reduction of proof verification to approximation gaps has its roots in Feige, Goldwasser, Lov\'asz, Safra, and Szegedy~\cite{FGLSS96} and in the PCP theorems of Arora--Safra and Arora, Lund, Motwani, Sudan, and Szegedy~\cite{AroraSafra98,ALMSS98}. H\aa stad's Fourier analysis of proof-verification tests~\cite{Hastad01} made many of these gaps sharp. For Max-Cut, the Gaussian geometry of the semidefinite relaxation gives a particularly precise target. Feige and Schechtman~\cite{FS02} constructed integrality gaps approaching $\GW$ for this relaxation; a limitation of that relaxation alone does not establish hardness for arbitrary algorithms. The Unique Games reduction of Khot, Kindler, Mossel, and O'Donnell~\cite{KKMO07} connected the same geometric threshold to computational hardness. The original analysis of Khot, Kindler, Mossel, and O'Donnell proposed Majority Is Stablest as the analytic statement needed to obtain this threshold. Mossel, O'Donnell, and Oleszkiewicz proved it through a comparison between low-influence Boolean functions and Gaussian functions~\cite{MOO10}, transferring Borell's halfspace noise-stability bound~\cite{Borell85} to the Boolean setting. Their theorem leaves the Unique Games Conjecture as the hypothesis in the classical hardness reduction~\cite[Corollary~2.12]{MOO10}. We use Majority Is Stablest to identify an influential coordinate of our test, then prove the additional extraction needed to turn that coordinate into a source-game label. The algorithmic benchmark above is the ideal rounding ratio; finite-precision SDP optimiz […]
+[theorem] \label{thm:main} For every fixed $\alpha$ with $\GW<\alpha\le1$, it is NP-hard to approximate Max-Cut within a factor of $\alpha$. This holds for simple unweighted graphs.
+[theorem] \label{thm:gap} Fix a rational $t\in(0,1)$ and a constant $0<\eps<(t-B(t))/4$. For graphs equipped with a rational probability distribution on edges, it is NP-hard to distinguish \begin{align*} \textnormal{YES:}\quad&\Val\ge\frac{1+t}{2}-\eps,\\ \textnormal{NO:}\quad&\Val\le\frac{1+B(t)}{2}+\eps, \end{align*} where $\Val$ is the maximum cut weight.
+
+=== MANUSCRIPT: The Factor-Two Hardness Threshold for Vertex Cover (September-23-2026) [preprints/The-Factor-Two-Hardness-Threshold-for-Vertex-Cover-September-23-2026/build/main.tex]
+ABSTRACT: We prove that minimum Vertex Cover is NP-hard to approximate within every fixed factor below two, even on simple unweighted graphs.
+INTRODUCTION (start): \label{sec:introduction} A vertex cover of a graph is a set of vertices meeting every edge. Its complement is an independent set, a set containing no two adjacent vertices. This elementary duality lets us express the hardness gap in terms of the densities of independent sets. For a finite simple undirected graph \(G\), write \(\tau(G)\) for the minimum size of a vertex cover and \(n=|V(G)|\). An \(\alpha\)-approximation returns an actual cover of size at most \(\alpha\tau(G)\). The endpoints of a maximal matching give a factor-\(2\) approximation. We prove that every fixed improvement in this factor is NP-hard. [statement] [statement] The ratio of the two thresholds is \(2-6/(m+2)\), which tends to \(2\). The reduction is polynomial for each fixed \(m\); its constants are allowed to depend on the desired approximation factor. We prove the approximation consequence, including an exact rational separating threshold, in \Cref{sec:conclusion}. \subsection{The construction and the soundness mechanism} A Label Cover instance is a bipartite constraint system: every edge asks that a specified map send the label on its left endpoint to the label on its right endpoint. Its value is the largest fraction of constraints satisfied by one assignment of labels to all variables. Our source promise separates value one from arbitrarily small fixed value. The alphabets may grow as that fixed value decreases; our analytic estimates will not depend on their sizes. The exact source theorem is stated in \Cref{src:hardness}. Imagine \(d\) positions, with an independent source constraint assigned to each unordered pair. At a pair \(j<k\), position \(j\) receives the constraint's left endpoint and position \(k\) its right endpoint. A position's \emph{query} is its type together with these \(d-1\) endpoint questions. It does not reveal constraint indices or opposite endpoints. A local label assigns symbols to the variables in one query and satisfies every source constraint internal to that scope. A compatible family chooses at most one label per query; its members agree on overlaps and satisfy every constraint internal to their combined scopes. Give one vector coordinate to each query--label pair. A compatible family acts on a vector by summing the coordinates it selects; the largest absolute value of these sums defines a norm, \(\norm{\cdot}\). At each position, a vector of grid weights is supported on that position's query block. A graph vertex specifies all pair constraints and all position weights. Let \(S_v\) be the sum of its position vectors. For a positive threshold \(t\), distinct vertices \(v,w\) are adjacent precisely when \(\norm{S_v+S_w}\leq2t\). A satisfying source assignment restricts to compatible labels for every query. Its linear functional exceeds \(t\) on an independent set: on the sum of two such vertices it exceeds \(2t\). A tail estimate for a sum of symmetric weights shows that this set occupies nearly half the graph. \Cref{graph:section} gives the construction, its deterministic implementation, and this completeness argument. \paragraph{Why endpoint information matters.} For soundness, we will extract short lists of local labels from a large independent set. Each list must depend only on its position's own query and weights. To see why, fix a pair of positions and all data except their shared source constraint. Each of the two lists then varies only with its own endpoint of that constraint. Choosing one rank in each list defines a labeling of all source variables, so source soundness bounds the probability that these two labels are compatible. This argument fails if either list also sees the opposite endpoint or the occurrence index. The main task is therefore to obtain both enough compatibility among the lists and this restriction on their information. \paragraph{Retaining variance in own-question means.} Discard from a large independent set its at most one vertex with vector norm at most \(t\). The remaining vectors are separat […]
+[theorem] [Explicit cover gap] \label{thm:gap} For every fixed integer \(m\geq4\), there is a deterministic polynomial-time reduction from \(\mathrm{3SAT}\) to finite simple undirected unweighted graphs with the following guarantees: \[ \begin{array}{ll} \text{the formula is satisfiable} &\Longrightarrow\quad \tau(G)<\left(\dfrac12+\dfrac1m\right)|V(G)|,\\[6pt] \text{the formula is unsatisfiable} &\Longrightarrow\quad \tau(G)>\left(1-\dfrac1m\right)|V(G)|. \end{array} \] The output lists all vertices and edges explicitly.
+[corollary] \label{thm:hardness} For every fixed real \(\alpha\) with \(1\leq\alpha<2\), approximating Vertex Cover within factor \(\alpha\) is NP-hard. Thus, unless \(\mathrm P=\mathrm{NP}\), no deterministic polynomial-time algorithm achieves factor \(2-\varepsilon\) for any fixed \(\varepsilon\in(0,1]\).
+
+=== MANUSCRIPT: Constant-factor hardness of Min-UnCut (September-23-2026) [preprints/Constant-factor-hardness-of-Min-UnCut-September-23-2026/build/main.tex]
+ABSTRACT: For every fixed C &gt; 1, approximating Min-UnCut within factor C is NP-hard, even on simple undirected unweighted graphs.
+INTRODUCTION (start): \label{sec:introduction} For a finite simple undirected graph $G=(V,E)$ and a bipartition $V=S\sqcup(V\setminus S)$, define \[ \Uncut_G(S)=\abs{\{uv\in E:u,v\in S\text{ or }u,v\notin S\}}, \qquad \OPT_{\rm uncut}(G)=\min_{S\subseteq V}\Uncut_G(S). \] The two parts may be empty and need not be balanced. Equivalently, $\OPT_{\rm uncut}(G)$ is the minimum number of edges whose deletion makes $G$ bipartite: deleting the uncut edges of a partition suffices, and a bipartition of any remaining bipartite graph makes every uncut edge belong to the deleted set. This is the edge-deletion problem throughout. Min-UnCut measures distance from bipartiteness. Although its objective is the number of edges minus the maximum cut size, a multiplicative approximation for Max-Cut does not give a comparable multiplicative approximation for Min-UnCut when the graph is nearly bipartite. Its approximation question therefore concerns how accurately one can recognize and exploit that regime. Agarwal, Charikar, Makarychev and Makarychev gave a randomized polynomial-time $O(\sqrt{\log |V|})$ approximation for Min-UnCut~\cite[Theorem~2.1]{ACMM2005}. Under the Unique Games Conjecture, the near-satisfiable Max-Cut gap of Khot, Kindler, Mossel and O'Donnell implies arbitrarily large constant gaps for weighted Min-UnCut~\cite{KKMO2007}: graphs admitting a cut that misses at most an $\eta$ fraction of the total edge weight are hard to distinguish from graphs in which every cut misses a constant times $\sqrt\eta$ of that weight. The ratio of these two uncut costs grows without bound as $\eta$ decreases. Unconditional lower bounds for particular constants have developed through successively stronger finite gadgets. H\aa stad, Huang, Manokaran, O'Donnell and Wright proved hardness for every factor below $11/8$ in the weighted minimum-deletion formulation of Max-Cut \cite[Corollary~3.3]{HHMOW2017}. Wiman strengthened the near-satisfiable Max-Cut gap to give factors below $1.45685$~\cite[Theorem~3.18]{Wiman2018}. Martinsson subsequently obtained hardness for every factor below $73139148/49096883\approx1.48969$ for minimizing the weight of violated two-variable parity equations~\cite[Theorem~1.1]{Martinsson2024}. The last result transfers to weighted Min-UnCut by replacing equality and inequality constraints by paths of lengths four and three, respectively, with fresh internal vertices and the constraint's weight on each edge. For fixed endpoint bits each path has minimum uncut weight equal to the violated constraint's weight, so this preserves absolute minimum cost even though the total weight changes. These results concern individual constant factors; the theorem below gives every prescribed constant factor on simple unweighted graphs. [statement] Theorem~\ref{thm:main} resolves the constant-factor approximability question for Min-UnCut in the hardness direction. It assumes neither the Unique Games Conjecture nor any other unproved hardness hypothesis. Choosing an integer $K$ at least any prescribed real factor $C>1$ shows that a deterministic polynomial-time $C$-approximation would imply $\mathsf P=\NP$. The positive threshold $k$ separates this assertion from ordinary bipartiteness testing. For a randomized approximation with constant success probability, the corresponding consequence is $\NP\subseteq\RP$; Section~\ref{sec:finite} explains the one-sided test. In minimum $2$CNF clause deletion, the input is an explicit list of two-literal disjunctions, each of unit cost, and one deletes as few clause occurrences as possible to make the remaining formula satisfiable. Write $\OPT_{\rm del}(F)$ for this minimum and $\operatorname{unsat}(F,a)$ for the number of clause occurrences falsified by an assignment $a$. Agarwal et al. also give a randomized polynomial-time $O(\sqrt{\log n})$ approximation for this problem on $n$ variables~\cite[Theorem~3.1]{ACMM2005}. [statement] The proof in Section~\ref{sec:2cnf-consequence} replaces each edge by two clauses and preserves the […]
+[theorem] \label{thm:main} For every fixed integer $K\ge2$, there is a deterministic polynomial-time many-one reduction mapping a $3$SAT formula $\varphi$ to a pair $(G,k)$, where $G$ is an explicit finite simple undirected unweighted graph and $k\ge1$ is a binary-encoded integer, such that \[ \begin{aligned} \varphi\text{ satisfiable}&\quad\Longrightarrow\quad \OPT_{\rm uncut}(G)\le k,\\ \varphi\text{ unsatisfiable}&\quad\Longrightarrow\quad \OPT_{\rm uncut}(G)>Kk. \end{aligned} \] For each fixed $K$, the graph size, full construction work, and bit complexity are polynomial in the bit length of $\varphi$. All constants are effective; no advice or oracle is supplied to the reduction.
+[corollary] \label{cor:min-2cnf-deletion} For every fixed real $C>1$, minimum $2$CNF clause deletion is NP-hard to approximate within factor $C$. In particular, a deterministic polynomial-time $C$-approximation would imply $\mathsf P=\NP$.
+
+=== MANUSCRIPT: Constant-factor hardness of directed feedback vertex set (September-23-2026) [preprints/Constant-factor-hardness-of-directed-feedback-vertex-set-September-23-2026/build/main.tex]
+ABSTRACT: Approximating minimum directed feedback vertex set within any fixed constant factor is NP-hard, even on unweighted digraphs.
+INTRODUCTION (start): \label{sec:introduction} A directed feedback vertex set of a finite digraph $G$ is a set $F\subseteq V(G)$ for which the induced digraph $G-F$ is acyclic. Write \[ \DFVS(G)=\min\{\abs F:G-F\text{ is acyclic}\}. \] Equivalently, $F$ intersects every directed cycle. A topological order of $G-F$ certifies this property in polynomial time. The minimum-cost version assigns a positive rational cost to each vertex and minimizes the sum of the deleted costs. Throughout, digraphs are finite and loopless; two vertices may have arcs in both directions. An $A$-approximation, for $A\ge1$, returns a feedback vertex set of size at most $A\DFVS(G)$. \subsection{The approximation question} Writing $n=\abs{V(G)}$, the general $O(\log n\log\log n)$ approximation guarantee originates in Seymour's work on fractional packing of directed circuits \cite{Seymour1995}. Even, Naor, Schieber, and Sudan give a constructive algorithm covering weighted directed feedback sets \cite{Even1998}. Ordinary NP-hardness of approximation already follows from Vertex Cover, which asks for a smallest vertex set meeting every edge of an undirected graph. Replacing every edge of an undirected graph by its two opposite arcs makes a vertex set a directed feedback vertex set exactly when it is a vertex cover. Thus the earlier hardness factors below $10\sqrt5-21$ of Dinur and Safra \cite{DinurSafra2005}, and the factors strictly below $\sqrt2$ obtained by the completed two-to-one games line \cite[Section~1.3.1]{KMS2018}, transfer to DFVS. These results exclude particular constants; excluding every constant had required a stronger complexity assumption. Guruswami, Manokaran, and Raghavendra established the Unique-Games barrier against every constant factor through maximum acyclic subgraph and feedback arc set \cite{GMR2008}. The expanded ordering-constraint framework appears in the journal paper with H\aa stad and Charikar \cite{GHMRC2011}. Svensson gave a direct Unique-Games-based construction with strong structure in the YES case \cite{Svensson2013}. Guruswami and Lee subsequently gave a simpler proof with structured completeness and short cycles in every sufficiently large induced subgraph in the NO case \cite{GuruswamiLee2016}. The recent discussion of Ghorbani and Mnich records the remaining gap for general digraphs \cite{GhorbaniMnich2026}. We prove the corresponding exclusion of every constant factor from ordinary NP-hardness. [statement] Theorem~\ref{thm:main} implies that a deterministic polynomial-time algorithm with any constant approximation guarantee exists if and only if $\mathrm P=\mathrm{NP}$. For the reverse implication, membership of the size-bounded decision problem in NP permits exact optimization and witness search when $\mathrm P=\mathrm{NP}$. The theorem establishes that the required approximation factor grows without bound with the input size, assuming $\mathrm P\ne\mathrm{NP}$. It does not identify that growth rate or improve the general approximation algorithm. A directed feedback arc set is a set of arcs whose deletion leaves an acyclic digraph. Corollary~\ref{cor:feedback-arc} transfers the same hardness to this problem on unweighted simple loopless digraphs, through a reduction preserving both the optimum and approximation solutions. The vertex-set hardness also holds when opposite arcs are forbidden, as shown in Remark~\ref{rem:no-opposite-arcs}. \subsection{Methodological background} Our construction shares the useful division between protected vertices and deletable test vertices in Svensson's dictatorship gadget \cite[Section~3.1.1]{Svensson2013}. His soundness proof also reads a Boolean function from a topological order \cite[Section~3.1.3]{Svensson2013}. Here the protected vertices encode rank profiles, and compatibility across tuple prefixes supplies a family of monotone functions. Svensson uses the ``It Ain't Over Till It's Over'' theorem; Guruswami and Lee instead use an invariance principle \cite[Section~1]{GuruswamiLee2016}. Our analyti […]
+[theorem] \label{thm:main} For every fixed real constant $A\ge1$, it is NP-hard to approximate minimum directed feedback vertex set within factor $A$ on unweighted digraphs. More precisely, there is a deterministic polynomial-time reduction from an NP-hard promise problem to instances $(G,k)$ with $k\in\N_{>0}$. The polynomial and its constants may depend on $A$. The reduction has the following alternatives: \[ \textnormal{YES: }\DFVS(G)\le k, \qquad \textnormal{NO: }\DFVS(G)>Ak. \]
+
+=== LEAN COMPARATOR UniqueGamesTheorem (exact formal statement)
+import Mathlib
+namespace OAI
+namespace UniqueGamesTheorem.Foundations.Target
+structure PermutationTable (alphabet : Nat) where
+  images : Vector (Fin alphabet) alphabet
+  inverseImages : Vector (Fin alphabet) alphabet
+  leftInverse : ∀ label : Fin alphabet, inverseImages[images[label]] = label
+  rightInverse : ∀ label : Fin alphabet, images[inverseImages[label]] = label
+structure Constraint (vertices alphabet : Nat) where
+  source : Fin vertices
+  target : Fin vertices
+  permutation : PermutationTable alphabet
+def Constraint.satisfied {n q : Nat} (constraint : Constraint n q)
+    (labeling : Fin n → Fin q) : Bool :=
+  decide (constraint.permutation.images[labeling constraint.source] = labeling constraint.target)
+structure Instance (alphabet : Nat) where
+  vertices : Nat
+  constraints : List (Constraint vertices alphabet)
+  nonempty : constraints ≠ []
+def countSatisfied {n q : Nat} (labeling : Fin n → Fin q) :
+    List (Constraint n q) → Nat
+  | [] => 0
+  | constraint :: rest =>
+      (if constraint.satisfied labeling then 1 else 0) + countSatisfied labeling rest
+end UniqueGamesTheorem.Foundations.Target
+namespace UniqueGamesTheorem.BinaryFormula
+open UniqueGamesTheorem.Foundations
+structure Literal where
+  name : Nat
+  positive : Bool
+  deriving DecidableEq
+def Literal.eval (literal : Literal) (assignment : Nat → Bool) : Bool :=
+  if literal.positive then assignment literal.name else !(assignment literal.name)
+abbrev Clause := Vector Literal 3
+def Clause.eval (clause : Clause) (assignment : Nat → Bool) : Bool :=
+  (clause[0].eval assignment || clause[1].eval assignment) || clause[2].eval assignment
+structure Formula where
+  clauses : List Clause
+def Formula.Satisfiable (F : Formula) : Prop :=
+  ∃ assignment : Nat → Bool, ∀ clause ∈ F.clauses, clause.eval assignment = true
+end UniqueGamesTheorem.BinaryFormula
+namespace UniqueGamesTheorem.BinaryEncoding
+open BinaryFormula
+def bitsValue : List Bool → Nat
+  | [] => 0
+  | b :: bits => Nat.bit b (bitsValue bits)
+def parseFrame : List Bool → Option (List Bool × List Bool)
+  | false :: rest => some ([], rest)
+  | true :: b :: rest => do
+      let (bits, trailing) ← parseFrame rest
+      return (b :: bits, trailing)
+  | _ => none
+def parseName (input : List Bool) : Option (Nat × List Bool) := do
+  let (digits, rest) ← parseFrame input
+  let name := bitsValue digits
+  if digits = name.bits then some (name, rest) else none
+def parseLiteral : List Bool → Option (Literal × List Bool)
+  | sign :: input => do
+      let (name, rest) ← parseName input
+      return (⟨name, sign⟩, rest)
+  | [] => none
+def parseClause (input : List Bool) : Option (Clause × List Bool) := do
+  let (a, input) ← parseLiteral input
+  let (b, input) ← parseLiteral input
+  let (c, rest) ← parseLiteral input
+  return (#v[a, b, c], rest)
+def parseClauses : Nat → List Bool → Option (List Clause × List Bool)
+  | 0, _ => none
+  | _ + 1, false :: rest => some ([], rest)
+  | fuel + 1, true :: input => do
+      let (clause, input) ← parseClause input
+      let (clauses, rest) ← parseClauses fuel input
+      return (clause :: clauses, rest)
+  | _ + 1, [] => none
+def decodeFormula (input : List Bool) : Option Formula := do
+  let (clauses, rest) ← parseClauses (input.length + 1) input
+  if rest = [] then some ⟨clauses⟩ else none
+end UniqueGamesTheorem.BinaryEncoding
+namespace UniqueGamesTheorem.BinaryLanguage
+open UniqueGamesTheorem.Foundations
+def language (input : List Bool) : Prop :=
+  ∃ formula, BinaryEncoding.decodeFormula input = some formula ∧ formula.Satisfiable
+end UniqueGamesTheorem.BinaryLanguage
+namespace UniqueGamesTheorem.Integration.BinaryLinear
+abbrev F2 := ZMod 2
+abbrev Vector (n : Nat) := Fin n → F2
+end UniqueGamesTheorem.Integration.BinaryLinear
+namespace UniqueGamesTheorem.Integration.TranslationTarget
+open UniqueGamesTheorem.Foundations
+open Target
+def IsTranslationInstance {q s : Nat} (coordinates : Fin q ≃ BinaryLinear.Vector s)
+    (g : Instance q) : Prop :=
+  ∀ constraint ∈ g.constraints, ∃ shift : BinaryL
+[…]
+
+=== LEAN COMPARATOR OptimalMaxCut (exact formal statement)
+import Mathlib
+namespace OAI
+namespace MaxCutGames.BinaryFormula
+structure Literal where
+  name : Nat
+  positive : Bool
+  deriving DecidableEq
+def Literal.eval (literal : Literal) (assignment : Nat → Bool) : Bool :=
+  if literal.positive then assignment literal.name else !(assignment literal.name)
+abbrev Clause := Vector Literal 3
+def Clause.eval (clause : Clause) (assignment : Nat → Bool) : Bool :=
+  (clause[0].eval assignment || clause[1].eval assignment) || clause[2].eval assignment
+structure Formula where
+  clauses : List Clause
+def Formula.Satisfiable (F : Formula) : Prop :=
+  ∃ assignment : Nat → Bool, ∀ clause ∈ F.clauses, clause.eval assignment = true
+end MaxCutGames.BinaryFormula
+namespace MaxCutGames.BinaryEncoding
+open BinaryFormula
+def bitsValue : List Bool → Nat
+  | [] => 0
+  | b :: bits => Nat.bit b (bitsValue bits)
+def frame : List Bool → List Bool
+  | [] => [false]
+  | b :: bits => true :: b :: frame bits
+def parseFrame : List Bool → Option (List Bool × List Bool)
+  | false :: rest => some ([], rest)
+  | true :: b :: rest => do
+      let (bits, trailing) ← parseFrame rest
+      return (b :: bits, trailing)
+  | _ => none
+def nameBits (name : Nat) : List Bool := frame name.bits
+def parseName (input : List Bool) : Option (Nat × List Bool) := do
+  let (digits, rest) ← parseFrame input
+  let name := bitsValue digits
+  if digits = name.bits then some (name, rest) else none
+def parseLiteral : List Bool → Option (Literal × List Bool)
+  | sign :: input => do
+      let (name, rest) ← parseName input
+      return (⟨name, sign⟩, rest)
+  | [] => none
+def parseClause (input : List Bool) : Option (Clause × List Bool) := do
+  let (a, input) ← parseLiteral input
+  let (b, input) ← parseLiteral input
+  let (c, rest) ← parseLiteral input
+  return (#v[a, b, c], rest)
+def parseClauses : Nat → List Bool → Option (List Clause × List Bool)
+  | 0, _ => none
+  | _ + 1, false :: rest => some ([], rest)
+  | fuel + 1, true :: input => do
+      let (clause, input) ← parseClause input
+      let (clauses, rest) ← parseClauses fuel input
+      return (clause :: clauses, rest)
+  | _ + 1, [] => none
+def decodeFormula (input : List Bool) : Option Formula := do
+  let (clauses, rest) ← parseClauses (input.length + 1) input
+  if rest = [] then some ⟨clauses⟩ else none
+end MaxCutGames.BinaryEncoding
+namespace OptimalMaxCut
+open scoped BigOperators
+noncomputable def alphaGW : ℝ :=
+  sInf ((fun ρ : ℝ => 2 * Real.arccos ρ / (Real.pi * (1 - ρ))) ''
+    Set.Ico (-1 : ℝ) 1)
+def binary3SAT (input : List Bool) : Prop :=
+  ∃ formula, MaxCutGames.BinaryEncoding.decodeFormula input = some formula ∧
+    formula.Satisfiable
+structure Graph where
+  vertices : ℕ
+  adj : Fin vertices → Fin vertices → Bool
+  symmetric : ∀ u v, adj u v = adj v u
+  loopless : ∀ u, adj u u = false
+def Graph.cutSize (G : Graph) (cut : Fin G.vertices → Bool) : ℕ :=
+  ∑ u : Fin G.vertices, ∑ v : Fin G.vertices,
+    if u < v ∧ G.adj u v = true ∧ cut u ≠ cut v then 1 else 0
+def Graph.maxCut (G : Graph) : ℕ :=
+  (Finset.univ.image G.cutSize).sup id
+structure ScaledGraph where
+  graph : Graph
+  scale : ℕ
+  scale_pos : 0 < scale
+def ScaledGraph.bits (G : ScaledGraph) : List Bool :=
+  MaxCutGames.BinaryEncoding.nameBits G.graph.vertices ++
+  MaxCutGames.BinaryEncoding.nameBits G.scale ++
+  (List.finRange G.graph.vertices).flatMap (fun u =>
+    (List.finRange G.graph.vertices).map (fun v => G.graph.adj u v))
+structure GapReduction (α : ℝ) where
+  yesBound : ℚ
+  noBound : ℚ
+  yes_pos : 0 < yesBound
+  no_nonneg : 0 ≤ noBound
+  gap : (noBound : ℝ) < α * (yesBound : ℝ)
+  construct : List Bool → ScaledGraph
+  computation : Turing.TM2ComputableInPolyTime (id : List Bool → List Bool)
+    ScaledGraph.bits construct
+  finiteAlphabet : ∀ k, Finite (computation.tm.Γ k)
+  completeness : ∀ input, binary3SAT input →
+    (yesBound : ℝ) ≤ ((construct input).graph.maxCut : ℝ) / (construct input).scale
+  soundness : ∀ input, ¬ binary3SAT input →
+    ((construct input).graph.maxCut : ℝ) / (construct input).scale ≤ 
+[…]
+
+=== LEAN COMPARATOR VertexCover (exact formal statement)
+import Mathlib
+namespace OAI
+namespace UniqueGames.BinaryFormula
+structure Literal where
+  name : Nat
+  positive : Bool
+  deriving DecidableEq
+def Literal.eval (literal : Literal) (assignment : Nat → Bool) : Bool :=
+  if literal.positive then assignment literal.name else !(assignment literal.name)
+abbrev Clause := Vector Literal 3
+def Clause.eval (clause : Clause) (assignment : Nat → Bool) : Bool :=
+  (clause[0].eval assignment || clause[1].eval assignment) || clause[2].eval assignment
+structure Formula where
+  clauses : List Clause
+def Formula.Satisfiable (F : Formula) : Prop :=
+  ∃ assignment : Nat → Bool, ∀ clause ∈ F.clauses, clause.eval assignment = true
+end UniqueGames.BinaryFormula
+namespace UniqueGames.BinaryEncoding
+open BinaryFormula
+def bitsValue : List Bool → Nat
+  | [] => 0
+  | b :: bits => Nat.bit b (bitsValue bits)
+def frame : List Bool → List Bool
+  | [] => [false]
+  | b :: bits => true :: b :: frame bits
+def parseFrame : List Bool → Option (List Bool × List Bool)
+  | false :: rest => some ([], rest)
+  | true :: b :: rest => do
+      let (bits, trailing) ← parseFrame rest
+      return (b :: bits, trailing)
+  | _ => none
+def nameBits (name : Nat) : List Bool := frame name.bits
+def parseName (input : List Bool) : Option (Nat × List Bool) := do
+  let (digits, rest) ← parseFrame input
+  let name := bitsValue digits
+  if digits = name.bits then some (name, rest) else none
+def parseLiteral : List Bool → Option (Literal × List Bool)
+  | sign :: input => do
+      let (name, rest) ← parseName input
+      return (⟨name, sign⟩, rest)
+  | [] => none
+def parseClause (input : List Bool) : Option (Clause × List Bool) := do
+  let (a, input) ← parseLiteral input
+  let (b, input) ← parseLiteral input
+  let (c, rest) ← parseLiteral input
+  return (#v[a, b, c], rest)
+def parseClauses : Nat → List Bool → Option (List Clause × List Bool)
+  | 0, _ => none
+  | _fuel + 1, false :: rest => some ([], rest)
+  | fuel + 1, true :: input => do
+      let (clause, input) ← parseClause input
+      let (clauses, rest) ← parseClauses fuel input
+      return (clause :: clauses, rest)
+  | _ + 1, [] => none
+def decodeFormula (input : List Bool) : Option Formula := do
+  let (clauses, rest) ← parseClauses (input.length + 1) input
+  if rest = [] then some ⟨clauses⟩ else none
+end UniqueGames.BinaryEncoding
+namespace VertexCover
+def ThreeSAT (input : List Bool) : Prop :=
+  ∃ formula, UniqueGames.BinaryEncoding.decodeFormula input = some formula ∧
+    formula.Satisfiable
+structure ExplicitGraph where
+  n : ℕ
+  edges : List (Fin n × Fin n)
+  increasing : ∀ e ∈ edges, e.1 < e.2
+  nodup : edges.Nodup
+namespace ExplicitGraph
+def Cover (G : ExplicitGraph) (S : Finset (Fin G.n)) : Prop :=
+  ∀ e ∈ G.edges, e.1 ∈ S ∨ e.2 ∈ S
+instance (G : ExplicitGraph) (S : Finset (Fin G.n)) : Decidable (G.Cover S) :=
+  inferInstanceAs (Decidable (∀ e ∈ G.edges, e.1 ∈ S ∨ e.2 ∈ S))
+noncomputable def coverNumber (G : ExplicitGraph) : ℕ :=
+  Nat.find (show ∃ k : ℕ, ∃ S : Finset (Fin G.n), G.Cover S ∧ S.card = k from
+    ⟨G.n, Finset.univ, by simp [Cover], by simp⟩)
+def bits (G : ExplicitGraph) : List Bool :=
+  let names := [G.n] ++ List.range G.n ++ [G.edges.length] ++
+    G.edges.flatMap (fun e => [e.1.val, e.2.val])
+  names.flatMap UniqueGames.BinaryEncoding.nameBits
+end ExplicitGraph
+def FiniteAlphabet (M : Turing.FinTM2) : Prop := ∀ k, Finite (M.Γ k)
+structure GapReduction (m : ℕ) where
+  construct : List Bool → ExplicitGraph
+  computation : Turing.TM2ComputableInPolyTime (id : List Bool → List Bool)
+    ExplicitGraph.bits construct
+  finiteAlphabet : FiniteAlphabet computation.tm
+  completeness : ∀ input, ThreeSAT input →
+    ((construct input).coverNumber : ℝ) <
+      (1 / 2 + 1 / (m : ℝ)) * (construct input).n
+  soundness : ∀ input, ¬ ThreeSAT input →
+    (1 - 1 / (m : ℝ)) * (construct input).n <
+      ((construct input).coverNumber : ℝ)
+def natListBits (L : List ℕ) : List Bool :=
+  (L.length :: L).flatMap UniqueGames.BinaryEncoding.nameBits
+structure Approximation (α : ℝ) 
+[…]
+
+=== LEAN COMPARATOR MinUncut (exact formal statement)
+import Mathlib
+namespace OAI
+namespace MinUncutGames.BinaryFormula
+structure Literal where
+  name : Nat
+  positive : Bool
+  deriving DecidableEq
+def Literal.eval (literal : Literal) (assignment : Nat → Bool) : Bool :=
+  if literal.positive then assignment literal.name else !(assignment literal.name)
+abbrev Clause := Vector Literal 3
+def Clause.eval (clause : Clause) (assignment : Nat → Bool) : Bool :=
+  (clause[0].eval assignment || clause[1].eval assignment) || clause[2].eval assignment
+structure Formula where
+  clauses : List Clause
+def Formula.Satisfiable (F : Formula) : Prop :=
+  ∃ assignment : Nat → Bool, ∀ clause ∈ F.clauses, clause.eval assignment = true
+end MinUncutGames.BinaryFormula
+namespace MinUncutGames.BinaryEncoding
+open BinaryFormula
+def frame : List Bool → List Bool
+  | [] => [false]
+  | b :: bits => true :: b :: frame bits
+def nameBits (name : Nat) : List Bool := frame name.bits
+def literalBits (literal : Literal) : List Bool :=
+  literal.positive :: nameBits literal.name
+def clauseBits (clause : Clause) : List Bool :=
+  literalBits clause[0] ++ literalBits clause[1] ++ literalBits clause[2]
+def clausesBits : List Clause → List Bool
+  | [] => [false]
+  | clause :: clauses => true :: (clauseBits clause ++ clausesBits clauses)
+def formulaBits (formula : Formula) : List Bool := clausesBits formula.clauses
+end MinUncutGames.BinaryEncoding
+namespace MinUncut
+open MinUncutGames.BinaryFormula MinUncutGames.BinaryEncoding
+structure Output where
+  vertices : ℕ
+  adjacent : Fin vertices → Fin vertices → Bool
+  symmetric : ∀ u v, adjacent u v = adjacent v u
+  loopless : ∀ u, adjacent u u = false
+  threshold : ℕ
+  threshold_pos : 1 ≤ threshold
+def Output.uncut (G : Output) (cut : Fin G.vertices → Bool) : ℕ :=
+  (Finset.univ.filter fun uv : Fin G.vertices × Fin G.vertices =>
+    uv.1 < uv.2 ∧ G.adjacent uv.1 uv.2 = true ∧ cut uv.1 = cut uv.2).card
+noncomputable def Output.opt (G : Output) : ℕ :=
+  (Finset.univ.image G.uncut).min' (by
+    exact Finset.image_nonempty.mpr Finset.univ_nonempty)
+def Output.bits (G : Output) : List Bool :=
+  nameBits G.vertices ++
+    ((List.finRange G.vertices).flatMap fun u =>
+      (List.finRange G.vertices).map fun v => G.adjacent u v) ++
+    nameBits G.threshold
+def inputBits (input : ℕ × Formula) : List Bool :=
+  nameBits input.1 ++ formulaBits input.2
+structure Reduction where
+  reduce : ℕ → Formula → Output
+  machine : Turing.TM2Computable inputBits Output.bits (fun p => reduce p.1 p.2)
+  finiteAlphabet : ∀ k : machine.tm.K, Finite (machine.tm.Γ k)
+  time : ℕ → Polynomial ℕ
+  runtime : ∀ K φ,
+    Turing.TM2OutputsInTime machine.tm
+      ((inputBits (K, φ)).map machine.inputAlphabet.symm)
+      (some (((reduce K φ).bits).map machine.outputAlphabet.symm))
+      ((time K).eval (formulaBits φ).length)
+  size : ℕ → Polynomial ℕ
+  output_size : ∀ K φ,
+    (reduce K φ).vertices + (reduce K φ).bits.length ≤
+      (size K).eval (formulaBits φ).length
+  yes : ∀ K, 2 ≤ K → ∀ φ, φ.Satisfiable →
+    (reduce K φ).opt ≤ (reduce K φ).threshold
+  no : ∀ K, 2 ≤ K → ∀ φ, ¬ φ.Satisfiable →
+    K * (reduce K φ).threshold < (reduce K φ).opt
+end MinUncut
+namespace MinUncut
+theorem main : Nonempty Reduction := by
+  sorry
+end MinUncut
+end OAI
+
+
+=== LEAN COMPARATOR DirectedFeedback (exact formal statement)
+import Mathlib
+namespace OAI
+namespace DirectedFeedback
+def natBits (n : ℕ) : List Bool := List.replicate n true ++ [false]
+def pairBits (p : List Bool × List Bool) : List Bool :=
+  natBits p.1.length ++ p.1 ++ p.2
+def FiniteAlphabet (M : Turing.FinTM2) : Prop := ∀ k, Finite (M.Γ k)
+structure NPVerifier where
+  witnessBound : Polynomial ℕ
+  verify : (List Bool × List Bool) → Bool
+  computation : Turing.TM2ComputableInPolyTime pairBits (fun b : Bool => [b]) verify
+  finiteAlphabet : FiniteAlphabet computation.tm
+def NPVerifier.Accepts (V : NPVerifier) (input : List Bool) : Prop :=
+  ∃ witness : List Bool, witness.length ≤ V.witnessBound.eval input.length ∧
+    V.verify (input, witness) = true
+def InNP (language : List Bool → Prop) : Prop :=
+  ∃ V : NPVerifier, ∀ input, language input ↔ V.Accepts input
+structure Digraph where
+  n : ℕ
+  arcs : List (Fin n × Fin n)
+  loopless : ∀ e ∈ arcs, e.1 ≠ e.2
+  nodup : arcs.Nodup
+namespace Digraph
+def IsCycle (G : Digraph) {r : ℕ} (c : Fin (r + 1) → Fin G.n) : Prop :=
+  Function.Injective c ∧ ∀ i, (c i, c (i + 1)) ∈ G.arcs
+def Feedback (G : Digraph) (F : Finset (Fin G.n)) : Prop :=
+  ∀ (r : ℕ) (c : Fin (r + 1) → Fin G.n), G.IsCycle c → ∃ i, c i ∈ F
+noncomputable def dfvs (G : Digraph) : ℕ := by
+  classical
+  exact Nat.find (show ∃ k : ℕ, ∃ F : Finset (Fin G.n), G.Feedback F ∧ F.card = k from
+    ⟨G.n, Finset.univ, by
+      intro r c _
+      exact ⟨0, Finset.mem_univ _⟩, by simp⟩)
+def bits (G : Digraph) : List Bool :=
+  ([G.n] ++ List.range G.n ++ [G.arcs.length] ++
+    G.arcs.flatMap (fun e => [e.1.val, e.2.val])).flatMap natBits
+end Digraph
+structure GapInstance where
+  graph : Digraph
+  k : ℕ
+  k_pos : 0 < k
+def GapInstance.bits (I : GapInstance) : List Bool :=
+  natBits I.k ++ I.graph.bits
+structure GapReduction (A : ℝ) (language : List Bool → Prop) where
+  construct : List Bool → GapInstance
+  computation : Turing.TM2ComputableInPolyTime (id : List Bool → List Bool)
+    GapInstance.bits construct
+  finiteAlphabet : FiniteAlphabet computation.tm
+  completeness : ∀ input, language input →
+    (construct input).graph.dfvs ≤ (construct input).k
+  soundness : ∀ input, ¬ language input →
+    A * ((construct input).k : ℝ) < ((construct input).graph.dfvs : ℝ)
+def MainStatement : Prop :=
+  ∀ A : ℝ, 1 ≤ A → ∀ language : List Bool → Prop,
+    InNP language → Nonempty (GapReduction A language)
+end DirectedFeedback
+theorem DirectedFeedback.main : DirectedFeedback.MainStatement := by
+  sorry
+end OAI
+

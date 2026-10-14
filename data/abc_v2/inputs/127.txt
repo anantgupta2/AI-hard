@@ -1,0 +1,49 @@
+FAMILY 127: Average sensitivity of polynomial threshold functions
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Proves that a degree-at-most-d polynomial threshold function on the uniform n-dimensional Boolean cube has average sensitivity at most $`8d\sqrt n`$, uniformly for $`1\le d\le n`$. Average sensitivity counts expected output changes under single-bit flips. This establishes the asymptotic Gotsman–Linial conjecture, allowing polynomial zeros with $`\mathop{\mathrm{sign}}\nolimits (0)=1`$.
+
+=== MANUSCRIPT: Average sensitivity of polynomial threshold functions (September-25-2026) [preprints/Average-Sensitivity-of-Polynomial-Threshold-Functions-September-25-2026/build/main.tex]
+ABSTRACT: For every n ≥ 1 and $`1\le d\le n`$, we prove that a polynomial threshold function of degree at most d on the uniform Boolean cube has average sensitivity at most $`8d\sqrt n`$. This proves the asymptotic form of the Gotsman–Linial conjecture. The bound is uniform in both parameters and uses the convention $`\mathop{\mathrm{sgn}}\nolimits (0)=1`$.
+INTRODUCTION (start): \label{sec:introduction} A polynomial threshold function assigns a sign to each vertex of the Boolean cube by evaluating a real polynomial. On the cube, the identities $x_i^2=1$ allow every polynomial to be replaced by a multilinear polynomial of no larger degree without changing its values. Average sensitivity measures the expected number of coordinate changes that reverse that sign. For $x\in\{-1,1\}^n$, let $x^{\oplus i}$ be obtained by reversing coordinate $i$. For $f:\{-1,1\}^n\to\{-1,1\}$, define \begin{equation}\label{eq:influence-definition} I(f)=\sum_{i=1}^n\Prb\{f(X)\ne f(X^{\oplus i})\}, \qquad X\text{ uniform on }\{-1,1\}^n. \end{equation} This quantity is also called the total influence of $f$. Throughout, \[ \sgn(t)=\begin{cases}1,&t\ge0,\\-1,&t<0.\end{cases} \] We prove the following estimate. [statement] The constant is independent of both $d$ and $n$. In particular, the degree may grow with the dimension. The polynomial may vanish on the cube, and no regularity condition is imposed on $p$. Gotsman and Linial proposed an exact extremal bound for average sensitivity~\cite[Section~5, p.~47]{GotsmanLinial1994}. Their candidate is symmetric: it is the sign of a degree-$d$ polynomial in $x_1+\cdots+x_n$ whose roots lie between the central levels of the cube. The proposal asserts that this function maximizes influence among all degree-$d$ polynomial threshold functions in $n$ variables. Chapman constructed counterexamples to this exact assertion and explicitly distinguished it from the asymptotic bound $I(f)=O(d\sqrt n)$ \cite[Conjectures~1.1--1.2 and Theorem~1.1]{Chapman2018}. Kim, Maldonado, and Wellens independently constructed quadratic counterexamples for odd $n\ge5$ and proved influence bounds for quadratic polynomials with restricted support graphs~\cite[Theorems~1.1--1.3]{KimMaldonadoWellens2017}. Theorem~\ref{thm:main} establishes the asymptotic bound with an absolute constant; it makes no assertion about exact maximizers. Numbered locators in references with a listed preprint refer to that preprint version. The classical symmetric examples explain the scale of the theorem. Let $1\le d\le\sqrt n$, let $J$ consist of the $d$ indices nearest $(n-1)/2$ in $\{0,\ldots,n-1\}$, breaking a tie arbitrarily, and put \[ t(x)=\frac{n+x_1+\cdots+x_n}{2},\qquad p_J(x)=\prod_{j\in J}\bigl(t(x)-j-\tfrac12\bigr). \] Here $t(x)$ is the number of coordinates of $x$ equal to $+1$. Multilinearization preserves the values of $p_J$ on the cube and has degree at most $d$. Its sign changes exactly across the boundaries between Hamming weights $j$ and $j+1$ for $j\in J$. There are $(n-j)\binom nj=n\binom{n-1}j$ unoriented edges at such a boundary, so the ordered-edge normalization in~\eqref{eq:influence-definition} gives \[ I(\sgn p_J)=n\,2^{-(n-1)}\sum_{j\in J}\binom{n-1}j \asymp d\sqrt n. \] Here the comparison constants are absolute. The central-binomial estimate from Stirling's formula, together with the ratios of consecutive binomial coefficients, shows that the binomial masses are comparable to $n^{-1/2}$ within $\sqrt n/2$ of the center, which includes all selected indices; the case $n=1$ follows directly from the count. Thus the order $d\sqrt n$ is sharp throughout this degree range; see also \cite[p.~3, discussion following Theorem~1.1]{KimMaldonadoWellens2017}. For every Boolean function, the additional bound $I(f)\le n$ holds. Early general bounds established sublinear influence for every fixed degree. For $n>1$, Harsha, Klivans, and Meka proved $I(f)\le2^{O(d)}n^{1-1/(4d+6)}$ \cite[Theorem~1.6]{HarshaKlivansMeka2014}, while the independent work of Diakonikolas, Raghavendra, Servedio, and Tan gave $I(f)\le2^{O(d)}(\log n)n^{1-1/(4d+2)}$ \cite[Theorem~1.1]{DRST2014}. These results first circulated in 2009, before their 2014 journal publications. Their proofs use regularity and invariance arguments to compare sufficiently regular Boolean polynomials with Gaussian ones. Kane subsequently established the square-root exponent  […]
+[theorem] \label{thm:main} Let $n\ge1$ and $1\le d\le n$ be integers. Let $p$ be a real multilinear polynomial of degree at most $d$, and define $f:\{-1,1\}^n\to\{-1,1\}$ by $f(x)=\sgn(p(x))$, with $\sgn(0)=1$. Then, for average sensitivity under the uniform law, \[ I(f)\le 8d\sqrt n. \]
+
+=== LEAN COMPARATOR GotsmanLinial (exact formal statement)
+import Mathlib.Algebra.MvPolynomial.Degrees
+import Mathlib.Algebra.BigOperators.Field
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Analysis.Real.Sqrt
+import Mathlib.Tactic.NormNum
+namespace OAI
+open scoped BigOperators
+namespace LeanBlast.GotsmanLinial
+abbrev Cube (n : ℕ) := Fin n → Bool
+def cubeCoord {n : ℕ} (x : Cube n) (i : Fin n) : ℝ :=
+  if x i then 1 else -1
+def flip {n : ℕ} (i : Fin n) (x : Cube n) : Cube n :=
+  Function.update x i (!(x i))
+noncomputable def thresholdSign (t : ℝ) : ℝ :=
+  if 0 ≤ t then 1 else -1
+noncomputable def sensitiveVertices {n : ℕ} (f : Cube n → ℝ) (i : Fin n) :
+    Finset (Cube n) := by
+  classical
+  exact Finset.univ.filter fun x => f x ≠ f (flip i x)
+noncomputable def averageSensitivity {n : ℕ} (f : Cube n → ℝ) : ℝ :=
+  ∑ i : Fin n, ((sensitiveVertices f i).card : ℝ) / (2 : ℝ) ^ n
+def IsMultilinear {n : ℕ} (p : MvPolynomial (Fin n) ℝ) : Prop :=
+  ∀ m ∈ p.support, ∀ i : Fin n, m i ≤ 1
+noncomputable def polynomialValue {n : ℕ} (p : MvPolynomial (Fin n) ℝ)
+    (x : Cube n) : ℝ :=
+  MvPolynomial.eval (cubeCoord x) p
+noncomputable def polynomialThreshold {n : ℕ} (p : MvPolynomial (Fin n) ℝ) :
+    Cube n → ℝ :=
+  fun x => thresholdSign (polynomialValue p x)
+def GotsmanLinialStatement : Prop :=
+  ∀ (n d : ℕ), 1 ≤ n → 1 ≤ d → d ≤ n →
+    ∀ p : MvPolynomial (Fin n) ℝ,
+      IsMultilinear p → p.totalDegree ≤ d →
+        averageSensitivity (polynomialThreshold p) ≤ 8 * (d : ℝ) * Real.sqrt (n : ℝ)
+theorem gotsmanLinialStatement : GotsmanLinialStatement := by
+  sorry
+end LeanBlast.GotsmanLinial
+end OAI
+

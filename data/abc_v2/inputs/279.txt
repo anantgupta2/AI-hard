@@ -1,0 +1,103 @@
+FAMILY 279: Exact quantum factoring over a fixed finite gate set
+SUBJECT: Mathematical physics
+OPENAI SUMMARY: Gives a polynomial-time uniform quantum circuit family that outputs the complete prime factorization of every integer with probability one. Both gate count and qubit count are polynomial in the input length, and one fixed finite gate set suffices.
+
+=== MANUSCRIPT: Exact quantum factoring over a fixed finite gate set (September-25-2026) [preprints/Exact-quantum-factoring-over-a-fixed-finite-gate-set-September-25-2026/build/main.tex]
+ABSTRACT: We give a polynomial-time uniform quantum circuit family that outputs the complete prime factorization of every integer N ≥ 2 with probability one. A fixed finite set of bounded-arity gates suffices, and both the gate count and the number of qubits have polynomial worst-case bounds in the input length.
+INTRODUCTION (start): \label{sec:introduction} The integer factorization problem asks, on input a binary integer $N\ge2$, for the nondecreasing list of primes whose product is $N$, including multiplicities. We consider quantum circuits on qubits with classical basis inputs. A circuit family is polynomial-time uniform if a deterministic classical algorithm generates the circuit for inputs of each bit length in time polynomial in that length. [statement] \subsection{Factoring and exact quantum computation} Shor's quantum algorithms established polynomial-time factorization and discrete logarithms with bounded error~\cite{Shor}. Their order-based factoring reduction builds on Miller's work~\cite{Miller,Shor}: suitable multiplicative orders produce nontrivial square roots of unity and hence gcd splits. The splitting argument used here is proved directly in Section~\ref{sec:process}. Verifying a proposed factorization makes repetition reliable, but a procedure that retries until success need not have a polynomial worst-case running time. Approximating an arbitrary-angle rotation to increasingly high precision likewise does not by itself yield probability-one correctness over a fixed finite gate set. Exact transforms and algorithms have been developed in several quantum models. Mosca and Zalka~\cite{MZ} construct exact Fourier transforms using computed rotations and obtain exact discrete-logarithm algorithms for known group orders. Their discussion also reports Mosca's exact factoring algorithm in a generalized model permitting gate parameters obtained during the computation~\cite[Section~5.2]{MZ}; see also \cite[Section~1]{Imran}. Imran's exact order-finding algorithm takes a supplied multiple of the unknown order~\cite[Section~3]{Imran}. A suitable multiple of polynomial bit length is additional information, which the factoring problem does not provide initially. These are material model and input distinctions. Nishimura and Ozawa~\cite{NO} study exact computation by finitely generated uniform circuit families; their results also explain why approximate universality cannot replace an explicit gate analysis in an exact algorithm. Theorem~\ref{thm:main} uses the single finite gate set stated there and receives only the integer to be factored. Recent quantum factoring algorithms also address resource costs. Regev's multidimensional construction~\cite{Regev} initially used a number-theoretic hypothesis; Pilatte~\cite{Pilatte} proves unconditional correctness for modified algorithms. Their success guarantees retain a nonzero failure probability. The present construction addresses certainty and worst-case polynomial bounds in a specified exact gate model. Its large polynomial parameters are not intended as practical resource improvements. It makes no claim of a classical deterministic or randomized polynomial-time factoring algorithm. The final step belongs to the amplitude-amplification method originating in quantum search~\cite{Grover,BHMT}. Exact probability engineering already appears in Brassard and H\o yer's exact algorithm for Simon's problem~\cite{BH}, and Mosca and Zalka explicitly use success probability $1/4$ followed by one ordinary amplification step~\cite[Section~2.1]{MZ}. General exact amplification may employ phases depending on the success probability~\cite{Hoyer,BHMT}. Here the preceding construction makes that probability exactly $1/4$ using dyadic arithmetic and the fixed gates, so the established pair of sign reflections suffices. \subsection{Proof strategy and the ancestry of its ingredients} The proof has two main ingredients beyond the order-based reduction to factoring. First, it constructs an order trial whose mass on the true order is a prescribed dyadic rational, meaning a rational with a power-of-two denominator. For a unit $a$ modulo $m$, its order is the least positive integer $r$ with $a^r\equiv1\pmod m$. Our trial returns no candidate or a positive multiple of $r$, and its probability of returning $r$ is an explicit arithmeti […]
+[theorem] \label{thm:main} There is a polynomial-time uniform family of polynomial-size quantum circuits that outputs the complete prime factorization of every input integer $N\ge2$ with probability one. The number of gates and qubits is bounded by a fixed polynomial in the bit length of $N$. One fixed finite gate set suffices: NOT, CNOT, Toffoli, Hadamard, $\operatorname{diag}(1,i)$, their inverses, and their singly controlled versions.
+
+=== LEAN COMPARATOR ExactQuantumFactoring (exact formal statement)
+import Mathlib
+namespace OAI
+namespace ExactQuantumFactoring
+open scoped BigOperators
+inductive Primitive where
+  | not | cnot | toffoli | hadamard | phase
+  deriving DecidableEq
+def Primitive.arity : Primitive → ℕ
+  | .not | .hadamard | .phase => 1
+  | .cnot => 2
+  | .toffoli => 3
+def Primitive.code : Primitive → ℕ
+  | .not => 0 | .cnot => 1 | .toffoli => 2 | .hadamard => 3 | .phase => 4
+structure Gate where
+  primitive : Primitive
+  inverse : Bool
+  controlled : Bool
+  deriving DecidableEq
+def Gate.arity (g : Gate) : ℕ := g.primitive.arity + if g.controlled then 1 else 0
+noncomputable def Primitive.matrix : Primitive → List Bool → List Bool → ℂ
+  | .not, [a], [b] => if a = !b then 1 else 0
+  | .cnot, [a,b], [c,d] => if a = c ∧ b = Bool.xor c d then 1 else 0
+  | .toffoli, [a,b,c], [d,e,f] =>
+      if a = d ∧ b = e ∧ c = Bool.xor f (d && e) then 1 else 0
+  | .hadamard, [a], [b] =>
+      (if a && b then -1 else 1) / (Real.sqrt 2 : ℂ)
+  | .phase, [a], [b] => if a = b then (if b then Complex.I else 1) else 0
+  | _, _, _ => 0
+noncomputable def Gate.baseMatrix (g : Gate) (a b : List Bool) : ℂ :=
+  if g.inverse then star (g.primitive.matrix b a) else g.primitive.matrix a b
+noncomputable def Gate.matrix (g : Gate) (a b : List Bool) : ℂ :=
+  if g.controlled then
+    match a, b with
+    | false :: a', false :: b' => if a' = b' then 1 else 0
+    | true :: a', true :: b' => g.baseMatrix a' b'
+    | _, _ => 0
+  else g.baseMatrix a b
+structure Instruction (q : ℕ) where
+  gate : Gate
+  wire : Fin gate.arity → Fin q
+  distinct : Function.Injective wire
+abbrev Basis (q : ℕ) := Fin q → Bool
+abbrev State (q : ℕ) := Basis q → ℂ
+noncomputable def Instruction.matrix {q : ℕ} (o : Instruction q) :
+    Matrix (Basis q) (Basis q) ℂ := by
+  classical
+  exact fun a b =>
+    if ∀ i : Fin q, (∀ j, o.wire j ≠ i) → a i = b i then
+      o.gate.matrix (List.ofFn (a ∘ o.wire)) (List.ofFn (b ∘ o.wire))
+    else 0
+structure Circuit where
+  qubits : ℕ
+  instructions : List (Instruction qubits)
+noncomputable def Circuit.apply (c : Circuit) (ψ : State c.qubits) : State c.qubits :=
+  c.instructions.foldl (fun v o => o.matrix.mulVec v) ψ
+def inputBasis (q ℓ N : ℕ) : Basis q :=
+  fun i => if i.val < ℓ then N.testBit i.val else false
+noncomputable def Circuit.outputState (c : Circuit) (ℓ N : ℕ) : State c.qubits := by
+  classical
+  exact c.apply (fun x => if x = inputBasis c.qubits ℓ N then 1 else 0)
+def paddedLength (ℓ : ℕ) : ℕ := max 128 ℓ
+def readBit {q : ℕ} (x : Basis q) (i : ℕ) : Bool :=
+  if h : i < q then x ⟨i,h⟩ else false
+def outputList {q : ℕ} (ℓ : ℕ) (x : Basis q) : List ℕ :=
+  let n := paddedLength ℓ
+  List.ofFn (fun a : Fin n =>
+    ∑ j ∈ Finset.range n, if readBit x (ℓ + a.val * n + j) then 2^j else 0)
+def CorrectEncoding (N n : ℕ) (xs : List ℕ) : Prop :=
+  ∃ ps : List ℕ, (∀ p ∈ ps, Nat.Prime p) ∧ ps.Pairwise (· ≤ ·) ∧
+    ps.prod = N ∧ ps.length ≤ n ∧ xs = ps ++ List.replicate (n - ps.length) 0
+noncomputable def Circuit.correctProbability (c : Circuit) (ℓ N : ℕ) : ℝ := by
+  classical
+  exact ∑ x : Basis c.qubits,
+    if CorrectEncoding N (paddedLength ℓ) (outputList ℓ x) then
+      Complex.normSq (c.outputState ℓ N x) else 0
+def natWord (k : ℕ) : List Bool := List.replicate k true ++ [false]
+def Instruction.encode {q : ℕ} (o : Instruction q) : List Bool :=
+  natWord o.gate.primitive.code ++ [o.gate.inverse, o.gate.controlled] ++
+    (List.ofFn (fun i => o.wire i |>.val)).flatMap natWord
+def Circuit.encode (c : Circuit) : List Bool :=
+  natWord c.qubits ++ natWord c.instructions.length ++
+    c.instructions.flatMap Instruction.encode
+def Uniform (family : ℕ → Circuit) : Prop :=
+  ∃ generator : Turing.TM2ComputableInPolyTime
+      (fun ℓ => List.replicate ℓ true) Circuit.encode family,
+    ∀ k, Finite (generator.tm.Γ k)
+def PolynomialResources (family : ℕ → Circuit) : Prop :=
+  ∃ bound : Polynomial ℕ, ∀ ℓ,
+    (family ℓ).qubits ≤ bound.eval ℓ ∧
+    (family ℓ).instructions.length ≤ bound.eval ℓ
+def MainTheorem : Prop :=
+  ∃ family : ℕ → Circuit, Uniform fami
+[…]

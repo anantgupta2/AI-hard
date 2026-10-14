@@ -1,0 +1,92 @@
+FAMILY 249: A finitely generated Eilenberg–Ganea counterexample
+SUBJECT: Group theory
+OPENAI SUMMARY: Constructs a finitely generated residually finite group with integral cohomological dimension two and geometric dimension three, disproving the Eilenberg–Ganea conjecture. It has no two-dimensional classifying space, even with infinitely many cells.
+
+=== MANUSCRIPT: A finitely generated counterexample to the Eilenberg–Ganea conjecture (September-23-2026) [preprints/A-finitely-generated-counterexample-to-the-Eilenberg-Ganea-conjecture-September-23-2026/build/main.tex]
+ABSTRACT: We construct a finitely generated residually finite group of integral cohomological dimension two and geometric dimension three, disproving the Eilenberg–Ganea conjecture.
+INTRODUCTION (start): \label{sec:introduction} For a discrete group $\Gamma$, its integral cohomological dimension $\cdim\Gamma$ is the projective dimension of the trivial left $\Z[\Gamma]$-module $\Z$: it measures the length of the shortest projective resolution of $\Z$. Its geometric dimension $\gdim\Gamma$ is the least dimension of a connected CW complex with fundamental group $\Gamma$ and contractible universal cover. Such a complex is a \emph{classifying space}, or a $K(\Gamma,1)$. These are ordinary dimensions; no family of subgroups or proper-action variant is involved. The cellular chains of a contractible universal cover give a free resolution, so $\cdim\Gamma\le\gdim\Gamma$. The Eilenberg--Ganea theorem of 1957 identifies these dimensions when $\cdim\Gamma\ge3$. In dimension one, Stallings proved that a finitely generated group of integral cohomological dimension one is free, and Swan removed the finite-generation hypothesis \cite{Stallings1968,Swan1969}; a free group has a one-dimensional classifying space. The remaining dimension-two conjecture asks whether every group of integral cohomological dimension two has a two-dimensional classifying space \cite{EG1957}. We answer this question negatively with a finitely generated residually finite group. Here \emph{residually finite} means that every nonidentity element remains nonidentity in some finite quotient. Our group comes from a finite simplicial complex. A simplicial complex is \emph{flag} if every finite set of pairwise adjacent vertices spans a simplex. For such a complex $L$ with vertex set $V$, the associated \emph{right-angled Artin group} is \[ A_L=\left\langle a_q\ (q\in V)\ \middle|\ [a_q,a_r]=1\text{ if }\{q,r\}\text{ is an edge of }L\right\rangle. \] The \emph{height homomorphism} $\lambda:A_L\to\Z$ sends every standard generator $a_q$ to $1$. Its kernel is a Bestvina--Brady group. Acyclicity below always means vanishing reduced integral homology. [statement] Section~\ref{sec:geometry} constructs the triangulation and proves the stated algebraic and geometric properties of its height kernel. Finite generation also makes $G$ countable, so restricting the conjecture to countable groups does not restore it. Proposition~\ref{prop:model} also supplies a length-two resolution of the trivial $\Z[G]$-module $\Z$ by finitely generated free $\Z[G]$-modules. A group admitting such a finite-length free resolution is said to be of \emph{type $\mathrm{FL}$}. Consequently, $G$ is of \emph{type $\mathrm{FP}_\infty$}: it admits a projective resolution with finitely generated terms in every degree. Here the length-two free resolution extends to such a projective resolution by taking all higher terms to be zero. The group is not finitely presented: $L$ has nontrivial fundamental group by Lemma~\ref{lem:geometric-seed}, and the Bestvina--Brady finite-presentability criterion applies \cite[Main Theorem, part~(3)]{BB1997}. \subsection*{History and the obstruction} Bestvina and Brady used height kernels to distinguish homological from homotopical finiteness conditions \cite[Main Theorem]{BB1997}. Their acyclic two-dimensional examples provide candidates for the dimension-two problem \cite[Example~6.3(3)]{BB1997}. For suitable flag triangulations of a spine of the Poincar\'e homology sphere, they proved that at least one of the Eilenberg--Ganea and Whitehead conjectures fails \cite[Theorem~8.7]{BB1997}. Whitehead's asphericity question asks whether every connected subcomplex of an aspherical two-dimensional CW complex is aspherical \cite{Whitehead1941}; see also \cite[Section~8]{BB1997}. The classical alternative does not itself determine the geometric dimension of a height kernel. Leary and Petrosyan give a recent conditional comparison between Coxeter and Bestvina--Brady candidates for the ordinary problem \cite[Section~5.6, Conjecture~5.20 and Corollary~5.21]{LP2026}. Dicks and Leary describe height kernels by edge generators and power relators associated to cycles \cite[Theorem~1 and Proposition […]
+[theorem] \label{thm:main} There is a finitely generated residually finite group $G$ such that \[ \cdim G=2,\qquad \gdim G=3. \] One may take $G$ to be the height kernel in the right-angled Artin group associated to a finite acyclic flag triangulation of the presentation complex \begin{equation} \label{eq:seed-presentation-intro} \langle x,y\mid x^2=y^5,\ x^2=(xy^{-1})^3\rangle. \end{equation} No two-dimensional classifying space for this $G$ exists, regardless of the number of its cells.
+
+=== LEAN COMPARATOR EilenbergGanea (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open Classical Set Topology
+namespace EilenbergGanea
+def seedWord : Bool → List (Bool × Bool)
+  | false => [(false, true), (false, true), (true, false), (true, false),
+      (true, false), (true, false), (true, false)]
+  | true => [(false, true), (false, true), (true, true), (false, false),
+      (true, true), (false, false), (true, true), (false, false)]
+def boundaryLength (relation : Bool) : ℕ := 3 * (seedWord relation).length
+abbrev RoseVertex := Option (Bool × Fin 2)
+abbrev SeedVertex := RoseVertex ⊕ Bool
+abbrev CircleEdge := Bool × Fin 3
+abbrev Sector := (relation : Bool) × Fin (boundaryLength relation)
+abbrev SeedEdge := CircleEdge ⊕ Sector
+abbrev SeedCell := SeedVertex ⊕ (SeedEdge ⊕ Sector)
+def circleStart (edge : CircleEdge) : RoseVertex :=
+  ![none, some (edge.1, 0), some (edge.1, 1)] edge.2
+def circleEnd (edge : CircleEdge) : RoseVertex :=
+  ![some (edge.1, 0), some (edge.1, 1), none] edge.2
+def sectorLetter (sector : Sector) : Bool × Bool :=
+  (seedWord sector.1).get ⟨sector.2.val / 3, by
+    have bound := sector.2.isLt
+    dsimp [boundaryLength] at bound
+    omega⟩
+def sectorCircleEdge (sector : Sector) : CircleEdge :=
+  ((sectorLetter sector).1, if (sectorLetter sector).2 then
+    ⟨sector.2.val % 3, Nat.mod_lt _ (by decide)⟩ else
+    ⟨2 - sector.2.val % 3, by omega⟩)
+def sectorStart (sector : Sector) : RoseVertex :=
+  if (sectorLetter sector).2 then circleStart (sectorCircleEdge sector)
+  else circleEnd (sectorCircleEdge sector)
+def nextSector (sector : Sector) : Sector :=
+  ⟨sector.1, ⟨(sector.2.val + 1) % boundaryLength sector.1,
+    Nat.mod_lt _ (by have := sector.2.isLt; omega)⟩⟩
+def edgeVertices : SeedEdge → Finset SeedVertex
+  | .inl edge => {.inl (circleStart edge), .inl (circleEnd edge)}
+  | .inr sector => {.inr sector.1, .inl (sectorStart sector)}
+def sectorEdges (sector : Sector) : Finset SeedEdge :=
+  {.inl (sectorCircleEdge sector), .inr sector, .inr (nextSector sector)}
+def sectorVertices (sector : Sector) : Finset SeedVertex :=
+  (sectorEdges sector).biUnion edgeVertices
+def properFace : SeedCell → SeedCell → Prop
+  | .inl vertex, .inr (.inl edge) => vertex ∈ edgeVertices edge
+  | .inl vertex, .inr (.inr sector) => vertex ∈ sectorVertices sector
+  | .inr (.inl edge), .inr (.inr sector) => edge ∈ sectorEdges sector
+  | _, _ => False
+def seedGraph : SimpleGraph SeedCell where
+  Adj first second := properFace first second ∨ properFace second first
+  symm := ⟨fun _ _ adjacent => adjacent.elim Or.inr Or.inl⟩
+  loopless := ⟨by
+    intro cell
+    rcases cell with vertex | cell
+    · simp [properFace]
+    · rcases cell with edge | sector <;> simp [properFace]⟩
+def artinRelations {Vertex : Type*} (graph : SimpleGraph Vertex) : Set (FreeGroup Vertex) :=
+  {word | ∃ first second, graph.Adj first second ∧
+    word = FreeGroup.of first * FreeGroup.of second *
+      (FreeGroup.of first)⁻¹ * (FreeGroup.of second)⁻¹}
+abbrev ArtinGroup {Vertex : Type*} (graph : SimpleGraph Vertex) :=
+  PresentedGroup (artinRelations graph)
+def height {Vertex : Type*} (graph : SimpleGraph Vertex) :
+    ArtinGroup graph →* Multiplicative ℤ :=
+  PresentedGroup.toGroup (f := fun _ : Vertex => Multiplicative.ofAdd (1 : ℤ)) (by
+    rintro word ⟨first, second, _, rfl⟩
+    simp)
+abbrev SourceGroup := (height seedGraph).ker
+def cohomologicalDimension (GroupType : Type*) [Group GroupType] : WithBot ℕ∞ :=
+  CategoryTheory.projectiveDimension
+    (ModuleCat.of (MonoidAlgebra ℤ GroupType)
+      (Representation.trivial ℤ GroupType ℤ).asModule)
+universe u
+def HasClassifyingSpace (GroupType : Type*) [Group GroupType] (dimension : ℕ) : Prop :=
+  ∃ (Space : Type u) (_ : TopologicalSpace Space) (_ : T2Space Space)
+    (_ : Topology.CWComplex (Set.univ : Set Space)),
+    (∀ degree : ℕ, dimension < degree →
+      IsEmpty (Topology.CWComplex.cell (Set.univ : Set Space) degree)) ∧
+    PathConnectedSpace Space ∧
+    ∃ basepoint : Space, Nonempty (FundamentalGroup Space basepoint ≃* GroupType) ∧
+    ∃ (Cover
+[…]

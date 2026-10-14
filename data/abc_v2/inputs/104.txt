@@ -1,0 +1,221 @@
+FAMILY 104: Quasipolynomial algorithms for mean-payoff, stochastic and parity games
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Gives deterministic algorithms using $`2^{O((\log(L+2))^2)}`$ bit operations, for complete binary input length L, for ordinary mean-payoff games and two separate extensions. They compute exact values and optimal positional strategies in ordinary games, the nonnegative expectation-of-liminf value set in turn-based stochastic games, and the winning set for nonnegative liminf mean payoff conjoined with parity. Signed rewards, rational chance probabilities, and parity priorities are unrestricted and binary-encoded.
+
+=== MANUSCRIPT: Turn-Based Stochastic Mean-Payoff Games in Deterministic Quasipolynomial Time (October-5-2026) [preprints/Turn-Based-Stochastic-Mean-Payoff-Games-in-Deterministic-Quasipolynomial-Time-October-5-2026/build/build/main.tex]
+ABSTRACT: We give a uniform deterministic quasipolynomial-time algorithm for finite turn-based stochastic mean-payoff games with signed integer rewards and rational chance-transition probabilities encoded in binary. It computes exactly the vertices of nonnegative value, including value zero, for the expectation of the pathwise liminf mean payoff. The algorithm uses exact rational arithmetic and $`2^{O((\log(L+2))^2)}`$ bit operations, where L is the complete binary input length.
+INTRODUCTION (start): \label{sec:introduction} Mean-payoff games ask how two players can control the long-run average reward of an infinite play. In the stochastic version, some transitions are chosen by chance. This combines strategic choice with the possibility of moving between regions having different long-run rewards. The input may describe very small transition probabilities and very large rewards with only a few binary digits, so an algorithm whose cost depends on their magnitudes need not be efficient in the input length. \subsection{The problem and the result} An instance consists of a finite directed multigraph $G=(V,E)$ with $V=\{1,\ldots,n\}$, $n\ge1$, and at least one outgoing edge at every vertex. The vertex set is partitioned as \[ V=V_{\max}\sqcup V_{\min}\sqcup V_{\mathrm{ch}}. \] Each edge $e$ has an integer reward $w(e)$. At a vertex of $V_{\max}$, Max chooses the next edge; at a vertex of $V_{\min}$, Min chooses it; at a vertex $i\in V_{\mathrm{ch}}$, the next edge is drawn from a prescribed rational probability distribution $p_i$ on the outgoing edges. Rewards and the numerators and positive denominators of the probabilities are encoded in binary. The graph and all edge data are listed explicitly. Loops, parallel edges, zero probabilities, and unreduced fractions are permitted. Both players observe the complete finite history, including traversed edges, and may use arbitrary behavioral strategies with private randomness. Chance draws have the prescribed conditional law at the current vertex. A pure positional strategy chooses one outgoing edge at each vertex of its player, independently of the preceding history. For a play $\pi=(X_0,e_0,X_1,e_1,\ldots)$ define \[ \MP_w(\pi)=\liminf_{T\to\infty}\frac1T\sum_{t=0}^{T-1}w(e_t), \qquad \val(i)=\sup_\sigma\inf_\tau \E_{i,\sigma,\tau}[\MP_w]. \] Here $\sigma$ and $\tau$ range over Max's and Min's behavioral strategies, respectively. The expectation is taken after the pathwise lower limit. If $L$ is the complete binary input length, the decision problem is to output the set \[ U=\{i\in V:\val(i)\ge0\}. \] [statement] \subsection{Historical context} \label{subsec:history} Shapley introduced stochastic games with positive stopping probabilities and characterized their values by a contraction operator \cite{Shapley1953}. Gillette considered the undiscounted, long-run average objective \cite{Gillette1957}; Liggett and Lippman supplied the classical stationary-strategy theorem for perfect-information time-average games \cite{LiggettLippman1969}. The relation between discounting and long-run optimization is also classical. Blackwell showed in finite dynamic programming that one stationary policy is optimal for every discount factor sufficiently close to one \cite{Blackwell1962}. Rational discounted values provide the corresponding stabilization mechanism for perfect-information stochastic games; see, for example, Gimbert and Zielonka \cite[Theorem~3]{GimbertZielonka2010}. The computational problem connects several familiar classes of games. A simple stochastic game is a finite turn-based reachability game in which chance chooses fairly between two successors. Condon placed its threshold problem in $\mathrm{NP}\cap\mathrm{coNP}$ \cite{Condon1992}, and Ludwig gave a randomized subexponential algorithm \cite{Ludwig1995}. Zwick and Paterson developed pseudopolynomial algorithms for deterministic mean-payoff games and a reduction to simple stochastic games \cite{ZwickPaterson1996}. Andersson and Miltersen later proved polynomial-time Turing equivalences among computing values and optimal strategies in simple stochastic, stochastic mean-payoff, and stochastic discounted-payoff games, with numerical parameters---including the discount factor---given in binary \cite[Theorem~1]{AnderssonMiltersen2009}. Randomized strategy-improvement algorithms have subexponential expected bounds \cite{Zwick2026}. A different line obtains pseudopolynomial bounds when the number of random positions is fixed \cite{Boro […]
+[theorem] \label{thm:main} There are a uniform deterministic Turing machine and an absolute constant $C$ such that, on every valid input described above, the machine outputs exactly $U$ in at most \[ 2^{C(\log_2(L+2))^2} \] bit operations. The bound includes input reading, exact rational arithmetic, and output. Vertices of value zero are included.
+
+=== MANUSCRIPT: Mean-payoff parity games in quasipolynomial time (October-5-2026) [preprints/Mean-payoff-parity-games-in-quasipolynomial-time-October-5-2026/build/main.tex]
+ABSTRACT: We give a uniform deterministic quasipolynomial-time algorithm for mean-payoff parity games. It computes all vertices from which a player can enforce both nonnegative liminf mean payoff and the parity condition, with arbitrary signed binary rewards and unrestricted binary priorities. The running time is $`2^{O((\log(L+2))^2)}`$ bit operations, where L is the complete input length.
+INTRODUCTION (start): \label{sec:introduction} A mean-payoff parity game asks a player to satisfy both a long-run reward constraint and a recurring-priority condition. These objectives interact: repeatedly visiting a favorable priority may incur a loss, even when a nonnegative mean reward is achievable on its own. We show that the combined winning region can be computed in deterministic quasipolynomial time in the full binary input length. An instance consists of a finite directed graph $G=(V,E)$ in which every vertex has an outgoing edge, a partition $V=V_{\Max}\sqcup V_{\Min}$, a reward $r(v)\in\Z$ at each vertex, and a priority $p(v)\in\N$ at each vertex, where $0\in\N$. The graph with its ownership partition is called an \emph{arena}. The owner of the current vertex chooses the next edge. Strategies are pure: each chooses an outgoing edge after every finite history ending at a vertex owned by that player. A strategy is \emph{positional} if the choice depends only on the current vertex. Max wins an infinite play $\pi=v_0v_1\cdots$ precisely when \begin{equation}\label{eq:objective} \min\{p(v):v\text{ occurs infinitely often in }\pi\} \text{ is even},\qquad \MP(\pi):=\liminf_{T\to\infty} \frac1T\sum_{t=0}^{T-1}r(v_t)\ge0. \end{equation} Min's winning objective is the complement of this conjunction. Let $L$ be the length of a fixed conventional explicit binary encoding of the graph, ownership, rewards, and priorities. In particular, large reward magnitudes and large priority values are charged by their binary lengths. [statement] The algorithmic input is the deterministic mean-payoff theorem of \cite[Theorem~1.1]{OpenAI2026Deterministic}, together with its positional-strategy guarantees \cite[Corollary~7.1]{OpenAI2026Deterministic}. We state the exact interface in Proposition~\ref{prop:mp-interface}. The reduction from the conjunction to ordinary mean payoff is proved here, including the determinacy and strategy-combination facts used by the recursion. Its number of mean-payoff queries is $2^{O((\log(n+2))^2)}$, where $n=|V|$, and every queried arena has encoding length polynomial in $L+2$. \paragraph{The reduction.} A \emph{dominion} for a player is a set of vertices within which that player can keep play and win from every start. Following the reduced-precision approach to parity games~\cite{Parys2019}, we compute tentative labels that must be correct on every dominion below a specified size bound for each player. Outside those protected dominions, the labels may be incorrect. A call has at most one recursive child retaining both bounds; every other child halves one bound. Each child removes the parent's least priority. These two measures give the quasipolynomial call count. The essential additional issue is how to combine strategies without spoiling mean payoff. A limiting average bound for each uninterrupted play does not itself control the cost of arbitrarily many restarts. We instead construct Max strategies whose every consistent prefix of length $t$ has weight at least $-\epsilon t-C_\epsilon$, for every $\epsilon>0$, with $C_\epsilon$ uniform over the opponent's choices. Using the increasing-round construction of~\cite[Lemma~7 of the full version]{BouyerMarkeyOlschewskiUmmels2011}, between attempts to visit an even least priority the strategy follows a mean-payoff policy for $1,2,3,\ldots$ edges. The number of such rounds completed by time $T$ is $O(\sqrt T)$, so bounded overhead per round has vanishing average. This uniform estimate supports both determinacy and the dominion extraction needed by the recursion. The two ingredients are separated in the proof: Section~\ref{sec:strategies} establishes the strategy and dominion statements; Section~\ref{sec:algorithm} gives the bounded-dominion algorithm; and Section~\ref{sec:complexity} counts its queries and bit operations. The recursion uses the ordinary mean-payoff solver only through its winning-set interface, allowing that solver to be replaced without changing the parity part of the con […]
+[theorem] \label{thm:main} A uniform deterministic algorithm returns exactly all vertices from which Max can force~\eqref{eq:objective} against every Min strategy. For an absolute constant $C>0$, it uses at most \[ 2^{C(\log_2(L+2))^2} \] bit operations. The number of distinct priorities and the magnitudes of the rewards are unrestricted.
+
+=== MANUSCRIPT: Deterministic quasipolynomial-time mean-payoff games (September-25-2026) [preprints/Deterministic-quasipolynomial-time-mean-payoff-games-September-25-2026/build/source/main.tex]
+ABSTRACT: We give a deterministic algorithm that computes the complete zero-threshold winning set of a finite mean-payoff game with arbitrary signed integer edge weights encoded in binary. For total explicit input length L, it uses $`2^{O((\log(L+2))^2)}`$ bit operations. A reduction also computes the exact rational value at every vertex and globally optimal positional strategies for both players within the same quasipolynomial bound.
+INTRODUCTION (start): \label{sec:introduction} In a mean-payoff game, two players choose edges of a finite graph and compete over the long-run average weight of the resulting infinite walk. The objective is numerical, but the question of who can enforce a nonnegative average is a finite decision problem. A central algorithmic issue is the representation of the weights: a procedure polynomial in their absolute values may take exponential time in the length of the input. We give a deterministic algorithm whose running time is quasipolynomial in that binary length and which determines all winning starting vertices together. \subsection{The problem and the main theorem} Let $G=(V,E)$ be a finite directed graph with $V=\{1,\ldots,n\}$ and $n\ge1$. Each vertex has at least one outgoing edge and belongs to exactly one of $V_{\mathrm{Max}}$ and $V_{\mathrm{Min}}$. The edge weights $w:E\to\Z$ are arbitrary signed binary integers. Self-loops and parallel edges are allowed; parallel edges are separate entries of the explicit edge list. At a vertex its owner chooses the next edge. Both players' strategies may depend on the entire finite history. For an infinite play $\pi=(e_0,e_1,\ldots)$, write \[ \MP_w(\pi)=\liminf_{T\to\infty}\frac1T \sum_{t=0}^{T-1}w(e_t). \] We count the complete input length $L$ in a fixed conventional binary encoding of the graph, endpoints, ownership, and weights. For a start $v$ and strategies $\sigma,\tau$, denote their induced play by $\pi_{v,\sigma,\tau}$. [statement] A positional strategy chooses its outgoing edge using only the current vertex. Section~\ref{sec:full-solution} derives the exact rational value at every starting vertex and globally optimal positional strategies for both players, within the same quasipolynomial bit bound. Section~\ref{sec:energy-credits} decides whether a prescribed initial credit can keep every finite accumulated weight nonnegative in a one-resource energy game, and computes minimum winning credits. Section~\ref{sec:tropical} applies classical reductions to tropical feasibility and fixed-corank tropical-rank tests. A polynomial bound for the complete binary input would be a further improvement. \subsection{Earlier algorithms and binary weights} Ehrenfeucht and Mycielski proved the existence of positional optimal strategies for mean-payoff games~\cite{EhrenfeuchtMycielski1979}. Positional determinacy places the threshold problem in $\mathrm{NP}\cap\mathrm{coNP}$. Zwick and Paterson developed pseudopolynomial algorithms and complexity reductions \cite{ZwickPaterson1996}. Such bounds can be polynomial in the number of vertices and the largest absolute weight while remaining exponential in the binary encoding length. This distinction is central to Theorem~\ref{thm:main}. The energy formulation asks whether a finite initial credit can keep all finite accumulated weights nonnegative. Brim, Chaloupka, Doyen, Gentilini, and Raskin developed bounded integer progress measures and monotone lifting, with an $O(|E|nW_0)$ threshold and winning-region bound when $W_0$ bounds the absolute weights \cite[Theorem~8]{BrimEtAl2011}. Dorfman, Kaplan, and Zwick developed a deterministic exponential-time approach based on accelerated potential updates and scaling; Austin and Dell'Erba corrected its update procedure \cite{DorfmanKaplanZwick2019,AustinDellErba2023}. Kozachinskiy gives a polyhedral interpretation and a weight-independent $n^{O(1)}2^{n/2}$ arithmetic bound for energy winners \cite{Kozachinskiy2021}. Strategy-improvement algorithms provide another important comparison. Bj\"orklund and Vorobyov proved an expected $2^{O(\sqrt{n\log n})}$ arithmetic bound for the threshold partition on graphs without parallel edges \cite[Theorem~7.1]{BjorklundVorobyov2007}, following work with Sandberg~\cite{BjorklundSandbergVorobyov2004}. Recent analyses concern Random-Action-Removal~\cite{Zwick2026} and Switch-All and Random-Edge for energy games \cite{DorfmanKaplanZwick2026}. Iteration counts and arithmetic bounds must be distin […]
+[theorem] \label{thm:main} A uniform deterministic algorithm returns exactly the set \[ U=\bigl\{v\in V:\exists\text{ Max strategy }\sigma\ \forall\text{ Min strategies }\tau, \ \MP_w(\pi_{v,\sigma,\tau})\ge0\bigr\} \] for every game specified above. For an absolute constant $C>0$, the complete computation uses at most \[ 2^{C(\log_2(L+2))^2} \] bit operations in a standard model polynomially equivalent to a uniform deterministic Turing machine. The bound includes preprocessing, exact arithmetic, recursion, and output of the entire set $U$.
+
+=== MANUSCRIPT: Randomized quasipolynomial-time mean-payoff games (September-25-2026) [preprints/Randomized-quasipolynomial-time-mean-payoff-games-September-25-2026/build/source/main.tex]
+ABSTRACT: We give a randomized algorithm that computes the complete zero-threshold winning set of a finite mean-payoff game with arbitrary signed integer edge weights encoded in binary. For total explicit input length L, it uses $`2^{O((\log(L+2))^2)}`$ bit operations on every random tape and is correct with probability at least 7/8. A polynomial-time check certifies the winning regions and positional strategies for both players or reports failure. Independent repetition therefore gives an always-correct algorithm with the same expected quasipolynomial bit bound.
+INTRODUCTION (start): A mean-payoff game asks whether a player can maintain a nonnegative long-run average reward while an opponent chooses some of the moves. The arena is finite, but plays are infinite and integer edge weights may have large magnitudes. Positional strategies provide finite certificates for the two winning regions. The algorithmic difficulty is to find those regions with a cost controlled by the binary description, rather than by the numerical size of a weight. This paper gives a randomized quasipolynomial-time algorithm. Its central output is an exact bounded integer potential: with probability at least $7/8$, every coordinate of that potential is correct. Thresholding it returns the complete winning set. The method also gives order guarantees in finite integer boxes with arbitrary endpoints and the allowed reference width. Each guarantee concerns a fixed comparison vector and all its coordinates at once. \subsection{Games, encoding, and the main theorem} The input consists of a finite directed graph $G=(V,E)$ on $V=\{1,\ldots,n\}$, $n\ge1$, an ownership partition $V=V_{\mathrm{Max}}\mathbin{\dot\cup}V_{\mathrm{Min}}$, and signed integer weights $w:E\to\Z$. Every vertex has an outgoing edge; self-loops and parallel edges are permitted. At a vertex its owner chooses the next edge. Both players may use strategies depending on the entire finite history. For a play $\pi=(e_0,e_1,\ldots)$, define \[ \operatorname{MP}_w(\pi) =\liminf_{T\to\infty}\frac1T\sum_{j=0}^{T-1}w(e_j). \] We use an explicit binary encoding of the graph, ownership, and signed weights. Its total length is $L$; in particular, endpoints and ownership are charged as part of the input. [statement] The probability statement concerns the whole returned set, and the time bound holds even when that output is wrong. Large weights are allowed: the resource parameter is their binary description together with the rest of the explicit input. The asserted bound is quasipolynomial; a polynomial-time bound would be stronger. The recovered potential has a polynomial-time check. A run can therefore return either a verified winning set with positional strategies for both players, or a failure symbol. It returns the verified output with probability at least $7/8$ and never accepts an incorrect one. Corollary~\ref{cor:certified-output} proves this consequence and an always-correct, or Las Vegas, version obtained by repeating until the check succeeds. The repeated version has quasipolynomial expected bit cost; each individual trial retains the bound on every tape. The strategies certify the zero-threshold regions, with Max enforcing nonnegative payoff on its region and Min enforcing strictly negative payoff on the complement. The companion article \emph{Deterministic quasipolynomial-time mean-payoff games}~\cite[Theorem~1.1]{OpenAI2026Deterministic} gives a deterministic complete winning-set algorithm with the same form of bit bound. Its Section~7 also reduces exact values and globally optimal positional strategies to polynomially many winning-set queries. The value at a start is the best worst-case mean payoff from that start; the two strategies attain these values simultaneously at all starts. Using amplified calls to the algorithm of Theorem~\ref{thm:main}, that reduction returns the entire value and strategy output correctly with probability at least $7/8$, with the same form of bit bound on every random tape \cite[Section~7]{OpenAI2026Deterministic}. The present paper retains different outputs and a different method: pointwise whole-vector comparisons in boxes with arbitrary integer endpoints and allowed reference width, exact recovery of the top-box potential, and a randomized orientation recursion. The proof of Theorem~\ref{thm:main} is independent of the deterministic algorithm. \subsection{Historical context and related algorithms} Ehrenfeucht and Mycielski proved the positional structure of mean-payoff games~\cite{EhrenfeuchtMycielski1979}. A long algorithmic line uses \emph{p […]
+[theorem] \label{thm:main} There is a uniform randomized algorithm that, for every such game, returns the entire set \[ U=\{v\in V:\text{there is a Max strategy }\sigma \text{ such that for every Min strategy }\tau,\ \operatorname{MP}_w(\pi_{v,\sigma,\tau})\ge0\} \] correctly with probability at least $7/8$. For an absolute constant $C>0$, on every random tape its total cost is at most \[ 2^{C(\log_2(L+2))^2} \] bit operations in a standard model polynomially equivalent to a uniform probabilistic Turing machine. The bound includes preprocessing, recursive calls, intermediate arithmetic, and random-bit generation.
+
+=== LEAN COMPARATOR TruffetCounterexample (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+namespace TruffetV4Counterexample
+abbrev Coeff := WithBot ℝ
+abbrev Form := Fin 3 → Coeff
+abbrev Var := Fin 2
+abbrev RowIndex := Fin 2
+def column (j : Var) : Fin 3 := ⟨j.val, Nat.lt_trans j.isLt (by decide)⟩
+def nullForm : Form := fun _ => ⊥
+structure Row where
+  lhs : Form
+  rhs : Form
+structure State where
+  rows : RowIndex → Row
+  cost : Form
+  remaining : Var → Prop
+def wellFormed (s : State) : Prop := ∀ j, ¬ s.remaining j →
+  s.cost (column j) = ⊥ ∧ ∀ i,
+    (s.rows i).lhs (column j) = ⊥ ∧ (s.rows i).rhs (column j) = ⊥
+def eval (f : Form) (w : Fin 3 → ℝ) : Coeff :=
+  max (f 0 + (w 0 : Coeff)) (max (f 1 + (w 1 : Coeff)) (f 2 + (w 2 : Coeff)))
+def feasible (s : State) (w : Fin 3 → ℝ) : Prop :=
+  ∀ i, eval (s.rows i).rhs w ≤ eval (s.rows i).lhs w
+def lower (s : State) (i : RowIndex) (j : Var) : Prop :=
+  (s.rows i).lhs (column j) ≠ ⊥ ∧
+    (s.rows i).rhs (column j) < (s.rows i).lhs (column j)
+def upper (s : State) (i : RowIndex) (j : Var) : Prop :=
+  (s.rows i).rhs (column j) ≠ ⊥ ∧
+    (s.rows i).lhs (column j) < (s.rows i).rhs (column j)
+def dominating (s : State) (j : Var) : Prop :=
+  s.remaining j ∧ (∃ i, lower s i j) ∧ ∃ i, upper s i j
+def eligible (s : State) (i : RowIndex) (j : Var) : Prop :=
+  s.remaining j ∧ lower s i j ∧ ((∃ k, dominating s k) → dominating s j)
+def bounded (s : State) : Prop :=
+  ∀ j, s.remaining j → (∃ i, lower s i j) ∨ ∃ i, upper s i j
+def stop (s : State) : Prop := ∀ i, (s.rows i).rhs 2 ≤ (s.rows i).lhs 2
+def switch (s : State) : Prop :=
+  (∀ j, s.remaining j → s.cost (column j) = ⊥) ∧ ¬ stop s ∧
+  (∃ j, s.remaining j) ∧
+  (¬ ∃ i j, s.remaining j ∧ lower s i j) ∧
+  ∃ i j, s.remaining j ∧ upper s i j
+def failure (s : State) : Prop := ¬ stop s ∧
+  ((¬ ∃ j, s.remaining j) ∨
+   ((¬ ∃ i j, s.remaining j ∧ lower s i j) ∧
+    (¬ ∃ i j, s.remaining j ∧ upper s i j)))
+def lowerForm (s : State) (i : RowIndex) (j : Var) : Form := fun k =>
+  if k = column j then ⊥ else
+    (s.rows i).rhs k + ((-WithBot.unbotD 0 ((s.rows i).lhs (column j)) : ℝ) : Coeff)
+def substitute (f : Form) (j : Var) (g : Form) : Form := fun k =>
+  if k = column j then ⊥ else max (f k) (f (column j) + g k)
+def cleanup (r : Row) : Row := by
+  classical
+  exact if ∀ k, r.rhs k ≤ r.lhs k then ⟨nullForm, nullForm⟩ else r
+def advance (s : State) (i : RowIndex) (j : Var) : State where
+  rows := fun r => cleanup ⟨substitute (s.rows r).lhs j (lowerForm s i j),
+    substitute (s.rows r).rhs j (lowerForm s i j)⟩
+  cost := substitute s.cost j (lowerForm s i j)
+  remaining := fun k => s.remaining k ∧ k ≠ j
+def ForcedSingletonStep (s s' : State) (i : RowIndex) (j : Var) : Prop :=
+  wellFormed s ∧ wellFormed s' ∧
+  bounded s ∧ ¬ stop s ∧ ¬ switch s ∧ ¬ failure s ∧
+  (∀ r k, eligible s r k ↔ r = i ∧ k = j) ∧
+  (∃ k, (substitute s.cost j (lowerForm s i j)) k ≠ ⊥) ∧
+  s' = advance s i j
+def initial : State where
+  rows := ![⟨![(0 : Coeff), 0, ⊥], ![⊥, ⊥, (0 : Coeff)]⟩,
+    ⟨![(0 : Coeff), ⊥, ⊥], ![⊥, (1 : Coeff), ((-2 : ℝ) : Coeff)]⟩]
+  cost := ![(0 : Coeff), ⊥, ⊥]
+  remaining := fun _ => True
+def middle : State where
+  rows := ![⟨nullForm, nullForm⟩,
+    ⟨![(0 : Coeff), ⊥, ⊥], ![⊥, ⊥, (1 : Coeff)]⟩]
+  cost := ![(0 : Coeff), ⊥, ⊥]
+  remaining := fun j => j = 0
+def finalState : State where
+  rows := fun _ => ⟨nullForm, nullForm⟩
+  cost := ![⊥, ⊥, (1 : Coeff)]
+  remaining := fun _ => False
+def crossRowRestriction (s : State) : Prop :=
+  ∀ i r : RowIndex, i ≠ r → ∀ α : ℝ, ∃ w : Fin 3 → ℝ,
+    eval (s.rows i).lhs w < (α : Coeff) + eval (s.rows r).rhs w
+def output : Fin 3 → ℝ := ![1, 0, 0]
+def better : Fin 3 → ℝ := ![0, -1, 0]
+theorem finite_execution_not_optimal :
+    crossRowRestriction initial ∧
+    ForcedSingletonStep initial middle 0 1 ∧
+    ForcedSingletonStep middle finalState 1 0 ∧
+    (¬ ∃ j, finalState.remaining j) ∧ stop finalState ∧
+    feasible initial output ∧ feasible initial better ∧
+    output 2 = 0 ∧ better 2 = 0 ∧
+    (output 1 : Coeff) = eval (lowerForm initial 0 1) output ∧
+    (output 0 :
+[…]
+
+=== LEAN COMPARATOR RandomizedMeanPayoff (exact formal statement)
+import Mathlib
+namespace OAI
+namespace MeanPayoff
+structure Game where
+  n : ℕ
+  positive : 0 < n
+  m : ℕ
+  tail : Fin m → Fin n
+  head : Fin m → Fin n
+  maxOwner : Fin n → Bool
+  weight : Fin m → ℤ
+  total : ∀ v : Fin n, ∃ e : Fin m, tail e = v
+def Strategy (G : Game) :=
+  List (Fin G.m) → (v : Fin G.n) → {e : Fin G.m // G.tail e = v}
+def move (G : Game) (σ τ : Strategy G) (v : Fin G.n)
+    (history : List (Fin G.m)) : Fin G.m :=
+  if G.maxOwner v then (σ history v).val else (τ history v).val
+def position (G : Game) (σ τ : Strategy G) (start : Fin G.n) :
+    ℕ → Fin G.n × List (Fin G.m)
+  | 0 => (start, [])
+  | t + 1 =>
+    let p := position G σ τ start t
+    let e := move G σ τ p.1 p.2
+    (G.head e, p.2 ++ [e])
+def play (G : Game) (σ τ : Strategy G) (start : Fin G.n) (t : ℕ) : Fin G.m :=
+  let p := position G σ τ start t
+  move G σ τ p.1 p.2
+noncomputable def meanPayoff (G : Game) (π : ℕ → Fin G.m) : ℝ :=
+  Filter.liminf (fun T : ℕ =>
+    (∑ j ∈ Finset.range T, (G.weight (π j) : ℝ)) / (T : ℝ)) Filter.atTop
+def Winning (G : Game) (v : Fin G.n) : Prop :=
+  ∃ σ : Strategy G, ∀ τ : Strategy G, 0 ≤ meanPayoff G (play G σ τ v)
+def encodeNat (n : ℕ) : List Bool :=
+  let bits := Nat.bits (n + 1)
+  List.replicate bits.length true ++ [false] ++ bits
+def encodeInt (z : ℤ) : List Bool :=
+  decide (z < 0) :: encodeNat z.natAbs
+def input (G : Game) : List Bool :=
+  encodeNat G.n ++ encodeNat G.m ++ List.ofFn G.maxOwner ++
+    (List.ofFn (fun e : Fin G.m =>
+      encodeNat ((G.tail e).val + 1) ++ encodeNat ((G.head e).val + 1) ++
+        encodeInt (G.weight e))).flatten
+abbrev Symbol := Option Bool
+inductive Direction where
+  | left | stay | right
+  deriving DecidableEq
+def Direction.offset : Direction → ℤ
+  | .left => -1
+  | .stay => 0
+  | .right => 1
+structure Action (q : ℕ) where
+  next : Fin q
+  write : Fin 3 → Symbol
+  shift : Fin 3 → Direction
+structure Machine where
+  states : ℕ
+  start : Fin states
+  transition : Fin states → (Fin 3 → Symbol) → Bool → Option (Action states)
+structure Configuration (M : Machine) where
+  control : Option (Fin M.states)
+  head : Fin 3 → ℤ
+  tape : Fin 3 → ℤ → Symbol
+def initial (M : Machine) (code : List Bool) : Configuration M where
+  control := some M.start
+  head := fun _ => 0
+  tape := fun k j => if k = 0 ∧ 0 ≤ j then code[j.toNat]? else none
+def step (M : Machine) (c : Configuration M) (bit : Bool) : Configuration M :=
+  match c.control with
+  | none => c
+  | some s =>
+    match M.transition s (fun k => c.tape k (c.head k)) bit with
+    | none => { c with control := none }
+    | some a =>
+      { control := some a.next
+        head := fun k => c.head k + (a.shift k).offset
+        tape := fun k => Function.update (c.tape k) (c.head k) (a.write k) }
+def run (M : Machine) (code : List Bool) (random : ℕ → Bool) : ℕ → Configuration M
+  | 0 => initial M code
+  | t + 1 => step M (run M code random t) (random t)
+def padBits {T : ℕ} (bits : Fin T → Bool) (j : ℕ) : Bool :=
+  if h : j < T then bits ⟨j, h⟩ else false
+def result (M : Machine) (G : Game) (T : ℕ) (bits : Fin T → Bool) : Configuration M :=
+  run M (input G) (padBits bits) T
+def CorrectOutput (G : Game) {M : Machine} (c : Configuration M) : Prop :=
+  c.control = none ∧
+  (∀ v : Fin G.n, c.tape 2 (v.val : ℤ) = some true ↔ Winning G v) ∧
+  (∀ v : Fin G.n, c.tape 2 (v.val : ℤ) = some false ↔ ¬ Winning G v) ∧
+  ∀ j : ℤ, (j < 0 ∨ (G.n : ℤ) ≤ j) → c.tape 2 j = none
+noncomputable def MainClaim : Prop := by
+  classical
+  exact ∃ M : Machine, ∃ C : ℝ, 0 < C ∧ ∀ G : Game, ∃ T : ℕ,
+    (T : ℝ) ≤ (2 : ℝ) ^ (C * (Real.logb 2 ((input G).length + 2)) ^ 2) ∧
+    (∀ bits : Fin T → Bool, (result M G T bits).control = none) ∧
+    7 * 2 ^ T ≤ 8 * (Finset.univ.filter
+      (fun bits : Fin T → Bool => CorrectOutput G (result M G T bits))).card
+end MeanPayoff
+theorem randomized_quasipolynomial_mean_payoff : MeanPayoff.MainClaim := by
+  sorry
+end OAI
+

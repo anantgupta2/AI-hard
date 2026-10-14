@@ -1,0 +1,189 @@
+FAMILY 115: Sampling and counting contingency tables with arbitrary margins
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: For nonnegative integer matrices with prescribed row and column sums, gives exact uniform sampling in expected polynomial bit time and almost-uniform sampling in worst-case polynomial bit time. The dimensions and binary-encoded margins are unrestricted. Also gives a fully polynomial randomized approximation scheme for counting such tables with arbitrary individual cell bounds, including structural zeros, with polynomial cost on every execution.
+
+=== MANUSCRIPT: Exact Uniform Sampling of Contingency Tables with Arbitrary Margins (September-24-2026) [preprints/Exact-Uniform-Sampling-of-Contingency-Tables-with-Arbitrary-Margins-September-24-2026/build/main.tex]
+ABSTRACT: We give an exact uniform sampler for nonnegative integer contingency tables with arbitrary prescribed margins. It terminates almost surely and has expected bit complexity polynomial in both dimensions and the binary length of the margins. No positivity, balance, sparsity, or fixed-dimension assumption is required.
+INTRODUCTION (start): \label{sec:introduction} For nonnegative integer vectors $r=(r_1,\ldots,r_m)$ and $c=(c_1,\ldots,c_n)$ with common total $N$, write \[ \Omega(r,c)=\left\{X\in\Z_{\ge0}^{m\times n}: \sum_jX_{ij}=r_i,\quad \sum_iX_{ij}=c_j\right\}. \] The uniform distribution on this finite set gives every table equal mass. We study sampling when both dimensions vary and the margins are encoded in binary. In particular, a polynomial bound in the numeric total $N$ would not, in general, give a polynomial bound in the input length. There are no cell bounds or forbidden positions: every nonnegative integer matrix with the prescribed margins is allowed. For probability laws on a finite set, we use the convention $\TV(\mu,\nu)=\tfrac12\sum_x|\mu(x)-\nu(x)|$. [statement] For a rational tolerance $0<\eps<1$ encoded by a binary numerator and denominator, integer comparisons compute $k=\lceil\log_2(1/\eps)\rceil$ in time polynomial in that encoding length. Thereafter part~\textup{(i)} has accuracy dependence polynomial in $\log(1/\eps)$. The algorithms below are explicit, although their exponents are deliberately large. Part~\textup{(ii)} concerns expected time: an exceptionally rare branch performs exhaustive computation. \paragraph{Counting and sampling fixed-margin arrays.} Contingency tables are a basic family of integer arrays with linear constraints. Their enumeration and exact and approximate generation are treated, for example, by Diaconis and Gangolli~\cite{DiaconisGangolli1995}. The algorithmic question involves more than producing one feasible table: the law must give all feasible tables nearly or exactly the same mass, even when their number and the coordinate ranges are exponentially large in the margin bit length. For two rows, Dyer and Greenhill~\cite{DyerGreenhill2000} give polynomial-time approximate counting and sampling. Their heat-bath chain has mixing time at most $n(n-1)\log(N/\eps)/2$ in the author version's Theorem~4.1. Dependence on $\log N$ rather than $N$ makes this a polynomial bound in the binary input length. Kijima and Matsui~\cite[Theorems~3.1 and~5.1]{KM2003} give exact uniform sampling for two rows by monotone coupling from the past, after sorting the columns. Their expected $O(n^3\ln N)$ bound is stated for pseudocode using uniform real draws. These results allow arbitrary two-row margin sizes after deleting zero margins. The fixed-row case extends beyond two rows. Cryan and Dyer~\cite{CD2003} combine dynamic programming with volume estimation for approximate counting and sampling. Dyer~\cite[Section~3]{Dyer2003} gives a dynamic-programming rejection sampler that is exactly uniform, analyzed in arithmetic operations. Cryan, Dyer, Goldberg, Jerrum, and Martin~\cite{CDGJM2006} prove rapid mixing of the $2\times2$ heat-bath chain for every fixed number of rows. The polynomial bounds in these results depend on that fixed row count; they do not give a bound polynomial jointly in both dimensions. DeSalvo and Zhao~\cite[Theorem~2.3 and Remarks~2.4--2.5]{DZ2016} give a general exact divide-and-conquer construction using $O(mn\log M)$ expected random bits, where $M$ is the largest margin. In the cited arXiv version, their polynomial total-runtime conclusion is conditional on efficient evaluation of the parity-restricted counting quantities in Conjecture~2.6; the bit-time bounds in Theorem~\ref{thm:main} are unconditional. Another line of work uses the geometry of the transportation polytope when margins are large. Dyer, Kannan, and Mount~\cite{DKM1997} develop scaled coordinates, softened constraints, lattice walks, and rounding comparisons for dense tables. Morris~\cite{Morris2002} improves the dense sampling bounds through expanded polytopes and rounding. These methods are close antecedents of the dense completion routine below. Our use of that routine is conditional: a padding construction makes every completion problem dense, while a separate chain handles all cells incident to small margins. For sparse margins, Arman, Gao,  […]
+[theorem] \label{thm:main} For arbitrary nonnegative integer margins of equal total, the following algorithms exist in the model of unbiased random bits and bit operations. \begin{enumerate}[label=\textup{(\roman*)}] \item Given an integer $k\ge1$, a bounded-time algorithm outputs a table in $\Omega(r,c)$ whose law is within $2^{-k}$ in total variation of the uniform law. Its running time is polynomial in $m,n,\log(N+1),k$. \item An algorithm outputs an exactly uniform table in $\Omega(r,c)$, terminates almost surely, and has expected running time polynomial in $m,n,\log(N+1)$. \end{enumerate} The polynomials are uniform over all margin vectors. No positivity, sparsity, balance, or fixed-dimension hypothesis is imposed.
+
+=== MANUSCRIPT: An FPRAS for Cell-Bounded Contingency Tables (September-24-2026) [preprints/An-FPRAS-for-Cell-Bounded-Contingency-Tables-September-24-2026/build/main.tex]
+ABSTRACT: We give a fully polynomial randomized approximation scheme for counting nonnegative integer matrices with prescribed row sums, column sums, and individual entry bounds. Both dimensions vary, all numerical data are encoded in binary, and zero bounds are allowed. The algorithm uses only unbiased random bits and has a polynomial bound on its bit operations on every execution.
+INTRODUCTION (start): \label{sec:introduction} A cell-bounded contingency table is a nonnegative integer matrix whose row sums, column sums, and individual entry bounds are prescribed. For positive integers $m,n$, margins $r\in\mathbb Z_{\ge0}^m$ and $c\in\mathbb Z_{\ge0}^n$ with equal total, and bounds $b\in\mathbb Z_{\ge0}^{m\times n}$, write \begin{equation}\label{eq:feasible-set} \begin{aligned} \Omega(r,c,b)&=\left\{X\in\mathbb Z_{\ge0}^{m\times n}: \sum_{j=1}^n X_{ij}=r_i,\quad \sum_{i=1}^m X_{ij}=c_j,\quad X_{ij}\le b_{ij}\right\},\\ Z(r,c,b)&=|\Omega(r,c,b)|. \end{aligned} \end{equation} Each table is counted once. In particular, $b_{ij}=0$ forbids an entry; no positivity condition is imposed on the support or margins. Our concern is the binary encoding model, in which a capacity can be exponentially larger than its description. Both $m$ and $n$ are part of the input. [statement] The theorem allows arbitrary cell bounds and margins without a fixed number of rows or columns, a lower bound on positive capacities, or a density or balance assumption. Its running-time guarantee includes preprocessing, random-bit generation, rational arithmetic, and output, even on executions in the failure event. The polynomial bounds in the proof are deliberately generous; the result is a uniform complexity guarantee rather than a practical running-time estimate. \subsection{History and significance} \subsection{From tables to weighted transversals} The proof separates numerical size from combinatorial complexity. Large binary bounds cannot be expanded into that many binary choices. We instead sum over large coordinates through a weighted completion problem, and expand only coordinates with polynomially bounded ranges. The resulting finite-state argument must preserve one unit of mass per table despite the multiplicities introduced by this expansion. \paragraph{Large entries and two views of a small entry.} Flow feasibility first tightens each cell to its attainable interval. Subtract its minimum, so that the new endpoints are $0$ and $b_s$; each endpoint is attained by some feasible table. Remove zero-width cells and separate the remaining cells at a polynomial threshold $W$. In the bipartite graph of large cells, choose a maximum-capacity spanning forest and one root in each component. The large cells outside the forest are free coordinates. Once their values and the contributions of small cells to each incident margin have been specified, leaf elimination uniquely determines the tree entries from the nonroot margin equations. For a small cell $s$, temporarily allow two counts $x_s,y_s$ between $0$ and $b_s$: its row contribution is $x_s$, and its column contribution is $b_s-y_s$. The views agree when $x_s+y_s=b_s$. Writing $p=\sum_{s\text{ small}}b_s$, we also consider unbalanced profiles satisfying only $\sum_s(x_s+y_s)=p$. Extending the weights to these profiles supplies the auxiliary states and algebraic tests used below. For every such profile, sum over the free large entries in their integer intervals. Penalize the resulting deviations from root margins and violations of tree-cell bounds by a nonnegative quantity $D$. This penalty vanishes exactly when those remaining constraints hold. A maximum-capacity forest bounds its slopes in normalized free coordinates independently of the numerical large capacities. For a polynomially bounded integer $H$, let $h_j(x,y)$ be the sum of $2^{-jD/H}$ over these free assignments, for $0\le j\le H$, and let $C(j)$ be the sum of $h_j$ over balanced small profiles. Thus $C(0)$ is an explicit product of interval sizes. Every feasible table contributes one to $C(H)$, while invalid completions contribute additional positive mass. Log-concavity of each tree-coordinate marginal, together with its attainable endpoints, controls violations close to a tree boundary; exponential decay controls more distant violations. This proves $Z\le C(H)\le(1+\epsilon/32)Z$. The use of scaled free coordinates and soft constraints builds on the […]
+[theorem] \label{thm:main} There is one randomized algorithm with the following guarantee. Given $(r,c,b)$ as above and rational $\varepsilon,\delta\in(0,1)$, it outputs a nonnegative rational $\widehat Z$ such that \[ \P\bigl((1-\varepsilon)Z(r,c,b)\le \widehat Z \le(1+\varepsilon)Z(r,c,b)\bigr)\ge1-\delta. \] If $\Omega(r,c,b)$ is empty, the output is zero on every execution. The algorithm uses independent unbiased bits, and one fixed polynomial in $L$, $\varepsilon^{-1}$, and $\log(\delta^{-1})$ bounds its total bit operations on every execution, where $L$ is the total binary input length, including the accuracy parameters. No counting or sampling oracle is required.
+
+=== LEAN COMPARATOR ContingencyTables (exact formal statement)
+import Mathlib
+namespace OAI
+namespace MatchingFPRAS
+abbrev Symbol := Fin 8
+def encodeNat (n : ℕ) : List Symbol :=
+  (Nat.bits n).map (fun b => if b then 2 else 1) ++ [3]
+def encodeInt (z : ℤ) : List Symbol :=
+  (if z < 0 then [5] else [4]) ++ encodeNat z.natAbs
+def encodeRat (q : ℚ) : List Symbol := encodeInt q.num ++ encodeNat q.den
+structure RandomMachine where
+  states : ℕ
+  transition : Fin (states + 1) → Symbol → Bool →
+    Option (Fin (states + 1) × Turing.TM0.Stmt Symbol)
+structure Configuration (A : RandomMachine) where
+  state : Option (Fin (A.states + 1))
+  tape : Turing.Tape Symbol
+def tick (A : RandomMachine) (c : Configuration A) (bit : Bool) : Configuration A :=
+  match c.state with
+  | none => c
+  | some s => match A.transition s c.tape.head bit with
+    | none => ⟨none, c.tape⟩
+    | some (s', action) =>
+      ⟨some s', match action with
+        | .move d => c.tape.move d
+        | .write a => c.tape.write a⟩
+def initial (A : RandomMachine) (input : List Symbol) : Configuration A :=
+  ⟨some 0, Turing.Tape.mk₁ input⟩
+def run (A : RandomMachine) (input : List Symbol) {t : ℕ}
+    (bits : Fin t → Bool) : Configuration A :=
+  (List.ofFn bits).foldl (tick A) (initial A input)
+def Outputs (A : RandomMachine) (input : List Symbol) {t : ℕ}
+    (bits : Fin t → Bool) (q : ℚ) : Prop :=
+  (run A input bits).state = none ∧
+    (run A input bits).tape.right₀ = Turing.ListBlank.mk (encodeRat q)
+end MatchingFPRAS
+namespace ContingencyTables
+open Finset
+variable {I J : Type*} [Fintype I] [Fintype J]
+def HasMargins (X : I → J → ℕ) (r : I → ℕ) (c : J → ℕ) : Prop :=
+  (∀ i, ∑ j, X i j = r i) ∧ (∀ j, ∑ i, X i j = c j)
+def Table (r : I → ℕ) (c : J → ℕ) := {X : I → J → ℕ // HasMargins X r c}
+def BoundedTable (r : I → ℕ) (c : J → ℕ) (b : I → J → ℕ) :=
+  {X : Table r c // ∀ i j, X.val i j ≤ b i j}
+theorem entry_le_row {X : I → J → ℕ} {r : I → ℕ} {c : J → ℕ}
+    (h : HasMargins X r c) (i : I) (j : J) : X i j ≤ r i := by
+  rw [← h.1 i]
+  exact single_le_sum (fun _ _ => Nat.zero_le _) (mem_univ j)
+theorem entry_le_total {X : I → J → ℕ} {r : I → ℕ} {c : J → ℕ}
+    (h : HasMargins X r c) (i : I) (j : J) : X i j ≤ ∑ i, r i :=
+  (entry_le_row h i j).trans (single_le_sum (fun _ _ => Nat.zero_le _) (mem_univ i))
+instance table_finite (r : I → ℕ) (c : J → ℕ) : Finite (Table r c) := by
+  let encode : Table r c → I → J → Fin ((∑ i, r i) + 1) :=
+    fun X i j => ⟨X.val i j, Nat.lt_succ_of_le (entry_le_total X.property i j)⟩
+  apply Finite.of_injective encode
+  intro X Y h
+  apply Subtype.ext
+  funext i j
+  exact congrArg Fin.val (congrFun (congrFun h i) j)
+noncomputable instance table_fintype (r : I → ℕ) (c : J → ℕ) : Fintype (Table r c) :=
+  Fintype.ofFinite _
+noncomputable instance boundedTable_fintype (r : I → ℕ) (c : J → ℕ) (b : I → J → ℕ) :
+    Fintype (BoundedTable r c b) := by
+  classical
+  unfold BoundedTable
+  infer_instance
+end ContingencyTables
+namespace ContingencyTables.Algorithms
+open scoped BigOperators
+open Filter
+abbrev Machine := MatchingFPRAS.RandomMachine
+abbrev Symbol := MatchingFPRAS.Symbol
+def encodeMatrix {m n : ℕ} (X : Fin m → Fin n → ℕ) : List Symbol :=
+  ((List.ofFn fun i => (List.ofFn fun j => MatchingFPRAS.encodeNat (X i j)).flatten)).flatten
+def encodeMargins {m n : ℕ} (r : Fin m → ℕ) (c : Fin n → ℕ) : List Symbol :=
+  MatchingFPRAS.encodeNat m ++ MatchingFPRAS.encodeNat n ++
+    (List.ofFn fun i => MatchingFPRAS.encodeNat (r i)).flatten ++
+    (List.ofFn fun j => MatchingFPRAS.encodeNat (c j)).flatten
+def encodeSamplingInput {m n : ℕ} (r : Fin m → ℕ) (c : Fin n → ℕ) (k : ℕ) : List Symbol :=
+  encodeMargins r c ++ MatchingFPRAS.encodeNat k
+def encodeCountingInput {m n : ℕ} (r : Fin m → ℕ) (c : Fin n → ℕ)
+    (b : Fin m → Fin n → ℕ) (ε δ : ℚ) : List Symbol :=
+  encodeMargins r c ++ encodeMatrix b ++ MatchingFPRAS.encodeRat ε ++ MatchingFPRAS.encodeRat δ
+theorem alphabetSize_neZero : NeZero (8 : ℕ) := inferInstance
+def OutputsTable (A : Machine) (input : List Symbol) {t m n : ℕ}
+    (bits : Fin t → Bool) (X : Fin m → Fin
+[…]
+
+=== LEAN COMPARATOR ContingencyTables (exact formal statement)
+import Mathlib
+namespace OAI
+namespace MatchingFPRAS
+abbrev Symbol := Fin 8
+def encodeNat (n : ℕ) : List Symbol :=
+  (Nat.bits n).map (fun b => if b then 2 else 1) ++ [3]
+def encodeInt (z : ℤ) : List Symbol :=
+  (if z < 0 then [5] else [4]) ++ encodeNat z.natAbs
+def encodeRat (q : ℚ) : List Symbol := encodeInt q.num ++ encodeNat q.den
+structure RandomMachine where
+  states : ℕ
+  transition : Fin (states + 1) → Symbol → Bool →
+    Option (Fin (states + 1) × Turing.TM0.Stmt Symbol)
+structure Configuration (A : RandomMachine) where
+  state : Option (Fin (A.states + 1))
+  tape : Turing.Tape Symbol
+def tick (A : RandomMachine) (c : Configuration A) (bit : Bool) : Configuration A :=
+  match c.state with
+  | none => c
+  | some s => match A.transition s c.tape.head bit with
+    | none => ⟨none, c.tape⟩
+    | some (s', action) =>
+      ⟨some s', match action with
+        | .move d => c.tape.move d
+        | .write a => c.tape.write a⟩
+def initial (A : RandomMachine) (input : List Symbol) : Configuration A :=
+  ⟨some 0, Turing.Tape.mk₁ input⟩
+def run (A : RandomMachine) (input : List Symbol) {t : ℕ}
+    (bits : Fin t → Bool) : Configuration A :=
+  (List.ofFn bits).foldl (tick A) (initial A input)
+def Outputs (A : RandomMachine) (input : List Symbol) {t : ℕ}
+    (bits : Fin t → Bool) (q : ℚ) : Prop :=
+  (run A input bits).state = none ∧
+    (run A input bits).tape.right₀ = Turing.ListBlank.mk (encodeRat q)
+end MatchingFPRAS
+namespace ContingencyTables
+open Finset
+variable {I J : Type*} [Fintype I] [Fintype J]
+def HasMargins (X : I → J → ℕ) (r : I → ℕ) (c : J → ℕ) : Prop :=
+  (∀ i, ∑ j, X i j = r i) ∧ (∀ j, ∑ i, X i j = c j)
+def Table (r : I → ℕ) (c : J → ℕ) := {X : I → J → ℕ // HasMargins X r c}
+def BoundedTable (r : I → ℕ) (c : J → ℕ) (b : I → J → ℕ) :=
+  {X : Table r c // ∀ i j, X.val i j ≤ b i j}
+theorem entry_le_row {X : I → J → ℕ} {r : I → ℕ} {c : J → ℕ}
+    (h : HasMargins X r c) (i : I) (j : J) : X i j ≤ r i := by
+  rw [← h.1 i]
+  exact single_le_sum (fun _ _ => Nat.zero_le _) (mem_univ j)
+theorem entry_le_total {X : I → J → ℕ} {r : I → ℕ} {c : J → ℕ}
+    (h : HasMargins X r c) (i : I) (j : J) : X i j ≤ ∑ i, r i :=
+  (entry_le_row h i j).trans (single_le_sum (fun _ _ => Nat.zero_le _) (mem_univ i))
+instance table_finite (r : I → ℕ) (c : J → ℕ) : Finite (Table r c) := by
+  let encode : Table r c → I → J → Fin ((∑ i, r i) + 1) :=
+    fun X i j => ⟨X.val i j, Nat.lt_succ_of_le (entry_le_total X.property i j)⟩
+  apply Finite.of_injective encode
+  intro X Y h
+  apply Subtype.ext
+  funext i j
+  exact congrArg Fin.val (congrFun (congrFun h i) j)
+noncomputable instance table_fintype (r : I → ℕ) (c : J → ℕ) : Fintype (Table r c) :=
+  Fintype.ofFinite _
+noncomputable instance boundedTable_fintype (r : I → ℕ) (c : J → ℕ) (b : I → J → ℕ) :
+    Fintype (BoundedTable r c b) := by
+  classical
+  unfold BoundedTable
+  infer_instance
+end ContingencyTables
+namespace ContingencyTables.Algorithms
+open scoped BigOperators
+open Filter
+abbrev Machine := MatchingFPRAS.RandomMachine
+abbrev Symbol := MatchingFPRAS.Symbol
+def encodeMatrix {m n : ℕ} (X : Fin m → Fin n → ℕ) : List Symbol :=
+  ((List.ofFn fun i => (List.ofFn fun j => MatchingFPRAS.encodeNat (X i j)).flatten)).flatten
+def encodeMargins {m n : ℕ} (r : Fin m → ℕ) (c : Fin n → ℕ) : List Symbol :=
+  MatchingFPRAS.encodeNat m ++ MatchingFPRAS.encodeNat n ++
+    (List.ofFn fun i => MatchingFPRAS.encodeNat (r i)).flatten ++
+    (List.ofFn fun j => MatchingFPRAS.encodeNat (c j)).flatten
+def encodeSamplingInput {m n : ℕ} (r : Fin m → ℕ) (c : Fin n → ℕ) (k : ℕ) : List Symbol :=
+  encodeMargins r c ++ MatchingFPRAS.encodeNat k
+def encodeCountingInput {m n : ℕ} (r : Fin m → ℕ) (c : Fin n → ℕ)
+    (b : Fin m → Fin n → ℕ) (ε δ : ℚ) : List Symbol :=
+  encodeMargins r c ++ encodeMatrix b ++ MatchingFPRAS.encodeRat ε ++ MatchingFPRAS.encodeRat δ
+theorem alphabetSize_neZero : NeZero (8 : ℕ) := inferInstance
+def OutputsTable (A : Machine) (input : List Symbol) {t m n : ℕ}
+    (bits : Fin t → Bool) (X : Fin m → Fin
+[…]

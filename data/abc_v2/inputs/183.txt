@@ -1,0 +1,55 @@
+FAMILY 183: Power savings for planar halving lines and k-sets
+SUBJECT: Combinatorics
+OPENAI SUMMARY: Improves the planar halving-line bound to $`O(n^{4/3-\varepsilon})`$ for sets with no three collinear and an absolute ε &gt; 0. More generally, an n-point set with no three collinear has $`O(n(k+1)^{1/3-\varepsilon_0})`$ strictly separable k-subsets for $`1\le k\le n/2`$, with an absolute $`\varepsilon_0\gt 0`$. The constants and positive exponents are nonquantitative.
+
+=== MANUSCRIPT: A power saving for planar halving lines (September-25-2026) [preprints/A-power-saving-for-planar-halving-lines-September-25-2026/build/main.tex]
+ABSTRACT: There are absolute constants ε &gt; 0 and C such that every sufficiently large even n-point set in the plane with no three collinear has at most $`Cn^{4/3-\varepsilon}`$ unordered halving pairs. This gives a power saving over the classical $`O(n^{4/3})`$ bound for planar halving lines. The proof is nonquantitative and does not supply explicit constants.
+INTRODUCTION (start): \label{sec:introduction} Let $P$ be a finite set of $n$ points in the plane, with no three collinear, where $n$ is even. A pair of points is a \emph{halving pair} if its line leaves exactly $(n-2)/2$ other points in each open halfplane. Write $h(P)$ for the number of unordered halving pairs. Because no three points are collinear, distinct pairs determine distinct lines; thus this convention also counts halving lines. [statement] The improvement is in the exponent and is uniform over all configurations. The proof is nonquantitative: it supplies neither a numerical value of $\varepsilon$ nor effective values of $C$ and $n_0$. \subsection{The halving-line problem and earlier bounds} A \emph{$k$-set} of a planar point configuration is a $k$-point subset strictly separable from the remaining points by a line. The $k$-set problem asks for the largest possible number of these subsets at a specified size and rank. Halving pairs concern its middle rank and measure the complexity of balanced line separations. The early work of Lov\'asz and of Erd\H{o}s, Lov\'asz, Simmons and Straus established the $O(n^{3/2})$ scale for halving lines and developed the rotating-line and dissection-graph viewpoint \cite{Lovasz1971,ErdosLovaszSimmonsStraus1973}. Pach, Steiger and Szemer\'edi improved the upper bound by an iterated-logarithm factor \cite{PachSteigerSzemeredi1992}. Dey then proved the bound $O(n(k+1)^{1/3})$ for $k$-sets with $1\le k\le n/2$, giving $O(n^{4/3})$ for halving lines \cite{Dey1998}. His use of convex chains and graph crossings provides the finite starting point of the present argument. The lower bounds developed on a different scale. Erd\H{o}s, Lov\'asz, Simmons and Straus constructed configurations with $\Omega(n\log n)$ halving lines \cite{ErdosLovaszSimmonsStraus1973}. T{\'o}th obtained $n\exp(\Omega(\sqrt{\log n}))$ halving pairs, and Nivasch subsequently simplified the construction and improved its exponential constant \cite{Toth2001,Nivasch2008}. These bounds remain far below a fixed power $n^{1+\delta}$. More recently, Alonso, L{\'o}pez and Rodrigo improved a lower-order term in the upper bound while retaining the exponent $4/3$ \cite{AlonsoLopezRodrigo2024}. A related route through measures was developed by Pinchasi \cite{Pinchasi2009}. A line avoiding the point set and leaving half its points on each side gives a balanced cut. Pinchasi studied the changes between such cuts ordered by slope and related endpoint-change bounds to planar measure concentration. Our activity parameter also counts points that change status during an interval and later return; Section~\ref{sec:finite} supplies the reduction from that parameter to endpoint changes, uniformly over all ranks. \subsection{Rank sweeps and the stronger conclusion} For the sweep arguments, call a configuration \emph{generic} if no three points are collinear, its first coordinates are distinct, its determined slopes are distinct, and no proper intersection of two determined segments lies on a third determined segment. Section~\ref{sec:finite} justifies reducing the halving-pair theorem to this case. Fix a generic configuration and an integer rank $0\le k\le n$. For a slope $s$ distinct from the determined slopes, mark the $k$ points with smallest values of $y-sx$. As $s$ increases, the marked set changes by exchanging one point for another. We call such a change a \emph{switch}. For an interval of this sweep, its \emph{activity} is the number of distinct points whose membership changes. At the middle rank, halving pairs are exactly the switches. Write $S_k(P)$ for the total number of switches as the slope ranges from $-\infty$ to $+\infty$. [statement] The uniformity in $k$ is needed even for the middle-rank conclusion: restricting a block of switches to its participating points changes the rank. At ranks $0$ and $N$ the marked set is constant and $S_k(P)=0$. The same uniformity gives a bound throughout the planar $k$-set range. For an arrangement $\mathcal L$ of nonve […]
+[theorem] \label{thm:halving-power} There exist absolute constants $\varepsilon>0$, $C<\infty$, and $n_0$ such that, for every even $n\ge n_0$ and every $n$-point set $P\subset\mathbb R^2$ with no three collinear, \[ h(P)\le C n^{4/3-\varepsilon}. \]
+[theorem] [Uniform bound over all ranks]\label{thm:all-ranks} There are absolute constants $\varepsilon>0$ and $C<\infty$ such that for every integer $N\ge1$, every generic $N$-point planar configuration $P$, and every integer $0\le k\le N$, \[ S_k(P)\le C N^{4/3-\varepsilon}. \]
+[corollary] [Planar $k$-sets and straight-line levels] \label{cor:k-sensitive} There are absolute constants $\varepsilon_0>0$ and $C_0<\infty$ such that, for every integer $n\ge2$ and every integer $1\le k\le n/2$, the number of $k$-sets of any $n$-point set $Q\subset\mathbb R^2$ with no three collinear is at most \begin{equation}\label{eq:k-sensitive} C_0 n(k+1)^{1/3-\varepsilon_0}. \end{equation} The same bound holds for $\operatorname{comp}(\Lambda_k(\mathcal L))$ for any arrangement $\mathcal L$ of $n$ nonvertical straight lines with no parallel pair and no three concurrent.
+
+=== LEAN COMPARATOR HalvingLines (exact formal statement)
+import Mathlib
+namespace OAI
+namespace PlanarHalving
+abbrev Point := ℝ × ℝ
+def orient (p q r : Point) : ℝ :=
+  (q.1 - p.1) * (r.2 - p.2) - (q.2 - p.2) * (r.1 - p.1)
+def GeneralPosition {n : ℕ} (P : Fin n → Point) : Prop :=
+  Function.Injective P ∧ ∀ i j l, i ≠ j → j ≠ l → i ≠ l →
+    orient (P i) (P j) (P l) ≠ 0
+noncomputable def sideCount {n : ℕ} (P : Fin n → Point) (i j : Fin n) : ℕ :=
+  (Finset.univ.filter fun l => 0 < orient (P i) (P j) (P l)).card
+noncomputable def halvingCount {n : ℕ} (P : Fin n → Point) : ℕ :=
+  (Finset.univ.filter fun ij : Fin n × Fin n =>
+    ij.1 < ij.2 ∧ sideCount P ij.1 ij.2 = (n - 2) / 2 ∧
+      sideCount P ij.2 ij.1 = (n - 2) / 2).card
+noncomputable def slope (p q : Point) : ℝ := (q.2 - p.2) / (q.1 - p.1)
+def Generic {n : ℕ} (P : Fin n → Point) : Prop :=
+  GeneralPosition P ∧
+  (∀ i j, i ≠ j → (P i).1 ≠ (P j).1) ∧
+  (∀ i j a b, i < j → a < b → slope (P i) (P j) = slope (P a) (P b) →
+    i = a ∧ j = b) ∧
+  (∀ i j a b c d, i < j → a < b → c < d →
+    (i, j) ≠ (a, b) → (c, d) ≠ (i, j) → (c, d) ≠ (a, b) →
+    ∀ z : Point, z ∈ openSegment ℝ (P i) (P j) →
+      z ∈ openSegment ℝ (P a) (P b) → z ∉ segment ℝ (P c) (P d))
+noncomputable def belowCount {n : ℕ} (P : Fin n → Point) (i j : Fin n) : ℕ :=
+  let s := slope (P i) (P j)
+  (Finset.univ.filter fun l => (P l).2 - s * (P l).1 <
+    (P i).2 - s * (P i).1).card
+noncomputable def switchCount {n : ℕ} (P : Fin n → Point) (k : ℕ) : ℕ :=
+  (Finset.univ.filter fun ij : Fin n × Fin n =>
+    ij.1 < ij.2 ∧ 0 < k ∧ k < n ∧ belowCount P ij.1 ij.2 = k - 1).card
+theorem power_bounds :
+    (∃ ε : ℝ, 0 < ε ∧ ∃ C : ℝ, ∃ n₀ : ℕ,
+      ∀ n : ℕ, Even n → n₀ ≤ n → ∀ P : Fin n → Point,
+        GeneralPosition P → (halvingCount P : ℝ) ≤ C * (n : ℝ) ^ ((4 : ℝ) / 3 - ε)) ∧
+    (∃ ε : ℝ, 0 < ε ∧ ∃ C : ℝ,
+      ∀ n : ℕ, 1 ≤ n → ∀ P : Fin n → Point, Generic P →
+        ∀ k : ℕ, k ≤ n → (switchCount P k : ℝ) ≤ C * (n : ℝ) ^ ((4 : ℝ) / 3 - ε)) :=
+  sorry
+end PlanarHalving
+end OAI
+

@@ -1,0 +1,97 @@
+FAMILY 301: Trace cones and Razak–Jacelon stabilization
+SUBJECT: Operator algebras
+OPENAI SUMMARY: Classifies separable nuclear complex C∗-algebras after tensoring with the Razak–Jacelon algebra and the compact operators, using their full topological cones of extended lower-semicontinuous tracial weights. This answers Robert’s trace-cone question, including algebras with arbitrary ideal structure and both finite and infinite subquotients.
+
+=== MANUSCRIPT: The trace cone classifies Razak–Jacelon stabilizations (September-25-2026) [preprints/The-trace-cone-classifies-Razak-Jacelon-stabilizations-September-25-2026/build/paper.tex]
+ABSTRACT: We prove that the canonical topological cone of all extended lower-semicontinuous tracial weights determines a separable nuclear C∗-algebra after tensoring with the Razak–Jacelon algebra and the compact operators, answering Robert's trace-cone classification question positively. The isomorphism realizes the prescribed cone map, with arbitrary ideal structure and without a density assumption on the finite domains of the weights.
+INTRODUCTION (start): \label{sec:introduction} The Razak--Jacelon algebra \(\W\) is a simple, monotracial, stably projectionless nuclear \(C^*\)-algebra \cite{Jacelon}. Tensoring by \(\W\) removes the \(K\)-theoretic part of the classification problem and makes the order on the Cuntz semigroup visible through traces. The question is whether the resulting trace data determine the algebra even when its ideal structure is unrestricted. We prove that they do. \subsection{The invariant and the main theorem} For a \(C^*\)-algebra \(C\), let \(T(C)\) consist of all maps \(\tau:C_+\to[0,\infty]\) satisfying \[ \tau(0)=0,\qquad \tau(a+b)=\tau(a)+\tau(b),\qquad \tau(ra)=r\tau(a)\quad(r>0), \] together with \(\tau(x^*x)=\tau(xx^*)\) and lower semicontinuity for norm-convergent nets in \(C_+\). Arithmetic is extended nonnegative arithmetic. We impose no density condition on the finite domain. In particular, every closed two-sided ideal \(I\) contributes the weight \begin{equation}\label{intro:ideal-weight} \tau_I(a)= \begin{cases} 0,&a\in I_+,\\ \infty,&a\in C_+\setminus I_+. \end{cases} \end{equation} The canonical topology is specified by \begin{equation}\label{intro:trace-topology} \tau_i\longrightarrow\tau \quad\Longleftrightarrow\quad \limsup_i\tau_i((a-\eps)_+) \leq\tau(a)\leq\liminf_i\tau_i(a) \quad(a\in C_+,\ \eps>0). \end{equation} An isomorphism of these topological cones is a homeomorphism preserving addition, the zero weight, and multiplication by every positive real scalar. \Needspace{3\baselineskip} [statement] The conclusion is an actual \(C^*\)-algebra isomorphism. The algebras may be nonunital, may have both finite and infinite subquotients, and may have an arbitrary primitive ideal space. Their only regularity assumptions are separability and nuclearity. Moreover, the isomorphism can realize the prescribed cone map: after transporting the given map to \(F:T(B\otimes\W\otimes\K)\to T(A\otimes\W\otimes\K)\), we obtain an isomorphism \(\Phi\) with \(\tau\circ\Phi=F(\tau)\) for every extended trace \(\tau\). This refinement is proved at the end of \Cref{pt:intertwining}. The presence of \eqref{intro:ideal-weight} makes the invariant sensitive to this ideal structure. For example, \[ I\subseteq J \quad\Longleftrightarrow\quad \tau_I+\tau_J=\tau_I. \] The finite and zero ideals of a general weight are also encoded by the two limiting operations obtained by letting its positive scalar multiple tend to zero and to infinity. These features will let us localize each approximation on the ideal where its controlling trace is finite. \subsection{History and significance} Razak's classification of simple inductive limits of stably projectionless building blocks made the cone of traces, together with its scale, an effective classification invariant \cite[Theorems~1.1 and~2.1]{Razak}. Jacelon's construction singled out the simple monotracial algebra $\W$ in this setting \cite{Jacelon}. The existence, uniqueness, and approximate-intertwining organization of those classification arguments also provides the broad method used here, with new local estimates needed for arbitrary ideals. The trace-cone question is due to Leonel Robert. It was recorded in Santiago's 2012 conference abstract \cite{SantiagoWStable} and appears as Problem~LXVIII in the survey of Schafhauser, Tikuisis, and White \cite{STW}. Their formulation retains every extended trace, including the zero/infinity ideal weights. Their May 2026 discussion describes the known simple and traceless cases and the difficulty already presented by one proper nonzero ideal. \Cref{thm:main} gives a positive answer to that problem for the full cone and the unrestricted class of separable nuclear algebras in its statement. Elliott, Robert, and Santiago developed the compact topological cone of extended lower-semicontinuous traces and its relation to functionals on the Cuntz semigroup \cite{ERS}. Robert subsequently identified tensoring with $\W$ with realification of that semigroup \cite[Theorem~5.1.2]{Robert}. Th […]
+[theorem] \label{thm:main} Let \(A\) and \(B\) be separable nuclear complex \(C^*\)-algebras. If \(T(A)\) and \(T(B)\) are isomorphic as topological cones, then \[ A\otimes\W\otimes\K\ \cong\ B\otimes\W\otimes\K, \] where \(\K=\K(\ell^2(\N))\) and all tensor products are spatial.
+
+=== LEAN COMPARATOR TraceIdealTransportSupport (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open Filter Topology Classical
+open scoped NNReal ENNReal
+namespace TraceConeClassification
+variable (A : Type*) [NonUnitalCStarAlgebra A] [PartialOrder A] [StarOrderedRing A]
+abbrev Positive := {a : A // 0 ≤ a}
+namespace Positive
+variable {A}
+def zero : Positive A := ⟨0, le_rfl⟩
+def add (a b : Positive A) : Positive A := ⟨a.1 + b.1, add_nonneg a.2 b.2⟩
+def scale (r : ℝ≥0) (a : Positive A) : Positive A :=
+  ⟨(r : ℝ) • a.1, smul_nonneg r.2 a.2⟩
+def starMul (x : A) : Positive A := ⟨star x * x, star_mul_self_nonneg x⟩
+def mulStar (x : A) : Positive A := ⟨x * star x, mul_star_self_nonneg x⟩
+def cut (a : Positive A) (ε : ℝ≥0) : Positive A :=
+  ⟨cfcₙ (fun t : ℝ => max (t - (ε : ℝ)) 0) a.1,
+    cfcₙ_nonneg (fun _ _ => le_max_right _ _)⟩
+end Positive
+structure ExtendedTrace where
+  toFun : Positive A → ℝ≥0∞
+  map_zero : toFun Positive.zero = 0
+  map_add : ∀ a b, toFun (Positive.add a b) = toFun a + toFun b
+  map_scale : ∀ (r : ℝ≥0), 0 < r → ∀ a,
+    toFun (Positive.scale r a) = (r : ℝ≥0∞) * toFun a
+  tracial : ∀ x : A, toFun (Positive.starMul x) = toFun (Positive.mulStar x)
+  lowerSemicontinuous : LowerSemicontinuous toFun
+instance : CoeFun (ExtendedTrace A) (fun _ => Positive A → ℝ≥0∞) :=
+  ⟨ExtendedTrace.toFun⟩
+def CanonicalConvergence {ι : Type*} (l : Filter ι) (τ : ι → ExtendedTrace A)
+    (σ : ExtendedTrace A) : Prop :=
+  ∀ (a : Positive A) (ε : ℝ≥0), 0 < ε →
+    Filter.limsup (fun i => τ i (Positive.cut a ε)) l ≤ σ a ∧
+    σ a ≤ Filter.liminf (fun i => τ i a) l
+variable {A}
+namespace ExtendedTrace
+def scale (r : ℝ≥0) (τ : ExtendedTrace A) : ExtendedTrace A where
+  toFun a := (r : ℝ≥0∞) * τ a
+  map_zero := by rw [τ.map_zero, mul_zero]
+  map_add a b := by rw [τ.map_add, mul_add]
+  map_scale s hs a := by rw [τ.map_scale s hs]; ac_rfl
+  tracial x := by rw [τ.tracial x]
+  lowerSemicontinuous :=
+    (ENNReal.continuous_const_mul ENNReal.coe_ne_top).comp_lowerSemicontinuous
+      τ.lowerSemicontinuous (fun _ _ h => mul_le_mul_of_nonneg_left h bot_le)
+end ExtendedTrace
+-- The proof obligations below make the ideal and equivalence constructions well typed.
+theorem closed_ideal_weight_exists
+    (I : NonUnitalStarSubalgebra ℂ A) (hI : IsClosed (I : Set A))
+    (hleft : ∀ (x y : A), y ∈ I → x * y ∈ I)
+    (hright : ∀ (x y : A), x ∈ I → x * y ∈ I) :
+    ∃ τ : ExtendedTrace A, ∀ a : Positive A, τ a = if a.1 ∈ I then 0 else ∞ := by
+  sorry
+namespace ExtendedTrace
+variable (τ : ExtendedTrace A)
+def finiteSquareSet : Set A := {x | τ (Positive.starMul x) < ∞}
+lemma zero_mem_finiteSquareSet : (0 : A) ∈ τ.finiteSquareSet := by sorry
+lemma star_mem_finiteSquareSet {x : A} (hx : x ∈ τ.finiteSquareSet) :
+    star x ∈ τ.finiteSquareSet := by sorry
+lemma smul_mem_finiteSquareSet (c : ℂ) {x : A} (hx : x ∈ τ.finiteSquareSet) :
+    c • x ∈ τ.finiteSquareSet := by sorry
+lemma add_mem_finiteSquareSet {x y : A}
+    (hx : x ∈ τ.finiteSquareSet) (hy : y ∈ τ.finiteSquareSet) :
+    x + y ∈ τ.finiteSquareSet := by sorry
+lemma mul_mem_finiteSquareSet_left (x : A) {y : A} (hy : y ∈ τ.finiteSquareSet) :
+    x * y ∈ τ.finiteSquareSet := by sorry
+def finiteSquareAlgebra : NonUnitalStarSubalgebra ℂ A where
+  carrier := τ.finiteSquareSet
+  zero_mem' := τ.zero_mem_finiteSquareSet
+  add_mem' := τ.add_mem_finiteSquareSet
+  smul_mem' := τ.smul_mem_finiteSquareSet
+  mul_mem' := fun _ hy => τ.mul_mem_finiteSquareSet_left _ hy
+  star_mem' := τ.star_mem_finiteSquareSet
+def finiteIdeal : NonUnitalStarSubalgebra ℂ A := τ.finiteSquareAlgebra.topologicalClosure
+lemma isClosed_finiteIdeal : IsClosed (τ.finiteIdeal : Set A) := by sorry
+lemma mul_mem_finiteIdeal_left (x : A) {y : A} (hy : y ∈ τ.finiteIdeal) :
+    x * y ∈ τ.finiteIdeal := by sorry
+lemma mul_mem_finiteIdeal_right {x : A} (hx : x ∈ τ.finiteIdeal) (y : A) :
+    x * y ∈ τ.finiteIdeal := by sorry
+end ExtendedTrace
+end TraceConeClassification
+namespace TraceConeClassification
+universe u v
+variable {A : Type u} [NonUnitalCStarAlgebra A] [PartialOrder A] [StarOrderedRing A]
+na
+[…]

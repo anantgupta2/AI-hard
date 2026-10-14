@@ -1,0 +1,49 @@
+FAMILY 013: Ostmann’s inverse Goldbach conjecture
+SUBJECT: Number theory
+OPENAI SUMMARY: Proves that no finite modification of the primes can be written as $`A+B`$ with $`A,B\subseteq\mathbb Z_{\ge0}`$ each containing at least two elements. This resolves Ostmann's inverse Goldbach conjecture on additive indecomposability.
+
+=== MANUSCRIPT: The additive indecomposability of the primes (September-24-2026) [preprints/the-additive-indecomposability-of-the-primes-September-24-2026/build/paper.tex]
+ABSTRACT: We prove Ostmann's inverse Goldbach conjecture: no set differing from the primes by finitely many elements can be written as $`A+B`$, where A and B are sets of nonnegative integers with at least two elements each.
+INTRODUCTION (start): \label{sec:introduction} Let $\mathcal P$ denote the set of positive primes, and put $\N_0=\{0,1,2,\ldots\}$. For $A,B\subseteq\N_0$, write $A+B=\{a+b:a\in A,\ b\in B\}$. Two subsets of $\N_0$ are \emph{asymptotically equal} if their symmetric difference is finite. Ostmann's conjecture asserts that $\mathcal P$ is asymptotically additively indecomposable: it is not asymptotically equal to $A+B$ when both summands contain at least two elements. The conjecture goes back to his 1956 treatise~\cite[p.~13]{Ostmann1956}; the eventual-equality formulation and its terminology are recorded explicitly in \cite[Definition~1.1 and Conjecture~1.2]{ElsholtzHarper}. It is also known as the inverse Goldbach problem. [statement] Laffer and Mann showed that a hypothetical decomposition must have two infinite summands~\cite[Theorem~12]{LafferMann1964}. We first give a short sieve proof of this reduction in Lemma~\ref{lem:finite-factor}, then state the two-infinite-set contradiction as Theorem~\ref{thm:main}. The rest of the paper proves that theorem. The conclusion concerns both eventual coverage of the primes and eventual exclusion of composite sums. Neither requirement is replaced by a density condition. In particular, if $|A|,|B|\ge2$ and $A+B$ contains every sufficiently large prime, then it contains infinitely many composite numbers. Earlier work established increasingly strong restrictions on a hypothetical decomposition. Hornfeck's work \cite{Hornfeck1954,Hornfeck1955} was followed by sieve arguments of Pomerance, S\'ark\"ozy and Stewart~\cite{PomeranceSarkozyStewart1988}, Hofmann and Wolke~\cite{HofmannWolke1996}, and Elsholtz~\cite{Elsholtz2001Remark}. Write $A(x)=|A\cap[0,x]|$ and similarly for $B$. Bounds such as $A(x)B(x)\ll x$ are compatible with the coverage lower bound $A(x)B(x)\gg x/\log x$ and therefore do not by themselves exclude a decomposition. Elsholtz combined the large and larger sieves to put both counting functions at the square-root scale, up to powers of $\log x$, and ruled out a decomposition into three nontrivial summands~\cite{Elsholtz2001}. His later refinement \cite[Theorem~1.9]{Elsholtz2006} gives the bounds reproduced in Lemma~\ref{lem:size}. Croot and Elsholtz also studied thin ternary sumsets contained in the primes, obtaining restrictions under a regularity hypothesis on representation multiplicities \cite[Theorem~1]{CrootElsholtz2005}. Shao later proved a finite ternary obstruction: for some absolute $c>0$, three subsets of $[1,N]$, each of size at least $N^{1/3-c}$, have a composite number in their sumset once $N$ is sufficiently large \cite[Theorem~1.3 of the preprint version]{Shao2016}. In their positive-integer formulation, Elsholtz and Harper sharpened the binary counting bounds to \[ \frac{\sqrt x}{\log x\log\log x} \ll A(x),B(x)\ll\sqrt x\log\log x \] under a hypothetical eventual decomposition \cite[Theorem~2.6]{ElsholtzHarper}. Green and Harper developed inverse questions for the large sieve and proved that a suitable inverse-sieve conjecture would imply Ostmann's conjecture~\cite[Conjecture~1.5 and Theorem~1.8]{GreenHarper}. Their conjecture proposes a quadratic description of sets near the square-root sieve bound. Under half-residue restrictions $|C\bmod p|\le p/2+O(1)$ at every prime and $|C|\gg\sqrt N$ for $C\subseteq[1,N]$, Hanson proved additive correlation with the squares and a logarithmic-size intersection with a quadratic image \cite[Theorem~1.2 and Corollary~1.3]{Hanson2020}. Croot, Mao and Yip subsequently proved inverse theorems for local restrictions to short arithmetic progressions, with extensions to unions of progressions and other additive structures~\cite{CrootMaoYip2025}. More recently, Croot, Mao, Pohoata and Yip used a weighted entropy argument to derive a further necessary condition for a hypothetical decomposition of the primes into two sets of positive integers, each containing at least two elements \cite[Theorem~1.10 and Corollary~1.11]{CrootMaoPohoataYip2026}. For some $c […]
+[theorem] [Ostmann's conjecture]\label{cor:ostmann} If $A,B\subseteq\N_0$ satisfy $|A|,|B|\ge2$, then $(A+B)\mathbin{\triangle}\mathcal P$ is infinite. Equivalently, every finite modification of $\mathcal P$ is additively indecomposable into two sets with at least two elements each.
+
+=== LEAN COMPARATOR OstmannComplete (exact formal statement)
+import Mathlib
+namespace OAI
+open scoped Pointwise symmDiff
+namespace Ostmann
+def primes : Set ℕ := {n | Nat.Prime n}
+abbrev sumset (A B : Set ℕ) : Set ℕ := A + B
+def EventuallyPrimeSumset (A B : Set ℕ) : Prop :=
+  ∃ N : ℕ, ∀ n, N ≤ n → (n ∈ sumset A B ↔ n.Prime)
+def TwoInfiniteSummandsImpossible : Prop :=
+  ∀ A B : Set ℕ, A.Infinite → B.Infinite → ¬ EventuallyPrimeSumset A B
+def InverseGoldbach : Prop :=
+  ∀ A B : Set ℕ, A.Nontrivial → B.Nontrivial →
+    Set.Infinite (@symmDiff (Set ℕ)
+      (@SemilatticeSup.toMax (Set ℕ)
+        (@Lattice.toSemilatticeSup (Set ℕ)
+          (@CompleteLattice.toLattice (Set ℕ)
+            (@CompleteBooleanAlgebra.toCompleteLattice (Set ℕ)
+              (@CompleteAtomicBooleanAlgebra.toCompleteBooleanAlgebra (Set ℕ)
+                (@Set.instCompleteAtomicBooleanAlgebra ℕ))))))
+      Set.instSDiff (sumset A B) primes)
+theorem inverseGoldbach : InverseGoldbach := by
+  sorry
+theorem twoInfiniteSummandsImpossible : TwoInfiniteSummandsImpossible := by
+  sorry
+end Ostmann
+end OAI
+
+
+=== LEAN COMPARATOR OstmannPrimes (exact formal statement)
+import Mathlib
+namespace OAI
+open scoped Pointwise symmDiff
+namespace Ostmann
+theorem main : ∀ A B : Set ℕ, A.Nontrivial → B.Nontrivial →
+    Set.Infinite ((A + B) ∆ {n : ℕ | Nat.Prime n}) := by
+  sorry
+end Ostmann
+end OAI
+

@@ -1,0 +1,118 @@
+FAMILY 121: Almost-linear approximation of edit distance
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: For every fixed rational $`\varepsilon\in(0,1)`$, gives a randomized $`(1+\varepsilon)`$ approximation to unit-cost edit distance in worst-case expected time $`N^{1+o(1)}`$, with success probability at least 2/3. The strings have total length N and polynomially bounded integer symbols. This is an asymptotic guarantee at fixed accuracy.
+
+=== MANUSCRIPT: An Almost-Linear Approximation Scheme for Edit Distance (September-24-2026) [preprints/An-Almost-Linear-Approximation-Scheme-for-Edit-Distance-September-24-2026/build/paper.tex]
+ABSTRACT: We give a uniform randomized approximation scheme for unit-cost edit distance. For every fixed rational $`\varepsilon\in(0,1)`$, it estimates the distance between arbitrary explicitly stored strings of total length N within a factor $`1+\varepsilon`$ with probability at least 2/3, in worst-case expected time $`N^{1+o(1)}`$ on a logarithmic-word RAM. The algorithm supports polynomially bounded integer alphabets and returns zero deterministically on equal strings.
+INTRODUCTION (start): \label{sec:intro} The unit-cost edit distance $\ED(x,y)$ is the minimum number of single-symbol insertions, deletions and substitutions that transform a string $x$ into a string $y$. All three operations have cost one. The strings are stored explicitly; write $N=|x|+|y|$. Their symbols are integer labels of polynomial magnitude in $N+2$, stored in words of $O(\log(N+2))$ bits. There is no bound on the alphabet size independent of $N$. An approximation scheme receives a rational $\varepsilon\in(0,1)$ and estimates the distance multiplicatively. Its guarantee must therefore include returning zero when the two strings are equal. We prove the following result. [statement] The program is uniform in the accuracy input. The asymptotic assertion is pointwise in each fixed rational accuracy: its constants and the threshold at which the bound applies may depend on $\varepsilon$. We do not assert polynomial dependence on $1/\varepsilon$ or a joint bound when the accuracy varies with $N$. The output is a distance estimate; no edit-script reconstruction is needed. The algorithm uses exact computation below an accuracy-dependent input-length threshold. Section~\ref{sec:geometry} gives the finite input convention and fallback rules; their thresholds are very large, so the result is an asymptotic approximation scheme. \subsection{Context and approach} Edit distance originates in the study of errors in transmitted strings, including Levenshtein's binary codes for insertions, deletions and bit flips~\cite{Levenshtein1966}. The dynamic program of Wagner and Fischer~\cite{WagnerFischer1974} computes the minimum cost of insertions, deletions and substitutions in quadratic time. Masek and Paterson~\cite{MasekPaterson1980} applied block tabulation to obtain a logarithmic speedup for fixed alphabets and suitable fixed costs. Distance-sensitive exact algorithms offer another route when few edits are needed: Ukkonen~\cite{Ukkonen1985} developed bounded-distance methods, and Landau and Vishkin~\cite{LandauVishkin1988,LandauVishkin1989} combined furthest-reaching states with fast matching queries. Myers's related difference algorithm~\cite{Myers1986} treats insertion--deletion scripts. For unrestricted exact computation, Backurs and Indyk~\cite{BackursIndyk2018} showed that a strongly subquadratic deterministic algorithm would refute the Strong Exponential Time Hypothesis. That lower bound does not rule out fixed-factor approximation. Approximation algorithms progressively improved the accuracy available with substantially less work. In the following historical comparisons, write $n$ for a common upper bound on the string lengths. Batu and coauthors~\cite{BatuEtAl2003} gave sublinear tests for fixed alphabets that distinguish sufficiently small distance from linear distance. For general pairs, Bar-Yossef, Jayram, Krauthgamer and Kumar~\cite{BarYossefEtAl2004} obtained an $n^{3/7}$ approximation in quasi-linear time; Batu, Erg\"un and Sahinalp~\cite{BatuErgunSahinalp2006} improved the factor to $n^{1/3+o(1)}$. For binary strings, Ostrovsky and Rabani~\cite{OstrovskyRabani2007} constructed a low-distortion embedding into $\ell_1$, and Andoni and Onak~\cite{AndoniOnak2012} obtained an efficiently computable $2^{\widetilde O(\sqrt{\log n})}$ approximation in $n^{1+o(1)}$ time. Andoni, Krauthgamer and Onak~\cite{AndoniKrauthgamerOnak2010} then achieved a $(\log n)^{O(1/\xi)}$ factor in $n^{1+\xi}$ time for each fixed $\xi>0$, using a hierarchical alignment representation and nonuniformly allocated precisions. The next advances reached constant factors. Chakraborty, Das, Goldenberg, Kouck\'y and Saks~\cite{ChakrabortyEtAl2020} gave a constant-factor approximation in $\widetilde O(n^{12/7})$ time. Brakensiek and Rubinstein~\cite{BrakensiekRubinstein2020} and Kouck\'y and Saks~\cite{KouckySaks2020} independently obtained near-linear exponents for sufficiently far input pairs, with a material additive error on general pairs. Andoni and Nosatzki~\cite{AndoniNosatz […]
+[theorem] \label{thm:main} There is one uniform randomized algorithm that, given $x,y$ and a rational $\varepsilon\in(0,1)$, returns a nonnegative integer $\widehat D$ such that \[ \Pr\bigl[\ED(x,y)\le \widehat D\le(1+\varepsilon)\ED(x,y)\bigr] \ge \frac23. \] For every fixed rational $\varepsilon$, its worst-case expected running time on strings of total length $N$ is $N^{1+o(1)}$ as $N\to\infty$ on the logarithmic-word RAM. The expectation is over internal randomness only, and the bound includes input processing, preprocessing, numerical work, random sampling and all data-structure operations. Equal strings return zero deterministically.
+
+=== LEAN COMPARATOR EditApproximation (exact formal statement)
+import Mathlib
+namespace OAI.EditDistortion
+end OAI.EditDistortion
+section
+universe u v w u_1 u_2 u_3 u_4 u_5 u_6 u_7 u_8
+namespace OAI.EditApproximation
+def bitWordValue : List Bool → ℕ
+  | [] => 0
+  | bit :: bits => bit.toNat + 2 * bitWordValue bits
+def bitSum (a b carry : Bool) : Bool := xor (xor a b) carry
+def bitCarry (a b carry : Bool) : Bool := (a && b) || (a && carry) || (b && carry)
+structure UnreducedRational where
+  num : ℤ
+  den : ℕ
+  den_pos : 0 < den
+def orderingMatches (o : Ordering) (a b : ℕ) : Prop :=
+  (o = .lt ∧ a < b) ∨ (o = .eq ∧ a = b) ∨ (o = .gt ∧ b < a)
+def bitOrdering (high : Ordering) (a b : Bool) : Ordering :=
+  match high with
+  | .lt => .lt
+  | .gt => .gt
+  | .eq => if a = b then .eq else if a then .gt else .lt
+def bitDifference (a b borrow : Bool) : Bool := xor (xor a b) borrow
+def bitBorrow (a b borrow : Bool) : Bool := ((!a) && (b || borrow)) || (b && borrow)
+structure SignedBinary where
+  negative : Bool
+  bits : List Bool
+def signedMagnitude (negative : Bool) (magnitude : ℕ) : ℤ :=
+  if negative then -(magnitude : ℤ) else magnitude
+def trimBitWordWithWork : List Bool → List Bool × ℕ
+  | [] => ([], 1)
+  | bit :: bits =>
+    let tail := trimBitWordWithWork bits
+    (if tail.1 = [] ∧ bit = false then [] else bit :: tail.1, tail.2 + 3)
+def balancedCut (lo width M i : ℕ) : ℕ := lo + i * width / M
+def gridRound (spacing position : ℕ) : ℕ := spacing * (position / spacing)
+def rationalMinimum (fallback : ℚ) : List ℚ → ℚ
+  | [] => fallback
+  | value :: rest => min value (rationalMinimum fallback rest)
+structure RationalBellmanAction (Parent : Type u_1) (Child : Type u_2) (M : ℕ) where
+  center : Parent
+  connection : ℚ
+  childState : Fin M → Child
+def rationalRefinementUpdate (δ cone : ℚ) : Option ℚ → ℚ
+  | none => cone
+  | some online => min cone (max (cone / (1 + δ)) online)
+def heightExponent (N : ℕ) : ℕ := Nat.clog 2 (Nat.clog 2 (N + 2))
+def coarseExponent (ell : ℕ) : ℕ := Nat.sqrt (Nat.sqrt (Nat.log 2 ell))
+structure IntegerParameters where
+  H : ℕ
+  ell : ℕ
+  p : ℕ
+  B : ℕ
+  initialFactor : ℕ
+  M : ℕ
+  P : ℕ
+  T : ℕ
+  S : ℕ
+structure RationalParameters where
+  F : ℚ
+  initialSlope : ℚ
+  coneSlope : ℚ
+  delta : ℚ
+  kappa : ℚ
+  tau : ℚ
+  theta : ℚ
+  gamma : ℚ
+  eta : ℚ
+def gridPointsBetween (g lo hi : ℕ) : List ℕ :=
+  (List.range' (lo ⌈/⌉ g) ((hi / g + 1) - lo ⌈/⌉ g)).map fun i => g * i
+def scaledSeedValue (U : ℕ) (a gap : ℚ) : ℚ :=
+  max (⌈(U : ℚ) / a⌉₊ : ℚ) |gap|
+def dyadicScales (N : ℕ) : List ℕ :=
+  (List.range (Nat.log 2 N + 1)).map fun k => 2 ^ k
+def seedGridSpacing (b P : ℕ) : ℕ := max 1 (b / P)
+def finiteAssignments {α : Type u_1} : (M : ℕ) → (Fin M → List α) → List (Fin M → α)
+  | 0, _ => [Fin.elim0]
+  | M + 1, choices =>
+    (choices 0).flatMap fun head =>
+      (finiteAssignments M (fun i => choices i.succ)).map fun tail => Fin.cons head tail
+def powerTwoWord (n : ℕ) : List Bool := List.replicate n false ++ [true]
+def filterWithWork {α : Type u_1} (test : α → Bool × ℕ) : List α → List α × ℕ
+  | [] => ([], 0)
+  | a :: rest =>
+    let current := test a
+    let tail := filterWithWork test rest
+    (if current.1 then a :: tail.1 else tail.1, current.2 + tail.2 + 3)
+def allWithWork {α : Type u_1} (test : α → Bool × ℕ) : List α → Bool × ℕ
+  | [] => (true, 0)
+  | a :: rest =>
+    let current := test a
+    let tail := allWithWork test rest
+    (current.1 && tail.1, current.2 + tail.2 + 3)
+def arithmeticMapWithWork {α : Type u_1} {β : Type u_2} (f : α → β × ℕ) : List α → List β × ℕ
+  | [] => ([], 0)
+  | a :: rest =>
+    let current := f a
+    let tail := arithmeticMapWithWork f rest
+    (current.1 :: tail.1, current.2 + tail.2 + 3)
+def arithmeticFlatMapWithWork {α : Type u_1} {β : Type u_2} (f : α → List β × ℕ) : List α → List β × ℕ
+  | [] => ([], 0)
+  | a :: rest =>
+    let current := f a
+    let tail := arithmeticFlatMapWithWork f rest
+    (current.1 ++ tail.1, current.2 + tail.2 + current.1.length + 3)
+def upperMedian (values : List ℕ) : ℕ :=
+  (values.mergeSort (· ≤ ·)).getD (values.length / 
+[…]

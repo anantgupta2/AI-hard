@@ -1,0 +1,57 @@
+FAMILY 188: The sharp terminal leave in random triangle removal
+SUBJECT: Combinatorics
+OPENAI SUMMARY: Starting from the complete graph on n vertices, repeatedly delete a uniformly chosen remaining triangle. The terminal edge count is asymptotic to $`n^{3/2}/(2\sqrt2)`$, with mean-square convergence after normalization by n3/2. This proves the triangle case of the Joos–Kühn sharp-constant conjecture.
+
+=== MANUSCRIPT: The sharp terminal leave in random triangle removal (September-25-2026) [preprints/The-Sharp-Terminal-Leave-in-Random-Triangle-Removal-September-25-2026/build/paper.tex]
+ABSTRACT: Starting from the complete graph on n vertices, repeatedly remove the three edges of a uniformly chosen remaining triangle. We prove that the number of edges left at termination, divided by n3/2, converges in L2 to $`1/(2\sqrt2)`$. This proves the triangle case of the sharp-constant conjecture of Joos and Kühn. In particular, the same limit holds in probability and for the normalized expectation.
+INTRODUCTION (start): \label{sec:introduction} Begin with the complete graph $K_n$. At each step, choose uniformly from the triangles whose three edges are still present, and delete those edges. Stop when no triangle remains. The removed triangles form an edge-disjoint packing; the edges left over form its \emph{leave}. Let $F_n$ be the number of edges in this terminal graph. The problem is to determine the typical size of this leave, including its leading constant. The accepted triangles form a partial Steiner triple system, and $F_n$ measures its uncovered pairs. Bollob\'as and Erd\H{o}s conjectured in 1990 that the expected leave has order $n^{3/2}$, as reported in \cite[Introduction]{BohmanFriezeLubetzky2015}. Spencer's branching-process analysis and the independent nibble argument of R\"odl and Thoma showed that the leave is $o(n^2)$ with high probability \cite{Spencer1995,RodlThoma1996}. Grable proved bounds $O(n^{11/6+\xi})$ for each fixed $\xi>0$ and outlined the higher-order calculations leading to $O(n^{7/4+\xi})$ \cite[Theorems~5 and~7]{Grable1997}. Bohman, Frieze and Lubetzky gave a short proof of the bound $O(n^{7/4}\log^{5/4}n)$ \cite[Theorem~1]{BohmanFriezeLubetzky2010} and subsequently proved $F_n=n^{3/2+o(1)}$ with high probability \cite[Theorem~1]{BohmanFriezeLubetzky2015}. Their analysis uses self-correcting dynamic concentration and carefully chosen triangular extensions to determine the exponent. Joos and K\"uhn developed removal estimates for general strictly balanced hypergraphs, including pseudorandom starting hypergraphs \cite[Theorems~1.2--1.3]{joosKuehn2025}. Their Conjecture~16.2 predicts an asymptotic constant for the terminal leave; its triangle specialization is $1/(2\sqrt2)$ in probability. The following theorem proves this triangle case with $L^2$ convergence. Numbered references to Joos and K\"uhn refer throughout to version~2. [statement] The only external proof input is the early-prefix control from Joos and K\"uhn, specialized in Section~\ref{sec:prefix}. All subsequent continuation estimates are proved here. The theorem concerns removal from $K_n$; it does not assert a sharp constant for arbitrary starting graphs or for general hypergraph removal, or a fluctuation law. \subsection{The continuation argument} The proof separates the part of the process governed by uniform subgraph counts from the final evolution of individual edges. Stop at a deterministic time when the edge density is approximately $p=n^{-1/2+\epsilon}$, for a small fixed $\epsilon>0$. The graph then has \[ m=\frac{n^2p}{2}\quad\text{edges},\qquad D=np^2 \] triangles through each edge to relative error $o(1)$. Section~\ref{sec:prefix} states the exact properties needed and verifies their application from the public removal estimates. The continuation analysis uses backward priority exploration, whose hypergraph form appears in Spencer's work \cite[Sections~2--4]{Spencer1995}. Grable formulated triangle packing as a uniform priority scan and used adaptive exposure decision trees in his concentration analysis \cite[Sections~1 and~4]{Grable1997}. The quantitative issue here is to follow a growing rescaled time interval and to approximate joint survival on the scale of its vanishing probability. A fixed-time local approximation alone does not give the precision required for a second moment. Give the triangles of this graph fresh independent uniform priorities and scan them in increasing order, accepting a triangle when all its edges remain. This represents the continuation of uniform removal. An edge survives precisely when a recursive test returns true. A child test asks whether the other \emph{two} edges of a candidate triangle survive before its priority. We test the two edges with one jointly ordered list of candidates, which is essential to the later visitation estimate. Section~\ref{sec:queries} proves this rule and constructs an auxiliary tree in which each occurrence of a candidate receives an independent priority. In this independent model, […]
+[theorem] \label{thm:main} For the uniform triangle-removal process starting from $K_n$, \[ \E\left[\left(\frac{F_n}{n^{3/2}}- \frac1{2\sqrt2}\right)^2\right]\longrightarrow0. \] In particular, \[ \frac{F_n}{n^{3/2}}\xrightarrow{\Prb}\frac1{2\sqrt2}, \qquad \frac{\E F_n}{n^{3/2}}\longrightarrow\frac1{2\sqrt2}. \]
+
+=== LEAN COMPARATOR TriangleRemoval (exact formal statement)
+import Mathlib
+namespace OAI
+section
+section
+open Filter
+open scoped BigOperators Topology
+namespace SharpTerminalLeave
+abbrev Graph (n : ℕ) := Finset (Finset (Fin n))
+def completeGraph (n : ℕ) : Graph n := Finset.univ.powersetCard 2
+def triangles {n : ℕ} (G : Graph n) : Finset (Finset (Fin n)) :=
+  (Finset.univ.powersetCard 3).filter (fun t => t.powersetCard 2 ⊆ G)
+noncomputable def step {n : ℕ} (G : Graph n) : PMF (Graph n) :=
+  if h : (triangles G).Nonempty then
+    (PMF.uniformOfFinset (triangles G) h).map (fun t => G \ t.powersetCard 2)
+  else PMF.pure G
+noncomputable def evolve {n : ℕ} (G : Graph n) : ℕ → PMF (Graph n)
+  | 0 => PMF.pure G
+  | k + 1 => (evolve G k).bind step
+noncomputable def terminalLaw (n : ℕ) : PMF (Graph n) :=
+  evolve (completeGraph n) (n.choose 2)
+noncomputable def expectation (n : ℕ) (f : Graph n → ℝ) : ℝ :=
+  ∑ G, (terminalLaw n G).toReal * f G
+noncomputable def probability (n : ℕ) (P : Graph n → Prop) : ℝ := by
+  classical
+  exact expectation n (fun G => if P G then 1 else 0)
+noncomputable def normalization (n : ℕ) : ℝ := (n : ℝ) ^ (3 / 2 : ℝ)
+noncomputable def normalizedLeave (n : ℕ) (G : Graph n) : ℝ :=
+  (G.card : ℝ) / normalization n
+noncomputable def sharpConstant : ℝ := 1 / (2 * Real.sqrt 2)
+end SharpTerminalLeave
+end
+end
+open Filter
+open scoped BigOperators Topology
+namespace SharpTerminalLeave
+theorem sharp_terminal_leave :
+    Tendsto (fun n => expectation n (fun G =>
+      (normalizedLeave n G - sharpConstant) ^ 2)) atTop (𝓝 0) ∧
+    (∀ ε : ℝ, 0 < ε →
+      Tendsto (fun n => probability n (fun G =>
+        ε < |normalizedLeave n G - sharpConstant|)) atTop (𝓝 0)) ∧
+    Tendsto (fun n => expectation n (fun G => (G.card : ℝ)) / normalization n)
+      atTop (𝓝 sharpConstant) := by
+  sorry
+end SharpTerminalLeave
+end OAI
+

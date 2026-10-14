@@ -1,0 +1,84 @@
+FAMILY 372: Global uniqueness in smooth isotropic elasticity
+SUBJECT: Partial differential equations
+OPENAI SUMMARY: Proves that full static boundary displacement-to-traction data determine both smooth real Lamé moduli on every bounded connected smooth domain in ℝ3, provided μ &gt; 0 and $`3\lambda+2\mu\gt 0`$ on the closure. Neither analyticity, proximity to constant coefficients nor prior knowledge near the boundary is required.
+
+=== MANUSCRIPT: Global Uniqueness for the Smooth Isotropic Elasticity Inverse Problem (September-24-2026) [preprints/Global-Uniqueness-for-the-Smooth-Isotropic-Elasticity-Inverse-Problem-September-24-2026/build/main.tex]
+ABSTRACT: We prove that the full static displacement-to-traction map uniquely determines both real smooth Lamé moduli on every bounded connected smooth domain in ℝ3, provided μ &gt; 0 and $`3\lambda+2\mu\gt 0`$ on the closure. This resolves the smooth three-dimensional isotropic elastic Calderón uniqueness problem under these positivity assumptions.
+INTRODUCTION (start): \label{sec:introduction} Let $\Omega\subset\R^3$ be a bounded connected domain with smooth boundary. For real functions $\lambda,\mu\in C^\infty(\overline\Omega)$ satisfying \begin{equation}\label{eq:energy-positivity} \mu>0,\qquad 3\lambda+2\mu>0 \quad\text{on }\overline\Omega, \end{equation} define the strain, stress, and static elasticity operator by \begin{equation}\label{eq:physical-operator} e(u)=\frac{\nabla u+(\nabla u)^T}{2},\qquad \sigma_{\lambda,\mu}(u)=\lambda(\diverg u)I+2\mu e(u),\qquad L_{\lambda,\mu}u=\diverg\sigma_{\lambda,\mu}(u). \end{equation} Here $\mu$ is the shear modulus and $\lambda+2\mu/3$ is the bulk modulus. The inequalities in \eqref{eq:energy-positivity} give uniformly positive elastic energy. For each $f\in H^{1/2}(\partial\Omega;\R^3)$ there is a unique $u_f\in H^1(\Omega;\R^3)$ with $L_{\lambda,\mu}u_f=0$ and trace $f$. The displacement-to-traction map is defined weakly by \begin{equation}\label{eq:physical-dn} \langle\Lambda_{\lambda,\mu}f,g\rangle =\int_\Omega\left[ \lambda(\diverg u_f)(\diverg v_g)+2\mu e(u_f):e(v_g) \right]\dd x, \end{equation} where $v_g\in H^1(\Omega;\R^3)$ has trace $g$, and $A:B=\tr(A^TB)$. The weak equation makes this expression independent of the extension. For smooth boundary data it is the traction $\sigma_{\lambda,\mu}(u_f)n$, with $n$ the outward normal. [statement] Thus Theorem~\ref{thm:main} gives a positive resolution of the smooth three-dimensional isotropic elastic Calder\'on uniqueness problem under \eqref{eq:energy-positivity}. It uses the full zero-frequency boundary operator in fixed Euclidean coordinates. The coefficients need not be analytic or close to constants, and their agreement near the boundary is not an additional hypothesis. \paragraph{History and significance.} The inverse problem asks whether static boundary measurements determine both spatially varying elastic moduli. The scalar conductivity problem posed by Calder\'on \cite{Calderon1980} and the complex geometric optics uniqueness theorem of Sylvester and Uhlmann \cite{SylvesterUhlmann1987} are important antecedents, but elasticity couples two moduli through vector displacements. Nakamura and Uhlmann recovered the elastic boundary Taylor series \cite{NakamuraUhlmann1995Boundary}. Their original global claim \cite{NU1994} was corrected in \cite{NU2003}. The erratum identifies two defects: the prescribed initial-value problem for a planar matrix transport need not be solvable, and substitution of the corrected complex geometric optics solutions yields a pseudodifferential equation where a partial differential equation had been asserted. Its corrected theorem proves uniqueness when both $\|\nabla\mu_j\|_{C^m}$ are sufficiently small. Eskin and Ralston developed higher-order matrix complex geometric optics expansions using invertible planar transport frames, together with restricted elasticity uniqueness results \cite{EskinRalston2002Elasticity,EskinRalston2004}. A direct inspection of the differential map from their auxiliary vector--scalar fields to physical displacement \cite[Section~3]{EskinRalston2004} shows that it is noninjective. The reduction alone therefore does not transfer equality of the physical boundary maps to equality of unrestricted auxiliary Cauchy data. The proof here transfers exact physical solutions while retaining their actual divergence. In two dimensions, Imanuvilov and Yamamoto proved global uniqueness for smooth coefficients satisfying $\mu>0$ and $\lambda+\mu>0$, without a smallness assumption \cite{ImanuvilovYamamoto2015Elasticity}. In three dimensions, Lin and Nakamura gave local boundary reconstruction at finite regularity \cite{LinNakamura2017}; Tan and Liu obtained boundary jets on smooth Riemannian manifolds and global recovery under their analytic hypotheses \cite{TanLiu2023}. A recent preprint of Chen, Jiang, Liu, and Tao treats structured shear moduli under axisymmetry, separation, or directional quasianalyticity in the specified geometries \cite{ChenJiangL […]
+[theorem] \label{thm:main} Let $\Omega\subset\R^3$ be any bounded connected domain with $C^\infty$ boundary. For $j=1,2$, let $\lambda_j,\mu_j\in C^\infty(\overline\Omega;\R)$ satisfy $\mu_j>0$ and $3\lambda_j+2\mu_j>0$ on $\overline\Omega$. If \[ \Lambda_{\lambda_1,\mu_1} =\Lambda_{\lambda_2,\mu_2} \colon H^{1/2}(\partial\Omega;\R^3) \longrightarrow H^{-1/2}(\partial\Omega;\R^3), \] then $\lambda_1=\lambda_2$ and $\mu_1=\mu_2$ throughout $\Omega$.
+
+=== LEAN COMPARATOR ElasticityUniqueness (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open MeasureTheory Set
+open scoped BigOperators
+namespace Elasticity
+abbrev X := EuclideanSpace ℝ (Fin 3)
+abbrev V := X
+def coordVector (i : Fin 3) : X := EuclideanSpace.single i 1
+def SmoothBoundary (Ω : Set X) : Prop :=
+  ∀ x ∈ frontier Ω, ∃ e : OpenPartialHomeomorph X X,
+    x ∈ e.source ∧
+    ContDiffOn ℝ (⊤ : ℕ∞) e e.source ∧
+    ContDiffOn ℝ (⊤ : ℕ∞) e.symm e.target ∧
+    e x 0 = 0 ∧
+    ∀ y ∈ e.source, y ∈ Ω ↔ 0 < e y 0
+def Domain (Ω : Set X) : Prop :=
+  IsOpen Ω ∧ IsConnected Ω ∧ Bornology.IsBounded Ω ∧ SmoothBoundary Ω
+def SmoothUpTo (Ω : Set X) (f : X → ℝ) : Prop :=
+  ∃ U : Set X, IsOpen U ∧ closure Ω ⊆ U ∧ ContDiffOn ℝ (⊤ : ℕ∞) f U
+def Admissible (Ω : Set X) (lam mu : X → ℝ) : Prop :=
+  SmoothUpTo Ω lam ∧ SmoothUpTo Ω mu ∧
+    ∀ x ∈ closure Ω, 0 < mu x ∧ 0 < 3 * lam x + 2 * mu x
+abbrev Ambient (Ω : Set X) :=
+  Lp V 2 (volume.restrict Ω) × (Fin 3 → Lp V 2 (volume.restrict Ω))
+def coordDeriv (f : X → V) (i : Fin 3) (x : X) : V :=
+  fderiv ℝ f x (coordVector i)
+def SmoothJets (Ω : Set X) : Set (Ambient Ω) :=
+  {j | ∃ (f : X → V) (hf : MemLp f 2 (volume.restrict Ω))
+      (hd : ∀ i, MemLp (coordDeriv f i) 2 (volume.restrict Ω)),
+    ContDiff ℝ (⊤ : ℕ∞) f ∧
+    j.1 = hf.toLp f ∧ j.2 = fun i => (hd i).toLp (coordDeriv f i)}
+def TestJets (Ω : Set X) : Set (Ambient Ω) :=
+  {j | ∃ (f : X → V) (hf : MemLp f 2 (volume.restrict Ω))
+      (hd : ∀ i, MemLp (coordDeriv f i) 2 (volume.restrict Ω)),
+    ContDiff ℝ (⊤ : ℕ∞) f ∧ HasCompactSupport f ∧ tsupport f ⊆ Ω ∧
+    j.1 = hf.toLp f ∧ j.2 = fun i => (hd i).toLp (coordDeriv f i)}
+abbrev H1 (Ω : Set X) := {j : Ambient Ω // j ∈ closure (SmoothJets Ω)}
+def HasZeroTrace (Ω : Set X) (u : H1 Ω) : Prop :=
+  u.val ∈ closure (TestJets Ω)
+def SameTrace (Ω : Set X) (u v : H1 Ω) : Prop :=
+  u.val - v.val ∈ closure (TestJets Ω)
+abbrev BoundaryData (Ω : Set X) := Quot (SameTrace Ω)
+def trace (Ω : Set X) (u : H1 Ω) : BoundaryData Ω := Quot.mk _ u
+def div (Ω : Set X) (u : H1 Ω) (x : X) : ℝ :=
+  ∑ i, (u.val.2 i x) i
+def strain (Ω : Set X) (u : H1 Ω) (x : X) (i j : Fin 3) : ℝ :=
+  ((u.val.2 j x) i + (u.val.2 i x) j) / 2
+def energy (Ω : Set X) (lam mu : X → ℝ) (u v : H1 Ω) : ℝ :=
+  ∫ x, (lam x * div Ω u x * div Ω v x +
+    2 * mu x * ∑ i, ∑ j, strain Ω u x i j * strain Ω v x i j)
+    ∂(volume.restrict Ω)
+def WeakSolution (Ω : Set X) (lam mu : X → ℝ) (u : H1 Ω) : Prop :=
+  ∀ v : H1 Ω, HasZeroTrace Ω v → energy Ω lam mu u v = 0
+def dirichletSolution (Ω : Set X) (lam mu : X → ℝ)
+    (f : BoundaryData Ω) : H1 Ω := by
+  classical
+  exact if h : ∃ u : H1 Ω, trace Ω u = f ∧ WeakSolution Ω lam mu u
+  then Classical.choose h
+  else f.out
+def DN (Ω : Set X) (lam mu : X → ℝ) : BoundaryData Ω → BoundaryData Ω → ℝ :=
+  fun f g => energy Ω lam mu (dirichletSolution Ω lam mu f) g.out
+def MainClaim : Prop :=
+  ∀ (Ω : Set X), Domain Ω →
+  ∀ (lam₁ mu₁ lam₂ mu₂ : X → ℝ),
+    Admissible Ω lam₁ mu₁ → Admissible Ω lam₂ mu₂ →
+    DN Ω lam₁ mu₁ = DN Ω lam₂ mu₂ →
+    (∀ x ∈ Ω, lam₁ x = lam₂ x) ∧ (∀ x ∈ Ω, mu₁ x = mu₂ x)
+theorem global_uniqueness : MainClaim := by
+  sorry
+end Elasticity
+end
+end OAI
+

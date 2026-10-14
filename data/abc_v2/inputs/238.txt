@@ -1,0 +1,1159 @@
+FAMILY 238: Optimal logarithmic mixing of the Thorp shuffle
+SUBJECT: Probability and statistical mechanics
+OPENAI SUMMARY: Proves that the Thorp shuffle randomizes $`N=2^d`$ labeled cards in $`\Theta(\log N)`$ physical shuffles, settling its optimal mixing order for power-of-two deck sizes. Convergence is in total variation from the worst initial ordering and concerns the entire permutation, not just individual card positions.
+
+=== MANUSCRIPT: Optimal-order mixing of the Thorp shuffle (September-26-2026) [preprints/Optimal-order-mixing-of-the-Thorp-shuffle-September-26-2026/build/main.tex]
+ABSTRACT: We prove that the Thorp shuffle on $`2^d`$ cards mixes in $`\Theta(d)`$ complete shuffles. The full permutation law after $`1600d`$ shuffles converges to uniform in total variation as $`d\to\infty`$, uniformly over the initial deck, while a support count gives a lower bound of $`2d-O(1)`$.
+INTRODUCTION (start): \label{sec:introduction} A single card can become uniformly distributed long before a shuffled deck is close to uniform. The Thorp shuffle makes this distinction particularly clear. Split a deck into two equal halves, pair cards that occupy corresponding positions, and choose the order of each pair by an independent fair coin. Interleaving the pairs produces the new deck. For a deck of size $n=2^d$, every individual card is uniform after $d$ shuffles. The question is how much longer it takes to randomize the joint order of all $n$ cards. We prove that a constant multiple of $d$ shuffles suffices. Let $q_d$ denote the law of one complete shuffle as a permutation of the positions, and let $U_n$ be uniform on the symmetric group $S_n$. Convolution is the law of composition of independent permutations, and \[ \|\mu-\nu\|_{\mathrm{TV}} =\frac12\sum_g|\mu(g)-\nu(g)|. \] Write $t_{\mathrm{mix}}(d)$ for the least nonnegative integer $t$ at which $\|q_d^{*t}-U_n\|_{\mathrm{TV}}\le1/4$. [statement] One step in this theorem is one complete physical shuffle. Changing the initial deck translates the permutation law, so its distance from uniform is unchanged. The upper bound is asymptotic in $d$; the constant $1600$ is an explicit choice in the proof, not a proposed sharp constant. Determining a leading constant or a cutoff remains a separate question. The full-law conclusion controls every statistic of the final deck and, in particular, the joint positions of any deterministic selection of cards, by contraction of total variation under a map. It also shows that this shuffle produces an approximately uniform permutation using $O(n\log n)$ independent fair bits: each of the $O(\log n)$ steps uses $n/2$ bits. The support bound identifies the same order of randomness as necessary for this construction. \subsection{History and related work} Thorp introduced the model in his 1973 study of the effects of nonrandom shuffling on Faro \cite[Section~3.1]{thorp}. Its simple pairwise rule conceals a difficult question about dependence across the whole deck. For dyadic decks, Morris obtained the first bound polynomial in $d$, namely $O(d^{44})$, using evolving sets and a chameleon process that tracks conditional card probabilities \cite{morris44}. Montenegro and Tetali sharpened this analysis to $O(d^{29})$ by spectral-profile and evolving-set methods \cite[Theorems~6.14--6.15]{montenegro-tetali2006}. A second line of attack used relative entropy. Morris related entropy decay to pairwise card collisions and obtained $O((\log n)^4)$ shuffles for every even $n$ \cite{morris4}. He then proved $O(d^3)$ for $n=2^d$ by a stronger contraction over a block of $d$ shuffles \cite{morris3}. Theorem~\ref{thm:mixing} attains the logarithmic order discussed in Jonasson's notes \cite[Section~5]{jonasson} for dyadic decks. The corresponding optimal-order question for arbitrary even deck sizes is not addressed by the cube argument here. Card marginals have also been studied for their own sake and for cryptography. Morris, Rogaway and Stegers analyzed the joint images of ordered input lists in their construction of enciphering schemes on small domains \cite[Theorem~1]{mrs}. Czumaj and V\"ocking proved that $O((\log n)^2)$ Thorp shuffles mix any fixed fraction of the cards strictly below one, using non-Markovian couplings and butterfly-network estimates \cite{CzumajVocking2014}. Our first stage needs a different, averaged guarantee: after $200d$ shuffles, the joint positions of a uniformly sampled list of $7n/8$ labels are close to uniform on average over the list. The passage from these averaged marginals to the full law is a separate part of the proof. The conditional-flow method has several predecessors. In the original Thorp analysis, Morris used a chameleon process to represent the law of a tagged card conditional on the set-valued trajectory of a collection containing that card; the conditional probabilities average across available pairs and are transported across  […]
+[theorem] [Optimal-order mixing]\label{thm:mixing} As $d\to\infty$, \[ \|q_d^{*(1600d)}-U_n\|_{\mathrm{TV}}\longrightarrow0. \] For every integer $t\ge0$, \[ \|q_d^{*t}-U_n\|_{\mathrm{TV}} \ge 1-\frac{2^{tn/2}}{n!}. \] Consequently the mixing time at distance $1/4$ satisfies \[ t_{\mathrm{mix}}(d)\ge \left\lceil\frac2n\log_2\frac{3n!}{4}\right\rceil =2d-O(1), \qquad t_{\mathrm{mix}}(d)=\Theta(d). \]
+
+=== MANUSCRIPT: Random coordinate frames and partial permutation laws (September-26-2026) [preprints/Random-coordinate-frames-and-partial-permutation-laws-September-26-2026/build/main.tex]
+ABSTRACT: For the Thorp shuffle on $`2^d`$ cards, we prove that the worst-start total-variation distance after $`32800d`$ physical shuffles tends to zero as $`d\to\infty`$. Combining our fixed-list estimate with the companion Fourier transfer improves this bound to $`512d`$ shuffles. These results follow from bounds on partially observed permutation laws in random coordinate frames.
+INTRODUCTION (start): \label{sec:introduction} A change of coordinates can relate a prescribed sequence of matching directions to a random one. For a permutation shuffle, we identify the joint path laws under the change of coordinates. A conditional calculation also needs to specify what has been revealed when the next direction is sampled. We separate these two questions. The resulting estimates describe the laws of large ordered lists of cards, and several ways of retaining that information lead to convergence of the whole permutation. Our model is the Thorp shuffle on $n=2^d$ labeled cards. Split a deck into two equal halves, pair corresponding positions, and interleave the pairs, choosing their orders with independent fair coins. One such operation is one \emph{physical shuffle}. Let $q_d$ be its law as a permutation of positions, let $U_n$ be uniform on $S_n$, and let $\mu*\nu$ denote the law of $XY$ for independent permutations with laws $\mu,\nu$. We use $\|\mu-\nu\|_{\TV}=\frac12\sum_g|\mu(g)-\nu(g)|$. A card becomes uniform after $d$ physical shuffles. The cards share the same switches, so the law of their joint positions requires a separate argument. Our first complete application uses the frame, marginal, degree, and Fourier arguments proved in this paper. [statement] The lower obstruction is elementary. After $t$ physical shuffles the process has used $tn/2$ random bits, so its support has size at most $2^{tn/2}$ and \[ \|q_d^{*t}-U_n\|_{\TV}\ge1-\frac{2^{tn/2}}{n!}. \] At distance $1/4$ this forces $t\ge\lceil(2/n)\log_2(3n!/4)\rceil=2d-O(1)$. Together with Theorem~\ref{thm:main}, this shows that the mixing time has the optimal order $d=\log_2 n$ on dyadic decks. The proof of Theorem~\ref{thm:main} is independent of the deterministic-coordinate companion, which proves convergence after $1600d$ physical shuffles as $d\to\infty$ \cite[Theorem~1.1]{optimal-thorp}, and of the abstract Fourier transfers in \cite{partial-fourier}. Later we prove that, after $256d$ shuffles, the ordered image of every fixed list of at most $7n/8$ cards has total-variation distance $o(1)$ from a uniform injection, uniformly over the list as $d\to\infty$. The orbit transfer gives the $2048d$ application in Theorem~\ref{shear:thm:2048}. Combining the same marginal estimate with the Fourier companion's isotypic estimate and its inverse-degree sum gives the $512d$ consequence in Corollary~\ref{shear:cor:512}. The orbit argument bounds the operator norm, while the isotypic argument bounds the Hilbert--Schmidt norm. Later sections also prove partial laws that retain information about histories and changing input sets. \subsection{Coordinate frames and the first proof} Identify positions with $V=\mathbb F_2^d$. Undoing the deterministic rotation in each shuffle leaves independent fair switches along successive coordinate directions. A run through all $d$ directions is a \emph{sweep}; it costs $d$ physical shuffles. We compare this process with switches in directions $v_1,v_2,\ldots$ such that every $d$ consecutive vectors form a basis. For a fixed sequence whose first basis is the same ordered coordinate basis, invertible changes of position frame identify the joint path laws. At the terminal time, the endpoint laws agree after a specified bijection of output positions. Hence every fixed input list has the same distance from a uniform injection in the two descriptions. A general initial frame also relabels the inputs; the corresponding comparison preserves the average over uniformly chosen input lists. This path comparison is proved after fixing the complete direction sequence. Its intermediate maps may use future directions. The probability calculation therefore uses a separately generated process: after the first basis, choose the next direction uniformly outside the span of its $d-1$ predecessors, then choose fresh switch coins. The observation field records the input list and any independent initial sampling, the direction prefix, and the path prefixes of the pre […]
+[theorem] \label{thm:main} For $n=2^d$, \[ \|q_d^{*(32800d)}-U_n\|_{\TV}\longrightarrow0 \qquad(d\longrightarrow\infty). \] The convergence is uniform over every deterministic initial ordering of the deck.
+
+=== MANUSCRIPT: From partial permutation information to Fourier bounds (September-26-2026) [preprints/From-partial-permutation-information-to-Fourier-bounds-September-26-2026/build/main.tex]
+ABSTRACT: We show how information about partial permutations controls full permutation laws. Let n tend to infinity through multiples of eight. If the images of a uniformly chosen $`7n/8`$ labels approach the uniform injection law in average total variation, and the sign mean tends to zero, then the product of two independent permutations with the given law converges to uniform on Sn.
+INTRODUCTION (start): \label{l:introduction} A permutation can look uniform on many labels while retaining information about the whole deck. Parity gives the simplest example: the uniform law on the alternating group has uniform images on any set of at most $n-2$ labels. Thus partial observations require an additional argument before they can establish convergence on $S_n$. This paper develops that argument. Its input is quantitative information about partial permutations; its output is a bound on every nontrivial Fourier matrix, with the sign representation treated separately. Let $X$ be a set of $n$ labels and $G=\Sym(X)$. We regard $g\in G$ as the map from initial labels to final positions. For $M\subseteq X$, let $H_M=\Sym(M)$ fix $X\setminus M$ pointwise. Two permutations have the same images on $X\setminus M$ precisely when they lie in the same left coset $gH_M$. Consequently an upper bound on the distribution of those images is exactly an upper bound on the masses of these cosets. The elements of $gH_M$ are obtained by multiplication on the right; this convention matters when image observations are compared with inverse-image observations. For a nonnegative measure $f$ on $G$ and an irreducible unitary representation $\rho:G\to U(V_\rho)$, write \[ \widehat f(\rho)=\sum_{g\in G}f(g)\rho(g),\qquad D_\rho=\dim V_\rho. \] Our Hilbert--Schmidt norm is unnormalized: $\|A\|_{\HS}^2=\tr(A^*A)$. Let $D_\lambda$ denote the degree of the irreducible of $S_m$ indexed by a partition $\lambda\vdash m$, and set \[ C_u=\sup_{m\ge1}\sum_{\lambda\vdash m}D_\lambda^{-u}\quad(u>0). \] These constants are finite, and the sums with the row and column partitions removed tend to zero. A short proof is given in Lemma~\ref{l:degree-basic}; Section~\ref{l:degrees} retains the distinct counting proofs that give more detailed information. [statement] The Hilbert--Schmidt conclusion implies the operator-norm conclusion, but the two proofs use different information. The orbit proof follows one vector and controls the dimension of its orbit under a small subgroup type. The isotypic proof instead bounds the entire Fourier matrix by cosetwise Plancherel. We give the orbit proof first because it isolates the multiplicity issue in a concrete linear map, and then prove the stronger norm conclusion independently. The principal consequence is a transfer from observations of $7n/8$ labels to the product of just two independent permutations. Suppose $8$ divides $n$, the average total-variation error of these observations tends to zero, and the sign mean is $o(1)$. One can choose eight complementary blocks whose errors sum to $o(1)$, then retain a common subprobability of mass $1-o(1)$ with coset cap one. With $b=8$ and $u=1$, Theorem~\ref{l:main} gives squared Hilbert--Schmidt norm at most $8C_1D^{-5/8}$. Two convolutions have nonsign Plancherel contribution at most $(8C_1)^2\sum D^{-1/4}$, which tends to zero. The discarded mass and sign coefficient also vanish. Corollary~\ref{l:isotypic-completion} gives the precise conclusion. The orbit proof alone gives four convolutions, as recorded in Corollary~\ref{l:orbit-completion}. The distinction is the dimension factor saved by controlling the whole matrix, not a change in the observed marginals. \subsection{The first proof and its extensions} Restriction to $H_1\times\cdots\times H_b$ decomposes an irreducible space into tensor-product types, each tensored with its multiplicity space. The product of the factor degrees is at most $D$. Hence some factor has degree at most $D^{1/b}$. Assign the whole type to one such factor. This produces an orthogonal decomposition of any test vector into $b$ pieces. The orbit of one piece under its assigned subgroup has dimension at most the sum of the squares of the small factor degrees. Multiplicity causes no extra factor: on all copies of one type the group acts by the same matrix tensored with identity. The bound $C_u$ now controls that sum. Averaging the projections onto translates of the orbit s […]
+[theorem] [Complementary cosets control Fourier matrices] \label{l:main} Partition $X$ into $b$ nonempty sets $M_1,\ldots,M_b$. Put $H_i=H_{M_i}$. Suppose $f$ is a nonnegative measure on $G$ of mass at most one and, for every $g\in G$ and $i$, \begin{equation}\label{l:main-cap} f(gH_i)\le \frac{B}{[G:H_i]}. \end{equation} For every $u>0$ and every irreducible $\rho$ of degree $D$, \begin{equation}\label{l:main-hs} \|\widehat f(\rho)\|_{\HS}^2 \le bBC_uD^{-1+(u+2)/b}. \end{equation} There is also an independent orbit-span proof of the bound \begin{equation}\label{l:main-orbit} \|\widehat f(\rho)\|_{\op}^2 \le bBC_uD^{-1+(u+2)/b}. \end{equation} No restriction is imposed on block sizes or on the multiplicities in $\rho|_{H_1\times\cdots\times H_b}$.
+
+=== MANUSCRIPT: Conditional information under deterministic coordinate sweeps (September-26-2026) [preprints/Conditional-information-under-deterministic-coordinate-sweeps-September-26-2026/build/main.tex]
+ABSTRACT: We bound the information remaining after paths of specified cards in the Thorp shuffle on $`n=2^d`$ cards have been observed. After a fixed number of deterministic coordinate sweeps, the joint endpoint law of further cards is close to uniform on the available positions, on average over the observed paths, provided a fixed positive fraction of labels lies outside both lists. Combined with a Fourier transfer, these bounds give full-deck mixing after $`2048d`$ physical shuffles.
+INTRODUCTION (start): What remains random in a shuffle after the paths of many cards have been observed? For the Thorp shuffle, the answer is especially concrete. On a pair containing two unobserved positions, the conditional masses of an additional card are averaged. On a pair containing one observed position, the remaining mass is transported to the uniquely available output. Observing more paths therefore changes an averaging process into a random mixture of averaging and transport. This paper estimates the information retained by that conditional process. The positions are the vertices of $V=\mathbb F_2^d$, with $n=2^d$. One physical Thorp shuffle independently switches each pair in one coordinate direction and rotates the coordinates. Undoing these rotations gives a process $(\Pi_t)$ that uses the coordinate directions in a fixed cyclic order. A sweep consists of $d$ such layers, hence $d$ physical shuffles. We label cards by their initial positions; $\Pi_t(a)$ is the position of card $a$ at time $t$. All starting decks considered below are deterministic. Total variation has the normalization $\|\mu-\nu\|_{\TV}=\frac12\sum_x|\mu(x)-\nu(x)|$. Write $q_d$ for the law of one physical shuffle on $S_n$ and $U_{S_n}$ for the uniform law. The threshold-$1/4$ mixing time is \[ t_{\mathrm{mix}}(d)=\min\{t\in\mathbb Z_{\ge0}: \|q_d^{*t}-U_{S_n}\|_{\TV}\le1/4\}. \] Convolution represents independent successive shuffles. Relabeling the deterministic starting deck leaves its distance from uniform unchanged. Thorp introduced the shuffle in a study of nonuniform human shuffling and its consequences for Faro~\cite{thorp,morris44}. Its simple description conceals a difficult full-deck mixing problem: the transitions are nonreversible, and uniformity of individual card positions does not control their joint order. Morris's first polynomial bound for $n=2^d$, circulated in 2005 and published in 2008, gave $O(d^{44})$ physical shuffles~\cite{morris44}. His proof combined evolving sets with a chameleon process for a forward--backward version of the shuffle. Montenegro and Tetali retained Morris's contraction estimate and sharpened the mixing analysis using spectral profiles and evolving sets, obtaining $O(d^{29})$ in 2006 \cite[Theorems~6.14--6.15]{montenegro-tetali2006}. Morris subsequently developed an entropy method that reduces mixing estimates to local interactions between pairs of cards. It yielded $O((\log n)^4)$ physical shuffles for every even $n$~\cite{morris4}, followed by $O(d^3)$ for $n=2^d$~\cite{morris3}. These arguments decompose the entropy of a permutation into conditional one-card contributions and analyze the reverse shuffle. They make explicit why information remaining after other cards are exposed is central to the full-deck problem. Ordered Thorp marginals also arise in the small-domain enciphering analysis of Morris, Rogaway and Stegers~\cite[Theorem~1]{mrs}. For each fixed $0<\varepsilon<1$, their estimate gives $O_\varepsilon(d)$ physical shuffles for specified lists of at most $n^{1-\varepsilon}$ cards. Czumaj and V\"ocking~\cite{CzumajVocking2014} reached lists containing any fixed fraction less than one of the deck: a non-Markovian coupling on butterfly networks gives $O((\log n)^2)$ physical shuffles. Their full-permutation algorithm adds empty cards and removes them afterwards; its chain therefore differs from the unchanged labeled deck considered here. A closely related conditional-energy strategy appears in the swap-or-not analysis of Hoang, Morris and Rogaway \cite[Section~3, Theorem~3 and Lemma~4]{hmr2014}. They control a centered squared error for the next card and sum the resulting conditional errors along an ordered list. Their matching is selected by a fresh uniform group key at each round, and their contraction is averaged over those keys. Here the coordinate directions are prescribed cyclically, while the switch coins remain random. We condition explicitly on preceding cards' complete paths. The resulting transport-and-aver […]
+[theorem] [Fixed lists and a full-deck consequence]\label{thm:first-main} Uniformly over deterministic starting decks and specified ordered lists of distinct labels, the following hold as $d\to\infty$: \begin{enumerate} \item At time $256d$, the images of any $k\le7n/8$ labels have total-variation distance $o(1)$ from $\Unif(\operatorname{inj}([k],V))$. \item At time $1024d$, the images of any $k\le15n/16$ labels have total-variation distance at most $n^{-3/2}$, for all sufficiently large $d$. \item The full permutation law satisfies $\|q_d^{*(2048d)}-U_{S_n}\|_{\TV}\to0$. \end{enumerate}
+
+=== MANUSCRIPT: Conditional permutations in a revealed switching environment (September-26-2026) [preprints/Conditional-permutations-in-a-revealed-switching-environment-September-26-2026/build/main.tex]
+ABSTRACT: Fix half the labels in a Thorp shuffle on $`2^d`$ positions and reveal their complete trajectories. We prove that, after an explicit absolute number of coordinate sweeps, the conditional permutation of the remaining labels approaches uniform in expected total variation as $`d\to\infty`$, uniformly in the initial layout. The resulting constructions give full-deck mixing in a constant multiple of d physical shuffles.
+INTRODUCTION (start): The random switches in a shuffle do more than move individual cards. They define a bijection between all starting and ending positions. If the paths of some cards are revealed, the other cards still undergo a random bijection, but its law depends on the revealed paths. We study when that entire conditional bijection becomes nearly uniform. This asks for information that is absent from a one-card mixing estimate: all remaining labels must be randomized together, after the surrounding motion has been observed. The Thorp shuffle makes this distinction concrete. Split a deck into two equal halves, pair the cards in corresponding positions, and independently choose the order of each pair before interleaving them. For $n=2^d$ positions, undoing a deterministic rotation of the binary coordinates identifies successive shuffles with fair switches in the cyclic directions of the binary cube. A \emph{sweep} visits all $d$ directions once and costs $d$ physical shuffles. Each individual card is uniform after one sweep. The dependence among the routes of different cards remains substantial. Write $U_m$ for uniform measure on the symmetric group $S_m$, and use total variation with its factor $1/2$. The mixing time $t_{\mathrm{mix}}(d)$ is the least number of physical shuffles at which the full-deck law is within $1/4$ of $U_n$ from every deterministic start. Fix $m=n/2$ outside labels. Given their full trajectories $\mathcal E$ through a time interval, list the unoccupied slots at each endpoint in increasing binary order. The switches map the initial free slots bijectively onto the final free slots; the resulting permutation of their indices has a conditional law $\nu_{\mathcal E}$ on $S_m$. Its definition uses the slot indices, independently of the order of the labels entering the interval. Section~\ref{sec:conditional} proves both this construction and the composition rule on consecutive intervals. The main contribution is the information retained after the outside paths are revealed. An independent companion~\cite{optimal-order} gives full-deck mixing after $1600d$ physical shuffles. That conclusion concerns the unconditioned deck law; the theorem here controls the entire remaining assignment conditional on a path environment, with its own explicit time bound. [statement] The conditional conclusion says that the free-slot permutation is nearly independent of the revealed environment. Indeed, if $g$ is that permutation, then \[ \left\|\mathcal L(\mathcal E,g) -\mathcal L(\mathcal E)\otimes U_{n/2}\right\|_{\TV} =\E_{\mathcal E}\|\nu_{\mathcal E}-U_{n/2}\|_{\TV}. \] The equality follows by summing first over the environment and then over the permutation. For each fixed $\varepsilon>0$, Markov's inequality also shows that the probability of a conditional distance exceeding $\varepsilon$ tends to zero, uniformly in the initial layout. Rare path environments can nevertheless leave too few useful switches. The proof handles them by deleting a small amount of probability, with the loss measured under the actual outside-path law; it does not assume that a typical free set stays typical after further conditioning. The first proof has three steps. We first mix any ordered half-deck in $400$ sweeps from every start. A two-copy calculation for a single sweep gives the exact collision kernel of a tagged free card. Splitting it into averages within large subcubes and fluctuations inside those subcubes produces a two-sweep contraction. Next, we alternate a preparation interval of $400$ sweeps with one active sweep. Truncating the preparation law gives domination by a uniform free set and an independent uniform slot permutation. The active sweep forces many coin agreements whenever two copies have many common endpoints. A symmetric-group character bound converts this into a normalized trace contraction. The preparation domination then turns that trace estimate into a matrix contraction which can be iterated while the outside paths continue to be reveale […]
+[theorem] [Conditional permutation and full-deck mixing]\label{thm:methods} Let $n=2^d$, and start the shuffle from any deterministic deck. After $J(s_0+1)$ sweeps, where $s_0=400$ and $J=40000$, the conditional free-slot law defined above satisfies \[ \sup_{\text{initial layouts}}\E_{\mathcal E} \|\nu_{\mathcal E}-U_{n/2}\|_{\TV}\longrightarrow0 \qquad(d\longrightarrow\infty). \] Consequently the full-deck law approaches uniform, uniformly in the starting deck, after $16\,040\,400d$ physical shuffles. For every integer $t\ge0$, after $t$ physical shuffles the full-deck distance from uniform is at least $1-2^{tn/2}/n!$. Thus the full-deck mixing time is of order $d$.
+
+=== MANUSCRIPT: Routing densities and representation contraction for Thorp sweeps (September-26-2026) [preprints/Routing-densities-and-representation-contraction-for-Thorp-sweeps-September-26-2026/build/main.tex]
+ABSTRACT: For $`N=2^d`$ cards, we prove that an absolute number of coordinate sweeps of the Thorp shuffle brings the full permutation law to total-variation distance tending to zero from uniform. The mixing time therefore has optimal order $`\Theta(\log N)`$ in physical shuffles.
+INTRODUCTION (start): \label{sec:introduction} An absolute number of coordinate sweeps suffices to mix the full Thorp permutation. Since a sweep consists of $d$ physical shuffles on $N=2^d$ cards, this gives the optimal order $\Theta(d)$ for the mixing time. A single sweep already sends each card to a uniform position, but the joint positions retain dependencies because all cards use the same random switches. We bound these dependencies through the density of ordered partial permutations, then use representation multiplicities to pass from partial information to the full deck. Write $N=2^d$ with $d\ge1$. The positions are the binary words in $\{0,1\}^d$. A coordinate layer independently swaps or leaves unchanged the cards on every edge in one coordinate direction, with probability $1/2$ each. A sweep visits all $d$ directions in order. In the rotating coordinate frame this is exactly $d$ physical Thorp shuffles; the precise physical map is given in Section~\ref{sec:prelim}. Let $T_N$ be the average action of one sweep. Its adjoint is the average action of a sweep in the reverse order. Thus $K_N=T_N^*T_N$ is the positive operator represented by a sweep followed by its reflection, using fresh independent switches. For $0\le k\le N$, let $\mathcal X_{N,k}$ be the set of ordered lists of $k$ distinct positions, let $(N)_k=N!/(N-k)!$, and let $u_{N,k}$ be its uniform probability measure. For $x,y\in\mathcal X_{N,k}$ define $R_x(y)=(N)_k\Pr_{K_N}(x\mapsto y)$. Thus $R_x$ is a density relative to a uniform injection. For a partition $\lambda\vdash N$, write $D_\lambda$ for its irreducible dimension and $T_N(\lambda)$ for the sweep's average matrix. [statement] The density estimate also measures how much information about the starting tuple remains. Let $P_x$ be its endpoint law under $K_N$, and let $H(P_x)$ be its Shannon entropy, with natural logarithms. Jensen's inequality under $P_x$ gives \[ \log (N)_k-H(P_x)=\KL(P_x\|u_{N,k}) \le a^{-1}\log\E_{u_{N,k}}R_x^{1+a} \le (C/a)k(k/N)^\eta. \] Thus the entropy deficit per tracked card tends to zero when $k/N\to0$. At full occupancy the deficit is $O(N)$ after the reflected pair of sweeps, compared with the initial deficit $\log N!$. The same saving has a representation-theoretic use. A shape whose first row is long occurs many times in a moderately larger injection module. A density cutoff has bounded Hilbert--Schmidt norm on that module, and these repeated copies force its norm on the shape to be small. Larger dimensions need a different use of the network, described below. All traces in the paper are unnormalized; in particular $\|A\|_{\HS}^2=\Tr(A^*A)$. Let $q_d$ denote the law of one physical shuffle, let $U_{S_N}$ be the uniform law on $S_N$, and use $\|\mu-\nu\|_{\TV}=\frac12\sum_g|\mu(g)-\nu(g)|$. Define $t_{\mathrm{mix}}(d)$ as the least number of physical shuffles at which this distance is at most $1/4$; by translation the distance is independent of the starting permutation. The lower obstruction counts random bits. Each physical shuffle uses $N/2$ bits, so after $t$ shuffles at most $2^{tN/2}$ permutations can occur. The exact bound \[ \|q_d^{*t}-U_{S_N}\|_{\TV}\ge1-2^{tN/2}/N! \] implies a lower bound $2d-O(1)$ at distance $1/4$. Together with Theorem~\ref{fac:main}, this gives the optimal order $\Theta(d)$ in physical time. The theorem does not specify a smallest mixing constant or a cutoff profile. \subsection{Network ancestry and previous mixing bounds} Thorp introduced the shuffle in his study of shuffling and Faro \cite{Thorp1973}. For power-of-two decks, Morris's 2005 preprint proved the first polynomial bound, $O(d^{44})$, using evolving sets and a chameleon process~\cite{Morris2008}. Montenegro and Tetali's spectral-profile and evolving-set analysis gave $O(d^{29})$ \cite[Theorems 6.14--6.15]{MontenegroTetali2006}. Morris then used entropy contraction to prove $O((\log N)^4)$ for every even deck size \cite{Morris2009}, and sharpened the contraction over a sweep to obtain $O(d^3)$ when $N=2 […]
+[theorem] [Routing density and representation contraction]\label{fac:main} There are absolute constants $\eta,c,C>0$ such that, with $a=1/1000$, \[ \log\E_{y\sim u_{N,k}}R_x(y)^{1+a} \le Ck(k/N)^\eta \qquad(1\le k\le N), \] uniformly over every starting injection $x$. For every sufficiently large dyadic $N$ and every nontrivial irreducible representation, \[ T_N(\lambda)=0\quad\hbox{or}\quad \|T_N(\lambda)\|_{\op}\le D_\lambda^{-c}. \] Consequently an absolute number of forward sweeps has worst-start total-variation distance from uniform tending to zero as $d\to\infty$.
+
+=== MANUSCRIPT: Row&#8211;column symmetry and contraction of coordinate sweeps (September-26-2026) [preprints/Row-column-symmetry-and-contraction-of-coordinate-sweeps-September-26-2026/build/main.tex]
+ABSTRACT: We prove that the Thorp shuffle on $`N=2^d`$ labeled cards has full-permutation total-variation mixing time $`\Theta(\log N)`$ in physical shuffles. An absolute number of coordinate sweeps suffices for the upper bound.
+INTRODUCTION (start): A coordinate sweep of the Thorp shuffle acts on $N=2^d$ labeled cards. It scans the $d$ binary coordinates in order and, in each direction, independently swaps or leaves unchanged the two cards on every parallel edge. A single card is uniform after a sweep. The full permutation retains dependence because the cards have used the same switches. We prove that an absolute number of sweeps suffices to mix the full permutation. Since a sweep consists of $d$ physical shuffles, this gives the optimal order $\Theta(\log N)$ in physical shuffle time. The Thorp shuffle arose in a study of nonrandom shuffling and advantageous play in Faro \cite{Thorp1973}. For $N=2^d$, Morris proved an $O(d^{44})$ bound using evolving sets \cite{Morris2008}; Montenegro and Tetali sharpened the spectral-profile and evolving-set analysis to $O(d^{29})$ \cite[Section~6.4]{MontenegroTetali2006}. Morris then used entropy contraction to obtain $O((\log N)^4)$ mixing for every even deck size \cite{Morris2009}, followed by an $O(d^3)$ bound for dyadic decks \cite{Morris2013}. These estimates concern the full permutation and count individual physical shuffles; one coordinate sweep comprises $d$ such steps. The $O(d^3)$ full-deck benchmark is also recorded in the November 2025 account of \citet[Section~1]{AlekseevEtAl2025}. Faster bounds for observing a fixed fraction of the cards, such as the $O((\log N)^2)$ bound of \citet{CzumajVocking2014}, concern a different projection of the permutation law. Here we obtain the order $O(d)$ for the full permutation on a dyadic deck, together with quantitative row--column representation estimates. The support bound in Proposition~\ref{ten:support} gives the matching lower order. To see the geometric issue, split the coordinates into two consecutive groups. The positions become a rectangular board. The first part of the sweep acts within rows, and the second within columns; each part consists of independent smaller sweeps. This suggests an induction on the number of coordinates. Its obstacle is that the row and column symmetry decompositions differ, and their projections generally do not commute. We estimate how much of a vector selected by one decomposition can survive selection by the other. Three forms of this estimate lead to the same mixing conclusion while retaining different information about the representation spaces. \subsection{The sweep and its moments} Positions are vectors $x=(x_1,\ldots,x_d)\in\mathbb F_2^d$. A physical Thorp shuffle sends \[ (x_1,u)\longmapsto(u,x_1+\xi_u), \] where the $2^{d-1}$ bits $\xi_u$ are independent and fair. Let $q_d$ denote the law of this shuffle. Removing the deterministic cyclic rotation after each shuffle gives successive matching updates in the $d$ coordinate directions. After $d$ updates the rotation is the identity. Thus one coordinate sweep has exactly the law of $d$ physical shuffles. Permutations map initial positions to final positions, and $gh$ applies $h$ first. Let $K_d=q_d^{*d}$ denote the law of one sweep. On the complex unitary irreducible representation $V_\lambda$ of $S_N$, indexed by a partition $\lambda\vdash N$, put \[ D_\lambda=\dim V_\lambda,\qquad K_d(\lambda)=\sum_{g\in S_N}K_d(g)\rho_\lambda(g). \] A matching layer is an orthogonal projection, so $K_d(\lambda)$ is a contraction. All traces are ordinary, unnormalized traces, and $\|A\|_p^p=\operatorname{Tr}|A|^p$. The matrix $K_d(\lambda)$ need not be normal. On restriction to a subgroup, an irreducible type may occur several times. We call its representation space the carrier and distinguish directions within it from the different multiplicity copies. Our first estimate attaches a positive weight to each Young diagram. When we pass from the full board to its rows and columns, the difference between the diagram weights pays for the cost of restoring deleted cells. The weights still retain a fixed power of representation dimension. Their construction appears in Section~\ref{ten:weighted:part:60}. [statement] Th […]
+[theorem] [Weighted sweep moments]\label{thm:weighted} There are positive weights $W_\lambda$, an absolute finite $p_*$, and real exponents $2\le p_d\le p_*$ such that, for every $d\ge1$ and every $\lambda\vdash2^d$, \begin{equation}\label{eq:weighted-main} D_\lambda^{3/4}\le W_\lambda\le D_\lambda, \qquad W_\lambda\|K_d(\lambda)\|_{p_d}^{p_d}\le1. \end{equation} Consequently $\|K_d(\lambda)\|_{\rm op}\le D_\lambda^{-3/(4p_*)}$.
+[corollary] [Optimal order of mixing]\label{cor:optimal-mixing} There is an absolute constant $C$ such that, for every $d\ge1$, \[ \left\lceil\frac2N\log_2\frac{3N!}{4}\right\rceil \le t_{\rm mix}(d)\le Cd, \qquad N=2^d. \] In particular $t_{\rm mix}(d)=\Theta(d)$, and its lower bound is $2d-O(1)$.
+
+=== MANUSCRIPT: Random-subspace tests and trace smoothing for coordinate sweeps (September-26-2026) [preprints/Random-subspace-tests-and-trace-smoothing-for-coordinate-sweeps-September-26-2026/build/main.tex]
+ABSTRACT: We prove that an absolute number of coordinate sweeps of the Thorp shuffle on $`n=2^d`$ positions brings the full permutation to total-variation distance at most $`\frac12n^{-5}`$ from uniform, uniformly over the initial deck. Thus $`O(d)`$ physical shuffles suffice, which is optimal in order.
+INTRODUCTION (start): A coordinate sweep sends each individual card to a uniform position, while correlations among cards remain. We study a stronger aggregate question: how small is the sum of fixed powers of all the nonconstant singular values of the full permutation operator? The answer gives a quantitative bound for repeated forward sweeps, including their multiplicities in the regular representation. Thorp introduced the shuffle in \cite{Thorp1973}. For $n=2^d$ positions, Morris obtained an $O(d^{44})$ mixing bound using evolving sets and a chameleon process \cite{Morris2008}. Montenegro and Tetali sharpened this to $O(d^{29})$ through spectral-profile and evolving-set estimates \cite[Section~6.4]{MontenegroTetali2006}. Morris then developed an entropy method based on card interactions, obtaining $O(\log^4 n)$ for every even deck size \cite{Morris2009} and $O(d^3)$ for dyadic decks \cite{Morris2013}. These bounds count physical shuffles. The proof here combines partial-deck smoothing with representation multiplicities and an estimate for the overlap of row and column symmetries. Splitting the binary coordinates into two consecutive groups makes one part of a sweep act independently within rows of a rectangular board and the other within columns. The two symmetry decompositions do not commute. Our geometric step estimates their overlap by testing tensor vectors against random subspaces of small dimension, and the resulting induction controls a fixed singular-value moment in the full regular representation. \subsection{The regular-trace statement} Index positions by $\mathbb F_2^d$. One physical shuffle sends \[ (x_1,x_2,\ldots,x_d)\longmapsto (x_2,\ldots,x_d,x_1+\xi_{x_2,\ldots,x_d}), \] with independent fair bits $\xi$. Removing the deterministic rotations gives a sweep through the coordinate matchings. The rotation returns to the identity after $d$ steps. Write $Q_n$ for the law of this sweep and for its average in a representation. A permutation maps inputs to outputs; a product applies its rightmost factor first. Different sweeps use independent coins. Every matching average is an orthogonal projection, so $Q_n$ is a contraction. For $|Y|=(Y^*Y)^{1/2}$, all traces and Schatten norms are unnormalized. The regular trace on the symmetric group is \[ \operatorname{Tr}_{\rm reg}|Q_n|^P =\sum_{\lambda\vdash n}D_\lambda \operatorname{Tr}_{V_\lambda}|Q_n(\lambda)|^P, \] where $V_\lambda$ is the irreducible representation of dimension $D_\lambda$. The constant representation contributes exactly one. [statement] Since one sweep consists of $d$ physical shuffles, the theorem gives an $O(d)$ mixing bound for $n=2^d$ cards. This order is optimal: the support count in Proposition~\ref{ten:support} shows that total-variation distance $1/4$ requires at least $2d-O(1)$ physical shuffles. The regular trace contains all irreducible multiplicities, not just one copy of each Fourier block. The conclusion concerns powers of the forward sweep. Its proof uses Schatten H\"older and does not identify $(Q_n^*Q_n)^v$ with $(Q_n^v)^*Q_n^v$. \subsection{Three ranges of representations} The proof separates three ranges, as shown in Figure~\ref{fig:three-ranges}, because the geometric test has a useful, explicit domain. If $X=\log D_\lambda$, Proposition~\ref{prop:grid-overlap} proves the overlap estimate in a window \[ ne^{-A_0\sqrt{\log n}}\le X\le A_1n \] for fixed positive $A_0,A_1$. In a balanced $a$ by $b$ board, take row and column Fourier projections selecting real unit carrier vectors, including every multiplicity copy. If their carrier dimensions are $D_R,D_F$, we prove \[ D_\lambda\operatorname{Tr}(E_RE_F) \le D_RD_F\exp\!\left(\frac{X}{(\log n)^{1/3}}\right). \] The test chooses independent, unitarily invariant \emph{complex} $r$-planes in the even and odd tensor alphabets, where $r=\lfloor n^{1/100}\rfloor$. The real assumption concerns the selected carrier vectors, and later permits real spectral decompositions of the sweep factors. Two analytic estimates pr […]
+[theorem] [Regular-trace smoothing]\label{ten:lowplanes:main} There is an absolute $P\ge2$ such that for every dyadic $n\ge2$, \begin{equation}\label{ten:lowplanes:eq:1} \operatorname{Tr}_{\rm reg}|Q_n|^P\le1+n^{-10}. \end{equation} If $v$ is an integer with $2v\ge P$, then $v$ independent sweeps have total-variation distance at most $\frac12n^{-5}$ from uniform, from every deterministic initial deck. Here $\|\mu-\nu\|_{\rm TV}=\tfrac12\sum_g|\mu(g)-\nu(g)|$.
+
+=== MANUSCRIPT: Compatibility entropy and the spectrum of a Thorp sweep (September-26-2026) [preprints/Compatibility-entropy-and-the-spectrum-of-a-Thorp-sweep-September-26-2026/build/main.tex]
+ABSTRACT: We prove that the Thorp shuffle on $`n=2^d`$ cards mixes in $`\Theta(d)`$ physical shuffles. After a sufficiently large fixed number of coordinate sweeps, the total-variation distance of the full permutation from uniform tends to zero as $`d\to\infty`$.
+INTRODUCTION (start): A single coordinate sweep of the Thorp shuffle sends each card to a uniform position. This marginal statement leaves open the correlations among cards that have used the same switches. Those correlations are the object of this paper. We ask how much simultaneous row and column structure a permutation can retain, and how that restriction controls all the singular values of the sweep. Let $n=2^d$ and identify the positions with $\{0,1\}^d$. A sweep visits the coordinates in order. At a visit it independently swaps, with probability $1/2$, the two cards on each edge in that coordinate direction. Write $T_n$ for its convolution operator on $\ell^2(S_n)$. One sweep is $d$ physical Thorp shuffles after removing the deterministic rotation of coordinates; Section~\ref{sec:prelim} gives the exact convention. The adjoint reverses the coordinate order. Thus $T_n^*T_n$ is a positive operator for a forward sweep followed by a reverse sweep, with fresh independent switches. Powers of $T_n$ instead describe repeated forward sweeps. Thorp introduced the shuffle in 1973 while studying imperfect shuffling in Faro; his original description already makes the independent pair choices explicit~\cite[Section~3.1]{Thorp1973}. The distinction between one card and the whole deck is fundamental. One sweep uses $nd/2$ random bits, whereas a uniform permutation has entropy $\log_2(n!)$ bits. More generally, the support after $t$ physical shuffles has size at most $2^{tn/2}$, giving the lower bound $2d-O(1)$ for fixed-error mixing. Uniformity of every one-card marginal therefore leaves a substantial global problem. The first polylogarithmic full-deck bound was Morris's $O(d^{44})$ theorem, announced in 2005 and published in 2008~\cite{Morris2008}. Montenegro and Tetali sharpened its evolving-set analysis to $O(d^{29})$~\cite[Section~6.4, Theorems~6.14--6.15]{MontenegroTetali2006}. Morris then introduced entropy contraction arguments giving $O((\log n)^4)$ shuffles for every even deck size~\cite{Morris2009}, and $O(d^3)$ for $n=2^d$~\cite{Morris2013}. These comparisons count physical shuffles at fixed total-variation error. The present paper obtains $\Theta(d)$ mixing for power-of-two decks from a stronger statement about the entire singular spectrum of one sweep. The upper bound uses a fixed number of complete sweeps. Partial-card laws lead to a related but different question. Morris, Rogaway and Stegers obtained bounds for designated labeled cards and used them to analyze enciphering on small domains~\cite{mrs,MorrisRogawayStegers2018}. Czumaj and V\"ocking proved mixing of any fixed fraction less than one of the labeled cards after $O((\log n)^2)$ ordinary Thorp shuffles~\cite{CzumajVocking2014}. Their passage to a full random permutation uses additional indistinguishable cards which are discarded afterward. Czumaj also constructed switching networks that mix a full permutation with $O(n\log n)$ switches and $O((\log n)^2)$ depth~\cite{Czumaj2015}. These results explain the importance of shared-switch correlations beyond individual marginals; their state spaces or networks differ from the ordinary full-deck chain studied here. Splitting the coordinate list in half identifies the positions with a rectangle. The first part of the sweep acts independently within its rows and the second independently within its columns. This is a recursion into smaller sweeps, but its two symmetry decompositions do not commute. We measure this obstruction by the following concrete event. Take an $A$-by-$D$ rectangle with $AD=n$, and let $R=(S_D)^A$ and $C=(S_A)^D$ be its row and column permutation groups. A row permutation $r=(r_i)$ followed by a column permutation $c=(c_k)$ sends $(i,j)$ to $(c_{r_i(j)}(i),r_i(j))$. We call $(r,c)$ \emph{compatible} if this permutation can also be performed by a column permutation followed by a row permutation. Equivalently, for each original column $j$, the $A$ values $c_{r_i(j)}(i)$ are distinct. The opposite-order factorization, if it ex […]
+[theorem] [Weighted compatibility]\label{tra:duality:weighted}\label{tra:duality:weighted-statement} There are absolute constants $L,C_0>0$ such that the following holds. Put $m=\sqrt n$, assume $m/2\le A,D\le2m$, and take $m$ sufficiently large that $\theta=1-L/\log m>0$. For all nonnegative functions $w_i:S_D\to[0,\infty)$ and $v_k:S_A\to[0,\infty)$, \begin{equation}\label{tra:duality:eq5} \frac{n!}{|R||C|}\, \mathbb E_U\!\left[\mathbf1_{\mathcal I} \prod_{i=1}^A w_i(r_i)\prod_{k=1}^D v_k(c_k)\right] \le e^{C_0n^{.54}} \prod_{i=1}^A(\mathbb E w_i^{1/\theta})^\theta \prod_{k=1}^D(\mathbb E v_k^{1/\theta})^\theta . \end{equation} The expectations on the right are uniform on the indicated symmetric groups, and logarithms are natural.
+[theorem] [A bounded regular moment]\label{tra:duality:moment} There is an absolute finite $p_*>0$ such that, for every dyadic $n$, \begin{equation}\label{tra:duality:eq7} Z_n(p_*)\le1+\frac1{16}. \end{equation} For every integer $M\ge p_*$, $M$ independent forward sweeps have worst-start total-variation distance at most $1/8$ from uniform.
+[corollary] [Singular ranks and full-deck mixing]\label{cor:intro-consequences} For every nontrivial $\lambda\vdash n$ and $1\le r\le D_\lambda$, \[ s_r(T_{n,\lambda})\le(16D_\lambda r)^{-1/(2p_*)}. \] If $s_j(T_n)$ denotes the full regular singular list, including all multiplicities and zeros, then \[ s_j(T_n)\le j^{-1/(2p_*)}\qquad(1\le j\le n!). \] The constant singular value is the first value. The physical Thorp chain has worst-start $1/4$ mixing time $\Theta(d)$; more precisely its lower bound is $2d-O(1)$. For every fixed integer $M>p_*$, the worst-start total-variation distance after $Md$ physical shuffles tends to zero as $d\to\infty$.
+
+=== MANUSCRIPT: Signed tensor densities and diagram budgets for the Thorp shuffle (September-26-2026) [preprints/Signed-tensor-densities-and-diagram-budgets-for-coordinate-sweeps-September-26-2026/build/main.tex]
+ABSTRACT: We prove that a fixed number of coordinate sweeps of the Thorp shuffle on $`2^d`$ cards makes the squared L2 distance of the full permutation density from uniform tend to zero as $`d\to\infty`$. In particular, the total-variation mixing time is $`\Theta(d)`$ physical shuffles.
+INTRODUCTION (start): \label{sec:introduction} A coordinate sweep visits each coordinate of a binary position once, independently swapping or retaining the two positions in every coordinate pair. A single card is uniform after one sweep. The full deck is a more difficult object: cards share switches, so their joint permutation law can retain information that every one-card test misses. We bound that information in every irreducible representation of the symmetric group. The bounds imply that an absolute number of sweeps suffices for the full permutation density to converge to uniform in squared $L^2$ distance as the deck size tends to infinity. Let $n=2^d$, $d\ge1$, and identify positions with $\{0,1\}^d$. A sweep first independently swaps or retains every pair in coordinate direction 1, and then does the same in directions $2,\ldots,d$. Write $B_n$ for its probability measure and its average action in a representation. One sweep is $d$ physical Thorp shuffles, after removing the deterministic rotations of coordinates; Section~\ref{sec:prelim} gives the exact convention. For $\lambda\vdash n$, let $V_\lambda$ be the complex Specht module and $D_\lambda=\dim V_\lambda$. Every trace in this paper is unnormalized. \subsection*{Prescribed signed occurrences} The main estimate describes a representation using two kinds of tensor colors and a remainder. Permuting tensor factors carrying odd colors introduces a sign; even colors describe long rows of a Young diagram, and odd colors describe long columns. The remainder is represented by distinctly marked positions. Its size enters the bound with an entropy saving that becomes important when those marks are sparse. Precisely, let $u+v+l=n$ and let $\alpha\vdash u$, $\beta\vdash v$, $\gamma\vdash l$. Suppose \begin{equation}\label{ten:spin:eq:1} V_\alpha\otimes V_{\beta^{\mathrm t}}\otimes V_\gamma \subseteq\operatorname{Res}^{S_n}_{S_u\times S_v\times S_l}V_\lambda, \end{equation} where $\subseteq$ means occurrence, with no multiplicity-one assumption, and $\beta^{\mathrm t}$ is the transposed partition. Empty factors are allowed and have dimension one. Define the unnormalized entropy of the concatenated part lists by \begin{equation}\label{ten:spin:eq:2} F(\alpha,\beta)=\sum_{i:\alpha_i>0}\alpha_i\log\frac{u+v}{\alpha_i} +\sum_{j:\beta_j>0}\beta_j\log\frac{u+v}{\beta_j}. \end{equation} It is zero if $u+v=0$. All logarithms are natural. [statement] The occurrence is prescribed, rather than selected by minimizing the right-hand side. This is useful in the proof itself: a local restriction supplies particular signed factors and a particular remainder, and the same theorem applies to those data. The saving $-l\log(n/l)$ is also essential. The two child bounds retain enough of it to pay for placing the marks when the children are assembled into the parent rectangle. \subsection*{The full permutation law} For a fixed number $L$ of sweeps, let $f_{d,L}(\sigma)=n!\,B_n^{*L}(\sigma)$ be the density of their permutation law with respect to the uniform measure $U_{S_n}$. Let $t_{\mathrm{mix}}(d)$ be the least number of physical shuffles whose law has total variation distance at most $1/4$ from uniform. [statement] To obtain the upper bound, choose an occurrence with no remainder and $F(\alpha,\beta)\le C_0\log D_\lambda$. With $\bar\eta$ sufficiently small, the theorem then gives a negative power of $D_\lambda$ for the sweep norm. Summing those powers by finite-group Fourier analysis proves the corollary. Section~\ref{ten:spin} establishes the required occurrence and completes this argument. The lower bound comes from the number of available switch choices: $t$ physical shuffles have support of size at most $2^{tn/2}$, whereas the uniform law is supported on $n!$ permutations. Lemma~\ref{lem:support} gives $t_{\mathrm{mix}}(d)\ge2d-O(1)$. The same fixed-sweep estimate also gives an approximately uniform permutation sampler whose output coordinates each require only $O(\log n)$ adaptive queries to shared randomness; s […]
+[theorem] [A moment bound for every signed occurrence] \label{ten:spin:main}\label{s:spin-moment} For each sufficiently small fixed $\bar\eta>0$, choose a sufficiently small $\bar\kappa>0$ with $\bar\kappa<\bar\eta/256$. There is an integer $r\ge1$, depending only on these fixed constants, such that for every $d\ge1$, every $\lambda\vdash n=2^d$, and every occurrence~\eqref{ten:spin:eq:1}, \begin{equation}\label{ten:spin:eq:3} \log\!\left(D_\lambda\operatorname{Tr}_{V_\lambda}(B_n^*B_n)^r\right) \le\eta_d F(\alpha,\beta)+g_n(l), \end{equation} where \[ \eta_d=\bar\eta\left(1-\frac1{2\sqrt d}\right),\qquad \kappa_d=\bar\kappa\left(1-\frac1{2\sqrt d}\right),\qquad g_n(l)=\max\{0,\kappa_d l\log n-l\log(n/l)\}. \] Set $g_n(0)=0$ and interpret the logarithm of a zero trace as $-\infty$.
+[corollary] [Fixed-sweep convergence of the full deck] \label{cor:spin-full-deck} There is an absolute positive integer $L$ such that \[ \mathbb E_{U_{S_n}}|f_{d,L}-1|^2\longrightarrow0 \qquad(d\longrightarrow\infty). \] The convergence is uniform over starting orders. Moreover $t_{\mathrm{mix}}(d)=\Theta(d)$.
+
+=== MANUSCRIPT: Conditional coordinate sweeps and analytic transfer (September-26-2026) [preprints/Conditional-coordinate-sweeps-and-analytic-transfer-September-26-2026/build/main.tex]
+ABSTRACT: For coordinate sweeps with near-uniform line laws and line sizes among powers of two in a suitable fixed interval, we prove a Schatten-moment bound after conditioning on any feasible collection of prescribed card trajectories. An analytic transfer to binary sweeps then shows that a fixed number of sweeps mixes the Thorp shuffle on $`2^d`$ cards in $`O(d)`$ physical steps, matching the order of the support lower bound.
+INTRODUCTION (start): \bookmark[level=1,dest={\HyperDestNameFilter{\@currentHref}}]{\refname} } \makeatother \hypersetup{pdftitle={Conditional coordinate sweeps and analytic transfer},pdfauthor={OpenAI}} \title{Conditional coordinate sweeps and analytic transfer} \author{OpenAI} \date{September 26, 2026} \begin{document} \maketitle \begin{abstract} For coordinate sweeps with near-uniform line laws and line sizes among powers of two in a suitable fixed interval, we prove a Schatten-moment bound after conditioning on any feasible collection of prescribed card trajectories. An analytic transfer to binary sweeps then shows that a fixed number of sweeps mixes the Thorp shuffle on $2^d$ cards in $O(d)$ physical steps, matching the order of the support lower bound. \end{abstract}
+[theorem] [Binary sweep contraction]\label{thm:binary} There are absolute constants \(g>0\) and \(d_0\) such that, for \(d\ge d_0\) and every \(\lambda\vdash 2^d\), \[ \|K_\lambda\|_{\op}\le D_\lambda^{-g}. \] The sign representation is annihilated. There is an absolute positive integer \(w\) such that the law after \(w\) independent sweeps converges to uniform in total variation as \(d\to\infty\), uniformly over deterministic initial decks.
+[proposition] [Support obstruction]\label{prop:support} For every integer \(t\ge0\), \[ \|q_d^{*t}-U_N\|_{\TV}\ge1-\frac{2^{tN/2}}{N!}. \] Consequently, \[ t_{\rm mix}(d)\ge \left\lceil\frac2N\log_2\!\left(\frac{3N!}{4}\right)\right\rceil =2d-O(1). \]
+[theorem] [Conditional sweep moment estimate] There\label{thm:conditional}\label{ac:main} are a power of two \(R\ge2\), a positive integer \(q\), and \(z_*>0\) such that every grid and every family \(\mathcal H\) of prescribed disjoint trajectories defined above satisfy, for every \(z\in[0,z_*]\) and every \(\lambda\vdash s-h\), \begin{equation} \log T_\lambda^{\mathcal H}\ \le\ -c(s)F(\lambda)+e(s)h\log s-C(\mathcal H). \label{ac:eq:15} \end{equation} Here a zero moment gives \(-\infty\). Use parameters \[ a=\frac1{100},\quad c_0=e_0=\frac a{100},\qquad c(s)=c_0+\frac1{\sqrt{\log s}},\qquad e(s)=e_0-\frac1{\sqrt{\log s}}. \] The empty diagram has dimension one. If \(h=s\), the remaining bijection is the unique empty bijection and its moment is one. The assertion also includes the one-dimensional trivial representation for every \(h\).
+
+=== MANUSCRIPT: A strict four-row permanent inequality and permutation moments (September-26-2026) [preprints/A-strict-four-row-permanent-inequality-and-permutation-moments-September-26-2026/build/main.tex]
+ABSTRACT: We prove a permanent inequality with exponent strictly below two for laws on S4 sufficiently close to uniform and with exactly uniform coordinate marginals. Applied to a four-row recursion, it shows that an absolute number of coordinate sweeps brings the full permutation of the Thorp shuffle on $`N=2^d`$ cards to total-variation distance tending to zero from uniform as $`N\to\infty`$. Thus the mixing time has the optimal order $`O(\log N)`$ in physical shuffles.
+INTRODUCTION (start): A product of independent random switches can make each card uniform while leaving substantial dependence between cards. The Thorp shuffle illustrates this distinction particularly well. On $N=2^d$ positions, with $d\ge1$, one coordinate sweep visits the binary-coordinate directions in the fixed order $1,\ldots,d$. In each direction it independently swaps the two cards on every edge with probability $1/2$, leaving them in place otherwise. Every individual card is uniform after this sweep. The question is how many sweeps randomize the entire permutation. We study that question through a four-row decomposition. Removing two coordinate directions leaves four smaller independent sweeps, one in each row of a $4$-by-$N/4$ array. The last two directions act within its columns. Each smaller sweep contracts according to the representations of its own row group, but restricting a representation of $S_N$ to the four row groups creates multiplicities. Those multiplicities accumulate as the decomposition is repeated. The main point is an inequality that makes their total cost strictly smaller than the available representation dimension. For a function $f:\{1,2,3,4\}\to[0,\infty)$, write \[ \|f\|_p=\left(\frac14\sum_{j=1}^4 f(j)^p\right)^{1/p}. \] If $u$ denotes uniform measure on $S_4$, then $\E_u\prod_i f_i(\pi(i))$ is the permanent of the matrix $(f_i(j))$ divided by $4!$. Carlen, Lieb and Loss proved that it is at most $\prod_i\|f_i\|_2$ and characterized equality \cite[Theorem~1.1]{cll2006}. For nonzero nonnegative functions on four points, equality requires that every function be constant. We will use both the bound and this equality statement. \begin{samepage} [statement] \end{samepage} Here total variation is one half the sum of the absolute differences of the probability masses. The marginal assumption in the theorem is exact. Indeed, setting three functions equal to one in \eqref{eq:permanent}, and varying the fourth around the constant one, forces its coordinate marginal to be uniform. Thus this hypothesis describes a structural feature of the inequality, as well as the cancellation used in its proof. Permanents with row or column $\ell^p$ constraints have a broader history. Carlen--Lieb--Loss discuss the below-two problem and Caputo's conjecture, and Samorodnitsky obtained further bounds in that range \cite{cll2006,Samorodnitsky2008}. Bristiel and Caputo subsequently proved the sharp permanent bound for every $p\ge1$ \cite[Corollary~1.14]{BristielCaputo2024}. In the present normalization, their result gives \[ \E_u\prod_i f_i(\pi(i))\le\prod_i\|f_i\|_p \quad\text{for every }p\ge p_c:=\frac{4\log4}{\log24}. \] The identity matrix shows that this uniform-law threshold is necessary. The assertion needed here is stability under small perturbations of the permutation law that preserve every coordinate marginal. We prove this nonoptimal robust form directly from the exponent-two theorem: a strict quadratic gap treats functions near constants, while the equality classification and compactness treat all remaining functions. The local calculation explains the endpoint $4/3$ in Theorem~\ref{thm:permanent}; the final exponent is chosen closer to two and is not optimized. Thus a below-two bound for the uniform law is not itself the new ingredient in the recursion. To state the application, let $\rho_\lambda$ be the irreducible unitary representation of $S_N$ indexed by a partition $\lambda\vdash N$, and write $D_\lambda$ for its dimension and $\lambda'$ for the conjugate partition. If $\mu_N$ is the law of one sweep, put \[ T_N(\lambda)=\sum_{g\in S_N}\mu_N(g)\rho_\lambda(g), \qquad B_N(\lambda)=T_N(\lambda)T_N(\lambda)^*. \] Traces are ordinary, unnormalized matrix traces. Unmarked logarithms are natural. [statement] A physical Thorp shuffle consists of independent fair switches on the pairs differing in one binary coordinate, followed by cyclic rotation of the coordinates. Tracking those deterministic rotations makes $d$ physical shuffles  […]
+[theorem] [A robust four-row inequality] There are absolute constants $p_0\in(4/3,2)$ and $\varepsilon>0$ with the following property.\label{thm:permanent} Let $\nu$ be a probability measure on $S_4$ such that \[ \|\nu-u\|_{\TV}<\varepsilon, \qquad \nu\{\pi:\pi(i)=j\}=\frac14\quad(1\le i,j\le4). \] Then every four nonnegative functions on $\{1,2,3,4\}$ satisfy \begin{equation}\label{eq:permanent} \E_\nu\prod_{i=1}^4f_i(\pi(i))\le\prod_{i=1}^4\|f_i\|_{p_0}. \end{equation}
+[theorem] [A fixed moment with a degree saving]\label{thm:moment} There exist an even integer $r\ge2$ and $\eta>0$, independent of $N$, such that for every dyadic $N$ and every $\lambda\vdash N$, \begin{equation}\label{eq:moment} D_\lambda\Tr B_N(\lambda)^r\le D_\lambda^{1-\eta}. \end{equation} Consequently there is an absolute integer $q$ for which the total-variation distance of $q$ independent forward sweeps from uniform tends to zero as $N\to\infty$, uniformly over the starting deck.
+
+=== LEAN COMPARATOR ThorpFirstReciprocal (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+universe uG uV uE uX uH uI uβ uα
+open scoped BigOperators Classical ComplexConjugate InnerProductSpace
+open Filter Topology
+namespace Thorp
+abbrev Position (d : ℕ) := Fin d → Bool
+namespace Block
+variable {I : Type uI} {β : Type uβ} {α : Type uα}
+def perm (p : I → Equiv.Perm β) : Equiv.Perm (I × β) where
+  toFun x := (x.1, p x.1 x.2)
+  invFun x := (x.1, (p x.1)⁻¹ x.2)
+  left_inv x := by simp
+  right_inv x := by simp
+def hom : (I → Equiv.Perm β) →* Equiv.Perm (I × β) where
+  toFun := perm
+  map_one' := by ext ⟨i,b⟩ <;> rfl
+  map_mul' p q := by ext ⟨i,b⟩ <;> rfl
+def embedding (e : α ≃ I × β) : (I → Equiv.Perm β) →* Equiv.Perm α :=
+  (e.symm.permCongrHom).toMonoidHom.comp hom
+end Block
+namespace Fourier
+variable {G : Type uG} [Group G] [Fintype G]
+variable {V : Type uV} [AddCommGroup V] [Module ℂ V]
+def integrated (ρ : Representation ℂ G V) (f : G → ℂ) : Module.End ℂ V :=
+  ∑ g, f g • ρ g
+end Fourier
+namespace Young
+abbrev Cells (D : YoungDiagram) := {p : ℕ × ℕ // p ∈ D.cells}
+def rowCellsEquiv (D : YoungDiagram) : Cells D ≃ (i : Fin (D.colLen 0)) × Fin (D.rowLen i) where
+  toFun x := ⟨⟨x.val.1, YoungDiagram.mem_iff_lt_colLen.mp (D.up_left_mem le_rfl (Nat.zero_le _) x.property)⟩,
+    ⟨x.val.2, YoungDiagram.mem_iff_lt_rowLen.mp x.property⟩⟩
+  invFun x := ⟨(x.1, x.2), YoungDiagram.mem_iff_lt_rowLen.mpr x.2.isLt⟩
+  left_inv x := rfl
+  right_inv x := by cases x; rfl
+def ofPartition {n : ℕ} (p : Nat.Partition n) : YoungDiagram :=
+  YoungDiagram.ofRowLens (p.parts.sort (· ≥ ·)) (Multiset.pairwise_sort _ _).sortedGE
+def longest (D : YoungDiagram) : ℕ := max (D.rowLen 0) (D.colLen 0)
+end Young
+namespace Specht
+variable {G : Type uG} [Group G]
+variable {E : Type uE} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+def cyclic (ρ : Representation ℂ G E) (e : E) : Subrepresentation ρ where
+  toSubmodule := Submodule.span ℂ (Set.range fun g => ρ g e)
+  apply_mem_toSubmodule g := by
+    intro v hv
+    induction hv using Submodule.span_induction with
+    | mem v hv =>
+      obtain ⟨h, rfl⟩ := hv
+      exact Submodule.subset_span ⟨g * h, by simp⟩
+    | zero => simp
+    | add x y hx hy ihx ihy =>
+      simpa using (Submodule.span ℂ (Set.range fun h => ρ h e)).add_mem ihx ihy
+    | smul a x hx ih =>
+      simpa using (Submodule.span ℂ (Set.range fun h => ρ h e)).smul_mem a ih
+namespace PermutationSpace
+variable {X : Type uX} [Fintype X] [MulAction G X]
+def rep : Representation ℂ G (EuclideanSpace ℂ X) where
+  toFun g := {
+    toFun v := WithLp.toLp 2 (fun x => v (g⁻¹ • x))
+    map_add' := by intro v w; rfl
+    map_smul' := by intro a v; rfl }
+  map_one' := by ext v x; simp
+  map_mul' := by
+    intro g h
+    ext v x
+    change v ((g * h)⁻¹ • x) = v (h⁻¹ • g⁻¹ • x)
+    simp [mul_smul]
+variable {H : Type uH} [Group H] [Fintype H]
+def alternator (ι : H →* G) (χ : H →* ℂ) : Module.End ℂ (EuclideanSpace ℂ X) :=
+  ∑ h, χ h • rep (ι h)
+end PermutationSpace
+variable {α : Type uα} [Fintype α]
+def Tabloid (r : α → ℕ) := {f : α → ℕ // ∃ g : Equiv.Perm α, f = r ∘ g}
+instance tabloidFinite (r : α → ℕ) : Finite (Tabloid r) := by
+  apply Finite.of_surjective (fun g : Equiv.Perm α => (⟨r ∘ g, g, rfl⟩ : Tabloid r))
+  rintro ⟨f, g, rfl⟩
+  exact ⟨g, rfl⟩
+instance tabloidFintype (r : α → ℕ) : Fintype (Tabloid r) := Fintype.ofFinite _
+instance tabloidAction (r : α → ℕ) : MulAction (Equiv.Perm α) (Tabloid r) where
+  smul g f := ⟨f.val ∘ ⇑(g⁻¹ : Equiv.Perm α), by
+    obtain ⟨h, hh⟩ := f.property
+    refine ⟨h * g⁻¹, ?_⟩
+    funext x
+    simp only [Function.comp_apply, hh, Equiv.Perm.mul_apply]⟩
+  one_smul f := by apply Subtype.ext; funext x; rfl
+  mul_smul g h f := by
+    apply Subtype.ext
+    funext x
+    change f.val ((g * h)⁻¹ x) = f.val (h⁻¹ (g⁻¹ x))
+    rw [mul_inv_rev, Equiv.Perm.mul_apply]
+def baseTabloid (r : α → ℕ) : Tabloid r := ⟨r, 1, by funext x; rfl⟩
+def fiberGroup (c : α → ℕ) : Subgroup (Equiv.Perm α) where
+  carrier := {g | ∀ x, c (g x) = c x}
+  one_mem' := by intro x; rfl
+  mul_mem' := by intro g h hg hh x;
+[…]
+
+=== LEAN COMPARATOR ThorpRemaining (exact formal statement)
+import Mathlib
+namespace OAI
+universe u v
+noncomputable section
+open scoped BigOperators
+open Filter
+namespace Thorp
+abbrev Position (d : ℕ) := Fin d → Bool
+abbrev State (d : ℕ) := Equiv.Perm (Position d)
+def Coins : ℕ → Type
+  | 0 => Unit
+  | d + 1 => Position d → Bool
+instance coinsFintype (d : ℕ) : Fintype (Coins d) := by
+  cases d <;> simp only [Coins] <;> infer_instance
+instance coinsInhabited (d : ℕ) : Inhabited (Coins d) := by
+  cases d <;> simp only [Coins] <;> infer_instance
+def pairSwitch (d : ℕ) (c : Position d → Bool) : Equiv.Perm (Bool × Position d) where
+  toFun p := (p.1 ^^ c p.2, p.2)
+  invFun p := (p.1 ^^ c p.2, p.2)
+  left_inv p := by
+    rcases p with ⟨b, s⟩
+    cases b <;> cases h : c s <;> simp [h]
+  right_inv p := by
+    rcases p with ⟨b, s⟩
+    cases b <;> cases h : c s <;> simp [h]
+def rotate (d : ℕ) : State d :=
+  Equiv.piCongrLeft (fun _ : Fin d => Bool) (finRotate d).symm
+def step : (d : ℕ) → Coins d → State d
+  | 0, _ => Equiv.refl _
+  | d + 1, c =>
+    (((Fin.consEquiv (fun _ : Fin (d + 1) => Bool)).symm.trans
+      (pairSwitch d c)).trans
+      (Fin.consEquiv (fun _ : Fin (d + 1) => Bool))).trans (rotate (d + 1))
+abbrev History (d t : ℕ) := Fin t → Coins d
+def run (d t : ℕ) (ω : History d t) : State d :=
+  ((List.ofFn fun i : Fin t => step d (ω i)).reverse).prod
+def fairMass {Ω : Type u} {α : Type v} [Fintype Ω] (f : Ω → α) (a : α) : ℝ := by
+  classical
+  exact (∑ ω : Ω, if f ω = a then (1 : ℝ) else 0) / Fintype.card Ω
+def law (d t : ℕ) : State d → ℝ := fairMass (run d t)
+def uniform (d : ℕ) (_ : State d) : ℝ := 1 / Fintype.card (State d)
+def tv {α : Type u} [Fintype α] (μ ν : α → ℝ) : ℝ :=
+  (1 / 2 : ℝ) * ∑ a : α, |μ a - ν a|
+def distance (d t : ℕ) : ℝ := tv (law d t) (uniform d)
+def lawFrom (d t : ℕ) (g₀ : State d) : State d → ℝ :=
+  fairMass (fun ω : History d t => run d t ω * g₀)
+abbrev LabelList (d k : ℕ) := Fin k ↪ Position d
+def coordinateRun (d t : ℕ) (ω : History d t) : State d :=
+  (rotate d)⁻¹ ^ t * run d t ω
+def images {d k : ℕ} (t : ℕ) (start : State d) (labels : LabelList d k)
+    (ω : History d t) : LabelList d k :=
+  labels.trans ((coordinateRun d t ω * start).toEmbedding)
+def listTV {d k : ℕ} (t : ℕ) (start : State d) (labels : LabelList d k) : ℝ :=
+  tv (fairMass (images t start labels)) (fun _ => 1 / Fintype.card (LabelList d k))
+def mixingTime (d : ℕ) : ℕ := sInf {t : ℕ | distance d t ≤ 1 / 4}
+end Thorp
+namespace ThorpNine.Harmonic
+namespace Thorp
+open scoped BigOperators
+open Filter
+abbrev Card (d : ℕ) := Fin d → Bool
+def switchFun {d : ℕ} (ξ : Card d → Bool) (x : Card (d + 1)) : Card (d + 1) :=
+  Fin.cons (Bool.xor (x 0) (ξ (Fin.tail x))) (Fin.tail x)
+theorem switchFun_involutive {d : ℕ} (ξ : Card d → Bool) :
+    Function.Involutive (switchFun ξ) := by
+  intro x
+  funext i
+  refine Fin.cases ?_ (fun j => ?_) i
+  · simp only [switchFun, Fin.cons_zero, Fin.tail_cons]
+    cases x 0 <;> cases ξ (Fin.tail x) <;> rfl
+  · simp [switchFun, Fin.tail]
+def pairSwitch {d : ℕ} (ξ : Card d → Bool) : Equiv.Perm (Card (d + 1)) :=
+  { toFun := switchFun ξ
+    invFun := switchFun ξ
+    left_inv := switchFun_involutive ξ
+    right_inv := switchFun_involutive ξ }
+end Thorp
+namespace Thorp
+run_cmd do
+  Lean.modifyEnv fun env => Lean.Meta.auxLemmasExt.setState env {}
+  let matcherCache := Lean.mkIdent
+    (Lean.mkPrivateNameCore `Lean.Meta.Match.Match `Lean.Meta.Match.matcherExt)
+  Lean.Elab.Command.elabCommand (← `(command|
+    run_cmd Lean.modifyEnv fun env => Lean.EnvExtension.setState $matcherCache env {}))
+open scoped BigOperators Classical
+def Coins : ℕ → Type
+  | 0 => Unit
+  | d + 1 => Card d → Bool
+instance (d : ℕ) : Fintype (Coins d) := by
+  cases d <;> dsimp [Coins] <;> infer_instance
+instance (d : ℕ) : Nonempty (Coins d) := by
+  cases d <;> dsimp [Coins] <;> infer_instance
+def rotate (d : ℕ) : Equiv.Perm (Card d) where
+  toFun x i := x (finRotate d i)
+  invFun x i := x ((finRotate d).symm i)
+  left_inv x := by funext i; simp only [Equiv.apply_symm_apply]
+  right_inv x := by funext i; si
+[…]
+
+=== LEAN COMPARATOR PartialPermutation (exact formal statement)
+import Mathlib
+namespace OAI
+open scoped Classical BigOperators ComplexConjugate MonoidAlgebra
+namespace PartialPermutation
+noncomputable section
+def IsUnitary {G V : Type*} [Group G] [NormedAddCommGroup V]
+    [InnerProductSpace ℂ V] (ρ : Representation ℂ G V) : Prop :=
+  ∀ g x y, inner ℂ (ρ g x) (ρ g y) = inner ℂ x y
+section
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    [FiniteDimensional ℂ V]
+def hsNormSq (A : Module.End ℂ V) : ℝ :=
+  (LinearMap.trace ℂ V (LinearMap.adjoint A * A)).re
+end
+def complexFourier {G V : Type*} [Group G] [Fintype G] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V) (f : G → ℂ) : Module.End ℂ V := ∑ g, f g • ρ g
+section
+variable {G V : Type*} [Group G] [Fintype G] [AddCommGroup V] [Module ℂ V]
+    [FiniteDimensional ℂ V] (ρ : Representation ℂ G V)
+noncomputable def componentSimple (c : isotypicComponents ℂ[G] ρ.asModule) :
+    Submodule ℂ[G] ρ.asModule := c.property.choose
+instance components_finite : Finite (isotypicComponents ℂ[G] ρ.asModule) := by
+  let : IsNoetherian ℂ[G] ρ.asModule := isNoetherian_of_tower ℂ inferInstance
+  infer_instance
+end
+section
+variable (G : Type*) [Group G] [Fintype G]
+def regularRep : Representation ℂ G (EuclideanSpace ℂ G) where
+  toFun g :=
+    { toFun := fun f => WithLp.toLp 2 (fun h => f (g⁻¹ * h))
+      map_add' := by intros; rfl
+      map_smul' := by intros; rfl }
+  map_one' := by ext f h; simp
+  map_mul' := by
+    intro x y
+    ext f h
+    change f ((x * y)⁻¹ * h) = f (y⁻¹ * (x⁻¹ * h))
+    simp [mul_assoc]
+end
+section
+variable {G : Type*} [Group G] [Fintype G]
+abbrev IrreducibleIndex (G : Type*) [Group G] [Fintype G] :=
+  isotypicComponents ℂ[G] (regularRep G).asModule
+noncomputable instance irreducibleIndex_fintype : Fintype (IrreducibleIndex G) :=
+  Fintype.ofFinite _
+abbrev irreducibleSpace (c : IrreducibleIndex G) :=
+  (Subrepresentation.ofSubmodule' (componentSimple (regularRep G) c)).toSubmodule
+abbrev irreducibleDegree (c : IrreducibleIndex G) := Module.finrank ℂ (irreducibleSpace c)
+end
+def mass {G : Type*} [Fintype G] (f : G → ℝ) : ℝ := ∑ g, f g
+def LeftCosetCap {G : Type*} [Group G] [Fintype G]
+    (f : G → ℝ) (H : Subgroup G) (B : ℝ) : Prop :=
+  by classical exact ∀ g, ∑ h : H, f (g * h) ≤ B / H.index
+def blockSubgroup {X : Type*} (M : Set X) : Subgroup (Equiv.Perm X) where
+  carrier := {g | ∀ x, x ∉ M → g x = x}
+  one_mem' := by simp
+  mul_mem' := by
+    intro g h hg hh x hx
+    simp only [Set.mem_ofPred_eq] at hg hh ⊢
+    simp [Equiv.Perm.mul_apply, hh x hx, hg x hx]
+  inv_mem' := by
+    intro g hg x hx
+    exact ((Equiv.eq_symm_apply g).mpr (hg x hx)).symm
+def inverseDegreeSum (G : Type*) [Group G] [Fintype G] (u : ℝ) : ℝ :=
+  ∑ c : IrreducibleIndex G, (irreducibleDegree c : ℝ)^(-u)
+def symmetricInverseDegreeSum (n : ℕ) (u : ℝ) : ℝ :=
+  inverseDegreeSum (Equiv.Perm (Fin n)) u
+def symmetricDegreeConstant (u : ℝ) : ℝ :=
+  sSup {x : ℝ | ∃ n : ℕ, 1 ≤ n ∧ x = symmetricInverseDegreeSum n u}
+def ComplementaryCosetsFiniteStatement : Prop :=
+  ∀ (X : Type*) [Fintype X] [DecidableEq X] (b : ℕ) (_ : 0 < b) (M : Fin b → Set X),
+    (∀ i, (M i).Nonempty) →
+    Pairwise (fun i j => Disjoint (M i) (M j)) → (⋃ i, M i) = Set.univ →
+    ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+      [FiniteDimensional ℂ V] (ρ : Representation ℂ (Equiv.Perm X) V),
+      Representation.IsIrreducible ρ → IsUnitary ρ →
+      ∀ (f : Equiv.Perm X → ℝ) (B u : ℝ),
+      (∀ g, 0 ≤ f g) → mass f ≤ 1 → 0 < u →
+      (∀ i, LeftCosetCap f (blockSubgroup (M i)) B) →
+      (hsNormSq (complexFourier ρ (fun g => f g)) ≤
+        b * B * symmetricDegreeConstant u *
+          (Module.finrank ℂ V : ℝ)^(-1+(u+2)/(b : ℝ))) ∧
+      (‖LinearMap.toContinuousLinearMap (complexFourier ρ (fun g => f g))‖^2 ≤
+        b * B * symmetricDegreeConstant u *
+          (Module.finrank ℂ V : ℝ)^(-1+(u+2)/(b : ℝ)))
+theorem complementaryCosets_finite : ComplementaryCosetsFiniteStatement := by
+  sorry
+end
+end PartialPermutation
+end OAI
+
+
+=== LEAN COMPARATOR ThorpRouting (exact formal statement)
+import Mathlib
+namespace OAI
+namespace ThorpNine.Adaptive
+namespace Thorp
+open scoped BigOperators
+open Filter
+abbrev Card (d : ℕ) := Fin d → Bool
+def switchFun {d : ℕ} (ξ : Card d → Bool) (x : Card (d + 1)) : Card (d + 1) :=
+  Fin.cons (Bool.xor (x 0) (ξ (Fin.tail x))) (Fin.tail x)
+theorem switchFun_involutive {d : ℕ} (ξ : Card d → Bool) :
+    Function.Involutive (switchFun ξ) := by
+  intro x
+  funext i
+  refine Fin.cases ?_ (fun j => ?_) i
+  · simp only [switchFun, Fin.cons_zero, Fin.tail_cons]
+    cases x 0 <;> cases ξ (Fin.tail x) <;> rfl
+  · simp [switchFun, Fin.tail]
+def pairSwitch {d : ℕ} (ξ : Card d → Bool) : Equiv.Perm (Card (d + 1)) :=
+  { toFun := switchFun ξ
+    invFun := switchFun ξ
+    left_inv := switchFun_involutive ξ
+    right_inv := switchFun_involutive ξ }
+def Butterfly : ℕ → Type
+  | 0 => Unit
+  | d + 1 => (Card d → Bool) × (Bool → Butterfly d)
+def childLift {d : ℕ} (p : Bool → Equiv.Perm (Card d)) : Equiv.Perm (Card (d + 1)) where
+  toFun x := Fin.cons (x 0) (p (x 0) (Fin.tail x))
+  invFun x := Fin.cons (x 0) ((p (x 0)).symm (Fin.tail x))
+  left_inv x := by simp only [Fin.cons_zero, Fin.tail_cons, Equiv.symm_apply_apply, Fin.cons_self_tail]
+  right_inv x := by simp only [Fin.cons_zero, Fin.tail_cons, Equiv.apply_symm_apply, Fin.cons_self_tail]
+def butterflyPerm : (d : ℕ) → Butterfly d → Equiv.Perm (Card d)
+  | 0, _ => 1
+  | d + 1, b => pairSwitch b.1 * childLift (fun ε => butterflyPerm d (b.2 ε))
+def SwitchIndex : ℕ → Type
+  | 0 => Empty
+  | d + 1 => Sum (Card d) (Bool × SwitchIndex d)
+instance (d : ℕ) : Fintype (SwitchIndex d) := by
+  induction d with
+  | zero => exact inferInstanceAs (Fintype Empty)
+  | succ d ih => exact inferInstanceAs (Fintype (Sum (Card d) (Bool × SwitchIndex d)))
+instance (d : ℕ) : DecidableEq (SwitchIndex d) := by
+  induction d with
+  | zero => exact inferInstanceAs (DecidableEq Empty)
+  | succ d ih => exact inferInstanceAs (DecidableEq (Sum (Card d) (Bool × SwitchIndex d)))
+def decodeButterfly : (d : ℕ) → (SwitchIndex d → Bool) → Butterfly d
+  | 0, _ => ()
+  | d + 1, ω => (fun y => ω (Sum.inl y), fun ε =>
+      decodeButterfly d (fun i => ω (Sum.inr (ε,i))))
+end Thorp
+namespace Thorp.Specht
+open scoped BigOperators Classical
+abbrev Cell (μ : YoungDiagram) := {x : ℕ × ℕ // x ∈ μ.cells}
+def row {μ : YoungDiagram} (x : Cell μ) : ℕ := x.1.1
+def col {μ : YoungDiagram} (x : Cell μ) : ℕ := x.1.2
+lemma row_lt_colLen {μ : YoungDiagram} (x : Cell μ) : row x < μ.colLen (col x) :=
+  YoungDiagram.mem_iff_lt_colLen.mp x.2
+noncomputable def rowIndex {μ : YoungDiagram} (x : Cell μ) : Fin (μ.colLen 0) :=
+  ⟨row x, (row_lt_colLen x).trans_le (μ.colLen_anti 0 (col x) (Nat.zero_le _))⟩
+abbrev Tabloid (μ : YoungDiagram) :=
+  {f : Cell μ → Fin (μ.colLen 0) // ∃ p : Equiv.Perm (Cell μ), f = rowIndex ∘ p}
+noncomputable instance (μ : YoungDiagram) : Fintype (Tabloid μ) := Fintype.ofFinite _
+noncomputable def baseTabloid (μ : YoungDiagram) : Tabloid μ := ⟨rowIndex, 1, rfl⟩
+noncomputable def tabloidAct {μ : YoungDiagram} (p : Equiv.Perm (Cell μ)) :
+    Equiv.Perm (Tabloid μ) where
+  toFun f := ⟨fun x => f.1 (p⁻¹ x), by
+    obtain ⟨q,hq⟩ := f.2
+    refine ⟨q*p⁻¹, ?_⟩
+    funext x
+    simp only [hq,Function.comp_apply,Equiv.Perm.mul_apply]⟩
+  invFun f := ⟨fun x => f.1 (p x), by
+    obtain ⟨q,hq⟩ := f.2
+    refine ⟨q*p, ?_⟩
+    funext x
+    simp only [hq,Function.comp_apply,Equiv.Perm.mul_apply]⟩
+  left_inv f := by apply Subtype.ext; funext x; simp
+  right_inv f := by apply Subtype.ext; funext x; simp
+@[simp] lemma tabloidAct_apply {μ : YoungDiagram} (p : Equiv.Perm (Cell μ))
+    (f : Tabloid μ) (x : Cell μ) : (tabloidAct p f).1 x = f.1 (p⁻¹ x) := rfl
+@[simp] lemma tabloidAct_one (μ : YoungDiagram) : tabloidAct (1 : Equiv.Perm (Cell μ)) = 1 := by
+  ext f x
+  rfl
+@[simp] lemma tabloidAct_mul {μ : YoungDiagram} (p q : Equiv.Perm (Cell μ)) :
+    tabloidAct (p*q) = tabloidAct p * tabloidAct q := by
+  ext f x
+  simp only [tabloidAct_apply, mul_inv_rev,Equiv.Perm.mul_apply]
+noncomputable def tabloidRep (μ : YoungDia
+[…]
+
+=== LEAN COMPARATOR OccupiedOverlap (exact formal statement)
+import Mathlib
+namespace OAI
+namespace CubeShuffle.Specht
+open scoped BigOperators Classical
+abbrev Cell (μ : YoungDiagram) := {x : ℕ × ℕ // x ∈ μ.cells}
+def row {μ : YoungDiagram} (x : Cell μ) : ℕ := x.1.1
+def col {μ : YoungDiagram} (x : Cell μ) : ℕ := x.1.2
+lemma row_lt_colLen {μ : YoungDiagram} (x : Cell μ) : row x < μ.colLen (col x) :=
+  YoungDiagram.mem_iff_lt_colLen.mp x.2
+noncomputable def rowIndex {μ : YoungDiagram} (x : Cell μ) : Fin (μ.colLen 0) :=
+  ⟨row x, (row_lt_colLen x).trans_le (μ.colLen_anti 0 (col x) (Nat.zero_le _))⟩
+abbrev Tabloid (μ : YoungDiagram) :=
+  {f : Cell μ → Fin (μ.colLen 0) // ∃ p : Equiv.Perm (Cell μ), f = rowIndex ∘ p}
+noncomputable instance (μ : YoungDiagram) : Fintype (Tabloid μ) := Fintype.ofFinite _
+noncomputable def baseTabloid (μ : YoungDiagram) : Tabloid μ := ⟨rowIndex, 1, rfl⟩
+noncomputable def tabloidAct {μ : YoungDiagram} (p : Equiv.Perm (Cell μ)) :
+    Equiv.Perm (Tabloid μ) where
+  toFun f := ⟨fun x => f.1 (p⁻¹ x), by
+    obtain ⟨q,hq⟩ := f.2
+    refine ⟨q*p⁻¹, ?_⟩
+    funext x
+    simp only [hq,Function.comp_apply,Equiv.Perm.mul_apply]⟩
+  invFun f := ⟨fun x => f.1 (p x), by
+    obtain ⟨q,hq⟩ := f.2
+    refine ⟨q*p, ?_⟩
+    funext x
+    simp only [hq,Function.comp_apply,Equiv.Perm.mul_apply]⟩
+  left_inv f := by apply Subtype.ext; funext x; simp
+  right_inv f := by apply Subtype.ext; funext x; simp
+@[simp] lemma tabloidAct_apply {μ : YoungDiagram} (p : Equiv.Perm (Cell μ))
+    (f : Tabloid μ) (x : Cell μ) : (tabloidAct p f).1 x = f.1 (p⁻¹ x) := rfl
+@[simp] lemma tabloidAct_one (μ : YoungDiagram) : tabloidAct (1 : Equiv.Perm (Cell μ)) = 1 := by
+  ext f x
+  rfl
+@[simp] lemma tabloidAct_mul {μ : YoungDiagram} (p q : Equiv.Perm (Cell μ)) :
+    tabloidAct (p*q) = tabloidAct p * tabloidAct q := by
+  ext f x
+  simp only [tabloidAct_apply, mul_inv_rev,Equiv.Perm.mul_apply]
+@[simp] lemma tabloidAct_inv {μ : YoungDiagram} (p : Equiv.Perm (Cell μ)) :
+    tabloidAct p⁻¹ = (tabloidAct p)⁻¹ := by
+  ext f x
+  simp [tabloidAct,Equiv.Perm.inv_def]
+noncomputable def tabloidRep (μ : YoungDiagram) :
+    Representation ℂ (Equiv.Perm (Cell μ)) (Tabloid μ → ℂ) where
+  toFun p :=
+    { toFun := fun v f => v (tabloidAct p⁻¹ f)
+      map_add' := by intros; rfl
+      map_smul' := by intros; rfl }
+  map_one' := by ext v f; simp
+  map_mul' p q := by
+    ext v f
+    simp only [mul_inv_rev,tabloidAct_mul,Equiv.Perm.mul_apply]
+    rfl
+@[simp] lemma tabloidRep_apply {μ : YoungDiagram} (p : Equiv.Perm (Cell μ))
+    (v : Tabloid μ → ℂ) (f : Tabloid μ) : tabloidRep μ p v f = v (tabloidAct p⁻¹ f) := rfl
+noncomputable def delta {μ : YoungDiagram} (f : Tabloid μ) : Tabloid μ → ℂ :=
+  fun g => if g=f then 1 else 0
+noncomputable def colGroup (μ : YoungDiagram) : Subgroup (Equiv.Perm (Cell μ)) where
+  carrier := {p | ∀ x, col (p x) = col x}
+  one_mem' := by intro x; rfl
+  mul_mem' := by intro p q hp hq x; exact (hp (q x)).trans (hq x)
+  inv_mem' := by intro p hp x; simpa using (hp (p⁻¹ x)).symm
+noncomputable def permSign {α : Type*} [Fintype α] [DecidableEq α] (p : Equiv.Perm α) : ℂ :=
+  ((Equiv.Perm.sign p : ℤ) : ℂ)
+section Alternator
+variable {α V : Type*} [Fintype α] [DecidableEq α] [AddCommGroup V] [Module ℂ V]
+noncomputable def alternator (C : Subgroup (Equiv.Perm α))
+    (ρ : Representation ℂ (Equiv.Perm α) V) : Module.End ℂ V := by
+  classical
+  exact ∑ c : C, permSign (c : Equiv.Perm α) • ρ c
+end Alternator
+noncomputable def polytabloid (μ : YoungDiagram) : Tabloid μ → ℂ :=
+  alternator (colGroup μ) (tabloidRep μ) (delta (baseTabloid μ))
+noncomputable def space (μ : YoungDiagram) : Submodule ℂ (Tabloid μ → ℂ) :=
+  Submodule.span ℂ (Set.range (fun p : Equiv.Perm (Cell μ) => tabloidRep μ p (polytabloid μ)))
+lemma orbit_mem_space (μ : YoungDiagram) (p : Equiv.Perm (Cell μ)) :
+    tabloidRep μ p (polytabloid μ) ∈ space μ := Submodule.subset_span ⟨p,rfl⟩
+lemma action_mem_space (μ : YoungDiagram) (p : Equiv.Perm (Cell μ))
+    (v : Tabloid μ → ℂ) (hv : v ∈ space μ) : tabloidRep μ p v ∈ space μ := by
+  induction hv using Su
+[…]
+
+=== LEAN COMPARATOR WeightedSweepMoments (exact formal statement)
+import Mathlib
+namespace OAI
+namespace CubeShuffle.Specht
+open scoped BigOperators Classical
+abbrev Cell (μ : YoungDiagram) := {x : ℕ × ℕ // x ∈ μ.cells}
+def row {μ : YoungDiagram} (x : Cell μ) : ℕ := x.1.1
+def col {μ : YoungDiagram} (x : Cell μ) : ℕ := x.1.2
+lemma row_lt_colLen {μ : YoungDiagram} (x : Cell μ) : row x < μ.colLen (col x) :=
+  YoungDiagram.mem_iff_lt_colLen.mp x.2
+noncomputable def rowIndex {μ : YoungDiagram} (x : Cell μ) : Fin (μ.colLen 0) :=
+  ⟨row x, (row_lt_colLen x).trans_le (μ.colLen_anti 0 (col x) (Nat.zero_le _))⟩
+abbrev Tabloid (μ : YoungDiagram) :=
+  {f : Cell μ → Fin (μ.colLen 0) // ∃ p : Equiv.Perm (Cell μ), f = rowIndex ∘ p}
+noncomputable instance (μ : YoungDiagram) : Fintype (Tabloid μ) := Fintype.ofFinite _
+noncomputable def baseTabloid (μ : YoungDiagram) : Tabloid μ := ⟨rowIndex, 1, rfl⟩
+noncomputable def tabloidAct {μ : YoungDiagram} (p : Equiv.Perm (Cell μ)) :
+    Equiv.Perm (Tabloid μ) where
+  toFun f := ⟨fun x => f.1 (p⁻¹ x), by
+    obtain ⟨q,hq⟩ := f.2
+    refine ⟨q*p⁻¹, ?_⟩
+    funext x
+    simp only [hq,Function.comp_apply,Equiv.Perm.mul_apply]⟩
+  invFun f := ⟨fun x => f.1 (p x), by
+    obtain ⟨q,hq⟩ := f.2
+    refine ⟨q*p, ?_⟩
+    funext x
+    simp only [hq,Function.comp_apply,Equiv.Perm.mul_apply]⟩
+  left_inv f := by apply Subtype.ext; funext x; simp
+  right_inv f := by apply Subtype.ext; funext x; simp
+@[simp] lemma tabloidAct_apply {μ : YoungDiagram} (p : Equiv.Perm (Cell μ))
+    (f : Tabloid μ) (x : Cell μ) : (tabloidAct p f).1 x = f.1 (p⁻¹ x) := rfl
+@[simp] lemma tabloidAct_one (μ : YoungDiagram) : tabloidAct (1 : Equiv.Perm (Cell μ)) = 1 := by
+  ext f x
+  rfl
+@[simp] lemma tabloidAct_mul {μ : YoungDiagram} (p q : Equiv.Perm (Cell μ)) :
+    tabloidAct (p*q) = tabloidAct p * tabloidAct q := by
+  ext f x
+  simp only [tabloidAct_apply, mul_inv_rev,Equiv.Perm.mul_apply]
+@[simp] lemma tabloidAct_inv {μ : YoungDiagram} (p : Equiv.Perm (Cell μ)) :
+    tabloidAct p⁻¹ = (tabloidAct p)⁻¹ := by
+  ext f x
+  simp [tabloidAct,Equiv.Perm.inv_def]
+noncomputable def tabloidRep (μ : YoungDiagram) :
+    Representation ℂ (Equiv.Perm (Cell μ)) (Tabloid μ → ℂ) where
+  toFun p :=
+    { toFun := fun v f => v (tabloidAct p⁻¹ f)
+      map_add' := by intros; rfl
+      map_smul' := by intros; rfl }
+  map_one' := by ext v f; simp
+  map_mul' p q := by
+    ext v f
+    simp only [mul_inv_rev,tabloidAct_mul,Equiv.Perm.mul_apply]
+    rfl
+@[simp] lemma tabloidRep_apply {μ : YoungDiagram} (p : Equiv.Perm (Cell μ))
+    (v : Tabloid μ → ℂ) (f : Tabloid μ) : tabloidRep μ p v f = v (tabloidAct p⁻¹ f) := rfl
+noncomputable def delta {μ : YoungDiagram} (f : Tabloid μ) : Tabloid μ → ℂ :=
+  fun g => if g=f then 1 else 0
+noncomputable def colGroup (μ : YoungDiagram) : Subgroup (Equiv.Perm (Cell μ)) where
+  carrier := {p | ∀ x, col (p x) = col x}
+  one_mem' := by intro x; rfl
+  mul_mem' := by intro p q hp hq x; exact (hp (q x)).trans (hq x)
+  inv_mem' := by intro p hp x; simpa using (hp (p⁻¹ x)).symm
+noncomputable def permSign {α : Type*} [Fintype α] [DecidableEq α] (p : Equiv.Perm α) : ℂ :=
+  ((Equiv.Perm.sign p : ℤ) : ℂ)
+section Alternator
+variable {α V : Type*} [Fintype α] [DecidableEq α] [AddCommGroup V] [Module ℂ V]
+noncomputable def alternator (C : Subgroup (Equiv.Perm α))
+    (ρ : Representation ℂ (Equiv.Perm α) V) : Module.End ℂ V := by
+  classical
+  exact ∑ c : C, permSign (c : Equiv.Perm α) • ρ c
+end Alternator
+noncomputable def polytabloid (μ : YoungDiagram) : Tabloid μ → ℂ :=
+  alternator (colGroup μ) (tabloidRep μ) (delta (baseTabloid μ))
+noncomputable def space (μ : YoungDiagram) : Submodule ℂ (Tabloid μ → ℂ) :=
+  Submodule.span ℂ (Set.range (fun p : Equiv.Perm (Cell μ) => tabloidRep μ p (polytabloid μ)))
+lemma orbit_mem_space (μ : YoungDiagram) (p : Equiv.Perm (Cell μ)) :
+    tabloidRep μ p (polytabloid μ) ∈ space μ := Submodule.subset_span ⟨p,rfl⟩
+lemma action_mem_space (μ : YoungDiagram) (p : Equiv.Perm (Cell μ))
+    (v : Tabloid μ → ℂ) (hv : v ∈ space μ) : tabloidRep μ p v ∈ space μ := by
+  induction hv using Su
+[…]
+
+=== LEAN COMPARATOR CoordinateTrace (exact formal statement)
+import Mathlib
+namespace OAI
+namespace ThorpNine.Harmonic
+namespace Thorp
+open scoped BigOperators
+open Filter
+abbrev Card (d : ℕ) := Fin d → Bool
+def switchFun {d : ℕ} (ξ : Card d → Bool) (x : Card (d + 1)) : Card (d + 1) :=
+  Fin.cons (Bool.xor (x 0) (ξ (Fin.tail x))) (Fin.tail x)
+theorem switchFun_involutive {d : ℕ} (ξ : Card d → Bool) :
+    Function.Involutive (switchFun ξ) := by
+  intro x
+  funext i
+  refine Fin.cases ?_ (fun j => ?_) i
+  · simp only [switchFun, Fin.cons_zero, Fin.tail_cons]
+    cases x 0 <;> cases ξ (Fin.tail x) <;> rfl
+  · simp [switchFun, Fin.tail]
+def pairSwitch {d : ℕ} (ξ : Card d → Bool) : Equiv.Perm (Card (d + 1)) :=
+  { toFun := switchFun ξ
+    invFun := switchFun ξ
+    left_inv := switchFun_involutive ξ
+    right_inv := switchFun_involutive ξ }
+def Coins : ℕ → Type
+  | 0 => Unit
+  | d + 1 => Card d → Bool
+instance (d : ℕ) : Fintype (Coins d) := by
+  cases d <;> dsimp [Coins] <;> infer_instance
+instance (d : ℕ) : Nonempty (Coins d) := by
+  cases d <;> dsimp [Coins] <;> infer_instance
+def rotate (d : ℕ) : Equiv.Perm (Card d) where
+  toFun x i := x (finRotate d i)
+  invFun x i := x ((finRotate d).symm i)
+  left_inv x := by funext i; simp only [Equiv.apply_symm_apply]
+  right_inv x := by funext i; simp only [Equiv.symm_apply_apply]
+def step : (d : ℕ) → Coins d → Equiv.Perm (Card d)
+  | 0, _ => 1
+  | d + 1, ξ => rotate (d + 1) * pairSwitch ξ
+def run (d : ℕ) : (t : ℕ) → (Fin t → Coins d) → Equiv.Perm (Card d)
+  | 0, _ => 1
+  | t + 1, ω => step d (ω (Fin.last t)) * run d t (fun i => ω i.castSucc)
+noncomputable def law (d t : ℕ) (g : Equiv.Perm (Card d)) : ℝ :=
+  (Fintype.card {ω : Fin t → Coins d // run d t ω = g} : ℝ) /
+    (Fintype.card (Fin t → Coins d) : ℝ)
+lemma card_positions (d : ℕ) : Fintype.card (Card d) = 2 ^ d := by
+  simp [Card]
+end Thorp
+namespace Thorp.Specht
+open scoped BigOperators Classical
+abbrev Cell (μ : YoungDiagram) := {x : ℕ × ℕ // x ∈ μ.cells}
+def row {μ : YoungDiagram} (x : Cell μ) : ℕ := x.1.1
+def col {μ : YoungDiagram} (x : Cell μ) : ℕ := x.1.2
+lemma row_lt_colLen {μ : YoungDiagram} (x : Cell μ) : row x < μ.colLen (col x) :=
+  YoungDiagram.mem_iff_lt_colLen.mp x.2
+noncomputable def rowIndex {μ : YoungDiagram} (x : Cell μ) : Fin (μ.colLen 0) :=
+  ⟨row x, (row_lt_colLen x).trans_le (μ.colLen_anti 0 (col x) (Nat.zero_le _))⟩
+abbrev Tabloid (μ : YoungDiagram) :=
+  {f : Cell μ → Fin (μ.colLen 0) // ∃ p : Equiv.Perm (Cell μ), f = rowIndex ∘ p}
+noncomputable instance (μ : YoungDiagram) : Fintype (Tabloid μ) := Fintype.ofFinite _
+noncomputable def baseTabloid (μ : YoungDiagram) : Tabloid μ := ⟨rowIndex, 1, rfl⟩
+noncomputable def tabloidAct {μ : YoungDiagram} (p : Equiv.Perm (Cell μ)) :
+    Equiv.Perm (Tabloid μ) where
+  toFun f := ⟨fun x => f.1 (p⁻¹ x), by
+    obtain ⟨q,hq⟩ := f.2
+    refine ⟨q*p⁻¹, ?_⟩
+    funext x
+    simp only [hq,Function.comp_apply,Equiv.Perm.mul_apply]⟩
+  invFun f := ⟨fun x => f.1 (p x), by
+    obtain ⟨q,hq⟩ := f.2
+    refine ⟨q*p, ?_⟩
+    funext x
+    simp only [hq,Function.comp_apply,Equiv.Perm.mul_apply]⟩
+  left_inv f := by apply Subtype.ext; funext x; simp
+  right_inv f := by apply Subtype.ext; funext x; simp
+@[simp] lemma tabloidAct_apply {μ : YoungDiagram} (p : Equiv.Perm (Cell μ))
+    (f : Tabloid μ) (x : Cell μ) : (tabloidAct p f).1 x = f.1 (p⁻¹ x) := rfl
+@[simp] lemma tabloidAct_one (μ : YoungDiagram) : tabloidAct (1 : Equiv.Perm (Cell μ)) = 1 := by
+  ext f x
+  rfl
+@[simp] lemma tabloidAct_mul {μ : YoungDiagram} (p q : Equiv.Perm (Cell μ)) :
+    tabloidAct (p*q) = tabloidAct p * tabloidAct q := by
+  ext f x
+  simp only [tabloidAct_apply, mul_inv_rev,Equiv.Perm.mul_apply]
+noncomputable def tabloidRep (μ : YoungDiagram) :
+    Representation ℂ (Equiv.Perm (Cell μ)) (Tabloid μ → ℂ) where
+  toFun p :=
+    { toFun := fun v f => v (tabloidAct p⁻¹ f)
+      map_add' := by intros; rfl
+      map_smul' := by intros; rfl }
+  map_one' := by ext v f; simp
+  map_mul' p q := by
+    ext v f
+    simp only [mul_inv_rev,tabloidAct_mul,Equiv.Perm.mul_apply]
+    rfl
+noncomput
+[…]
+
+=== LEAN COMPARATOR ThorpWeightedCompatibility (exact formal statement)
+import Mathlib
+namespace OAI
+open scoped Classical
+namespace ThorpCompatibility
+open Finset
+abbrev Rows (A D : ℕ) := Fin A → Equiv.Perm (Fin D)
+abbrev Cols (A D : ℕ) := Fin D → Equiv.Perm (Fin A)
+def Compatible {A D : ℕ} (r : Rows A D) (c : Cols A D) : Prop :=
+  ∀ j : Fin D, Function.Injective (fun i : Fin A => c (r i j) i)
+noncomputable def uniformMean {α : Type*} [Fintype α] (f : α → ℝ) : ℝ :=
+  (∑ x, f x) / Fintype.card α
+noncomputable def marginalFactor {α : Type*} [Fintype α]
+    (θ : ℝ) (w : α → ℝ) : ℝ :=
+  (uniformMean (fun x => Real.rpow (w x) (1 / θ))) ^ θ
+noncomputable def weightedCompatibility (A D : ℕ)
+    (w : Fin A → Equiv.Perm (Fin D) → ℝ)
+    (v : Fin D → Equiv.Perm (Fin A) → ℝ) : ℝ := by
+  classical
+  exact (Nat.factorial (A * D) : ℝ) /
+    ((Nat.factorial D : ℝ) ^ A * (Nat.factorial A : ℝ) ^ D) *
+    uniformMean (fun rc : Rows A D × Cols A D =>
+      if Compatible rc.1 rc.2 then (∏ i, w i (rc.1 i)) * (∏ k, v k (rc.2 k)) else 0)
+def WeightedCompatibilityTheorem : Prop :=
+  ∃ L C₀ m₀ : ℝ, 0 < L ∧ 0 < C₀ ∧ 0 < m₀ ∧
+    ∀ A D : ℕ,
+    let n : ℝ := A * D
+    let m := Real.sqrt n
+    let θ := 1 - L / Real.log m
+    m₀ ≤ m → 0 < θ → m / ((2 : ℕ) : ℝ) ≤ A → (A : ℝ) ≤ ((2 : ℕ) : ℝ) * m →
+    m / ((2 : ℕ) : ℝ) ≤ D → (D : ℝ) ≤ ((2 : ℕ) : ℝ) * m →
+    ∀ (w : Fin A → Equiv.Perm (Fin D) → ℝ)
+      (v : Fin D → Equiv.Perm (Fin A) → ℝ),
+    (∀ i σ, 0 ≤ w i σ) → (∀ k σ, 0 ≤ v k σ) →
+    weightedCompatibility A D w v ≤
+      Real.exp (C₀ * n ^ (((54 : ℕ) : ℝ) / ((100 : ℕ) : ℝ))) *
+        (∏ i, marginalFactor θ (w i)) * (∏ k, marginalFactor θ (v k))
+theorem weightedCompatibility_main : WeightedCompatibilityTheorem := by
+  sorry
+end ThorpCompatibility
+end OAI
+
+
+=== LEAN COMPARATOR SpinAngle (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open scoped BigOperators ComplexConjugate InnerProductSpace Matrix TensorProduct
+open scoped Matrix.Norms.L2Operator MatrixOrder ComplexOrder
+namespace SpinAngle.Specht
+variable {G : Type*} [Group G]
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+def cyclic (ρ : Representation ℂ G E) (e : E) : Subrepresentation ρ where
+  toSubmodule := Submodule.span ℂ (Set.range fun g => ρ g e)
+  apply_mem_toSubmodule g := by
+    intro v hv
+    induction hv using Submodule.span_induction with
+    | mem v hv =>
+      obtain ⟨h, rfl⟩ := hv
+      exact Submodule.subset_span ⟨g * h, by simp⟩
+    | zero => simp
+    | add x y hx hy ihx ihy =>
+      simpa using (Submodule.span ℂ (Set.range fun h => ρ h e)).add_mem ihx ihy
+    | smul a x hx ih =>
+      simpa using (Submodule.span ℂ (Set.range fun h => ρ h e)).smul_mem a ih
+end SpinAngle.Specht
+namespace SpinAngle.TensorRep
+variable {ι n : Type*} [Fintype ι] [DecidableEq ι] [Fintype n] [DecidableEq n]
+def tensor (a : ι → Matrix n n ℂ) : Matrix (ι → n) (ι → n) ℂ :=
+  fun x y => ∏ i, a i (x i) (y i)
+lemma tensor_mul
+    {ι : Type*} {n : Type*}
+    [Fintype ι]
+    [DecidableEq ι]
+    [Fintype n]
+    [DecidableEq n] (a b : ι → Matrix n n ℂ) :
+    tensor (fun i => a i * b i) = tensor a * tensor b := by
+  ext x y
+  simp only [tensor, Matrix.mul_apply, ← Finset.prod_mul_distrib]
+  symm
+  simpa using (Finset.sum_prod_piFinset (ι := ι) Finset.univ
+    (fun i j => a i (x i) j * b i j (y i)))
+lemma tensor_one
+    {ι : Type*} {n : Type*}
+    [Fintype ι]
+    [DecidableEq ι]
+    [Fintype n]
+    [DecidableEq n] : tensor (fun _ : ι => (1 : Matrix n n ℂ)) = 1 := by
+  ext x y
+  classical
+  by_cases h : x = y
+  · subst y
+    simp [tensor]
+  · obtain ⟨i, hi⟩ := Function.ne_iff.mp h
+    simp only [tensor, Matrix.one_apply, ite_eq_right h]
+    apply Finset.prod_eq_zero (Finset.mem_univ i)
+    simp [hi]
+lemma toEuclideanLin_mul
+    {ι : Type*} {n : Type*}
+    [Fintype ι]
+    [DecidableEq ι]
+    [Fintype n]
+    [DecidableEq n] (a b : Matrix n n ℂ) :
+    Matrix.toEuclideanLin (a * b) =
+      Matrix.toEuclideanLin a * Matrix.toEuclideanLin b := by
+  ext v x
+  change ((a * b) *ᵥ (WithLp.ofLp v)) x = (a *ᵥ (b *ᵥ (WithLp.ofLp v))) x
+  rw [Matrix.mulVec_mulVec]
+lemma toEuclideanLin_one
+    {ι : Type*} {n : Type*}
+    [Fintype ι]
+    [DecidableEq ι]
+    [Fintype n]
+    [DecidableEq n] : Matrix.toEuclideanLin (1 : Matrix n n ℂ) = 1 := by
+  ext v x
+  change ((1 : Matrix n n ℂ) *ᵥ (WithLp.ofLp v)) x = v x
+  simp
+def action : Matrix n n ℂ →* Module.End ℂ (EuclideanSpace ℂ (ι → n)) where
+  toFun a := Matrix.toEuclideanLin (tensor (fun _ : ι => a))
+  map_one' := by rw [tensor_one, toEuclideanLin_one (ι := ι)]
+  map_mul' a b := by rw [tensor_mul, toEuclideanLin_mul (ι := ι)]
+def rep : Representation ℂ (Matrix.unitaryGroup n ℂ) (EuclideanSpace ℂ (ι → n)) :=
+  action.comp (Matrix.unitaryGroup n ℂ).subtype
+lemma tensor_reindex
+    {ι : Type*} {n : Type*}
+    [Fintype ι]
+    [DecidableEq ι]
+    [Fintype n]
+    [DecidableEq n] (a : Matrix n n ℂ) (σ : Equiv.Perm ι) (x y : ι → n) :
+    tensor (fun _ : ι => a) (x ∘ σ) (y ∘ σ) = tensor (fun _ : ι => a) x y := by
+  exact Equiv.prod_comp σ (fun i => a (x i) (y i))
+end SpinAngle.TensorRep
+namespace SpinAngle.Specht
+open scoped Classical
+variable {G : Type*} [Group G]
+namespace PermutationSpace
+open scoped Classical
+variable {X : Type*} [Fintype X] [MulAction G X]
+def rep : Representation ℂ G (EuclideanSpace ℂ X) where
+  toFun g := {
+    toFun v := WithLp.toLp 2 (fun x => v (g⁻¹ • x))
+    map_add' := by intro v w; rfl
+    map_smul' := by intro a v; rfl }
+  map_one' := by ext v x; simp
+  map_mul' := by
+    intro g h
+    ext v x
+    change v ((g * h)⁻¹ • x) = v (h⁻¹ • g⁻¹ • x)
+    simp [mul_smul]
+variable {H : Type*} [Group H] [Fintype H]
+def alternator (ι : H →* G) (χ : H →* ℂ) : Module.End ℂ (EuclideanSpace ℂ X) :=
+  ∑ h, χ h • rep (ι h)
+omit [Fintype X] in
+lemma alternator_apply (ι : H →* G) (χ : H →* ℂ) (v : EuclideanSpace ℂ X) 
+[…]
+
+=== LEAN COMPARATOR SignedSweepMoment (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open scoped BigOperators TensorProduct
+open Module
+namespace SignedSweeps
+abbrev Partition (n : ℕ) := {lam : YoungDiagram // lam.card = n}
+abbrev SymmetricGroup (n : ℕ) := Equiv.Perm (Fin n)
+namespace Partition
+def transpose {n : ℕ} (lam : Partition n) : Partition n :=
+  ⟨lam.1.transpose, by simpa [YoungDiagram.card, YoungDiagram.transpose] using lam.2⟩
+def tableau {n : ℕ} (lam : Partition n) : {c // c ∈ lam.1.cells} ≃ Fin n :=
+  Fintype.equivFinOfCardEq (by simpa using lam.2)
+def rowOf {n : ℕ} (lam : Partition n) (x : Fin n) : ℕ :=
+  ((tableau lam).symm x).1.1
+def colOf {n : ℕ} (lam : Partition n) (x : Fin n) : ℕ :=
+  ((tableau lam).symm x).1.2
+end Partition
+def fiberSubgroup {A C : Type*} (f : A → C) : Subgroup (Equiv.Perm A) where
+  carrier := {g | ∀ x, f (g x) = f x}
+  one_mem' := by intro x; rfl
+  mul_mem' := by
+    intro g h hg hh x
+    exact (hg (h x)).trans (hh x)
+  inv_mem' := by
+    intro g hg x
+    simpa using (hg (g⁻¹ x)).symm
+def rowSubgroup {n : ℕ} (lam : Partition n) : Subgroup (SymmetricGroup n) :=
+  fiberSubgroup lam.rowOf
+def colSubgroup {n : ℕ} (lam : Partition n) : Subgroup (SymmetricGroup n) :=
+  fiberSubgroup lam.colOf
+abbrev RegularSpace (n : ℕ) := EuclideanSpace ℂ (SymmetricGroup n)
+def regularIsometry {n : ℕ} (g : SymmetricGroup n) :
+    RegularSpace n ≃ₗᵢ[ℂ] RegularSpace n :=
+  LinearIsometryEquiv.piLpCongrLeft 2 ℂ ℂ (Equiv.mulLeft g)
+@[simp]
+lemma regularIsometry_apply {n : ℕ} (g : SymmetricGroup n)
+    (f : RegularSpace n) (h : SymmetricGroup n) :
+    regularIsometry g f h = f (g⁻¹ * h) := rfl
+def regularRepresentation (n : ℕ) : Representation ℂ (SymmetricGroup n) (RegularSpace n) where
+  toFun g := (regularIsometry g).toLinearEquiv.toLinearMap
+  map_one' := by ext f h; simp
+  map_mul' := by
+    intro g h
+    ext f k
+    simp [mul_assoc]
+@[simp]
+lemma regularRepresentation_apply {n : ℕ} (g : SymmetricGroup n)
+    (f : RegularSpace n) (h : SymmetricGroup n) :
+    regularRepresentation n g f h = f (g⁻¹ * h) := rfl
+def polytabloid {n : ℕ} (lam : Partition n) : RegularSpace n := by
+  classical
+  exact ∑ c : colSubgroup lam, ∑ a : rowSubgroup lam,
+    (((Equiv.Perm.sign (c : SymmetricGroup n) : ℤˣ) : ℤ) : ℂ) •
+      EuclideanSpace.single ((c : SymmetricGroup n) * (a : SymmetricGroup n)) 1
+def spechtSubrepresentation {n : ℕ} (lam : Partition n) :
+    Subrepresentation (regularRepresentation n) where
+  toSubmodule := Submodule.span ℂ (Set.range (fun g => regularRepresentation n g (polytabloid lam)))
+  apply_mem_toSubmodule := by
+    intro g f hf
+    induction hf using Submodule.span_induction with
+    | mem v hv =>
+        obtain ⟨h, rfl⟩ := hv
+        apply Submodule.subset_span
+        refine ⟨g * h, ?_⟩
+        simp [map_mul, Module.End.mul_apply]
+    | zero => simp
+    | add x y hx hy ihx ihy =>
+        simpa only [map_add] using Submodule.add_mem _ ihx ihy
+    | smul a x hx ih =>
+        simpa only [map_smul] using Submodule.smul_mem _ a ih
+def Specht {n : ℕ} (lam : Partition n) : Type := (spechtSubrepresentation lam).toSubmodule
+instance spechtNormedAddCommGroup {n : ℕ} (lam : Partition n) : NormedAddCommGroup (Specht lam) :=
+  inferInstanceAs (NormedAddCommGroup (spechtSubrepresentation lam).toSubmodule)
+instance spechtInnerProductSpace {n : ℕ} (lam : Partition n) : InnerProductSpace ℂ (Specht lam) :=
+  inferInstanceAs (InnerProductSpace ℂ (spechtSubrepresentation lam).toSubmodule)
+instance spechtFiniteDimensional {n : ℕ} (lam : Partition n) : FiniteDimensional ℂ (Specht lam) :=
+  inferInstanceAs (FiniteDimensional ℂ (spechtSubrepresentation lam).toSubmodule)
+def spechtRepresentation {n : ℕ} (lam : Partition n) :
+    Representation ℂ (SymmetricGroup n) (Specht lam) :=
+  (spechtSubrepresentation lam).toRepresentation
+def spechtDimension {n : ℕ} (lam : Partition n) : ℕ := finrank ℂ (Specht lam)
+def blockEmbedding {u v l n : ℕ} (h : u + v + l = n)
+    (a : SymmetricGroup u) (b : SymmetricGroup v) (c : SymmetricGroup l) :
+    SymmetricGroup n :=
+  let e
+[…]
+
+=== LEAN COMPARATOR BinarySweep (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open scoped BigOperators
+namespace BinaryCoordinateSweeps
+abbrev Slot (d : ℕ) := Fin d → Bool
+def coordinateLayer (d : ℕ) (j : Fin d)
+    (c : (({i : Fin d // i ≠ j} → Bool)) → Bool) : Equiv.Perm (Slot d) :=
+  let e := Equiv.piSplitAt j (fun _ : Fin d => Bool)
+  let sw : Equiv.Perm (Bool × ({i : Fin d // i ≠ j} → Bool)) :=
+    { toFun := fun x => (x.1 ^^ c x.2, x.2)
+      invFun := fun x => (x.1 ^^ c x.2, x.2)
+      left_inv := fun x => by simp
+      right_inv := fun x => by simp }
+  e.trans (sw.trans e.symm)
+abbrev SweepCoins (d : ℕ) :=
+  (j : Fin d) → ({i : Fin d // i ≠ j} → Bool) → Bool
+def binarySweep (d : ℕ) (c : SweepCoins d) : Equiv.Perm (Slot d) :=
+  (List.ofFn (fun j => coordinateLayer d j (c j))).reverse.prod
+def finiteLaw {Ω G : Type*} [Fintype Ω] [Fintype G] (f : Ω → G) (g : G) : ℝ := by
+  classical
+  exact ∑ ω, if f ω = g then (Fintype.card Ω : ℝ)⁻¹ else 0
+def totalVariation {G : Type*} [Fintype G] (p q : G → ℝ) : ℝ :=
+  (1 / ((2 : ℕ) : ℝ)) * ∑ g, |p g - q g|
+def uniformLaw (G : Type*) [Fintype G] : G → ℝ :=
+  fun _ => (Fintype.card G : ℝ)⁻¹
+def binaryLaw (d : ℕ) : Equiv.Perm (Slot d) → ℝ :=
+  finiteLaw (binarySweep d)
+abbrev RepSpace (D : ℕ) := EuclideanSpace ℂ (Fin D)
+def IsUnitaryRep {G : Type*} [Monoid G]
+    {D : ℕ} (ρ : Representation ℂ G (RepSpace D)) : Prop :=
+  ∀ g x, ‖ρ g x‖ = ‖x‖
+def averageOperator {G : Type*} [Fintype G] [Monoid G] {D : ℕ}
+    (p : G → ℝ) (ρ : Representation ℂ G (RepSpace D)) :
+    RepSpace D →L[ℂ] RepSpace D :=
+  LinearMap.toContinuousLinearMap (∑ g, (p g : ℂ) • ρ g)
+def BinaryContractionTarget : Prop :=
+  ∃ g : ℝ, 0 < g ∧ ∃ d₀ : ℕ, ∀ d ≥ d₀, ∀ D : ℕ,
+    ∀ ρ : Representation ℂ (Equiv.Perm (Slot d)) (RepSpace D),
+      ρ.IsIrreducible → IsUnitaryRep ρ →
+      ‖averageOperator (binaryLaw d) ρ‖ ≤ (D : ℝ) ^ (-g)
+def realSign {α : Type*} [Fintype α] [DecidableEq α] : Equiv.Perm α →* ℝ :=
+  (Int.castRingHom ℝ).toMonoidHom.comp ((Units.coeHom ℤ).comp Equiv.Perm.sign)
+section FiniteLaws
+variable {G : Type*} [Fintype G] [Group G]
+def convolution (p q : G → ℝ) (g : G) : ℝ := ∑ x, p x * q (x⁻¹ * g)
+def pointMassOne (g : G) : ℝ := by
+  classical
+  exact if g = 1 then 1 else 0
+def convolutionPower (p : G → ℝ) : ℕ → G → ℝ
+  | 0 => pointMassOne
+  | n + 1 => convolution p (convolutionPower p n)
+end FiniteLaws
+def sweepLaw (d t : ℕ) : Equiv.Perm (Slot d) → ℝ :=
+  convolutionPower (binaryLaw d) t
+def UniformSweepMixingTarget : Prop :=
+  ∃ w : ℕ, ∀ ε : ℝ, 0 < ε → ∃ d₀ : ℕ, ∀ d ≥ d₀,
+    ∀ τ : Equiv.Perm (Slot d),
+      totalVariation (fun g => sweepLaw d w (g * τ⁻¹))
+        (uniformLaw (Equiv.Perm (Slot d))) ≤ ε
+end BinaryCoordinateSweeps
+end
+open scoped BigOperators
+theorem binary_sweep_contraction_and_mixing :
+    BinaryCoordinateSweeps.BinaryContractionTarget ∧
+    (∀ d : ℕ, 0 < d → ∑ g : Equiv.Perm (BinaryCoordinateSweeps.Slot d),
+      BinaryCoordinateSweeps.binaryLaw d g * BinaryCoordinateSweeps.realSign g = 0) ∧
+    BinaryCoordinateSweeps.UniformSweepMixingTarget := by
+  sorry
+end OAI
+
+
+=== LEAN COMPARATOR CoordinateSweeps (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+open scoped BigOperators Matrix.Norms.L2Operator ComplexOrder ComplexConjugate MatrixOrder ENNReal
+open MeasureTheory
+attribute [local instance] Classical.propDecidable
+namespace CoordinateSweeps
+structure FiniteLaw (Ω : Type*) where
+  mass : Ω → ℝ
+  nonneg : ∀ x, 0 ≤ mass x
+  total : ∑ᶠ x, mass x = 1
+namespace FiniteLaw
+variable {Ω X Y : Type*}
+instance : CoeFun (FiniteLaw Ω) (fun _ => Ω → ℝ) := ⟨FiniteLaw.mass⟩
+@[ext] theorem ext {μ ν : FiniteLaw Ω} (h : ∀ x, μ x = ν x) : μ = ν := by
+  cases μ
+  cases ν
+  congr
+  exact funext h
+variable [Fintype Ω] [Fintype X] [Fintype Y]
+@[simp] theorem sum_mass (μ : FiniteLaw Ω) : ∑ x, μ x = 1 := by
+  simpa only [finsum_eq_sum_of_fintype] using μ.total
+def uniform (Ω : Type*) [Fintype Ω] [Nonempty Ω] : FiniteLaw Ω where
+  mass _ := (Fintype.card Ω : ℝ)⁻¹
+  nonneg _ := inv_nonneg.mpr (Nat.cast_nonneg _)
+  total := by
+    rw [finsum_eq_sum_of_fintype]
+    simp only [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+    exact mul_inv_cancel₀ (by exact_mod_cast Fintype.card_ne_zero)
+def map (μ : FiniteLaw Ω) (f : Ω → X) : FiniteLaw X where
+  mass y := ∑ x, if f x = y then μ x else 0
+  nonneg y := Finset.sum_nonneg (fun x _ => by split_ifs; exact μ.nonneg x; exact le_rfl)
+  total := by
+    rw [finsum_eq_sum_of_fintype]
+    classical
+    rw [Finset.sum_comm]
+    simp [μ.sum_mass]
+end FiniteLaw
+abbrev Cube (d : ℕ) := Fin d → Bool
+def pairSwitch {L : Type*} (bits : L → Bool) : Equiv.Perm (Bool × L) where
+  toFun x := (Bool.xor x.1 (bits x.2), x.2)
+  invFun x := (Bool.xor x.1 (bits x.2), x.2)
+  left_inv point := by
+    rcases point with ⟨bit, label⟩
+    change ((bit ^^ bits label) ^^ bits label, label) = (bit, label)
+    cases bit <;> cases bits label <;> simp
+  right_inv point := by
+    rcases point with ⟨bit, label⟩
+    change ((bit ^^ bits label) ^^ bits label, label) = (bit, label)
+    cases bit <;> cases bits label <;> simp
+def binaryLayer {d : ℕ} (j : Fin d) (bits : ({k : Fin d // k ≠ j} → Bool) → Bool) :
+    Equiv.Perm (Cube d) :=
+  (Equiv.funSplitAt j Bool).trans ((pairSwitch bits).trans (Equiv.funSplitAt j Bool).symm)
+def orderedProduct {G : Type*} [Monoid G] {d : ℕ} (g : Fin d → G) : G :=
+  (List.ofFn g).reverse.prod
+abbrev BinaryChoices (d : ℕ) := ∀ j : Fin d, ({k : Fin d // k ≠ j} → Bool) → Bool
+instance (d : ℕ) : Nonempty (BinaryChoices d) := ⟨fun _ _ => false⟩
+def binarySweep (d : ℕ) (bits : BinaryChoices d) : Equiv.Perm (Cube d) :=
+  orderedProduct (fun j => binaryLayer j (bits j))
+def binaryLaw (d : ℕ) : FiniteLaw (Equiv.Perm (Cube d)) :=
+  (FiniteLaw.uniform (BinaryChoices d)).map (binarySweep d)
+structure Grid where
+  b : ℕ
+  positive : 0 < b
+  bits : Fin b → ℕ
+namespace Grid
+def size (G : Grid) : ℕ := ∏ j, 2 ^ G.bits j
+abbrev Slot (G : Grid) := ∀ j, Cube (G.bits j)
+abbrev Line (G : Grid) (j : Fin G.b) := ∀ k : {k : Fin G.b // k ≠ j}, Cube (G.bits k)
+abbrev Choices (G : Grid) := ∀ j, G.Line j → Equiv.Perm (Cube (G.bits j))
+def fiberPerm {A B : Type*} (p : B → Equiv.Perm A) : Equiv.Perm (A × B) where
+  toFun x := (p x.2 x.1, x.2)
+  invFun x := ((p x.2).symm x.1, x.2)
+  left_inv x := by simp
+  right_inv x := by simp
+def stage (G : Grid) (ω : G.Choices) (j : Fin G.b) : Equiv.Perm G.Slot :=
+  (Equiv.piSplitAt j (fun k => Cube (G.bits k))).trans
+    ((fiberPerm (ω j)).trans (Equiv.piSplitAt j (fun k => Cube (G.bits k))).symm)
+def boundary (G : Grid) (ω : G.Choices) (t : ℕ) : Equiv.Perm G.Slot :=
+  ((List.ofFn (G.stage ω)).take t).reverse.prod
+def sweep (G : Grid) (ω : G.Choices) : Equiv.Perm G.Slot := G.boundary ω G.b
+def Allowed (G : Grid) (r : ℕ) : Prop := ∀ j, r ≤ G.bits j ∧ G.bits j ≤ 2 * r
+structure Holes (G : Grid) (h : ℕ) where
+  path : Fin h → Fin (G.b + 1) → G.Slot
+  disjoint : ∀ t, Function.Injective (fun i => path i t)
+  coordinate_step : ∀ i (j : Fin G.b) (k : Fin G.b), k ≠ j →
+    path i j.succ k = path i j.castSucc k
+namespace Holes
+variable {G : Grid} {h : ℕ}
+def Compatible (H : G.Holes h) (ω : G.Choices) : Prop :=
+  ∀ i
+[…]
+
+=== LEAN COMPARATOR FourRowPermanent (exact formal statement)
+import Mathlib
+namespace OAI
+noncomputable section
+namespace FourRow
+open scoped BigOperators
+abbrev Site := Fin 4
+abbrev Perm := Equiv.Perm Site
+abbrev Law := Perm → ℝ
+abbrev Functions := Site → Site → ℝ
+def IsProbability (ν : Law) : Prop :=
+  (∀ π, 0 ≤ ν π) ∧ ∑ π, ν π = 1
+def UniformMarginals (ν : Law) : Prop :=
+  ∀ i j : Site, ∑ π, (if π i = j then ν π else 0) = 1 / 4
+def totalVariation (ν : Law) : ℝ :=
+  (∑ π, |ν π - 1 / 24|) / 2
+def lpNorm (p : ℝ) (f : Site → ℝ) : ℝ :=
+  ((∑ j, (f j) ^ p) / 4) ^ (1 / p)
+def permanentExpectation (ν : Law) (f : Functions) : ℝ :=
+  ∑ π, ν π * ∏ i, f i (π i)
+theorem robust_permanent :
+  ∃ p₀ : ℝ, 4 / 3 < p₀ ∧ p₀ < 2 ∧
+    ∃ ε : ℝ, 0 < ε ∧ ∀ ν : Law,
+      IsProbability ν → totalVariation ν < ε → UniformMarginals ν →
+      ∀ f : Functions, (∀ i j, 0 ≤ f i j) →
+        permanentExpectation ν f ≤ ∏ i, lpNorm p₀ (f i) := by
+  sorry
+end FourRow
+end
+end OAI
+

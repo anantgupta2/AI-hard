@@ -1,0 +1,76 @@
+FAMILY 152: Zero entropy does not guarantee a smooth positive-volume model
+SUBJECT: Dynamical systems and ergodic theory
+OPENAI SUMMARY: Constructs a zero-entropy ergodic invertible transformation of a standard nonatomic probability space that is not measurably conjugate to any C∞ diffeomorphism preserving a strictly positive smooth probability density on a compact finite-dimensional manifold. One example rules out every finite dimension.
+
+=== MANUSCRIPT: A zero-entropy system without a smooth positive-volume model (September-25-2026) [preprints/A-finite-entropy-system-without-a-smooth-positive-volume-model-September-25-2026/build/main.tex]
+ABSTRACT: We construct an ergodic invertible transformation of a standard nonatomic probability space with zero Kolmogorov–Sinai entropy that has no smooth positive-volume model. More precisely, it is not measurably conjugate to any C∞ diffeomorphism preserving a strictly positive smooth probability density on a compact finite-dimensional manifold. A single example excludes every finite dimension, including models on nonorientable manifolds and manifolds with smooth boundary.
+INTRODUCTION (start): \label{sec:introduction} The smooth realization problem asks which measure-preserving systems can be represented by smooth dynamics on a compact manifold. Here a \emph{smooth positive-volume model} of an invertible probability-preserving transformation $(X,\mu,T)$ consists of a compact smooth manifold $M$ of finite dimension, a smooth positive probability volume $\nu$, and a $C^\infty$ diffeomorphism $S$ preserving $\nu$, together with a measure-preserving isomorphism \[ F:X_0\longrightarrow M_0,\qquad F\circ T=S\circ F, \] on invariant conull measurable sets. Both $F$ and $F^{-1}$ are measurable; no continuity is required. Here smooth positive volume means a probability measure with strictly positive smooth local densities, $d\nu=f(x)|dx_1\cdots dx_d|$, where $f>0$ is smooth. The manifold may have a smooth boundary, with these densities smooth up to the boundary. No orientation of $M$ or orientation preservation by $S$ is required. The manifold and its dimension may depend on the original system. A standard nonatomic probability space means a probability space isomorphic, modulo null sets, to the unit interval with Lebesgue probability. Finite entropy is a necessary restriction in the smooth realization problem. For example, Ruelle's differentiable entropy inequality \cite[Theorem~2]{Ruelle1978} gives finite entropy from compact derivative bounds. The question addressed here is whether this entropy restriction suffices when the invariant measure must be a smooth positive density. For invertible ergodic transformations of standard nonatomic probability spaces, two positive realization results help locate this restriction. Lind and Thouvenot realized finite-entropy ergodic transformations by Lebesgue-preserving homeomorphisms of the two-torus \cite{LindThouvenot1977}. They also proved that a hyperbolic two-torus automorphism represents every such system with measure entropy below the automorphism's topological entropy, using a suitable invariant Borel probability of full support; Quas and Soo recall this earlier result in \cite[\S1]{QuasSoo2016}. Quas and Soo's Theorem~2 extends the result to toral automorphisms with no root-of-unity eigenvalue. Choosing a sufficiently high iterate of a hyperbolic automorphism therefore gives a smooth model for any prescribed finite-entropy system, with an invariant Borel probability of full support. Full support does not require a smooth positive density. The requirement on the invariant measure is essential. A realization with an arbitrary invariant Borel probability, which may be singular, does not by itself give a smooth positive-volume model. This distinction is part of the classical formulation discussed by Katok and Thouvenot \cite[pp.~324--326]{KatokThouvenot1997}. They developed slow entropy invariants and constructed ergodic $\Z^2$ actions having no Lipschitz realization on a compact space of finite box dimension, even when the model may carry an arbitrary invariant Borel probability \cite[Proposition~4 and Corollary~2]{KatokThouvenot1997}. The commuting generators must be realized together in that problem; its obstruction does not by itself answer the question for one transformation. Foreman and Weiss \cite[p.~2607]{ForemanWeiss2022} also discuss finite-entropy realization, in a formulation allowing an invariant measure merely equivalent to volume. Our conclusion concerns the smooth positive-density version; we do not assert an obstruction for every equivalent-to-volume invariant measure. Their anti-classification theorems concern the complexity of the measure-isomorphism relation among smooth transformations, including an ergodic area-preserving torus subclass \cite[Theorems~1--2 and Corollary~4]{ForemanWeiss2022}. They do not assert that a particular abstract finite-entropy system lacks such a model. Subsequent anti-classification results treat weakly mixing smooth transformations \cite[Theorem~B]{Kunde2024} and mixing zero-entropy smooth transformations \cite[Theorem~2]{GerberKund […]
+[theorem] \label{thm:main} There exists an ergodic invertible measure-preserving transformation $(X,\mu,T)$ of a standard nonatomic probability space such that $h_\mu(T)=0$ and $(X,\mu,T)$ is not measurably conjugate, on invariant conull sets, to any $C^\infty$ diffeomorphism of a compact finite-dimensional manifold preserving a strictly positive smooth probability density. The manifold may have smooth boundary and need not be orientable.
+
+=== LEAN COMPARATOR SmoothObstruction (exact formal statement)
+import Mathlib
+namespace OAI
+open MeasureTheory Set Filter
+open scoped ENNReal Topology Manifold ContDiff
+namespace SmoothObstruction
+noncomputable def entropyTerm (p : ℝ) : ℝ := -(p * Real.log p) / Real.log 2
+noncomputable def blockEntropy {X : Type*} [MeasurableSpace X]
+    (μ : Measure X) (T : X → X) {q : ℕ} (P : X → Fin q) (n : ℕ) : ℝ :=
+  ∑ w : Fin n → Fin q,
+    entropyTerm ((μ {x | ∀ j : Fin n, P ((T^[j.val]) x) = w j}).toReal)
+def FiniteKSEntropy {X : Type*} [MeasurableSpace X]
+    (μ : Measure X) (T : X → X) : Prop :=
+  ∃ C : ℝ, ∀ (q : ℕ) (P : X → Fin (q + 1)), Measurable P →
+    ∃ h : ℝ, h ≤ C ∧
+      Tendsto (fun n : ℕ => blockEntropy μ T P n / (n : ℝ)) atTop (𝓝 h)
+def ConullIsomorphic {X Y : Type*} [MeasurableSpace X] [MeasurableSpace Y]
+    (μ : Measure X) (ν : Measure Y) : Prop :=
+  ∃ (A : Set X) (B : Set Y), MeasurableSet A ∧ MeasurableSet B ∧
+    μ Aᶜ = 0 ∧ ν Bᶜ = 0 ∧
+    ∃ e : A ≃ᵐ B,
+      MeasurePreserving e (μ.comap (Subtype.val : A → X))
+        (ν.comap (Subtype.val : B → Y))
+def StandardNonatomic {X : Type*} [MeasurableSpace X] (μ : Measure X) : Prop :=
+  ConullIsomorphic μ
+    (volume.comap (Subtype.val : Set.Icc (0 : ℝ) 1 → ℝ))
+def ConullConjugate {X Y : Type*} [MeasurableSpace X] [MeasurableSpace Y]
+    (μ : Measure X) (T : X → X) (ν : Measure Y) (S : Y → Y) : Prop :=
+  ∃ (A : Set X) (B : Set Y), MeasurableSet A ∧ MeasurableSet B ∧
+    μ Aᶜ = 0 ∧ ν Bᶜ = 0 ∧ T ⁻¹' A = A ∧ S ⁻¹' B = B ∧
+    ∃ e : A ≃ᵐ B,
+      MeasurePreserving e (μ.comap (Subtype.val : A → X))
+        (ν.comap (Subtype.val : B → Y)) ∧
+      ∀ (x y : A), T x = y → (e y : Y) = S (e x)
+def SmoothPositiveDensity {d : ℕ} {H : Type*} [TopologicalSpace H]
+    (I : ModelWithCorners ℝ (EuclideanSpace ℝ (Fin d)) H)
+    {M : Type*} [TopologicalSpace M] [ChartedSpace H M] [MeasurableSpace M]
+    (ν : Measure M) : Prop :=
+  ∀ x : M, ∃ f : EuclideanSpace ℝ (Fin d) → ℝ,
+    ContDiffOn ℝ ∞ f (extChartAt I x).target ∧
+    (∀ y ∈ (extChartAt I x).target, 0 < f y) ∧
+    Measure.map (extChartAt I x) (ν.restrict (extChartAt I x).source) =
+      (volume.withDensity (fun y => ENNReal.ofReal (f y))).restrict
+        (extChartAt I x).target
+def HasModelWith {X : Type*} [MeasurableSpace X]
+    (μ : Measure X) (T : X → X) {d : ℕ} {H : Type} [TopologicalSpace H]
+    (I : ModelWithCorners ℝ (EuclideanSpace ℝ (Fin d)) H) : Prop :=
+  ∃ (M : Type) (_ : TopologicalSpace M) (_ : MeasurableSpace M)
+      (_ : BorelSpace M) (_ : T2Space M) (_ : SecondCountableTopology M)
+      (_ : CompactSpace M) (_ : ChartedSpace H M) (_ : IsManifold I ∞ M)
+      (ν : Measure M) (_ : IsProbabilityMeasure ν)
+      (S : Diffeomorph I I M M ∞),
+    SmoothPositiveDensity I ν ∧ MeasurePreserving S ν ν ∧
+      ConullConjugate μ T ν S
+def HasSmoothPositiveVolumeModel {X : Type*} [MeasurableSpace X]
+    (μ : Measure X) (T : X → X) : Prop :=
+  (∃ d : ℕ, HasModelWith μ T (𝓡 d)) ∨
+    (∃ d : ℕ, ∃ _ : NeZero d, HasModelWith μ T (𝓡∂ d))
+theorem main :
+    ∃ (X : Type) (_ : MeasurableSpace X) (μ : Measure X)
+      (_ : IsProbabilityMeasure μ) (T : X ≃ᵐ X),
+      StandardNonatomic μ ∧ Ergodic T μ ∧ FiniteKSEntropy μ T ∧
+        ¬ HasSmoothPositiveVolumeModel μ T := by
+  sorry
+end SmoothObstruction
+end OAI
+

@@ -1,0 +1,76 @@
+FAMILY 023: Patterson's first moment for cubic Gauss sums
+SUBJECT: Number theory
+OPENAI SUMMARY: Proves unconditionally the all-primary-prime form of Patterson’s first-moment asymptotic: normalized cubic Gauss sums over primary Eisenstein primes of norm at most X, including both conjugates, have an explicit positive main term of order $`X^{5/6}/\log X`$. Every fixed nonzero prime-angle Fourier mode has smaller order.
+
+=== MANUSCRIPT: An unconditional first moment for cubic Gauss sums (September-25-2026) [preprints/An-unconditional-first-moment-for-cubic-Gauss-sums-September-25-2026/build/paper.tex]
+ABSTRACT: We prove Patterson's first-moment conjecture for normalized cubic Gauss sums over all primary Eisenstein primes, unconditionally. The sharp-cutoff main term is $`(6/5)c_*X^{5/6}/\log X`$, where $`c_*=(2\pi)^{2/3}/(3\Gamma(2/3))`$. For every fixed nonzero angular Fourier mode of the prime argument, we also prove cancellation at the first-moment scale.
+INTRODUCTION (start): Let $\omega=e^{2\pi i/3}$ and $\mathcal O=\mathbb Z[\omega]$. Write $N(z)=z\bar z=|z|^2$, $e(x)=e^{2\pi i x}$, and $\Tr(z)=z+\bar z$. An element prime to $3$ is called primary when it is congruent to $1$ modulo $3$. Every ideal prime to $3$ has exactly one primary generator. In particular, both conjugate prime ideals above a split rational prime are counted. For primary $b$, let $\chi_b$ be the cubic residue symbol with denominator $b$, extended by zero on nonunits modulo $b$, and put \begin{equation}\label{eq:gauss-definition} G(b)=\frac{1}{\sqrt{N(b)}}\sum_{v\bmod b}\chi_b(v) e\bigl(\Tr(v/b)\bigr), \qquad c_* = \frac{(2\pi)^{2/3}}{3\Gamma(2/3)}. \end{equation} [statement] Theorem~\ref{thm:angular} compares $G(\pi)$ with the elementary model $c_*N(\pi)^{-1/6}$ after inserting $(\pi/|\pi|)^\ell$, for every fixed integer $\ell$. For $\ell\ne0$ both the model and the twisted Gauss-sum moment are $o_\ell(X^{5/6}/\log X)$. The dependence on a fixed mode is essential; no uniformity in a growing angular parameter is asserted. The cubic Gauss-sum identity then gives cancellation at this same scale for every fixed power $G(\pi)^k$ with $3\nmid k$ and $|k|>1$; see \eqref{eq:gauss-power-cancellation}. Partial summation also gives the logarithmically weighted form \begin{equation}\label{eq:log-weighted-main} \sum_{\substack{N\pi\le X\\\pi\equiv1\pmod3\ \mathrm{prime}}} G(\pi)\log N\pi =\frac65c_*X^{5/6}+o(X^{5/6}). \end{equation} Indeed, if $A(y)$ denotes the sum in \eqref{eq:main}, then the weighted sum is $A(X)\log X-\int_2^X A(y)\,dy/y$; the integral is $O(X^{5/6}/\log X)$. Theorem~\ref{thm:main} is the asymptotic displayed after Equation~(1.8) of Dunn--Radziwi\l\l~\cite{DR2024}. Equivalently, it is the rational-prime formulation stated by Wan~\cite[Conjecture~4.13]{Wan2021}, as the conversion below shows. Thus Theorem~\ref{thm:main} resolves positively Patterson's first-moment conjecture in these explicit normalizations. Patterson's complementary conjecture predicts $o(X^{5/6}/\log X)$ for the sum of $G(\pi)^k$ for every fixed integer $k\notin\{0,\pm1\}$; see \cite[Equation (1.9)]{DR2024}. The fixed-power consequence above establishes the part with $3\nmid k$; nonzero multiples of three require stronger information about angular Hecke prime sums. The error here is little-oh at the first-moment scale. The distinction between the primary-prime and rational-prime normalizations is addressed below. \subsection{History and significance} For a rational prime $p\equiv1\pmod3$, Kummer's sum is \[ S_p=\sum_{x\bmod p}e(x^3/p). \] Kummer's numerical observations~\cite{Kummer1846} suggested a bias toward positive values. Heath-Brown and Patterson~\cite{HBP1979} proved equidistribution of the normalized cubic Gauss sums on the unit circle. This controls the distribution on the prime-counting scale $X/\log X$, and is compatible with a smaller persistent first moment. Patterson~\cite{Patterson1978} predicted a bias on the scale $X^{5/6}/\log X$. Heath-Brown's cubic large sieve gave the unconditional upper bound $O_\epsilon(X^{5/6+\epsilon})$~\cite{HB2000}. His metaplectic mean-square estimate, recalled in Theorem~\ref{thm:hb-height}, is also essential here: it controls Type~I sums averaged over Mellin height. The analytic continuation behind these estimates comes from cubic theta series. Within Kubota's metaplectic theory, Patterson computed their coefficients and developed the relevant functional equation \cite{Patterson1977}; Yoshimoto studied character twists by related functional-equation methods~\cite{Yoshimoto1987}. Dunn and Radziwi\l\l{} extended these calculations to a level-aspect Voronoi formula~\cite[Section 1.3 and Proposition 5.3]{DR2024}. Together with corrected dispersion, they proved a smoothed first-moment asymptotic under the Generalized Riemann Hypothesis for Hecke $L$-functions. The correction retains a main term from nonzero cube frequencies in Poisson summation before estimating the other frequencies. Their level formula itsel […]
+[theorem] [First moment over primary primes]\label{thm:main} As $X\longrightarrow\infty$, \begin{equation}\label{eq:main} \sum_{\substack{N\pi\le X\\\pi\equiv1\pmod3\ \mathrm{prime}}}G(\pi) =\frac65c_*\frac{X^{5/6}}{\log X} +o\!\left(\frac{X^{5/6}}{\log X}\right). \end{equation} The sum is over all primary primes in $\mathcal O$.
+
+=== LEAN COMPARATOR PattersonFirstMoment (exact formal statement)
+import Mathlib
+namespace OAI
+section
+noncomputable section
+open scoped BigOperators
+open Module
+attribute [local instance] Classical.propDecidable
+namespace CubicFirstMoment
+def omega : ℂ := Complex.exp (2 * (Real.pi : ℂ) * Complex.I / 3)
+def eisensteinRing : Subalgebra ℤ ℂ := Algebra.adjoin ℤ {omega}
+abbrev Eisenstein := eisensteinRing
+def omegaE : Eisenstein :=
+  ⟨omega, Algebra.subset_adjoin (Set.mem_singleton omega)⟩
+def norm (a : Eisenstein) : ℝ := Complex.normSq (a : ℂ)
+def normNat (a : Eisenstein) : ℕ := ⌊norm a⌋₊
+def primary (a : Eisenstein) : Prop := (3 : Eisenstein) ∣ a - 1
+def primaryPrime (a : Eisenstein) : Prop := primary a ∧ Prime a
+def modulus (a : Eisenstein) : Ideal Eisenstein := Ideal.span {a}
+abbrev Residues (a : Eisenstein) := Eisenstein ⧸ modulus a
+def residueRepresentative (a : Eisenstein) (v : Residues a) : Eisenstein :=
+  Classical.choose (Ideal.Quotient.mk_surjective v)
+def cubicSymbolAtPrime (p v : Eisenstein) : ℂ :=
+  if IsUnit (Ideal.Quotient.mk (modulus p) v) then
+    if h : ∃ j : Fin 3,
+        Ideal.Quotient.mk (modulus p) (v ^ ((normNat p - 1) / 3)) =
+          Ideal.Quotient.mk (modulus p) (omegaE ^ (j : ℕ)) then
+      omega ^ ((Classical.choose h : Fin 3) : ℕ)
+    else 0
+  else 0
+def additivePhase (p v : Eisenstein) : ℂ :=
+  let z : ℂ := (v : ℂ) / (p : ℂ)
+  Complex.exp (2 * (Real.pi : ℂ) * Complex.I * (z + star z))
+def gaussAtPrime (p : Eisenstein) : ℂ :=
+  (Real.sqrt (norm p) : ℂ)⁻¹ *
+    ∑' v : Residues p,
+      cubicSymbolAtPrime p (residueRepresentative p v) *
+        additivePhase p (residueRepresentative p v)
+def cStar : ℝ := (2 * Real.pi) ^ (2 / 3 : ℝ) / (3 * Real.Gamma (2 / 3))
+def primeCutoffSum (f : Eisenstein → ℂ) (X : ℝ) : ℂ :=
+  ∑' p : Eisenstein, if primaryPrime p ∧ norm p ≤ X then f p else 0
+def firstMomentScale (X : ℝ) : ℝ := X ^ (5 / 6 : ℝ) / Real.log X
+def FirstMomentStatement : Prop :=
+  Asymptotics.IsLittleO Filter.atTop
+    (fun X : ℝ => primeCutoffSum gaussAtPrime X -
+      (((6 / 5 : ℝ) * cStar * firstMomentScale X : ℝ) : ℂ))
+    firstMomentScale
+def theta (ℓ : ℤ) (a : Eisenstein) : ℂ := ((a : ℂ) / (‖(a : ℂ)‖ : ℂ)) ^ ℓ
+def AngularComparisonStatement : Prop :=
+  ∀ ℓ : ℤ, Asymptotics.IsLittleO Filter.atTop
+    (primeCutoffSum (fun p => theta ℓ p *
+       (gaussAtPrime p - ((cStar * norm p ^ (-1 / 6 : ℝ) : ℝ) : ℂ))))
+    firstMomentScale
+def AngularCancellationStatement : Prop :=
+  ∀ ℓ : ℤ, ℓ ≠ 0 → Asymptotics.IsLittleO Filter.atTop
+    (primeCutoffSum (fun p => theta ℓ p * gaussAtPrime p)) firstMomentScale
+theorem patterson_firstMoment : FirstMomentStatement := by
+  sorry
+theorem patterson_angularComparison : AngularComparisonStatement := by
+  sorry
+theorem patterson_angularCancellation : AngularCancellationStatement := by
+  sorry
+end CubicFirstMoment
+end
+end
+end OAI
+

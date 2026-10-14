@@ -1,0 +1,92 @@
+FAMILY 317: Thomason model structures in all strict higher dimensions
+SUBJECT: Topology
+OPENAI SUMMARY: Resolves the Ara–Maltsiniotis conjecture: for every n ≥ 1 and n = ω, small strict globular n-categories admit proper combinatorial Thomason model structures Quillen equivalent to simplicial sets. Thus strict higher categories model the homotopy theory of spaces in every stated dimension.
+
+=== MANUSCRIPT: Thomason Model Structures in Every Strict Higher Dimension (September-25-2026) [preprints/Thomason-Model-Structures-in-Every-Strict-Higher-Dimension-September-25-2026/build/paper.tex]
+ABSTRACT: We prove the higher-dimensional Thomason model-structure conjecture of Ara and Maltsiniotis. For every $`1\le n\le\infty`$, the category of small strict globular n-categories admits a proper combinatorial model structure that is Quillen equivalent to simplicial sets. Its weak equivalences and fibrations are detected by the twice-extended Street nerve $`\mathrm{Ex}^2N_n`$, and the Quillen equivalence is given by $`c_n\mathrm{Sd}^2\dashv\mathrm{Ex}^2N_n`$. Thus strict higher categories model the homotopy theory of spaces in every positive finite dimension and in dimension ω.
+INTRODUCTION (start): \label{sec:introduction} Thomason's model structure equips the category of small categories with the homotopy theory of spaces. Its higher-dimensional analogue asks for the same result on the entire category of strict globular $n$-categories, with weak equivalences detected by the Street nerve and fibrations detected by its twice-extended nerve. We prove this analogue in every dimension, resolving positively the higher-dimensional Thomason model-structure conjecture of Ara and Maltsiniotis. Fix a universe of small sets and enlarge the universe when forming categories of small objects. For a positive integer $n$, let $\nCat$ be the category of small strict globular $n$-categories and strict functors. We regard it as the full subcategory of $\omCat$ consisting of strict $\omega$-categories whose cells above dimension $n$ are identities; for $n=\infty$, set $\nCat=\omCat$. There is no invertibility assumption on positive-dimensional cells. The Street nerve and its left adjoint are denoted by \[ c_n:\sSet\rightleftarrows\nCat:N_n, \qquad (N_nX)_m=\Hom_{\omCat}(\Orient{m},X), \] where $\Orient{m}$ is the $m$th oriental. With the usual subdivision adjunction $\Sd\dashv\Ex$, put \[ L_n=c_n\Sd^2,\qquad R_n=\Ex^2N_n. \] Write $W_{\KQ}$ and $\mathrm{Fib}_{\KQ}$ for the weak homotopy equivalences and Kan fibrations of simplicial sets, and define \begin{equation} \label{eq:prescribed-classes} W_n=R_n^{-1}(W_{\KQ})=N_n^{-1}(W_{\KQ}),\qquad F_n=R_n^{-1}(\mathrm{Fib}_{\KQ}),\qquad C_n={}^{\perp}(F_n\cap W_n). \end{equation} Here ${}^{\perp}$ denotes the left lifting class. The equality defining $W_n$ follows from the classical properties of $\Ex$, recalled in Section~\ref{sec:transfer}. [statement] \subsection*{History and significance} Thomason established the case $n=1$ by transferring the simplicial model structure through $c_1\Sd^2\dashv\Ex^2N_1$ \cite{Thomason1980}. His proof separates two issues that persist in higher dimensions: the homotopy behavior of the adjunction unit and the comparison between a pushout of nerves and the nerve of a categorical pushout. For the latter he introduced Dwyer maps and proved the comparison for their arbitrary cobase changes \cite[Definition~4.1 and Proposition~4.3]{Thomason1980}. Cisinski corrected the retract argument used for properness, while preserving the model structure and its properness \cite{Cisinski1999}. Street's orientals extend the nerve to strict higher categories \cite{Street1987}, providing the weak equivalences in the question considered here. Ara and Maltsiniotis developed an abstract transfer theorem, drawing on the homotopy theory of categories developed by Grothendieck and Cisinski, and established the proper combinatorial model structure in dimension two. Using Chiche's comparison theorem for the homotopy categories of categories and $2$-categories, they also obtained the Quillen equivalence \cite[Theorems~4.11, 6.27, 6.30, and Corollary~6.32]{AraMaltsiniotis2014}. Worytkiewicz, Hess, Parent, and Tonks had proposed the two-dimensional structure earlier \cite{WorytkiewiczHessParentTonks2007}; their later corrigendum addresses the gaps identified by Ara and Maltsiniotis \cite{WorytkiewiczHessParentTonks2016}. For arbitrary $1\le n\le\infty$, the transfer framework isolates two sufficient conditions: a unit comparison on nerves of posets, and preservation of certain poset equivalences by every categorical pushout \cite[Scholie~5.14]{AraMaltsiniotis2014}. Ara and Maltsiniotis proved the poset-unit condition in all these dimensions \cite[Corollary~10.11 and Scholie~10.12]{AraMaltsiniotis2015}. Gagna subsequently gave a direct simplicial proof and showed that the Street nerve induces an equivalence with homotopy types after localizing at the nerve weak equivalences \cite[Theorems~5.6 and~6.9]{Gagna2018}. Thus strict higher categories already described the homotopy category of spaces in every dimension. The prescribed model structure requires the additional lifting and factorization sta […]
+[theorem] \label{thm:main} For every $n\in\{1,2,3,\ldots\}\cup\{\infty\}$, the classes $(C_n,W_n,F_n)$ in \eqref{eq:prescribed-classes} form a proper combinatorial model structure on $\nCat$. It is cofibrantly generated by $(L_nI,L_nJ)$, where \[ I=\{\partial\Delta[m]\hookrightarrow\Delta[m]:m\ge0\},\qquad J=\{\Lambda^k[m]\hookrightarrow\Delta[m]:m\ge1,\ 0\le k\le m\}. \] Moreover, \[ L_n:\sSet_{\KQ}\rightleftarrows(\nCat,C_n,W_n,F_n):R_n \] is a Quillen equivalence.
+
+=== LEAN COMPARATOR ThomasonModelStructures (exact formal statement)
+import Mathlib
+noncomputable section
+universe u v w
+section
+namespace OAI.Thomason
+structure OmegaCategory where
+  Cell : Type u
+  source : ℕ → Cell → Cell
+  target : ℕ → Cell → Cell
+  source_source (i j : ℕ) (x : Cell) : source i (source j x) = source (min i j) x
+  target_target (i j : ℕ) (x : Cell) : target i (target j x) = target (min i j) x
+  source_target (i j : ℕ) (x : Cell) :
+    source i (target j x) = if i < j then source i x else target j x
+  target_source (i j : ℕ) (x : Cell) :
+    target i (source j x) = if i < j then target i x else source j x
+  comp (k : ℕ) (x y : Cell) : target k x = source k y → Cell
+  source_comp_le (i k : ℕ) (hik : i ≤ k) (x y : Cell)
+      (h : target k x = source k y) : source i (comp k x y h) = source i x
+  target_comp_le (i k : ℕ) (hik : i ≤ k) (x y : Cell)
+      (h : target k x = source k y) : target i (comp k x y h) = target i y
+  source_comp_gt (i k : ℕ) (hki : k < i) (x y : Cell)
+      (h : target k x = source k y)
+      (hs : target k (source i x) = source k (source i y)) :
+    source i (comp k x y h) = comp k (source i x) (source i y) hs
+  target_comp_gt (i k : ℕ) (hki : k < i) (x y : Cell)
+      (h : target k x = source k y)
+      (ht : target k (target i x) = source k (target i y)) :
+    target i (comp k x y h) = comp k (target i x) (target i y) ht
+  unit_left (k : ℕ) (x : Cell) (h : target k (source k x) = source k x) :
+    comp k (source k x) x h = x
+  unit_right (k : ℕ) (x : Cell) (h : target k x = source k (target k x)) :
+    comp k x (target k x) h = x
+  assoc (k : ℕ) (x y z : Cell)
+      (hxy : target k x = source k y) (hyz : target k y = source k z)
+      (hxy_z : target k (comp k x y hxy) = source k z)
+      (hx_yz : target k x = source k (comp k y z hyz)) :
+    comp k (comp k x y hxy) z hxy_z = comp k x (comp k y z hyz) hx_yz
+  interchange (k l : ℕ) (hkl : k < l) (a b c d : Cell)
+      (hab : target l a = source l b) (hcd : target l c = source l d)
+      (hac : target k a = source k c) (hbd : target k b = source k d)
+      (hab_cd : target k (comp l a b hab) = source k (comp l c d hcd))
+      (hac_bd : target l (comp k a c hac) = source l (comp k b d hbd)) :
+    comp k (comp l a b hab) (comp l c d hcd) hab_cd =
+      comp l (comp k a c hac) (comp k b d hbd) hac_bd
+  finite_dimension (x : Cell) : ∃ k, source k x = x
+end OAI.Thomason
+end
+section
+namespace OAI.Thomason.OmegaCategory
+variable (C : OmegaCategory.{u})
+@[ext]
+structure Functor (C : OAI.Thomason.OmegaCategory.{u}) (D : OAI.Thomason.OmegaCategory.{v}) where
+  map : C.Cell → D.Cell
+  map_source (k : ℕ) (x : C.Cell) : map (C.source k x) = D.source k (map x)
+  map_target (k : ℕ) (x : C.Cell) : map (C.target k x) = D.target k (map x)
+  map_comp (k : ℕ) (x y : C.Cell) (h : C.target k x = C.source k y)
+      (h' : D.target k (map x) = D.source k (map y)) :
+    map (C.comp k x y h) = D.comp k (map x) (map y) h'
+end OAI.Thomason.OmegaCategory
+end
+section
+namespace OAI.Thomason.OmegaCategory.Functor
+variable (C : OmegaCategory.{u})
+variable {C : OmegaCategory.{u}} {D : OmegaCategory.{v}} {B : OmegaCategory.{w}}
+noncomputable def id (C : OAI.Thomason.OmegaCategory.{u}) : OAI.Thomason.OmegaCategory.Functor C C where
+  map x := x
+  map_source _ _ := rfl
+  map_target _ _ := rfl
+  map_comp _ _ _ _ _ := rfl
+noncomputable def comp (F : OAI.Thomason.OmegaCategory.Functor C D) (G : OAI.Thomason.OmegaCategory.Functor D B) : OAI.Thomason.OmegaCategory.Functor C B := by
+  classical
+  have proof_map_composable_0 {C : OAI.Thomason.OmegaCategory.{u}} {D : OAI.Thomason.OmegaCategory.{v}}  (F : OAI.Thomason.OmegaCategory.Functor C D) {k : ℕ} {x y : C.Cell}
+      (h : C.target k x = C.source k y) :
+      D.target k (F.map x) = D.source k (F.map y) := by
+    rw [← F.map_target, ← F.map_source, h]
+  exact {
+    map x := G.map (F.map x)
+    map_source k x := by rw [F.map_source, G.map_source]
+    map_target k x := by rw [F.map_target, G.map_target]
+    map_comp k x y h h' := by
+      rw [F.map_comp k x y h (proof_map_composable_0 F h), G.map_c
+[…]

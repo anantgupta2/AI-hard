@@ -1,0 +1,37 @@
+FAMILY 145: Rokhlin’s multiple-mixing problem
+SUBJECT: Dynamical systems and ergodic theory
+OPENAI SUMMARY: Proves that every invertible mixing probability-preserving transformation is mixing of all finite orders, resolving Rokhlin's multiple-mixing problem for a single transformation. Correlations among any finite collection of measurable sets converge to the product of their measures whenever all pairwise time separations diverge.
+
+=== MANUSCRIPT: Rokhlin's multiple-mixing problem for one transformation (September-23-2026) [preprints/Rokhlins-multiple-mixing-problem-for-one-transformation-September-23-2026/build/main.tex]
+ABSTRACT: Every invertible mixing probability-preserving transformation is mixing of every finite order. Thus Rokhlin's multiple-mixing problem for a single transformation has an affirmative answer.
+INTRODUCTION (start): \label{sec:introduction} Let $(\Omega,\mathcal F,\mu)$ be a probability space and let $T$ be an invertible measurable transformation with measurable inverse that preserves $\mu$. The transformation is \emph{mixing} if \[ \mu(A\cap T^{-n}B)\longrightarrow\mu(A)\mu(B) \qquad(|n|\to\infty) \] for every $A,B\in\mathcal F$. For an integer $k\ge2$, it is \emph{mixing of order $k$} if \[ \mu\left(\bigcap_{i=1}^k T^{-t_i}A_i\right) \longrightarrow\prod_{i=1}^k\mu(A_i) \] whenever $t_1<\cdots<t_k$ are integers and $\min_{i<k}(t_{i+1}-t_i)\to\infty$, for every fixed choice of the measurable sets $A_i$. Invariance allows us to take $t_1=0$. [statement] Corollary~\ref{cor:endomorphisms-flows} extends the conclusion to mixing endomorphisms on arbitrary probability spaces and to mixing flows whose Koopman operators are strongly continuous on $L^1$. These consequences are stated and proved in Section~\ref{sec:consequences}. Theorem~\ref{thm:main} answers Rokhlin's multiple-mixing problem affirmatively for one transformation. Rokhlin~\cite{Rokhlin1949} introduced higher-order mixing and proved it for ergodic surjective continuous endomorphisms of compact commutative groups with Haar probability. The question whether ordinary mixing alone implies the next order is presented as Rokhlin's 1949 question in de la Rue's account~\cite[Section~1.1]{deLaRue2006}; Ryzhikov surveys the all-orders formulation in~\cite[Section~1]{Ryzhikov2024}. We count the order by the number of sets, as de la Rue does: order $k$ here corresponds to multiplicity $k-1$ in Rokhlin and Ryzhikov. Neither a group structure nor any other special form of the transformation is assumed in our theorem. The distinction between one time generator and several is essential. Ledrappier's zero-entropy, mixing $\Z^2$ example is not threefold mixing~\cite{Ledrappier1978}; de la Rue explains its three-dot relation and why a direct one-dimensional analogue fails \cite[Sections~1.2 and~3.4, preprint version]{deLaRue2006}. On the positive side, Kalikow proved the twofold-to-threefold implication for rank-one transformations~\cite{Kalikow1984}. Host obtained all orders under a singular-spectrum hypothesis~\cite{Host1991}, and Ryzhikov obtained all-orders conclusions for mixing finite-rank automorphisms \cite{Ryzhikov1993}. More recently, Kanigowski and Ravotti proved that mixing locally uniformly shearing flows are mixing of all orders \cite[Theorem~6.8]{KanigowskiRavotti2024}. These results require structure not present in a general mixing transformation. For strongly mixing actions of countable abelian groups on separable probability spaces, Bergelson and Zelada proved that the higher-order good layouts form a strong Ramsey-large set~\cite[Theorem~1.11]{BergelsonZelada2024}; this does not assert convergence along every diverging-gap layout required here. The language of joinings, originating with Furstenberg's work on disjointness~\cite{Furstenberg1967}, makes a failure of higher-order mixing visible as a nonproduct limit law with independent proper marginals. Pairwise independence alone does not force a joining to be product. For an aperiodic finite-alphabet process, Janvresse and de la Rue show that a pairwise-independent joining in which one coordinate is a continuous function of the other two forces positive entropy~\cite{JanvresseDeLaRue2008}. For the twofold/threefold question, de la Rue records both the limit joining and a zero-entropy reduction \cite[Propositions~3.1 and~3.2, preprint version]{deLaRue2006}. At arbitrary order, an antecedent Pinsker-factor reduction is described by Ryzhikov~\cite[p.~251]{Ryzhikov1997}, who attributes it to a lemma of Thouvenot~\cite{Thouvenot1975Pinsker}. We prove below the exact finite-alphabet, least-failure form needed here, including the passage from a possibly nonstandard original probability space. The new obstacle after that reduction is to control all residual interactions of the proper-independent limit law, not merely a selected joining. We  […]
+[theorem] \label{thm:main} Every invertible mixing probability-preserving transformation is mixing of every finite order. More explicitly, under the assumptions above, for every $k\ge3$ and every $A_1,\ldots,A_k\in\mathcal F$, \[ \mu\bigl(A_1\cap T^{-n_1}A_2\cap\cdots\cap T^{-(n_1+\cdots+n_{k-1})}A_k\bigr) \longrightarrow\prod_{i=1}^k\mu(A_i) \] as $\min(n_1,\ldots,n_{k-1})\to\infty$ through positive integers. No standardness or countable-generation assumption is imposed on the original probability space.
+
+=== LEAN COMPARATOR Rokhlin (exact formal statement)
+import Mathlib
+namespace OAI
+open MeasureTheory Filter
+open scoped BigOperators Topology
+namespace Rokhlin
+variable {Ω : Type*} [MeasurableSpace Ω]
+def timeMap (T : Ω ≃ᵐ Ω) (n : ℤ) : Ω → Ω :=
+  ⇑((T.toEquiv : Equiv.Perm Ω) ^ n)
+def IsMixing (μ : Measure Ω) (T : Ω ≃ᵐ Ω) : Prop :=
+  ∀ A B : Set Ω, MeasurableSet A → MeasurableSet B →
+    Tendsto (fun n : ℤ => μ (A ∩ timeMap T n ⁻¹' B))
+      (comap Int.natAbs atTop) (𝓝 (μ A * μ B))
+def layoutTime {k : ℕ} (gaps : Fin (k - 1) → ℕ+) (i : Fin k) : ℕ :=
+  ∑ j : Fin (k - 1), if j.val < i.val then (gaps j : ℕ) else 0
+def MixingOfOrder (μ : Measure Ω) (T : Ω ≃ᵐ Ω) (k : ℕ) : Prop :=
+  ∀ A : Fin k → Set Ω, (∀ i, MeasurableSet (A i)) →
+    Tendsto
+      (fun gaps : Fin (k - 1) → ℕ+ =>
+        μ (⋂ i : Fin k, timeMap T (layoutTime gaps i : ℤ) ⁻¹' A i))
+      atTop (𝓝 (∏ i : Fin k, μ (A i)))
+theorem mixing_all_finite_orders (μ : Measure Ω) [IsProbabilityMeasure μ]
+    (T : Ω ≃ᵐ Ω) (h_pres : MeasurePreserving T μ μ) (h_mix : IsMixing μ T) :
+    ∀ k : ℕ, 3 ≤ k → MixingOfOrder μ T k := by
+  sorry
+end Rokhlin
+end OAI
+
