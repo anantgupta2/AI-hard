@@ -123,6 +123,8 @@ B1 ≈ O1, B2 ≈ O2/O3, B3 ≈ O5/O6/O7, B4 ≈ O8), so the cheap pass stays co
 17. **Several formulations posed side by side.** If a conjecture is posed jointly in several models or forms and the family settles one of them, that is O5 (rule 6) unless the source singles that form out as the main one.
 18. **Resource bounds in complexity.** Upper or lower bounds on a computational resource (time, space, circuit size or depth, query or communication complexity, approximation ratio achievable in polynomial time) are M10, even when stated as a rate. M8 is for bounds on mathematical quantities.
 19. **Constants are not prefix objects.** An unspecified absolute constant in a bound (∃C, ∃c > 0) belongs to the bound, not the prefix: "∃C ∀n: f(n) ≤ C g(n)" has prefix ∀. Truncated Lean in the input is not evidence for `same`: read the challenge file or say `unknown` in notes.
+20. **Record or question.** Use P2 only when a source explicitly asks the question ("can one beat 2^{n/2}?", "is Ω(n log n) necessary?"); answering it is O1 or O2 by its wording. Without such an explicit question, beating a known exponent, ratio or running time is P4: O7 if it only improves the record, O1 if it determines the optimal value.
+21. **Precedence of problem kinds.** A named conjecture (P1) beats a problem-list entry (P3), which beats an open question (P2). For an already-refuted conjecture whose least counterexample dimension is being lowered, the posed object is that dimension (P4): O7 if lowered, O1 with M9 if determined.
 
 ## High-confidence labelling protocol
 
