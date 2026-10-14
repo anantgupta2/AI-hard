@@ -111,5 +111,17 @@ def MainTheorem : Prop :=
       M₁.eRank = (r : ℕ∞) → M₂.eRank = (r : ℕ∞) →
       ExactOracles M₁ M₂ O → 0 < ε → ε < 1 → 0 < δ → δ < 1 →
       let B := resourceBound C d n r ε δ
-      let Z := commonBaseCount M₁ M
-[…]
+      let Z := commonBaseCount M₁ M₂
+      (∀ bits : ℕ → Bool,
+        let out := execution P O (initialConfig k s n r ε δ) bits B
+        out.output.isSome ∧ out.oracleCalls ≤ B ∧ out.bitOperations ≤ B ∧
+        ∀ z, out.output = some z → 0 ≤ z ∧ (Z = 0 → z = 0)) ∧
+      (1 - δ) * (2 : ℚ) ^ B ≤
+        (Nat.card {bits : Fin B → Bool //
+          ∃ z, (execution P O (initialConfig k s n r ε δ) (finiteBits bits) B).output
+            = some z ∧ relativeAccuracy ε Z z} : ℚ)
+end CommonBasesFPRAS
+theorem common_bases_fpras : CommonBasesFPRAS.MainTheorem := by
+  sorry
+end OAI
+

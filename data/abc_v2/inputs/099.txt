@@ -144,7 +144,82 @@ def MaskPrimes (h : ℕ) (p : ℕ → ℕ → ℕ) : Prop :=
   (∀ l k : Fin h, Nat.Prime (p (l.val + 1) k)) ∧
   Function.Injective (fun lk : Fin h × Fin h => p (lk.1.val + 1) lk.2) ∧
   ∀ l k : Fin h, h ^ 3 ≤ p (l.val + 1) k ∧ p (l.val + 1) k ≤ 2 * h ^ 3
-def ExcludedPrimes
+def ExcludedPrimes (m : ℕ) (p : ℕ → ℕ → ℕ) : Prop :=
+  (∀ l k : Fin m, Nat.Prime (p (l.val + 1) k)) ∧
+  Function.Injective (fun lk : Fin m × Fin m => p (lk.1.val + 1) lk.2) ∧
+  ∀ l k : Fin m, m ^ 3 < p (l.val + 1) k ∧ p (l.val + 1) k ≤ m ^ 5
+abbrev MaskTag (h : ℕ) (p : ℕ → ℕ → ℕ) (l : ℕ) := Σ k : Fin h, Fin (p l k)
+def maskTags (h : ℕ) (p : ℕ → ℕ → ℕ) (l : ℕ) : List (MaskTag h p l) :=
+  (List.ofFn fun k : Fin h => List.ofFn fun b : Fin (p l k) => Sigma.mk k b).flatten
+def MaskAlphabet (h : ℕ) (p : ℕ → ℕ → ℕ) : ℕ → Type
+  | 0 => Bool
+  | l + 1 => MaskTag h p (l + 1) × MaskAlphabet h p l
+instance maskAlphabetFintype (h : ℕ) (p : ℕ → ℕ → ℕ) (l : ℕ) :
+    Fintype (MaskAlphabet h p l) := by
+  induction l with
+  | zero => exact inferInstanceAs (Fintype Bool)
+  | succ l ih => exact @instFintypeProd _ _ inferInstance ih
+def MaskState (h : ℕ) (p : ℕ → ℕ → ℕ) (M : ℕ) : ℕ → Type
+  | 0 => ZMod M
+  | l + 1 => MaskTag h p (l + 1) → MaskState h p M l
+def shiftMaskState (h : ℕ) (p : ℕ → ℕ → ℕ) (M : ℕ) :
+    (l : ℕ) → MaskState h p M l → ZMod M → MaskState h p M l
+  | 0, v, θ => (show ZMod M from v) + θ
+  | l + 1, v, θ => fun j => shiftMaskState h p M l (v j) θ
+def maskGamma (h : ℕ) (p : ℕ → ℕ → ℕ) (M l a : ℕ)
+    (j : MaskTag h p l) : ZMod M :=
+  (∑ k : Fin h, ((M / p l k * (a % p l k) : ℕ) : ZMod M)) +
+    ((j.2.val * (M / p l j.1) * (a % p l j.1) : ℕ) : ZMod M)
+def maskWord (h : ℕ) (p : ℕ → ℕ → ℕ) (R M : ℕ) :
+    (l : ℕ) → MaskState h p M l → List (MaskAlphabet h p l)
+  | 0, v => (List.range M).map (fun b => decide (((b : ZMod M) - (show ZMod M from v)).val < M / 2))
+  | l + 1, v => (List.range (R * period h p (l + 1))).flatMap fun a =>
+      (maskTags h p (l + 1)).flatMap fun j =>
+        (maskWord h p R M l
+          (shiftMaskState h p M l (v j) (maskGamma h p M (l + 1) a j))).map
+          (fun x => (j, x))
+def ExcludedAlphabet (m L : ℕ) : ℕ → Type
+  | 0 => Fin L × Bool
+  | l + 1 => Fin m × ExcludedAlphabet m L l
+instance excludedAlphabetFintype (m L l : ℕ) : Fintype (ExcludedAlphabet m L l) := by
+  induction l with
+  | zero => exact inferInstanceAs (Fintype (Fin L × Bool))
+  | succ l ih => exact @instFintypeProd _ _ inferInstance ih
+def ExcludedState (m L : ℕ) : ℕ → Type
+  | 0 => ZMod L
+  | l + 1 => Fin m → ExcludedState m L l
+def shiftExcludedState (m L : ℕ) :
+    (l : ℕ) → ExcludedState m L l → ZMod L → ExcludedState m L l
+  | 0, v, θ => (show ZMod L from v) + θ
+  | l + 1, v, θ => fun i => shiftExcludedState m L l (v i) θ
+def excludedTranslation (m : ℕ) (p : ℕ → ℕ → ℕ) (L l s : ℕ) (i : Fin m) :
+    ZMod L := ∑ j ∈ Finset.univ.erase i, ((L / p l j * (s % p l j) : ℕ) : ZMod L)
+def excludedWord (m : ℕ) (p : ℕ → ℕ → ℕ) (R L : ℕ) :
+    (l : ℕ) → ExcludedState m L l → List (ExcludedAlphabet m L l)
+  | 0, v => List.ofFn fun b : Fin L =>
+      (b, decide (((b.val : ZMod L) - (show ZMod L from v)).val < L / 2))
+  | l + 1, v => (List.range (R * period m p (l + 1))).flatMap fun s =>
+      (List.ofFn fun i : Fin m =>
+        (excludedWord m p R L l
+          (shiftExcludedState m L l (v i) (excludedTranslation m p L (l + 1) s i))).map
+          (fun x => (i, x))).flatten
+def MaskWitness (a C δ lower : ℝ) (d : ℕ) : Prop :=
+  ∃ h : ℕ, 2 ≤ h ∧ ∃ p : ℕ → ℕ → ℕ, MaskPrimes h p ∧
+    ∃ (w : ℕ) (c : MaskAlphabet h p h → Fin w → Bool),
+      SubstitutionBounds a C c ∧ OffsetLocal δ c ∧
+      ∃ n : ℕ, 0 < n ∧ n ≤ d ∧
+        (∀ v : MaskState h p (circleSize h p) h,
+          (encode c (maskWord h p (h ^ (2 * h)) (circleSize h p) h v)).length = n) ∧
+        Real.exp (lower * exponentScale d) ≤ setDistortion
+          (Set.range fun v : MaskState h p (circleSize h p) h =>
+            encode c (maskWord h p (h ^ (2 * h)) (circleSize h p) h v))
+def ExcludedWitness (a C ε lower : ℝ) (d : ℕ) : Prop :=
+  ∃ m : ℕ, 2 ≤ m ∧ ∃ p : ℕ → ℕ → ℕ, ExcludedPrimes m p ∧
+    ∃ (w : ℕ) (c : ExcludedAlphabet m (circleSize m p) m → Fin w → Bool),
+      SubstitutionBounds a C c ∧ AnchorLocal ε c ∧
+      ∃ n : ℕ, 0 < n ∧ n ≤ d ∧
+        (∀ v : ExcludedState m (circleSize m p) m,
+          (encode
 […]
 
 === LEAN COMPARATOR BinaryEditLower (exact formal statement)

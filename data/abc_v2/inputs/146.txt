@@ -82,8 +82,18 @@ def HyperbolicBernoulliComponent (k : ℝ) : Prop :=
     ∃ (N : ℕ) (hN : 0 < N) (P : Fin N → Set Torus),
       (∀ j, MeasurableSet (P j)) ∧
       ((⋃ j, P j) =ᵐ[area] E) ∧
-      (∀ i j, i ≠ j → area (P i ∩ P j) = 
-[…]
+      (∀ i j, i ≠ j → area (P i ∩ P j) = 0) ∧
+      (∀ j : Fin N, (standardMap k '' P j) =ᵐ[area]
+        P ⟨(j.val+1)%N, Nat.mod_lt _ hN⟩) ∧
+      (∀ j, area (P j) = area E / (N : ℝ≥0∞) ∧ 0 < area (P j)) ∧
+      (∀ j, IsBernoulli ((standardMap k)^[N]) (normalizedArea (P j)))
+def MainComponentsObligation : Prop :=
+  ∃ k₀ : ℝ, 0 < k₀ ∧ ∀ k : ℝ, k₀ ≤ k → HyperbolicBernoulliComponent k
+theorem main_components : MainComponentsObligation := by
+  sorry
+end StandardMapEntropy
+end OAI
+
 
 === LEAN COMPARATOR StandardMapEntropy (exact formal statement)
 import Mathlib
@@ -199,5 +209,12 @@ def PositiveLargestLyapunov (k : ℝ) : Prop :=
       Tendsto
         (fun n : ℕ => Real.log ‖standardDerivativeProduct k z n‖ / (n : ℝ))
         atTop (𝓝 l)
-theorem main_entr
-[…]
+theorem main_entropy_complete :
+    ∃ k₀ : ℝ, 0 < k₀ ∧ ∀ k : ℝ, k₀ ≤ k →
+      0 < metricEntropy area (standardMap k) ∧
+      PositiveLargestLyapunov k ∧
+      (0 < metricEntropy area (standardMap k) ↔ PositiveLargestLyapunov k) := by
+  sorry
+end StandardMapEntropy
+end OAI
+

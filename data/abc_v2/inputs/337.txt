@@ -96,8 +96,24 @@ abbrev IntegralCurrent (X : Type u) [MetricSpace X] [MeasurableSpace X] [BorelSp
 def CompactlySupported {k : ℕ} (T : Functional X k) : Prop :=
   ∃ K : Set X, IsCompact K ∧
     ∀ b π, Admissible b π → (∀ x ∈ K, b x = 0) → T b π = 0
-def IsCycle {k : ℕ} (T : Functional X k) : Prop :
-[…]
+def IsCycle {k : ℕ} (T : Functional X k) : Prop := boundary T = fun _ _ => 0
+end MetricCurrents
+noncomputable def omega (k : ℕ) : ℝ :=
+  (volume (Metric.ball (0 : Euc k) 1)).toReal
+noncomputable def sphereArea (n : ℕ) : ℝ := (n + 1 : ℝ) * omega (n + 1)
+noncomputable def fillingCoefficient (n : ℕ) : ℝ :=
+  1 / ((n + 1 : ℝ) * (sphereArea n) ^ (1 / (n : ℝ)))
+noncomputable def fillingPower (n : ℕ) : ℝ := (n + 1 : ℝ) / (n : ℝ)
+theorem coefficient_optimal (n : ℕ) (hn : 2 ≤ n) :
+    ∃ T : IntegralCurrent (Euc (n + 1)) n,
+      CompactlySupported T.val ∧ IsCycle T.val ∧ 0 < mass T.val ∧
+      ∀ S : IntegralCurrent (Euc (n + 1)) (n + 1),
+        CompactlySupported S.val → boundarySucc S.val = T.val →
+        fillingCoefficient n * (mass T.val) ^ fillingPower n ≤ mass S.val := by
+  sorry
+end SharpIntegralFillings
+end OAI
+
 
 === LEAN COMPARATOR SharpCAT0Filling (exact formal statement)
 import Mathlib
@@ -180,5 +196,34 @@ abbrev IntegralCurrent (X : Type u) [MetricSpace X] [MeasurableSpace X] [BorelSp
 def CompactlySupported {k : ℕ} (T : Functional X k) : Prop :=
   ∃ K : Set X, IsCompact K ∧
     ∀ b π, Admissible b π → (∀ x ∈ K, b x = 0) → T b π = 0
-def IsCycle {k : ℕ} (T : Functional X k) : Prop := boundar
-[…]
+def IsCycle {k : ℕ} (T : Functional X k) : Prop := boundary T = fun _ _ => 0
+end MetricCurrents
+section Geometry
+variable (X : Type u) [MetricSpace X]
+def IsCAT0 : Prop :=
+  ∃ segment : X → X → ℝ → X,
+    (∀ x y, segment x y 0 = x ∧ segment x y 1 = y) ∧
+    (∀ x y s t, s ∈ Icc (0 : ℝ) 1 → t ∈ Icc (0 : ℝ) 1 →
+      dist (segment x y s) (segment x y t) = |s - t| * dist x y) ∧
+    (∀ o x y s t, s ∈ Icc (0 : ℝ) 1 → t ∈ Icc (0 : ℝ) 1 →
+      dist (segment o x s) (segment o y t) ^ 2 ≤
+        (s * dist o x - t * dist o y) ^ 2 +
+          s * t * ((dist x y) ^ 2 - (dist o x - dist o y) ^ 2))
+end Geometry
+noncomputable def omega (k : ℕ) : ℝ :=
+  (volume (Metric.ball (0 : Euc k) 1)).toReal
+noncomputable def sphereArea (n : ℕ) : ℝ := (n + 1 : ℝ) * omega (n + 1)
+noncomputable def fillingCoefficient (n : ℕ) : ℝ :=
+  1 / ((n + 1 : ℝ) * (sphereArea n) ^ (1 / (n : ℝ)))
+noncomputable def fillingPower (n : ℕ) : ℝ := (n + 1 : ℝ) / (n : ℝ)
+theorem sharp_integral_filling
+    (X : Type u) [MetricSpace X] [MeasurableSpace X] [BorelSpace X] [ProperSpace X]
+    (hX : IsCAT0 X) (n : ℕ) (hn : 2 ≤ n) (T : IntegralCurrent X n)
+    (hTc : CompactlySupported T.val) (hTz : IsCycle T.val) :
+    ∃ S : IntegralCurrent X (n + 1), CompactlySupported S.val ∧
+      boundarySucc S.val = T.val ∧
+      mass S.val ≤ fillingCoefficient n * (mass T.val) ^ fillingPower n := by
+  sorry
+end CAT0Fillings
+end OAI
+

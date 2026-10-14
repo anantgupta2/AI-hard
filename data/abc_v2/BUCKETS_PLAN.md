@@ -1,6 +1,6 @@
 # A/B buckets v2 and a high-confidence labelling plan
 
-Status: proposal (2026-10-14). Nothing here changes `docs/PLAN.md` or the argument doc yet.
+Status: pilot done (2026-10-14; 50 families, κ 0.88–0.98, see `pilot/report.md`); rules below added for the full run. Nothing here changes `docs/PLAN.md` or the argument doc yet.
 
 ## Why v1 is not enough
 
@@ -100,6 +100,19 @@ For P2 questions, O1/O2 follow the wording of the question as posed ("is H10 ove
 
 v1 is recoverable from v2 (A1 ≈ prefix ending ∀ with M1, A2 ≈ M2/M3, A3 ≈ M8/M9, A4 ≈ M5/M6, A5 ≈ M4/M10/M11;
 B1 ≈ O1, B2 ≈ O2/O3, B3 ≈ O5/O6/O7, B4 ≈ O8), so the cheap pass stays comparable.
+
+## Tie-break rules (added after the pilot)
+
+1. **Explicit witnesses.** If the headline says "there is an X" and the paper or Lean fixes X explicitly, the prefix still starts with ∃. Use `none` only for claims about an object that was named before the paper (ζ(3), χ(ℝ²), the class L, ω).
+2. **Thresholds.** "For all sufficiently large n" with no explicit threshold → ∀^∞. An explicit threshold (∀ m ≥ 1408) → ∀ with the flag `effective`.
+3. **Almost every / generic / very general** → ∀ᵍ, even when the Lean writes it as "∃ a null set E, ∀ x ∉ E".
+4. **Random processes.** A limit or concentration statement about a random object → ℙ (not `none`, not ∀^∞).
+5. **Counterexamples to questions.** An object answering a universal question negatively is M3, like a counterexample to a conjecture.
+6. **Restricted dimension.** Settling one dimension (or characteristic, or class) of a problem posed in general → O5 with `restricted_range`. Use O1 only if the source poses exactly that case as its own problem.
+7. **Records.** If the posed object is a number (exponent, constant, chromatic number): improving it without settling it → P4/O7; determining it exactly → O1 with M9; refuting a conjectured value and determining the true one → O3.
+8. **Problem lists.** P3 only for an explicit numbered list or database (Hilbert, Erdős, Kourovka, OPG). A question that a survey merely repeats stays P2.
+9. **Earlier proofs.** If the paper says the headline was already proved by others, the outcome is O9 (new proof), whatever the problem type.
+10. **Lean coverage.** A new field `lean_vs_headline` ∈ {`same`, `weaker` (special case, one direction or one half), `different` (a secondary or intermediate result), `no_lean`}.
 
 ## High-confidence labelling protocol
 

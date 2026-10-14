@@ -114,5 +114,96 @@ def arithmeticFlatMapWithWork {α : Type u_1} {β : Type u_2} (f : α → List �
     let tail := arithmeticFlatMapWithWork f rest
     (current.1 ++ tail.1, current.2 + tail.2 + current.1.length + 3)
 def upperMedian (values : List ℕ) : ℕ :=
-  (values.mergeSort (· ≤ ·)).getD (values.length / 
+  (values.mergeSort (· ≤ ·)).getD (values.length / 2) 0
+def filterMapWithWork {α : Type u_1} {β : Type u_2} (f : α → Option β × ℕ) : List α → List β × ℕ
+  | [] => ([], 0)
+  | a :: rest =>
+    let first := f a
+    let tail := filterMapWithWork f rest
+    (match first.1 with | none => tail.1 | some b => b :: tail.1, first.2 + tail.2 + 3)
+def cellGridPoints (side : ℚ) (g cell : ℕ) : List ℕ :=
+  (List.range' ⌈(cell : ℚ) * side / g⌉₊
+    (⌈((cell : ℚ) + 1) * side / g⌉₊ - ⌈(cell : ℚ) * side / g⌉₊)).map fun i => g * i
+def groupRoundSpacing (exponent : ℕ) (h : ℚ) : ℕ :=
+  ⌈max 1 ((2 : ℚ) ^ (-(exponent : ℤ)) * h)⌉₊
+def refinementFactor (A : ℚ) (F : ℕ) : ℚ := max 1 (A / F)
+def localCellCoordinates (side : ℚ) (p radius : ℕ) : List ℕ :=
+  let first := ⌊((p - radius : ℕ) : ℚ) / side⌋₊
+  let last := ⌊((p + radius : ℕ) : ℚ) / side⌋₊
+  List.range' first (last + 1 - first)
+def dyadicSeedPassCount (f initial : ℕ) : ℕ := (initial - f) ⌈/⌉ (f - 2)
+def dyadicSeedExponent (f initial pass : ℕ) : ℕ := initial - pass * (f - 2)
+def memberByWithWork {α : Type u_1} (equal : α → α → Bool × ℕ) (a : α) : List α → Bool × ℕ
+  | [] => (false, 1)
+  | b :: rest =>
+    let test := equal a b
+    let tail := memberByWithWork equal a rest
+    (test.1 || tail.1, test.2 + tail.2 + 1)
+inductive BinaryMemo (α : Type u_1) where
+  | empty
+  | node (value : Option α) (left right : BinaryMemo α)
+def binaryMemoKey : ℕ → ℕ → List Bool
+  | 0, _ => []
+  | d + 1, n => decide (n % 2 = 1) :: binaryMemoKey d (n / 2)
+inductive FiniteQuery (ι : Type u_1) where
+  | done (value : ℚ)
+  | read (key : ι) (next : ℚ → FiniteQuery ι)
+def finiteAnswerTable {κ : Type u_1} [DecidableEq κ] : List κ → List ℚ → κ → ℚ
+  | key :: keys, value :: values, query =>
+      if query = key then value else finiteAnswerTable keys values query
+  | _, _, _ => 0
+def queryFinRange (n m : ℕ) (h : n = m) : List (Fin m) :=
+  (List.finRange n).map fun i => ⟨i.val, by simpa only [← h] using i.isLt⟩
+def queryInsertWithWork {α : Type u_1} (le : α → α → Bool × ℕ) (a : α) : List α → List α × ℕ
+  | [] => ([a], 1)
+  | b :: rest =>
+    let test := le a b
+    if test.1 then (a :: b :: rest, test.2 + 2)
+    else
+      let tail := queryInsertWithWork le a rest
+      (b :: tail.1, test.2 + tail.2 + 2)
+def integerSymbolCode : ℤ → ℕ
+  | .ofNat n => 2 * n
+  | .negSucc n => 2 * n + 1
+inductive PositionCounts where
+  | empty
+  | node (count : ℕ) (left right : PositionCounts)
+def integerMagnitude : List ℤ → ℕ
+  | [] => 0
+  | z :: zs => max z.natAbs (integerMagnitude zs)
+def integerInputPositionBits (target : List ℤ) : ℕ := Nat.size target.length
+def dpLength {α : Type u_1} : List α → ℕ × ℕ
+  | [] => (0, 1)
+  | _ :: rest => let result := dpLength rest; (result.1 + 1, result.2 + 1)
+def dpDrop {α : Type u_1} : ℕ → List α → List α × ℕ
+  | 0, word => (word, 1)
+  | _ + 1, [] => ([], 1)
+  | n + 1, _ :: rest => let result := dpDrop n rest; (result.1, result.2 + 1)
+def dpTake {α : Type u_1} : ℕ → List α → List α × ℕ
+  | 0, _ => ([], 1)
+  | _ + 1, [] => ([], 1)
+  | n + 1, first :: rest => let result := dpTake n rest; (first :: result.1, result.2 + 1)
+def dpGetD : List ℕ → ℕ → ℕ × ℕ
+  | [], _ => (0, 1)
+  | first :: _, 0 => (first, 1)
+  | _ :: rest, n + 1 => let result := dpGetD rest n; (result.1, result.2 + 1)
+def dpMember {α : Type u_1} [DecidableEq α] (a : α) : List α → Bool × ℕ
+  | [] => (false, 1)
+  | first :: rest => if a = first then (true, 1) else
+      let result := dpMember a rest; (result.1, result.2 + 1)
+def dpMinimum (fallback : ℕ) : List ℕ → ℕ × ℕ
+  | [] => (fallback, 1)
+  | first :: rest => let result := dpMinimum fallback rest; (min first result.1, result.2 + 1)
+def integerMagnitudeWithWork : List ℤ → ℕ × ℕ
+  | [] => (0, 0)
+  | z :: rest =>
+    let tail := integerMagnitudeWithWork rest
+    (max z.natAbs tail.1, tail.2 + 2)
+def inputBitLengthWithWork (n : ℕ) : ℕ × ℕ :=
+  if h : n = 0 then (0, 1) else
+    let tail := inputBitLengthWithWork (n / 2)
+    (tail.1 + 1, tail.2 + 2)
+termination_by n
+decreasing_by exact Nat.div_lt_self (by omega) (by decide)
+def naturalPairWithWork (a b : ℕ
 […]

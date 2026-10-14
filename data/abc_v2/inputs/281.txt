@@ -88,8 +88,68 @@ noncomputable def hamiltonian (n : ℕ) (J : (Fin n × Fin n) → ℝ)
 noncomputable def groundStateSequence (n : ℕ) : ℝ :=
   (n : ℝ)⁻¹ * ∫ J, sSup (range (hamiltonian n J)) ∂gaussianProduct (Fin n × Fin n)
 noncomputable def groundStateValue : ℝ := limUnder atTop groundStateSequence
-noncomp
-[…]
+noncomputable def gradientStopped (W : BrownianSpace) (γ : OrderParameter)
+    (X : ℝ → W.Ω → ℝ) (U : W.Ω → ℝ) (t : ℝ≥0) (ω : W.Ω) : ℝ :=
+  if (t : ℝ) < 1 then gradient W γ t (X t ω) else U ω
+def ScalarValueConclusion (W : BrownianSpace) (γ : OrderParameter)
+    (X : ℝ → W.Ω → ℝ) : Prop :=
+  Tendsto groundStateSequence atTop (𝓝 groundStateValue) ∧
+  ∃ U : W.Ω → ℝ,
+    Martingale (gradientStopped W γ X U) W.filtration W.μ ∧
+    (∀ᵐ ω ∂W.μ, |U ω| ≤ 1 ∧ (U ω)^2 = 1 ∧
+      Tendsto (fun t ↦ gradient W γ t (X t ω)) (𝓝[<] (1 : ℝ)) (𝓝 (U ω))) ∧
+    Tendsto (fun t ↦ ∫ ω, (gradient W γ t (X t ω) - U ω)^2 ∂W.μ)
+      (𝓝[<] (1 : ℝ)) (𝓝 (0 : ℝ)) ∧
+    groundStateValue = (∫ ω, |X 1 ω| ∂W.μ) - ∫ t in (0 : ℝ)..1, t * γ.coeff t ∧
+    groundStateValue = ∫ ω, U ω * W.B 1 ω ∂W.μ ∧
+    groundStateValue = ∫ t in (0 : ℝ)..1, ∫ ω, curvature W γ t (X t ω) ∂W.μ ∧
+    IntervalIntegrable (fun t ↦ ∫ ω, curvature W γ t (X t ω) ∂W.μ) volume 0 1
+noncomputable def eulerPath (W : BrownianSpace) (γ : OrderParameter) (T : ℝ) (N : ℕ)
+    (z : Fin (N+1) → ℝ) (j : ℕ) : ℝ :=
+  euler T N γ.coeff (gradient W γ) z j
+noncomputable def rawCoefficient (W : BrownianSpace) (γ : OrderParameter)
+    (T : ℝ) (N j : ℕ) (z : Fin (N+1) → ℝ) : ℝ :=
+  curvature W γ (meshTime T N j) (eulerPath W γ T N z j)
+noncomputable def normalizer (W : BrownianSpace) (γ : OrderParameter)
+    (T : ℝ) (N j : ℕ) : ℝ :=
+  (Real.sqrt (∫ z, (rawCoefficient W γ T N j z)^2 ∂gaussianProduct (Fin (N+1))))⁻¹
+noncomputable def gaussianIncrement (W : BrownianSpace) (γ : OrderParameter)
+    (T : ℝ) (N j : ℕ) (z : Fin (N+1) → ℝ) : ℝ :=
+  normalizer W γ T N j * rawCoefficient W γ T N j z * coordinate N j z
+noncomputable def roundedSign (W : BrownianSpace) (γ : OrderParameter)
+    (T : ℝ) (N : ℕ) (z : Fin (N+1) → ℝ) : ℝ :=
+  Real.sign (gradient W γ T (eulerPath W γ T N z N) +
+    2 * cdf standardGaussian (coordinate N N z) - 1)
+noncomputable def coefficientA (W : BrownianSpace) (γ : OrderParameter)
+    (T : ℝ) (N j : ℕ) : ℝ :=
+  if j = 0 then 0 else
+    ∫ z, roundedSign W γ T N z * gaussianIncrement W γ T N (j-1) z
+      ∂gaussianProduct (Fin (N+1))
+noncomputable def coefficientB (W : BrownianSpace) (γ : OrderParameter)
+    (T : ℝ) (N i : ℕ) : ℝ :=
+  ∫ z, roundedSign W γ T N z * coordinate N (i-1) z ∂gaussianProduct (Fin (N+1))
+noncomputable def shiftedCoefficientSum (W : BrownianSpace) (γ : OrderParameter)
+    (T : ℝ) (N : ℕ) : ℝ :=
+  ∑ j ∈ Finset.range (N+1), coefficientA W γ T N j * coefficientB W γ T N (j+1)
+def FiniteGaussianConclusion (W : BrownianSpace) (γ : OrderParameter)
+    (X : ℝ → W.Ω → ℝ) (T : ℝ) : Prop :=
+  (∀ᶠ N in atTop, ∀ j < N, 0 < normalizer W γ T N j) ∧
+  Tendsto (shiftedCoefficientSum W γ T) atTop
+    (𝓝 (∫ t in (0 : ℝ)..T, ∫ ω, curvature W γ t (X t ω) ∂W.μ)) ∧
+  Tendsto (fun S ↦ ∫ t in (0 : ℝ)..S, ∫ ω, curvature W γ t (X t ω) ∂W.μ)
+    (𝓝[<] (1 : ℝ)) (𝓝 groundStateValue)
+theorem value_consequences :
+    (∀ (W : BrownianSpace) (γ : OrderParameter) (X : ℝ → W.Ω → ℝ),
+      IsMinimizer W γ → IsDiffusion W γ X → ScalarValueConclusion W γ X) ∧
+    (∀ (W : BrownianSpace) (γ : OrderParameter) (X : ℝ → W.Ω → ℝ) (T : ℝ),
+      0 < T → T < 1 → IsMinimizer W γ → IsDiffusion W γ X →
+      FiniteGaussianConclusion W γ X T) ∧
+    (∀ (W : BrownianSpace) (γ : OrderParameter),
+      IsMinimizer W γ → groundStateValue = parisi W γ) := by
+  sorry
+end SKValue
+end OAI
+
 
 === LEAN COMPARATOR SKFullSupport (exact formal statement)
 import Mathlib

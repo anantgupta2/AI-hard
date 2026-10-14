@@ -93,5 +93,78 @@ structure MassTest where
   compact_time : ∃ R : ℝ, 0 < R ∧ ∀ t x, R < |t| → toFun t x = 0
 def MassTest.transportDerivative (φ : MassTest) (t : ℝ) (z : Phase) : ℝ :=
   fderiv ℝ (fun p : ℝ × Velocity => φ.toFun p.1 (torusProjection p.2))
-    (t, torusRep
-[…]
+    (t, torusRepresentative z.1) (1, z.2)
+def relativeDensity (F : Evolution) (t : ℝ) (z : Phase) : ℝ := F t z / maxwellian z.2
+def renormalizedIntegrand (F : Evolution) (β : Renormalization) (φ : KineticTest)
+    (p : SpaceTimePhase) : ℝ :=
+  maxwellian p.2.2 * β.toFun (relativeDensity F p.1 p.2) *
+      φ.transportDerivative p.1 p.2 +
+    derivWithin β.toFun (Ici 0) (relativeDensity F p.1 p.2) *
+      collision (F p.1) p.2.1 p.2.2 * φ.toFun p.1 p.2.1 p.2.2
+def nonnegativeTimes : Set SpaceTimePhase := Ici (0 : ℝ) ×ˢ univ
+def boundedTimes (T : ℝ) : Set SpaceTimePhase := Icc 0 T ×ˢ univ
+structure AdmissibleGlobal (f₀ : Density) (F : Evolution) : Prop where
+  datum : FiniteEntropyDatum f₀
+  spacetime_measurable : AEStronglyMeasurable (fun p : SpaceTimePhase => F p.1 p.2)
+    (volume.restrict nonnegativeTimes)
+  finite_each_time : ∀ t ∈ Ici (0 : ℝ), FiniteEntropyDatum (F t)
+  initial : F 0 =ᵐ[volume] f₀
+  weak_continuity : ∀ ψ : Phase → ℝ, Measurable ψ →
+    (∃ C : ℝ, ∀ z, |ψ z| ≤ C) →
+    ContinuousOn (fun t => ∫ z, F t z * ψ z) (Ici 0)
+  uniform_moment : ∀ T : ℝ, 0 ≤ T → ∃ C : ℝ, ∀ t ∈ Icc 0 T,
+    (∫ z, entropyMoment (F t) z) ≤ C
+  -- These finiteness conditions prevent the real Bochner integrals defining `gain` and
+  -- `loss` from silently taking the value zero at divergent collision fibers.
+  collision_fibers : ∀ T : ℝ, 0 ≤ T → ∀ᵐ p ∂volume.restrict (boundedTimes T),
+    Integrable (fun q : Velocity × Sphere =>
+      collisionKernel p.2.2 q.1 q.2 *
+        F p.1 (p.2.1, scatterLeft p.2.2 q.1 q.2) *
+        F p.1 (p.2.1, scatterRight p.2.2 q.1 q.2))
+      ((volume : Measure Velocity).prod sphereArea) ∧
+    Integrable (fun q : Velocity × Sphere =>
+      collisionKernel p.2.2 q.1 q.2 * F p.1 p.2 * F p.1 (p.2.1, q.1))
+      ((volume : Measure Velocity).prod sphereArea)
+  gain_integrable : ∀ T : ℝ, 0 ≤ T → IntegrableOn
+    (fun p : SpaceTimePhase => gain (F p.1) p.2.1 p.2.2 /
+      (1 + relativeDensity F p.1 p.2)) (boundedTimes T)
+  loss_integrable : ∀ T : ℝ, 0 ≤ T → IntegrableOn
+    (fun p : SpaceTimePhase => loss (F p.1) p.2.1 p.2.2 /
+      (1 + relativeDensity F p.1 p.2)) (boundedTimes T)
+  renormalized_integrable : ∀ β φ, IntegrableOn (renormalizedIntegrand F β φ)
+    nonnegativeTimes
+  renormalized_equation : ∀ β : Renormalization, ∀ φ : KineticTest,
+    (∫ p in nonnegativeTimes, renormalizedIntegrand F β φ p) +
+      (∫ z, maxwellian z.2 * β.toFun (f₀ z / maxwellian z.2) *
+        φ.toFun 0 z.1 z.2) = 0
+  local_mass_integrable : ∀ φ : MassTest, IntegrableOn
+    (fun p : SpaceTimePhase => F p.1 p.2 * φ.transportDerivative p.1 p.2)
+    nonnegativeTimes
+  local_mass : ∀ φ : MassTest,
+    (∫ p in nonnegativeTimes, F p.1 p.2 * φ.transportDerivative p.1 p.2) +
+      (∫ z, f₀ z * φ.toFun 0 z.1) = 0
+  momentum_conservation : ∀ t ∈ Ici (0 : ℝ), momentum (F t) = momentum f₀
+  energy_inequality : ∀ t ∈ Ici (0 : ℝ), energy (F t) ≤ energy f₀
+  entropy_inequality : ∀ t ∈ Ici (0 : ℝ),
+    ENNReal.ofReal (relativeEntropy (F t)) +
+      (∫⁻ s in Icc (0 : ℝ) t, entropyDissipation (F s)) ≤
+        ENNReal.ofReal (relativeEntropy f₀)
+structure StrongEarly (T : ℝ) (F : Evolution) : Prop where
+  positive_time : 0 < T
+  strong_continuity : ∀ t ∈ Icc 0 T,
+    Tendsto (fun s => eLpNorm (fun z => F s z - F t z) 1 volume)
+      (𝓝[Icc 0 T] t) (𝓝 0)
+  gain_integrable : IntegrableOn (fun p : SpaceTimePhase => gain (F p.1) p.2.1 p.2.2)
+    (boundedTimes T)
+  loss_integrable : IntegrableOn (fun p : SpaceTimePhase => loss (F p.1) p.2.1 p.2.2)
+    (boundedTimes T)
+theorem nonuniqueness :
+    ∃ f₀ : Density, BoundedVelocitySupport f₀ ∧
+      ∃ (F G : Evolution) (T : ℝ), AdmissibleGlobal f₀ F ∧ AdmissibleGlobal f₀ G ∧
+        StrongEarly T F ∧ StrongEarly T G ∧
+        ∃ t ∈ Set.Icc 0 T, ¬(F t =ᵐ[MeasureTheory.volume] G t) :=
+  sorry
+end BoltzmannNonuniqueness
+end
+end OAI
+

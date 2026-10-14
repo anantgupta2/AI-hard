@@ -89,8 +89,65 @@ def minimalTensorSubalgebra (A : Type u) (B : Type v)
   (NonUnitalStarAlgebra.adjoin ℂ (Set.range fun p : A × B => spatialElementary p.1 p.2)).topologicalClosure
 abbrev MinimalTensor (A : Type u) (B : Type v)
     [NonUnitalCStarAlgebra A] [NonUnitalCStarAlgebra B] := minimalTensorSubalgebra A B
-instance (A : Type u) (B : Type v) [NonUnitalCStarAlgebra A] [NonUnitalCSta
-[…]
+instance (A : Type u) (B : Type v) [NonUnitalCStarAlgebra A] [NonUnitalCStarAlgebra B] :
+    NonUnitalCStarAlgebra (MinimalTensor A B) := by
+  letI : IsClosed ((minimalTensorSubalgebra A B : NonUnitalStarSubalgebra ℂ
+    (SpatialAmbient A B)) : Set (SpatialAmbient A B)) :=
+    isClosed_closure
+  exact inferInstance
+section Exactness
+variable {A : Type u} {C D : Type v}
+  [NonUnitalCStarAlgebra A] [NonUnitalCStarAlgebra C] [NonUnitalCStarAlgebra D]
+def SpatialRepresentation.precompRight (π : SpatialRepresentation A D)
+    (q : C →⋆ₙₐ[ℂ] D) : SpatialRepresentation A C where
+  left := π.left
+  right := π.right
+  leftRep := π.leftRep
+  rightRep := π.rightRep.comp q
+def tensorKernelIdeal (q : C →⋆ₙₐ[ℂ] D) : NonUnitalStarSubalgebra ℂ (SpatialAmbient A C) :=
+  (NonUnitalStarAlgebra.adjoin ℂ
+    {z | ∃ a : A, ∃ c : C, q c = 0 ∧ z = spatialElementary a c}).topologicalClosure
+end Exactness
+def Exact (A : Type u) [NonUnitalCStarAlgebra A] : Prop :=
+  ∀ (C D : Type u) [NonUnitalCStarAlgebra C] [NonUnitalCStarAlgebra D]
+    (q : C →⋆ₙₐ[ℂ] D), Function.Surjective q →
+    ∀ z : MinimalTensor A C,
+      (∀ π : SpatialRepresentation A D, (z.val : SpatialAmbient A C) (π.precompRight q) = 0) →
+      z.val ∈ tensorKernelIdeal (A := A) q
+section Definitions
+variable {A : Type*} [NonUnitalCStarAlgebra A] [PartialOrder A] [StarOrderedRing A]
+variable {m k : Type*} [Fintype m] [Fintype k]
+def CuntzSubequiv (a : CStarMatrix m m A) (b : CStarMatrix k k A) : Prop :=
+  ∀ ε : ℝ, 0 < ε → ∃ v : CStarMatrix k m A, ‖v.conjTranspose * b * v - a‖ < ε
+def blockSum (a : CStarMatrix m m A) (b : CStarMatrix k k A) :
+    CStarMatrix (m ⊕ k) (m ⊕ k) A :=
+  CStarMatrix.ofMatrix (Matrix.fromBlocks (CStarMatrix.ofMatrix.symm a) 0 0
+    (CStarMatrix.ofMatrix.symm b))
+def ProperlyInfinite (a : CStarMatrix m m A) : Prop :=
+  CuntzSubequiv (blockSum a a) a
+def diagonalCopies (n : ℕ) (a : A) : CStarMatrix (Fin n) (Fin n) A :=
+  CStarMatrix.ofMatrix (Matrix.diagonal fun _ => a)
+variable (A)
+def WeaklyPurelyInfinite : Prop :=
+  ∃ n : ℕ, 1 ≤ n ∧ ∀ a : A, 0 ≤ a → a ≠ 0 → ProperlyInfinite (diagonalCopies n a)
+def StronglyPurelyInfinite : Prop :=
+  ∀ a b : A, 0 ≤ a → 0 ≤ b → ∀ ε : ℝ, 0 < ε →
+    ∃ s t : A, ‖star s * (a * a) * s - a * a‖ < ε ∧
+      ‖star t * (b * b) * t - b * b‖ < ε ∧ ‖star s * a * b * t‖ < ε
+end Definitions
+theorem exact_weaklyPurelyInfinite_individuallyProperlyInfinite_any
+    {A : Type u} [NonUnitalCStarAlgebra A] [PartialOrder A] [StarOrderedRing A]
+    (hA : Exact A) (hW : WeaklyPurelyInfinite A) {a : A} (ha : 0 ≤ a) :
+    ProperlyInfinite (diagonalCopies 1 a) := by
+  sorry
+theorem exact_weaklyPurelyInfinite_stronglyPurelyInfinite
+    (A : Type u) [NonUnitalCStarAlgebra A] [PartialOrder A] [StarOrderedRing A]
+    (hExact : Exact A) (hWeak : WeaklyPurelyInfinite A) : StronglyPurelyInfinite A := by
+  sorry
+end WeakPureInfiniteness
+end
+end OAI
+
 
 === LEAN COMPARATOR IndividualStrongInfiniteness (exact formal statement)
 import Mathlib
@@ -178,5 +235,77 @@ lemma norm_pad {n m : ℕ} (h : n ≤ m) (x : Mat A n) : ‖pad h x‖ = ‖x‖
 lemma pad_self (n : ℕ) (x : Mat A n) : pad le_rfl x = x := by
   ext i j
   simp [pad_entry]
-lemma pad_pad {n m k : ℕ} (h : n ≤ m) (h' : m ≤ k) (x : 
+lemma pad_pad {n m k : ℕ} (h : n ≤ m) (h' : m ≤ k) (x : Mat A n) :
+    pad h' (pad h x) = pad (h.trans h') x := by
+  ext i j
+  by_cases hi : i.val < n <;> by_cases hj : j.val < n
+  · have hi' : i.val < m := lt_of_lt_of_le hi h
+    have hj' : j.val < m := lt_of_lt_of_le hj h
+    simp [pad_entry, hi, hj, hi', hj']
+  · by_cases hi' : i.val < m <;> by_cases hj' : j.val < m <;> simp [pad_entry, hi, hj, hi', hj']
+  · by_cases hi' : i.val < m <;> by_cases hj' : j.val < m <;> simp [pad_entry, hi, hi', hj']
+  · by_cases hi' : i.val < m <;> by_cases hj' : j.val < m <;> simp [pad_entry, hi, hi', hj']
+instance pad_directedSystem : DirectedSystem (Mat A) (fun _ _ h => padHom h) where
+  map_self := fun {_} x => pad_self _ x
+  map_map := fun {_ _ _} h h' x => pad_pad h h' x
+abbrev Algebraic (A : Type*) [NonUnitalCStarAlgebra A] :=
+  DirectLimit (Mat A) (fun _ _ h => padHom h)
+local instance matLinear (n m : ℕ) :
+    LinearMapClass (Mat A n →⋆ₙₐ[ℂ] Mat A m) ℂ (Mat A n) (Mat A m) where
+  map_add f x y := f.map_add x y
+  map_smulₛₗ f c x := f.map_smul c x
+instance : Module ℂ (Algebraic A) := DirectLimit.instModule
+instance : Norm (Algebraic A) where
+  norm := DirectLimit.lift _ (fun _ x => ‖x‖) (fun _ _ h x => (norm_pad h x).symm)
+@[simp] lemma norm_mk (n : ℕ) (x : Mat A n) :
+    ‖(⟦⟨n,x⟩⟧ : Algebraic A)‖ = ‖x‖ := rfl
+lemma normedCore : NormedSpace.Core ℂ (Algebraic A) where
+  norm_nonneg := DirectLimit.induction _ fun n x => norm_nonneg x
+  norm_smul c := DirectLimit.induction _ fun n x => by
+    rw [DirectLimit.smul_def, norm_mk, norm_mk, norm_smul]
+  norm_triangle := DirectLimit.induction₂ _ fun n x y => by
+    rw [DirectLimit.add_def, norm_mk, norm_mk, norm_mk]
+    exact norm_add_le x y
+  norm_eq_zero_iff := DirectLimit.induction _ fun n x => by
+    rw [norm_mk, norm_eq_zero]
+    constructor
+    · rintro rfl
+      exact (DirectLimit.zero_def (f := fun _ _ h => padHom (A := A) h) n).symm
+    · intro h
+      apply pad_injective (le_rfl : n ≤ n)
+      have hi := DirectLimit.mk_injective (fun _ _ h => padHom (A := A) h) (fun _ _ h => pad_injective h) n
+      exact congrArg (pad le_rfl) (hi (h.trans (DirectLimit.zero_def (f := fun _ _ h => padHom (A := A) h) n)))
+instance : NormedAddCommGroup (Algebraic A) := .ofCore (𝕜 := ℂ) (normedCore (A := A))
+instance : NormedSpace ℂ (Algebraic A) := .ofCore (normedCore (A := A))
+instance : NonUnitalNormedRing (Algebraic A) where
+  dist_eq _ _ := rfl
+  norm_mul_le := DirectLimit.induction₂ _ fun n x y => by
+    rw [DirectLimit.mul_def, norm_mk, norm_mk, norm_mk]
+    exact norm_mul_le x y
+instance : CStarRing (Algebraic A) where
+  norm_mul_self_le := DirectLimit.induction _ fun n x => by
+    rw [DirectLimit.star_def, DirectLimit.mul_def, norm_mk, norm_mk]
+    exact CStarRing.norm_mul_self_le x
+def cornerAlg (n : ℕ) : Mat A n →⋆ₙₐ[ℂ] Algebraic A where
+  __ := DirectLimit.NonUnitalAlgebra.of (Mat A) (fun _ _ h => padHom h) n
+  map_star' _ := rfl
+@[simp] lemma cornerAlg_apply (n : ℕ) (x : Mat A n) :
+    cornerAlg n x = (⟦⟨n,x⟩⟧ : Algebraic A) := rfl
+lemma cornerAlg_isometry (n : ℕ) : Isometry (cornerAlg (A := A) n) :=
+  AddMonoidHomClass.isometry_of_norm (cornerAlg n) (fun _ => rfl)
+abbrev Stabilization (A : Type*) [NonUnitalCStarAlgebra A] := UniformSpace.Completion (Algebraic A)
+local instance algebraicTopology : TopologicalSpace (Algebraic A) :=
+  (inferInstance : PseudoMetricSpace (Algebraic A)).toUniformSpace.toTopologicalSpace
+open UniformSpace
+open UniformSpace.Completion
+instance : Mul (Stabilization A) :=
+  ⟨Function.curry <| (isDenseInducing_coe.prodMap isDenseInducing_coe).extend
+    ((↑) ∘ Function.uncurry (· * · : Algebraic A → Algebraic A → Algebraic A))⟩
+@[simp, norm_cast] lemma coe_mul_stable (x y : Algebraic A) :
+    ((x*y : Algebraic A) : Stabilization A) = (x : Stabilization A) * (y : Stabilization A) :=
+  ((isDenseInducing_coe.prodMap isDenseInducing_coe).extend_eq
+    ((continuous_coe _).comp continuous_mul) (x,y)).symm
+instance : ContinuousMul (Stabilization A) where
+  continuous_mul := by
+    let m := (AddMonoidHom.mul : Algebraic A →+ Algebra
 […]

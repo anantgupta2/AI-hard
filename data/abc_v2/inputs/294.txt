@@ -137,5 +137,91 @@ def ProperlyInfinite (A : Type*) [CStarAlgebra A] : Prop :=
 end
 attribute [local instance] CStarAlgebra.spectralOrder CStarAlgebra.spectralOrderedRing
 variable {A : Type*} [CStarAlgebra A]
-def upperLeft (a : A) : CS
-[…]
+def upperLeft (a : A) : CStarMatrix (Fin 2) (Fin 2) A :=
+  CStarMatrix.ofMatrix fun i j => if i = 0 ∧ j = 0 then a else 0
+def OneQuasitrace.IsTwo (τ : OneQuasitrace A) : Prop :=
+  ∃ σ : OneQuasitrace (CStarMatrix (Fin 2) (Fin 2) A), ∀ a, σ (upperLeft a) = τ a
+end Kaplansky
+namespace KaplanskyConsequences
+section
+open scoped ComplexOrder
+open Metric Topology
+attribute [local instance] CStarAlgebra.spectralOrder CStarAlgebra.spectralOrderedRing
+structure ClosedStarIdeal (A : Type*) [CStarAlgebra A] extends NonUnitalStarSubalgebra ℂ A where
+  mul_mem_left : ∀ (a b : A), b ∈ toNonUnitalStarSubalgebra → a * b ∈ toNonUnitalStarSubalgebra
+  mul_mem_right : ∀ (a b : A), a ∈ toNonUnitalStarSubalgebra → a * b ∈ toNonUnitalStarSubalgebra
+  closed : IsClosed (toNonUnitalStarSubalgebra : Set A)
+end
+open scoped ComplexOrder
+attribute [local instance] CStarAlgebra.spectralOrder CStarAlgebra.spectralOrderedRing
+def StablyFinite (A : Type*) [CStarAlgebra A] : Prop :=
+  ∀ n : ℕ, 0 < n → ∀ v : CStarMatrix (Fin n) (Fin n) A,
+    star v * v = 1 → v * star v = 1
+structure TracialState (A : Type*) [CStarAlgebra A] where
+  functional : A →ₚ[ℂ] ℂ
+  normalized : functional 1 = 1
+  tracial : ∀ a b, functional (a * b) = functional (b * a)
+def TraceFreeStablyFinite : Prop :=
+  ∃ (A : Type) (inst : CStarAlgebra A),
+    letI := inst
+    Nontrivial A ∧ TopologicalSpace.SeparableSpace A ∧ StablyFinite A ∧
+      IsEmpty (TracialState A)
+end KaplanskyConsequences
+namespace KaplanskyConsequences.Regular
+open scoped ComplexOrder InnerProductSpace BigOperators ENNReal
+attribute [local instance] Classical.propDecidable
+attribute [local instance] CStarAlgebra.spectralOrder CStarAlgebra.spectralOrderedRing
+variable {A : Type*} [CStarAlgebra A]
+variable {G H : Type*} [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+def tensorAlgebra (ρ : A →⋆ₐ[ℂ] (H →L[ℂ] H)) :
+    StarSubalgebra ℂ (HilbertSum G H →L[ℂ] HilbertSum G H) :=
+  (StarAlgebra.adjoin ℂ (Set.range (fun a => diagonal (G:=G) (ρ a)) ∪ Set.range (left (G:=G) (H:=H)))).topologicalClosure
+instance (ρ : A →⋆ₐ[ℂ] (H →L[ℂ] H)) :
+    IsClosed (tensorAlgebra (G:=G) ρ : Set (HilbertSum G H →L[ℂ] HilbertSum G H)) :=
+  StarSubalgebra.isClosed_topologicalClosure _
+instance (ρ : A →⋆ₐ[ℂ] (H →L[ℂ] H)) : CStarAlgebra (tensorAlgebra (G:=G) ρ) := inferInstance
+end KaplanskyConsequences.Regular
+namespace KaplanskyConsequences
+section
+section
+open Kaplansky Regular
+def ReducedQuasitraceLoss : Prop :=
+  ∃ (B : Type) (instB : CStarAlgebra B),
+    letI := instB
+    Nontrivial B ∧ TopologicalSpace.SeparableSpace B ∧
+      (∃ τ : OneQuasitrace B, τ.Normalized ∧ τ.IsTwo) ∧
+      ∃ (H : Type) (instH : NormedAddCommGroup H) (innerH : InnerProductSpace ℂ H),
+        letI := instH
+        letI := innerH
+        ∃ (completeH : CompleteSpace H),
+          letI := completeH
+          ∃ ρ : B →⋆ₐ[ℂ] (H →L[ℂ] H), Function.Injective ρ ∧
+            ProperlyInfinite (tensorAlgebra (G:=F2) ρ) ∧
+            ¬ ∃ τ : OneQuasitrace (tensorAlgebra (G:=F2) ρ), τ.Normalized ∧ τ.IsTwo
+end
+open Kaplansky Regular
+def CStarSimple (A : Type*) [CStarAlgebra A] : Prop :=
+  ∀ I : ClosedStarIdeal A,
+    (∀ a : A, a ∈ I.toNonUnitalStarSubalgebra → a = 0) ∨
+    (∀ a : A, a ∈ I.toNonUnitalStarSubalgebra)
+def SimpleStableTensorCounterexample : Prop :=
+  CStarSimple (Algebra F2) ∧ StablyFinite (Algebra F2) ∧
+  ∃ (M : Type) (instM : CStarAlgebra M),
+    letI := instM
+    Nontrivial M ∧ CStarSimple M ∧ StablyFinite M ∧
+      ∃ (H : Type) (instH : NormedAddCommGroup H) (innerH : InnerProductSpace ℂ H),
+        letI := instH
+        letI := innerH
+        ∃ (completeH : CompleteSpace H),
+          letI := completeH
+          ∃ ρ : M →⋆ₐ[ℂ] (H →L[ℂ] H), Function.Injective ρ ∧
+            ProperlyInfinite (tensorAlgebra (G:=F2) ρ)
+end
+def StableFinitenessBundle : Prop :=
+  SimpleStableTensorCounterexample ∧ ReducedQuasitraceLoss ∧ TraceFreeStablyFinite
+theorem stable_finiteness_bundle : StableFinitenessBundle := by
+  sorry
+end KaplanskyConsequences
+end
+end OAI
+

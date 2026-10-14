@@ -130,5 +130,18 @@ def phiTwo (B : Mat 10) : Mat 10 :=
   hsAdjoint complementaryMap (firstSixᴴ * B * firstSix)
 def compositeChoi : Matrix (Fin 10 × Fin 10) (Fin 10 × Fin 10) ℂ :=
   choi (phiTwo ∘ phiOne)
-def productVector {a b : ℕ} (u : Fin a → ℂ) (v : Fin b → ℂ) : Fin
-[…]
+def productVector {a b : ℕ} (u : Fin a → ℂ) (v : Fin b → ℂ) : Fin a × Fin b → ℂ :=
+  fun ij => u ij.1 * v ij.2
+theorem main_pair :
+    ∃ Φ₁ Φ₂ : Mat 10 → Mat 10,
+      Φ₁ = phiOne ∧ Φ₂ = phiTwo ∧ PPT Φ₁ ∧ PPT Φ₂ ∧
+      (let Z := choi (Φ₂ ∘ Φ₁)
+       Z ≠ 0 ∧
+       (∀ u v : Fin 10 → ℂ, ∀ w : Fin 10 × Fin 10 → ℂ,
+         Z *ᵥ w = productVector u v → u = 0 ∨ v = 0) ∧
+       ¬ EntanglementBreaking (Φ₂ ∘ Φ₁)) := by
+  sorry
+end DimensionTen
+end
+end OAI
+

@@ -121,4 +121,70 @@ class NormConstruction : Prop where
   star_eq : ∀ {D : Type} [CStarAlgebra D] (J : ClosedStarIdeal D) (x : J.Quotient),
     ‖star x‖ = ‖x‖
   square_le : ∀ {D : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D]
+    (J : ClosedStarIdeal D) (x : J.Quotient), ‖x‖ * ‖x‖ ≤ ‖star x * x‖
+variable [ComparatorModel.Pureness.ClosedStarIdeal.NormConstruction]
+instance quotientNormedRing : NormedRing (J.Quotient) where
+  dist_eq := dist_eq_norm_neg_add
+  norm_mul_le := NormConstruction.mul_le J
+instance quotientNormedAlgebra : NormedAlgebra ℂ (J.Quotient) where
+  norm_smul_le := norm_smul_le
+instance quotientNormedStarGroup : NormedStarGroup (J.Quotient) where
+  norm_star_le x := (NormConstruction.star_eq J x).le
+end
+open Filter
+open scoped Topology NNReal ENNReal
+variable {D : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D]
+variable (J : ClosedStarIdeal D)
+variable [ComparatorModel.Pureness.ClosedStarIdeal.NormConstruction]
+instance quotientCStarAlgebra : CStarAlgebra (J.Quotient) where
+  norm_mul_self_le := NormConstruction.square_le J
+end Pureness.ClosedStarIdeal
+end
+section
+open _root_.OAI.ComparatorModel.Pureness
+section UniformTraceNorm
+variable {D : Type} {I : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D]
+variable (τ : I → TracialState D) [Nonempty I]
+variable [ComparatorModel.Pureness.ClosedStarIdeal.NormConstruction]
+def CurrentMain.familyTwoNorm (a : D) : ℝ := ⨆ i, traceTwoNorm (τ i) a
+end UniformTraceNorm
+open _root_.OAI.ComparatorModel.Pureness Filter
+open scoped Topology NNReal ENNReal
+variable [ComparatorModel.Pureness.ClosedStarIdeal.NormConstruction]
+instance CurrentMain.boundedFamilyProductCStar {X : Type} {D : Type} [CStarAlgebra D] [Nontrivial D] :
+    CStarAlgebra (lp (fun _ : X => D) ∞) where
+section UniformNull
+variable {D : Type} {I : Type} {X : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D]
+variable (τ : I → TracialState D) [Nonempty I]
+def CurrentMain.IsFamilyNull (F : Filter X) (u : X → D) : Prop :=
+  Tendsto (fun n => familyTwoNorm τ (u n)) F (𝓝 0)
+class CurrentMain.NullConstruction : Prop where
+  zero : ∀ {D I X : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D] (τ : I → Pureness.TracialState D) [Nonempty I]
+    (F : Filter X), IsFamilyNull τ F (fun _ => 0)
+  add : ∀ {D I X : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D] (τ : I → Pureness.TracialState D) [Nonempty I]
+    {F : Filter X} {u v : X → D}, IsFamilyNull τ F u → IsFamilyNull τ F v →
+    IsFamilyNull τ F (fun n => u n + v n)
+  neg : ∀ {D I X : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D] (τ : I → Pureness.TracialState D) [Nonempty I]
+    {F : Filter X} {u : X → D}, IsFamilyNull τ F u → IsFamilyNull τ F (fun n => -u n)
+  star : ∀ {D I X : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D] (τ : I → Pureness.TracialState D) [Nonempty I]
+    {F : Filter X} {u : X → D}, IsFamilyNull τ F u → IsFamilyNull τ F (fun n => star (u n))
+  mul_left : ∀ {D I X : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D] (τ : I → Pureness.TracialState D) [Nonempty I]
+    {F : Filter X} {u v : X → D}, IsFamilyNull τ F v → ∀ {M : ℝ},
+    (∀ n, ‖u n‖ ≤ M) → IsFamilyNull τ F (fun n => u n * v n)
+  mul_right : ∀ {D I X : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D] (τ : I → Pureness.TracialState D) [Nonempty I]
+    {F : Filter X} {u v : X → D}, IsFamilyNull τ F u → ∀ {M : ℝ},
+    (∀ n, ‖v n‖ ≤ M) → IsFamilyNull τ F (fun n => u n * v n)
+  closed : ∀ {D I X : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D] (τ : I → Pureness.TracialState D) [Nonempty I] (F : Filter X),
+    IsClosed {u : lp (fun _ : X => D) ∞ | IsFamilyNull τ F (fun n => u n)}
+variable [Nontrivial D]
+variable [ComparatorModel.CurrentMain.NullConstruction]
+def CurrentMain.familyNullTwoSided (F : Filter X) : TwoSidedIdeal (lp (fun _ : X => D) ∞) :=
+  TwoSidedIdeal.mk' {u | IsFamilyNull τ F (fun n => u n)}
+    (NullConstruction.zero τ F)
+    (fun hu hv => NullConstruction.add τ hu hv)
+    (fun hu => NullConstruction.neg τ hu)
+    (fun {u _} hv => NullConstruction.mul_left τ hv
+      (lp.norm_apply_le_norm ENNReal.top_ne_zero u))
+    (fun {_ v} hu => NullConstruction.mul_right τ hu
+      (lp.norm_apply_le_n
 […]

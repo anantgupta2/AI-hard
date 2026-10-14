@@ -97,5 +97,66 @@ structure ComplexHilbert where
 attribute [instance] ComplexHilbert.normed ComplexHilbert.inner ComplexHilbert.complete
 instance : CoeSort ComplexHilbert (Type u) := ⟨ComplexHilbert.carrier⟩
 section TensorNormDefinitions
-variable {B : Type u} {C : Type v} [NonUnita
-[…]
+variable {B : Type u} {C : Type v} [NonUnitalCStarAlgebra B] [NonUnitalCStarAlgebra C]
+def spatialEval (H K : ComplexHilbert.{w})
+    (ρ : B →⋆ₙₐ[ℂ] (H →L[ℂ] H)) (σ : C →⋆ₙₐ[ℂ] (K →L[ℂ] K)) :
+    B ⊗[ℂ] C →ₗ[ℂ] ((H ⊗[ℂ] K) →L[ℂ] (H ⊗[ℂ] K)) :=
+  TensorProduct.lift (LinearMap.mk₂ ℂ (fun b c => TensorProduct.mapL (ρ b) (σ c))
+    (by intros; simp [TensorProduct.mapL_add_left])
+    (by intros; simp [TensorProduct.mapL_smul_left])
+    (by intros; simp [TensorProduct.mapL_add_right])
+    (by intros; simp [TensorProduct.mapL_smul_right]))
+def commutingEval (H : ComplexHilbert.{w})
+    (ρ : B →⋆ₙₐ[ℂ] (H →L[ℂ] H)) (σ : C →⋆ₙₐ[ℂ] (H →L[ℂ] H)) :
+    B ⊗[ℂ] C →ₗ[ℂ] (H →L[ℂ] H) :=
+  (LinearMap.mul' ℂ (H →L[ℂ] H)).comp
+    (TensorProduct.map
+      (show B →ₗ[ℂ] (H →L[ℂ] H) from
+        { toFun := ρ, map_add' := map_add ρ, map_smul' := map_smul ρ })
+      (show C →ₗ[ℂ] (H →L[ℂ] H) from
+        { toFun := σ, map_add' := map_add σ, map_smul' := map_smul σ }))
+def minTensorNorm (x : B ⊗[ℂ] C) : ℝ :=
+  sSup {r | ∃ (H K : ComplexHilbert.{w})
+    (ρ : B →⋆ₙₐ[ℂ] (H →L[ℂ] H)) (σ : C →⋆ₙₐ[ℂ] (K →L[ℂ] K)),
+    r = ‖spatialEval H K ρ σ x‖}
+def maxTensorNorm (x : B ⊗[ℂ] C) : ℝ :=
+  sSup {r | ∃ (H : ComplexHilbert.{w})
+    (ρ : B →⋆ₙₐ[ℂ] (H →L[ℂ] H)) (σ : C →⋆ₙₐ[ℂ] (H →L[ℂ] H)),
+    (∀ b c, Commute (ρ b) (σ c)) ∧ r = ‖commutingEval H ρ σ x‖}
+def IsNuclear (B : Type u) [NonUnitalCStarAlgebra B] : Prop :=
+  ∀ (C : Type v) [NonUnitalCStarAlgebra C] (x : B ⊗[ℂ] C),
+    minTensorNorm.{u, v, max u v} x = maxTensorNorm.{u, v, max u v} x
+end TensorNormDefinitions
+structure UnitalCStar where
+  carrier : Type u
+  [cstar : CStarAlgebra carrier]
+  [nontrivial : Nontrivial carrier]
+attribute [instance] UnitalCStar.cstar UnitalCStar.nontrivial
+instance : CoeSort UnitalCStar (Type u) := ⟨UnitalCStar.carrier⟩
+def IsFullGroupAlgebra (A : UnitalCStar.{u}) (ι : G →* unitary A) : Prop :=
+  Dense (Submodule.span ℂ (Set.range (fun g => (ι g : A))) : Set A) ∧
+  ∀ (D : UnitalCStar.{u}) (ρ : G →* unitary D),
+    ∃! φ : A →⋆ₐ[ℂ] D, ∀ g, φ (ι g) = (ρ g : D)
+def CuntzTwoRelations {D : Type u} [CStarAlgebra D] (s : Fin 2 → D) : Prop :=
+  (∀ i, star (s i) * s i = 1) ∧ ∑ i, s i * star (s i) = 1
+def IsCuntzTwoAlgebra (O : UnitalCStar.{u}) (s : Fin 2 → O) : Prop :=
+  CuntzTwoRelations s ∧
+  ∀ (D : UnitalCStar.{u}) (r : Fin 2 → D), CuntzTwoRelations r →
+    ∃! φ : O →⋆ₐ[ℂ] D, ∀ i, φ (s i) = r i
+def MainStatementWithCuntzCorollary : Prop :=
+  ∃ (A : UnitalCStar.{u}) (ι : G →* unitary A),
+    IsFullGroupAlgebra A ι ∧ TopologicalSpace.SeparableSpace A ∧
+    (∀ (B : UnitalCStar.{u}), IsNuclear.{u, u} B →
+      ∀ (ω : Ultrafilter ℕ), IsFree ω →
+        ¬ ∃ φ : A →⋆ₐ[ℂ] NormUltrapower B ω, Function.Injective φ) ∧
+    ∃ (O : UnitalCStar.{u}) (s : Fin 2 → O), IsCuntzTwoAlgebra O s ∧
+      ∀ (ω : Ultrafilter ℕ), IsFree ω →
+        ¬ ∃ φ : A →⋆ₐ[ℂ] NormUltrapower O ω, Function.Injective φ
+end NuclearUltrapower
+end
+namespace NuclearUltrapower
+theorem main_no_embedding : MainStatementWithCuntzCorollary.{0} := by
+  sorry
+end NuclearUltrapower
+end OAI
+

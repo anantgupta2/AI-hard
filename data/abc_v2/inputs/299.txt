@@ -80,5 +80,61 @@ variable {A : Type*} [CStarAlgebra A]
 abbrev BoundedSeq (A : Type*) [CStarAlgebra A] := ℕ →ᵇ A
 def normLimit (ω : Ultrafilter ℕ) (x : OAI.KirchbergRordam.NormUltrapower.BoundedSeq A) : ℝ := by
   classical
-  have h_NormUltrapower_exists_norm_limit  (ω : Ultrafilter ℕ) (x : OAI.KirchbergRordam.NormU
+  have h_NormUltrapower_exists_norm_limit  (ω : Ultrafilter ℕ) (x : OAI.KirchbergRordam.NormUltrapower.BoundedSeq A) :
+      ∃ r ∈ Set.Icc (0 : ℝ) ‖x‖, Tendsto (fun n => ‖x n‖) (ω : Filter ℕ) (𝓝 r) := by
+    obtain ⟨r, hr, h⟩ := isCompact_Icc.ultrafilter_le_nhds'
+      (Ultrafilter.map (fun n => ‖x n‖) ω) (by
+        change ∀ᶠ n in (ω : Filter ℕ), ‖x n‖ ∈ Set.Icc (0 : ℝ) ‖x‖
+        exact Eventually.of_forall fun n => ⟨norm_nonneg _, x.norm_coe_le_norm n⟩)
+    exact ⟨r, hr, h⟩
+  exact
+    (h_NormUltrapower_exists_norm_limit ω x).choose
+def nullIdeal (ω : Ultrafilter ℕ) : Ideal (OAI.KirchbergRordam.NormUltrapower.BoundedSeq A) := by
+  classical
+  have h_NormUltrapower_exists_norm_limit  (ω : Ultrafilter ℕ) (x : OAI.KirchbergRordam.NormUltrapower.BoundedSeq A) :
+      ∃ r ∈ Set.Icc (0 : ℝ) ‖x‖, Tendsto (fun n => ‖x n‖) (ω : Filter ℕ) (𝓝 r) := by
+    obtain ⟨r, hr, h⟩ := isCompact_Icc.ultrafilter_le_nhds'
+      (Ultrafilter.map (fun n => ‖x n‖) ω) (by
+        change ∀ᶠ n in (ω : Filter ℕ), ‖x n‖ ∈ Set.Icc (0 : ℝ) ‖x‖
+        exact Eventually.of_forall fun n => ⟨norm_nonneg _, x.norm_coe_le_norm n⟩)
+    exact ⟨r, hr, h⟩
+  have h_NormUltrapower_tendsto_norm  (ω : Ultrafilter ℕ) (x : OAI.KirchbergRordam.NormUltrapower.BoundedSeq A) :
+      Tendsto (fun n => ‖x n‖) (ω : Filter ℕ) (𝓝 (OAI.KirchbergRordam.NormUltrapower.normLimit ω x)) :=
+    (h_NormUltrapower_exists_norm_limit ω x).choose_spec.2
+  have h_NormUltrapower_normLimit_add_le  (ω : Ultrafilter ℕ) (x y : OAI.KirchbergRordam.NormUltrapower.BoundedSeq A) :
+      OAI.KirchbergRordam.NormUltrapower.normLimit ω (x + y) ≤ OAI.KirchbergRordam.NormUltrapower.normLimit ω x + OAI.KirchbergRordam.NormUltrapower.normLimit ω y := by
+    exact le_of_tendsto_of_tendsto (h_NormUltrapower_tendsto_norm ω (x+y))
+      ((h_NormUltrapower_tendsto_norm ω x).add (h_NormUltrapower_tendsto_norm ω y))
+      (Eventually.of_forall fun n => norm_add_le (x n) (y n))
+  have h_NormUltrapower_normLimit_mul_le  (ω : Ultrafilter ℕ) (x y : OAI.KirchbergRordam.NormUltrapower.BoundedSeq A) :
+      OAI.KirchbergRordam.NormUltrapower.normLimit ω (x * y) ≤ OAI.KirchbergRordam.NormUltrapower.normLimit ω x * OAI.KirchbergRordam.NormUltrapower.normLimit ω y := by
+    exact le_of_tendsto_of_tendsto (h_NormUltrapower_tendsto_norm ω (x*y))
+      ((h_NormUltrapower_tendsto_norm ω x).mul (h_NormUltrapower_tendsto_norm ω y))
+      (Eventually.of_forall fun n => norm_mul_le (x n) (y n))
+  have h_NormUltrapower_normLimit_nonneg  (ω : Ultrafilter ℕ) (x : OAI.KirchbergRordam.NormUltrapower.BoundedSeq A) : 0 ≤ OAI.KirchbergRordam.NormUltrapower.normLimit ω x :=
+    (h_NormUltrapower_exists_norm_limit ω x).choose_spec.1.1
+  have h_NormUltrapower_normLimit_zero  (ω : Ultrafilter ℕ) : OAI.KirchbergRordam.NormUltrapower.normLimit ω (0 : OAI.KirchbergRordam.NormUltrapower.BoundedSeq A) = 0 := by
+    apply tendsto_nhds_unique (h_NormUltrapower_tendsto_norm ω 0)
+    simp
+  exact {
+    carrier := {x | OAI.KirchbergRordam.NormUltrapower.normLimit ω x = 0}
+    zero_mem' := h_NormUltrapower_normLimit_zero ω
+    add_mem' := by
+      intro x y hx hy
+      change OAI.KirchbergRordam.NormUltrapower.normLimit ω x = 0 at hx
+      change OAI.KirchbergRordam.NormUltrapower.normLimit ω y = 0 at hy
+      apply le_antisymm _ (h_NormUltrapower_normLimit_nonneg ω (x+y))
+      simpa only [hx, hy, add_zero] using h_NormUltrapower_normLimit_add_le ω x y
+    smul_mem' := by
+      intro x y hy
+      change OAI.KirchbergRordam.NormUltrapower.normLimit ω y = 0 at hy
+      apply le_antisymm _ (h_NormUltrapower_normLimit_nonneg ω (x*y))
+      simpa only [hy, mul_zero] using h_NormUltrapower_normLimit_mul_le ω x y
+  }
+instance nullIdeal_twoSided (ω : Ultrafilter ℕ) : (OAI.KirchbergRordam.NormUltrapower.nullIdeal (A := A) ω).IsTwoSided := by
+  classical
+  have h_NormUltrapower_exists_norm_limit  (ω : Ultrafilter ℕ) (x : OAI.KirchbergRordam.NormUltrapower.BoundedSeq A) :
+      ∃ r ∈ Set.Icc (0 : ℝ) ‖x‖, Tendsto (fun n => ‖x n‖) (ω : Filter ℕ) (𝓝 r) := by
+    obtain ⟨r, hr, h⟩ := isCompact_Icc.ultrafilter_le_nhds'
+      (Ultrafilter.map (fun n => ‖x n‖) ω) 
 […]

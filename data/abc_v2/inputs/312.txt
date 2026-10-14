@@ -98,5 +98,98 @@ def face {m n : ℕ} (h : m < n) (side : Bool) : disk.{u} m ⟶ disk.{u} n :=
   uliftYoneda.{u}.map (Globe.face h side)
 end GlobularPresheaf
 inductive Table : ℕ → Type
-  | globe (n :
+  | globe (n : ℕ) : Table n
+  | attach {last : ℕ} (T : Table last) (b h : ℕ) (left : b < last) (right : b < h) : Table h
+namespace Table
+def height : {n : ℕ} → Table n → ℕ
+  | _, .globe n => n
+  | _, .attach T _ h _ _ => max T.height h
+noncomputable def realizeWithLast : {n : ℕ} → Table n →
+    (Σ X : GlobularPresheaf.{0}, GlobularPresheaf.disk n ⟶ X)
+  | _, .globe n => ⟨GlobularPresheaf.disk n, 𝟙 _⟩
+  | _, .attach T _ h hl hr =>
+    let prev := T.realizeWithLast
+    let f := GlobularPresheaf.face hl true ≫ prev.2
+    let g := GlobularPresheaf.face hr false
+    ⟨pushout f g, pushout.inr f g⟩
+noncomputable def realize {n} (T : Table n) : GlobularPresheaf.{0} := T.realizeWithLast.1
+noncomputable def lastInclusion {n} (T : Table n) : GlobularPresheaf.disk n ⟶ T.realize :=
+  T.realizeWithLast.2
+end Table
+abbrev Shape := Σ n, Table n
+namespace Shape
+noncomputable def realize (S : Shape) : GlobularPresheaf.{0} := S.2.realize
+def height (S : Shape) : ℕ := S.2.height
+def globe (n : ℕ) : Shape := ⟨n, Table.globe n⟩
+noncomputable instance : Category Shape where
+  Hom S T := S.realize ⟶ T.realize
+  id S := 𝟙 S.realize
+  comp f g := f ≫ g
+  id_comp := Category.id_comp
+  comp_id := Category.comp_id
+  assoc := Category.assoc
+noncomputable def face {m n : ℕ} (h : m < n) (side : Bool) : globe m ⟶ globe n :=
+  GlobularPresheaf.face h side
+noncomputable def source (n : ℕ) : globe n ⟶ globe (n + 1) := face (Nat.lt_succ_self n) false
+noncomputable def target (n : ℕ) : globe n ⟶ globe (n + 1) := face (Nat.lt_succ_self n) true
+def attach (S : Shape) (b h : ℕ) (hl : b < S.1) (hr : b < h) : Shape :=
+  ⟨h, Table.attach S.2 b h hl hr⟩
+noncomputable def seam (S : Shape) {b : ℕ} (hl : b < S.1) : globe b ⟶ S :=
+  show GlobularPresheaf.disk b ⟶ S.realize from
+    GlobularPresheaf.face hl true ≫ S.2.lastInclusion
+noncomputable def inl (S : Shape) (b h : ℕ) (hl : b < S.1) (hr : b < h) :
+    S ⟶ S.attach b h hl hr :=
+  pushout.inl (GlobularPresheaf.face hl true ≫ S.2.lastInclusion)
+    (GlobularPresheaf.face hr false)
+noncomputable def inr (S : Shape) (b h : ℕ) (hl : b < S.1) (hr : b < h) :
+    globe h ⟶ S.attach b h hl hr :=
+  pushout.inr (GlobularPresheaf.face hl true ≫ S.2.lastInclusion)
+    (GlobularPresheaf.face hr false)
+end Shape
+structure TheoryData where
+  Hom : Shape → Shape → Type v
+  id : ∀ S, Hom S S
+  comp : ∀ {S T U}, Hom S T → Hom T U → Hom S U
+  id_comp : ∀ {S T} (f : Hom S T), comp (id S) f = f
+  comp_id : ∀ {S T} (f : Hom S T), comp f (id T) = f
+  assoc : ∀ {R S T U} (f : Hom R S) (g : Hom S T) (h : Hom T U),
+    comp (comp f g) h = comp f (comp g h)
+  base : ∀ {S T}, (S ⟶ T) → Hom S T
+  base_id : ∀ S, base (𝟙 S) = id S
+  base_comp : ∀ {R S T} (f : R ⟶ S) (g : S ⟶ T), base (f ≫ g) = comp (base f) (base g)
+namespace TheoryData
+structure Obj (C : TheoryData.{v}) where
+  shape : Shape
+instance (C : TheoryData.{v}) : Category C.Obj where
+  Hom S T := C.Hom S.shape T.shape
+  id S := C.id S.shape
+  comp f g := C.comp f g
+  id_comp := C.id_comp
+  comp_id := C.comp_id
+  assoc := C.assoc
+noncomputable def arity (C : TheoryData.{v}) : Shape ⥤ C.Obj where
+  obj S := ⟨S⟩
+  map f := C.base f
+  map_id := C.base_id
+  map_comp := C.base_comp
+def PreservesGlobularSums (C : TheoryData.{v}) : Prop :=
+  ∀ (S : Shape) (b h : ℕ) (hl : b < S.1) (hr : b < h),
+    IsPushout (C.arity.map (S.seam hl)) (C.arity.map (Shape.face hr false))
+      (C.arity.map (S.inl b h hl hr)) (C.arity.map (S.inr b h hl hr))
+end TheoryData
+structure GlobularTheory extends TheoryData.{v} where
+  sums : toTheoryData.PreservesGlobularSums
+namespace GlobularTheory
+abbrev Obj (C : GlobularTheory.{v}) := C.toTheoryData.Obj
+@[ext]
+structure Morphism (C D : GlobularTheory.{v}) where
+  map : ∀ {S T}, C.Hom S T → D.Hom S T
+  map_id : ∀ S, map (C.id S) = D.id S
+  map_comp : ∀ {R S T} (f : C.Hom R S) (g : C.Hom S T),
+    map (C.comp f g) = D.comp (map f) (map g)
+  map_base : ∀ {S T} (f : S ⟶ T), map (C.base f) = D.base f
+namespace Morphism
+def id (C : GlobularTheory.{v}) : Morphism C C where
+  map f := f
+  map_i
 […]

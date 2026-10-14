@@ -99,5 +99,65 @@ def Operator.compressionTrace (T : Operator H) (A : H →L[ℂ] K) : ℝ :=
   ∑' j : basisSet K,(inner ℂ (adjoint (basis K j)) (T.toCLM (adjoint (basis K j)))).re
 end Density
 namespace Orbital
-def sliceIntegral {N : ℕ} (hN : 0<N) {L : Length} (ψ : ScalarL2 N L) (Y : Configuration (N-1) L
+def sliceIntegral {N : ℕ} (hN : 0<N) {L : Length} (ψ : ScalarL2 N L) (Y : Configuration (N-1) L) : ℂ :=
+  (Real.sqrt (L.val^3))⁻¹ • ∫x : Torus L,ψ (insertFirst hN x Y)
+def map {N : ℕ} (hN : 0<N) {L : Length} (ψ : ScalarL2 N L) : ScalarL2 (N-1) L := by
+  have integral_mul_le_sqrt {X : Type} [MeasurableSpace X] {ν : Measure X} (f g : X → ℝ) (hf : MemLp f 2 ν) (hg : MemLp g 2 ν)
+      (hf0 : 0 ≤ᵐ[ν] f) (hg0 : 0 ≤ᵐ[ν] g) :
+      ∫ x, f x * g x ∂ν ≤ Real.sqrt (∫ x, f x ^ 2 ∂ν) *
+        Real.sqrt (∫ x, g x ^ 2 ∂ν) := by
+    have h := integral_mul_le_Lp_mul_Lq_of_nonneg
+      Real.HolderConjugate.two_two hf0 hg0 (by simpa using hf) (by simpa using hg)
+    simpa only [Real.rpow_two, ← Real.sqrt_eq_rpow] using h
+  have integral_norm_sq_le {X : Type} [MeasurableSpace X] {ν : Measure X} [IsFiniteMeasure ν] {f : X → ℂ} (hf : MemLp f 2 ν) :
+      (∫ x, ‖f x‖ ∂ν)^2 ≤ ν.real univ * ∫ x, ‖f x‖ ^ 2 ∂ν := by
+    have h := integral_mul_le_sqrt (fun _ : X ↦ 1) (fun x ↦ ‖f x‖)
+      (memLp_const (1 : ℝ)) hf.norm (Eventually.of_forall fun _ ↦ zero_le_one)
+      (Eventually.of_forall fun _ ↦ norm_nonneg _)
+    simp only [one_mul, one_pow, integral_const, smul_eq_mul, mul_one] at h
+    have ha : 0 ≤ ∫ x, ‖f x‖ ∂ν := integral_nonneg fun _ ↦ norm_nonneg _
+    have hm : 0 ≤ ∫ x, ‖f x‖^2 ∂ν := integral_nonneg fun _ ↦ sq_nonneg _
+    have hs := (sq_le_sq₀ ha (by positivity)).2 h
+    simpa only [mul_pow, Real.sq_sqrt (measureReal_nonneg), Real.sq_sqrt hm] using hs
+  have memLp_slices {X Y : Type} [MeasurableSpace X] [MeasurableSpace Y] {ν : Measure X} {μ : Measure Y} [IsFiniteMeasure ν] [IsFiniteMeasure μ] {f : Y × X → ℂ} (hf : MemLp f 2 (μ.prod ν)) :
+      ∀ᵐ y ∂μ, MemLp (fun x ↦ f (y,x)) 2 ν := by
+    filter_upwards [hf.aestronglyMeasurable.prodMk_left,
+      (hf.integrable_norm_pow (by norm_num : (2 : ℕ) ≠ 0)).prod_right_ae] with y hm hi
+    exact (memLp_two_iff_integrable_sq_norm hm).2 hi
+  have memLp_integral_norm {X Y : Type} [MeasurableSpace X] [MeasurableSpace Y] {ν : Measure X} {μ : Measure Y} [IsFiniteMeasure ν] [IsFiniteMeasure μ] {f : Y × X → ℂ} (hf : MemLp f 2 (μ.prod ν)) :
+      MemLp (fun y ↦ ∫ x, ‖f (y,x)‖ ∂ν) 2 μ := by
+    have hm := hf.aestronglyMeasurable.norm.integral_prod_right'
+    apply (memLp_two_iff_integrable_sq hm).2
+    have hi := (hf.integrable_norm_pow (by norm_num : (2 : ℕ) ≠ 0)).integral_prod_left
+    apply (hi.const_mul (ν.real univ)).mono' (hm.pow 2)
+    filter_upwards [memLp_slices hf] with y hy
+    change ‖(∫ x, ‖f (y,x)‖ ∂ν)^2‖ ≤ _
+    rw [Real.norm_eq_abs, abs_of_nonneg (sq_nonneg _)]
+    exact integral_norm_sq_le hy
+  have cons_preserving {n : ℕ} (L : Length) :
+      MeasurePreserving (fun p : Configuration n L × Torus L ↦ Fin.cons (α:=fun _ ↦ Torus L) p.2 p.1)
+        (volume.prod volume) volume := by
+    have h := (volume_preserving_piFinSuccAbove (fun _ : Fin (n+1) ↦ Torus L) 0).symm
+    have hh := h.comp (Measure.measurePreserving_swap (μ:= (volume : Measure (Configuration n L))) (ν:=volume))
+    convert hh using 1; try rfl
+    funext p i
+    simp [MeasurableEquiv.piFinSuccAbove]
+  have insertFirst_preserving {N : ℕ} (hN : 0<N) (L : Length) :
+      MeasurePreserving (fun p : Torus L×Configuration (N-1) L ↦ insertFirst hN p.1 p.2)
+        ((volume : Measure (Torus L)).prod volume) volume := by
+    cases N with
+    | zero => omega
+    | succ n =>
+      unfold insertFirst
+      have h := (cons_preserving (n:=n) L).comp
+        (Measure.measurePreserving_swap (μ:=(volume : Measure (Torus L))) (ν:=volume))
+      convert h using 1 <;> simp [Function.comp_def]
+  have bathFirst_preserving {N : ℕ} (hN : 0<N) (L : Length) :
+      MeasurePreserving (fun p : Configuration (N-1) L×Torus L ↦ insertFirst hN p.2 p.1)
+        ((volume : Measure (Configuration (N-1) L)).prod volume) volume :=
+    (insertFirst_preserving hN L).comp (Measure.measurePreserving_swap)
+  have ground_slice_memLp {N : ℕ} (hN : 0<N) {L : Length} (ψ : ScalarL2 N L) :
+      MemLp (fun p : Configuration (N-1) L×Torus L ↦ ψ (insertFirst hN p.2 p.1)) 2
+        ((volume : Measure (Configuration (N-1) L)).prod volume) :=
+    (Lp.memLp ψ).comp_measurePreser
 […]

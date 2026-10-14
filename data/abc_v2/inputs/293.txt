@@ -269,7 +269,92 @@ variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   [CompleteSpace H]
 local instance instStarModuleGenerated : StarModule ℂ (H →L[ℂ] H) :=
   ContinuousLinearMap.instStarModuleId
-noncomputable def vonNeumannGenerated (s : Set (H →L[ℂ] H)) : VonNeumannAl
+noncomputable def vonNeumannGenerated (s : Set (H →L[ℂ] H)) : VonNeumannAlgebra H where
+  toStarSubalgebra :=
+    StarSubalgebra.centralizer ℂ (StarSubalgebra.centralizer ℂ s : Set (H →L[ℂ] H))
+  centralizer_centralizer' := by
+    change Set.centralizer (Set.centralizer
+      (StarSubalgebra.centralizer ℂ (StarSubalgebra.centralizer ℂ s : Set (H →L[ℂ] H)) :
+        Set (H →L[ℂ] H))) = _
+    rw [StarSubalgebra.coe_centralizer_centralizer]
+    rw [Set.centralizer_centralizer_centralizer]
+    exact (StarSubalgebra.coe_centralizer_centralizer ℂ s).symm
+end Invariant233
+end
+section
+noncomputable section
+open MeasureTheory Filter
+open scoped ENNReal lp Topology
+run_cmd Lean.modifyEnv fun env => Lean.Meta.auxLemmasExt.setState env {}
+namespace Invariant233.WeightedShift
+variable {X : Type*} [MeasurableSpace X] {μ : Measure X}
+theorem diagonal_value (w : Weight) (v : Hilbert) (i : ℤ) :
+    diagonal w v i = w i * v i := rfl
+theorem diagonal_bound (w : Weight) (C : ℝ) (hw : ‖w‖ ≤ C) (v : Hilbert) :
+    ‖diagonal w v‖ ≤ C * ‖v‖ := by
+  apply (diagonal w).le_of_opNorm_le
+  exact (lp.norm_mapCLM_le 2 _ (norm_nonneg w) _).trans hw
+theorem diagonal_aestronglyMeasurable (a : X → Weight) (C : ℝ) (_hC : 0 ≤ C)
+    (_ha : ∀ x, ‖a x‖ ≤ C)
+    (hm : ∀ i, AEStronglyMeasurable (fun x => a x i) μ)
+    {f : X → Hilbert} (hf : AEStronglyMeasurable f μ) :
+    AEStronglyMeasurable (fun x => diagonal (a x) (f x)) μ := by
+  classical
+  let : Nonempty (Finset ℤ) := ⟨∅⟩
+  let F : Finset ℤ → X → Hilbert :=
+    fun s => ∑ i ∈ s, fun x => lp.single 2 i (a x i * f x i)
+  apply aestronglyMeasurable_of_tendsto_ae (atTop : Filter (Finset ℤ))
+    (f := F)
+  · intro s
+    apply Finset.aestronglyMeasurable_sum
+    intro i hi
+    exact (lp.singleContinuousLinearMap ℂ (fun _ : ℤ => ℂ) 2 i).continuous.comp_aestronglyMeasurable
+      ((hm i).mul ((lp.evalCLM ℂ (fun _ : ℤ => ℂ) 2 i).continuous.comp_aestronglyMeasurable hf))
+  · apply Filter.Eventually.of_forall
+    intro x
+    simpa only [F, Finset.sum_apply, diagonal_value, HasSum, SummationFilter.unconditional] using
+      lp.hasSum_single (by norm_num) (diagonal (a x) (f x))
+def fieldDiagonalVec (a : X → Weight) (C : ℝ) (hC : 0 ≤ C)
+    (ha : ∀ x, ‖a x‖ ≤ C)
+    (hm : ∀ i, AEStronglyMeasurable (fun x => a x i) μ)
+    (f : Lp (Hilbert) 2 μ) : Lp (Hilbert) 2 μ :=
+  ((Lp.memLp f).of_le_mul
+    (diagonal_aestronglyMeasurable a C hC ha hm (Lp.aestronglyMeasurable f))
+    (Filter.Eventually.of_forall fun x => diagonal_bound (a x) C (ha x) (f x))).toLp _
+theorem fieldDiagonalVec_ae (a : X → Weight) (C : ℝ) (hC : 0 ≤ C)
+    (ha : ∀ x, ‖a x‖ ≤ C)
+    (hm : ∀ i, AEStronglyMeasurable (fun x => a x i) μ)
+    (f : Lp (Hilbert) 2 μ) :
+    fieldDiagonalVec a C hC ha hm f =ᵐ[μ]
+      fun x => diagonal (a x) (f x) :=
+  MemLp.coeFn_toLp _
+def fieldDiagonalLinear (a : X → Weight) (C : ℝ) (hC : 0 ≤ C)
+    (ha : ∀ x, ‖a x‖ ≤ C)
+    (hm : ∀ i, AEStronglyMeasurable (fun x => a x i) μ) :
+    Lp (Hilbert) 2 μ →ₗ[ℂ] Lp (Hilbert) 2 μ where
+  toFun := fieldDiagonalVec a C hC ha hm
+  map_add' f g := by
+    apply Lp.ext
+    filter_upwards [fieldDiagonalVec_ae a C hC ha hm (f + g),
+      fieldDiagonalVec_ae a C hC ha hm f, fieldDiagonalVec_ae a C hC ha hm g,
+      Lp.coeFn_add f g, Lp.coeFn_add
+        (fieldDiagonalVec a C hC ha hm f) (fieldDiagonalVec a C hC ha hm g)]
+      with x hfg hf hg hsum hout
+    simp only [Pi.add_apply] at hsum hout
+    rw [hfg, hout, hf, hg, hsum, map_add]
+  map_smul' c f := by
+    change fieldDiagonalVec a C hC ha hm (c • f) = c • fieldDiagonalVec a C hC ha hm f
+    apply Lp.ext
+    filter_upwards [fieldDiagonalVec_ae a C hC ha hm (c • f),
+      fieldDiagonalVec_ae a C hC ha hm f, Lp.coeFn_smul c f,
+      Lp.coeFn_smul c (fieldDiagonalVec a C hC ha hm f)] with x hcf hf hsmul hout
+    simp only [Pi.smul_apply] at hsmul hout
+    rw [hcf, hout, hf, hsmul, map_smul]
+def fieldDiagonal (a : X → Weight) (C : ℝ) (hC : 0 ≤ C)
+    (ha : ∀ x, ‖a x‖ ≤ C)
+    (hm : ∀ i, AEStronglyMeasurable (fun x => a x i) μ) :
+    Lp (Hilbert) 2 μ →L[ℂ] Lp (Hilbert) 2 μ :=
+  (fieldDiagonalLinear a C hC ha hm).mkContinuou
 […]
 
 === LEAN COMPARATOR ProductBrown (exact formal statement)
@@ -352,7 +437,114 @@ theorem uniform_product_coefficient_bound (K : ℕ) (D δ : ℝ) (hδ : 0 < δ) 
   have hc : IsCompact S := (isCompact_admissibleCoefficients K D δ).prod
     (isCompact_admissibleCoefficients K D δ)
   by_cases hs : S.Nonempty
-  · obtain ⟨ab, ha
+  · obtain ⟨ab, hab, hmin⟩ := hc.exists_isMinOn hs
+      (continuous_lowCoefficients K).norm.continuousOn
+    have hpos : 0 < ‖lowCoefficients ab‖ := by
+      apply norm_pos_iff.mpr
+      apply lowCoefficients_ne_zero
+      · exact norm_pos_iff.mp (hδ.trans_le hab.1.2)
+      · exact norm_pos_iff.mp (hδ.trans_le hab.2.2)
+    refine ⟨‖lowCoefficients ab‖, hpos, ?_⟩
+    intro a b ha hb ha0 hb0
+    have hm : ‖lowCoefficients ab‖ ≤ ‖lowCoefficients (a, b)‖ :=
+      hmin ⟨⟨ha, ha0⟩, ⟨hb, hb0⟩⟩
+    by_contra hn
+    push Not at hn
+    have hlt : ‖lowCoefficients (a, b)‖ < ‖lowCoefficients ab‖ :=
+      (pi_norm_lt_iff hpos).mpr hn
+    exact (not_lt_of_ge hm) hlt
+  · refine ⟨1, zero_lt_one, ?_⟩
+    intro a b ha hb ha0 hb0
+    exact False.elim (hs ⟨(a, b), ⟨⟨ha, ha0⟩, ⟨hb, hb0⟩⟩⟩)
+end FiniteFactor
+end
+end
+section
+noncomputable section
+open MeasureTheory
+open scoped ENNReal
+namespace FiniteFactor
+def unitIntervalMeasure : Measure ℝ := volume.restrict (Set.Ico 0 1)
+instance : IsProbabilityMeasure unitIntervalMeasure := by
+  constructor
+  simp [unitIntervalMeasure, Real.volume_Ico]
+end FiniteFactor
+end
+end
+section
+noncomputable section
+open MeasureTheory
+open scoped ENNReal
+namespace FiniteFactor
+def sourceKappa (s : ℕ) : ℝ := 1 / (100*((s : ℝ)+1))
+end FiniteFactor
+end
+end
+section
+noncomputable section
+open Filter Finset
+open scoped Topology
+namespace FiniteFactor
+def sourceNextCutoff (m : ℕ) : ℕ := Nat.ceil ((m : ℝ)^((3/4 : ℝ)*(m : ℝ)))
+theorem sourceNextCutoff_large (m : ℕ) (hm : 100 ≤ m) : 2*m < sourceNextCutoff m := by
+  have hmR : (100 : ℝ) ≤ m := by exact_mod_cast hm
+  have hp : (m : ℝ)^2 ≤ (m : ℝ)^((3/4 : ℝ)*(m : ℝ)) := by
+    rw [← Real.rpow_natCast]
+    exact Real.rpow_le_rpow_of_exponent_le (by linarith) (by norm_num; linarith)
+  have hh := hp.trans (Nat.le_ceil _)
+  have hh2 : (2 : ℝ)*m < (sourceNextCutoff m : ℝ) := by
+    change (m : ℝ)^2 ≤ (sourceNextCutoff m : ℝ) at hh
+    nlinarith
+  exact_mod_cast hh2
+theorem exists_source_block_length (R κ L G : ℝ) (hκ : 0 < κ) (hG : 0 < G) :
+    ∃ m : ℕ, R ≤ (m : ℝ) ∧ 100 ≤ m ∧ κ*(m : ℝ)^(1/40 : ℝ) ≥ L ∧
+      G*(sourceNextCutoff m : ℝ) < (m : ℝ)^((4/5 : ℝ)*(m : ℝ)) := by
+  have ht : Tendsto (fun m : ℕ => (m : ℝ)^(1/40 : ℝ)) atTop atTop :=
+    (tendsto_rpow_atTop (by norm_num)).comp tendsto_natCast_atTop_atTop
+  obtain ⟨m, hmR, hm100, hmG, hmκ⟩ :=
+    ((tendsto_natCast_atTop_atTop.eventually (eventually_ge_atTop R)).and
+      ((eventually_ge_atTop (100 : ℕ)).and
+        ((tendsto_natCast_atTop_atTop.eventually (eventually_gt_atTop (2*G))).and
+          (ht.eventually (eventually_ge_atTop (L/κ)))))).exists
+  refine ⟨m, hmR, hm100, (div_le_iff₀ hκ).mp hmκ |>.trans_eq (mul_comm _ _), ?_⟩
+  have hm1 : (1 : ℝ) ≤ m := by exact_mod_cast (show 1 ≤ m by omega)
+  have hm0 : (0 : ℝ) < m := lt_of_lt_of_le zero_lt_one hm1
+  let A : ℝ := (m : ℝ)^((3/4 : ℝ)*(m : ℝ))
+  have hApos : 0 < A := Real.rpow_pos_of_pos hm0 _
+  have hA1 : 1 ≤ A := Real.one_le_rpow hm1 (by positivity)
+  have hceil : (sourceNextCutoff m : ℝ) ≤ 2*A := by
+    have hh := Nat.ceil_lt_add_one hApos.le
+    change (Nat.ceil A : ℝ) ≤ 2*A
+    linarith
+  calc
+    G*(sourceNextCutoff m : ℝ) ≤ G*(2*A) := mul_le_mul_of_nonneg_left hceil hG.le
+    _ < (m : ℝ)*A := by nlinarith
+    _ = (m : ℝ)^((3/4 : ℝ)*(m : ℝ)+1) := by rw [Real.rpow_add hm0, Real.rpow_one]; ring
+    _ ≤ (m : ℝ)^((4/5 : ℝ)*(m : ℝ)) :=
+      Real.rpow_le_rpow_of_exponent_le hm1 (by
+        have hh : (100 : ℝ) ≤ m := by exact_mod_cast hm100
+        linarith)
+structure SourceStageState where
+  K : ℕ
+  G : ℝ
+  d : ℕ
+  B : ℝ
+  previousL : ℝ
+  K_ge : 1 ≤ K
+  G_ge : 1 ≤ G
+  B_nonneg : 0 ≤ B
+  previousL_ge : 1 ≤ previousL
+def SourceStageState.D (a : SourceStageState) : ℝ := Real.exp (((a.K : ℝ)+1)*a.B)
+structure SourceStageChoice (s : ℕ) (a : SourceStageState) where
+  ε : ℝ
+  L : ℝ
+  Gnext : ℝ
+  m : ℕ
+  ε_pos : 0 < ε
+  polynomial : ∀ u v : Coefficients a.K,
+    (∀ i, ‖u i‖ ≤ a.D) → (∀ i, ‖v i‖ ≤ a.D) →
+    1/((s : ℝ)+1) ≤ ‖u ⟨a.K, by omega⟩‖ → 1/((s : ℝ)+1) ≤ ‖v ⟨a.K, by omega⟩‖ →
+    ∃ n : Fin (2*a.K+1),
 […]
 
 === LEAN COMPARATOR HyperinvariantSubspaces (exact formal statement)

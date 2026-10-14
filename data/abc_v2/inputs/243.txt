@@ -106,7 +106,96 @@ def rank (x : HF A) : ℕ := Quotient.liftOn x rawRank (by
       rcases List.mem_cons.mp ha with rfl | ha
       · exact lt_of_lt_of_le (Nat.lt_succ_self _) (le_max_left _ _)
       · exact lt_of_lt_of_le (ihl ha) (le_max_right _ _)
-  have rawRank_congr {l r : Lists A} (h : Lists.Equiv l r) : rawRank l 
+  have rawRank_congr {l r : Lists A} (h : Lists.Equiv l r) : rawRank l = rawRank r := by
+    induction h using Lists.Equiv.rec
+        (motive_2 := fun l r _ => rawRank' l ≤ rawRank' r) with
+    | refl => rfl
+    | antisymm hl hr ihl ihr => exact Nat.le_antisymm ihl ihr
+    | nil => exact Nat.zero_le _
+    | @cons a a' l r heq hmem hsub iheq ihsub =>
+      change max (rawRank a + 1) (rawRank' l) ≤ rawRank' r
+      refine max_le ?_ ihsub
+      rw [iheq]
+      exact rawRank_lt_of_mem r a' hmem
+  exact fun _ _ h => rawRank_congr h)
+end
+open Classical Finset
+variable {A : Type uA} {B : Type uB}
+def double (a b : HF A) : HF A := ofFinset {a,b}
+def ordinal : ℕ → HF A
+  | 0 => ofFinset ∅
+  | i+1 => ofFinset (insert (ordinal i) (elements (ordinal i)))
+end Hereditary
+namespace Operational
+open Classical Hereditary Finset
+variable {A : Type uA} {B : Type uB} {R : Type uR} {F : Type uF} {arity : F → ℕ}
+local instance instDecidableEqHF {C : Type uC} : DecidableEq (HF C) := Classical.decEq _
+abbrev empty : HF A := ordinal 0
+abbrev truth : HF A := ordinal 1
+def boolean (p : Prop) : HF A := if p then truth else empty
+def inputRelation (rel : R → A → A → Bool) (r : R) (x y : HF A) : Prop :=
+  ∃ a b, x = atom a ∧ y = atom b ∧ rel r a b = true
+def allAtoms [Fintype A] : HF A := ofFinset (univ.image atom)
+def unionHF (x : HF A) : HF A := ofFinset ((elements x).biUnion elements)
+def uniqueHF (x : HF A) : HF A :=
+  if h : ∃ a, elements x = {a} then h.choose else empty
+def cardinalityHF (x : HF A) : HF A := ordinal (elements x).card
+abbrev Location (F : Type uF) (arity : F → ℕ) (A : Type uA) := Σ f : F, Fin (arity f) → HF A
+structure State (F : Type uF) (arity : F → ℕ) (A : Type uA) where
+  value : Location F arity A → HF A
+  finite : Set.Finite {l | value l ≠ empty}
+namespace State
+def initial : State F arity A := ⟨fun _ => empty, by simp⟩
+def support (s : State F arity A) : Finset (Location F arity A) := s.finite.toFinset
+end State
+abbrev Update (F : Type uF) (arity : F → ℕ) (A : Type uA) := Location F arity A × HF A
+def State.Consistent (u : Finset (Update F arity A)) : Prop :=
+  ∀ l x y, (l,x) ∈ u → (l,y) ∈ u → x = y
+def State.updatedValue (s : State F arity A) (u : Finset (Update F arity A))
+    (l : Location F arity A) : HF A :=
+  if h : ∃ x, (l,x) ∈ u then h.choose else s.value l
+def State.applyUpdates (s : State F arity A) (u : Finset (Update F arity A)) : State F arity A where
+  value := s.updatedValue u
+  finite := by
+    apply (s.finite.union (u.image Prod.fst).finite_toSet).subset
+    intro l hl
+    by_cases h : ∃ x, (l,x) ∈ u
+    · obtain ⟨x,hx⟩ := h
+      exact Or.inr (mem_image.mpr ⟨(l,x),hx,rfl⟩)
+    · exact Or.inl (by simpa only [Set.mem_ofPred_eq,updatedValue,dite_eq_right h] using hl)
+inductive Control | halt | accept deriving DecidableEq
+end Operational
+section
+open Classical Finset
+variable {A : Type uA} {B : Type uB}
+local instance Hereditary.instDecidableEqHF_1 {C : Type uC} : DecidableEq (HF C) := Classical.decEq _
+def Hereditary.closure (x : HF A) : Finset (HF A) :=
+  insert x ((elements x).attach.biUnion (fun y => closure y.val))
+termination_by rank x
+decreasing_by
+  have mem_rawElements (a l : Lists A) : mk a ∈ rawElements l ↔ a ∈ l := by
+    classical
+    rcases l with ⟨(_ | _), l⟩
+    · cases l
+      change mk a ∈ (∅ : Finset (HF A)) ↔ False
+      simp
+    · change mk a ∈ (Lists'.toList l).toFinset.image mk ↔ a ∈ l
+      simp only [Finset.mem_image, List.mem_toFinset, Lists'.mem_def, mk, Quotient.eq]
+      constructor
+      · rintro ⟨a',ha',heq⟩
+        exact ⟨a',ha',heq.symm⟩
+      · rintro ⟨a',ha',heq⟩
+        exact ⟨a',ha',heq.symm⟩
+  have rawRank_lt_of_mem {b : Bool} (l : Lists' A b) (a : Lists A)
+      (ha : a ∈ l.toList) : rawRank a < rawRank' l := by
+    induction l with
+    | atom => simp at ha
+    | nil => simp at ha
+    | cons' c l ihc ihl =>
+      rcases List.mem_cons.mp ha with rfl | ha
+      · exact lt_of_lt_of_le (Nat.lt_succ_self _) (le_max_left _ _)
+      · exact lt_of_lt_of_le (ihl ha) (le_max_right _ _)
+  have rawRank_congr {l r : Lists A} (h : Lists.Equiv l r) : rawRank 
 […]
 
 === LEAN COMPARATOR WitnessedChoice (exact formal statement)
@@ -207,5 +296,102 @@ def map (f : A → B) (x : HF A) : HF B := by
       apply Lists'.Subset.cons iheq _ ihsub
       rw [toList_rawMap']
       exact List.mem_map.mpr ⟨a',hmem,rfl⟩
-  e
+  exact Quotient.liftOn x (fun l => mk (rawMap f l)) (fun _ _ h => Quotient.eq.mpr (rawMap_congr f h))
+instance {G : Type w} [Group G] [MulAction G A] : MulAction G (HF A)  := by
+  have map_mk {A B : Type u} (f : A → B) (l : Lists A) : map f (mk l) = mk (rawMap f l) := rfl
+  have rawMap_id {A : Type u} : ∀ l : Lists A, rawMap id l = l := by
+    rintro ⟨b,l⟩
+    have h : rawMap' id l = l := by
+      induction l with
+      | atom => rfl
+      | nil => rfl
+      | cons' a l iha ihl => simp only [rawMap', iha,ihl]
+    exact congrArg (Sigma.mk b) h
+  have map_id {A : Type u} (x : HF A) : map id x = x := by
+    induction x using Quotient.inductionOn with
+    | _ l =>
+      change map id (mk l) = mk l
+      rw [map_mk, rawMap_id]
+  have rawMap_comp {A B : Type u} {C : Type u} (g : B → C) (f : A → B) (l : Lists A) :
+      rawMap g (rawMap f l) = rawMap (g ∘ f) l := by
+    rcases l with ⟨b,l⟩
+    have h : rawMap' g (rawMap' f l) = rawMap' (g ∘ f) l := by
+      induction l with
+      | atom => rfl
+      | nil => rfl
+      | cons' a l iha ihl => simp only [rawMap', iha,ihl]
+    exact congrArg (Sigma.mk b) h
+  have map_comp {A B : Type u} {C : Type u} (g : B → C) (f : A → B) (x : HF A) :
+      map g (map f x) = map (g ∘ f) x := by
+    induction x using Quotient.inductionOn with
+    | _ l =>
+      change map g (map f (mk l)) = map (g ∘ f) (mk l)
+      simp only [map_mk,rawMap_comp]
+  exact {
+    smul g x := map (fun a => g • a) x
+    one_smul x := by
+      change map (fun a : A => (1 : G) • a) x = x
+      have h : (fun a : A => (1 : G) • a) = id := by funext a; simp
+      rw [h,map_id]
+    mul_smul g h x := by
+      change map (fun a : A => (g*h) • a) x = map (fun a => g • a) (map (fun a => h • a) x)
+      rw [map_comp]
+      congr 1
+      funext a
+      exact mul_smul g h a }
+end
+open Classical Finset
+def singleton (a : HF A) : HF A := ofFinset {a}
+def double (a b : HF A) : HF A := ofFinset {a,b}
+def pair (a b : HF A) : HF A := double (singleton a) (double a b)
+def ordinal : ℕ → HF A
+  | 0 => ofFinset ∅
+  | i+1 => ofFinset (insert (ordinal i) (elements (ordinal i)))
+local instance {C : Type w} : DecidableEq (HF C) := Classical.decEq _
+def closure (x : HF A) : Finset (HF A) :=
+  insert x ((elements x).attach.biUnion (fun y => closure y.val))
+termination_by rank x
+decreasing_by
+  have mem_rawElements (a l : Lists A) : mk a ∈ rawElements l ↔ a ∈ l := by
+    classical
+    rcases l with ⟨(_ | _), l⟩
+    · cases l
+      change mk a ∈ (∅ : Finset (HF A)) ↔ False
+      simp
+    · change mk a ∈ (Lists'.toList l).toFinset.image mk ↔ a ∈ l
+      simp only [Finset.mem_image, List.mem_toFinset, Lists'.mem_def, mk, Quotient.eq]
+      constructor
+      · rintro ⟨a',ha',heq⟩
+        exact ⟨a',ha',heq.symm⟩
+      · rintro ⟨a',ha',heq⟩
+        exact ⟨a',ha',heq.symm⟩
+  have rawRank_lt_of_mem {b : Bool} (l : Lists' A b) (a : Lists A)
+      (ha : a ∈ l.toList) : rawRank a < rawRank' l := by
+    induction l with
+    | atom => simp at ha
+    | nil => simp at ha
+    | cons' c l ihc ihl =>
+      rcases List.mem_cons.mp ha with rfl | ha
+      · exact lt_of_lt_of_le (Nat.lt_succ_self _) (le_max_left _ _)
+      · exact lt_of_lt_of_le (ihl ha) (le_max_right _ _)
+  have rawRank_congr {l r : Lists A} (h : Lists.Equiv l r) : rawRank l = rawRank r := by
+    induction h using Lists.Equiv.rec
+        (motive_2 := fun l r _ => rawRank' l ≤ rawRank' r) with
+    | refl => rfl
+    | antisymm _ _ ihl ihr => exact Nat.le_antisymm ihl ihr
+    | nil => exact Nat.zero_le _
+    | @cons a a' l r _ hmem _ iheq ihsub =>
+      change max (rawRank a + 1) (rawRank' l) ≤ rawRank' r
+      refine max_le ?_ ihsub
+      rw [iheq]
+      exact rawRank_lt_of_mem r a' hmem
+  have rank_lt_of_mem {x y : HF A} (h : x ∈ y) : rank x < rank y := by
+    induction y using Quotient.inductionOn with
+    | _ l =>
+      induction x using Quotient.inductionOn with
+      | _ a =>
+        have h' := (mem_rawElements a l).mp h
+        rcases l with ⟨(_ | _), l⟩
+        · exact False.elim h'
+        · obtain ⟨a',ha'
 […]

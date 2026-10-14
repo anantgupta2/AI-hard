@@ -103,5 +103,39 @@ def countSatisfied {l r q : Nat} (a : Fin l → Fin (2 * q))
   | e :: es => (if e.satisfied a b then 1 else 0) + countSatisfied a b es
 end PerfectCompleteness
 namespace PerfectCompleteness.Instance
-def maxSatisfied {q : Nat} (G : In
-[…]
+def maxSatisfied {q : Nat} (G : Instance q) : Nat :=
+  Finset.univ.sup (fun s : Labeling G => countSatisfied s.1 s.2 G.edges)
+noncomputable def value {q : Nat} (G : Instance q) : ℝ :=
+  (G.maxSatisfied : ℝ) / G.edges.length
+end PerfectCompleteness.Instance
+namespace PerfectCompleteness.Encoding
+open UniqueGamesTheorem.Foundations.Complexity
+def tableWords {q : Nat} (table : ProjectionTable q) : List Nat :=
+  table.images.toList.map Fin.val
+def edgeWords {l r q : Nat} (edge : Edge l r q) : List Nat :=
+  [edge.left.val, edge.right.val] ++ tableWords edge.projection
+def gameWords {q : Nat} (game : Instance q) : List Nat :=
+  [game.leftVertices, game.rightVertices, q, game.edges.length] ++
+    game.edges.flatMap edgeWords
+def gameBits {q : Nat} (game : Instance q) : List Bool :=
+  encodeWords (gameWords game)
+end PerfectCompleteness.Encoding
+namespace PerfectCompleteness
+open Turing UniqueGamesTheorem.Foundations.Complexity
+structure BinaryGapReduction (δ : ℚ) where
+  alphabet : Nat
+  alphabet_ge_two : 2 ≤ alphabet
+  construct : List Bool → Instance alphabet
+  computation : TM2ComputableInPolyTime (id : List Bool → List Bool)
+    Encoding.gameBits construct
+  finiteAlphabet : MachineFiniteAlphabet.FiniteAlphabet computation.tm
+  completeness : ∀ input, BinaryLanguage.language input → (construct input).value = 1
+  soundness : ∀ input, ¬BinaryLanguage.language input → (construct input).value ≤ (δ : ℝ)
+end PerfectCompleteness
+namespace PerfectCompleteness.Theorem11
+theorem exists_reduction (δ : ℚ) (positive : 0 < δ) (less_than_one : δ < 1) :
+    Nonempty (PerfectCompleteness.BinaryGapReduction δ) := by
+  sorry
+end PerfectCompleteness.Theorem11
+end OAI
+

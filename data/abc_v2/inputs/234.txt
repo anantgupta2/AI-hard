@@ -90,5 +90,67 @@ def spectralFunctional (R : ℝ → ℝ) (p : OverlapPath) : ℝ :=
   (1 / 2 : ℝ) * ∫ r, R (deficit p r) ∂pathMeasure
 def variationalFunctional (R : ℝ → ℝ) : EReal :=
   ⨅ p : OverlapPath, entropyFunctional p + (spectralFunctional R p : EReal)
-def measureResolvent (μ : Measure ℝ) (b : ℝ) : ℝ := ∫ y
+def measureResolvent (μ : Measure ℝ) (b : ℝ) : ℝ := ∫ y, 1 / (b - y) ∂μ
+def measureInverse (μ : Measure ℝ) (e x : ℝ) : ℝ :=
+  if h : ∃ b, e < b ∧ measureResolvent μ b = x then h.choose else e
+def measureR (μ : Measure ℝ) (e x : ℝ) : ℝ :=
+  if 0 < x then measureInverse μ e x - 1 / x else ∫ y, y ∂μ
+def finiteSpectralMeasure {ι : Type*} (ρ eig : ι → ℝ) : Measure ℝ :=
+  Measure.sum fun a => ENNReal.ofReal (ρ a) • Measure.dirac (eig a)
+theorem finiteSpectralMeasure_probability {ι : Type*} [Fintype ι] (ρ eig : ι → ℝ)
+    (hρ : ∀ a, 0 ≤ ρ a) (hsum : ∑ a, ρ a = 1) :
+    IsProbabilityMeasure (finiteSpectralMeasure ρ eig) := by
+  apply HasSum.isProbabilityMeasure_sum_dirac hρ
+  simpa only [hsum] using hasSum_fintype ρ
+run_cmd Lean.modifyEnv fun env => Lean.Meta.auxLemmasExt.setState env {}
+lemma empiricalSpectralWeight_sum {N : ℕ} (hN : 0 < N) :
+    ∑ _i : Fin N, (1 : ℝ)/N=1 := by
+  simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+  field_simp
+def empiricalSpectralLaw {N : ℕ} (hN : 0 < N) (eig : Fin N → ℝ) : ProbabilityMeasure ℝ :=
+  ⟨finiteSpectralMeasure (fun _ => (1 : ℝ)/N) eig,
+    finiteSpectralMeasure_probability _ _ (fun _ => by positivity) (empiricalSpectralWeight_sum hN)⟩
+def spectralMinimum {n : ℕ} (eig : Fin (n+1) → ℝ) : ℝ :=
+  (Finset.univ.image eig).min' (Finset.image_nonempty.mpr Finset.univ_nonempty)
+def spectralMaximum {n : ℕ} (eig : Fin (n+1) → ℝ) : ℝ :=
+  (Finset.univ.image eig).max' (Finset.image_nonempty.mpr Finset.univ_nonempty)
+def magneticBiasObjective (h : FieldStep) (s b : ℝ) : ℝ := fieldValue h b - b * s
+def constrainedFieldValue (h : FieldStep) (s : ℝ) : ℝ :=
+  sInf (range (magneticBiasObjective h s))
+def magneticGroupValue {A : Type*} [Fintype A] (γ m : A → ℝ) (h : FieldStep) : ℝ :=
+  ∑ a, γ a * constrainedFieldValue h (m a)
+run_cmd Lean.modifyEnv fun env => Lean.Meta.auxLemmasExt.setState env {}
+def magneticEntropyFunctional {A : Type*} [Fintype A] (γ m : A → ℝ)
+    (p : OverlapPath) : EReal :=
+  ⨆ h : FieldStep, ((magneticGroupValue γ m h + fieldPairing p h / 2 : ℝ) : EReal)
+def magneticVariationalFunctional {A : Type*} [Fintype A] (R : ℝ → ℝ) (γ m : A → ℝ) : EReal :=
+  ⨅ p : OverlapPath, magneticEntropyFunctional γ m p + (spectralFunctional R p : EReal)
+def RationalMagnetization (A : Type*) := {m : A → ℚ // ∀ a, |(m a : ℝ)| < 1}
+def finiteMagneticFunctional {A : Type*} [Fintype A] (R : ℝ → ℝ) (γ c : A → ℝ) : EReal :=
+  ⨆ m : RationalMagnetization A,
+    ((∑ a, γ a * c a * (m.val a : ℝ) : ℝ) : EReal) +
+      magneticVariationalFunctional R γ (fun a => (m.val a : ℝ))
+def finiteIndexWeight {Ω A : Type*} [MeasurableSpace Ω]
+    (P : Measure Ω) (g : Ω → A) (a : A) : ℝ := P.real (g ⁻¹' {a})
+def simpleFieldIndex {Ω : Type*} [MeasurableSpace Ω] (s : SimpleFunc Ω ℝ) (x : Ω) : s.range :=
+  ⟨s x,s.mem_range_self x⟩
+def simpleFieldWeight {Ω : Type*} [MeasurableSpace Ω] (P : Measure Ω) (s : SimpleFunc Ω ℝ) :=
+  finiteIndexWeight P (simpleFieldIndex s)
+abbrev SimpleFieldPositive {Ω : Type*} [MeasurableSpace Ω] (P : Measure Ω) (s : SimpleFunc Ω ℝ) :=
+  {i : s.range // 0 < simpleFieldWeight P s i}
+def simpleFieldValue {Ω : Type*} [MeasurableSpace Ω]
+    (P : Measure Ω) [IsProbabilityMeasure P] (s : SimpleFunc Ω ℝ) (R : ℝ → ℝ) : ℝ :=
+  (finiteMagneticFunctional R (fun i : SimpleFieldPositive P s => simpleFieldWeight P s i)
+    (fun i => i.val.val)).toReal
+def fieldSimpleApproximation (n : ℕ) : SimpleFunc ℝ ℝ :=
+  SimpleFunc.approxOn id measurable_id (range (id : ℝ → ℝ) ∪ {0}) 0 (by simp) n
+def magneticFieldFunctional (spectral : Measure ℝ) (edge : ℝ) (field : ProbabilityMeasure ℝ) : ℝ :=
+  limUnder atTop (fun n => simpleFieldValue (field : Measure ℝ) (fieldSimpleApproximation n)
+    (measureR spectral edge))
+structure FieldLawCoupling (μ ν : ProbabilityMeasure ℝ) where
+  law : ProbabilityMeasure (ℝ × ℝ)
+  fst : (law : Measure (ℝ × ℝ)).map Prod.fst = (μ : Measure ℝ)
+  snd : (law : Measure (ℝ × ℝ)).map Prod.snd = (ν : Measure ℝ)
+def FieldLawCoupling.cost {μ ν : ProbabilityMeasure ℝ} (p : FieldLawCoupling μ ν) : ℝ≥0∞ :=
+  ∫⁻ xy, ENNReal.ofReal |xy.1-
 […]

@@ -132,7 +132,86 @@ def shiftedPair (a b : UnitAddCircle) : WeakFEPair ℂ :=
     (Complex.continuous_ofReal.comp_continuousOn (HurwitzZeta.continuousOn_evenKernel b))
     (Complex.continuous_ofReal.comp_continuousOn (HurwitzZeta.continuousOn_cosKernel b))
 @[simp] theorem shiftedPair_k (a b : UnitAddCircle) : (shiftedPair a b).k = 1 := by
-  norm_num [shiftedPair, product, Hu
+  norm_num [shiftedPair, product, HurwitzZeta.hurwitzEvenFEPair]
+@[simp] theorem shiftedPair_f (a b : UnitAddCircle) (t : ℝ) :
+    (shiftedPair a b).f t =
+      (HurwitzZeta.evenKernel a t : ℂ) * (HurwitzZeta.evenKernel b t : ℂ) := rfl
+theorem shiftedPair_differentiableAt (a b : UnitAddCircle) {s : ℂ}
+    (hs₀ : s ≠ 0) (hs₁ : s ≠ 1) :
+    DifferentiableAt ℂ (shiftedPair a b).Λ s := by
+  exact (shiftedPair a b).differentiableAt_Λ (Or.inl hs₀)
+    (Or.inl (by simpa using hs₁))
+def scaledEvenPair (a : UnitAddCircle) (u : ℝ) (hu : 0 < u) : WeakFEPair ℂ :=
+  rescale (HurwitzZeta.hurwitzEvenFEPair a)
+    (Complex.continuous_ofReal.comp_continuousOn (HurwitzZeta.continuousOn_evenKernel a))
+    (Complex.continuous_ofReal.comp_continuousOn (HurwitzZeta.continuousOn_cosKernel a)) u hu
+theorem scaledEvenPair_f_continuous (a : UnitAddCircle) (u : ℝ) (hu : 0 < u) :
+    ContinuousOn (scaledEvenPair a u hu).f (Ioi 0) :=
+  (Complex.continuous_ofReal.comp_continuousOn
+    (HurwitzZeta.continuousOn_evenKernel a)).comp (by fun_prop)
+      (fun x hx => mul_pos hu hx)
+theorem scaledEvenPair_g_continuous (a : UnitAddCircle) (u : ℝ) (hu : 0 < u) :
+    ContinuousOn (scaledEvenPair a u hu).g (Ioi 0) :=
+  (Complex.continuous_ofReal.comp_continuousOn
+    (HurwitzZeta.continuousOn_cosKernel a)).comp (by fun_prop)
+      (fun x hx => mul_pos (inv_pos.mpr hu) hx)
+def rectangularPair (a b : UnitAddCircle) (u v : ℝ) (hu : 0 < u) (hv : 0 < v) :
+    WeakFEPair ℂ :=
+  product (scaledEvenPair a u hu) (scaledEvenPair b v hv)
+    (scaledEvenPair_f_continuous a u hu) (scaledEvenPair_g_continuous a u hu)
+    (scaledEvenPair_f_continuous b v hv) (scaledEvenPair_g_continuous b v hv)
+@[simp] theorem rectangularPair_k (a b : UnitAddCircle) (u v : ℝ)
+    (hu : 0 < u) (hv : 0 < v) : (rectangularPair a b u v hu hv).k = 1 := by
+  norm_num [rectangularPair, scaledEvenPair, rescale, product, HurwitzZeta.hurwitzEvenFEPair]
+end SevenEighths.ThetaProduct
+namespace SevenEighths.EisensteinTheta
+open ThetaProduct
+def xShift (a b L : ℝ) (e : Fin 2) : ℝ := (2 * a - b - L * e) / (2 * L)
+def yShift (b L : ℝ) (e : Fin 2) : ℝ := (b + L * e) / (2 * L)
+def parityPair (a b L : ℝ) (hL : 0 < L) (e : Fin 2) : WeakFEPair ℂ :=
+  rectangularPair (xShift a b L e) (yShift b L e) (L ^ 2) (3 * L ^ 2)
+    (sq_pos_of_pos hL) (mul_pos (by norm_num) (sq_pos_of_pos hL))
+end SevenEighths.EisensteinTheta
+namespace SevenEighths.HeckeTheta
+open EisensteinTheta
+theorem locallyIntegrableOn_sum {ι : Type*} (s : Finset ι)
+    (f : ι → ℝ → ℂ) (hf : ∀ i ∈ s, LocallyIntegrableOn (f i) (Ioi 0)) :
+    LocallyIntegrableOn (∑ i ∈ s, f i) (Ioi 0) := by
+  exact Finset.sum_induction f (fun g => LocallyIntegrableOn g (Ioi 0))
+    (fun _ _ => LocallyIntegrableOn.add) (locallyIntegrableOn_const 0) hf
+def finitePair {ι : Type*} [Fintype ι] (P : ι → WeakFEPair ℂ)
+    (hk : ∀ i, (P i).k = 1) (w : ι → ℂ) : WeakFEPair ℂ where
+  f := ∑ i, w i • (P i).f
+  g := ∑ i, (w i * (P i).ε) • (P i).g
+  k := 1
+  ε := 1
+  f₀ := ∑ i, w i * (P i).f₀
+  g₀ := ∑ i, w i * (P i).ε * (P i).g₀
+  hf_int := locallyIntegrableOn_sum Finset.univ _
+    (fun i _ => (P i).hf_int.smul (w i))
+  hg_int := locallyIntegrableOn_sum Finset.univ _
+    (fun i _ => (P i).hg_int.smul (w i * (P i).ε))
+  hk := by norm_num
+  hε := one_ne_zero
+  h_feq x hx := by
+    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, one_mul]
+    rw [Finset.mul_sum]
+    apply Finset.sum_congr rfl
+    intro i _
+    rw [(P i).h_feq x hx, hk i]
+    simp only [smul_eq_mul]
+    ring
+  hf_top r := by
+    have h := Asymptotics.IsBigO.fun_sum (s := Finset.univ)
+      (fun i _ => ((P i).hf_top r).const_mul_left (w i))
+    simpa only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, ← Finset.sum_sub_distrib,
+      mul_sub] using h
+  hg_top r := by
+    have h := Asymptotics.IsBigO.fun_sum (s := Finset.univ)
+      (fun i _ => ((P i).hg_top r).const_mul_left (w i * (P i).ε))
+    simpa only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, ← Finset.sum_sub_distrib,
+      mul_sub] using h
+def pair {N : ℕ} [NeZero N] (w : Fin N × Fin N → ℂ) : We
 […]
 
 === LEAN COMPARATOR SiegelZeros (exact formal statement)

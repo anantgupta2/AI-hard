@@ -148,5 +148,34 @@ instance (o : M) : NormedSpace ℝ (FreeSpace o) :=
   inferInstanceAs (NormedSpace ℝ ↥(freeSubmodule o))
 def delta (o x : M) : FreeSpace o :=
   ⟨evaluation o x, Submodule.le_topologicalClosure _
-    (Submodule.subset_span ⟨x, rfl
-[…]
+    (Submodule.subset_span ⟨x, rfl⟩)⟩
+def HasAP (X : Type*) [NormedAddCommGroup X] [NormedSpace ℝ X] : Prop :=
+  ∀ C : Set X, IsCompact C → ∀ ε : ℝ, 0 < ε →
+    ∃ T : X →L[ℝ] X, Module.Finite ℝ (LinearMap.range T.toLinearMap) ∧
+      ∃ η : ℝ, η < ε ∧ ∀ u ∈ C, ‖T u - u‖ ≤ η
+def HasBAP (X : Type*) [NormedAddCommGroup X] [NormedSpace ℝ X] (Λ : ℝ) : Prop :=
+  ∀ C : Set X, IsCompact C → ∀ ε : ℝ, 0 < ε →
+    ∃ T : X →L[ℝ] X, Module.Finite ℝ (LinearMap.range T.toLinearMap) ∧
+      ‖T‖ ≤ Λ ∧ ∃ η : ℝ, η < ε ∧ ∀ u ∈ C, ‖T u - u‖ ≤ η
+def blockBound (p : ℕ) : ℝ := 300 * (p : ℝ)^2 + 150 * (p : ℝ) + 5
+def BlockStatement : Prop :=
+  ∀ p : ℕ, 1 ≤ p → ∃ (M : Type) (d : MetricSpace M) (o : M),
+    letI := d
+    Countable M ∧ (∀ x y : M, x ≠ y → 1 ≤ dist x y) ∧
+      (∀ x y : M, dist x y ≤ blockBound p) ∧
+      ∃ A : Finset M, o ∈ A ∧ ∀ T : FreeSpace o →L[ℝ] FreeSpace o,
+        Module.Finite ℝ (LinearMap.range T.toLinearMap) → ‖T‖ ≤ (p : ℝ) →
+          ∃ a ∈ A, (1 / 2 : ℝ) ≤ ‖T (delta o a) - delta o a‖
+def MainStatement : Prop :=
+  ∃ (M : Type) (d : MetricSpace M) (o : M),
+    letI := d
+    Countable M ∧ (∀ x y : M, x ≠ y → 1 ≤ dist x y) ∧
+      (¬ Bornology.IsBounded (Set.univ : Set M)) ∧
+      (¬ ProperSpace M) ∧ HasAP (FreeSpace o) ∧
+      ∀ Λ : ℝ, 1 ≤ Λ → ¬ HasBAP (FreeSpace o) Λ
+theorem source_endpoints : BlockStatement ∧ MainStatement := by
+  sorry
+end DiscreteFree
+end
+end OAI
+

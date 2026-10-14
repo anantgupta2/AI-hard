@@ -115,5 +115,14 @@ def RL : Set Language :=
       (x ∉ A → M.acceptanceProbability x (polynomialClock c k x.length) = 0)}
 def BPL : Set Language :=
   {A | ∃ (q w h : ℕ) (M : Machine q w h),
-    M.LogSpace ∧ ∃ (c k : ℕ), 0 < c ∧ ∀ x : Word
-[…]
+    M.LogSpace ∧ ∃ (c k : ℕ), 0 < c ∧ ∀ x : Word,
+      M.HaltsBy x (polynomialClock c k x.length) ∧
+      (x ∈ A → (2 / 3 : ℚ) ≤ M.acceptanceProbability x
+        (polynomialClock c k x.length)) ∧
+      (x ∉ A → M.acceptanceProbability x (polynomialClock c k x.length) ≤ (1 / 3 : ℚ))}
+theorem exact_logarithmic_space_derandomization :
+    L = RL ∧ RL = BPL := by
+  sorry
+end ExactDerandomization
+end OAI
+

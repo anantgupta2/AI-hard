@@ -108,5 +108,82 @@ def translation (d ℓ : ℕ) (x : Site d) : QuasiLocal d ℓ →⋆ₐ[ℂ] Qua
       (l2Reindex e).symm v i = v (e i) := rfl
   have relabel_matrixUnit (d ℓ : ℕ) (e : Equiv.Perm (Site d))
       (x : Site d) (a b : Level ℓ) :
-      operatorRelabel d ℓ e (matrixUnit d ℓ x a b) = 
+      operatorRelabel d ℓ e (matrixUnit d ℓ x a b) = matrixUnit d ℓ (e x) a b := by
+    ext v c
+    simp only [operatorRelabel, LinearIsometryEquiv.conjStarAlgEquiv_apply_apply,
+      l2Reindex_apply, matrixUnit_apply]
+    change (if c (e x) = a then
+      (l2Reindex (Finsupp.equivCongrLeft e)).symm v
+        (((Finsupp.equivCongrLeft e).symm c).update x b) else 0) = _
+    rw [l2Reindex_symm_apply]
+    by_cases h : c (e x) = a
+    · simp only [h, ite_eq_left]
+      apply congrArg v
+      ext y
+      simp only [Finsupp.equivCongrLeft_apply, Finsupp.equivMapDomain_apply,
+        Finsupp.update_apply]
+      by_cases hy : y = e x
+      · subst y; simp
+      · have hy' : e.symm y ≠ x := fun hxy => hy (by simpa using congrArg e hxy)
+        simp [hy, hy']
+    · simp only [h, ite_false]
+  have relabel_mem (d ℓ : ℕ) (e : Equiv.Perm (Site d))
+      {A : SpinOperator d ℓ} (hA : A ∈ quasiLocalAlgebra d ℓ) :
+      operatorRelabel d ℓ e A ∈ quasiLocalAlgebra d ℓ := by
+    let f := (operatorRelabel d ℓ e).toStarAlgHom
+    have h : StarAlgebra.adjoin ℂ {A | ∃ x a b, A = matrixUnit d ℓ x a b} ≤
+        (quasiLocalAlgebra d ℓ).comap f := by
+      apply StarAlgebra.adjoin_le
+      rintro _ ⟨x, a, b, rfl⟩
+      change operatorRelabel d ℓ e (matrixUnit d ℓ x a b) ∈ quasiLocalAlgebra d ℓ
+      rw [relabel_matrixUnit]
+      exact (localUnit d ℓ (e x) a b).property
+    have hc : IsClosed ((quasiLocalAlgebra d ℓ).comap f : Set (SpinOperator d ℓ)) :=
+      (StarSubalgebra.isClosed_topologicalClosure _).preimage
+        (StarAlgEquiv.isometry (operatorRelabel d ℓ e)).continuous
+    exact StarSubalgebra.topologicalClosure_minimal h hc hA
+  exact let f := (operatorRelabel d ℓ (Equiv.addLeft x)).toStarAlgHom
+    (f.comp (quasiLocalAlgebra d ℓ).subtype).codRestrict (quasiLocalAlgebra d ℓ)
+      (fun A => relabel_mem d ℓ (Equiv.addLeft x) A.property)
+def magneticLevel (ℓ : ℕ) (k : Level ℓ) : ℝ := (k : ℝ) - (ℓ : ℝ) / 2
+def spinZ (d ℓ : ℕ) (x : Site d) : QuasiLocal d ℓ :=
+  ∑ k : Level ℓ, (magneticLevel ℓ k : ℂ) • localUnit d ℓ x k k
+def spinPlus (d ℓ : ℕ) (x : Site d) : QuasiLocal d ℓ :=
+  ∑ k : Fin ℓ,
+    (Real.sqrt ((ℓ / 2 : ℝ) * (ℓ / 2 + 1) -
+      magneticLevel ℓ k.castSucc * (magneticLevel ℓ k.castSucc + 1)) : ℂ) •
+      localUnit d ℓ x k.succ k.castSucc
+def spinMinus (d ℓ : ℕ) (x : Site d) : QuasiLocal d ℓ := star (spinPlus d ℓ x)
+def spinX (d ℓ : ℕ) (x : Site d) : QuasiLocal d ℓ :=
+  (1 / 2 : ℂ) • (spinPlus d ℓ x + spinMinus d ℓ x)
+def spinY (d ℓ : ℕ) (x : Site d) : QuasiLocal d ℓ :=
+  (1 / (2 * Complex.I) : ℂ) • (spinPlus d ℓ x - spinMinus d ℓ x)
+def NearestNeighbor {d : ℕ} (x y : Site d) : Prop :=
+  ∑ i : Fin d, |x i - y i| = (1 : ℤ)
+def volumeEdges {d : ℕ} (Λ : Finset (Site d)) : Finset (Site d × Site d) :=
+  (Λ ×ˢ Λ).filter fun p => NearestNeighbor p.1 p.2 ∧ WellOrderingRel p.1 p.2
+def hamiltonian (d ℓ : ℕ) (Λ : Finset (Site d)) : QuasiLocal d ℓ :=
+  -∑ e ∈ volumeEdges Λ,
+    (spinX d ℓ e.1 * spinX d ℓ e.2 + spinY d ℓ e.1 * spinY d ℓ e.2 +
+      spinZ d ℓ e.1 * spinZ d ℓ e.2)
+def box (d n : ℕ) : Finset (Site d) :=
+  Fintype.piFinset fun _ : Fin d => Finset.Icc (-(n : ℤ)) (n : ℤ)
+def finiteDynamics (d ℓ : ℕ) (Λ : Finset (Site d)) (t : ℝ)
+    (A : QuasiLocal d ℓ) : QuasiLocal d ℓ :=
+  NormedSpace.exp ((Complex.I * (t : ℂ)) • hamiltonian d ℓ Λ) * A *
+    NormedSpace.exp ((-(Complex.I * (t : ℂ))) • hamiltonian d ℓ Λ)
+def dynamics (d ℓ : ℕ) (t : ℝ) (A : QuasiLocal d ℓ) : QuasiLocal d ℓ :=
+  Filter.limUnder Filter.atTop (fun n : ℕ => finiteDynamics d ℓ (box d n) t A)
+def DynamicsConverges (d ℓ : ℕ) : Prop :=
+  ∀ (t : ℝ) (A : QuasiLocal d ℓ),
+    Filter.Tendsto (fun n : ℕ => finiteDynamics d ℓ (box d n) t A)
+      Filter.atTop (nhds (dynamics d ℓ t A))
+structure State (d ℓ : ℕ) where
+  functional : QuasiLocal d ℓ →L[ℂ] ℂ
+  normalized : functional 1 = 1
+  positive : ∀ A, (functional (star A * A)).im = 0 ∧
+    0 ≤ (functional (star A * A)).re
+def TranslationInvariant {d ℓ : ℕ} (ω : State d ℓ) : Prop :=
+  ∀ (x : Site d) (A : QuasiLocal d ℓ), ω.functional (translation d ℓ x A) = ω.functional A
+def IsKMS {d ℓ :
 […]

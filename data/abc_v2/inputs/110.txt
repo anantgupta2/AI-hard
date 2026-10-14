@@ -166,5 +166,46 @@ def requestBudget (c e L t : ℕ) : ℕ :=
 def boot {n k : ℕ} (M : BitMachine) (c e : ℕ)
     (d : RationalMetric n) (s : Configuration n k) : MachineState M :=
   M.run (M.initial (instanceCode d s))
-    (List.replicate (polynomialBudget c e (instanceCode d s).
-[…]
+    (List.replicate (polynomialBudget c e (instanceCode d s).length) false)
+def requestStep {n : ℕ} (M : BitMachine) (c e L t : ℕ)
+    (s : MachineState M) (r : Fin n)
+    (coins : Fin (requestBudget c e L t) → Bool) : MachineState M :=
+  M.run (M.install s (natCode (r.val + 1))) (List.ofFn coins)
+inductive Reachable {n k : ℕ} (M : BitMachine) (c e : ℕ)
+    (d : RationalMetric n) (s : Configuration n k) : ℕ → MachineState M → Prop
+  | boot : Reachable M c e d s 0 (boot M c e d s)
+  | next {t z} : Reachable M c e d s t z → (r : Fin n) →
+      (bits : Fin (requestBudget c e (instanceCode d s).length (t+1)) → Bool) →
+      Reachable M c e d s (t+1)
+        (requestStep M c e (instanceCode d s).length (t+1) z r bits)
+def selectedLabel {M : BitMachine} {k : ℕ} (hk : 0 < k) (s : MachineState M) : Fin k :=
+  ⟨outputValue s % k, Nat.mod_lt _ hk⟩
+noncomputable def machineExpectedCost {n k : ℕ} (M : BitMachine) (c e L : ℕ)
+    (d : RationalMetric n) (hk : 0 < k) :
+    ℕ → MachineState M → Configuration n k → List (Fin n) → ℝ
+  | _, _, _, [] => 0
+  | t, z, s, r :: w =>
+      let B := requestBudget c e L (t+1)
+      (∑ bits : Fin B → Bool,
+        let z' := requestStep M c e L (t+1) z r bits
+        let j := selectedLabel hk z'
+        (d.distance (s j) r : ℝ) +
+          machineExpectedCost M c e L d hk (t+1) z' (serve s r j) w) / (2 : ℝ)^B
+def UniformAlgorithmClaim : Prop :=
+  ∃ (M : BitMachine) (c e : ℕ) (C : ℝ), 0 < c ∧ 0 < C ∧
+    ∀ (n k : ℕ) (hn : 3 ≤ n) (hk : 2 ≤ k) (hkn : k < n)
+      (d : RationalMetric n) (s : Configuration n k),
+      let L := (instanceCode d s).length
+      (boot M c e d s).yielded = true ∧
+      (∀ (t : ℕ) (z : MachineState M), Reachable M c e d s t z →
+        ∀ (r : Fin n) (bits : Fin (requestBudget c e L (t+1)) → Bool),
+          let z' := requestStep M c e L (t+1) z r bits
+          z'.yielded = true ∧ outputValue z' < k) ∧
+      (∃ B : ℝ, 0 ≤ B ∧ ∀ w : List (Fin n),
+        machineExpectedCost M c e L d (by omega) 0 (boot M c e d s) s w ≤
+          C * (Real.log (k + 1))^2 * offlineCost d s w + B)
+theorem uniform_squared_logarithmic_main : UniformAlgorithmClaim := by
+  sorry
+end UniformKServer
+end OAI
+

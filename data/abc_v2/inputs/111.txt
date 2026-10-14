@@ -157,5 +157,95 @@ noncomputable def observed {n bits : ℕ} (A : HiddenRule n bits) (r : Seed bits
 noncomputable def hiddenAcceptedThrough {n bits : ℕ} (A : HiddenRule n bits)
     (r : Seed bits) (w : Weights n) (π : ArrivalOrder n) (t : ℕ) : Finset (Fin n) :=
   acceptedThrough A.core r (observed A r w) w π t \ A.mask r
-nonco
-[…]
+noncomputable def hiddenReward {n bits : ℕ} (A : HiddenRule n bits)
+    (r : Seed bits) (w : Weights n) (π : ArrivalOrder n) : ℝ :=
+  ∑ e ∈ hiddenAcceptedThrough A r w π n, w e
+noncomputable def hiddenWorstReward {n bits : ℕ} (A : HiddenRule n bits)
+    (w : Weights n) (r : Seed bits) : ℝ := by
+  classical
+  exact Finset.univ.inf' Finset.univ_nonempty (hiddenReward A r w)
+end MatroidProphet
+end
+section
+open MeasureTheory ProbabilityTheory
+namespace MatroidProphet
+def HiddenVectorChallenge : Prop :=
+  ∀ (n : ℕ) (M : Matroid (Fin n)), M.E = Set.univ →
+    ∃ (bits : ℕ) (ν : Measure (Seed bits)), IsProbabilityMeasure ν ∧
+    ∃ (A : HiddenRule n bits),
+      (∀ (w : Weights n), (∀ e, 0 ≤ w e) →
+        ∀ (r : Seed bits) (π : ArrivalOrder n) (t : ℕ),
+          M.Indep (hiddenAcceptedThrough A r w π t : Set (Fin n))) ∧
+      ∀ (w : Weights n), (∀ e, 0 ≤ w e) →
+        ((2 : ℝ) ^ 293)⁻¹ * optimum M w ≤
+          ∫ r, hiddenWorstReward A w r ∂ν
+end MatroidProphet
+end
+section
+open MeasureTheory
+namespace MatroidProphet
+structure SecretaryRule (n : ℕ) (Q : Type*) [MeasurableSpace Q] where
+  prefixLength : Q → Fin (n + 1)
+  measurable_prefixLength : Measurable prefixLength
+  decide : (k : Fin n) → Q → History n k → Bool
+  measurable_decide : ∀ k, Measurable
+    (fun x : Q × History n k => decide k x.1 x.2)
+def SamePrefix {n : ℕ} (K : ℕ) (σ π : ArrivalOrder n) : Prop :=
+  ∀ k : Fin n, k.val < K → σ k = π k
+def secretaryDecisionAt {n : ℕ} {Q : Type*} [MeasurableSpace Q]
+    (A : SecretaryRule n Q) (q : Q) (w : Weights n) (π : ArrivalOrder n)
+    (k : Fin n) : Bool :=
+  if k.val < (A.prefixLength q).val then false else A.decide k q (history w π k)
+noncomputable def secretaryAcceptedThrough {n : ℕ} {Q : Type*} [MeasurableSpace Q]
+    (A : SecretaryRule n Q) (q : Q) (w : Weights n) (π : ArrivalOrder n)
+    (t : ℕ) : Finset (Fin n) := by
+  classical
+  exact Finset.univ.filter fun e =>
+    (π.symm e).val < t ∧ secretaryDecisionAt A q w π (π.symm e) = true
+noncomputable def secretaryReward {n : ℕ} {Q : Type*} [MeasurableSpace Q]
+    (A : SecretaryRule n Q) (q : Q) (w : Weights n) (π : ArrivalOrder n) : ℝ :=
+  ∑ e ∈ secretaryAcceptedThrough A q w π n, w e
+def SecretaryFeasible {n : ℕ} {Q : Type*} [MeasurableSpace Q]
+    (M : Matroid (Fin n)) (A : SecretaryRule n Q) : Prop :=
+  ∀ (q : Q) (w : Weights n), (∀ e, 0 ≤ w e) →
+    ∀ (π : ArrivalOrder n) (t : ℕ),
+      M.Indep (secretaryAcceptedThrough A q w π t : Set (Fin n))
+end MatroidProphet
+end
+section
+namespace MatroidProphet.Secretary
+open MeasureTheory
+noncomputable def uniformArrivalLaw (n : ℕ) : Measure (ArrivalOrder n) :=
+  (PMF.uniformOfFintype (ArrivalOrder n)).toMeasure
+end MatroidProphet.Secretary
+end
+section
+open MeasureTheory ProbabilityTheory
+namespace MatroidProphet
+def SecretaryChallenge.{u} : Prop :=
+  ∀ (n : ℕ) (M : Matroid (Fin n)), M.E = Set.univ →
+    ∃ (q : ℕ) (ν : Measure (Fin q)), IsProbabilityMeasure ν ∧
+    ∃ (A : SecretaryRule n (Fin q)), SecretaryFeasible M A ∧
+      ∀ (w : Weights n), (∀ e, 0 ≤ w e) →
+      ∀ {Ω : Type u} [MeasurableSpace Ω] (μ : Measure Ω) [IsProbabilityMeasure μ]
+        (Q : Ω → Fin q) (σ π : Ω → ArrivalOrder n),
+        Measurable Q → Measurable σ → Measurable π →
+        Measure.map Q μ = ν →
+        Measure.map σ μ = Secretary.uniformArrivalLaw n →
+        IndepFun Q σ μ →
+        (∀ᵐ ω ∂μ, SamePrefix (A.prefixLength (Q ω)).val (σ ω) (π ω)) →
+        Integrable (fun ω => secretaryReward A (Q ω) w (π ω)) μ ∧
+          ((2 : ℝ) ^ 293)⁻¹ * optimum M w ≤
+            ∫ ω, secretaryReward A (Q ω) w (π ω) ∂μ
+end MatroidProphet
+end
+namespace MatroidProphet.Assigned
+theorem one_sample.{u} : MatroidProphet.OneSampleChallenge.{u} := by
+  sorry
+theorem hidden_vector : MatroidProphet.HiddenVectorChallenge := by
+  sorry
+theorem secretary.{u} : MatroidProphet.SecretaryChallenge.{u} := by
+  sorry
+end MatroidProphet.Assigned
+end OAI
+

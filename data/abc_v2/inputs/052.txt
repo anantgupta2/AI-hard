@@ -93,8 +93,42 @@ structure OrdinaryUniversalCover (X : ComplexManifold.{u} n)
     (Z : ComplexManifold.{v} n) where
   projection : Z.Carrier → X.Carrier
   covering : IsCoveringMap projection
-  [
-[…]
+  [connected : ConnectedSpace Z.Carrier]
+  [simplyConnected : SimplyConnectedSpace Z.Carrier]
+  liftedComplexStructure : LocalBiholomorphism projection
+def CompatibleProduct {X : ComplexManifold.{u} n} {Z : ComplexManifold.{v} n}
+    (S : HolomorphicSplitting X r₁ r₂) (π : OrdinaryUniversalCover X Z)
+    (Y₁ : ComplexManifold.{v} r₁) (Y₂ : ComplexManifold.{v} r₂) : Prop :=
+  ∃ Φ : Z.Carrier ≃ₜ (Y₁.Carrier × Y₂.Carrier),
+    MDifferentiable (model n) ((model r₁).prod (model r₂)) Φ ∧
+    MDifferentiable ((model r₁).prod (model r₂)) (model n) Φ.symm ∧
+    (∀ z, Submodule.map
+      (mfderiv (model n) ((model r₁).prod (model r₂)) Φ z).toLinearMap
+      (Submodule.comap (mfderiv (model n) (model n) π.projection z).toLinearMap
+        (LinearMap.range (S.projection (π.projection z)).toLinearMap)) =
+      LinearMap.ker (ContinuousLinearMap.snd ℂ (Model r₁) (Model r₂)).toLinearMap) ∧
+    (∀ z, Submodule.map
+      (mfderiv (model n) ((model r₁).prod (model r₂)) Φ z).toLinearMap
+      (Submodule.comap (mfderiv (model n) (model n) π.projection z).toLinearMap
+        (LinearMap.ker (S.projection (π.projection z)).toLinearMap)) =
+      LinearMap.ker (ContinuousLinearMap.fst ℂ (Model r₁) (Model r₂)).toLinearMap)
+open Set
+open scoped Manifold ContDiff
+variable {n r₁ r₂ : ℕ}
+theorem main (X : ComplexManifold.{u} n) [CompactSpace X.Carrier]
+    [ConnectedSpace X.Carrier] (hn : 2 ≤ n) (hr₁ : 0 < r₁) (hr₂ : 0 < r₂)
+    (g : KahlerMetric X) (S : HolomorphicSplitting X r₁ r₂)
+    (h₁ : Integrable S.projection) (h₂ : Integrable (complementaryProjection S))
+    (Z : ComplexManifold.{v} n) (π : OrdinaryUniversalCover X Z) :
+    ∃ (Y₁ : ComplexManifold.{v} r₁) (Y₂ : ComplexManifold.{v} r₂),
+      ConnectedSpace Y₁.Carrier ∧ ConnectedSpace Y₂.Carrier ∧
+      SimplyConnectedSpace Y₁.Carrier ∧ SimplyConnectedSpace Y₂.Carrier ∧
+      CompatibleProduct S π Y₁ Y₂ := by
+  sorry
+end UniversalCoverSplitting
+end
+end OAI
+
 
 === LEAN COMPARATOR SplitTangentIntegrability (exact formal statement)
 import Mathlib
@@ -175,5 +209,22 @@ def TangentSplitting.first {X : ComplexManifold.{u}} (S : TangentSplitting X) (x
     Submodule ℂ (Tangent X x) := LinearMap.range (S.projector x).toLinearMap
 def TangentSplitting.second {X : ComplexManifold.{u}} (S : TangentSplitting X) (x : X.Carrier) :
     Submodule ℂ (Tangent X x) := LinearMap.ker (S.projector x).toLinearMap
+def HolomorphicSectionOn (X : ComplexManifold.{u})
+    (V : ∀ x : X.Carrier, Tangent X x) (U : Set X.Carrier) : Prop :=
+  ContMDiffOn (ModelWithCorners X) ((ModelWithCorners X).prod 𝓘(ℂ, Model X)) ω
+    (fun x => (⟨x, V x⟩ : TangentBundle (ModelWithCorners X) X.Carrier)) U
+def Integrable (X : ComplexManifold.{u}) (D : ∀ x : X.Carrier, Submodule ℂ (Tangent X x)) : Prop :=
+  ∀ U : Set X.Carrier, IsOpen U → ∀ V W : ∀ x : X.Carrier, Tangent X x,
+    HolomorphicSectionOn X V U → HolomorphicSectionOn X W U →
+    (∀ x ∈ U, V x ∈ D x) → (∀ x ∈ U, W x ∈ D x) →
+    ∀ x ∈ U, VectorField.mlieBracketWithin (ModelWithCorners X) V W U x ∈ D x
+def IntegrabilityStatement : Prop :=
+  ∀ (X : ComplexManifold.{u}), ConnectedSpace X.Carrier → CompactSpace X.Carrier →
+    2 ≤ X.dim → ∀ e : ProjectiveEmbedding X, RationallyConnected e →
+    ∀ S : TangentSplitting X, Integrable X S.first ∧ Integrable X S.second
+theorem integrability_main : IntegrabilityStatement.{u} := by
+  sorry
+end SplitTangent
+end
+end OAI
 
-[…]

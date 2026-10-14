@@ -114,5 +114,62 @@ instance : LieRing Tangent where
     apply Prod.ext
     · exact leibniz_lie a.base b.base c.base
     · change ⁅a.velocity, ⁅b.base, c.base⁆⁆ +
- 
-[…]
+          ⁅a.base, ⁅b.velocity, c.base⁆ + ⁅b.base, c.velocity⁆⁆ =
+        (⁅⁅a.velocity, b.base⁆ + ⁅a.base, b.velocity⁆, c.base⁆ +
+          ⁅⁅a.base, b.base⁆, c.velocity⁆) +
+        (⁅b.velocity, ⁅a.base, c.base⁆⁆ +
+          ⁅b.base, ⁅a.velocity, c.base⁆ + ⁅a.base, c.velocity⁆⁆)
+      simp only [lie_add, add_lie, lie_lie]
+      abel
+instance : LieAlgebra ℚ Tangent where
+  lie_smul scalar left right := by
+    apply Tangent.equiv.injective
+    apply Prod.ext
+    · exact lie_smul scalar left.base right.base
+    · change ⁅left.velocity, scalar • right.base⁆ + ⁅left.base, scalar • right.velocity⁆ =
+        scalar • (⁅left.velocity, right.base⁆ + ⁅left.base, right.velocity⁆)
+      simp only [lie_smul, smul_add]
+def tangentLift (p : L) : L →ₗ⁅ℚ⁆ Tangent :=
+  FreeLieAlgebra.lift ℚ (fun i => if i then ⟨y, ⁅y,p⁆⟩ else ⟨x, 0⟩)
+def D (p q : L) : L := (tangentLift p q).velocity
+def ihara (p q : L) : L := D p q - D q p + ⁅p,q⁆
+inductive WeightedWord {α : Type*} (wt : α → ℕ) : ℕ → FreeLieAlgebra ℚ α → Prop
+  | generator (a : α) : WeightedWord wt (wt a) (FreeLieAlgebra.of ℚ a)
+  | bracket {n m a b} : WeightedWord wt n a → WeightedWord wt m b →
+      WeightedWord wt (n+m) ⁅a,b⁆
+def weightPiece {α : Type*} (wt : α → ℕ) (n : ℕ) : Submodule ℚ (FreeLieAlgebra ℚ α) :=
+  Submodule.span ℚ {p | WeightedWord wt n p}
+abbrev OddFree := FreeLieAlgebra ℚ ℕ
+def oddWeight (k : ℕ) : ℕ := 2*k+3
+abbrev Fn (n : ℕ) := weightPiece oddWeight n
+abbrev Ln (n : ℕ) := weightPiece (fun _ : Bool => 1) n
+abbrev Wn (n : ℕ) : Submodule ℚ L := W ⊓ Ln n
+def Graded (e : OddFree ≃ₗ[ℚ] W) : Prop :=
+  ∀ n a, (e a : L) ∈ Ln n ↔ a ∈ Fn n
+abbrev OddCompletion := (n : ℕ) → Fn n
+abbrev WCompletion := (n : ℕ) → Wn n
+instance : TopologicalSpace L := ⊥
+instance : TopologicalSpace OddFree := ⊥
+def completed (e : OddFree ≃ₗ[ℚ] W) (h : Graded e) : OddCompletion → WCompletion :=
+  fun a n => ⟨e (a n), (e (a n)).property, (h n (a n)).2 (a n).property⟩
+def completedInv (e : OddFree ≃ₗ[ℚ] W) (h : Graded e) : WCompletion → OddCompletion :=
+  fun a n => ⟨e.symm ⟨a n, (a n).property.1⟩,
+    (h n (e.symm ⟨a n, (a n).property.1⟩)).1 (by
+      rw [LinearEquiv.apply_symm_apply]
+      exact (a n).property.2)⟩
+def MainStatement : Prop :=
+  ∃ (e : OddFree ≃ₗ[ℚ] W) (h : Graded e),
+    (∀ a b, (e ⁅a,b⁆ : L) = ihara (e a) (e b)) ∧
+    Function.LeftInverse (completedInv e h) (completed e h) ∧
+    Function.RightInverse (completedInv e h) (completed e h) ∧
+    Continuous (completed e h) ∧ Continuous (completedInv e h) ∧
+    (∀ (a b : OddCompletion) n,
+      (e (∑ i ∈ Finset.range (n+1), ⁅(a i : OddFree), (b (n-i) : OddFree)⁆) : L) =
+      ∑ i ∈ Finset.range (n+1),
+        ihara (completed e h a i) (completed e h b (n-i)))
+theorem main : MainStatement := by
+  sorry
+end DeligneDrinfeld
+end
+end OAI
+

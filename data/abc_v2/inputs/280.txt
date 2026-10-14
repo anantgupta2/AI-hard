@@ -76,5 +76,77 @@ noncomputable def CompletelyReducible : Prop :=
   ∀ I : Submodule ℂ W, M.IsInvariant I →
     ∃ J : Submodule ℂ W, M.IsInvariant J ∧ IsCompl I J
 end OAI.StronglyRationalVOA.WeakModule
-namespace OAI.StronglyRationalV
+namespace OAI.StronglyRationalVOA
+variable {V : Type u} [AddCommGroup V] [Module ℂ V]
+structure CFTTypeVOA (V : Type u) [AddCommGroup V] [Module ℂ V]
+    extends OAI.StronglyRationalVOA.VertexAlgebra V where
+  conformalVector : V
+  centralCharge : ℂ
+  grade : ℕ → Submodule ℂ V
+  grading_internal : DirectSum.IsInternal grade
+  grade_finite : ∀ d, FiniteDimensional ℂ (grade d)
+  vacuum_ne_zero : vacuum ≠ 0
+  grade_zero : grade 0 = ℂ ∙ vacuum
+  conformal_mem : conformalVector ∈ grade 2
+  conformal_energy : ∀ d, ∀ a ∈ grade d,
+    OAI.StronglyRationalVOA.mode fields conformalVector 1 a = (d : ℂ) • a
+  conformal_translation : OAI.StronglyRationalVOA.mode fields conformalVector 0 = toVertexAlgebra.translation
+  translation_covariance : ∀ a : V, ∀ n : ℤ,
+    OAI.StronglyRationalVOA.mode fields (toVertexAlgebra.translation a) n =
+      (-(n : ℂ)) • OAI.StronglyRationalVOA.mode fields a (n - 1)
+  virasoro : ∀ m n : ℤ,
+    (OAI.StronglyRationalVOA.mode fields conformalVector (m + 1)).comp (OAI.StronglyRationalVOA.mode fields conformalVector (n + 1)) -
+      (OAI.StronglyRationalVOA.mode fields conformalVector (n + 1)).comp (OAI.StronglyRationalVOA.mode fields conformalVector (m + 1)) =
+    ((m - n : ℤ) : ℂ) • OAI.StronglyRationalVOA.mode fields conformalVector (m + n + 1) +
+      (if m + n = 0 then (centralCharge / 12) * ((m : ℂ)^3 - m) else 0) •
+        (1 : Module.End ℂ V)
+end OAI.StronglyRationalVOA
+namespace OAI.StronglyRationalVOA.CFTTypeVOA
+variable {V : Type u} [AddCommGroup V] [Module ℂ V]
+variable (A : CFTTypeVOA V)
+noncomputable def virasoroMode (m : ℤ) : Module.End ℂ V :=
+  OAI.StronglyRationalVOA.mode A.fields A.conformalVector (m + 1)
+noncomputable def physicalMode (a : V) (d : ℕ) (m : ℤ) : Module.End ℂ V :=
+  OAI.StronglyRationalVOA.mode A.fields a (m + d - 1)
+noncomputable def energyShift : Module.End ℂ V := 1 + A.virasoroMode 0
+noncomputable def gradingEquiv : V ≃ₗ[ℂ] DirectSum ℕ (fun d => A.grade d) :=
+  (LinearEquiv.ofBijective (DirectSum.coeLinearMap A.grade) A.grading_internal).symm
+noncomputable def IsAdmissible {W : Type v} [AddCommGroup W] [Module ℂ W]
+    (M : OAI.StronglyRationalVOA.WeakModule A.toVertexAlgebra W) : Prop :=
+  ∃ G : ℤ → Submodule ℂ W,
+    DirectSum.IsInternal G ∧ (∀ k : ℤ, k < 0 → G k = ⊥) ∧
+      ∀ d : ℕ, ∀ a ∈ A.grade d, ∀ n k : ℤ, ∀ x ∈ G k,
+        OAI.StronglyRationalVOA.mode M.fields a n x ∈ G (k + d - n - 1)
+noncomputable def IsRational : Prop :=
+  ∀ (W : Type v) [AddCommGroup W] [Module ℂ W]
+    (M : OAI.StronglyRationalVOA.WeakModule A.toVertexAlgebra W),
+    A.IsAdmissible M → M.CompletelyReducible
+end OAI.StronglyRationalVOA.CFTTypeVOA
+namespace OAI.StronglyRationalVOA.CFTTypeVOA
+variable {V : Type u} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    (A : CFTTypeVOA V)
+noncomputable def PolynomialEnergyBound (a : V) : Prop :=
+  ∃ C : ℝ, 0 < C ∧ ∃ p k : ℕ, ∀ (n : ℤ) (b : V),
+    ‖OAI.StronglyRationalVOA.mode A.fields a n b‖ ≤ C * (1 + |(n : ℝ)|) ^ p * ‖(A.energyShift ^ k) b‖
+noncomputable def PolynomialEnergyBounds : Prop := ∀ a : V, A.PolynomialEnergyBound a
+structure UnitaryStructure where
+  pct : V →ₛₗ[starRingEnd ℂ] V
+  pct_involutive : Function.Involutive pct
+  pct_vacuum : pct A.vacuum = A.vacuum
+  pct_conformal : pct A.conformalVector = A.conformalVector
+  pct_modes : ∀ (a b : V) (n : ℤ),
+    pct (OAI.StronglyRationalVOA.mode A.fields a n b) = OAI.StronglyRationalVOA.mode A.fields (pct a) n (pct b)
+  vacuum_norm : ‖A.vacuum‖ = 1
+  invariant : ∀ d : ℕ, ∀ a ∈ A.grade d, ∀ n : ℤ, ∀ b c : V,
+    inner ℂ (OAI.StronglyRationalVOA.mode A.fields a n b) c =
+      inner ℂ b (((-1 : ℂ) ^ d) •
+        ∑ j ∈ Finset.range (d + 1), ((j.factorial : ℂ)⁻¹) •
+          OAI.StronglyRationalVOA.mode A.fields ((A.virasoroMode 1 ^ j) (pct a))
+            (2 * (d : ℤ) - j - n - 2) c)
+end OAI.StronglyRationalVOA.CFTTypeVOA
+namespace OAI.StronglyRationalVOA.HilbertCore
+open Filter
+open UniformSpace
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+noncomputable def _root_.OAI.MinimalVertex.Code.StronglyRationalVOA.Hi
 […]

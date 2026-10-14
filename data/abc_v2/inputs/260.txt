@@ -251,5 +251,103 @@ end OAI.CKSAngularGeometry
 end
 noncomputable section
 universe u v w u_1 u_2 u_3 u_4 u_5 u_6
-namespace 
+namespace OAI.CKSCalculus
+open Filter Set
+open scoped Topology ContDiff
+variable {E : Type u_1} [NormedAddCommGroup E] [NormedSpace ℝ E]
+def D (e : E) (f : E → ℝ) (x : E) : ℝ := fderiv ℝ f x e
+end OAI.CKSCalculus
+end
+noncomputable section
+universe u v w u_1 u_2 u_3 u_4 u_5 u_6
+namespace OAI.CKSRound
+abbrev Idx := Fin 3
+abbrev Mat := Matrix OAI.CKSRound.Idx OAI.CKSRound.Idx ℝ
+structure MetricJet where
+  inv : OAI.CKSRound.Mat
+  d : OAI.CKSRound.Idx → OAI.CKSRound.Mat
+  dd : OAI.CKSRound.Idx → OAI.CKSRound.Idx → OAI.CKSRound.Mat
+end OAI.CKSRound
+end
+noncomputable section
+universe u v w u_1 u_2 u_3 u_4 u_5 u_6
+namespace OAI.CKSRound.MetricJet
+def gamma (j : OAI.CKSRound.MetricJet) (a i k : OAI.CKSRound.Idx) : ℝ :=
+  (∑ l, j.inv a l * (j.d i k l + j.d k i l - j.d l i k)) / 2
+def dInv (j : OAI.CKSRound.MetricJet) (s a b : OAI.CKSRound.Idx) : ℝ :=
+  - ∑ i, ∑ k, j.inv a i * j.d s i k * j.inv k b
+def dGamma (j : OAI.CKSRound.MetricJet) (s a i k : OAI.CKSRound.Idx) : ℝ :=
+  (∑ l, (j.dInv s a l * (j.d i k l + j.d k i l - j.d l i k) +
+    j.inv a l * (j.dd s i k l + j.dd s k i l - j.dd s l i k))) / 2
+def ricci (j : OAI.CKSRound.MetricJet) (i k : OAI.CKSRound.Idx) : ℝ :=
+  (∑ a, (j.dGamma a a i k - j.dGamma k a i a)) +
+  ∑ a, ∑ b, (j.gamma a a b * j.gamma b i k - j.gamma a k b * j.gamma b i a)
+def scalar (j : OAI.CKSRound.MetricJet) : ℝ := ∑ i, ∑ k, j.inv i k * j.ricci i k
+end OAI.CKSRound.MetricJet
+end
+noncomputable section
+universe u v w u_1 u_2 u_3 u_4 u_5 u_6
+namespace OAI.CKSRound
+structure TensorJet where
+  val : OAI.CKSRound.Mat
+  d : OAI.CKSRound.Idx → OAI.CKSRound.Mat
+end OAI.CKSRound
+end
+noncomputable section
+universe u v w u_1 u_2 u_3 u_4 u_5 u_6
+namespace OAI.CKSRound.MetricJet
+def trace (g : OAI.CKSRound.MetricJet) (k : OAI.CKSRound.TensorJet) : ℝ :=
+  ∑ a, ∑ b, g.inv a b * k.val a b
+def normSq (g : OAI.CKSRound.MetricJet) (k : OAI.CKSRound.TensorJet) : ℝ :=
+  ∑ a, ∑ b, ∑ c, ∑ d, g.inv a c * g.inv b d * k.val a b * k.val c d
+def dTrace (g : OAI.CKSRound.MetricJet) (k : OAI.CKSRound.TensorJet) (i : OAI.CKSRound.Idx) : ℝ :=
+  ∑ a, ∑ b, (g.dInv i a b * k.val a b + g.inv a b * k.d i a b)
+def tensorDivergence (g : OAI.CKSRound.MetricJet) (k : OAI.CKSRound.TensorJet) (i : OAI.CKSRound.Idx) : ℝ :=
+  ∑ a, ∑ b, g.inv a b * (k.d a b i -
+    (∑ c, g.gamma c a b * k.val c i) - (∑ c, g.gamma c a i * k.val b c))
+def energy (g : OAI.CKSRound.MetricJet) (k : OAI.CKSRound.TensorJet) : ℝ :=
+  (g.scalar + g.trace k ^ 2 - g.normSq k) / 2
+def momentum (g : OAI.CKSRound.MetricJet) (k : OAI.CKSRound.TensorJet) (i : OAI.CKSRound.Idx) : ℝ :=
+  g.tensorDivergence k i - g.dTrace k i
+end OAI.CKSRound.MetricJet
+end
+noncomputable section
+universe u v w u_1 u_2 u_3 u_4 u_5 u_6
+namespace OAI.CKSRealizedRound
+open CKSCalculus CKSRound
+open scoped Topology ContDiff
+abbrev Point := Fin 3 → ℝ
+def basis (a : OAI.CKSRound.Idx) : OAI.CKSRealizedRound.Point := Pi.single a 1
+end OAI.CKSRealizedRound
+end
+noncomputable section
+universe u v w u_1 u_2 u_3 u_4 u_5 u_6
+namespace OAI.CKSLocalBending
+open CKSRound
+def momentumSq (j : OAI.CKSRound.MetricJet) (k : OAI.CKSRound.TensorJet) : ℝ :=
+  ∑ i, ∑ l, j.inv i l * j.momentum k i * j.momentum k l
+def DEC (j : OAI.CKSRound.MetricJet) (k : OAI.CKSRound.TensorJet) : Prop :=
+  Real.sqrt (OAI.CKSLocalBending.momentumSq j k) ≤ j.energy k
+end OAI.CKSLocalBending
+end
+noncomputable section
+universe u v w u_1 u_2 u_3 u_4 u_5 u_6
+namespace OAI.CKSAngularGeometry
+open CKSCalculus Set Filter
+open scoped Topology ContDiff NNReal Matrix.Norms.Elementwise
+abbrev Point := OAI.CKSAngularGeometry.I → ℝ
+def basis (a : OAI.CKSAngularGeometry.I) : OAI.CKSAngularGeometry.Point := Pi.single a 1
+end OAI.CKSAngularGeometry
+end
+noncomputable section
+universe u v w u_1 u_2 u_3 u_4 u_5 u_6
+namespace OAI.CKSAngularGeometry
+open CKSCalculus Set Filter Matrix
+open scoped Topology ContDiff NNReal Matrix.Norms.Elementwise
+abbrev AmbientMat := Matrix (Fin 3) (Fin 3) ℝ
+end OAI.CKSAngularGeometry
+end
+noncomputable section
+universe u v w u_1 u_2 u_3 u_4 u_5 u_6
+namespac
 […]

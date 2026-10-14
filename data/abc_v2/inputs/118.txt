@@ -103,5 +103,95 @@ def multiplicity (s : NumericalSize I) : ℕ :=
 def capacityBound (s : NumericalSize I) : ℕ :=
   Classical.choose (exists_nat_gt (1 / s.val))
 theorem capacityBound_spec (s : NumericalSize I) : 1 / s.val < (s.capacityBound : ℚ) :=
-  
+  Classical.choose_spec (exists_nat_gt (1 / s.val))
+end NumericalSize
+def TypeConfiguration (I : Instance) :=
+  {c : NumericalSize I → ℕ // ∑ s, s.val * (c s : ℚ) ≤ 1}
+namespace TypeConfiguration
+variable {I : Instance}
+theorem count_lt_bound (c : TypeConfiguration I) (s : NumericalSize I) :
+    c.val s < s.capacityBound := by
+  have hterm : s.val * (c.val s : ℚ) ≤ ∑ t, t.val * (c.val t : ℚ) := by
+    exact Finset.single_le_sum (fun t _ => mul_nonneg (le_of_lt t.positive) (Nat.cast_nonneg _))
+      (Finset.mem_univ s)
+  have hquot : (c.val s : ℚ) ≤ 1 / s.val := by
+    apply (le_div_iff₀ s.positive).mpr
+    simpa [mul_comm] using hterm.trans c.property
+  have hlt := hquot.trans_lt s.capacityBound_spec
+  exact_mod_cast hlt
+def boundedCounts (c : TypeConfiguration I) : ∀ s : NumericalSize I, Fin s.capacityBound :=
+  fun s => ⟨c.val s, c.count_lt_bound s⟩
+theorem boundedCounts_injective :
+    Function.Injective
+      (boundedCounts : TypeConfiguration I → ∀ s : NumericalSize I, Fin s.capacityBound) := by
+  intro c d h
+  apply Subtype.ext
+  funext s
+  exact congrArg Fin.val (congrFun h s)
+instance : Finite (TypeConfiguration I) := by
+  classical
+  exact Finite.of_injective boundedCounts boundedCounts_injective
+instance : Fintype (TypeConfiguration I) := Fintype.ofFinite _
+end TypeConfiguration
+namespace FractionalCover
+open Set
+variable {I C : Type*} [Fintype I] [Fintype C]
+def Feasible (a : C → I → ℝ) (d : I → ℝ) (w : C → ℝ) : Prop :=
+  (∀ c, 0 ≤ w c) ∧ ∀ i, d i ≤ ∑ c, a c i * w c
+def objective (w : C → ℝ) : ℝ := ∑ c, w c
+def objectiveSet (a : C → I → ℝ) (d : I → ℝ) : Set ℝ :=
+  {v | ∃ w, Feasible a d w ∧ objective w = v}
+def value (a : C → I → ℝ) (d : I → ℝ) : ℝ :=
+  sInf (objectiveSet a d)
+end FractionalCover
+def individualMatrix (I : Instance) (H : IndividualConfiguration I) (i : I.Item) : ℝ :=
+  if i ∈ H.val then 1 else 0
+def individualLP (I : Instance) : ℝ :=
+  FractionalCover.value (individualMatrix I) (fun _ => 1)
+def typeMatrix (I : Instance) (c : TypeConfiguration I) (s : NumericalSize I) : ℝ :=
+  c.val s
+def typeLP (I : Instance) : ℝ :=
+  FractionalCover.value (typeMatrix I) (fun s => (s.multiplicity : ℝ))
+abbrev RawInstance := List (ℕ × ℕ)
+abbrev RawReductionOutput := ℕ × RawInstance
+namespace RawInstance
+def Valid (r : RawInstance) : Prop :=
+  ∀ q ∈ r, 0 < q.1 ∧ q.1 ≤ q.2
+def ratValue (q : ℕ × ℕ) : ℚ := (q.1 : ℚ) / (q.2 : ℚ)
+theorem den_pos {r : RawInstance} (hr : r.Valid) {q : ℕ × ℕ} (hq : q ∈ r) :
+    0 < q.2 := lt_of_lt_of_le (hr q hq).1 (hr q hq).2
+def toInstance (r : RawInstance) (hr : r.Valid) : Instance where
+  n := r.length
+  size i := ratValue (r.get i)
+  size_pos i := div_pos (Nat.cast_pos.mpr (hr _ (List.get_mem r i)).1)
+    (Nat.cast_pos.mpr (den_pos hr (List.get_mem r i)))
+  size_le_one i := (div_le_one₀ (Nat.cast_pos.mpr (den_pos hr (List.get_mem r i)))).mpr
+    (Nat.cast_le.mpr (hr _ (List.get_mem r i)).2)
+end RawInstance
+structure RawPacking where
+  bins : ℕ
+  assignments : List ℕ
+namespace RawPacking
+def load (r : RawInstance) (a : List ℕ) (j : ℕ) : ℚ :=
+  ((r.zip a).map fun qa =>
+    if qa.2 = j then RawInstance.ratValue qa.1 else 0).sum
+def Feasible (r : RawInstance) (p : RawPacking) : Prop :=
+  p.assignments.length = r.length ∧
+  (∀ j ∈ p.assignments, j < p.bins) ∧
+  ∀ j < p.bins, load r p.assignments j ≤ 1
+end RawPacking
+namespace BinaryEncoding
+abbrev natBits := BinPackingCompleteness.BinaryEncoding.nameBits
+abbrev parseNat := BinPackingCompleteness.BinaryEncoding.parseName
+def listBits {α : Type} (encode : α → List Bool) : List α → List Bool
+  | [] => [false]
+  | a :: rest => true :: (encode a ++ listBits encode rest)
+def pairBits {α β : Type} (ea : α → List Bool) (eb : β → List Bool)
+    (p : α × β) : List Bool := ea p.1 ++ eb p.2
+def optionBits {α : Type} (encode : α → List Bool) : Option α → List Bool
+  | none => [false]
+  | some a => true :: encode a
+abbrev Parser (α : Type) := List Bool → Option (α × List Bool)
+def parsePair {α β : Type} (pa : Parser α) (pb : Parser β) : Parser (α × β) :=
+  fu
 […]

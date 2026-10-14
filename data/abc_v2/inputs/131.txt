@@ -117,5 +117,29 @@ def hasSpectralGapAtLeast (n : Nat) (d : Fin n → Nat) (γ : ℝ) : Prop :=
 def tvDistanceFrom (n : Nat) (d : Fin n → Nat)
     (t : Nat) (G : GraphState n d) : ℝ :=
   (1 / 2 : ℝ) *
-    Finset.sum (allGraphStates
-[…]
+    Finset.sum (allGraphStates n d)
+      (fun H =>
+        |kernelPow n d t G H - (1 : ℝ) / (stateCount n d : ℝ)|)
+def MixedAt (n : Nat) (d : Fin n → Nat) (t : Nat) : Prop :=
+  ∀ G : GraphState n d, tvDistanceFrom n d t G ≤ (1 : ℝ) / 4
+def mixingTime (n : Nat) (d : Fin n → Nat)
+    (h : ∃ t : Nat, MixedAt n d t) : Nat := by
+  classical
+  exact Nat.find h
+def SwitchStep (n : Nat) (d : Fin n → Nat)
+    (G H : GraphState n d) : Prop :=
+  ∃ p : SwitchProposal n,
+    validSwitch G.val p ∧ proposalResult G.val p = H.val
+theorem switch_chain_main :
+    ∀ (n : Nat) (d : Fin n → Nat), 4 ≤ n → (∀ v, d v ≤ n - 1) → Graphical n d → ((∃ h : (∃ t : Nat, MixedAt n d t), mixingTime n d h ≤ 2 * n ^ 8) ∧ (stateCount n d = 1 → (MixedAt n d 0 ∧ ∀ h : (∃ t : Nat, MixedAt n d t), mixingTime n d h = 0)) ∧ (1 < stateCount n d → hasSpectralGapAtLeast n d ((1 : ℝ) / (24 * (n : ℝ) ^ 2 * (Nat.choose n 4 : ℝ))))) := by
+  sorry
+theorem switch_chain_tv_bound :
+    ∀ (n : Nat) (d : Fin n → Nat), 4 ≤ n → (∀ v, d v ≤ n - 1) → Graphical n d → 1 < stateCount n d → ∀ (t : Nat) (G : GraphState n d), tvDistanceFrom n d t G ≤ Real.sqrt (stateCount n d : ℝ) / 2 * Real.exp (- (t : ℝ) / (24 * (n : ℝ) ^ 2 * (Nat.choose n 4 : ℝ))) := by
+  sorry
+theorem switch_connectivity :
+    ∀ (n : Nat) (d : Fin n → Nat), 4 ≤ n → (∀ v, d v ≤ n - 1) → Graphical n d → ∀ G H : GraphState n d, Relation.ReflTransGen (SwitchStep n d) G H := by
+  sorry
+end Problem315
+end
+end OAI
+

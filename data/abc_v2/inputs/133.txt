@@ -117,8 +117,77 @@ end Lifts
 noncomputable def starParity (t : ℕ) : TemplateVertex t → Bit :=
   fun a => if ∃ i : Fin t, i.val = 0 ∧ a = .inl i then 1 else 0
 noncomputable def zeroLift {t : ℕ} (C : ChoiceSystem t) :=
-  liftGraph (template t) (baseGraph C) (basePr
-[…]
+  liftGraph (template t) (baseGraph C) (baseProjection C) (fun _ => 0)
+noncomputable def starLift {t : ℕ} (C : ChoiceSystem t) :=
+  liftGraph (template t) (baseGraph C) (baseProjection C) (starParity t)
+inductive Convention | joint | separate
+  deriving DecidableEq
+def bagParameter (c : Convention) (k : ℕ) : ℕ :=
+  match c with | .joint => k + 1 | .separate => k
+def detectionRound : Convention → ℕ | .joint => 2 | .separate => 1
+def orderFactor (t : ℕ) : ℕ :=
+  t * 2 ^ (t - 2 + 3 * (t - 1).choose 2) + 12 * t.choose 3
+abbrev AtomicType (k : ℕ) := Fin k → Fin k → Bool × Bool
+def JointColor (k : ℕ) : ℕ → Type
+  | 0 => AtomicType k
+  | r + 1 => JointColor k r × Multiset (Fin k → JointColor k r)
+def SeparateColor (k : ℕ) : ℕ → Type
+  | 0 => AtomicType k
+  | r + 1 => SeparateColor k r × (Fin k → Multiset (SeparateColor k r))
+noncomputable def atomicType {V : Type} (G : SimpleGraph V) {k : ℕ}
+    (x : Fin k → V) : AtomicType k := by
+  classical
+  exact fun i j => (decide (x i = x j), decide (G.Adj (x i) (x j)))
+noncomputable def jointColor {V : Type} [Fintype V] (G : SimpleGraph V) (k : ℕ) :
+    (r : ℕ) → (Fin k → V) → JointColor k r
+  | 0, x => atomicType G x
+  | r + 1, x => (jointColor G k r x,
+      Finset.univ.val.map (fun y => fun i => jointColor G k r (Function.update x i y)))
+noncomputable def separateColor {V : Type} [Fintype V] (G : SimpleGraph V) (k : ℕ) :
+    (r : ℕ) → (Fin k → V) → SeparateColor k r
+  | 0, x => atomicType G x
+  | r + 1, x => (separateColor G k r x,
+      fun i => Finset.univ.val.map (fun y => separateColor G k r (Function.update x i y)))
+noncomputable def sameHistogram {V W : Type} [Fintype V] [Fintype W]
+    (G : SimpleGraph V) (H : SimpleGraph W) (c : Convention) (k r : ℕ) : Prop :=
+  match c with
+  | .joint => Finset.univ.val.map (jointColor G k r) =
+      Finset.univ.val.map (jointColor H k r)
+  | .separate => Finset.univ.val.map (separateColor G k r) =
+      Finset.univ.val.map (separateColor H k r)
+noncomputable def samePureHistogram {V W : Type} [Fintype V] [Fintype W]
+    (G : SimpleGraph V) (H : SimpleGraph W) (c : Convention) (k r : ℕ) : Prop :=
+  match c with
+  | .joint =>
+      Finset.univ.val.map (fun x : Fin k → V => jointColor (G.sum H) k r (Sum.inl ∘ x)) =
+      Finset.univ.val.map (fun x : Fin k → W => jointColor (G.sum H) k r (Sum.inr ∘ x))
+  | .separate =>
+      Finset.univ.val.map (fun x : Fin k → V => separateColor (G.sum H) k r (Sum.inl ∘ x)) =
+      Finset.univ.val.map (fun x : Fin k → W => separateColor (G.sum H) k r (Sum.inr ∘ x))
+noncomputable def WLEquivalent {V W : Type} [Fintype V] [Fintype W]
+    (G : SimpleGraph V) (H : SimpleGraph W) (c : Convention) (k : ℕ) : Prop :=
+  ∀ r, sameHistogram G H c k r
+noncomputable def PureWLEquivalent {V W : Type} [Fintype V] [Fintype W]
+    (G : SimpleGraph V) (H : SimpleGraph W) (c : Convention) (k : ℕ) : Prop :=
+  ∀ r, samePureHistogram G H c k r
+noncomputable def ParityReductionStatement : Prop :=
+  ∀ (k : ℕ), 4 ≤ k → ∀ c : Convention, ∀ C : ChoiceSystem (bagParameter c k),
+    let T := template (bagParameter c k)
+    let G := baseGraph C
+    let τ := baseProjection C
+    let V₀ := LiftVertex T G τ (fun _ => 0)
+    let V₁ := LiftVertex T G τ (starParity (bagParameter c k))
+    Fintype.card V₀ = Fintype.card V₁ ∧
+    (∀ A : ℕ, 1 ≤ A → C.SizeAtMost A → Fintype.card V₀ ≤ A * orderFactor (bagParameter c k)) ∧
+    (WLEquivalent (zeroLift C) (starLift C) c k ↔ ¬ C.Successful) ∧
+    (PureWLEquivalent (zeroLift C) (starLift C) c k ↔ ¬ C.Successful) ∧
+    (C.Successful → ¬ sameHistogram (zeroLift C) (starLift C) c k (detectionRound c) ∧
+      ¬ samePureHistogram (zeroLift C) (starLift C) c k (detectionRound c))
+theorem parity_reduction : ParityReductionStatement := by
+  sorry
+end ParityWL
+end OAI
+
 
 === LEAN COMPARATOR WLIdentification (exact formal statement)
 import Mathlib
@@ -209,8 +278,17 @@ def InEXPTIME (L : BinaryLanguage) : Prop :=
     DecidesWithin M L (fun n => 2 ^ (C * (n + 1) ^ d))
 def ComputesWithin (M : Machine) (f : Word → Word) (bound : ℕ → ℕ) : Prop :=
   ∀ w, ∃ t ≤ bound w.length, (run M w t).state = 1 ∧ Output (run M w t) (f w)
-def PolytimeManyOne
-[…]
+def PolytimeManyOne (L S : BinaryLanguage) : Prop :=
+  ∃ (f : Word → Word) (M : Machine) (C d : ℕ),
+    ComputesWithin M f (fun n => C * (n + 1) ^ d) ∧ ∀ w, w ∈ L ↔ f w ∈ S
+def EXPTIMEComplete (S : BinaryLanguage) : Prop :=
+  InEXPTIME S ∧ ∀ L : BinaryLanguage, InEXPTIME L → PolytimeManyOne L S
+theorem main : EXPTIMEComplete dimensionLanguage :=
+  by
+    sorry
+end WLIdentification
+end OAI
+
 
 === LEAN COMPARATOR WeisfeilerLeman (exact formal statement)
 import Mathlib
@@ -309,7 +387,101 @@ def accepts (M : TM) (w : List Bool) : Prop :=
 def outputs (M : TM) (input output : List Bool) : Prop :=
   M.halts input ∧ ∀ i : Fin output.length,
     (M.run input (M.time input)).tape ⟨0, M.tapes_pos⟩ (i.val : ℤ) =
-    
+      M.symbol (output.get i)
+end TM
+abbrev Word (w : ℕ) := Fin (2 ^ w)
+def wordBits {w : ℕ} (a : Word w) : List Bool :=
+  List.ofFn (fun i : Fin w => a.val.testBit i.val)
+def registerBits {R w : ℕ} (a : Fin R → Word w) : List Bool :=
+  (List.ofFn fun i : Fin R => wordBits (a i)).flatten
+structure WordOperation (R : ℕ) where
+  apply : (w : ℕ) → (Fin R → Word w) → (Fin R → Word w)
+  implementation : TM
+  exponent : ℕ
+  constant : ℕ
+  computes : ∀ w a, implementation.outputs
+    (encodeNat w ++ registerBits a) (registerBits (apply w a))
+  cost : ∀ w (a : Fin R → Word w), implementation.time (encodeNat w ++ registerBits a) ≤
+    constant * (w + 1) ^ exponent
+inductive RAMInstruction (R P : ℕ) where
+  | halt (answer : Bool)
+  | jump (pc : Fin P)
+  | compute (op : WordOperation R) (next : RAMInstruction R P)
+  | load (dest addr : Fin R) (next : RAMInstruction R P)
+  | store (addr src : Fin R) (next : RAMInstruction R P)
+  | branchZero (reg : Fin R) (yes no : RAMInstruction R P)
+structure WordWidth where
+  bits : ℕ → ℕ
+  positive : ∀ n, 0 < bits n
+  bound : ℕ
+  logarithmic : ∀ n, bits n ≤ bound * (Nat.log2 (n + 2) + 1)
+structure RAM where
+  registers : ℕ
+  locations : ℕ
+  locations_pos : 0 < locations
+  width : WordWidth
+  program : Fin locations → RAMInstruction registers locations
+  input_fits : ∀ n (G H : Graph n),
+    (encodePair G H).length ≤ width.bits n * 2 ^ width.bits n
+namespace RAM
+structure Config (A : RAM) (n : ℕ) where
+  pc : Fin A.locations
+  registers : Fin A.registers → Word (A.width.bits n)
+  memory : Word (A.width.bits n) → Word (A.width.bits n)
+  answer : Option Bool
+def packedWord (w : ℕ) (input : List Bool) (a : Word w) : Word w :=
+  ⟨(∑ i ∈ Finset.range w, if input.getD (w * a.val + i) false then 2 ^ i else 0)
+      % (2 ^ w), Nat.mod_lt _ (by positivity)⟩
+def initial (A : RAM) (n : ℕ) (w : List Bool) : A.Config n where
+  pc := ⟨0, A.locations_pos⟩
+  registers := fun _ => ⟨0, by positivity⟩
+  memory := packedWord (A.width.bits n) w
+  answer := none
+def execute (A : RAM) {n : ℕ} :
+    RAMInstruction A.registers A.locations → A.Config n → A.Config n
+  | .halt b, C => { C with answer := some b }
+  | .jump p, C => { C with pc := p }
+  | .compute op next, C => A.execute next { C with
+      registers := op.apply (A.width.bits n) C.registers }
+  | .load dest addr next, C => A.execute next { C with
+      registers := Function.update C.registers dest (C.memory (C.registers addr)) }
+  | .store addr src next, C => A.execute next { C with
+      memory := Function.update C.memory (C.registers addr) (C.registers src) }
+  | .branchZero reg yes no, C =>
+      if (C.registers reg).val = 0 then A.execute yes C else A.execute no C
+def step (A : RAM) {n : ℕ} (C : A.Config n) : A.Config n :=
+  match C.answer with
+  | some _ => C
+  | none => A.execute (A.program C.pc) C
+def run (A : RAM) (n : ℕ) (w : List Bool) (t : ℕ) : A.Config n :=
+  A.step^[t] (A.initial n w)
+def halts (A : RAM) (n : ℕ) (w : List Bool) : Prop :=
+  ∃ t, (A.run n w t).answer.isSome = true
+noncomputable def time (A : RAM) (n : ℕ) (w : List Bool) : ℕ := by
+  classical
+  exact if h : A.halts n w then Nat.find h else 0
+def accepts (A : RAM) (n : ℕ) (w : List Bool) : Prop :=
+  ∃ t, (A.run n w t).answer = some true
+end RAM
+inductive Model where
+  | turing (machine : TM)
+  | ram (machine : RAM)
+def Model.halts (A : Model) (n : ℕ) (w : List Bool) : Prop := match A with
+  | .turing M => M.halts w
+  | .ram M => M.halts n w
+def Model.accepts (A : Model) (n : ℕ) (w : List Bool) : Prop := match A with
+  | .turing M => M.accepts w
+  | .ram M => M.accepts n w
+noncomputable def Model.time (A : Model) (n : ℕ) (w : List Bool) : ℕ := match A with
+  | .turing M => M.time w
+  | .ram M => M.time n w
+inductive InputClass where
+  | unrestricted | diameterTwo
+  deriving DecidableEq
+def InputClass.contains (p : InputClass) {n : ℕ} (G H : Graph n) : Prop := match p with
+  | .unrestricted => True
+  | .diameterTwo => G.diameterTwo ∧ H.diameterTwo
+def Decides (A : Model) (c : Convention) (k : ℕ) 
 […]
 
 === LEAN COMPARATOR VariableWL (exact formal statement)

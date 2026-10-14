@@ -91,5 +91,80 @@ instance cornerCStarAlgebra (p : A) (hp : IsStarProjection p) : CStarAlgebra (Co
 end
 section
 variable {A : Type u_3} {B : Type u_4} [CStarAlgebra A] [CStarAlgebra B]
-@[instance
+@[instance_reducible] def cornerTopology (𝒯 : TopologicalSpace A)
+    (p : A) (hp : IsStarProjection p) : TopologicalSpace (Corner p hp) :=
+  TopologicalSpace.induced (fun x : Corner p hp => (x : A)) 𝒯
+def normalizedCornerTrace (τ : A → ℂ) (t : ℝ) (p : A) (hp : IsStarProjection p)
+    (x : Corner p hp) : ℂ := (t : ℂ)⁻¹ * τ x
+end
+def stabilizedRightTranslations (G : Type u_5) [Group G] : Set (GroupOperator (ℕ × G)) :=
+  {T | ∃ g : G, ∀ (ξ : GroupHilbert (ℕ × G)) (x : ℕ × G),
+    T ξ x = ξ (x.1,x.2*g)}
+def stabilization (G : Type u_6) [Group G] : StarSubalgebra ℂ (GroupOperator (ℕ × G)) :=
+  StarSubalgebra.centralizer ℂ (stabilizedRightTranslations G)
+instance stabilization_isClosed (G : Type u_7) [Group G] :
+    IsClosed (stabilization G : Set (GroupOperator (ℕ × G))) := by
+  rw [stabilization,StarSubalgebra.coe_centralizer]
+  exact Set.isClosed_centralizer _
+instance stabilization_CStarAlgebra (G : Type u_8) [Group G] : CStarAlgebra (stabilization G) :=
+  inferInstance
+def stabilizedProjectionTrace {G : Type u_9} [Group G] (p : stabilization G) : ℝ≥0∞ := by
+  classical
+  exact ∑' k : ℕ, ENNReal.ofReal (‖(p : GroupOperator (ℕ × G))
+    (lp.single 2 (k,1) (1 : ℂ))‖ ^ 2)
+def stabilizedTrace {G : Type u_10} [Group G] (T : stabilization G) : ℂ := by
+  classical
+  exact ∑' k : ℕ, inner ℂ (lp.single 2 (k,1) (1 : ℂ))
+    ((T : GroupOperator (ℕ × G)) (lp.single 2 (k,1) (1 : ℂ)))
+@[instance_reducible] def stabilizationTopology (G : Type u_11) [Group G] :
+    TopologicalSpace (stabilization G) :=
+  TopologicalSpace.induced (fun T : stabilization G => (T : GroupOperator (ℕ × G)))
+    (ultraweakOperatorTopology (ℕ × G))
+section
+variable {A : Type u_42} {B : Type u_43} [CStarAlgebra A] [CStarAlgebra B]
+structure NormalTracialEquiv (τA : A → ℂ) (τB : B → ℂ)
+    (𝒯A : TopologicalSpace A) (𝒯B : TopologicalSpace B) where
+  equiv : A ≃⋆ₐ[ℂ] B
+  trace_eq : ∀x,τB (equiv x)=τA x
+  normal : @Continuous _ _ 𝒯A 𝒯B equiv
+  inverse_normal : @Continuous _ _ 𝒯B 𝒯A equiv.symm
+end
+end FreeGroupFactorMain.Amplification
+namespace FreeGroupFactorMain.Interpolation
+open Amplification
+open scoped ENNReal
+abbrev RankTwoProjection := {p : stabilization (FreeGroupRank 2) // IsStarProjection p}
+instance rankTwoProjectionInhabited : Inhabited RankTwoProjection :=
+  ⟨⟨0,IsStarProjection.zero _⟩⟩
+def selectedProjection (a : ℝ) : RankTwoProjection :=
+  Classical.epsilon (fun p : RankTwoProjection => stabilizedProjectionTrace p.val=ENNReal.ofReal a)
+def interpolationScale (r : ℝ) : ℝ := (Real.sqrt (r-1))⁻¹
+inductive Model where
+  | integer (n : ℕ)
+  | continuous (r : ℝ)
+  | infinity
+def Model.Algebra : Model → Type
+  | .integer n => groupVonNeumann (FreeGroupRank n)
+  | .continuous r => Corner (selectedProjection (interpolationScale r)).val
+      (selectedProjection (interpolationScale r)).property
+  | .infinity => groupVonNeumann (FreeGroup ℕ)
+instance modelCStarAlgebra (m : Model) : CStarAlgebra m.Algebra := by
+  cases m <;> dsimp only [Model.Algebra] <;> infer_instance
+def Model.trace : (m : Model) → m.Algebra → ℂ
+  | .integer _ => canonicalTrace
+  | .continuous r => normalizedCornerTrace stabilizedTrace (interpolationScale r)
+      (selectedProjection (interpolationScale r)).val (selectedProjection (interpolationScale r)).property
+  | .infinity => canonicalTrace
+@[instance_reducible] def Model.topology : (m : Model) → TopologicalSpace m.Algebra
+  | .integer n => groupUltraweakTopology (FreeGroupRank n)
+  | .continuous r => cornerTopology (stabilizationTopology (FreeGroupRank 2))
+      (selectedProjection (interpolationScale r)).val (selectedProjection (interpolationScale r)).property
+  | .infinity => groupUltraweakTopology (FreeGroup ℕ)
+def parameterModel (r : ℝ≥0∞) : Model := by
+  classical
+  exact if r=⊤ then .infinity else
+    if h : ∃n : ℕ,r=(n:ℝ≥0∞) then .integer h.choose else .continuous r.toReal
+abbrev InterpolatedFactor (r : ℝ≥0∞) := (parameterModel r).Algebra
+abbrev interpolatedTrace (r : ℝ≥0∞) := (parameterModel r).trace
+abbrev interpolatedTopology (r : ℝ≥0∞) := (par
 […]

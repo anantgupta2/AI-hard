@@ -98,7 +98,78 @@ def HattoriStallings : Group (MonoidAlgebra ℂ G) →+ (ConjClasses G →₀ �
     | empty => simp [classCoefficient_zero]
     | @insert a s ha ih => simp [classCoefficient_add, ha, ih]
   have classCoefficient_mul_comm (g : G) (a b : MonoidAlgebra ℂ G) :
-      classCoeffici
+      classCoefficient g (a * b) = classCoefficient g (b * a) := by
+    induction a using MonoidAlgebra.induction_on with
+    | of h =>
+        induction b using MonoidAlgebra.induction_on with
+        | of k =>
+            have hconj : IsConj (h * k) (k * h) := by
+              apply isConj_iff.mpr
+              exact ⟨k, by simp [mul_assoc]⟩
+            have hiff : IsConj (h * k) g ↔ IsConj (k * h) g :=
+              ⟨hconj.symm.trans, hconj.trans⟩
+            change classCoefficient g (MonoidAlgebra.single h 1 * MonoidAlgebra.single k 1) =
+              classCoefficient g (MonoidAlgebra.single k 1 * MonoidAlgebra.single h 1)
+            simp only [MonoidAlgebra.single_mul_single, classCoefficient_single, hiff]
+        | add b c hb hc => simp only [mul_add, add_mul, classCoefficient_add, hb, hc]
+        | smul z b hb => simp only [mul_smul_comm, smul_mul_assoc, classCoefficient_smul, hb]
+    | add a c ha hc => simp only [add_mul, mul_add, classCoefficient_add, ha, hc]
+    | smul z a ha => simp only [mul_smul_comm, smul_mul_assoc, classCoefficient_smul, ha]
+  have classCoefficient_matrix_mul_comm {ι κ : Type} [Fintype ι] [Fintype κ]
+      (g : G) (a : Matrix ι κ (MonoidAlgebra ℂ G))
+      (b : Matrix κ ι (MonoidAlgebra ℂ G)) :
+      classCoefficient g (Matrix.trace (a * b)) =
+        classCoefficient g (Matrix.trace (b * a)) := by
+    classical
+    simp only [Matrix.trace, Matrix.diag, Matrix.mul_apply, classCoefficient_sum]
+    rw [Finset.sum_comm]
+    apply Finset.sum_congr rfl
+    intro i _
+    apply Finset.sum_congr rfl
+    intro j _
+    exact classCoefficient_mul_comm g _ _
+  have trace_reindex {α β : Type} [Fintype α] [Fintype β]
+      (j : α≃β) (a : Matrix α α (MonoidAlgebra ℂ G)) :
+      Matrix.trace (Matrix.reindexRingEquiv (MonoidAlgebra ℂ G) j a)=Matrix.trace a := by
+    change (∑i, a (j.symm i) (j.symm i))=∑i,a i i
+    exact Equiv.sum_comp j.symm (fun i=>a i i)
+  have trace_directSum (e f : Idempotent (MonoidAlgebra ℂ G)) :
+      Matrix.trace (directSum e f).matrix=Matrix.trace e.matrix+Matrix.trace f.matrix := by
+    rw [directSum,trace_reindex]
+    simp only [Matrix.trace,Matrix.diag,Fintype.sum_sum_type,Matrix.fromBlocks_apply₁₁,Matrix.fromBlocks_apply₂₂]
+  have relations_in_kernel (g : G) : relations (MonoidAlgebra ℂ G)≤(rawCoefficient g).ker := by
+    apply (AddSubgroup.closure_le _).mpr
+    intro x hx
+    rcases hx with ⟨e,f,a,b,hab,hba,rfl⟩|⟨e,f,rfl⟩
+    · change rawCoefficient g (FreeAbelianGroup.of e-FreeAbelianGroup.of f)=0
+      simp only [map_sub,rawCoefficient,FreeAbelianGroup.lift_apply_of]
+      apply sub_eq_zero.mpr
+      rw [←hab,←hba]
+      exact classCoefficient_matrix_mul_comm g a b
+    · change rawCoefficient g (FreeAbelianGroup.of (directSum e f)-FreeAbelianGroup.of e-FreeAbelianGroup.of f)=0
+      simp only [map_sub,rawCoefficient,FreeAbelianGroup.lift_apply_of,trace_directSum,classCoefficient_add]
+      rw [add_sub_cancel_left, sub_self]
+  have classTrace_apply (a : MonoidAlgebra ℂ G) (g : G) :
+      classTrace a (ConjClasses.mk g)=classCoefficient g a := by
+    unfold classTrace classCoefficient
+    simp only [Finsupp.mapDomain,Finsupp.sum_apply,Finsupp.single_apply]
+    apply Finset.sum_congr rfl
+    intro h hh
+    dsimp only
+    by_cases hc : IsConj h g
+    · rw [ite_eq_left (ConjClasses.mk_eq_mk_iff_isConj.mpr hc), ite_eq_left hc]
+    · rw [ite_eq_right (mt ConjClasses.mk_eq_mk_iff_isConj.mp hc), ite_eq_right hc]
+  have rawTrace_apply (z : FreeAbelianGroup (Idempotent (MonoidAlgebra ℂ G))) (g : G) :
+      rawTrace z (ConjClasses.mk g)=rawCoefficient g z := by
+    induction z using FreeAbelianGroup.induction_on with
+    | zero => simp only [map_zero,Finsupp.zero_apply]
+    | of e =>
+      simp only [rawTrace,rawCoefficient,FreeAbelianGroup.lift_apply_of]
+      exact classTrace_apply _ g
+    | neg e he => simp only [map_neg,Finsupp.neg_apply,he]
+    | add x y hx hy => simp only [map_add,Finsupp.add_apply,hx,hy]
+  have relations_in_trace_kernel : relations (MonoidAlgebra ℂ G)≤(rawTrace (G := G)).ker := by
+  
 […]
 
 === LEAN COMPARATOR BassTorsionFree (exact formal statement)
@@ -194,5 +265,84 @@ def directSum (e f : Idempotent R) : Idempotent R where
 def relationGenerators (R : Type*) [Ring R] : Set (FreeAbelianGroup (Idempotent R)) :=
   {x | (∃e f : Idempotent R,∃a : Matrix (Fin e.size) (Fin f.size) R,
     ∃b : Matrix (Fin f.size) (Fin e.size) R,
-    a*b=e.matrix ∧ b*a=f.matrix ∧ x=FreeAbelia
+    a*b=e.matrix ∧ b*a=f.matrix ∧ x=FreeAbelianGroup.of e-FreeAbelianGroup.of f) ∨
+    (∃e f : Idempotent R,x=FreeAbelianGroup.of (directSum e f)-FreeAbelianGroup.of e-FreeAbelianGroup.of f)}
+def relations (R : Type*) [Ring R] : AddSubgroup (FreeAbelianGroup (Idempotent R)) :=
+  AddSubgroup.closure (relationGenerators R)
+instance relations_normal (R : Type*) [Ring R] : (relations R).Normal := inferInstance
+abbrev Group (R : Type*) [Ring R] := FreeAbelianGroup (Idempotent R) ⧸ relations R
+variable {G : Type*} [_root_.Group G]
+instance groupRingRelations_normal : (relations (MonoidAlgebra ℂ G)).Normal := inferInstance
+def rawCoefficient (g : G) : FreeAbelianGroup (Idempotent (MonoidAlgebra ℂ G)) →+ ℂ :=
+  FreeAbelianGroup.lift (fun e=>classCoefficient g (Matrix.trace e.matrix))
+end
+end K0
+end BassTrace
+end
+open Set MeasureTheory
+open Finset MeasureTheory intervalIntegral
+noncomputable section
+namespace BassTrace.K0
+section
+open scoped Classical BigOperators
+variable {R : Type*} [Ring R]
+lemma trace_reindex {α β : Type*} [Fintype α] [Fintype β]
+    (j : α≃β) (a : Matrix α α R) :
+    Matrix.trace (Matrix.reindexRingEquiv R j a)=Matrix.trace a := by
+  change (∑i, a (j.symm i) (j.symm i))=∑i,a i i
+  exact Equiv.sum_comp j.symm (fun i=>a i i)
+lemma trace_directSum (e f : Idempotent R) :
+    Matrix.trace (directSum e f).matrix=Matrix.trace e.matrix+Matrix.trace f.matrix := by
+  rw [directSum,trace_reindex]
+  simp only [Matrix.trace,Matrix.diag,Fintype.sum_sum_type,Matrix.fromBlocks_apply₁₁,Matrix.fromBlocks_apply₂₂]
+variable {G : Type*} [_root_.Group G]
+lemma relations_in_kernel (g : G) : relations (MonoidAlgebra ℂ G)≤(rawCoefficient g).ker := by
+  apply (AddSubgroup.closure_le _).mpr
+  intro x hx
+  rcases hx with ⟨e,f,a,b,hab,hba,rfl⟩|⟨e,f,rfl⟩
+  · change rawCoefficient g (FreeAbelianGroup.of e-FreeAbelianGroup.of f)=0
+    simp only [map_sub,rawCoefficient,FreeAbelianGroup.lift_apply_of]
+    apply sub_eq_zero.mpr
+    rw [←hab,←hba]
+    exact classCoefficient_matrix_mul_comm g a b
+  · change rawCoefficient g (FreeAbelianGroup.of (directSum e f)-FreeAbelianGroup.of e-FreeAbelianGroup.of f)=0
+    simp only [map_sub,rawCoefficient,FreeAbelianGroup.lift_apply_of,trace_directSum,classCoefficient_add]
+    abel
+def hsCoefficient (g : G) : Group (MonoidAlgebra ℂ G) →+ ℂ :=
+  QuotientAddGroup.lift (relations (MonoidAlgebra ℂ G)) (rawCoefficient g) (relations_in_kernel g)
+end
+end BassTrace.K0
+end
+open scoped Classical BigOperators
+noncomputable section
+namespace TorsionFreeBass
+def TorsionFree (G : Type*) [Group G] : Prop := ∀ g : G, IsOfFinOrder g → g = 1
+variable {G : Type*} [Group G]
+def augmentation : MonoidAlgebra ℂ G →+* ℂ :=
+  (MonoidAlgebra.lift ℂ ℂ G (1 : G →* ℂ)).toRingHom
+def canonicalTrace (a : MonoidAlgebra ℂ G) : ℂ := a.coeff 1
+def matrixTrace {q : ℕ} (e : Matrix (Fin q) (Fin q) (MonoidAlgebra ℂ G)) : ℂ :=
+  ∑ i, canonicalTrace (e i i)
+def augmentedMatrix {m n : ℕ} (e : Matrix (Fin m) (Fin n) (MonoidAlgebra ℂ G)) :
+    Matrix (Fin m) (Fin n) ℂ := e.map augmentation
+lemma augmentedMatrix_mul {m n p : ℕ}
+    (a : Matrix (Fin m) (Fin n) (MonoidAlgebra ℂ G))
+    (b : Matrix (Fin n) (Fin p) (MonoidAlgebra ℂ G)) :
+    augmentedMatrix (a * b) = augmentedMatrix a * augmentedMatrix b := by
+  exact Matrix.map_mul
+lemma augmentedMatrix_trace {q : ℕ}
+    (e : Matrix (Fin q) (Fin q) (MonoidAlgebra ℂ G)) :
+    Matrix.trace (augmentedMatrix e) = augmentation (Matrix.trace e) := by
+  simp [augmentedMatrix, Matrix.trace, Matrix.diag]
+lemma idempotent_matrix_trace_eq_rank {q : ℕ} (a : Matrix (Fin q) (Fin q) ℂ)
+    (ha : a * a = a) : Matrix.trace a = (a.rank : ℂ) := by
+  have h : IsIdempotentElem a.toLin' := by
+    change a.toLin'.comp a.toLin' = a.toLin'
+    rw [← Matrix.toLin'_mul, ha]
+  rw [← Matrix.trace_toLin'_eq, (LinearMap.IsIdempotentElem.isProj_range _ h).trace]
+  rfl
+open BassTrace.K0 in
+def rawAugmentationRank : FreeAbelianGroup (Idempotent (MonoidAlgebra ℂ G)) →+ ℤ :=
+  FreeAbelianGroup.lift (fun e => ((augmentedMatrix e.matrix).rank : ℤ))
+lemma rawAugmentationRank_of (e : BassTrace
 […]

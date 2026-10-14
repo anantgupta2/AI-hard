@@ -95,8 +95,11 @@ def globalApplicationClaim : Prop :=
       1 - Real.rpow ((I.size : ℝ) + 2) (-a) ≤
         A.successProbability I ((2 - σ) * (I.optimum : ℝ))) ∧
     (∀ I : RationalMetricInput, A.expectedCost I ≤ (2 - σ) * (I.optimum : ℝ))
-theorem global_applica
-[…]
+theorem global_application : globalApplicationClaim := by
+  sorry
+end MetricKMedianRecovery
+end OAI
+
 
 === LEAN COMPARATOR KMedianRefinedRecovery (exact formal statement)
 import Mathlib
@@ -181,8 +184,50 @@ structure Certificate (I : Input) (μ : ℚ) (L₀ : ℝ) where
   proxy_inj : Set.InjOn proxy (↑good)
   proxy_cost : (∑ i ∈ good, ∑ p ∈ I.cluster centers i,
       (I.metric.distance p (proxy i) : ℝ)) ≤
-    (∑ i ∈ good, I.clusterCost centers i) + (
-[…]
+    (∑ i ∈ good, I.clusterCost centers i) + (μ : ℝ) * (I.metric.cost centers : ℝ)
+  few_bad : (((centers \ good).card : ℕ) : ℝ) ≤ L₀ * Real.log (I.size : ℝ)
+noncomputable def precision (ζ : ℝ) : ℕ :=
+  ⌈Real.log (1 / ζ) / Real.log 2⌉₊
+noncomputable def queryBits (I : Input) (ζ : ℝ) : List Bool :=
+  pairBits (I.metric.bits, I.anchorBits ++ List.replicate (precision ζ) true)
+noncomputable def seedLength (A : BinaryRandomizedAlgorithm) (I : Input) (ζ : ℝ) : ℕ :=
+  A.randomBits.eval (queryBits I ζ).length
+abbrev Seed (A : BinaryRandomizedAlgorithm) (I : Input) (ζ : ℝ) :=
+  Fin (seedLength A I ζ) → Bool
+noncomputable def output (A : BinaryRandomizedAlgorithm) (I : Input) (ζ : ℝ)
+    (s : Seed A I ζ) : Finset I.Point :=
+  I.metric.decodeOutput (A.run (queryBits I ζ, List.ofFn s))
+noncomputable def successProbability (A : BinaryRandomizedAlgorithm) (I : Input)
+    (ζ target : ℝ) : ℝ := by
+  classical
+  exact ((Finset.univ.filter (fun s : Seed A I ζ =>
+    (I.metric.cost (output A I ζ s) : ℝ) ≤ target)).card : ℝ) /
+    2 ^ seedLength A I ζ
+noncomputable def workBound (A : BinaryRandomizedAlgorithm) (I : Input) (ζ : ℝ) : ℕ :=
+  (queryBits I ζ).length + seedLength A I ζ +
+    A.computation.time.eval (pairBits
+      (queryBits I ζ, List.replicate (seedLength A I ζ) false)).length
+def PolynomialWork (A : BinaryRandomizedAlgorithm) (bound : Polynomial ℕ) : Prop :=
+  ∃ c : ℝ, 0 < c ∧ ∃ d : ℕ,
+    ∀ I : Input, I.Bounded bound → ∀ ζ : ℝ, 0 < ζ → ζ < 1 →
+      (workBound A I ζ : ℝ) ≤
+        c * ((I.size : ℝ) + 1) ^ d * (1 + Real.log (1 / ζ)) ^ d
+end MetricKMedianRecovery.RefinedRecovery
+namespace MetricKMedianRecovery.RefinedRecovery
+theorem refined_recovery :
+    ∀ (bound : Polynomial ℕ) (ε L₀ : ℝ) (μ : ℚ),
+      0 < ε → 0 < L₀ → 0 < μ → μ ≤ 1/4 → (μ : ℝ) ≤ ε/12 →
+      ∃ A : BinaryRandomizedAlgorithm,
+        PolynomialWork A bound ∧
+        ∀ I : Input, I.Bounded bound → ∀ ζ : ℝ, 0 < ζ → ζ < 1 →
+          (∀ s : Seed A I ζ, I.metric.Feasible (output A I ζ s)) ∧
+          (∀ C : Certificate I μ L₀,
+            1 - ζ ≤ successProbability A I ζ
+              ((1 + 2 / Real.exp 1 + ε) * (I.metric.cost C.centers : ℝ))) := by
+  sorry
+end MetricKMedianRecovery.RefinedRecovery
+end OAI
+
 
 === LEAN COMPARATOR KMedianThreshold (exact formal statement)
 import Mathlib

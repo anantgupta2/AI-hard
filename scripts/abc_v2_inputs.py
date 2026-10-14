@@ -61,6 +61,6 @@ for fid, f in sorted(fams.items()):
             t = p.read_text(encoding="utf-8", errors="replace")
             t = re.sub(r"/-[\s\S]*?-/", "", t)
             t = re.sub(r"\n\s*\n+", "\n", t)
-            parts.append(f"\n=== LEAN COMPARATOR {c.strip()} (exact formal statement)\n" + (t if len(t) <= 4000 else t[:4000] + "\n[…]"))
+            parts.append(f"\n=== LEAN COMPARATOR {c.strip()} (exact formal statement)\n" + (t if len(t) <= 8000 else t[:8000] + "\n[…]"))
     (OUT / f"{fid}.txt").write_text("\n".join(parts) + "\n", encoding="utf-8")
 print(len(fams), "families,", n_lean, "comparator files included")

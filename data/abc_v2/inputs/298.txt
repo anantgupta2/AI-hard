@@ -78,5 +78,30 @@ def microstates {M : VonNeumannAlgebra H} (τ : TracialVector M) {n : ℕ}
     (X : Fin n → H →L[ℂ] H) (R : ℝ) (m d : ℕ) (ε : ℝ) : Set (MatrixCoordinates n d) :=
   {a | (∀ i, matrixOpNorm (hermitianMatrix a i) ≤ R) ∧
     ∀ w : List (Fin n), w.length ≤ m → ‖matrixMoment a w - wordMoment τ X w‖ < ε}
-def chiC
-[…]
+def chiCutoff {M : VonNeumannAlgebra H} (τ : TracialVector M) {n : ℕ}
+    (X : Fin n → H →L[ℂ] H) (R : ℝ) : EReal :=
+  ⨅ m : ℕ, ⨅ ε : {ε : ℝ // 0 < ε},
+    limsup (fun d : ℕ =>
+      (((((d + 1 : ℕ) : ℝ) ^ 2)⁻¹ : ℝ) : EReal) *
+        (volume (microstates τ X R m (d + 1) ε.val)).log +
+      (((n : ℝ) / 2 * Real.log (d + 1) : ℝ) : EReal)) atTop
+def chi {M : VonNeumannAlgebra H} (τ : TracialVector M) {n : ℕ}
+    (X : Fin n → H →L[ℂ] H) : EReal :=
+  ⨆ R : {R : ℝ // 0 < R}, chiCutoff τ X R.val
+open MeasureTheory
+theorem main :
+    ∃ (H : Type) (_ : NormedAddCommGroup H) (_ : InnerProductSpace ℂ H)
+      (_ : CompleteSpace H) (M : VonNeumannAlgebra H) (τ : TracialVector M)
+      (n : ℕ) (X S : Fin n → H →L[ℂ] H),
+      2 ≤ n ∧
+      (∀ i, X i ∈ M ∧ IsSelfAdjoint (X i)) ∧
+      (∀ i, S i ∈ M ∧ IsSelfAdjoint (S i)) ∧
+      FreeStandardNoise τ X S ∧
+      (⊥ : EReal) < chi τ X ∧
+      chi τ X ≤ chiStar τ X S - (1 / 2 : EReal) ∧
+      chiStar τ X S - (1 / 2 : EReal) < (⊤ : EReal) := by
+  sorry
+end FiniteEntropySeparation
+end
+end OAI
+

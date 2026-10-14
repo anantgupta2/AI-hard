@@ -166,8 +166,85 @@ variable {n : Type u_83} {m : Type u_84} [Fintype n] [DecidableEq n] [instFintyp
 def completeAnalyticEval (D : Matrix n n ℂ) (F : ℂ → Matrix m m ℂ) :
     Matrix (n×m) (n×m) ℂ :=
   fun i j => matrixAnalyticEval D (fun z => F z i.2 j.2) i.1 j.1
+end CompleteCrouzeix
+namespace CompleteCrouzeix
+open scoped Matrix MatrixOrder
+variable {n : Type u_181} [Fintype n] [DecidableEq n] [Nonempty n]
+def MetricFeasible (T : Matrix n n ℂ) (τ : ℝ) (H : Matrix n n ℂ) : Prop :=
+  1 ≤ H ∧ H ≤ algebraMap ℝ (Matrix n n ℂ) τ ∧ Tᴴ * H * T ≤ H
+end CompleteCrouzeix
+end
+noncomputable section
+open Set Filter Metric Complex MeasureTheory
+open scoped Matrix Topology ComplexConjugate ComplexOrder MatrixOrder
+  Matrix.Norms.L2Operator Kronecker
+namespace StructuralCrouzeix
+open CompleteCrouzeix
+def RegularAnalyticBoundaryAt (U : Set ℂ) (p : ℂ) : Prop :=
+  ∃ χ : ℂ → ℂ, χ 0 = p ∧ AnalyticAt ℂ χ 0 ∧ deriv χ 0 ≠ 0 ∧
+    (∀ᶠ z : ℂ in 𝓝 0, χ z ∈ frontier U ↔ z.im = 0)
+structure IsAdmissible (U : Set ℂ) : Prop where
+  isOpen : IsOpen U
+  bounded : Bornology.IsBounded U
+  convex : Convex ℝ U
+  nonempty : U.Nonempty
+  jordan : Nonempty (Circle ≃ₜ ↥(frontier U))
+  regular : ∀ p ∈ frontier U, RegularAnalyticBoundaryAt U p
+def IsMinimizing {n : ℕ} (T : Matrix (Fin n) (Fin n) ℂ)
+    (τ : ℝ) (H : Matrix (Fin n) (Fin n) ℂ) : Prop :=
+  MetricFeasible T τ H ∧
+    ∀ (σ : ℝ) (J : Matrix (Fin n) (Fin n) ℂ),
+      MetricFeasible T σ J → τ ≤ σ
+def StrictlyFeasible {n : ℕ} (T : Matrix (Fin n) (Fin n) ℂ) : Prop :=
+  ∃ (τ : ℝ) (H : Matrix (Fin n) (Fin n) ℂ), H.IsHermitian ∧
+    (H - 1).PosDef ∧
+    (algebraMap ℝ (Matrix (Fin n) (Fin n) ℂ) τ - H).PosDef ∧
+    (H - Tᴴ * H * T).PosDef
+def analyticSupNorm {m : ℕ} (U : Set ℂ)
+    (v : ℂ → Matrix (Fin m) (Fin m) ℂ) : ℝ :=
+  sSup ((fun z => ‖v z‖) '' closure U)
+def boundaryPoint {U : Set ℂ} (G : ExteriorCoordinate U) (t : UnitAddCircle) : ℂ :=
+  exteriorMap G.leading G.constant G.regular (t.toCircle : ℂ)
+def FullEndpoint : Prop :=
+  ∀ (U : Set ℂ), IsAdmissible U →
+    (∀ a ∈ U, Nonempty (DiskCoordinate U a)) ∧
+    Nonempty (ExteriorCoordinate U) ∧
+    ∀ (a : ℂ), a ∈ U → ∀ (f : DiskCoordinate U a) (G : ExteriorCoordinate U),
+      ∀ (n : ℕ), 0 < n → ∀ (A : Matrix (Fin n) (Fin n) ℂ),
+        numericalRange A ⊆ U →
+        let T := matrixAnalyticEval A f.toDisk
+        StrictlyFeasible T ∧
+        ∃ κ : ℝ, 1 ≤ κ ∧ κ ≤ 2 ∧
+          (∃ H : Matrix (Fin n) (Fin n) ℂ, IsMinimizing T (κ ^ 2) H) ∧
+          ∀ H : Matrix (Fin n) (Fin n) ℂ, IsMinimizing T (κ ^ 2) H →
+            let S := CFC.sqrt H
+            let A' := S * A * S⁻¹
+            let D := S * T * S⁻¹
+            H.PosDef ∧ IsUnit S ∧
+            D = matrixAnalyticEval A' f.toDisk ∧
+            Dᴴ * D ≤ 1 ∧ spectralRadius ℂ D < 1 ∧
+            ‖S‖ * ‖S⁻¹‖ = κ ∧
+            (∀ R : Matrix (Fin n) (Fin n) ℂ, IsUnit R →
+              (R * T * R⁻¹)ᴴ * (R * T * R⁻¹) ≤ 1 →
+              κ ≤ ‖R‖ * ‖R⁻¹‖) ∧
+            ∃ Λ : C(UnitAddCircle, Matrix (Fin n) (Fin n) ℂ),
+              (∀ t, (Λ t).PosSemidef) ∧
+              (∫ t, Λ t ∂AddCircle.haarAddCircle) = 1 ∧
+              ∀ (m : ℕ), 0 < m →
+                ∀ v : ℂ → Matrix (Fin m) (Fin m) ℂ,
+                  AnalyticOnNhd ℂ v (closure U) →
+                  completeAnalyticEval A' v =
+                    (∫ t, Λ t ⊗ₖ v (boundaryPoint G t) ∂AddCircle.haarAddCircle) ∧
+                  ‖completeAnalyticEval A v‖ ≤ κ * analyticSupNorm U v
+end StructuralCrouzeix
+end
+namespace StructuralCrouzeixReference
+theorem challenge : StructuralCrouzeix.FullEndpoint ∧
+    StructuralCrouzeix.IsAdmissible (Metric.ball (0 : ℂ) 1) := by
+  sorry
+end StructuralCrouzeixReference
+end OAI
 
-[…]
 
 === LEAN COMPARATOR CrouzeixHilbert (exact formal statement)
 import Mathlib
@@ -246,8 +323,51 @@ def NonzeroConclusion (A : Operator H) : Prop :=
     Nonempty (CalculusContour (numericalClosure A) U) ∧
     (∀ Γ : CalculusContour (numericalClosure A) U, ∀ i j,
       holomorphicEval A U (fun z => F z i j) =
-        c
-[…]
+        contourEval A Γ.toSmoothContour (fun z => F z i j)) ∧
+    ‖matrixHolomorphicEval A U F‖ ≤ 2 * supNorm (numericalClosure A) F ∧
+    ∃ z ∈ numericalClosure A, supNorm (numericalClosure A) F = ‖F z‖) ∧
+  (∀ (m : ℕ), 0 < m → ∀ (R : RationalMatrix m),
+    PolesOutside (numericalClosure A) R →
+    (∀ i j, IsUnit (Polynomial.aeval A (R i j).denom)) ∧
+    ‖matrixRationalEval A R‖ ≤
+      2 * supNorm (numericalClosure A) (matrixRationalFunction R) ∧
+    (∃ z ∈ numericalClosure A,
+      supNorm (numericalClosure A) (matrixRationalFunction R) =
+        ‖matrixRationalFunction R z‖) ∧
+    ∃ U : Set ℂ, IsOpen U ∧ numericalClosure A ⊆ U ∧
+      EntrywiseHolomorphic U (matrixRationalFunction R) ∧
+      matrixRationalEval A R = matrixHolomorphicEval A U (matrixRationalFunction R))
+def ZeroConclusion (A : Operator H) : Prop :=
+  numericalRange A = ∅ ∧
+  (∀ (m d : ℕ) (B : Fin (d + 1) → Coeff m),
+    polynomialEval A B = 0 ∧
+    supNorm (numericalRange A) (matrixPolynomial B) = 0 ∧
+    ‖polynomialEval A B‖ ≤ 2 * supNorm (numericalRange A) (matrixPolynomial B)) ∧
+  (∀ (m : ℕ) (U : Set ℂ) (F : ℂ → Coeff m),
+    matrixHolomorphicEval A U F = 0 ∧
+    supNorm (numericalRange A) F = 0 ∧
+    ‖matrixHolomorphicEval A U F‖ ≤ 2 * supNorm (numericalRange A) F) ∧
+  (∀ (m : ℕ) (R : RationalMatrix m),
+    matrixRationalEval A R = 0 ∧
+    supNorm (numericalRange A) (matrixRationalFunction R) = 0 ∧
+    ‖matrixRationalEval A R‖ ≤
+      2 * supNorm (numericalRange A) (matrixRationalFunction R))
+def SharpConstant : Prop :=
+  ∃ (A : Operator (EuclideanSpace ℂ (Fin 2))) (B : Fin 2 → Coeff 1),
+    supNorm (numericalRange A) (matrixPolynomial (d := 1) B) = 1 ∧
+    ‖polynomialEval A (d := 1) B‖ = 2
+end CrouzeixHilbert
+namespace CrouzeixHilbert
+universe u
+theorem hilbert (H : Type u) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    [CompleteSpace H] (A : Operator H) :
+    (Nontrivial H → NonzeroConclusion A) ∧
+    (Subsingleton H → ZeroConclusion A) ∧ SharpConstant := by
+  sorry
+end CrouzeixHilbert
+end
+end OAI
+
 
 === LEAN COMPARATOR HilbertCrouzeix (exact formal statement)
 import Mathlib
@@ -324,5 +444,36 @@ omit [CompleteSpace H]
 def compression (A : H →L[ℂ] H) (E : Submodule ℂ H) [E.HasOrthogonalProjection] :
     E →L[ℂ] E := E.orthogonalProjectionOnto.comp (A.comp E.subtypeL)
 def completedIsometry {V : Type*} {W : Type*}
-    [NormedAddCommGroup V] [N
-[…]
+    [NormedAddCommGroup V] [NormedAddCommGroup W] [NormedSpace ℂ V] [NormedSpace ℂ W]
+    (f : V →ₗᵢ[ℂ] W) : UniformSpace.Completion V →ₗᵢ[ℂ] UniformSpace.Completion W :=
+  { f.toContinuousLinearMap.completion.toLinearMap with
+    norm_map' := f.isometry.completion_map.norm_map_of_map_zero
+      (f.toContinuousLinearMap.completion.map_zero) }
+def tensorInclusion (E : Submodule ℂ H) (m : ℕ) :
+    Amplification E m →ₗᵢ[ℂ] Amplification H m :=
+  completedIsometry (TensorProduct.mapIsometry E.subtypeₗᵢ (.id : CoeffSpace m →ₗᵢ[ℂ] CoeffSpace m))
+end CompressionDefinitions
+theorem numericalClosure_geometry (A : H →L[ℂ] H) :
+    IsCompact (numericalClosure A) ∧ Convex ℝ (numericalClosure A) ∧
+      spectrum ℂ A ⊆ numericalClosure A := by
+  sorry
+omit [CompleteSpace H] in
+theorem exists_finite_compression {m d : ℕ} (A : H →L[ℂ] H)
+    (B : Fin (d + 1) → Coeff m) (ξ : H ⊗[ℂ] CoeffSpace m) :
+    ∃ (E : Submodule ℂ H) (hE : FiniteDimensional ℂ E),
+      letI : FiniteDimensional ℂ E := hE
+      ∃ η : Amplification E m,
+        tensorInclusion E m η = (↑ξ : Amplification H m) ∧
+        tensorInclusion E m (polynomialEval (compression A E) B η) =
+          polynomialEval A B (↑ξ) := by
+  sorry
+theorem rational_denominator_isUnit [Nontrivial H] (A : H →L[ℂ] H)
+    {m : ℕ} (R : RationalMatrix m) (hR : numericalClosure A ⊆ poleFreeSet R)
+    (i j : Fin m) : IsUnit (Polynomial.aeval A (R i j).denom) := by
+  sorry
+theorem zeroConclusion [Subsingleton H] (A : H →L[ℂ] H) : ZeroConclusion A := by
+  sorry
+end HilbertCrouzeix
+end
+end OAI
+

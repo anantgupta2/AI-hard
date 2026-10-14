@@ -85,5 +85,47 @@ def MainTheorem : Prop :=
 def psi (z : Base) : ℝ := -Real.log (1 - ‖z‖ ^ 2)
 def metricPotential (φ : Base → ℝ) (lam : ℝ) (p : Ambient) : ℝ :=
   lam * psi p.1 - Real.log (1 - Real.exp (φ p.1) * ‖p.2‖ ^ 2)
-def 
-[…]
+def complexHessian (f : Ambient → ℝ) (p : Ambient) : CMatrix :=
+  fun i j ↦ dz (fun q ↦ dbar (fun r ↦ (f r : ℂ)) q j) p i
+def hartogsMetric (φ : Base → ℝ) (lam : ℝ) : Ambient → CMatrix :=
+  complexHessian (metricPotential φ lam)
+def dzBase (f : Base → ℂ) (z : Base) (i : Fin 2) : ℂ :=
+  (fderiv ℝ f z (EuclideanSpace.single i 1) -
+    Complex.I * fderiv ℝ f z (Complex.I • EuclideanSpace.single i 1)) / 2
+def dbarBase (f : Base → ℂ) (z : Base) (i : Fin 2) : ℂ :=
+  (fderiv ℝ f z (EuclideanSpace.single i 1) +
+    Complex.I * fderiv ℝ f z (Complex.I • EuclideanSpace.single i 1)) / 2
+def baseHessian (φ : Base → ℝ) (z : Base) : Matrix (Fin 2) (Fin 2) ℂ :=
+  fun i j ↦ dzBase (fun q ↦ dbarBase (fun r ↦ (φ r : ℂ)) q j) z i
+def centeredChart (r : ℝ) (U : Base ≃ₗᵢ[ℂ] Base) (ζ : Base) : Base :=
+  U (WithLp.toLp 2 ![((r : ℂ) + ζ 0) / (1 + (r : ℂ) * ζ 0),
+    ((Real.sqrt (1 - r ^ 2) : ℝ) : ℂ) * ζ 1 / (1 + (r : ℂ) * ζ 0)])
+def ChartControl (φ : Base → ℝ) (c C : ℝ) : Prop :=
+  ∀ r : ℝ, 0 ≤ r → r < 1 → ∀ U : Base ≃ₗᵢ[ℂ] Base, ∀ v : Base,
+    c * ‖v‖ ^ 2 ≤ (∑ i, ∑ j, baseHessian (φ ∘ centeredChart r U) 0 i j * v i * star (v j)).re ∧
+    (∑ i, ∑ j, baseHessian (φ ∘ centeredChart r U) 0 i j * v i * star (v j)).re ≤ C * ‖v‖ ^ 2
+def ChartJets (φ : Base → ℝ) (C : ℝ) : Prop :=
+  ∀ r : ℝ, 0 ≤ r → r < 1 → ∀ U : Base ≃ₗᵢ[ℂ] Base, ∀ i j k l : Fin 2,
+    ‖dzBase (fun z ↦ baseHessian (φ ∘ centeredChart r U) z i j) 0 k‖ +
+    ‖dbarBase (fun z ↦ baseHessian (φ ∘ centeredChart r U) z i j) 0 l‖ +
+    ‖dzBase (fun z ↦ dbarBase (fun q ↦ baseHessian (φ ∘ centeredChart r U) q i j) z l) 0 k‖ ≤ C
+def ControlledPotential : Prop :=
+  ∃ φ : Base → ℝ, ∃ C : ℝ, ContDiffOn ℝ ∞ φ ball ∧
+    ChartControl φ 1 C ∧ ChartJets φ C ∧ noMinorant φ
+def MetricTransfer : Prop :=
+  ∀ c C : ℝ, 0 < c → c ≤ C → ∃ lam0 : ℝ, 0 < lam0 ∧
+    ∀ φ : Base → ℝ, ContDiffOn ℝ ∞ φ ball → ChartControl φ c C → ChartJets φ C →
+      ∀ lam : ℝ, lam0 ≤ lam → ContractibleSpace (hartogs φ) ∧
+        IsKahlerMetric (hartogs φ) (hartogsMetric φ lam) ∧
+        GeodesicallyComplete (hartogs φ) (hartogsMetric φ lam) ∧
+        ∃ A B : ℝ, IsNegativelyPinched (hartogs φ) (hartogsMetric φ lam) A B
+theorem main_theorem : MainTheorem := by
+  sorry
+theorem controlled_potential : ControlledPotential := by
+  sorry
+theorem metric_transfer : MetricTransfer := by
+  sorry
+end PinchedHartogs
+end
+end OAI
+

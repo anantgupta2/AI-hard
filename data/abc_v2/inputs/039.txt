@@ -100,7 +100,79 @@ abbrev OrderedDistinctPoints (count : ℕ) :=
 structure MultihomogeneousEquation (count : ℕ) where
   polynomial : MvPolynomial (Fin count × Fin 3) ℂ
   multidegree : Fin count → ℕ
-  homogeneous : ∀ exponent ∈ polynomial.sup
+  homogeneous : ∀ exponent ∈ polynomial.support, ∀ index,
+    (∑ coordinate : Fin 3, exponent (index, coordinate)) = multidegree index
+def equationVanishes {count : ℕ} (equation : MultihomogeneousEquation count)
+    (points : Fin count → PlanePoint) : Prop :=
+  ∀ (vectors : Fin count → Fin 3 → ℂ) (nonzero : ∀ index, vectors index ≠ 0),
+    (∀ index, Projectivization.mk ℂ (vectors index) (nonzero index) = points index) →
+    MvPolynomial.eval (fun index => vectors index.1 index.2) equation.polynomial = 0
+def IsProductZariskiClosed {count : ℕ} (locus : Set (Fin count → PlanePoint)) : Prop :=
+  ∃ equations : Set (MultihomogeneousEquation count),
+    ∀ points, points ∈ locus ↔ ∀ equation ∈ equations, equationVanishes equation points
+def IsConfigurationZariskiClosed {count : ℕ}
+    (locus : Set (OrderedDistinctPoints count)) : Prop :=
+  ∃ ambient : Set (Fin count → PlanePoint), IsProductZariskiClosed ambient ∧
+    ∀ points, points ∈ locus ↔ points.val ∈ ambient
+abbrev ChartVariables (chart : Fin 3) := {coordinate : Fin 3 // coordinate ≠ chart}
+def dehomogenize (chart : Fin 3) (polynomial : MvPolynomial (Fin 3) ℂ) :
+    MvPolynomial (ChartVariables chart) ℂ :=
+  MvPolynomial.eval₂ MvPolynomial.C
+    (fun coordinate => if equal : coordinate = chart then 1
+      else MvPolynomial.X ⟨coordinate, equal⟩) polynomial
+def chartCoordinates (chart : Fin 3) (point : PlanePoint) : ChartVariables chart → ℂ :=
+  fun coordinate => point.rep coordinate.val / point.rep chart
+def multiplicityAtLeast (polynomial : MvPolynomial (Fin 3) ℂ)
+    (point : PlanePoint) (multiplicity : ℕ) : Prop :=
+  ∀ chart : Fin 3, point.rep chart ≠ 0 →
+    AffineMultiplicity.orderAtLeast (chartCoordinates chart point) multiplicity
+      (dehomogenize chart polynomial)
+theorem chart_exists (point : PlanePoint) : ∃ chart : Fin 3, point.rep chart ≠ 0 := by
+  by_contra absent
+  apply point.rep_nonzero
+  funext chart
+  exact Classical.not_not.mp (fun nonzero => absent ⟨chart, nonzero⟩)
+end Nagata.ProjectiveGeometry
+namespace Nagata.Workers.W30
+open UniqueFactorizationMonoid
+abbrev TernaryPolynomial := MvPolynomial (Fin 3) ℂ
+local instance : DecidableEq (Associates TernaryPolynomial) := Classical.decEq _
+def equationMultiplicity (polynomial : TernaryPolynomial) :
+    Associates TernaryPolynomial →₀ ℕ :=
+  factorization (Associates.mk polynomial)
+def associatePrincipalIdeal (associate : Associates TernaryPolynomial) :
+    Ideal TernaryPolynomial :=
+  (Ideal.associatesEquivIsPrincipal TernaryPolynomial associate).val
+def equationIdealCycle (polynomial : TernaryPolynomial) : Ideal TernaryPolynomial →₀ ℕ :=
+  (equationMultiplicity polynomial).mapDomain associatePrincipalIdeal
+attribute [local instance] MvPolynomial.gradedAlgebra
+theorem exists_positive_degree_equation_of_homogeneous_cycle
+    (cycle : Ideal TernaryPolynomial →₀ ℕ) (nonzero : cycle ≠ 0)
+    (homogeneous : ∀ ideal ∈ cycle.support,
+      ideal.IsPrime ∧ ideal ≠ ⊥ ∧ ideal.IsPrincipal ∧
+        ideal.IsHomogeneous (MvPolynomial.homogeneousSubmodule (Fin 3) ℂ)) :
+    ∃ polynomial : TernaryPolynomial,
+      polynomial ≠ 0 ∧ polynomial.IsHomogeneous polynomial.totalDegree ∧
+        0 < polynomial.totalDegree ∧ equationIdealCycle polynomial = cycle := by
+  sorry
+end Nagata.Workers.W30
+namespace Nagata.W16
+abbrev PlanePolynomial := MvPolynomial (Fin 3) ℂ
+structure NonzeroHomogeneousForm (degree : ℕ) where
+  polynomial : PlanePolynomial
+  homogeneous : polynomial.IsHomogeneous degree
+  nonzero : polynomial ≠ 0
+theorem homogeneous_eval_scale {Variables Coefficient : Type*} [CommSemiring Coefficient]
+    {polynomial : MvPolynomial Variables Coefficient} {degree : ℕ}
+    (homogeneous : polynomial.IsHomogeneous degree)
+    (coordinates : Variables → Coefficient) (scalar : Coefficient) :
+    MvPolynomial.eval (fun index => scalar * coordinates index) polynomial =
+      scalar ^ degree * MvPolynomial.eval coordinates polynomial := by
+  classical
+  simp only [MvPolynomial.eval_eq, Finset.mul_sum]
+  apply Finset.sum_congr rfl
+  intro exponent supported
+  simp only [mul_pow, F
 […]
 
 === LEAN COMPARATOR MaximalSeshadriConstants (exact formal statement)
@@ -185,5 +257,99 @@ def sheafHomSMul {M N : X.Modules} (r : Γ(X, ⊤)) (f : M ⟶ N) : M ⟶ N wher
       calc
         _ = X.presheaf.map g (restrictScalar X U.unop r) •
             N.presheaf.map g (f.app U.unop m) := by
-              exact cong
+              exact congrArg (fun a : X.presheaf.obj V =>
+                a • N.presheaf.map g (f.app U.unop m))
+                (restrictScalar_naturality X g.unop r).symm
+        _ = _ := (N.map_smul g.unop (restrictScalar X U.unop r) (f.app U.unop m)).symm }
+instance sheafHomModule (M N : X.Modules) : Module Γ(X, ⊤) (M ⟶ N) where
+  smul := sheafHomSMul X
+  one_smul f := by
+    ext U m
+    change restrictScalar X U 1 • f.app U m = f.app U m
+    simp
+  mul_smul r s f := by
+    ext U m
+    change restrictScalar X U (r * s) • f.app U m =
+      restrictScalar X U r • (restrictScalar X U s • f.app U m)
+    simp [mul_smul]
+  smul_zero r := by
+    ext U m
+    change restrictScalar X U r • (0 : Γ(N, U)) = 0
+    exact smul_zero _
+  smul_add r f g := by
+    ext U m
+    change restrictScalar X U r • (f.app U m + g.app U m) =
+      restrictScalar X U r • f.app U m + restrictScalar X U r • g.app U m
+    exact smul_add _ _ _
+  zero_smul f := by
+    ext U m
+    change restrictScalar X U 0 • f.app U m = 0
+    simp
+  add_smul r s f := by
+    ext U m
+    change restrictScalar X U (r + s) • f.app U m =
+      restrictScalar X U r • f.app U m + restrictScalar X U s • f.app U m
+    simp [add_smul]
+instance sheafLinear : Linear Γ(X, ⊤) X.Modules where
+  smul_comp M N P r f g := by
+    ext U m
+    change g.app U (restrictScalar X U r • f.app U m) =
+      restrictScalar X U r • g.app U (f.app U m)
+    exact g.app_smul _ _
+  comp_smul M N P f r g := by
+    ext U m
+    rfl
+end
+end MaximalSeshadri.Geometry
+namespace MaximalSeshadri.Geometry
+noncomputable section
+open CategoryTheory AlgebraicGeometry TopologicalSpace
+open scoped AlgebraicGeometry
+variable {X : Scheme.{0}}
+instance schemeHasExt : HasExt.{1} X.Modules := HasExt.standard X.Modules
+def baseScalars (f : X ⟶ Spec (CommRingCat.of ℂ)) : ℂ →+* Γ(X, ⊤) :=
+  f.appTop.hom.comp (Scheme.ΓSpecIso (CommRingCat.of ℂ)).inv.hom
+abbrev cohomology (M : X.Modules) (n : ℕ) : Type 1 :=
+  Abelian.Ext.{1} (C := X.Modules) (structureSheaf X) M n
+def cohomologyDimension (f : X ⟶ Spec (CommRingCat.of ℂ))
+    (M : X.Modules) (n : ℕ) : ℕ :=
+  letI : Module ℂ (cohomology M n) :=
+    Module.compHom (cohomology M n) (baseScalars f)
+  Module.finrank ℂ (cohomology M n)
+def eulerCharacteristic (f : X ⟶ Spec (CommRingCat.of ℂ)) (d : ℕ)
+    (M : X.Modules) : ℤ :=
+  ∑ n ∈ Finset.range (d + 1), (-1 : ℤ) ^ n * (cohomologyDimension f M n : ℤ)
+def selfIntersection (S : Surface) (L : LineBundle S.scheme) : ℤ :=
+  eulerCharacteristic S.structureMap 2 (modulePow S.scheme L.sheaf 2) -
+    2 * eulerCharacteristic S.structureMap 2 L.sheaf +
+    eulerCharacteristic S.structureMap 2 (SheafOfModules.unit S.scheme.ringCatSheaf)
+structure IntegralCurve (S : Surface) where
+  scheme : Scheme
+  embedding : scheme ⟶ S.scheme
+  closedImmersion : IsClosedImmersion embedding
+  integral : IsIntegral scheme
+  dimension : topologicalKrullDim scheme = 1
+attribute [instance] IntegralCurve.closedImmersion IntegralCurve.integral
+def curveDegree (S : Surface) (L : LineBundle S.scheme) (C : IntegralCurve S) : ℤ :=
+  eulerCharacteristic (C.embedding ≫ S.structureMap) 1
+    ((Scheme.Modules.pullback C.embedding).obj L.sheaf) -
+  eulerCharacteristic (C.embedding ≫ S.structureMap) 1
+    (SheafOfModules.unit C.scheme.ringCatSheaf)
+end
+end MaximalSeshadri.Geometry
+namespace MaximalSeshadri.Geometry
+noncomputable section
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TopologicalSpace
+open scoped AlgebraicGeometry
+abbrev complexBase : Scheme := Spec (CommRingCat.of ℂ)
+abbrev ComplexPoint (S : Surface) :=
+  Over.mk (𝟙 complexBase) ⟶ Over.mk S.structureMap
+def ComplexPoint.image {S : Surface} (p : ComplexPoint S) : S.scheme :=
+  p.left (⟨⊥, Ideal.isPrime_bot⟩ : PrimeSpectrum ℂ)
+def surfacePower (S : Surface) (r : ℕ) : Over complexBase :=
+  ∏ᶜ (fun _ : Fin r => Over.mk S.structureMap)
+def tupleImage (S : Surface) (r : ℕ) (p : Fin r → ComplexPoint S) :
+    (surfacePower S r).left :=
+  (Limits.Pi.lift p).left (⟨⊥, Ideal.isPrime_bot⟩ : PrimeSpectrum ℂ)
+@[instance_reducible] def tu
 […]

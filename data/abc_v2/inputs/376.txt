@@ -155,7 +155,65 @@ structure ClassicalSolution (ν : ℝ) (f u : Field) (p : Pressure) : Prop where
   continuous_p : ∀ T, 0 ≤ T →
     ContinuousOn (fun z : SpaceTime => p z.1 z.2) (cylinder T)
   differentiable_p : ∀ t, 0 ≤ t → Differentiable ℝ (p t)
-[…]
+  continuous_px : ∀ T, 0 ≤ T →
+    ContinuousOn (fun z : SpaceTime => gradient p z.1 z.2) (cylinder T)
+  pressure_mean_zero : ∀ t, 0 ≤ t → (∫ x in fundamentalCell, p t x) = 0
+  incompressible : ∀ t, 0 ≤ t → ∀ x, divergence u t x = 0
+  initial : ∀ x, u 0 x = 0
+  equation : ∀ t, 0 ≤ t → ∀ x,
+    timePartial u t x + advection u t x =
+      -gradient p t x + ν • laplacian u t x + f t x
+def MaterialFlow (u : Field) (X : ℝ → Space → Space) : Prop :=
+  (∀ a, X 0 a = a) ∧
+  (∀ a, ContinuousOn (fun t => X t a) (Set.Ici 0)) ∧
+  (∀ a t, 0 ≤ t →
+    HasDerivWithinAt (fun s => X s a) (u t (X t a)) (Set.Ici 0) t)
+def spacetimeBasis : Fin 4 → SpaceTime :=
+  ![(1, 0), (0, basis 0), (0, basis 1), (0, basis 2)]
+def mixedDerivative (u : Field) : List (Fin 4) → SpaceTime → Space
+  | [] => fun z => u z.1 z.2
+  | j :: α => fun z => fderiv ℝ (mixedDerivative u α) z (spacetimeBasis j)
+def flatten (z : SpaceTime) : Fin 4 → ℝ := ![z.1, z.2 0, z.2 1, z.2 2]
+def NamesReal (c : Nat.Partrec.Code) (r : ℝ) : Prop :=
+  ∀ n : ℕ, ∃ q : ℚ, Encodable.encode q ∈ c.eval n ∧
+    |(q : ℝ) - r| ≤ (1 / 2 : ℝ) ^ n
+def ComputableReal (r : ℝ) : Prop := ∃ c, NamesReal c r
+def NamesPoint (c : Nat.Partrec.Code) (z : SpaceTime) : Prop :=
+  ∀ n : ℕ, ∃ q : Fin 4 → ℚ,
+    @Encodable.encode (Fin 4 → ℚ) Encodable.finArrow q ∈ c.eval n ∧
+    ‖(fun j => (q j : ℝ)) - flatten z‖ ≤ (1 / 2 : ℝ) ^ n
+def Effective (u : Field) : Prop :=
+  ∃ e : Nat.Partrec.Code, ∀ α : List (Fin 4), ∀ c : Nat.Partrec.Code,
+    ∀ z : SpaceTime, NamesPoint c z → ∀ ε : ℚ, 0 < ε →
+      ∃ q : Fin 3 → ℚ,
+        @Encodable.encode (Fin 3 → ℚ) Encodable.finArrow q ∈
+          e.eval (Encodable.encode (α, c, ε)) ∧
+          ‖(fun j => (q j : ℝ)) - mixedDerivative u α z‖ < (ε : ℝ)
+def EffectiveBounds (u : Field) : Prop :=
+  ∃ e : Nat.Partrec.Code, ∀ α : List (Fin 4), ∃ B : ℚ,
+    Encodable.encode B ∈ e.eval (Encodable.encode α) ∧ 0 ≤ B ∧
+      ∀ z : SpaceTime, ‖mixedDerivative u α z‖ ≤ (B : ℝ)
+theorem sheet_theorem {N : ℕ} (D : SheetData N) (ν : ℝ)
+    (hν : 0 < ν) (hνcomp : ComputableReal ν) :
+    ∃ f u : Field, ∃ X : ℝ → Space → Space,
+      SpatiallyPeriodic f ∧ SpatiallyPeriodic u ∧
+      Smooth f ∧ Smooth u ∧ Effective f ∧
+      MeanZero f ∧ DivergenceFree f ∧ OnePeriodic f ∧
+      ClassicalSolution ν f u (fun _ _ => 0) ∧
+      (∀ v : Field, ∀ p : Pressure, ClassicalSolution ν f v p →
+        ∀ t, 0 ≤ t → ∀ x, v t x = u t x ∧ p t x = 0) ∧
+      MaterialFlow u X ∧
+      (∀ i : Fin N, ∀ y ∈ (D.source i).carrier,
+        toTorus (X 1 (sheet y)) =
+          toTorus (sheet (diagonalMap (D.source i) (D.target i) (D.ratio i) y))) ∧
+      IntegerCollars u ∧ (∀ t x, advection u t x = 0) ∧
+      EffectiveBounds f ∧ EffectiveBounds u ∧
+      (N = 0 → f = 0 ∧ u = 0) := by
+  sorry
+end Solenoidal
+end
+end OAI
+
 
 === LEAN COMPARATOR NavierStokesAlternating (exact formal statement)
 import Mathlib
@@ -248,7 +306,90 @@ def ClassicalRegularity (u : Velocity) (p : Pressure) : Prop :=
     (∀ i j, ContinuousOn (Function.uncurry (dx i (dx j u))) (timeCylinder T)) ∧
     ContinuousOn (Function.uncurry p) (timeCylinder T) ∧
     (∀ i, ContinuousOn (Function.uncurry (dx i p)) (timeCylinder T))
-def ContinuousInH {E : Type*} [NormedAddCommGrou
+def ContinuousInH {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    (k : ℕ) (F : Field E) (T : ℝ) : Prop :=
+  ∀ α : MultiIndex, (∑ i, α i) ≤ k →
+    ∃ g : ℝ → Lp E 2 (volume : Measure Space),
+      ContinuousOn g (Set.Icc 0 T) ∧
+      ∀ t ∈ Set.Icc 0 T,
+        ∀ᵐ x ∂(volume : Measure Space), (g t) x = spatial α F t x
+def C1InL2 (u : Velocity) (T : ℝ) : Prop :=
+  ∃ g g' : ℝ → Lp Space 2 (volume : Measure Space),
+    ContinuousOn g (Set.Icc 0 T) ∧
+    ContinuousOn g' (Set.Icc 0 T) ∧
+    (∀ t ∈ Set.Icc 0 T, HasDerivWithinAt g (g' t) (Set.Icc 0 T) t) ∧
+    (∀ t ∈ Set.Icc 0 T, ∀ᵐ x ∂(volume : Measure Space), (g t) x = u t x) ∧
+    (∀ t ∈ Set.Icc 0 T, ∀ᵐ x ∂(volume : Measure Space), (g' t) x = dt u t x)
+def CompetitorEnergyClass (u : Velocity) (p : Pressure) : Prop :=
+  ∀ T, 0 ≤ T →
+    ContinuousInH 2 u T ∧ C1InL2 u T ∧ ContinuousInH 1 p T ∧
+    ∃ C : ℝ, ∀ t ∈ Set.Icc 0 T, ∀ x, ‖u t x‖ ≤ C
+def EnergyClass (u : Velocity) (p : Pressure) : Prop :=
+  CompetitorEnergyClass u p ∧
+  ∀ T, 0 ≤ T → ∃ C : ℝ, ∀ t ∈ Set.Icc 0 T, ∀ x,
+    ‖u t x‖ + ‖fderiv ℝ (u t) x‖ ≤ C
+def NavierStokes (ν : ℝ) (f u : Velocity) (p : Pressure) : Prop :=
+  ClassicalRegularity u p ∧
+  (∀ x, u 0 x = 0) ∧
+  ∀ t, 0 ≤ t → ∀ x,
+    div u t x = 0 ∧
+    dt u t x + advection u t x = -grad p t x + ν • laplacian u t x + f t x
+def Rapid (F : Velocity) : Prop :=
+  ∀ J l : ℕ, ∀ α : MultiIndex, ∃ C : ℝ, 0 ≤ C ∧
+    ∀ t, 0 ≤ t → ∀ x,
+      (1 + t + ‖x‖) ^ J * ‖mixed l α F t x‖ ≤ C
+def SupportedIn (F : Velocity) (K : Set Space) : Prop :=
+  ∀ t, 0 ≤ t → Function.support (F t) ⊆ K
+def IsTrajectory (u : Velocity) (a : Space) (γ : ℝ → Space) : Prop :=
+  γ 0 = a ∧ ∀ t, 0 ≤ t → HasDerivWithinAt γ (u t (γ t)) (Set.Ici 0) t
+def observedParticle : Space := (EuclideanSpace.equiv (Fin 3) ℝ).symm ![-1, 0, 0]
+abbrev RationalPoint := ℚ × ℚ × ℚ × ℚ
+abbrev RationalVector := ℚ × ℚ × ℚ
+abbrev IndexCode := ℕ × ℕ × ℕ
+abbrev Program := Nat.Partrec.Code
+abbrev FieldProgram := Program × Program × Program
+def Returns {A B : Type*} [Encodable A] [Encodable B]
+    (c : Program) (a : A) (b : B) : Prop :=
+  Encodable.encode b ∈ c.eval (Encodable.encode a)
+def index (α : IndexCode) : MultiIndex := ![α.1, α.2.1, α.2.2]
+def rationalVector (q : RationalVector) : Space :=
+  (EuclideanSpace.equiv (Fin 3) ℝ).symm ![(q.1 : ℝ), (q.2.1 : ℝ), (q.2.2 : ℝ)]
+def rationalPoint (q : RationalPoint) : ℝ × Space :=
+  ((q.1 : ℝ), rationalVector q.2)
+def dyadicError (n : ℕ) : ℝ := (1 / 2 : ℝ) ^ n
+def ComputableReal (r : ℝ) : Prop :=
+  ∃ a : ℕ → ℚ, Computable (fun n => ((a n).num, (a n).den)) ∧
+    ∀ n, |r - (a n : ℝ)| ≤ dyadicError n
+def ProgramFor (c : FieldProgram) (F : Velocity) : Prop :=
+  (∀ (l : ℕ) (α : IndexCode) (q : RationalPoint) (k : ℕ),
+    ∃ v : RationalVector, Returns c.1 (l, α, q, k) v ∧
+      (0 ≤ q.1 →
+        ‖rationalVector v - mixed l (index α) F (rationalPoint q).1 (rationalPoint q).2‖
+          ≤ dyadicError k)) ∧
+  (∀ (l : ℕ) (α : IndexCode) (R k : ℕ),
+    ∃ m : ℕ, Returns c.2.1 (l, α, R, k) m ∧
+      ∀ z z' : ℝ × Space,
+        0 ≤ z.1 → 0 ≤ z'.1 → ‖z‖ ≤ R → ‖z'‖ ≤ R →
+        ‖z - z'‖ ≤ dyadicError m →
+        ‖mixed l (index α) F z.1 z.2 - mixed l (index α) F z'.1 z'.2‖ ≤ dyadicError k) ∧
+  (∀ (J l : ℕ) (α : IndexCode),
+    ∃ B : ℕ, Returns c.2.2 (J, l, α) B ∧
+      ∀ t, 0 ≤ t → ∀ x,
+        (1 + t + ‖x‖) ^ J * ‖mixed l (index α) F t x‖ ≤ B)
+def AlternatingConclusion (ν : ℝ) : Prop :=
+  ∃ (compileForce compileVelocity : Machine × List ℕ → FieldProgram),
+    Computable compileForce ∧ Computable compileVelocity ∧
+    ∃ K : Set Space, IsCompact K ∧
+      ∀ (M : Machine) (w : List ℕ), M.WellFormed → M.ValidInput w →
+        ∃ (f U : Velocity) (X : Space → ℝ → Space),
+          ProgramFor (compileForce (M, w)) f ∧
+          ProgramFor (compileVelocity (M, w)) U ∧
+          Smooth f ∧ Smooth U ∧
+          SupportedIn f K ∧ SupportedIn U K ∧ Rapid f ∧ Rapid U ∧
+          f = residual ν U ∧
+          NavierStokes ν f U (fun _ _ => 0) ∧ EnergyClass U (fun _ _ => 0) ∧
+          (∀ (v : Velocity) (p : Pressure),
+            NavierStokes ν f v p → Compe
 […]
 
 === LEAN COMPARATOR NavierStokesVelocity (exact formal statement)
@@ -357,7 +498,100 @@ namespace VelocityDetection.TranslationGates
 open scoped BigOperators Topology ContDiff
 open Set Function Filter
 open Set Function Filter MeasureTheory
-open scoped To
+open scoped Topology BigOperators ContDiff
+open SmoothProfiles
+def window (s : ℝ) : ℝ := step (s + 3) * step (3 - s)
+end VelocityDetection.TranslationGates
+end
+noncomputable section
+namespace VelocityDetection.CenterPaths
+open scoped BigOperators Topology ContDiff
+open Set Function Filter
+open Set Function Filter MeasureTheory
+open scoped Topology BigOperators ContDiff
+open scoped Topology ContDiff BigOperators
+open SmoothProfiles
+def ramp (r : ℝ) : ℝ := step (2 * r - 1 / 2)
+def theta (a T : ℝ) (j : ℕ) (t : ℝ) : ℝ := ramp (3 * (t - a) / T - j)
+def privateRow (S : ℝ) (k : ℕ) : ℝ := -((k : ℝ) + 2) * S
+def center (a T S S' σ : ℝ) (k l : ℕ) (t : ℝ) : Coord 2 :=
+  ![(1 - theta a T 1 t) * S * k + theta a T 1 t * S' * l,
+    -(1 - theta a T 0 t) * S +
+      (theta a T 0 t - theta a T 2 t) * privateRow S k + theta a T 2 t * σ * S']
+end VelocityDetection.CenterPaths
+end
+noncomputable section
+namespace VelocityDetection.UniformDerivatives
+open scoped BigOperators Topology ContDiff
+open Set Function Filter
+open Set Function Filter MeasureTheory
+open scoped Topology BigOperators ContDiff
+open scoped Topology ContDiff BigOperators
+variable {I E F G : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [NormedAddCommGroup F] [NormedSpace ℝ F] [NormedAddCommGroup G] [NormedSpace ℝ G]
+def Bounded (f : I → E → F) : Prop :=
+  ∀ n : ℕ, ∃ C : ℝ, 0 ≤ C ∧ ∀ a x, ‖iteratedFDeriv ℝ n (f a) x‖ ≤ C
+end VelocityDetection.UniformDerivatives
+end
+noncomputable section
+namespace VelocityDetection.Stacks
+open scoped BigOperators Topology ContDiff
+open Set Function Filter
+open Set Function Filter MeasureTheory
+open scoped Topology BigOperators ContDiff
+open scoped Topology ContDiff BigOperators
+variable {N b : ℕ} (hb : 0 < b) (table : Fin N → Fin b → Option (Rule (Fin N) b))
+def lookup (c : Configuration (Fin N)) : Option (Rule (Fin N) b) :=
+  table c.state ⟨c.rightStack % b, Nat.mod_lt _ hb⟩
+end VelocityDetection.Stacks
+end
+noncomputable section
+namespace VelocityDetection.TailSpace
+open scoped BigOperators Topology ContDiff
+open Set Function Filter
+open Set Function Filter MeasureTheory
+open scoped Topology BigOperators ContDiff
+open scoped Topology ContDiff BigOperators
+open scoped Topology ContDiff ZeroAtInfty
+def compatible (n : ℕ) : Submodule ℝ
+    (C₀(Coord n, ℝ) × Lp ℝ 1 (volume : Measure (Coord n))) where
+  carrier := {v | (fun X => v.2 X) =ᵐ[volume] (fun X => v.1 X)}
+  zero_mem' := by exact Lp.coeFn_zero ..
+  add_mem' := by
+    intro v w hv hw
+    change (fun X => (v.2 + w.2) X) =ᵐ[volume] (fun X => v.1 X + w.1 X)
+    change (fun X => v.2 X) =ᵐ[volume] (fun X => v.1 X) at hv
+    change (fun X => w.2 X) =ᵐ[volume] (fun X => w.1 X) at hw
+    filter_upwards [Lp.coeFn_add v.2 w.2, hv, hw] with X hadd hvx hwx
+    simpa [hvx, hwx] using hadd
+  smul_mem' := by
+    intro c v hv
+    change (fun X => (c • v.2) X) =ᵐ[volume] (fun X => c * v.1 X)
+    change (fun X => v.2 X) =ᵐ[volume] (fun X => v.1 X) at hv
+    filter_upwards [Lp.coeFn_smul c v.2, hv] with X hsmul hvx
+    simpa [hvx] using hsmul
+end VelocityDetection.TailSpace
+end
+noncomputable section
+namespace VelocityDetection.Cylinder
+open scoped BigOperators Topology ContDiff
+open Set Function Filter
+open Set Function Filter MeasureTheory
+open scoped Topology BigOperators ContDiff
+open scoped Topology ContDiff BigOperators
+open scoped Topology ContDiff ZeroAtInfty
+abbrev Space := Coord 2 × ℝ
+abbrev Vect := Fin 3 → ℝ
+def measure : Measure Space := volume.prod (volume.restrict (Ioc (0 : ℝ) 1))
+def periodic (f : Space → ℝ) : Prop := ∀ X z, f (X, z + 1) = f (X, z)
+def frame (i : Fin 3) : Space := ![(![1, 0], 0), (![0, 1], 0), (0, 1)] i
+def D (i : Fin 3) (f : Space → ℝ) (x : Space) : ℝ := fderiv ℝ f x (frame i)
+structure SliceH2 (v : Space → Vect) : Prop where
+  smooth : ∀ i, ContDiff ℝ 2 (fun x => v x i)
+  per : ∀ i, periodic (fun x => v x i)
+  square_integrable : ∀ i, MemLp (fun x => v x i) 2 measure
+  derivative_square_integrable : ∀ i k, MemLp (D k (fun x => v x i)) 2 measure
+  second_square_integrable : ∀ i k l, MemLp (
 […]
 
 === LEAN COMPARATOR BalancedBoxRouting (exact formal statement)
@@ -530,8 +764,97 @@ def gradient (p : Pressure) (t : ℝ) (x : Space) : Space :=
 def affineForce (f₀ f₁ : Velocity) (ν : ℝ) : Velocity :=
   fun t x => f₀ t x + ν • f₁ t x
 def inertialCoefficient (u : Velocity) : Velocity :=
-  fun t x => timeD
-[…]
+  fun t x => timeD u t x + convection u t x
+def viscousCoefficient (u : Velocity) : Velocity :=
+  fun t x => -laplacian u t x
+def ZeroDataSolution (ν : ℝ) (f u : Velocity) (p : Pressure) : Prop :=
+  Smooth u ∧ Smooth p ∧
+  (∀ x, u 0 x = 0) ∧
+  (∀ t, 0 ≤ t → ∀ x, div u t x = 0) ∧
+  (∀ t, 0 ≤ t → ∀ x,
+    timeD u t x + convection u t x =
+      -gradient p t x + ν • laplacian u t x + f t x)
+def BoundedOnFiniteSlabs (u : Velocity) : Prop :=
+  ∀ T : ℝ, 0 ≤ T → ∃ C : ℝ, 0 ≤ C ∧
+    ∀ t ∈ Set.Icc (0 : ℝ) T, ∀ x,
+      ‖u t x‖ ≤ C ∧ ∀ i : Fin 3, ‖spaceD i u t x‖ ≤ C
+def ComparisonClass (u : Velocity) (p : Pressure) : Prop :=
+  CH 2 u ∧ C1L2 u ∧ BoundedOnFiniteSlabs u ∧
+    ∃ c : ℝ → ℝ, CH 1 (fun t x => p t x - c t)
+def UniqueInComparison (ν : ℝ) (f U : Velocity) : Prop :=
+  ∀ u p, ZeroDataSolution ν f u p → ComparisonClass u p →
+    (∀ t, 0 ≤ t → ∀ x, u t x = U t x) ∧
+    (∀ t, 0 ≤ t → ∀ x y, p t x = p t y)
+def CommonCompactSupport (U f₀ f₁ : Velocity) : Prop :=
+  ∃ K : Set Space, IsCompact K ∧
+    ∀ t, 0 ≤ t → ∀ x, x ∉ K → U t x = 0 ∧ f₀ t x = 0 ∧ f₁ t x = 0
+def PeriodicAfterOne (v : Velocity) : Prop :=
+  ∀ t, 1 ≤ t → ∀ x, v (t + 1) x = v t x
+def IsMaterialFlow (u : Velocity) (X : MaterialFlow) : Prop :=
+  (∀ a, X 0 a = a) ∧
+  ∀ a t, 0 ≤ t → HasDerivWithinAt (fun s => X s a) (u t (X t a)) (Set.Ici 0) t
+def fixedLabel : Space := ![4, 0, 0]
+def observer : Set Space :=
+  Set.pi Set.univ (fun _ : Fin 3 => Set.Ioo (-1 : ℝ) 2)
+def rationalSpace (x : Fin 3 → ℚ) : Space := fun i => (x i : ℝ)
+def error (n : ℕ) : ℝ := (2 : ℝ)⁻¹ ^ n
+def EffectiveFamily (v : Family Velocity) : Prop :=
+  ∃ E : (ℕ × MultiIndex × RationalPoint × ℕ) → (Fin 3 → ℚ),
+  ∃ b : (ℕ × MultiIndex) → ℕ,
+  ∃ R : ℕ → ℕ,
+    Computable E ∧ Computable b ∧ Computable R ∧
+    (∀ M w a z n, 0 ≤ z.1 → ∀ i,
+      |(E (inputCode M w, a, z, n) i : ℝ) -
+        mixedD a (v M w) (z.1 : ℝ) (rationalSpace z.2) i| ≤ error n) ∧
+    (∀ M w a t, 0 ≤ t → ∀ x,
+      ‖mixedD a (v M w) t x‖ ≤ (b (inputCode M w, a) : ℝ)) ∧
+    (∀ M w t, 0 ≤ t → ∀ x,
+      (R (inputCode M w) : ℝ) < ‖x‖ → v M w t x = 0)
+def EffectiveFieldIn (O : Set (ℕ →. ℕ)) (v : Velocity) : Prop :=
+  ∃ E : (MultiIndex × RationalPoint × ℕ) → (Fin 3 → ℚ),
+  ∃ b : MultiIndex → ℕ,
+    ComputableIn O E ∧ ComputableIn O b ∧
+    (∀ a z n, 0 ≤ z.1 → ∀ i,
+      |(E (a, z, n) i : ℝ) -
+        mixedD a v (z.1 : ℝ) (rationalSpace z.2) i| ≤ error n) ∧
+    (∀ a t, 0 ≤ t → ∀ x, ‖mixedD a v t x‖ ≤ (b a : ℝ))
+def RealName (name : ℕ → ℚ) (x : ℝ) : Prop :=
+  ∀ n, |(name n : ℝ) - x| ≤ error n
+def ComputableReal (x : ℝ) : Prop :=
+  ∃ name : ℕ → ℚ, Computable name ∧ RealName name x
+def nameOracle (name : ℕ → ℚ) : ℕ →. ℕ :=
+  fun n => Part.some (Encodable.encode (name n))
+end
+end BalancedTransport
+namespace BalancedTransport
+theorem balanced_three_stack_realization :
+    ∃ U f₀ f₁ : Family Velocity,
+    ∃ X : Family MaterialFlow,
+    ∃ repeated : FiniteMachine → Velocity,
+      EffectiveFamily U ∧ EffectiveFamily f₀ ∧ EffectiveFamily f₁ ∧
+      (∀ M, Function.Periodic (repeated M) 1) ∧
+      ∀ (M : FiniteMachine) (w : Input M),
+        Smooth (U M w) ∧ Smooth (f₀ M w) ∧ Smooth (f₁ M w) ∧
+        f₀ M w = inertialCoefficient (U M w) ∧
+        f₁ M w = viscousCoefficient (U M w) ∧
+        CommonCompactSupport (U M w) (f₀ M w) (f₁ M w) ∧
+        BoundedMixed (U M w) ∧
+        PeriodicAfterOne (U M w) ∧
+        (∀ t, 1 ≤ t → ∀ x, U M w t x = repeated M t x) ∧
+        ComparisonClass (U M w) (fun _ _ => 0) ∧
+        IsMaterialFlow (U M w) (X M w) ∧
+        ((∃ t : ℝ, 0 ≤ t ∧ X M w t fixedLabel ∈ observer) ↔ Halts M w) ∧
+        ∀ ν : ℝ, 0 < ν →
+          let f := affineForce (f₀ M w) (f₁ M w) ν
+          ZeroDataSolution ν f (U M w) (fun _ _ => 0) ∧
+          Smooth f ∧ BoundedMixed f ∧ PeriodicAfterOne f ∧
+          UniqueInComparison ν f (U M w) ∧
+          (ComputableReal ν → EffectiveFieldIn ∅ f) ∧
+          (∀ name : ℕ → ℚ, RealName name ν → EffectiveFieldIn {nameOracle name} f) := by
+  sorry
+end BalancedTransport
+end OAI
+
 
 === LEAN COMPARATOR ForcedNavierStokesComputation (exact formal statement)
 import Mathlib
@@ -629,5 +952,89 @@ def affineForce (f₀ f₁ : Velocity) (ν : ℝ) : Velocity :=
 def inertialCoefficient (u : Velocity) : Velocity :=
   fun t x => timeD u t x + convection u t x
 def viscousCoefficient (u : Velocity) : Velocity :=
-  fun t x => -laplaci
-[…]
+  fun t x => -laplacian u t x
+def ZeroDataSolution (ν : ℝ) (f u : Velocity) (p : Pressure) : Prop :=
+  Smooth u ∧ Smooth p ∧
+  (∀ x, u 0 x = 0) ∧
+  (∀ t, 0 ≤ t → ∀ x, div u t x = 0) ∧
+  (∀ t, 0 ≤ t → ∀ x,
+    timeD u t x + convection u t x =
+      -gradient p t x + ν • laplacian u t x + f t x)
+def BoundedOnFiniteSlabs (u : Velocity) : Prop :=
+  ∀ T : ℝ, 0 ≤ T → ∃ C : ℝ, 0 ≤ C ∧
+    ∀ t ∈ Set.Icc (0 : ℝ) T, ∀ x,
+      ‖u t x‖ ≤ C ∧ ∀ i : Fin 3, ‖spaceD i u t x‖ ≤ C
+def ComparisonClass (u : Velocity) (p : Pressure) : Prop :=
+  CH 2 u ∧ C1L2 u ∧ BoundedOnFiniteSlabs u ∧
+    ∃ c : ℝ → ℝ, CH 1 (fun t x => p t x - c t)
+def UniqueInComparison (ν : ℝ) (f U : Velocity) : Prop :=
+  ∀ u p, ZeroDataSolution ν f u p → ComparisonClass u p →
+    (∀ t, 0 ≤ t → ∀ x, u t x = U t x) ∧
+    (∀ t, 0 ≤ t → ∀ x y, p t x = p t y)
+def CommonCompactSupport (U f₀ f₁ : Velocity) : Prop :=
+  ∃ K : Set Space, IsCompact K ∧
+    ∀ t, 0 ≤ t → ∀ x, x ∉ K → U t x = 0 ∧ f₀ t x = 0 ∧ f₁ t x = 0
+def PeriodicAfterOne (v : Velocity) : Prop :=
+  ∀ t, 1 ≤ t → ∀ x, v (t + 1) x = v t x
+def IsMaterialFlow (u : Velocity) (X : MaterialFlow) : Prop :=
+  (∀ a, X 0 a = a) ∧
+  ∀ a t, 0 ≤ t → HasDerivWithinAt (fun s => X s a) (u t (X t a)) (Set.Ici 0) t
+def fixedLabel : Space := ![4, 0, 0]
+def observer : Set Space :=
+  Set.pi Set.univ (fun _ : Fin 3 => Set.Ioo (-1 : ℝ) 2)
+def rationalSpace (x : Fin 3 → ℚ) : Space := fun i => (x i : ℝ)
+def error (n : ℕ) : ℝ := (2 : ℝ)⁻¹ ^ n
+def EffectiveFamily (v : Family Velocity) : Prop :=
+  ∃ E : (ℕ × MultiIndex × RationalPoint × ℕ) → (Fin 3 → ℚ),
+  ∃ b : (ℕ × MultiIndex) → ℕ,
+  ∃ R : ℕ → ℕ,
+    Computable E ∧ Computable b ∧ Computable R ∧
+    (∀ M w a z n, 0 ≤ z.1 → ∀ i,
+      |(E (inputCode M w, a, z, n) i : ℝ) -
+        mixedD a (v M w) (z.1 : ℝ) (rationalSpace z.2) i| ≤ error n) ∧
+    (∀ M w a t, 0 ≤ t → ∀ x,
+      ‖mixedD a (v M w) t x‖ ≤ (b (inputCode M w, a) : ℝ)) ∧
+    (∀ M w t, 0 ≤ t → ∀ x,
+      (R (inputCode M w) : ℝ) < ‖x‖ → v M w t x = 0)
+def EffectiveFieldIn (O : Set (ℕ →. ℕ)) (v : Velocity) : Prop :=
+  ∃ E : (MultiIndex × RationalPoint × ℕ) → (Fin 3 → ℚ),
+  ∃ b : MultiIndex → ℕ,
+    ComputableIn O E ∧ ComputableIn O b ∧
+    (∀ a z n, 0 ≤ z.1 → ∀ i,
+      |(E (a, z, n) i : ℝ) -
+        mixedD a v (z.1 : ℝ) (rationalSpace z.2) i| ≤ error n) ∧
+    (∀ a t, 0 ≤ t → ∀ x, ‖mixedD a v t x‖ ≤ (b a : ℝ))
+def RealName (name : ℕ → ℚ) (x : ℝ) : Prop :=
+  ∀ n, |(name n : ℝ) - x| ≤ error n
+def ComputableReal (x : ℝ) : Prop :=
+  ∃ name : ℕ → ℚ, Computable name ∧ RealName name x
+def nameOracle (name : ℕ → ℚ) : ℕ →. ℕ :=
+  fun n => Part.some (Encodable.encode (name n))
+end
+theorem balanced_three_stack_realization :
+    ∃ U f₀ f₁ : Family Velocity,
+    ∃ X : Family MaterialFlow,
+    ∃ repeated : FiniteMachine → Velocity,
+      EffectiveFamily U ∧ EffectiveFamily f₀ ∧ EffectiveFamily f₁ ∧
+      (∀ M, Function.Periodic (repeated M) 1) ∧
+      ∀ (M : FiniteMachine) (w : Input M),
+        Smooth (U M w) ∧ Smooth (f₀ M w) ∧ Smooth (f₁ M w) ∧
+        f₀ M w = inertialCoefficient (U M w) ∧
+        f₁ M w = viscousCoefficient (U M w) ∧
+        CommonCompactSupport (U M w) (f₀ M w) (f₁ M w) ∧
+        BoundedMixed (U M w) ∧
+        PeriodicAfterOne (U M w) ∧
+        (∀ t, 1 ≤ t → ∀ x, U M w t x = repeated M t x) ∧
+        ComparisonClass (U M w) (fun _ _ => 0) ∧
+        IsMaterialFlow (U M w) (X M w) ∧
+        ((∃ t : ℝ, 0 ≤ t ∧ X M w t fixedLabel ∈ observer) ↔ Halts M w) ∧
+        ∀ ν : ℝ, 0 < ν →
+          let f := affineForce (f₀ M w) (f₁ M w) ν
+          ZeroDataSolution ν f (U M w) (fun _ _ => 0) ∧
+          Smooth f ∧ BoundedMixed f ∧ PeriodicAfterOne f ∧
+          UniqueInComparison ν f (U M w) ∧
+          (ComputableReal ν → EffectiveFieldIn ∅ f) ∧
+          (∀ name : ℕ → ℚ, RealName name ν → EffectiveFieldIn {nameOracle name} f) := by
+  sorry
+end OAI.BalancedTransport
+

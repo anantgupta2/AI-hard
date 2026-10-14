@@ -84,5 +84,65 @@ structure SymmetricSection (V : AlgebraicRankTwoBundle) (n : ℕ) where
   compatible : ∀ i j x, x ∈ V.domain i → x ∈ V.domain j → ∀ v : FiberCoordinates,
     (∑ k : Fin (n+1), coefficient i k (coordQuadric (V.chart i) x) *
       ((V.dualTransition i j x).mulVec v 0)^k.val *
-      ((V.d
+      ((V.dualTransition i j x).mulVec v 1)^(n-k.val)) =
+    ∑ k : Fin (n+1), coefficient j k (coordQuadric (V.chart j) x) * v 0^k.val * v 1^(n-k.val)
+def SymmetricSection.value {V : AlgebraicRankTwoBundle} {n : ℕ}
+    (s : SymmetricSection V n) (i : ℕ) (x : QuadricSurface) (v : FiberCoordinates) : ℂ :=
+  ∑ k : Fin (n+1), s.coefficient i k (coordQuadric (V.chart i) x) * v 0^k.val * v 1^(n-k.val)
+def ProjectiveAlgebraicCone {N : ℕ} (C : Set (Fin N → ℂ)) : Prop :=
+  ∃ equations : Set (MvPolynomial (Fin N) ℂ),
+    (∀ p ∈ equations, ∃ d : ℕ, p.IsHomogeneous d) ∧
+    C = {y | ∀ p ∈ equations, MvPolynomial.eval y p=0}
+def sectionVector {V : AlgebraicRankTwoBundle} {n N : ℕ}
+    (s : Fin N → SymmetricSection V n) (i : ℕ) (x : QuadricSurface)
+    (v : FiberCoordinates) : Fin N → ℂ := fun j ↦ (s j).value i x v
+def GivesClosedProjectiveEmbedding {V : AlgebraicRankTwoBundle} {n N : ℕ}
+    (s : Fin N → SymmetricSection V n) : Prop :=
+  (∀ i x, x ∈ V.domain i → ∀ v : FiberCoordinates, v ≠ 0 → sectionVector s i x v ≠ 0) ∧
+  (∀ i j x y, x ∈ V.domain i → y ∈ V.domain j → ∀ v w : FiberCoordinates,
+    v ≠ 0 → w ≠ 0 → (∃ c : ℂ, c ≠ 0 ∧ sectionVector s i x v = c • sectionVector s j y w) →
+    x=y ∧ ∃ c : ℂ, c ≠ 0 ∧ v=c • ((V.dualTransition i j x).mulVec w)) ∧
+  ProjectiveAlgebraicCone ({0} ∪ {a | ∃ i x, x ∈ V.domain i ∧
+    ∃ v : FiberCoordinates, v ≠ 0 ∧ ∃ c : ℂ, c ≠ 0 ∧ a=c • sectionVector s i x v}) ∧
+  ∀ i x, x ∈ V.domain i → ∀ v : FiberCoordinates, v ≠ 0 →
+    ∃ j : Fin N, ∃ b : Fin 2, v b ≠ 0 ∧ sectionVector s i x v j ≠ 0 ∧
+    ∃ p q : Fin 3 → MvPolynomial (Fin N) ℂ,
+      (∀ k, MvPolynomial.eval (fun l ↦ sectionVector s i x v l / sectionVector s i x v j) (q k) ≠ 0) ∧
+      ∀ i' x', x' ∈ V.domain i' → ∀ v' : FiberCoordinates, v' ≠ 0 →
+        sectionVector s i' x' v' j ≠ 0 →
+        (∀ k, MvPolynomial.eval (fun l ↦ sectionVector s i' x' v' l / sectionVector s i' x' v' j) (q k) ≠ 0) →
+        x' ∈ V.domain i ∧ ((V.dualTransition i i' x').mulVec v') b ≠ 0 ∧
+        (∀ k : Fin 3,
+          (![ (coordQuadric (V.chart i) x').1, (coordQuadric (V.chart i) x').2,
+             ((V.dualTransition i i' x').mulVec v') (1-b) /
+               ((V.dualTransition i i' x').mulVec v') b ] : Fin 3 → ℂ) k =
+          MvPolynomial.eval (fun l ↦ sectionVector s i' x' v' l / sectionVector s i' x' v' j) (p k) /
+          MvPolynomial.eval (fun l ↦ sectionVector s i' x' v' l / sectionVector s i' x' v' j) (q k))
+def IsAmple (V : AlgebraicRankTwoBundle) : Prop :=
+  ∃ n : ℕ, 0 < n ∧ ∃ N : ℕ, ∃ s : Fin N → SymmetricSection V n,
+    GivesClosedProjectiveEmbedding s
+def holomorphicMetricDerivative (H : BaseCoordinates → TwoMatrix)
+    (z u : BaseCoordinates) : TwoMatrix :=
+  (1/2 : ℂ) • (fderiv ℝ H z u - Complex.I • fderiv ℝ H z (Complex.I • u))
+def metricMixedHessian (H : BaseCoordinates → TwoMatrix)
+    (z u : BaseCoordinates) : TwoMatrix :=
+  (1/4 : ℂ) • ((fderiv ℝ (fun y ↦ fderiv ℝ H y) z u) u +
+    (fderiv ℝ (fun y ↦ fderiv ℝ H y) z (Complex.I • u)) (Complex.I • u))
+structure SmoothHermitianMetric (V : AlgebraicRankTwoBundle) where
+  dualMatrix : ℕ → BaseCoordinates → TwoMatrix
+  smooth : ∀ i, ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (dualMatrix i) (V.coordinateDomain i)
+  positive : ∀ i z, z ∈ V.coordinateDomain i → (dualMatrix i z).PosDef
+  compatible : ∀ i j x, x ∈ V.domain i → x ∈ V.domain j →
+    dualMatrix j (coordQuadric (V.chart j) x) =
+      (V.dualTransition i j x).conjTranspose * dualMatrix i (coordQuadric (V.chart i) x) *
+        V.dualTransition i j x
+def SmoothHermitianMetric.StrictlyGriffithsPositive {V : AlgebraicRankTwoBundle}
+    (h : SmoothHermitianMetric V) : Prop :=
+  ∀ i z, z ∈ V.coordinateDomain i → ∀ u : BaseCoordinates, u ≠ 0 →
+    (metricMixedHessian (h.dualMatrix i) z u -
+      (holomorphicMetricDerivative (h.dualMatrix i) z u).conjTranspose *
+        (h.dualMatrix i z)⁻¹ * holomorphicMetricDerivative (h.dualMatrix i) z u).PosDef
+def SourceMainTheorem : Prop :=
+  ∃ G : AlgebraicRankTwoBundle, ∃ E : ℕ → AlgebraicRankTwoBundle,
+    (∀ m, 0 < m → IsPowerPul
 […]

@@ -145,8 +145,34 @@ def HasUnboundedNodalRatio [T3Space M] (g : SmoothMetric E M) (d : ℕ) : Prop :
     (∀ j, ContMDiff 𝓘(ℝ, E) 𝓘(ℝ, ℝ) ∞ (u j) ∧ u j ≠ 0 ∧ 0 < eigenvalue j ∧
       (∀ x, -laplaceBeltrami g (u j) x = eigenvalue j * u j x) ∧
       nodalMeasure g (d - 1 : ℕ) (u j) ≠ (∞ : ℝ≥0∞)) ∧
-    Tendsto eig
-[…]
+    Tendsto eigenvalue atTop atTop ∧
+    Tendsto (fun j => (nodalMeasure g (d - 1 : ℕ) (u j)).toReal / Real.sqrt (eigenvalue j))
+      atTop atTop
+end Definitions
+def IsRound (g : SmoothMetric (Euclidean 3) (Sphere 3)) : Prop :=
+  ∀ (x : Sphere 3) (v w : TangentSpace 𝓘(ℝ, Euclidean 3) x),
+    g.inner x v w = inner ℝ
+      (mfderiv 𝓘(ℝ, Euclidean 3) 𝓘(ℝ, Euclidean 4)
+        (fun y : Sphere 3 => (y : Euclidean 4)) x v)
+      (mfderiv 𝓘(ℝ, Euclidean 3) 𝓘(ℝ, Euclidean 4)
+        (fun y : Sphere 3 => (y : Euclidean 4)) x w)
+end
+open Set Filter Manifold Bundle MeasureTheory
+open scoped Topology ContDiff ENNReal
+theorem sphere_three (gRound : SmoothMetric (Euclidean 3) (Sphere 3))
+    (hRound : IsRound gRound) :
+    ∀ N : Set (SmoothMetric (Euclidean 3) (Sphere 3)),
+      IsSmoothNeighborhood gRound N →
+      ∃ g ∈ N, HasUnboundedNodalRatio g 3 := by
+  sorry
+theorem sphere_two_torus_two :
+    ∃ g : SmoothMetric FourModel FourManifold,
+      HasUnboundedNodalRatio g 4 := by
+  sorry
+end YauCounterexamples
+end
+end OAI
+
 
 === LEAN COMPARATOR YauCounterexample (exact formal statement)
 import Mathlib

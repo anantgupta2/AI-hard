@@ -140,7 +140,75 @@ def outputTest {d M T : ℕ} (K : Policy d M T) (f : Sphere d × Sphere d → �
   ∫⁻ v, f (s,v) ∂K.output t j
 def angleTest {d : ℕ} (ε : ℝ)
     (point : MemoryPrecision.Kernel.Sphere d × MemoryPrecision.Kernel.Sphere d) : ℝ≥0∞ :=
-  @it
+  @ite ℝ≥0∞ (Real.arccos (@inner ℝ (EuclideanSpace ℝ (Fin d))
+      (@InnerProductSpace.toInner ℝ (EuclideanSpace ℝ (Fin d)) _
+        (PiLp.seminormedAddCommGroup
+          (@OfNat.ofNat ℝ≥0∞ 2
+            (@instOfNatAtLeastTwo ℝ≥0∞ 2 ENNReal.instAddCommMonoidWithOne.toNatCast inferInstance))
+          (fun _ : Fin d => ℝ))
+        (PiLp.innerProductSpace (𝕜 := ℝ) (fun _ : Fin d => ℝ)))
+      point.2.val point.1.val) ≤ ε) (Classical.propDecidable _) 1 0
+def chordTest {d : ℕ} (ε : ℝ) (x : Sphere d × Sphere d) : ℝ≥0∞ :=
+  {x : Sphere d × Sphere d | dist x.2.val x.1.val ≤ ε}.indicator (fun _ => 1) x
+def experiment {d M T : ℕ} {Ω : Type u} (K : Ω → Policy d M T)
+    (f : Sphere d × Sphere d → ℝ≥0∞) (z : Sphere d × (Ω × Rows d T)) : ℝ≥0∞ :=
+  (K z.2.1).pathValue ((K z.2.1).outputTest f) z.1 (records z.1 z.2.2)
+structure Admissible {d M T : ℕ} {Ω : Type u} [MeasurableSpace Ω]
+    (K : Ω → Policy d M T) (ρ : Measure Ω) (π : Measure (Sphere d)) : Prop where
+  completed : ∀ᵐ ω ∂ρ, (K ω).Completed
+  experiment : ∀ f : Sphere d × Sphere d → ℝ≥0∞, Measurable f →
+    (∀ x, f x ≤ 1) → AEMeasurable (experiment K f) (π.prod (ρ.prod (RowLaw d T)))
+def Success {d M T : ℕ} {Ω : Type u} [MeasurableSpace Ω]
+    (K : Ω → Policy d M T) (ρ : Measure Ω) (π : Measure (Sphere d)) (ε : ℝ) : ℝ≥0∞ :=
+  ∫⁻ z, experiment K (angleTest ε) z ∂π.prod (ρ.prod (RowLaw d T))
+def ChordSuccess {d M T : ℕ} {Ω : Type u} [MeasurableSpace Ω]
+    (K : Ω → Policy d M T) (ρ : Measure Ω) (π : Measure (Sphere d)) (ε : ℝ) : ℝ≥0∞ :=
+  ∫⁻ z, experiment K (chordTest ε) z ∂π.prod (ρ.prod (RowLaw d T))
+end Policy
+end MemoryPrecision.Kernel
+namespace NoiselessRegression
+abbrev Vector (d : ℕ) := EuclideanSpace ℝ (Fin d)
+abbrev UnitSphere (d : ℕ) := Metric.sphere (0 : Vector d) 1
+end NoiselessRegression
+namespace MemoryPrecision
+open NoiselessRegression
+abbrev Space (d : ℕ) := EuclideanSpace ℝ (Fin d)
+def J (β : ℝ) (m j : ℕ) : ℝ :=
+  let two : ℝ := @OfNat.ofNat ℝ 2 (@instOfNatAtLeastTwo ℝ 2 Real.commRing.toNatCast
+    (Mathlib.Meta.NormNum.instAtLeastTwo (nat_lit 0)))
+  let three : ℝ := @OfNat.ofNat ℝ 3 (@instOfNatAtLeastTwo ℝ 3 Real.commRing.toNatCast
+    (Mathlib.Meta.NormNum.instAtLeastTwo (nat_lit 1)))
+  1 + three^j * two^β * (m : ℝ) / (β - (j : ℝ) - (m : ℝ))
+def AmbientBallBound {d : ℕ} (μ : Measure (Space d)) (H β : ℝ) : Prop :=
+  ∀ x : Space d, ∀ r : ℝ, 0 < r →
+    μ (Metric.closedBall x r) ≤ ENNReal.ofReal (H * r^β)
+def InverseGram {d p : ℕ} (m : ℕ) (v : Space d × (Fin (p-1) → Space d)) : ℝ≥0∞ :=
+  let exponent : ℝ≥0∞ := @OfNat.ofNat ℝ≥0∞ 2
+    (@instOfNatAtLeastTwo ℝ≥0∞ 2 ENNReal.instAddCommMonoidWithOne.toNatCast
+      (Mathlib.Meta.NormNum.instAtLeastTwo (nat_lit 0)))
+  letI : AddCommGroup (Space d) := WithLp.instAddCommGroup exponent (Fin d → ℝ)
+  letI : Inner ℝ (Space d) := @InnerProductSpace.toInner ℝ (Space d) _
+    (PiLp.seminormedAddCommGroup exponent (fun _ : Fin d => ℝ))
+    (PiLp.innerProductSpace (𝕜 := ℝ) (fun _ : Fin d => ℝ))
+  ENNReal.ofReal ((Real.sqrt (Matrix.gram ℝ (fun i => v.2 i - v.1)).det)⁻¹ ^ m)
+def MatrixLabelReference (d m : ℕ) : @Measure ((Fin m → Space d) × (Fin m → ℝ))
+    (@MeasurableSpace.prod (Fin m → Space d) (Fin m → ℝ)
+      (@MeasurableSpace.pi (Fin m) (fun _ => Space d)
+        (fun _ => WithLp.measurableSpace
+          (@OfNat.ofNat ℝ≥0∞ 2
+            (@instOfNatAtLeastTwo ℝ≥0∞ 2 ENNReal.instAddCommMonoidWithOne.toNatCast
+              (Mathlib.Meta.NormNum.instAtLeastTwo (nat_lit 0)))) (Fin d → ℝ)))
+      inferInstance) :=
+  let exponent : ℝ≥0∞ := @OfNat.ofNat ℝ≥0∞ 2
+    (@instOfNatAtLeastTwo ℝ≥0∞ 2 ENNReal.instAddCommMonoidWithOne.toNatCast
+      (Mathlib.Meta.NormNum.instAtLeastTwo (nat_lit 0)))
+  let euclideanMeasurable := WithLp.measurableSpace exponent (Fin d → ℝ)
+  let rowMeasurable := @MeasurableSpace.pi (Fin m) (fun _ => Space d)
+    (fun _ => euclideanMeasurable)
+  let rowLaw := @Measure.pi (Fin m) (fun _ => Space d) inferInstance
+    (fun _ => euclideanMeasurable)
+    (fun _ => @stdGaussian (Space d)
+      (PiLp.normedAddCommGroup ex
 […]
 
 === LEAN COMPARATOR NoiselessRegression (exact formal statement)
@@ -232,8 +300,13 @@ def FixedQuadraticMemory : Prop :=
     ∀ (Ω : Type u) [MeasurableSpace Ω] (ρ : Measure Ω), IsProbabilityMeasure ρ →
     ∀ L : Learner d M T Ω, L.Admissible ρ →
     ((2 : ℕ) / (3 : ℕ) : ℝ≥0∞) ≤ L.uniformSuccess ρ ε →
-    c * (d :
-[…]
+    c * (d : ℝ) * Real.log (1 / ε) ≤ (T : ℝ)
+theorem main : SubquadraticMemory.{u} ∧ FixedQuadraticMemory.{u} := by
+  sorry
+end NoiselessRegression
+end
+end OAI
+
 
 === LEAN COMPARATOR PosteriorReplicas (exact formal statement)
 import Mathlib
@@ -329,7 +402,83 @@ def baseFiber {d k : ℕ} (base : BaseLaw) (A : Rows d k) (y : Labels k) :
       (fun x => liftLabel A y +
         (Real.sqrt (1 - ‖liftLabel A y‖ ^ 2) / ‖kernelComponent A x‖) •
           kernelComponent A x)
-def baseDensity {d k : ℕ} (base : BaseLaw) (A : Rows d k) (y : Labels k) : ℝ≥0∞
+def baseDensity {d k : ℕ} (base : BaseLaw) (A : Rows d k) (y : Labels k) : ℝ≥0∞ :=
+  if LinearIndependent ℝ A then
+    match base with
+    | .gaussian => ENNReal.ofReal
+        ((2 * Real.pi) ^ (-(k : ℝ) / 2) *
+          Real.exp (-‖liftLabel A y‖ ^ 2 / 2) / Real.sqrt (rowGram A).det)
+    | .spherical => if ‖liftLabel A y‖ < 1 then ENNReal.ofReal
+        (Real.Gamma ((d : ℝ) / 2) /
+          (Real.pi ^ ((k : ℝ) / 2) * Real.Gamma (((d : ℝ) - k) / 2)) *
+          (1 - ‖liftLabel A y‖ ^ 2) ^ (((d : ℝ) - k - 2) / 2) /
+          Real.sqrt (rowGram A).det) else 0
+  else 0
+def tiltMass {d k : ℕ} (base : BaseLaw) (f : Vec d → ℝ≥0∞)
+    (A : Rows d k) (y : Labels k) : ℝ≥0∞ :=
+  ∫⁻ x, f x ∂baseFiber base A y
+def projectedDensity {d k : ℕ} (base : BaseLaw) (f : Vec d → ℝ≥0∞)
+    (A : Rows d k) (y : Labels k) : ℝ≥0∞ :=
+  baseDensity base A y * tiltMass base f A y
+def tiltedFiber {d k : ℕ} (base : BaseLaw) (f : Vec d → ℝ≥0∞)
+    (A : Rows d k) (y : Labels k) : Measure (Vec d) :=
+  if tiltMass base f A y = 0 then Measure.dirac 0
+  else (tiltMass base f A y)⁻¹ • (baseFiber base A y).withDensity f
+def differences {d m : ℕ} (u : Tuple d m) : Fin m → Vec d :=
+  fun i => u i.succ - u 0
+def differenceSpan {d m : ℕ} (u : Tuple d m) : Submodule ℝ (Vec d) :=
+  Submodule.span ℝ (Set.range (differences u))
+def affineVolume {d m : ℕ} (u : Tuple d m) : ℝ :=
+  Real.sqrt (Matrix.gram ℝ (differences u)).det
+def constrainedRows {d m : ℕ} (k : ℕ) (u : Tuple d m) : Measure (Rows d k) :=
+  (gaussianRows d k).map
+    (fun A i => (differenceSpan u)ᗮ.starProjection (A i))
+def equalLabelLeft {d k m : ℕ} (base : BaseLaw) (f : Vec d → ℝ≥0∞)
+    (H : Rows d k × Labels k × Tuple d m → ℝ≥0∞) : ℝ≥0∞ :=
+  ∫⁻ A, ∫⁻ y, (projectedDensity base f A y) ^ (m + 1) *
+    ∫⁻ u, H (A, y, u) ∂Measure.pi (fun _ : Fin (m + 1) => tiltedFiber base f A y)
+      ∂volume ∂gaussianRows d k
+def equalLabelRight {d k m : ℕ} (base : BaseLaw) (f : Vec d → ℝ≥0∞)
+    (H : Rows d k × Labels k × Tuple d m → ℝ≥0∞) : ℝ≥0∞ :=
+  ENNReal.ofReal ((2 * Real.pi) ^ (-(k * m : ℝ) / 2)) *
+    ∫⁻ u, (ENNReal.ofReal (affineVolume u))⁻¹ ^ k *
+      ∫⁻ A, H (A, labels A (u 0), u) ∂constrainedRows k u
+      ∂Measure.pi (fun _ : Fin (m + 1) => (base.measure d).withDensity f)
+def EqualLabelMeasureIdentity : Prop :=
+  ∀ (d k m : ℕ), 1 ≤ k → 1 ≤ m → k + m ≤ d - 2 →
+    ∀ (base : BaseLaw) (f : Vec d → ℝ≥0∞), Measurable f →
+      (∃ L : ℝ≥0∞, L ≠ ∞ ∧ ∀ x, f x ≤ L) →
+      equalLabelLeft (k := k) (m := m) base f (fun _ => 1) < ∞ ∧
+      ∀ H : Rows d k × Labels k × Tuple d m → ℝ≥0∞,
+        Measurable H → equalLabelLeft base f H = equalLabelRight base f H
+def DistanceReplicaBlock : Prop :=
+  ∃ C : ℝ, 0 < C ∧ ∃ d₀ : ℕ, ∀ d : ℕ, d₀ ≤ d →
+    ∀ (p : Measure (Vec d)) [IsProbabilityMeasure p]
+      (f : Vec d → ℝ) (b : ℝ),
+      0 ≤ b → Measurable f → (∀ x, 0 ≤ f x ∧ f x ≤ Real.exp b) →
+      p = (sphereLaw d).withDensity (fun x => ENNReal.ofReal (f x)) →
+      ∀ (N : ℕ) [NeZero N] (κ : Kernel (Data d (d / 16)) (Fin N)) [IsMarkovKernel κ],
+        conditionalInformation (sideLaw (d / 2) (signalMessageLaw p κ)) ≤
+          ENNReal.ofReal (messageEntropy (signalMessageLaw p κ) / ((d / 8 : ℕ) : ℝ) +
+            C * ((d : ℝ) + b / (d : ℝ)))
+def SyntheticReplicaBlock : Prop :=
+  ∃ C : ℝ, 0 < C ∧ ∀ d : ℕ, 16 ≤ d →
+    ∀ (p : Measure (Vec d)) [IsProbabilityMeasure p]
+      (f : Vec d → ℝ) (L : ℝ),
+      1 ≤ L → Measurable f → (∀ x, 0 ≤ f x ∧ f x ≤ L) →
+      p = (sphereLaw d).withDensity (fun x => ENNReal.ofReal (f x)) →
+      ∀ (N : ℕ) [NeZero N] (z : Data d (d / 8) → Fin N) (hz : Measurable z),
+        conditionalInformation
+          (sideLaw (d / 2) (signalMessageLaw p (Kernel.deterministic z hz))) ≤
+          ENNReal.ofReal (Real.log (N : ℝ) / ((d / 8 : ℕ) : ℝ) +
+            C * ((d : ℝ) + Real.log (1 + Real.log L)))
+def IncidenceReplicaBlock : Prop :=
+  ∃ C : ℝ, 0 < C ∧ ∃ d₀ : ℕ, ∀ d : ℕ, d₀ ≤ d →
+    ∀ (p : Measure (Vec d)) [IsProbabilityMeasure p]
+      (f : Vec d → ℝ) (F : ℝ),
+      1 ≤ F → Measurable f → (∀ x, 0 ≤ f x ∧ f x ≤ F) →
+      p = (sphereLaw d).withDensity (fun x => ENNReal.ofReal (f x)) →
+  
 […]
 
 === LEAN COMPARATOR GaussianFiniteEntropy (exact formal statement)
@@ -403,7 +552,77 @@ noncomputable def finalLevel {n N t : ℕ} (Q : Disclosure n N t)
   else 0
 def MainStatement : Prop :=
   ∃ c : ℝ, 0 < c ∧ ∃ n₀ : ℕ, ∀ C₀ : ℝ, 0 < C₀ →
-    ∃ C : ℝ, 0 < C ∧ ∀ (n N t : ℕ), 
+    ∃ C : ℝ, 0 < C ∧ ∀ (n N t : ℕ), n₀ ≤ n → 1 ≤ N → ∀ rules : Rules n N t,
+      (2 / (n / 8 : ℕ) + Real.exp (-c * (n / 16 : ℕ))) * Real.log N ≤ C₀ * (n + 1) →
+      ∃ Q : Disclosure n N t, ValidDisclosure Q ∧
+        mutualInformation (augmentedLaw rules Q) ≤ ENNReal.ofReal (C * (n + 1) * t) ∧
+        (∫ zw, (finalLevel Q zw : ℝ) ∂experimentLaw rules) ≤ C * t
+namespace FiniteEntropy
+noncomputable def uniformCell {n : ℕ} (Q : Cell n) : Measure (Coordinate n) :=
+  ProbabilityTheory.cond volume (cellSet Q)
+def Descendant {n : ℕ} (Q R : Cell n) : Prop :=
+  Q.1 ≤ R.1 ∧ cellSet R ⊆ cellSet Q
+noncomputable def threshold (n h : ℕ) : ℝ := (2:ℝ)^(-(n:ℝ)*h/2)
+def Heavy {n : ℕ} (P : Measure (Coordinate n)) (Q R : Cell n) : Prop :=
+  Descendant Q R ∧ Q.1 < R.1 ∧ threshold n (R.1-Q.1) < (P (cellSet R)).toReal
+def FirstHeavy {n : ℕ} (P : Measure (Coordinate n)) (Q R : Cell n) : Prop :=
+  Heavy P Q R ∧ ∀ E : Cell n, Heavy P Q E → Descendant E R → E = R
+noncomputable def residual {n : ℕ} (P : Measure (Coordinate n)) (Q : Cell n) : Set (Coordinate n) :=
+  cellSet Q \ ⋃ R : {R : Cell n // FirstHeavy P Q R}, cellSet R.val
+abbrev Letter (n : ℕ) := Option (Cell n)
+abbrev Log (n : ℕ) := List (Letter n)
+instance logMeasurableSpace (n : ℕ) : MeasurableSpace (Log n) := ⊤
+noncomputable def branch {n : ℕ} (P : Measure (Coordinate n)) (Q : Cell n) : Letter n → Set (Coordinate n) := by
+  classical
+  exact fun
+  | none => residual P Q
+  | some R => if FirstHeavy P Q R then cellSet R else ∅
+noncomputable def attemptLetter {n : ℕ} (P : Measure (Coordinate n)) (Q : Cell n)
+    (z : Coordinate n) : Letter n := by
+  classical
+  exact if h : ∃ R : Cell n, FirstHeavy P Q R ∧ z ∈ cellSet R then some h.choose else none
+structure State (n : ℕ) where
+  cell : Cell n
+  event : Set (Coordinate n)
+  stopped : Bool
+noncomputable def update {n : ℕ} (P : Measure (Coordinate n)) (s : State n) (a : Letter n) : State n :=
+  if s.stopped then s else
+  let μ := ProbabilityTheory.cond P s.event
+  let E := branch μ s.cell a
+  { cell := a.getD s.cell
+    event := s.event ∩ E
+    stopped := if a = none then decide ((1/2:ℝ) ≤ (μ E).toReal) else false }
+noncomputable def state {n : ℕ} (P : Measure (Coordinate n)) (Q : Cell n) (h : Log n) : State n :=
+  h.foldl (update P) ⟨Q,cellSet Q,false⟩
+noncomputable def run {n : ℕ} (P : Measure (Coordinate n)) (Q : Cell n) : ℕ → Coordinate n → Log n
+  | 0, _ => []
+  | N+1, z =>
+    let h := run P Q N z
+    let s := state P Q h
+    if s.stopped then h else
+      h ++ [attemptLetter (ProbabilityTheory.cond P s.event) s.cell z]
+def Terminates {n : ℕ} (P : Measure (Coordinate n)) (Q : Cell n) (z : Coordinate n) : Prop :=
+  ∃ N, (state P Q (run P Q N z)).stopped = true
+noncomputable def attempts {n : ℕ} (P : Measure (Coordinate n)) (Q : Cell n) (z : Coordinate n) : ℕ := by
+  classical
+  exact if h : Terminates P Q z then Nat.find h else 0
+noncomputable def terminalLog {n : ℕ} (P : Measure (Coordinate n)) (Q : Cell n) (z : Coordinate n) : Log n :=
+  run P Q (attempts P Q z) z
+noncomputable def terminalCell {n : ℕ} (P : Measure (Coordinate n)) (Q : Cell n) (h : Log n) : Cell n :=
+  (state P Q h).cell
+noncomputable def terminalLaw {n : ℕ} (P : Measure (Coordinate n)) (Q : Cell n) (h : Log n) : Measure (Coordinate n) :=
+  ProbabilityTheory.cond P {z | terminalLog P Q z = h}
+noncomputable def depth {n : ℕ} (P : Measure (Coordinate n)) (Q : Cell n) (z : Coordinate n) : ℕ :=
+  (terminalCell P Q (terminalLog P Q z)).1-Q.1
+def Regular {n : ℕ} (P : Measure (Coordinate n)) (Q : Cell n) : Prop :=
+  P (cellSet Q) = 1 ∧ ∀ R : Cell n, Descendant Q R → Q.1 < R.1 →
+    (P (cellSet R)).toReal ≤ 2 * threshold n (R.1-Q.1)
+def FiniteEntropyStatement : Prop :=
+  ∃ n₀ : ℕ, ∀ n : ℕ, n₀ ≤ n → ∀ Q : Cell n, ∀ P : Measure (Coordinate n),
+    IsProbabilityMeasure P → P ≪ uniformCell Q → InformationTheory.klDiv P (uniformCell Q) ≠ ∞ →
+      (∀ᵐ z ∂P, Terminates P Q z) ∧ Measurable (terminalLog P Q) ∧
+      (∀ h : Log n, P {z | terminalLog P Q z = h} ≠ 0 →
+        Descendant Q (terminalCell P Q h) ∧ Regular (termi
 […]
 
 === LEAN COMPARATOR GaussianInformation (exact formal statement)
@@ -477,7 +696,77 @@ noncomputable def finalLevel {n N t : ℕ} (Q : Disclosure n N t)
   else 0
 def MainStatement : Prop :=
   ∃ c : ℝ, 0 < c ∧ ∃ n₀ : ℕ, ∀ C₀ : ℝ, 0 < C₀ →
-    ∃ C : ℝ, 0 < C ∧ ∀ (n N t : ℕ), 
+    ∃ C : ℝ, 0 < C ∧ ∀ (n N t : ℕ), n₀ ≤ n → 1 ≤ N → ∀ rules : Rules n N t,
+      (2 / (n / 8 : ℕ) + Real.exp (-c * (n / 16 : ℕ))) * Real.log N ≤ C₀ * (n + 1) →
+      ∃ Q : Disclosure n N t, ValidDisclosure Q ∧
+        mutualInformation (augmentedLaw rules Q) ≤ ENNReal.ofReal (C * (n + 1) * t) ∧
+        (∫ zw, (finalLevel Q zw : ℝ) ∂experimentLaw rules) ≤ C * t
+theorem repeated_localization : MainStatement := by
+  sorry
+end RepeatedLocalization
+open MeasureTheory Metric
+open scoped ENNReal
+namespace AllScaleInverseVolume
+local instance namedAtLeastTwoTwo : Nat.AtLeastTwo 2 := ⟨Nat.le_refl 2⟩
+abbrev Ambient (d : ℕ) := EuclideanSpace ℝ (Fin d)
+noncomputable local instance ambientSub (d : ℕ) : Sub (Ambient d) where
+  sub vector other := WithLp.toLp (2 : ℝ≥0∞)
+    (WithLp.ofLp (p := (2 : ℝ≥0∞)) vector - WithLp.ofLp (p := (2 : ℝ≥0∞)) other)
+noncomputable local instance ambientInner (d : ℕ) : Inner ℝ (Ambient d) where
+  inner vector other := ∑ coordinate : Fin d,
+    inner ℝ (WithLp.ofLp (p := (2 : ℝ≥0∞)) vector coordinate)
+      (WithLp.ofLp (p := (2 : ℝ≥0∞)) other coordinate)
+noncomputable def gramVolume {d k : ℕ} (u : Ambient d) (z : Fin k → Ambient d) : ℝ :=
+  Real.sqrt (Matrix.gram ℝ (fun i => z i-u)).det
+noncomputable def inverseVolume {d : ℕ} (u : Ambient d) (z : Fin (d/100) → Ambient d) : ℝ≥0∞ :=
+  ((ENNReal.ofReal (gramVolume u z))⁻¹)^(d/100)
+def BallBound {d : ℕ} (ν : Measure (Ambient d)) : Prop :=
+  ∀ (x : Ambient d) (r : ℝ), 0 < r →
+    ν (ball x r) ≤ ENNReal.ofReal (r^(((d:ℝ)-1)/2))
+def InverseVolumeStatement : Prop :=
+  ∃ C : ℝ, 0 < C ∧ ∃ d₀ : ℕ, ∀ d : ℕ, d₀ ≤ d →
+    ∀ ν : Measure (Ambient d), IsProbabilityMeasure ν → BallBound ν →
+      ∀ u : Ambient d, (∫⁻ z,inverseVolume u z ∂Measure.pi (fun _ : Fin (d/100) => ν)) ≤
+        ENNReal.ofReal (Real.exp (C*d*(d/100:ℕ)))
+theorem inverse_volume_without_support : InverseVolumeStatement := by
+  sorry
+end AllScaleInverseVolume
+open MeasureTheory ProbabilityTheory Metric Set
+open scoped ENNReal
+namespace KernelPotential
+local instance namedAtLeastTwoTwo : Nat.AtLeastTwo 2 := ⟨Nat.le_refl 2⟩
+abbrev Ambient (d : ℕ) := EuclideanSpace ℝ (Fin d)
+abbrev Rows (d : ℕ) := Fin (d/16) → Fin d → ℝ
+noncomputable def radial {d : ℕ} (x : Ambient d) : Ambient d := ‖x‖⁻¹ • x
+noncomputable def sphereProbability (d : ℕ) : Measure (Ambient d) :=
+  ((volume (ball (0 : Ambient d) 1))⁻¹ • volume.restrict (ball (0 : Ambient d) 1)).map radial
+noncomputable def J {d : ℕ} (ν : Measure (Ambient d)) (s : Ambient d) : ℝ≥0∞ :=
+  ∫⁻ u,((ENNReal.ofReal ‖u-s‖)⁻¹)^(2*(d/16)) ∂ν
+noncomputable def B {d : ℕ} (ν : Measure (Ambient d)) : ℝ :=
+  ∫ s, Real.log ((J ν s).toReal) ∂ν
+noncomputable def Phi {d : ℕ} (ν : Measure (Ambient d)) : ℝ :=
+  (InformationTheory.klDiv ν (sphereProbability d)).toReal - B ν
+def BoundedDensity {d : ℕ} (ν : Measure (Ambient d)) : Prop :=
+  ∃ H : ℝ, 0 < H ∧ ν ≤ ENNReal.ofReal H • sphereProbability d
+noncomputable def rowLaw (d : ℕ) : Measure (Rows d) :=
+  Measure.pi (fun _ : Fin (d/16) => Measure.pi (fun _ : Fin d => gaussianReal 0 1))
+noncomputable def labels {d : ℕ} (a : Rows d) (s : Ambient d) : Fin (d/16) → ℝ :=
+  fun i => ∑ j,a i j*s j
+structure BlockRule (d N : ℕ) where
+  prob : (Fin N × (Rows d × (Fin (d/16) → ℝ))) → Fin N → ℝ
+  measurable_prob : ∀ w, Measurable (fun x => prob x w)
+  nonneg_prob : ∀ x w, 0 ≤ prob x w
+  sum_prob : ∀ x, ∑ w,prob x w=1
+noncomputable def outgoingLaw {d N : ℕ} (μ : Measure (Ambient d × Fin N))
+    (rule : BlockRule d N) : Measure (Ambient d × Fin N) :=
+  ∑ w : Fin N, ((μ.prod (rowLaw d)).withDensity (fun x =>
+    ENNReal.ofReal (rule.prob (x.1.2,x.2,labels x.2 x.1.1) w))).map (fun x => (x.1.1,w))
+noncomputable def component {d N : ℕ} (μ : Measure (Ambient d × Fin N)) (v : Fin N) :
+    Measure (Ambient d) := (μ.restrict {x|x.2=v}).map Prod.fst
+noncomputable def posterior {d N : ℕ} (μ : Measure (Ambient d × Fin N)) (v : Fin N) :
+    Measure (Ambient d) := (component μ v univ)⁻¹ • component μ v
+noncomputable def averagePhi {d N : ℕ} (μ : Measure (Ambient d × Fin N)) : ℝ :=
+  ∑ v : Fin N, (co
 […]
 
 === LEAN COMPARATOR ProjectionMoments (exact formal statement)
@@ -575,7 +864,80 @@ end
 open MeasureTheory ProbabilityTheory Set Filter
 open scoped ENNReal NNReal RealInnerProductSpace
 variable {d M T : ℕ} {Ω : Type u} [MeasurableSpace Ω]
-struc
+structure Learner.MeasurableRules (L : Learner d M T Ω) : Prop where
+  initial : Measurable L.initialChoice
+  transition : ∀ t j, Measurable (fun z : Ω × (Vector d × ℝ) => L.transition t z.1 j z.2)
+  output : ∀ t j, Measurable (fun ω => L.output t ω j)
+end
+open MeasureTheory ProbabilityTheory Set Filter
+open scoped ENNReal NNReal RealInnerProductSpace
+structure FiniteKernelLearner (d M T : ℕ) where
+  initial : Measure (Bool × State M)
+  initial_probability : IsProbabilityMeasure initial
+  transition : ℕ → State M → (Vector d × ℝ) → Measure (Bool × State M)
+  transition_probability : ∀ t j obs, IsProbabilityMeasure (transition t j obs)
+  output : ℕ → State M → Measure (UnitSphere d)
+  output_probability : ∀ t j, IsProbabilityMeasure (output t j)
+namespace FiniteKernelLearner
+variable {d M T : ℕ}
+structure CompletedRules (K : FiniteKernelLearner d M T) : Prop where
+  transition : ∀ t j a, AEMeasurable (fun obs => K.transition t j obs {a}) (observationReference d)
+end FiniteKernelLearner
+open MeasureTheory ProbabilityTheory Set Filter unitInterval
+section CoinRun
+variable {J O : Type*} [Fintype J] [MeasurableSpace J] [MeasurableSingletonClass J]
+  [MeasurableSpace O]
+def kernelRun (P : ℕ → J → O → Measure J) : (n : ℕ) → J → (Fin n → O) → Measure J
+  | 0, j, _ => Measure.dirac j
+  | n+1, j, obs => (kernelRun P n j (Fin.init obs)).bind (fun a => P (n+1) a (obs (Fin.last n)))
+end CoinRun
+section
+section
+open Learner
+variable {d M T : ℕ}
+abbrev FiniteKernelLearner.Tape (M T : ℕ) := (Bool × State M) × ((Fin T → I) × I)
+def FiniteKernelLearner.destination (t : ℕ) (h : t ≤ T) (a : Bool × State M) : TaggedState M T :=
+  if a.1 then .inr (⟨t,by omega⟩,a.2) else .inl a.2
+def FiniteKernelLearner.taggedKernel (K : FiniteKernelLearner d M T) (t : ℕ) :
+    TaggedState M T → (Vector d × ℝ) → Measure (TaggedState M T)
+  | .inr a, _ => Measure.dirac (.inr a)
+  | .inl j, obs => if ht : t ≤ T then (K.transition t j obs).map (destination t ht)
+    else Measure.dirac (.inl j)
+def FiniteKernelLearner.terminalOutput (K : FiniteKernelLearner d M T) : TaggedState M T → Measure (UnitSphere d)
+  | .inl j => K.output T j
+  | .inr (t,j) => K.output t j
+end
+open MeasureTheory ProbabilityTheory Set Filter unitInterval
+open scoped ENNReal NNReal RealInnerProductSpace
+open Learner
+variable {d M T : ℕ}
+abbrev FiniteKernelLearner.Result (d M : ℕ) := (ℕ × State M) × UnitSphere d
+def FiniteKernelLearner.terminalTag : TaggedState M T → ℕ × State M
+  | .inl j => (T,j)
+  | .inr (t,j) => (t,j)
+def FiniteKernelLearner.terminalJointOutput (K : FiniteKernelLearner d M T) (j : TaggedState M T) : Measure (Result d M) :=
+  (K.terminalOutput j).map (fun y => (terminalTag j,y))
+def FiniteKernelLearner.jointExperimentLaw (K : FiniteKernelLearner d M T) (obs : Fin T → (Vector d × ℝ)) : Measure (Result d M) :=
+  K.initial.bind (fun a => (kernelRun K.taggedKernel T (taggedStart a) obs).bind K.terminalJointOutput)
+def FiniteKernelLearner.uniformSuccess (K : FiniteKernelLearner d M T) (ε : ℝ) : ℝ≥0∞ :=
+  ∫⁻ z : UnitSphere d × Samples d T,
+    K.jointExperimentLaw (fun i => (z.2 i,⟪z.1.val,z.2 i⟫))
+      {r | angularError z.1 r.2 ≤ ε} ∂((uniformSphere d).prod (sampleLaw d T))
+def FiniteKernelLearner.uniformFixedSuccess (K : FiniteKernelLearner d M T) (ε : ℝ) (t : ℕ) : ℝ≥0∞ :=
+  ∫⁻ z : UnitSphere d × Samples d T,
+    K.jointExperimentLaw (fun i => (z.2 i,⟪z.1.val,z.2 i⟫))
+      {r | r.1.1 = t ∧ angularError z.1 r.2 ≤ ε} ∂((uniformSphere d).prod (sampleLaw d T))
+end
+section
+open MeasureTheory ProbabilityTheory Set Filter
+open scoped ENNReal NNReal RealInnerProductSpace
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+  [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] [Nontrivial E]
+variable {d M T : ℕ} {Ω : Type u}
+def Learner.uniformFixedSuccess [MeasurableSpace Ω] (L : Learner d M T Ω) (ρ : Measure Ω)
+    (ε : ℝ) (t : ℕ) : ℝ≥0∞ :=
+  ((uniformSphere d).prod (ρ.prod (sampleLaw d T)))
+    {z | (L.terminal z.1 z.2.1 z.2.2).1 = t ∧ angularError z.1 (L.estimate z.1 z
 […]
 
 === LEAN COMPARATOR GaussianReplacement (exact formal statement)
@@ -655,6 +1017,69 @@ noncomputable def shannonEntropy {W : Type*} [MeasurableSpace W] (π : Measure W
 def conditionalMutualInformation {Z A B : Type*} [MeasurableSpace Z]
     [MeasurableSpace A] [MeasurableSpace B] [StandardBorelSpace A] [StandardBorelSpace B]
     (P : Measure (Z×(A×B))) [IsFiniteMeasure P] : ℝ≥0∞ := by
+  classical
+  exact if h : Nonempty (A×B) then
+    letI := h
+    InformationTheory.klDiv P (P.fst ⊗ₘ (P.condKernel.fst ×ₖ P.condKernel.snd))
+  else 0
+def actualExperiment {d m r : ℕ} {W : Type*} [MeasurableSpace W]
+    (P : Measure ((Sphere d × W) × Rows m d)) :
+    Measure (((Sphere d × W) × Rows m d) × Rows r d) := P.prod (gaussianRows r d)
+instance actualExperiment_isProbabilityMeasure {d m r : ℕ} {W : Type*} [MeasurableSpace W]
+    (P : Measure ((Sphere d×W)×Rows m d)) [IsProbabilityMeasure P] :
+    IsProbabilityMeasure (actualExperiment (r:=r) P) :=
+  inferInstanceAs (IsProbabilityMeasure (P.prod (gaussianRows r d)))
+def actualObservation {d m r : ℕ} {W : Type*}
+    (p : ((Sphere d × W) × Rows m d) × Rows r d) :
+    (Rows (m+r) d × W) × (Fin (m+r) → ℝ) :=
+  ((Fin.append p.1.2 p.2,p.1.1.2), label (Fin.append p.1.2 p.2) (p.1.1.1 : Vector d))
+instance actualObservation_isProbabilityMeasure {d m r : ℕ} {W : Type*} [MeasurableSpace W]
+    (P : Measure ((Sphere d×W)×Rows m d)) [IsProbabilityMeasure P] :
+    IsProbabilityMeasure ((actualExperiment (r:=r) P).map actualObservation) :=
+  inferInstance
+def selectedCube {k d : ℕ} {W : Type*} (ρ : W → Measure (Sphere d)) (δ : ℝ)
+    (z : (Rows k d×W)×(Fin k → ℝ)) : ℝ≥0∞ := cubeAverage (ρ z.1.2) z.1.1 z.2 δ
+def selectedExact {k d : ℕ} {W : Type*} (ρ : W → Measure (Sphere d))
+    (z : (Rows k d×W)×(Fin k → ℝ)) : ℝ≥0∞ := exactDensity (ρ z.1.2) z.1.1 z.2
+def momentBound (C : ℝ) (d : ℕ) (B D : ℝ) : ℝ :=
+  Real.exp (C*d)*B*(1+max (Real.log (D/B)) 0)
+def logPositive (x : ℝ≥0∞) : ℝ := max (Real.log x.toReal) 0
+def logNegative (x : ℝ≥0∞) : ℝ≥0∞ := if x = 0 then ∞ else ENNReal.ofReal (-Real.log x.toReal)
+def extendedLogExpectation {A : Type*} [MeasurableSpace A] (μ : Measure A)
+    (f : A → ℝ≥0∞) : EReal :=
+  ((∫⁻ a, ENNReal.ofReal (logPositive (f a)) ∂μ) : EReal) -
+    ((∫⁻ a, logNegative (f a) ∂μ) : EReal)
+def PositiveMessage {W : Type*} [MeasurableSpace W] (π : Measure W) := {w : W // 0 < π {w}}
+def completeFamily {W : Type*} [MeasurableSpace W] {T : Type*} (π : Measure W)
+    (f : PositiveMessage π → T) (t₀ : T) (w : W) : T :=
+  if h : 0 < π {w} then f ⟨w,h⟩ else t₀
+structure ActualRowConclusion {d m r q : ℕ} {W : Type*} [MeasurableSpace W]
+    (P : Measure ((Sphere d×W)×Rows m d)) [IsProbabilityMeasure P]
+    (ρ : W → Measure (Sphere d)) (B D : W → ℝ) : Prop where
+  row_finite : rowInformation P (gaussianRows m d) ≠ ∞
+  row_le_entropy : (rowInformation P (gaussianRows m d)).toReal ≤
+    (shannonEntropy (P.map swapLast).snd).toReal
+  conditional_density : ∀ᵐ gw ∂((actualExperiment (r:=r) P).map actualObservation).fst,
+    ((actualExperiment (r:=r) P).map actualObservation).condKernel gw ≪ volume
+  actual_limit : ∀ᵐ p ∂actualExperiment (r:=r) P,
+    Tendsto (fun j : ℕ => selectedCube ρ (1/(j:ℝ)) (actualObservation p)) atTop
+      (𝓝 (selectedExact ρ (actualObservation p)))
+  smoothed_bound : ∀ δ : ℝ, 0 < δ →
+    Integrable (fun p => Real.log (1+(selectedCube ρ δ (actualObservation p)).toReal))
+      (actualExperiment (r:=r) P) ∧
+    (∫ p, Real.log (1+(selectedCube ρ δ (actualObservation p)).toReal) ∂actualExperiment (r:=r) P) ≤
+      (rowInformation P (gaussianRows m d)).toReal/q +
+        ∫ sw : Sphere d×W, Real.log (1+momentBound 9 d (B sw.2) (D sw.2)) ∂P.fst
+  exact_integrable : Integrable (fun p => Real.log (1+(selectedExact ρ (actualObservation p)).toReal))
+    (actualExperiment (r:=r) P)
+  exact_bound : (∫ p, Real.log (1+(selectedExact ρ (actualObservation p)).toReal) ∂actualExperiment (r:=r) P) ≤
+    (rowInformation P (gaussianRows m d)).toReal/q +
+      ∫ sw : Sphere d×W, Real.log (1+momentBound 9 d (B sw.2) (D sw.2)) ∂P.fst
+  entropy_bound : (rowInformation P (gaussianRows m d)).toReal/q +
+      ∫ sw : Sphere d×W, Real.log (1+momentBound 9 d (B sw.2) (D sw.2)) ∂P.fst ≤
+    (shannonEntropy (P.map swapLast).snd).toReal/q +
+      ∫ sw : Sphere d×W, Real.log (1+momentBound 9 d (B sw.2) (D sw.2)) ∂P.fst
+  positive_log_integrable : Integrable (fun p => logPositive (selectedExact ρ (actua
 […]
 
 === LEAN COMPARATOR SubsphereCurrent (exact formal statement)
@@ -743,5 +1168,98 @@ def ExplicitPrecision : Prop :=
     ∀ L : SeededLearner d (M d) T Ω, L.Admissible ρ →
     ((2 / 3 : ℝ≥0∞) ≤ L.uniformSuccess ρ ε ∨
       ∀ s, (2 / 3 : ℝ≥0∞) ≤ L.success ρ ε s) →
-    (2 : ℝ)⁻¹ ^ 16 * 
+    (2 : ℝ)⁻¹ ^ 16 * (d : ℝ) * Real.logb 2 (1 / ε) ≤ (T : ℝ)
+end SubsphereCurrent
+end
+open MeasureTheory ProbabilityTheory Set
+open scoped ENNReal NNReal RealInnerProductSpace
+noncomputable section
+universe u v
+namespace SubsphereCurrent.Affine
+abbrev Vector (d : ℕ) := EuclideanSpace ℝ (Fin d)
+abbrev Sphere (E : Type*) [NormedAddCommGroup E] := Metric.sphere (0 : E) 1
+def sphereLaw (E : Type*) [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+    [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] : Measure (Sphere E) :=
+  let σ := (volume : Measure E).toSphere
+  (σ Set.univ)⁻¹ • σ
+structure Test (d n : ℕ) where
+  space : Submodule ℝ (Vector d)
+  dimension : Module.finrank ℝ space = n
+  center : Vector d
+  perpendicular : center ∈ spaceᗮ
+  radius : ℝ
+  radius_positive : 0 < radius
+  unit : ‖center‖^2 + radius^2 = 1
+def Test.point {d n : ℕ} (A : Test d n) (s : Sphere A.space) : Vector d :=
+  A.center + A.radius • s.val.val
+end SubsphereCurrent.Affine
+end
+open MeasureTheory ProbabilityTheory Set
+open scoped ENNReal NNReal RealInnerProductSpace
+noncomputable section
+universe v
+namespace SubsphereCurrent.Weighted
+abbrev Vector (d : ℕ) := Affine.Vector d
+abbrev Sphere (d : ℕ) := Metric.sphere (0 : Vector d) 1
+abbrev Rows (d k : ℕ) := Fin k → Vector d
+abbrev Observation (d k : ℕ) := Rows d k × (Fin k → ℝ)
+def onTest {d n : ℕ} (A : Affine.Test d n) (s : Affine.Sphere A.space) : Sphere d := by
+  refine ⟨A.point s,mem_sphere_zero_iff_norm.mpr ?_⟩
+  have hs : ‖(s.val : Vector d)‖ = 1 := by
+    rw [Submodule.norm_coe]
+    exact mem_sphere_zero_iff_norm.mp s.property
+  have ho : ⟪A.center, (s.val : Vector d)⟫ = 0 :=
+    Submodule.inner_left_of_mem_orthogonal s.val.property A.perpendicular
+  have hz : ‖A.point s‖^2 = 1 := by
+    rw [Affine.Test.point,norm_add_sq_real,real_inner_smul_right,ho,mul_zero,norm_smul,
+      Real.norm_eq_abs,abs_of_pos A.radius_positive,hs,mul_one]
+    nlinarith [A.unit]
+  nlinarith [norm_nonneg (A.point s)]
+def norm (d n : ℕ) (g : Sphere d → ℝ≥0∞) : ℝ≥0∞ :=
+  ⨆ A : Affine.Test d n, (ENNReal.ofReal A.radius)^((d : ℝ)/16) *
+    ∫⁻ s : Affine.Sphere A.space, g (onTest A s) ∂Affine.sphereLaw A.space
+def blockInput {d k : ℕ} {V : Type*} [Fintype V]
+    (κ : V → Observation d k → ℝ≥0∞) (g : V → Sphere d → ℝ≥0∞)
+    (s : Sphere d) : ℝ≥0∞ :=
+  ∫⁻ X : Rows d k, ∑ v, κ v (X,fun i => ⟪X i,s.val⟫)*g v s
+    ∂Measure.pi (fun _ => stdGaussian (Vector d))
+def terminalInput {d : ℕ} (π : Measure (Sphere d)) (ε : ℝ) (s : Sphere d) : ℝ≥0∞ :=
+  π {u | Real.arccos ⟪u.val,s.val⟫ ≤ ε}
+end SubsphereCurrent.Weighted
+end
+open MeasureTheory ProbabilityTheory Set
+open scoped ENNReal NNReal RealInnerProductSpace
+noncomputable section
+universe v
+namespace SubsphereCurrent.Weighted
+def RadiusWeightedFullEstimate : Prop :=
+  ∃ C : ℝ, 1 ≤ C ∧ ∃ d₀ : ℕ, ∀ d : ℕ, d₀ ≤ d →
+    (∀ W : ℝ, 1 ≤ W → ∀ (V : Type v) [Fintype V] [Nonempty V],
+      (Fintype.card V : ℝ) ≤ W →
+      ∀ κ : V → Observation d (d/16) → ℝ≥0∞,
+      (∀ v, Measurable (κ v)) → (∀ obs, ∑ v, κ v obs ≤ 1) →
+      ∀ g : V → Sphere d → ℝ≥0∞,
+      (∀ v, Measurable (g v)) → (∀ v s, g v s ≤ 1) →
+      ∀ n : ℕ, (d : ℝ)/2 ≤ n → n ≤ d →
+      norm d n (blockInput κ g) ≤
+        (ENNReal.ofReal W)^(1/((d/16 : ℕ) : ℝ))*ENNReal.ofReal (C^d)*(⨆ v, norm d (n-2) (g v))) ∧
+    (∀ n : ℕ, (d : ℝ)/2 ≤ n → n ≤ d →
+      ∀ π : Measure (Sphere d), IsProbabilityMeasure π →
+      ∀ ε : ℝ, 0 < ε →
+      norm d n (terminalInput π ε) ≤ ENNReal.ofReal (C^d)*(ENNReal.ofReal ε)^((d : ℝ)/16))
+end SubsphereCurrent.Weighted
+end
+open MeasureTheory ProbabilityTheory Set Filter
+open scoped ENNReal NNReal RealInnerProductSpace
+noncomputable section
+universe u
+namespace SubsphereCurrent
+def HalfPrecision : Prop :=
+  ∃ c : ℝ, 0 < c ∧ ∀ M : ℕ → ℕ,
+    Asymptotics.IsLittleO atTop (fun d => (M d : ℝ)) (fun d => (d : ℝ)^2) →
+    ∃ d₀ : ℕ, ∀ d : ℕ, d₀ ≤ d → ∀ T : ℕ, ∀ ε : ℝ,
+    0 < ε → ε ≤ 1/10 →
+    ∀ (Ω : Type u) [MeasurableSpace Ω] (ρ : Measure Ω), IsProbabilityMeasure ρ →
+    ∀ L : SeededLearner d (M d) T Ω, L.Admissible ρ →
+    (1/2 : ℝ≥
 […]

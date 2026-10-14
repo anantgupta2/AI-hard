@@ -123,8 +123,72 @@ open UniqueGamesTheorem.Foundations
 open Target
 def IsTranslationInstance {q s : Nat} (coordinates : Fin q ≃ BinaryLinear.Vector s)
     (g : Instance q) : Prop :=
-  ∀ constraint ∈ g.constraints, ∃ shift : BinaryL
-[…]
+  ∀ constraint ∈ g.constraints, ∃ shift : BinaryLinear.Vector s,
+    ∀ label : Fin q,
+      coordinates (constraint.permutation.images[label]) = coordinates label + shift
+end UniqueGamesTheorem.Integration.TranslationTarget
+namespace UniqueGamesTheorem.Foundations.Complexity
+def encodeWord (n : Nat) : List Bool := List.replicate n true ++ [false]
+def encodeWords : List Nat → List Bool
+  | [] => []
+  | n :: ns => encodeWord n ++ encodeWords ns
+end UniqueGamesTheorem.Foundations.Complexity
+namespace UniqueGamesTheorem.Foundations.Complexity
+open Target
+def tableWords {q : Nat} (table : PermutationTable q) : List Nat :=
+  table.images.toList.map Fin.val
+def constraintWords {n q : Nat} (constraint : Constraint n q) : List Nat :=
+  [constraint.source.val, constraint.target.val] ++ tableWords constraint.permutation
+def gameWords {q : Nat} (game : Instance q) : List Nat :=
+  [game.vertices, q, game.constraints.length] ++ game.constraints.flatMap constraintWords
+def gameBits {q : Nat} (game : Instance q) : List Bool := encodeWords (gameWords game)
+end UniqueGamesTheorem.Foundations.Complexity
+namespace UniqueGamesTheorem.Foundations.Complexity.MachineFiniteAlphabet
+open Turing
+def FiniteAlphabet (M : FinTM2) : Prop := ∀ k, Finite (M.Γ k)
+end UniqueGamesTheorem.Foundations.Complexity.MachineFiniteAlphabet
+namespace UniqueGamesTheorem.Explicit.MachineOutputContract
+open UniqueGamesTheorem.Foundations
+open Target
+open scoped BigOperators
+structure SimpleBipartite {q : Nat} (game : Instance q) where
+  side : Fin game.vertices → Bool
+  sourceSide : ∀ i : Fin game.constraints.length,
+    side game.constraints[i].source = false
+  targetSide : ∀ i : Fin game.constraints.length,
+    side game.constraints[i].target = true
+  endpoints_injective : Function.Injective (fun i : Fin game.constraints.length =>
+    (game.constraints[i].source, game.constraints[i].target))
+structure BinaryGapReduction (ε δ : ℝ) where
+  alphabet : Nat
+  alphabetAtLeastTwo : 2 ≤ alphabet
+  dimension : Nat
+  dimensionPositive : 1 ≤ dimension
+  coordinates : Fin alphabet ≃ Integration.BinaryLinear.Vector dimension
+  construct : List Bool → Instance alphabet
+  simpleBipartite : ∀ input, SimpleBipartite (construct input)
+  translations : ∀ input,
+    Integration.TranslationTarget.IsTranslationInstance coordinates (construct input)
+  computation : Turing.TM2ComputableInPolyTime (id : List Bool → List Bool)
+    Complexity.gameBits construct
+  finiteAlphabet : Complexity.MachineFiniteAlphabet.FiniteAlphabet computation.tm
+  completeness : ∀ input, BinaryLanguage.language input →
+    ∃ labeling, 1 - ε ≤
+      (countSatisfied labeling (construct input).constraints : ℝ) /
+        (construct input).constraints.length
+  soundness : ∀ input, ¬BinaryLanguage.language input →
+    ∀ labeling, (countSatisfied labeling (construct input).constraints : ℝ) /
+      (construct input).constraints.length ≤ δ
+end UniqueGamesTheorem.Explicit.MachineOutputContract
+namespace UniqueGamesTheorem
+theorem theorem11 (ε δ : ℝ)
+    (hε : 0 < ε) (hεhalf : ε < 1 / 2)
+    (hδ : 0 < δ) (hδhalf : δ < 1 / 2) :
+    Nonempty (Explicit.MachineOutputContract.BinaryGapReduction ε δ) := by
+  sorry
+end UniqueGamesTheorem
+end OAI
+
 
 === LEAN COMPARATOR OptimalMaxCut (exact formal statement)
 import Mathlib
@@ -225,8 +289,14 @@ structure GapReduction (α : ℝ) where
   completeness : ∀ input, binary3SAT input →
     (yesBound : ℝ) ≤ ((construct input).graph.maxCut : ℝ) / (construct input).scale
   soundness : ∀ input, ¬ binary3SAT input →
-    ((construct input).graph.maxCut : ℝ) / (construct input).scale ≤ 
-[…]
+    ((construct input).graph.maxCut : ℝ) / (construct input).scale ≤ (noBound : ℝ)
+def MainStatement : Prop :=
+  ∀ α : ℝ, alphaGW < α → α ≤ 1 → Nonempty (GapReduction α)
+end OptimalMaxCut
+theorem OptimalMaxCut.main : OptimalMaxCut.MainStatement := by
+  sorry
+end OAI
+
 
 === LEAN COMPARATOR VertexCover (exact formal statement)
 import Mathlib
@@ -323,8 +393,28 @@ structure GapReduction (m : ℕ) where
       ((construct input).coverNumber : ℝ)
 def natListBits (L : List ℕ) : List Bool :=
   (L.length :: L).flatMap UniqueGames.BinaryEncoding.nameBits
-structure Approximation (α : ℝ) 
-[…]
+structure Approximation (α : ℝ) where
+  run : ExplicitGraph → List ℕ
+  computation : Turing.TM2ComputableInPolyTime ExplicitGraph.bits natListBits run
+  finiteAlphabet : FiniteAlphabet computation.tm
+  nodup : ∀ G, (run G).Nodup
+  vertices : ∀ G, ∀ v ∈ run G, v < G.n
+  covers : ∀ G, ∀ e ∈ G.edges, e.1.val ∈ run G ∨ e.2.val ∈ run G
+  quality : ∀ G, ((run G).length : ℝ) ≤ α * (G.coverNumber : ℝ)
+structure ThreeSATDecision where
+  run : List Bool → Bool
+  computation : Turing.TM2ComputableInPolyTime (id : List Bool → List Bool)
+    (fun b : Bool => [b]) run
+  finiteAlphabet : FiniteAlphabet computation.tm
+  correct : ∀ input, run input = true ↔ ThreeSAT input
+theorem explicit_cover_gap (m : ℕ) (hm : 4 ≤ m) : Nonempty (GapReduction m) := by
+  sorry
+theorem every_fixed_factor_below_two (α : ℝ) (hα : 1 ≤ α) (hα2 : α < 2)
+    (algorithm : Approximation α) : Nonempty ThreeSATDecision := by
+  sorry
+end VertexCover
+end OAI
+
 
 === LEAN COMPARATOR MinUncut (exact formal statement)
 import Mathlib

@@ -93,5 +93,81 @@ end TraceConeClassification
 namespace TraceConeClassification
 universe u v
 variable {A : Type u} [NonUnitalCStarAlgebra A] [PartialOrder A] [StarOrderedRing A]
-na
+namespace ExtendedTrace
+def add (τ σ : ExtendedTrace A) : ExtendedTrace A where
+  toFun a := τ a + σ a
+  map_zero := by rw [τ.map_zero, σ.map_zero, add_zero]
+  map_add a b := by rw [τ.map_add, σ.map_add]; ac_rfl
+  map_scale r hr a := by rw [τ.map_scale r hr, σ.map_scale r hr, mul_add]
+  tracial x := by rw [τ.tracial x, σ.tracial x]
+  lowerSemicontinuous := τ.lowerSemicontinuous.add σ.lowerSemicontinuous
+def zero : ExtendedTrace A where
+  toFun _ := 0
+  map_zero := rfl
+  map_add _ _ := (add_zero _).symm
+  map_scale _ _ _ := (mul_zero _).symm
+  tracial _ := rfl
+  lowerSemicontinuous := lowerSemicontinuous_const
+end ExtendedTrace
+def ClosedIdeal (A : Type u) [NonUnitalCStarAlgebra A] [PartialOrder A]
+    [StarOrderedRing A] :=
+  {I : NonUnitalStarSubalgebra ℂ A // IsClosed (I : Set A) ∧
+    (∀ (x y : A), y ∈ I → x * y ∈ I) ∧ (∀ (x y : A), x ∈ I → x * y ∈ I)}
+namespace ExtendedTrace
+def finIdeal (τ : ExtendedTrace A) : ClosedIdeal A :=
+  ⟨τ.finiteIdeal, τ.isClosed_finiteIdeal, fun x _ hy => τ.mul_mem_finiteIdeal_left x hy,
+    fun _ y hx => τ.mul_mem_finiteIdeal_right hx y⟩
+lemma lowerSemicontinuous_supportWeight (τ : ExtendedTrace A) :
+    LowerSemicontinuous (fun a : Positive A => if τ a = 0 then (0 : ℝ≥0∞) else ∞) := by sorry
+def supportWeight (τ : ExtendedTrace A) : ExtendedTrace A where
+  toFun a := if τ a = 0 then 0 else ∞
+  map_zero := by simp [τ.map_zero]
+  map_add a b := by
+    rw [τ.map_add]
+    by_cases ha : τ a = 0 <;> by_cases hb : τ b = 0 <;> simp [ha, hb]
+  map_scale r hr a := by
+    rw [τ.map_scale r hr]
+    by_cases ha : τ a = 0 <;> simp [ha, ENNReal.coe_ne_zero.mpr hr.ne']
+  tracial x := by rw [τ.tracial x]
+  lowerSemicontinuous := τ.lowerSemicontinuous_supportWeight
+def zeroIdeal (τ : ExtendedTrace A) : ClosedIdeal A := τ.supportWeight.finIdeal
+end ExtendedTrace
+namespace ClosedIdeal
+instance : PartialOrder (ClosedIdeal A) := inferInstanceAs (PartialOrder (Subtype _))
+def weight (I : ClosedIdeal A) : ExtendedTrace A :=
+  (closed_ideal_weight_exists I.1 I.2.1 I.2.2.1 I.2.2.2).choose
+theorem weight_idempotent (I : ClosedIdeal A) : I.weight.add I.weight = I.weight := by sorry
+theorem finiteIdeal_weight (I : ClosedIdeal A) : I.weight.finiteIdeal = I.1 := by sorry
+theorem le_iff_add_weight (I J : ClosedIdeal A) :
+    I ≤ J ↔ I.weight.add J.weight = I.weight := by sorry
+end ClosedIdeal
+namespace ExtendedTrace
+theorem idempotent_eq_weight {τ : ExtendedTrace A} (hτ : τ.add τ = τ) :
+    τ.finIdeal.weight = τ := by sorry
+end ExtendedTrace
+def IdempotentTrace (A : Type u) [NonUnitalCStarAlgebra A] [PartialOrder A]
+    [StarOrderedRing A] := {τ : ExtendedTrace A // τ.add τ = τ}
+def closedIdealEquivIdempotent : ClosedIdeal A ≃ IdempotentTrace A where
+  toFun I := ⟨I.weight, I.weight_idempotent⟩
+  invFun τ := τ.1.finIdeal
+  left_inv I := Subtype.ext (ClosedIdeal.finiteIdeal_weight I)
+  right_inv τ := Subtype.ext (ExtendedTrace.idempotent_eq_weight τ.2)
+variable {B : Type v} [NonUnitalCStarAlgebra B] [PartialOrder B] [StarOrderedRing B]
+def idempotentTraceEquiv (e : ExtendedTrace A ≃ ExtendedTrace B)
+    (he : ∀ τ σ, e (τ.add σ) = (e τ).add (e σ)) : IdempotentTrace A ≃ IdempotentTrace B where
+  toFun τ := ⟨e τ.1, by rw [← he, τ.2]⟩
+  invFun σ := ⟨e.symm σ.1, by
+    apply e.injective
+    rw [he, e.apply_symm_apply, σ.2]⟩
+  left_inv τ := Subtype.ext (e.symm_apply_apply τ.1)
+  right_inv σ := Subtype.ext (e.apply_symm_apply σ.1)
+def closedIdealEquivOfAdditive (e : ExtendedTrace A ≃ ExtendedTrace B)
+    (he : ∀ τ σ, e (τ.add σ) = (e τ).add (e σ)) : ClosedIdeal A ≃ ClosedIdeal B :=
+  closedIdealEquivIdempotent.trans ((idempotentTraceEquiv e he).trans
+    closedIdealEquivIdempotent.symm)
+lemma closedIdealEquivOfAdditive_weight (e : ExtendedTrace A ≃ ExtendedTrace B)
+    (he : ∀ τ σ, e (τ.add σ) = (e τ).add (e σ)) (I : ClosedIdeal A) :
+    (closedIdealEquivOfAdditive e he I).weight = e I.weight := by sorry
+def closedIdealOrderEquivOfAdditive (e : ExtendedTrace A ≃ ExtendedTrace B)
+    (he : ∀ τ σ, e (τ.add σ) = (e τ).add (e σ)) : Closed
 […]

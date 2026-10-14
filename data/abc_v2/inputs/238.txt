@@ -166,8 +166,81 @@ def baseTabloid (r : α → ℕ) : Tabloid r := ⟨r, 1, by funext x; rfl⟩
 def fiberGroup (c : α → ℕ) : Subgroup (Equiv.Perm α) where
   carrier := {g | ∀ x, c (g x) = c x}
   one_mem' := by intro x; rfl
-  mul_mem' := by intro g h hg hh x;
-[…]
+  mul_mem' := by intro g h hg hh x; exact (hg (h x)).trans (hh x)
+  inv_mem' := by
+    intro g hg x
+    have hh := hg (g⁻¹ x)
+    change c (g (g.symm x)) = c (g.symm x) at hh
+    rw [g.apply_symm_apply] at hh
+    exact hh.symm
+def complexSign : Equiv.Perm α →* ℂ where
+  toFun g := ((Equiv.Perm.sign g : ℤˣ) : ℤ)
+  map_one' := by simp
+  map_mul' := by intro g h; simp
+variable (D : YoungDiagram) (t : α ≃ Thorp.Young.Cells D)
+def tableauRow (x : α) : ℕ := (t x).val.1
+def tableauCol (x : α) : ℕ := (t x).val.2
+def tabloidRep : Representation ℂ (Equiv.Perm α) (EuclideanSpace ℂ (Tabloid (tableauRow D t))) :=
+  PermutationSpace.rep
+def columnAlternator : Module.End ℂ (EuclideanSpace ℂ (Tabloid (tableauRow D t))) :=
+  PermutationSpace.alternator (fiberGroup (tableauCol D t)).subtype
+    (complexSign.comp (fiberGroup (tableauCol D t)).subtype)
+def polytabloid : EuclideanSpace ℂ (Tabloid (tableauRow D t)) :=
+  columnAlternator D t (EuclideanSpace.single (baseTabloid (tableauRow D t)) (1 : ℂ))
+def module : Subrepresentation (tabloidRep D t) := cyclic (tabloidRep D t) (polytabloid D t)
+abbrev Shape (α : Type uα) [Fintype α] := Nat.Partition (Fintype.card α)
+def canonicalTableau (p : Shape α) : α ≃ Thorp.Young.Cells (Thorp.Young.ofPartition p) := by
+  have card_cells_eq_sum (D : YoungDiagram) : Fintype.card (Thorp.Young.Cells D) = D.rowLens.sum := by
+    rw [Fintype.card_congr (Thorp.Young.rowCellsEquiv D), Fintype.card_sigma]
+    simp only [Fintype.card_fin, YoungDiagram.rowLens]
+    rw [← List.sum_toFinset _ List.nodup_range, List.toFinset_range, Finset.sum_range]
+  have rowLens_ofPartition {n : ℕ} (p : Nat.Partition n) :
+      (Thorp.Young.ofPartition p).rowLens = p.parts.sort (· ≥ ·) := by
+    apply YoungDiagram.rowLens_ofRowLens_eq_self
+    intro x hx
+    exact p.parts_pos ((Multiset.mem_sort _).mp hx)
+  have card_ofPartition {n : ℕ} (p : Nat.Partition n) : Fintype.card (Thorp.Young.Cells (Thorp.Young.ofPartition p)) = n := by
+    rw [card_cells_eq_sum, rowLens_ofPartition]
+    simpa only [← Multiset.sum_coe, Multiset.sort_eq] using p.parts_sum
+  exact Fintype.equivOfCardEq (card_ofPartition p).symm
+abbrev Space (p : Shape α) := (module (Thorp.Young.ofPartition p) (canonicalTableau p)).toSubmodule
+def degree (p : Shape α) : ℕ := Module.finrank ℂ (Space p)
+open Thorp.Young
+abbrev NShape (n : ℕ) := Shape (Fin n)
+def defect {n : ℕ} (p : NShape n) : ℕ := n - longest (ofPartition p)
+end Specht
+namespace Current
+def reciprocalFirst (n : ℕ) : ℝ :=
+  ∑ p : Specht.NShape n, (Specht.degree p : ℝ)⁻¹
+def exceptionalFirst (n : ℕ) : ℝ :=
+  ∑ p : Specht.NShape n, if 0 < Specht.defect p then (Specht.degree p : ℝ)⁻¹ else 0
+def C1 : ℝ := sSup (Set.range (fun n : {n : ℕ // 1 ≤ n} => reciprocalFirst n.val))
+theorem first_reciprocal_main :
+    (BddAbove (Set.range (fun n : {n : ℕ // 1 ≤ n} => reciprocalFirst n.val)) ∧
+    (∀ n : ℕ, 1 ≤ n → reciprocalFirst n ≤ C1) ∧
+    Tendsto exceptionalFirst atTop (nhds 0)) ∧
+    (∀ (d : ℕ) (_hd : 3 ≤ d)
+    (e : Position d ≃ Fin 8 × Fin (2 ^ (d - 3)))
+    {E : Type uE} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+    [FiniteDimensional ℂ E]
+    (ρ : Representation ℂ (Equiv.Perm (Position d)) E)
+    [Representation.IsIrreducible ρ]
+    (_ : ∀ g x y, ⟪ρ g x, ρ g y⟫_ℂ = ⟪x, y⟫_ℂ)
+    (ν : Equiv.Perm (Position d) → ℝ)
+    (_ : ∀ g, 0 ≤ ν g) (_ : ∑ g, ν g = 1)
+    (_ : ∀ (i : Fin 8) (g : Equiv.Perm (Position d)),
+      ∑ h : Equiv.Perm (Fin (2 ^ (d - 3))),
+          ν (g * Block.embedding e (Pi.mulSingle i h)) ≤
+        4 * (Fintype.card (Equiv.Perm (Fin (2 ^ (d - 3)))) : ℝ) /
+          Fintype.card (Equiv.Perm (Position d))),
+    ‖LinearMap.toContinuousLinearMap (Fourier.integrated ρ (fun g => (ν g : ℂ)))‖ ≤
+      Real.sqrt (32 * C1) * (Module.finrank ℂ E : ℝ) ^ (-5 / 16 : ℝ)) := by
+  sorry
+end Current
+end Thorp
+end
+end OAI
+
 
 === LEAN COMPARATOR ThorpRemaining (exact formal statement)
 import Mathlib
@@ -266,7 +339,89 @@ def rotate (d : ℕ) : Equiv.Perm (Card d) where
   toFun x i := x (finRotate d i)
   invFun x i := x ((finRotate d).symm i)
   left_inv x := by funext i; simp only [Equiv.apply_symm_apply]
-  right_inv x := by funext i; si
+  right_inv x := by funext i; simp only [Equiv.symm_apply_apply]
+def step : (d : ℕ) → Coins d → Equiv.Perm (Card d)
+  | 0, _ => 1
+  | d + 1, ξ => rotate (d + 1) * pairSwitch ξ
+def run (d : ℕ) : (t : ℕ) → (Fin t → Coins d) → Equiv.Perm (Card d)
+  | 0, _ => 1
+  | t + 1, ω => step d (ω (Fin.last t)) * run d t (fun i => ω i.castSucc)
+noncomputable def law (d t : ℕ) (g : Equiv.Perm (Card d)) : ℝ :=
+  (Fintype.card {ω : Fin t → Coins d // run d t ω = g} : ℝ) /
+    (Fintype.card (Fin t → Coins d) : ℝ)
+lemma card_positions (d : ℕ) : Fintype.card (Card d) = 2 ^ d := by
+  simp [Card]
+end Thorp
+namespace Thorp.Specht
+open scoped BigOperators Classical
+abbrev Cell (μ : YoungDiagram) := {x : ℕ × ℕ // x ∈ μ.cells}
+def row {μ : YoungDiagram} (x : Cell μ) : ℕ := x.1.1
+def col {μ : YoungDiagram} (x : Cell μ) : ℕ := x.1.2
+lemma row_lt_colLen {μ : YoungDiagram} (x : Cell μ) : row x < μ.colLen (col x) :=
+  YoungDiagram.mem_iff_lt_colLen.mp x.2
+noncomputable def rowIndex {μ : YoungDiagram} (x : Cell μ) : Fin (μ.colLen 0) :=
+  ⟨row x, (row_lt_colLen x).trans_le (μ.colLen_anti 0 (col x) (Nat.zero_le _))⟩
+abbrev Tabloid (μ : YoungDiagram) :=
+  {f : Cell μ → Fin (μ.colLen 0) // ∃ p : Equiv.Perm (Cell μ), f = rowIndex ∘ p}
+noncomputable instance (μ : YoungDiagram) : Fintype (Tabloid μ) := Fintype.ofFinite _
+noncomputable def baseTabloid (μ : YoungDiagram) : Tabloid μ := ⟨rowIndex, 1, rfl⟩
+noncomputable def tabloidAct {μ : YoungDiagram} (p : Equiv.Perm (Cell μ)) :
+    Equiv.Perm (Tabloid μ) where
+  toFun f := ⟨fun x => f.1 (p⁻¹ x), by
+    obtain ⟨q,hq⟩ := f.2
+    refine ⟨q*p⁻¹, ?_⟩
+    funext x
+    simp only [hq,Function.comp_apply,Equiv.Perm.mul_apply]⟩
+  invFun f := ⟨fun x => f.1 (p x), by
+    obtain ⟨q,hq⟩ := f.2
+    refine ⟨q*p, ?_⟩
+    funext x
+    simp only [hq,Function.comp_apply,Equiv.Perm.mul_apply]⟩
+  left_inv f := by apply Subtype.ext; funext x; simp
+  right_inv f := by apply Subtype.ext; funext x; simp
+@[simp] lemma tabloidAct_apply {μ : YoungDiagram} (p : Equiv.Perm (Cell μ))
+    (f : Tabloid μ) (x : Cell μ) : (tabloidAct p f).1 x = f.1 (p⁻¹ x) := rfl
+@[simp] lemma tabloidAct_one (μ : YoungDiagram) : tabloidAct (1 : Equiv.Perm (Cell μ)) = 1 := by
+  ext f x
+  rfl
+@[simp] lemma tabloidAct_mul {μ : YoungDiagram} (p q : Equiv.Perm (Cell μ)) :
+    tabloidAct (p*q) = tabloidAct p * tabloidAct q := by
+  ext f x
+  simp only [tabloidAct_apply, mul_inv_rev,Equiv.Perm.mul_apply]
+noncomputable def tabloidRep (μ : YoungDiagram) :
+    Representation ℂ (Equiv.Perm (Cell μ)) (Tabloid μ → ℂ) where
+  toFun p :=
+    { toFun := fun v f => v (tabloidAct p⁻¹ f)
+      map_add' := by intros; rfl
+      map_smul' := by intros; rfl }
+  map_one' := by ext v f; simp
+  map_mul' p q := by
+    ext v f
+    simp only [mul_inv_rev,tabloidAct_mul,Equiv.Perm.mul_apply]
+    rfl
+noncomputable def delta {μ : YoungDiagram} (f : Tabloid μ) : Tabloid μ → ℂ :=
+  fun g => if g=f then 1 else 0
+noncomputable def colGroup (μ : YoungDiagram) : Subgroup (Equiv.Perm (Cell μ)) where
+  carrier := {p | ∀ x, col (p x) = col x}
+  one_mem' := by intro x; rfl
+  mul_mem' := by intro p q hp hq x; exact (hp (q x)).trans (hq x)
+  inv_mem' := by intro p hp x; simpa using (hp (p⁻¹ x)).symm
+noncomputable def permSign {α : Type*} [Fintype α] [DecidableEq α] (p : Equiv.Perm α) : ℂ :=
+  ((Equiv.Perm.sign p : ℤ) : ℂ)
+section
+variable {α V : Type*} [Fintype α] [DecidableEq α] [AddCommGroup V] [Module ℂ V]
+noncomputable def alternator (C : Subgroup (Equiv.Perm α))
+    (ρ : Representation ℂ (Equiv.Perm α) V) : Module.End ℂ V := by
+  classical
+  exact ∑ c : C, permSign (c : Equiv.Perm α) • ρ c
+end
+noncomputable def polytabloid (μ : YoungDiagram) : Tabloid μ → ℂ :=
+  alternator (colGroup μ) (tabloidRep μ) (delta (baseTabloid μ))
+noncomputable def space (μ : YoungDiagram) : Submodule ℂ (Tabloid μ → ℂ) :=
+  Submodule.span ℂ (Set.range (fun p : Equiv.Perm (Cell μ) => tabloidRep μ p (polytabloid μ)))
+lemma orbit_mem_space (μ : YoungDiagram) (p : Equiv.Perm (Cell μ)) :
+    tabloidRep μ p (polytabloid μ) ∈ space μ := Submodule.subset_span ⟨p,rfl⟩
+lem
 […]
 
 === LEAN COMPARATOR PartialPermutation (exact formal statement)
@@ -448,7 +603,91 @@ noncomputable def tabloidAct {μ : YoungDiagram} (p : Equiv.Perm (Cell μ)) :
     tabloidAct (p*q) = tabloidAct p * tabloidAct q := by
   ext f x
   simp only [tabloidAct_apply, mul_inv_rev,Equiv.Perm.mul_apply]
-noncomputable def tabloidRep (μ : YoungDia
+noncomputable def tabloidRep (μ : YoungDiagram) :
+    Representation ℂ (Equiv.Perm (Cell μ)) (Tabloid μ → ℂ) where
+  toFun p :=
+    { toFun := fun v f => v (tabloidAct p⁻¹ f)
+      map_add' := by intros; rfl
+      map_smul' := by intros; rfl }
+  map_one' := by ext v f; simp
+  map_mul' p q := by
+    ext v f
+    simp only [mul_inv_rev,tabloidAct_mul,Equiv.Perm.mul_apply]
+    rfl
+noncomputable def delta {μ : YoungDiagram} (f : Tabloid μ) : Tabloid μ → ℂ :=
+  fun g => if g=f then 1 else 0
+noncomputable def colGroup (μ : YoungDiagram) : Subgroup (Equiv.Perm (Cell μ)) where
+  carrier := {p | ∀ x, col (p x) = col x}
+  one_mem' := by intro x; rfl
+  mul_mem' := by intro p q hp hq x; exact (hp (q x)).trans (hq x)
+  inv_mem' := by intro p hp x; simpa using (hp (p⁻¹ x)).symm
+noncomputable def permSign {α : Type*} [Fintype α] [DecidableEq α] (p : Equiv.Perm α) : ℂ :=
+  ((Equiv.Perm.sign p : ℤ) : ℂ)
+section
+variable {α V : Type*} [Fintype α] [DecidableEq α] [AddCommGroup V] [Module ℂ V]
+noncomputable def alternator (C : Subgroup (Equiv.Perm α))
+    (ρ : Representation ℂ (Equiv.Perm α) V) : Module.End ℂ V := by
+  classical
+  exact ∑ c : C, permSign (c : Equiv.Perm α) • ρ c
+end
+noncomputable def polytabloid (μ : YoungDiagram) : Tabloid μ → ℂ :=
+  alternator (colGroup μ) (tabloidRep μ) (delta (baseTabloid μ))
+noncomputable def space (μ : YoungDiagram) : Submodule ℂ (Tabloid μ → ℂ) :=
+  Submodule.span ℂ (Set.range (fun p : Equiv.Perm (Cell μ) => tabloidRep μ p (polytabloid μ)))
+lemma orbit_mem_space (μ : YoungDiagram) (p : Equiv.Perm (Cell μ)) :
+    tabloidRep μ p (polytabloid μ) ∈ space μ := Submodule.subset_span ⟨p,rfl⟩
+lemma action_mem_space (μ : YoungDiagram) (p : Equiv.Perm (Cell μ))
+    (v : Tabloid μ → ℂ) (hv : v ∈ space μ) : tabloidRep μ p v ∈ space μ := by
+  induction hv using Submodule.span_induction with
+  | mem v hv =>
+    obtain ⟨q,rfl⟩ := hv
+    change ((tabloidRep μ p)*(tabloidRep μ q)) (polytabloid μ) ∈ space μ
+    rw [←map_mul]
+    exact orbit_mem_space μ (p*q)
+  | zero => simp
+  | add v w hv hw ihv ihw => simpa using (space μ).add_mem ihv ihw
+  | smul a v hv ih => simpa using (space μ).smul_mem a ih
+noncomputable def subrepresentation (μ : YoungDiagram) : Subrepresentation (tabloidRep μ) :=
+  ⟨space μ, fun p v hv => action_mem_space μ p v hv⟩
+noncomputable def representation (μ : YoungDiagram) :
+    Representation ℂ (Equiv.Perm (Cell μ)) (space μ) :=
+  (subrepresentation μ).toRepresentation
+end Thorp.Specht
+namespace Thorp.PermutationHilbert
+open scoped BigOperators ComplexConjugate Classical
+open Complex
+variable {X : Type*} [Fintype X]
+abbrev H (X : Type*) [Fintype X] := EuclideanSpace ℂ X
+end Thorp.PermutationHilbert
+namespace Thorp.Specht
+open scoped BigOperators Classical
+noncomputable def hilbertEquiv (μ : YoungDiagram) :
+    (Tabloid μ → ℂ) ≃ₗ[ℂ] PermutationHilbert.H (Tabloid μ) :=
+  (WithLp.linearEquiv 2 ℂ (Tabloid μ → ℂ)).symm
+noncomputable def hilbertSpace (μ : YoungDiagram) :
+    Submodule ℂ (PermutationHilbert.H (Tabloid μ)) := (space μ).map (hilbertEquiv μ).toLinearMap
+end Thorp.Specht
+namespace Thorp.UnitaryFinite
+section
+open scoped BigOperators ComplexConjugate Classical
+variable {G : Type*} [Group G] [Fintype G]
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
+noncomputable def continuousRepresentation (ρ : Representation ℂ G V) : G →* (V →L[ℂ] V) where
+  toFun g := (ρ g).toContinuousLinearMap
+  map_one' := by ext v; simp
+  map_mul' g h := by ext v; simp
+end
+open scoped BigOperators Classical
+variable {G : Type*} [Group G] [Fintype G]
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
+variable {Ω Ξ : Type*} [Fintype Ω] [Fintype Ξ]
+noncomputable def sampleOperator (ρ : Representation ℂ G V) (P : Ω → G) : V →L[ℂ] V :=
+  (Fintype.card Ω:ℂ)⁻¹ • ∑ ω,continuousRepresentation ρ (P ω)
+end Thorp.UnitaryFinite
+namespace Thorp.Specht
+open scoped BigOperators Classical
+noncomputable def spaceHilbertEquiv (μ : YoungDiagram) : space μ ≃ₗ[ℂ] hilbertSpace μ :=
+  (hilbertEquiv μ).submo
 […]
 
 === LEAN COMPARATOR OccupiedOverlap (exact formal statement)
@@ -531,7 +770,93 @@ lemma orbit_mem_space (μ : YoungDiagram) (p : Equiv.Perm (Cell μ)) :
     tabloidRep μ p (polytabloid μ) ∈ space μ := Submodule.subset_span ⟨p,rfl⟩
 lemma action_mem_space (μ : YoungDiagram) (p : Equiv.Perm (Cell μ))
     (v : Tabloid μ → ℂ) (hv : v ∈ space μ) : tabloidRep μ p v ∈ space μ := by
-  induction hv using Su
+  induction hv using Submodule.span_induction with
+  | mem v hv =>
+    obtain ⟨q,rfl⟩ := hv
+    change ((tabloidRep μ p)*(tabloidRep μ q)) (polytabloid μ) ∈ space μ
+    rw [←map_mul]
+    exact orbit_mem_space μ (p*q)
+  | zero => simp
+  | add v w hv hw ihv ihw => simpa using (space μ).add_mem ihv ihw
+  | smul a v hv ih => simpa using (space μ).smul_mem a ih
+noncomputable def subrepresentation (μ : YoungDiagram) : Subrepresentation (tabloidRep μ) :=
+  ⟨space μ, fun p v hv => action_mem_space μ p v hv⟩
+noncomputable def representation (μ : YoungDiagram) :
+    Representation ℂ (Equiv.Perm (Cell μ)) (space μ) :=
+  (subrepresentation μ).toRepresentation
+end CubeShuffle.Specht
+namespace CubeShuffle.PermutationHilbert
+open scoped BigOperators ComplexConjugate Classical
+open Complex
+variable {X : Type*} [Fintype X]
+abbrev H (X : Type*) [Fintype X] := EuclideanSpace ℂ X
+end CubeShuffle.PermutationHilbert
+namespace CubeShuffle.Specht
+open scoped BigOperators Classical
+noncomputable def hilbertEquiv (μ : YoungDiagram) :
+    (Tabloid μ → ℂ) ≃ₗ[ℂ] PermutationHilbert.H (Tabloid μ) :=
+  (WithLp.linearEquiv 2 ℂ (Tabloid μ → ℂ)).symm
+noncomputable def hilbertSpace (μ : YoungDiagram) :
+    Submodule ℂ (PermutationHilbert.H (Tabloid μ)) := (space μ).map (hilbertEquiv μ).toLinearMap
+noncomputable def spaceHilbertEquiv (μ : YoungDiagram) : space μ ≃ₗ[ℂ] hilbertSpace μ :=
+  (hilbertEquiv μ).submoduleMap (space μ)
+noncomputable def unitaryRepresentation (μ : YoungDiagram) :
+    Representation ℂ (Equiv.Perm (Cell μ)) (hilbertSpace μ) :=
+  ((spaceHilbertEquiv μ).conjAlgEquiv ℂ).toMonoidHom.comp (representation μ)
+variable {α ι : Type*} [Fintype α] [Fintype ι]
+noncomputable def relabelledUnitary (μ : YoungDiagram) (e : α ≃ Cell μ) :
+    Representation ℂ (Equiv.Perm α) (hilbertSpace μ) :=
+  (unitaryRepresentation μ).comp e.permCongrHom.toMonoidHom
+end CubeShuffle.Specht
+namespace CubeShuffle.UnitaryFinite
+open scoped BigOperators ComplexConjugate Classical
+variable {G : Type*} [Group G] [Fintype G]
+variable {V W : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+  [FiniteDimensional ℂ V] [NormedAddCommGroup W] [InnerProductSpace ℂ W]
+  [FiniteDimensional ℂ W]
+def IsUnitary (ρ : Representation ℂ G V) : Prop :=
+  ∀ g v w, inner ℂ (ρ g v) (ρ g w) = inner ℂ v w
+end CubeShuffle.UnitaryFinite
+noncomputable section
+open scoped BigOperators Classical
+namespace RowColumn
+open CubeShuffle CubeShuffle.Specht CubeShuffle.UnitaryFinite
+def lineGroup {α β : Type*} (f : α → β) : Subgroup (Equiv.Perm α) where
+  carrier := {g | ∀ x, f (g x) = f x}
+  one_mem' := by intro x; rfl
+  mul_mem' := by
+    intro a b ha hb x
+    exact (ha (b x)).trans (hb x)
+  inv_mem' := by
+    intro a ha x
+    simpa using (ha (a⁻¹ x)).symm
+abbrev Board (m n : ℕ) := Fin m × Fin n
+abbrev rowGroup {m n : ℕ} (Ω : Finset (Board m n)) :=
+  lineGroup (fun x : Ω => x.1.1)
+abbrev columnGroup {m n : ℕ} (Ω : Finset (Board m n)) :=
+  lineGroup (fun x : Ω => x.1.2)
+def InHook (a : YoungDiagram) (h : ℕ) : Prop :=
+  ∀ c ∈ a.cells, c.1 < h ∨ c.2 < h
+section Copies
+variable {G V W : Type*} [Group G]
+  [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
+  [NormedAddCommGroup W] [InnerProductSpace ℂ W] [FiniteDimensional ℂ W]
+def Intertwines (ρ : Representation ℂ G V) (τ : Representation ℂ G W)
+    (I : V →ₗ[ℂ] W) : Prop :=
+  ∀ g v, I (ρ g v) = τ g (I v)
+def CompleteCopies (ρ : Representation ℂ G V) (τ : Representation ℂ G W)
+    {u : ℕ} (I : Fin u → V →ₗᵢ[ℂ] W) : Prop :=
+  (∀ i, Intertwines ρ τ (I i).toLinearMap) ∧
+  (∀ i j, i ≠ j → ∀ v w, inner ℂ (I i v) (I j w) = 0) ∧
+  ∀ J : V →ₗ[ℂ] W, Intertwines ρ τ J →
+    LinearMap.range J ≤ ⨆ i, LinearMap.range (I i).toLinearMap
+end Copies
+def allCopyOverlap {V W X : Type*}
+    [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
+    [NormedAddCommGroup W] [InnerProductSpace ℂ W] [FiniteDimensional ℂ W]
+    [NormedAddCommGroup X] [InnerProductSpace ℂ X] [FiniteDimensional ℂ X]
+    {u v : ℕ} (I : Fin u → V →ₗᵢ[ℂ] X) (J : Fin v → W →ₗᵢ[ℂ] X) : ℝ :=
+  ∑ i,
 […]
 
 === LEAN COMPARATOR WeightedSweepMoments (exact formal statement)
@@ -614,7 +939,94 @@ lemma orbit_mem_space (μ : YoungDiagram) (p : Equiv.Perm (Cell μ)) :
     tabloidRep μ p (polytabloid μ) ∈ space μ := Submodule.subset_span ⟨p,rfl⟩
 lemma action_mem_space (μ : YoungDiagram) (p : Equiv.Perm (Cell μ))
     (v : Tabloid μ → ℂ) (hv : v ∈ space μ) : tabloidRep μ p v ∈ space μ := by
-  induction hv using Su
+  induction hv using Submodule.span_induction with
+  | mem v hv =>
+    obtain ⟨q,rfl⟩ := hv
+    change ((tabloidRep μ p)*(tabloidRep μ q)) (polytabloid μ) ∈ space μ
+    rw [←map_mul]
+    exact orbit_mem_space μ (p*q)
+  | zero => simp
+  | add v w hv hw ihv ihw => simpa using (space μ).add_mem ihv ihw
+  | smul a v hv ih => simpa using (space μ).smul_mem a ih
+noncomputable def subrepresentation (μ : YoungDiagram) : Subrepresentation (tabloidRep μ) :=
+  ⟨space μ, fun p v hv => action_mem_space μ p v hv⟩
+noncomputable def representation (μ : YoungDiagram) :
+    Representation ℂ (Equiv.Perm (Cell μ)) (space μ) :=
+  (subrepresentation μ).toRepresentation
+end CubeShuffle.Specht
+namespace CubeShuffle.PermutationHilbert
+open scoped BigOperators ComplexConjugate Classical
+open Complex
+variable {X : Type*} [Fintype X]
+abbrev H (X : Type*) [Fintype X] := EuclideanSpace ℂ X
+end CubeShuffle.PermutationHilbert
+namespace CubeShuffle.Specht
+open scoped BigOperators Classical
+noncomputable def hilbertEquiv (μ : YoungDiagram) :
+    (Tabloid μ → ℂ) ≃ₗ[ℂ] PermutationHilbert.H (Tabloid μ) :=
+  (WithLp.linearEquiv 2 ℂ (Tabloid μ → ℂ)).symm
+noncomputable def hilbertSpace (μ : YoungDiagram) :
+    Submodule ℂ (PermutationHilbert.H (Tabloid μ)) := (space μ).map (hilbertEquiv μ).toLinearMap
+noncomputable def spaceHilbertEquiv (μ : YoungDiagram) : space μ ≃ₗ[ℂ] hilbertSpace μ :=
+  (hilbertEquiv μ).submoduleMap (space μ)
+noncomputable def unitaryRepresentation (μ : YoungDiagram) :
+    Representation ℂ (Equiv.Perm (Cell μ)) (hilbertSpace μ) :=
+  ((spaceHilbertEquiv μ).conjAlgEquiv ℂ).toMonoidHom.comp (representation μ)
+variable {α ι : Type*} [Fintype α] [Fintype ι]
+noncomputable def relabelledUnitary (μ : YoungDiagram) (e : α ≃ Cell μ) :
+    Representation ℂ (Equiv.Perm α) (hilbertSpace μ) :=
+  (unitaryRepresentation μ).comp e.permCongrHom.toMonoidHom
+end CubeShuffle.Specht
+namespace CubeShuffle
+open scoped BigOperators
+open Filter
+abbrev Card (d : ℕ) := Fin d → Bool
+def Coins : ℕ → Type
+  | 0 => Unit
+  | d + 1 => Card d → Bool
+instance (d : ℕ) : Fintype (Coins d) := by
+  cases d <;> dsimp [Coins] <;> infer_instance
+instance (d : ℕ) : Nonempty (Coins d) := by
+  cases d <;> dsimp [Coins] <;> infer_instance
+def switchFun {d : ℕ} (ξ : Card d → Bool) (x : Card (d + 1)) : Card (d + 1) :=
+  Fin.cons (Bool.xor (x 0) (ξ (Fin.tail x))) (Fin.tail x)
+theorem switchFun_involutive {d : ℕ} (ξ : Card d → Bool) :
+    Function.Involutive (switchFun ξ) := by
+  intro x
+  funext i
+  refine Fin.cases ?_ (fun j => ?_) i
+  · simp only [switchFun, Fin.cons_zero, Fin.tail_cons]
+    cases x 0 <;> cases ξ (Fin.tail x) <;> rfl
+  · simp [switchFun, Fin.tail]
+def pairSwitch {d : ℕ} (ξ : Card d → Bool) : Equiv.Perm (Card (d + 1)) :=
+  { toFun := switchFun ξ
+    invFun := switchFun ξ
+    left_inv := switchFun_involutive ξ
+    right_inv := switchFun_involutive ξ }
+def rotate (d : ℕ) : Equiv.Perm (Card d) where
+  toFun x i := x (finRotate d i)
+  invFun x i := x ((finRotate d).symm i)
+  left_inv x := by funext i; simp only [Equiv.apply_symm_apply]
+  right_inv x := by funext i; simp only [Equiv.symm_apply_apply]
+def step : (d : ℕ) → Coins d → Equiv.Perm (Card d)
+  | 0, _ => 1
+  | d + 1, ξ => rotate (d + 1) * pairSwitch ξ
+def run (d : ℕ) : (t : ℕ) → (Fin t → Coins d) → Equiv.Perm (Card d)
+  | 0, _ => 1
+  | t + 1, ω => step d (ω (Fin.last t)) * run d t (fun i => ω i.castSucc)
+lemma card_positions (d : ℕ) : Fintype.card (Card d) = 2 ^ d := by
+  simp [Card]
+end CubeShuffle
+namespace CubeShuffle.Specht
+open scoped BigOperators Classical
+@[simp] lemma card_cell (μ : YoungDiagram) : Fintype.card (Cell μ) = μ.card := by
+  simp [Cell, YoungDiagram.card]
+abbrev Shapes (N : ℕ) := {μ : YoungDiagram // μ.card = N}
+noncomputable def labels {N : ℕ} (μ : Shapes N) : Cell μ.1 ≃ Fin N :=
+  (Fintype.equivFin (Cell μ.1)).trans (finCongr ((card_cell μ.1).trans μ.2))
+noncomputable def cardLabels (d : ℕ) (μ : Shapes (2^d)) : Card d ≃ Cell μ.1 :=
+  ((Fintype.equivFin (Card d)).trans (finCongr (card_positions d))).trans (labels μ).symm
+nonc
 […]
 
 === LEAN COMPARATOR CoordinateTrace (exact formal statement)
@@ -711,7 +1123,87 @@ noncomputable def tabloidRep (μ : YoungDiagram) :
     ext v f
     simp only [mul_inv_rev,tabloidAct_mul,Equiv.Perm.mul_apply]
     rfl
-noncomput
+noncomputable def delta {μ : YoungDiagram} (f : Tabloid μ) : Tabloid μ → ℂ :=
+  fun g => if g=f then 1 else 0
+noncomputable def colGroup (μ : YoungDiagram) : Subgroup (Equiv.Perm (Cell μ)) where
+  carrier := {p | ∀ x, col (p x) = col x}
+  one_mem' := by intro x; rfl
+  mul_mem' := by intro p q hp hq x; exact (hp (q x)).trans (hq x)
+  inv_mem' := by intro p hp x; simpa using (hp (p⁻¹ x)).symm
+noncomputable def permSign {α : Type*} [Fintype α] [DecidableEq α] (p : Equiv.Perm α) : ℂ :=
+  ((Equiv.Perm.sign p : ℤ) : ℂ)
+end Thorp.Specht
+namespace Thorp.Specht
+open scoped BigOperators Classical
+variable {α V : Type*} [Fintype α] [DecidableEq α] [AddCommGroup V] [Module ℂ V]
+noncomputable def alternator (C : Subgroup (Equiv.Perm α))
+    (ρ : Representation ℂ (Equiv.Perm α) V) : Module.End ℂ V := by
+  classical
+  exact ∑ c : C, permSign (c : Equiv.Perm α) • ρ c
+end Thorp.Specht
+namespace Thorp.Specht
+open scoped BigOperators Classical
+noncomputable def polytabloid (μ : YoungDiagram) : Tabloid μ → ℂ :=
+  alternator (colGroup μ) (tabloidRep μ) (delta (baseTabloid μ))
+noncomputable def space (μ : YoungDiagram) : Submodule ℂ (Tabloid μ → ℂ) :=
+  Submodule.span ℂ (Set.range (fun p : Equiv.Perm (Cell μ) => tabloidRep μ p (polytabloid μ)))
+lemma orbit_mem_space (μ : YoungDiagram) (p : Equiv.Perm (Cell μ)) :
+    tabloidRep μ p (polytabloid μ) ∈ space μ := Submodule.subset_span ⟨p,rfl⟩
+lemma action_mem_space (μ : YoungDiagram) (p : Equiv.Perm (Cell μ))
+    (v : Tabloid μ → ℂ) (hv : v ∈ space μ) : tabloidRep μ p v ∈ space μ := by
+  induction hv using Submodule.span_induction with
+  | mem v hv =>
+    obtain ⟨q,rfl⟩ := hv
+    change ((tabloidRep μ p)*(tabloidRep μ q)) (polytabloid μ) ∈ space μ
+    rw [←map_mul]
+    exact orbit_mem_space μ (p*q)
+  | zero => simp
+  | add v w hv hw ihv ihw => simpa using (space μ).add_mem ihv ihw
+  | smul a v hv ih => simpa using (space μ).smul_mem a ih
+noncomputable def subrepresentation (μ : YoungDiagram) : Subrepresentation (tabloidRep μ) :=
+  ⟨space μ, fun p v hv => action_mem_space μ p v hv⟩
+noncomputable def representation (μ : YoungDiagram) :
+    Representation ℂ (Equiv.Perm (Cell μ)) (space μ) :=
+  (subrepresentation μ).toRepresentation
+end Thorp.Specht
+namespace Thorp.PermutationHilbert
+open scoped BigOperators ComplexConjugate Classical
+open Complex
+variable {X : Type*} [Fintype X]
+abbrev H (X : Type*) [Fintype X] := EuclideanSpace ℂ X
+end Thorp.PermutationHilbert
+namespace Thorp.Specht
+open scoped BigOperators Classical
+noncomputable def hilbertEquiv (μ : YoungDiagram) :
+    (Tabloid μ → ℂ) ≃ₗ[ℂ] PermutationHilbert.H (Tabloid μ) :=
+  (WithLp.linearEquiv 2 ℂ (Tabloid μ → ℂ)).symm
+noncomputable def hilbertSpace (μ : YoungDiagram) :
+    Submodule ℂ (PermutationHilbert.H (Tabloid μ)) := (space μ).map (hilbertEquiv μ).toLinearMap
+end Thorp.Specht
+namespace Thorp.UnitaryFinite
+open scoped BigOperators ComplexConjugate Classical
+variable {G : Type*} [Group G] [Fintype G]
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
+noncomputable def continuousRepresentation (ρ : Representation ℂ G V) : G →* (V →L[ℂ] V) where
+  toFun g := (ρ g).toContinuousLinearMap
+  map_one' := by ext v; simp
+  map_mul' g h := by ext v; simp
+end Thorp.UnitaryFinite
+namespace Thorp.UnitaryFinite
+open scoped BigOperators Classical
+variable {G : Type*} [Group G] [Fintype G]
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
+variable {Ω Ξ : Type*} [Fintype Ω] [Fintype Ξ]
+noncomputable def sampleOperator (ρ : Representation ℂ G V) (P : Ω → G) : V →L[ℂ] V :=
+  (Fintype.card Ω:ℂ)⁻¹ • ∑ ω,continuousRepresentation ρ (P ω)
+end Thorp.UnitaryFinite
+namespace Thorp.Specht
+open scoped BigOperators Classical
+noncomputable def spaceHilbertEquiv (μ : YoungDiagram) : space μ ≃ₗ[ℂ] hilbertSpace μ :=
+  (hilbertEquiv μ).submoduleMap (space μ)
+noncomputable def unitaryRepresentation (μ : YoungDiagram) :
+    Representation ℂ (Equiv.Perm (Cell μ)) (hilbertSpace μ) :=
+  ((spaceHilbertEquiv μ).
 […]
 
 === LEAN COMPARATOR ThorpWeightedCompatibility (exact formal statement)
@@ -867,7 +1359,103 @@ variable {H : Type*} [Group H] [Fintype H]
 def alternator (ι : H →* G) (χ : H →* ℂ) : Module.End ℂ (EuclideanSpace ℂ X) :=
   ∑ h, χ h • rep (ι h)
 omit [Fintype X] in
-lemma alternator_apply (ι : H →* G) (χ : H →* ℂ) (v : EuclideanSpace ℂ X) 
+lemma alternator_apply (ι : H →* G) (χ : H →* ℂ) (v : EuclideanSpace ℂ X) :
+    alternator ι χ v = ∑ h, χ h • rep (ι h) v := by
+  simp [alternator, LinearMap.sum_apply]
+lemma rep_alternator
+    {G : Type*} {H : Type*} {X : Type*}
+    [Group G]
+    [Group H]
+    [Fintype H]
+    [Fintype X]
+    [MulAction G X] (ι : H →* G) (χ : H →* ℂ) (a : H)
+    (v : EuclideanSpace ℂ X) :
+    rep (ι a) (alternator ι χ v) = χ a⁻¹ • alternator ι χ v := by
+  rw [alternator_apply, map_sum, Finset.smul_sum]
+  have he := Equiv.sum_comp (Equiv.mulLeft a)
+    (fun h => χ a⁻¹ • (χ h • (rep (ι h) v : EuclideanSpace ℂ X)))
+  rw [← he]
+  apply Finset.sum_congr rfl
+  intro h _
+  simp only [Equiv.coe_mulLeft, smul_smul, map_mul, map_smul]
+  rw [show χ a⁻¹ * (χ a * χ h) = χ h by
+    rw [← mul_assoc, ← map_mul, inv_mul_cancel, map_one, one_mul]]
+  rfl
+end PermutationSpace
+variable {α : Type*} [Fintype α]
+def complexSign : Equiv.Perm α →* ℂ where
+  toFun g := ((Equiv.Perm.sign g : ℤˣ) : ℤ)
+  map_one' := by simp
+  map_mul' := by intro g h; simp
+@[simp] lemma complexSign_inv (g : Equiv.Perm α) : complexSign g⁻¹ = complexSign g := by
+  simp [complexSign]
+end SpinAngle.Specht
+namespace SpinAngle.Young
+abbrev Cells (D : YoungDiagram) := {p : ℕ × ℕ // p ∈ D.cells}
+end SpinAngle.Young
+namespace SpinAngle.PolynomialCarrier
+open scoped Classical Matrix
+open SpinAngle.Specht SpinAngle.Young
+variable {ι n : Type*} [Fintype ι] [DecidableEq ι] [Fintype n] [DecidableEq n]
+instance coloringAction : MulAction (Equiv.Perm ι) (ι → n) where
+  smul g x := x ∘ g.symm
+  one_smul _ := rfl
+  mul_smul _ _ _ := rfl
+def reindex (g : Equiv.Perm ι) : (ι → n) ≃ (ι → n) where
+  toFun x := x ∘ g
+  invFun x := x ∘ g.symm
+  left_inv x := by funext i; simp
+  right_inv x := by funext i; simp
+lemma action_site_commute (a : Matrix n n ℂ) (g : Equiv.Perm ι)
+    (v : EuclideanSpace ℂ (ι → n)) :
+    TensorRep.action a (PermutationSpace.rep g v) =
+      PermutationSpace.rep g (TensorRep.action a v) := by
+  ext x
+  change (∑ y, TensorRep.tensor (fun _ : ι => a) x y * v (y ∘ g)) =
+    ∑ y, TensorRep.tensor (fun _ : ι => a) (x ∘ g) y * v y
+  rw [← Equiv.sum_comp (reindex (n := n) g)
+    (fun y => TensorRep.tensor (fun _ : ι => a) (x ∘ g) y * v y)]
+  apply Finset.sum_congr rfl
+  intro y _
+  change _ = TensorRep.tensor (fun _ : ι => a) (x ∘ g) (y ∘ g) * v (y ∘ g)
+  rw [TensorRep.tensor_reindex]
+def columnGroup (D : YoungDiagram) : Subgroup (Equiv.Perm (Cells D)) where
+  carrier := {g | ∀ x, (g x).val.2 = x.val.2}
+  one_mem' := fun _ => rfl
+  mul_mem' := by intro g h hg hh x; exact (hg (h x)).trans (hh x)
+  inv_mem' := by
+    intro g hg x
+    simpa using (hg (g⁻¹ x)).symm
+variable (D : YoungDiagram) (q : ℕ)
+abbrev TensorSpace := EuclideanSpace ℂ (Cells D → Fin q)
+def alternating : Subrepresentation (TensorRep.rep (ι := Cells D) (n := Fin q)) where
+  toSubmodule := {
+    carrier := {v | ∀ g : columnGroup D,
+      PermutationSpace.rep (g : Equiv.Perm (Cells D)) v = complexSign g.val • v}
+    zero_mem' := by intro g; simp
+    add_mem' := by intro x y hx hy g; simp [map_add, hx g, hy g, smul_add]
+    smul_mem' := by intro c x hx g; simp [map_smul, hx g, smul_comm c] }
+  apply_mem_toSubmodule a := by
+    intro v hv g
+    change PermutationSpace.rep g.val (TensorRep.action (a : Matrix (Fin q) (Fin q) ℂ) v) = _
+    rw [← action_site_commute, hv g, map_smul]
+    rfl
+variable (hq : D.colLen 0 ≤ q)
+def rowColor : Cells D → Fin q := fun x => ⟨x.val.1, by
+  have hm := D.up_left_mem le_rfl (Nat.zero_le x.val.2) x.property
+  have hl := YoungDiagram.mem_iff_lt_colLen.mp hm
+  exact lt_of_lt_of_le hl hq⟩
+def highest : TensorSpace D q := by
+  classical
+  exact PermutationSpace.alternator (columnGroup D).subtype
+    (complexSign.comp (columnGroup D).subtype)
+    (EuclideanSpace.single (rowColor D q hq) (1 : ℂ))
+lemma highest_mem : highest D q hq ∈ alternating D q := by
+  classical
+  intro g
+  change PermutationSpace.rep g.val (PermutationSpace.alternator _ _ _) = _
+  have hh := PermutationSpace.rep_alternator (columnGroup D).subtype
+    (complexSign.comp (columnGroup D).subtype) g (EuclideanSpace.s
 […]
 
 === LEAN COMPARATOR SignedSweepMoment (exact formal statement)
@@ -956,8 +1544,66 @@ def spechtDimension {n : ℕ} (lam : Partition n) : ℕ := finrank ℂ (Specht l
 def blockEmbedding {u v l n : ℕ} (h : u + v + l = n)
     (a : SymmetricGroup u) (b : SymmetricGroup v) (c : SymmetricGroup l) :
     SymmetricGroup n :=
-  let e
-[…]
+  let e : (Fin u ⊕ Fin v) ⊕ Fin l ≃ Fin n :=
+    ((Equiv.sumCongr finSumFinEquiv (Equiv.refl (Fin l))).trans finSumFinEquiv).trans
+      (finCongr h)
+  e.permCongr ((a.sumCongr b).sumCongr c)
+def SignedOccurrence {u v l n : ℕ} (h : u + v + l = n)
+    (α : Partition u) (β : Partition v) (γ : Partition l) (lam : Partition n) : Prop :=
+  ∃ f : ((Specht α ⊗[ℂ] Specht β.transpose) ⊗[ℂ] Specht γ) →ₗ[ℂ] Specht lam,
+    Function.Injective f ∧
+    ∀ (a : SymmetricGroup u) (b : SymmetricGroup v) (c : SymmetricGroup l) x,
+      f (TensorProduct.map
+        (TensorProduct.map (spechtRepresentation α a) (spechtRepresentation β.transpose b))
+        (spechtRepresentation γ c) x) =
+      spechtRepresentation lam (blockEmbedding h a b c) (f x)
+abbrev BinaryPositions (d : ℕ) := Fin d → Fin 2
+def positionsEquiv (d : ℕ) : BinaryPositions d ≃ Fin (2 ^ d) :=
+  Fintype.equivFinOfCardEq (by simp [BinaryPositions])
+def coordinateSubgroup (d : ℕ) (i : Fin d) : Subgroup (SymmetricGroup (2 ^ d)) :=
+  fiberSubgroup (fun x : Fin (2 ^ d) =>
+    fun j : {j : Fin d // j ≠ i} => (positionsEquiv d).symm x j.1)
+def layerOperator {d : ℕ} (lam : Partition (2 ^ d)) (i : Fin d) :
+    Specht lam →ₗ[ℂ] Specht lam := by
+  classical
+  exact (Fintype.card (coordinateSubgroup d i) : ℂ)⁻¹ •
+    ∑ g : coordinateSubgroup d i, spechtRepresentation lam g.1
+def sweepOperator {d : ℕ} (lam : Partition (2 ^ d)) : Specht lam →ₗ[ℂ] Specht lam :=
+  ((List.ofFn (layerOperator lam)).reverse).prod
+def positiveSquare {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+    [FiniteDimensional ℂ E] (T : E →ₗ[ℂ] E) : E →ₗ[ℂ] E := T.adjoint * T
+def sweepSquare {d : ℕ} (lam : Partition (2 ^ d)) : Specht lam →ₗ[ℂ] Specht lam :=
+  positiveSquare (E := Specht lam) (sweepOperator lam)
+def weightedMoment {d : ℕ} (lam : Partition (2 ^ d)) (r : ℕ) : ℝ :=
+  (spechtDimension lam : ℝ) * (LinearMap.trace ℂ (Specht lam) (sweepSquare lam ^ r)).re
+def logMoment (x : ℝ) : EReal := if x = 0 then ⊥ else (Real.log x : EReal)
+def signedEntropy {u v : ℕ} (α : Partition u) (β : Partition v) : ℝ :=
+  ((α.1.rowLens ++ β.1.rowLens).map
+    (fun a : ℕ => (a : ℝ) * Real.log (((u : ℝ) + v) / a))).sum
+def coefficient (a : ℝ) (d : ℕ) : ℝ := a * (1 - 1 / (2 * Real.sqrt d))
+def remainderBudget (κ : ℝ) (d l : ℕ) : ℝ :=
+  if l = 0 then 0 else
+    max 0 (coefficient κ d * l * Real.log (2 ^ d : ℕ) -
+      (l : ℝ) * Real.log ((2 ^ d : ℕ) / (l : ℝ)))
+theorem signed_occurrence_moment_bound :
+    ∃ η₀ : ℝ, 0 < η₀ ∧
+      ∀ η : ℝ, 0 < η → η < η₀ →
+        ∃ κ₀ : ℝ, 0 < κ₀ ∧ κ₀ < η / 256 ∧
+          ∀ κ : ℝ, 0 < κ → κ < κ₀ →
+            ∃ r : ℕ, 1 ≤ r ∧
+              ∀ d : ℕ, 1 ≤ d →
+                ∀ lam : Partition (2 ^ d),
+                  ∀ (u v l : ℕ) (h : u + v + l = 2 ^ d)
+                    (α : Partition u) (β : Partition v) (γ : Partition l),
+                    SignedOccurrence h α β γ lam →
+                      logMoment (weightedMoment lam r) ≤
+                        ((coefficient η d * signedEntropy α β +
+                            remainderBudget κ d l : ℝ) : EReal) := by
+  sorry
+end SignedSweeps
+end
+end OAI
+
 
 === LEAN COMPARATOR BinarySweep (exact formal statement)
 import Mathlib
@@ -1123,7 +1769,89 @@ structure Holes (G : Grid) (h : ℕ) where
 namespace Holes
 variable {G : Grid} {h : ℕ}
 def Compatible (H : G.Holes h) (ω : G.Choices) : Prop :=
-  ∀ i
+  ∀ i (t : Fin (G.b + 1)), G.boundary ω t (H.path i 0) = H.path i t
+def Feasible (H : G.Holes h) : Prop := ∃ ω, H.Compatible ω
+def lineCount (H : G.Holes h) (j : Fin G.b) (L : G.Line j) : ℕ :=
+  (Finset.univ.filter (fun i : Fin h =>
+    (fun k : {k : Fin G.b // k ≠ j} => H.path i j.castSucc k) = L)).card
+def cost (H : G.Holes h) : ℝ :=
+  ∑ j, ∑ L : G.Line j,
+    Real.log (((2 ^ G.bits j : ℕ) : ℝ) ^ H.lineCount j L /
+      ((2 ^ G.bits j).descFactorial (H.lineCount j L) : ℝ))
+def stabilizer (H : G.Holes h) : Subgroup (Equiv.Perm G.Slot) where
+  carrier g := ∀ i, g (H.path i 0) = H.path i 0
+  one_mem' _ := rfl
+  mul_mem' := by
+    intro g g' hg hg' i
+    change g (g' (H.path i 0)) = H.path i 0
+    rw [hg' i, hg i]
+  inv_mem' hg i := (Equiv.symm_apply_eq _).mpr (hg i).symm
+def reference (H : G.Holes h) (hf : H.Feasible) : G.Choices := hf.choose
+theorem reference_compatible (H : G.Holes h) (hf : H.Feasible) :
+    H.Compatible (H.reference hf) := hf.choose_spec
+def residual (H : G.Holes h) (hf : H.Feasible) (ω : {ω : G.Choices // H.Compatible ω}) :
+    H.stabilizer :=
+  ⟨(G.sweep (H.reference hf))⁻¹ * G.sweep ω.val, by
+    intro i
+    change (G.sweep (H.reference hf)).symm (G.sweep ω.val (H.path i 0)) = H.path i 0
+    apply (Equiv.symm_apply_eq _).mpr
+    exact (ω.property i (Fin.last _)).trans ((H.reference_compatible hf i (Fin.last _)).symm)⟩
+end Holes
+def choiceWeight (G : Grid) (z : ℝ) (ω : G.Choices) : ℝ :=
+  ∏ j, ∏ L : G.Line j,
+    ((1-z) * (Fintype.card (Equiv.Perm (Cube (G.bits j))) : ℝ)⁻¹ +
+      z * binaryLaw (G.bits j) (ω j L))
+namespace Holes
+variable {G : Grid} {h : ℕ}
+def probability (H : G.Holes h) (z : ℝ) : ℝ :=
+  ∑ ω : {ω : G.Choices // H.Compatible ω}, G.choiceWeight z ω.val
+end Holes
+def eventDistance (G : Grid) (E : Finset G.Choices) (z : ℝ) : ℝ :=
+  ∑ ω ∈ E, |G.choiceWeight z ω/(∑ v ∈ E, G.choiceWeight z v)-
+    G.choiceWeight 0 ω/(∑ v ∈ E, G.choiceWeight 0 v)|
+end Grid
+structure UnitaryIrrep (Γ : Type*) [Group Γ] where
+  dimension : ℕ
+  positive : 0 < dimension
+  matrix : Γ →* Matrix (Fin dimension) (Fin dimension) ℂ
+  unitary : ∀ g, (matrix g).conjTranspose * matrix g = 1
+  irreducible : ∀ S : Submodule ℂ (Fin dimension → ℂ),
+    (∀ g v, v ∈ S → (matrix g).mulVec v ∈ S) → S = ⊥ ∨ S = ⊤
+def schattenMoment {D : ℕ} (q : ℕ) (K : Matrix (Fin D) (Fin D) ℂ) : ℝ :=
+  (Matrix.trace ((K.conjTranspose * K) ^ q)).re
+namespace Grid.Holes
+variable {G : Grid} {h : ℕ}
+def conditionalAverage (H : G.Holes h) (hf : H.Feasible) (z : ℝ)
+    (ρ : UnitaryIrrep H.stabilizer) : Matrix (Fin ρ.dimension) (Fin ρ.dimension) ℂ :=
+  (H.probability z : ℂ)⁻¹ •
+    ∑ ω : {ω : G.Choices // H.Compatible ω},
+      (G.choiceWeight z ω.val : ℂ) • ρ.matrix (H.residual hf ω)
+end Grid.Holes
+def a : ℝ := 1 / 100
+def c0 : ℝ := a / 100
+def e0 : ℝ := a / 100
+def c (s : ℕ) : ℝ := c0 + 1 / Real.sqrt (Real.log s)
+def e (s : ℕ) : ℝ := e0 - 1 / Real.sqrt (Real.log s)
+def logMoment (t : ℝ) : EReal := if t = 0 then ⊥ else (Real.log t : EReal)
+def ConditionalMain : Prop :=
+  ∃ (r q : ℕ) (zStar : ℝ), 1 ≤ r ∧ 1 ≤ q ∧ 0 < zStar ∧ zStar ≤ 1 / ((2 : ℕ) : ℝ) ∧
+    ∀ (G : Grid), G.Allowed r → ∀ (h : ℕ) (H : G.Holes h) (hf : H.Feasible),
+    ∀ z ∈ Set.Icc 0 zStar, ∀ ρ : UnitaryIrrep H.stabilizer,
+      logMoment (schattenMoment q (H.conditionalAverage hf z ρ)) ≤
+        ((-c G.size * Real.log ρ.dimension + e G.size * h * Real.log G.size - H.cost : ℝ) : EReal)
+def MomentBound (G : Grid) (q : ℕ) (z : ℝ) : Prop :=
+  ∀ (h : ℕ) (H : G.Holes h) (hf : H.Feasible) (σ : UnitaryIrrep H.stabilizer),
+    schattenMoment q (H.conditionalAverage hf z σ) ≤
+      Real.exp (-c G.size*Real.log σ.dimension+e G.size*h*Real.log G.size-H.cost)
+def ScaleLarge (r : ℕ) : Prop :=
+  1 ≤ r ∧ (2/e0)^2 ≤ (r : ℝ)*Real.log 2 ∧ 4/e0 ≤ (r : ℝ)*Real.log 2
+def baseWidth (r : ℕ) : ℝ := ((2^(2*r)).factorial : ℕ)
+def baseZeta (r : ℕ) : ℝ := 1/(4*(baseWidth r)^2)
+namespace ScalarInduction
+structure MainSizeReady (q : ℕ) (s : ℝ) : Prop where
+  one : 1 ≤ Real.log s
+  sparse : (100004:ℝ)*s^(1-a/4) ≤ s^(1-(1:ℝ)/1600)
+
 […]
 
 === LEAN COMPARATOR FourRowPermanent (exact formal statement)

@@ -83,5 +83,92 @@ noncomputable def fourierConjugate (f : FourierL2) : FourierL2 :=
     simpa only [Complex.norm_conj, Function.comp_def, Equiv.neg_apply] using
       (Equiv.neg frequencyLattice).summable_iff.mpr
         ((lp.memℓp f).summable (by norm_num : 0 < (2 : ℝ≥0∞).toReal))⟩
-run_cmd Lean.modifyEnv fun env => Lean.Meta.
+run_cmd Lean.modifyEnv fun env => Lean.Meta.auxLemmasExt.setState env {}
+noncomputable def sobolevOddPower (k : ℝ) (hk : 6 < k) : ℕ → FourierL2 → FourierL2
+  | 0, f => f
+  | m + 1, f => sobolevProduct k hk
+      (sobolevProduct k hk (sobolevOddPower k hk m f) (fourierConjugate f)) f
+run_cmd Lean.modifyEnv fun env => Lean.Meta.auxLemmasExt.setState env {}
+noncomputable def schrodingerMultiplier (t : ℝ) (n : frequencyLattice) : ℂ :=
+  Complex.exp (-Complex.I * ((t * ‖n‖ ^ 2 : ℝ) : ℂ))
+noncomputable def schrodingerFlow (t : ℝ) : FourierL2 →ₗᵢ[ℂ] FourierL2 where
+  toFun f := ⟨fun n => schrodingerMultiplier t n * f n, by
+    apply (lp.memℓp f).mono'
+    intro n
+    simp only [norm_mul, schrodingerMultiplier, Complex.norm_exp, Complex.mul_re,
+      Complex.neg_re, Complex.neg_im, Complex.I_re, Complex.I_im,
+      Complex.ofReal_re, Complex.ofReal_im, neg_zero, zero_mul, mul_zero,
+      sub_zero, Real.exp_zero, one_mul]
+    exact le_rfl⟩
+  map_add' f g := by
+    ext n
+    change schrodingerMultiplier t n * (f n + g n) =
+      schrodingerMultiplier t n * f n + schrodingerMultiplier t n * g n
+    exact mul_add _ _ _
+  map_smul' c f := by ext n; simp [mul_left_comm]
+  norm_map' f := by
+    have hm (n : frequencyLattice) : ‖schrodingerMultiplier t n‖ = 1 := by
+      simp only [schrodingerMultiplier, Complex.norm_exp, Complex.mul_re, Complex.neg_re,
+        Complex.neg_im, Complex.I_re, Complex.I_im, Complex.ofReal_re, Complex.ofReal_im,
+        neg_zero, zero_mul, mul_zero, sub_zero, Real.exp_zero]
+    apply le_antisymm
+    · apply lp.norm_mono (by norm_num : (2 : ℝ≥0∞) ≠ 0)
+      intro n
+      change ‖schrodingerMultiplier t n * f n‖ ≤ ‖f n‖
+      rw [norm_mul, hm, one_mul]
+    · apply lp.norm_mono (by norm_num : (2 : ℝ≥0∞) ≠ 0)
+      intro n
+      change ‖f n‖ ≤ ‖schrodingerMultiplier t n * f n‖
+      rw [norm_mul, hm, one_mul]
+run_cmd Lean.modifyEnv fun env => Lean.Meta.auxLemmasExt.setState env {}
+noncomputable def fourierContraction (m : frequencyLattice → ℂ)
+    (hm : ∀ n, ‖m n‖ ≤ 1) : FourierL2 →L[ℂ] FourierL2 :=
+  LinearMap.mkContinuous
+    { toFun := fun f => ⟨fun n => m n * f n, (lp.memℓp f).mono' (by
+        intro n
+        rw [norm_mul]
+        simpa using mul_le_mul_of_nonneg_right (hm n) (norm_nonneg (f n)))⟩
+      map_add' := by
+        intro f g
+        ext n
+        change m n * (f n + g n) = m n * f n + m n * g n
+        exact mul_add _ _ _
+      map_smul' := by
+        intro c f
+        ext n
+        change m n * (c * f n) = c * (m n * f n)
+        ring }
+    1 (by
+      intro f
+      simp only [one_mul]
+      apply lp.norm_mono (by norm_num : (2 : ℝ≥0∞) ≠ 0)
+      intro n
+      change ‖m n * f n‖ ≤ ‖f n‖
+      rw [norm_mul]
+      simpa using mul_le_mul_of_nonneg_right (hm n) (norm_nonneg (f n)))
+noncomputable def lowerSobolevInclusion : FourierL2 →L[ℂ] FourierL2 :=
+  fourierContraction (fun n => (((1 + ‖n‖ ^ 2)⁻¹ : ℝ) : ℂ)) (by
+    intro n
+    rw [Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (by positivity)]
+    exact inv_le_one_of_one_le₀ (le_add_of_nonneg_right (sq_nonneg _)))
+noncomputable def lowerSobolevGenerator : FourierL2 →L[ℂ] FourierL2 :=
+  fourierContraction (fun n => -Complex.I * (((‖n‖ ^ 2 / (1 + ‖n‖ ^ 2)) : ℝ) : ℂ)) (by
+    intro n
+    rw [norm_mul, norm_neg, Complex.norm_I, one_mul, Complex.norm_real,
+      Real.norm_eq_abs, abs_of_nonneg (by positivity)]
+    exact (div_le_one (by positivity)).mpr (by linarith [sq_nonneg ‖n‖]))
+run_cmd Lean.modifyEnv fun env => Lean.Meta.auxLemmasExt.setState env {}
+noncomputable def schrodingerInteractionField (k : ℝ) (hk : 6 < k) (m : ℕ)
+    (t : ℝ) (f : FourierL2) : FourierL2 :=
+  (-Complex.I) • schrodingerFlow (-t) (sobolevOddPower k hk m (schrodingerFlow t f))
+run_cmd Lean.modifyEnv fun env => Lean.Meta.auxLemmasExt.setState env {}
+structure SobolevInteractionPatch (k : ℝ) (hk : 6 < k) (m : ℕ) (f₀ : FourierL2) where
+  left : ℝ
+  right : ℝ
+  left_neg : left < 0
+  right_pos : 0 < right
+  curve : ℝ → FourierL2
+  initial : curve 0 = f₀
+  solves : ∀ t ∈ Ioo left right,
+    HasDerivAt curve (schrodingerInter
 […]

@@ -265,5 +265,70 @@ def poissonRandomMeasureLaw {S : Type*} [MeasurableSpace S] [Nonempty S]
   countablePoissonLaw (fun i => ((sfiniteSeq κ i) univ).toNNReal)
     (fun i => finiteIntensityMarks (sfiniteSeq κ i))
 instance poissonRandomMeasureLaw_probability {S : Type*} [MeasurableSpace S] [Nonempty S]
-    (κ : Measure S) [SFi
+    (κ : Measure S) [SFinite κ] : IsProbabilityMeasure (poissonRandomMeasureLaw κ) := by
+  unfold poissonRandomMeasureLaw
+  infer_instance
+def stableLogIntensity (b : ℝ) : Measure ℝ :=
+  volume.withDensity (fun x => ENNReal.ofReal (b * Real.exp (-b*x)))
+instance stableLogIntensity_sigmaFinite (b : ℝ) : SigmaFinite (stableLogIntensity b) := by
+  unfold stableLogIntensity
+  infer_instance
+def normalizedMeasure {S : Type*} [MeasurableSpace S] (μ : Measure S) : Measure S :=
+  (μ univ)⁻¹ • μ
+lemma measurable_measure_withDensity_fixed {S : Type*} [MeasurableSpace S]
+    {f : S → ℝ≥0∞} (hf : Measurable f) : Measurable (fun μ : Measure S => μ.withDensity f) := by
+  refine Measure.measurable_of_measurable_coe _ fun s hs => ?_
+  simp only [withDensity_apply _ hs,← lintegral_indicator hs]
+  exact Measure.measurable_lintegral (hf.indicator hs)
+lemma normalizedMeasure_measurable {S : Type*} [MeasurableSpace S] :
+    Measurable (normalizedMeasure (S := S)) := by
+  refine Measure.measurable_of_measurable_coe _ fun s hs => ?_
+  change Measurable (fun μ : Measure S => (μ univ)⁻¹ * μ s)
+  exact (Measure.measurable_coe MeasurableSet.univ).inv.mul (Measure.measurable_coe hs)
+section MarkedStable
+variable {S : Type*} [MeasurableSpace S]
+def markedStableTotalE (η : Measure (ℝ × S)) : ℝ≥0∞ :=
+  ∫⁻ p, ENNReal.ofReal (Real.exp p.1) ∂η
+@[fun_prop] lemma markedStableTotalE_measurable : Measurable (markedStableTotalE (S := S)) :=
+  Measure.measurable_lintegral (by fun_prop)
+def markedStableTotal (η : Measure (ℝ × S)) : ℝ := (markedStableTotalE η).toReal
+@[fun_prop] lemma markedStableTotal_measurable : Measurable (markedStableTotal (S := S)) :=
+  markedStableTotalE_measurable.ennreal_toReal
+def markedStableMassKernel : Kernel (Measure (ℝ × S)) (ℝ × S) where
+  toFun η := normalizedMeasure (η.withDensity (fun p => ENNReal.ofReal (Real.exp p.1)))
+  measurable' := normalizedMeasure_measurable.comp (measurable_measure_withDensity_fixed (by fun_prop))
+instance markedStableMassKernel_finite : IsFiniteKernel (markedStableMassKernel (S := S)) := by
+  refine ⟨1, by simp, ?_⟩
+  intro η
+  change (η.withDensity (fun p => ENNReal.ofReal (Real.exp p.1)) univ)⁻¹ *
+    (η.withDensity (fun p => ENNReal.ofReal (Real.exp p.1)) univ) ≤ 1
+  exact ENNReal.inv_mul_le_one _
+def markedStableCountKernel : Kernel (Measure (ℝ × S)) (ℝ × S) :=
+  markedStableMassKernel.withDensity (fun η p => ENNReal.ofReal (markedStableTotal η*Real.exp (-p.1)))
+end MarkedStable
+@[reducible] def DecoratedCascade (S : Type) [MeasurableSpace S] : ℕ → MeasCat
+  | 0 => MeasCat.of Unit
+  | n+1 => MeasCat.of (Measure (ℝ×(S×DecoratedCascade S n)))
+instance decoratedCascadeNonempty (S : Type) [MeasurableSpace S] (n : ℕ) :
+    Nonempty (DecoratedCascade S n) := by
+  cases n with
+  | zero => exact ⟨()⟩
+  | succ n => exact ⟨(0 : Measure (ℝ×(S×DecoratedCascade S n)))⟩
+def decoratedCascadeLaw {S : Type} [MeasurableSpace S] [Nonempty S]
+    (ν : ProbabilityMeasure S) : (n : ℕ) → (Fin n → ℝ) → ProbabilityMeasure (DecoratedCascade S n)
+  | 0, _ => ⟨Measure.dirac (),by exact Measure.dirac.isProbabilityMeasure⟩
+  | n+1, z => ⟨poissonRandomMeasureLaw ((stableLogIntensity (z 0)).prod
+      ((ν : Measure S).prod (decoratedCascadeLaw ν n (fun i => z i.succ)))),
+        by exact poissonRandomMeasureLaw_probability _⟩
+def decoratedTerminalTotalE {X S : Type} [MeasurableSpace X] [MeasurableSpace S]
+    (step : X×S → X) (H : X → ℝ) : (n : ℕ) → X×DecoratedCascade S n → ℝ≥0∞
+  | 0, p => ENNReal.ofReal (Real.exp (H p.1))
+  | n+1, p => ∫⁻ q : ℝ×(S×DecoratedCascade S n), ENNReal.ofReal (Real.exp q.1) *
+      decoratedTerminalTotalE step H n (step (p.1,q.2.1),q.2.2) ∂markedStableCountKernel p.2
+def decoratedTerminalTotal {X S : Type} [MeasurableSpace X] [MeasurableSpace S]
+    (step : X×S → X) (H : X → ℝ) (n : ℕ) (p : X×DecoratedCascade S n) : ℝ :=
+  (decoratedTerminalTotalE step H n p).toReal
+def gaussianShiftStep (σ : ℕ → ℝ) (p : (ℕ → ℝ) × ℝ) : ℕ → ℝ :=
+  fun i => p.1 (i+1)+σ i*p.2
+def standardGaussianMark : ProbabilityMeasure ℝ := ⟨gaussianReal 0 1,infer
 […]

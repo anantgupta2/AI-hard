@@ -94,7 +94,84 @@ noncomputable def susceptibility (G : BondGraph V E) (p : unitInterval) (x : V) 
   ∑' y, twoPoint G p x y
 end Percolation
 run_elab Lean.modifyEnv fun environment => Lean.Meta.auxLemmasExt.setState environment {}
-namespace Percolation.BenjaminiSchra
+namespace Percolation.BenjaminiSchramm
+universe u v
+variable {V : Type u} {E : Type v}
+attribute [local instance] Classical.decEq
+noncomputable def triangleDiagram (G : BondGraph V E) (p : unitInterval) (x : V) : ℝ≥0∞ :=
+  ∑' ab : V × V, ENNReal.ofReal
+    (twoPoint G p x ab.1 * twoPoint G p ab.1 ab.2 * twoPoint G p ab.2 x)
+noncomputable def graphDistance (G : BondGraph V E) (x y : V) : ℕ :=
+  (openSimpleGraph G Set.univ).dist x y
+def ExponentialDecay (G : BondGraph V E) (p : unitInterval) : Prop :=
+  ∃ A a : ℝ, 0 < A ∧ 0 < a ∧ ∀ x y,
+    twoPoint G p x y ≤ A * Real.exp (-a * graphDistance G x y)
+noncomputable def pexp (G : BondGraph V E) : unitInterval :=
+  sSup {p | ExponentialDecay G p}
+def PowerTail (f : ℕ → ℝ) (exponent : ℝ) : Prop :=
+  ∃ c C : ℝ, 0 < c ∧ 0 < C ∧ ∀ n : ℕ, 0 < n →
+    c * (n : ℝ) ^ (-exponent) ≤ f n ∧ f n ≤ C * (n : ℝ) ^ (-exponent)
+def volumeEvent (G : BondGraph V E) (x : V) (n : ℕ) : Set (Set E) :=
+  {ω | (n : ℕ∞) ≤ (cluster G ω x).encard}
+def intrinsicRadiusEvent (G : BondGraph V E) (x : V) (n : ℕ) : Set (Set E) :=
+  {ω | ∃ y ∈ cluster G ω x, n ≤ (openSimpleGraph G ω).dist x y}
+def extrinsicRadiusEvent (G : BondGraph V E) (x : V) (n : ℕ) : Set (Set E) :=
+  {ω | ∃ y ∈ cluster G ω x, n ≤ graphDistance G x y}
+noncomputable def criticalTail (G : BondGraph V E)
+    (A : V → ℕ → Set (Set E)) (x : V) (n : ℕ) : ℝ :=
+  (law (pc G) (A x n)).toReal
+def CriticalTailLaws (G : BondGraph V E) : Prop :=
+  ∀ x, PowerTail (criticalTail G (volumeEvent G) x) (1 / 2) ∧
+    PowerTail (criticalTail G (intrinsicRadiusEvent G) x) 1 ∧
+    PowerTail (criticalTail G (extrinsicRadiusEvent G) x) 1
+def SusceptibilityLaw (G : BondGraph V E) : Prop :=
+  ∀ x, ∃ c C δ : ℝ, 0 < c ∧ 0 < C ∧ 0 < δ ∧
+    ∀ p : unitInterval, p < pc G → (pc G : ℝ) - p < δ →
+      c / ((pc G : ℝ) - p) ≤ susceptibility G p x ∧
+      susceptibility G p x ≤ C / ((pc G : ℝ) - p)
+noncomputable def percolationProbability (G : BondGraph V E) (p : unitInterval)
+    (x : V) : ℝ := (law p {ω | (cluster G ω x).Infinite}).toReal
+def PercolationProbabilityLaw (G : BondGraph V E) : Prop :=
+  ∀ x, ∃ c C δ : ℝ, 0 < c ∧ 0 < C ∧ 0 < δ ∧
+    ∀ p : unitInterval, pc G < p → (p : ℝ) - pc G < δ →
+      c * ((p : ℝ) - pc G) ≤ percolationProbability G p x ∧
+      percolationProbability G p x ≤ C * ((p : ℝ) - pc G)
+end Percolation.BenjaminiSchramm
+run_elab Lean.modifyEnv fun environment => Lean.Meta.auxLemmasExt.setState environment {}
+namespace Percolation.BenjaminiSchramm
+universe u v
+variable {V : Type u} {E : Type v}
+def CriticalLawsConclusion (G : BondGraph V E) : Prop :=
+  (∀ x, triangleDiagram G (pc G) x ≤ operatorNorm G (pc G) ^ 3 ∧
+    triangleDiagram G (pc G) x < ⊤) ∧
+  SusceptibilityLaw G ∧ PercolationProbabilityLaw G ∧ CriticalTailLaws G ∧
+  (pc G < ptwo G ∧ ptwo G ≤ pexp G) ∧
+  ∀ p : unitInterval, p < ptwo G → ExponentialDecay G p
+end Percolation.BenjaminiSchramm
+run_elab Lean.modifyEnv fun environment => Lean.Meta.auxLemmasExt.setState environment {}
+namespace Percolation.BenjaminiSchramm
+universe u
+variable {Λ : Type u} [Group Λ]
+attribute [local instance] Classical.decEq
+abbrev CayleyEdge (S : Finset Λ) := (SimpleGraph.mulCayley (S : Set Λ)).edgeSet
+def cayleyBond (S : Finset Λ) : BondGraph Λ (CayleyEdge S) := Subtype.val
+def FolnerAmenable (Λ : Type u) [Group Λ] : Prop :=
+  ∀ K : Finset Λ, ∀ ε : ℝ, 0 < ε → ∃ A : Finset Λ, A.Nonempty ∧
+    ∀ k ∈ K, (((A.image (fun x => x * k)) \ A).card : ℝ) < ε * A.card
+end Percolation.BenjaminiSchramm
+namespace Percolation.BenjaminiSchramm
+universe u v
+theorem full_main {V : Type u} {E : Type v} [Infinite V]
+    (G : BondGraph V E) (hc : Connected G) (hl : LocallyFinite G)
+    (hq : QuasiTransitive G) (hh : 0 < hV G) : MainConclusion G := by
+  sorry
+theorem critical_laws {V : Type u} {E : Type v} [Infinite V]
+    (G : BondGraph V E) (hc : Connected G) (hl : LocallyFinite G)
+    (hq : QuasiTransitive G) (hh : 0 < hV G) : CriticalLawsConclusion G := by
+  sorry
+theorem cayley_main {Λ : Type u} [Group Λ]
+    (S : Finset Λ) (hsym : ∀ s ∈ S, s⁻¹ ∈ S) (_hone : 1 ∉ S)
+    (hgen 
 […]
 
 === LEAN COMPARATOR CayleyPercolation (exact formal statement)

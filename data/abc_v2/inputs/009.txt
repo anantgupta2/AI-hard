@@ -85,5 +85,36 @@ abbrev IsomCUnits (ell : ℕ) [Fact ell.Prime] (K L : Type*) [Field K] [Field L]
   Quotient (Relation.EqvGen.setoid (ScalarStep (ell := ell) (K := K) (L := L)))
 def absoluteToPiA (ell : ℕ) (F : Type*) [Field F] :
     Field.absoluteGaloisGroup F →* PiA ell F :=
-  (QuotientGroup.mk'
-[…]
+  (QuotientGroup.mk' _).comp (QuotientGroup.mk' _)
+def absoluteAction {F : Type*} [Field F] (σ : Field.absoluteGaloisGroup F)
+    (x : AlgebraicClosure F) : AlgebraicClosure F := by
+  change AlgebraicClosure F ≃ₐ[F] AlgebraicClosure F at σ
+  exact σ x
+def PullbackGraph {ell : ℕ} {k K l L : Type*}
+    [Field k] [Field K] [Field l] [Field L] [Algebra k K] [Algebra l L]
+    (α : PerfectIsom k K l L) (φ : IsomC ell K L) : Prop :=
+  ∃ β : AlgebraicClosure K ≃+* AlgebraicClosure L,
+    (∀ x : PerfectFieldClosure K, β x = ((α.1 x : PerfectFieldClosure L) :
+      AlgebraicClosure L)) ∧
+    ∀ σ : Field.absoluteGaloisGroup L, ∃ τ : Field.absoluteGaloisGroup K,
+      (∀ x : AlgebraicClosure K,
+        β (absoluteAction τ x) = absoluteAction σ (β x)) ∧
+      φ.1 (absoluteToPiA ell L σ) = absoluteToPiA ell K τ
+def PhiGraph {ell : ℕ} [Fact ell.Prime] {k K l L : Type*}
+    [Field k] [Field K] [Field l] [Field L] [Algebra k K] [Algebra l L]
+    (a : IsomF k K l L) (b : IsomCUnits ell K L) : Prop :=
+  ∃ α : PerfectIsom k K l L, ∃ φ : IsomC ell K L,
+    Quotient.mk _ α = a ∧ Quotient.mk _ φ = b ∧ PullbackGraph α φ
+theorem main_graph_injective (ell : ℕ) [Fact ell.Prime]
+    (k K l L : Type*) [Field k] [Field K] [Field l] [Field L]
+    [IsAlgClosed k] [IsAlgClosed l] [Algebra k K] [Algebra l L]
+    [Algebra.EssFiniteType k K] [Algebra.EssFiniteType l L]
+    (hk : (ell : k) ≠ 0) (hl : (ell : l) ≠ 0)
+    (hK : 2 ≤ Algebra.trdeg k K) (hL : 2 ≤ Algebra.trdeg l L) :
+    ∀ (a a' : IsomF k K l L) (b : IsomCUnits ell K L),
+      PhiGraph a b → PhiGraph a' b → a = a'  := by
+  sorry
+end BogomolovPop
+end
+end OAI
+

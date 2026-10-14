@@ -88,5 +88,97 @@ noncomputable def comp (F : OAI.Thomason.OmegaCategory.Functor C D) (G : OAI.Tho
     map_source k x := by rw [F.map_source, G.map_source]
     map_target k x := by rw [F.map_target, G.map_target]
     map_comp k x y h h' := by
-      rw [F.map_comp k x y h (proof_map_composable_0 F h), G.map_c
+      rw [F.map_comp k x y h (proof_map_composable_0 F h), G.map_comp]
+  }
+end OAI.Thomason.OmegaCategory.Functor
+end
+section
+namespace OAI.Thomason.OmegaCategory
+variable (C : OmegaCategory.{u})
+noncomputable instance : CategoryTheory.Category OAI.Thomason.OmegaCategory.{u} where
+  Hom C D := OAI.Thomason.OmegaCategory.Functor C D
+  id := OAI.Thomason.OmegaCategory.Functor.id
+  comp := OAI.Thomason.OmegaCategory.Functor.comp
+noncomputable def IsTruncated (n : ℕ) : Prop := ∀ x : C.Cell, C.source n x = x
+noncomputable def NCategory (n : ℕ) := {C : OAI.Thomason.OmegaCategory.{u} // C.IsTruncated n}
+noncomputable instance (n : ℕ) : CategoryTheory.Category (OAI.Thomason.OmegaCategory.NCategory.{u} n) where
+  Hom C D := OAI.Thomason.OmegaCategory.Functor C.val D.val
+  id C := OAI.Thomason.OmegaCategory.Functor.id C.val
+  comp := OAI.Thomason.OmegaCategory.Functor.comp
+end OAI.Thomason.OmegaCategory
+end
+section
+namespace OAI.Thomason
+structure DirectedComplex where
+  Chain : ℕ → Type u
+  group : ∀ p, AddCommGroup (Chain p)
+  d : (p : ℕ) → Chain (p+1) →+ Chain p
+  d_d (p : ℕ) (x : Chain (p+2)) : d p (d (p+1) x) = 0
+  augmentation : Chain 0 →+ ℤ
+  augmentation_d (x : Chain 1) : augmentation (d 0 x) = 0
+  positive : (p : ℕ) → AddSubmonoid (Chain p)
+end OAI.Thomason
+end
+attribute [instance] OAI.Thomason.DirectedComplex.group
+section
+namespace OAI.Thomason.DirectedComplex
+@[ext]
+structure Hom (K : OAI.Thomason.DirectedComplex.{u}) (L : OAI.Thomason.DirectedComplex.{v}) where
+  map (p : ℕ) : K.Chain p →+ L.Chain p
+  map_d (p : ℕ) (x : K.Chain (p+1)) : map p (K.d p x) = L.d p (map (p+1) x)
+  map_augmentation (x : K.Chain 0) : L.augmentation (map 0 x) = K.augmentation x
+  map_positive (p : ℕ) (x : K.Chain p) : x ∈ K.positive p → map p x ∈ L.positive p
+end OAI.Thomason.DirectedComplex
+end
+section
+namespace OAI.Thomason.DirectedComplex.Hom
+variable {K : DirectedComplex.{u}} {L : DirectedComplex.{v}} {M : DirectedComplex.{w}}
+noncomputable def id (K : OAI.Thomason.DirectedComplex.{u}) : OAI.Thomason.DirectedComplex.Hom K K where
+  map _ := AddMonoidHom.id _
+  map_d _ _ := rfl
+  map_augmentation _ := rfl
+  map_positive _ _ h := h
+noncomputable def comp (f : OAI.Thomason.DirectedComplex.Hom K L) (g : OAI.Thomason.DirectedComplex.Hom L M) : OAI.Thomason.DirectedComplex.Hom K M where
+  map p := (g.map p).comp (f.map p)
+  map_d p x := by simp only [AddMonoidHom.comp_apply, f.map_d, g.map_d]
+  map_augmentation x := by simp only [AddMonoidHom.comp_apply,
+    g.map_augmentation, f.map_augmentation]
+  map_positive p x hx := g.map_positive p _ (f.map_positive p x hx)
+end OAI.Thomason.DirectedComplex.Hom
+end
+section
+namespace OAI.Thomason.DirectedComplex
+noncomputable instance : CategoryTheory.Category OAI.Thomason.DirectedComplex.{u} where
+  Hom := OAI.Thomason.DirectedComplex.Hom
+  id := OAI.Thomason.DirectedComplex.Hom.id
+  comp := OAI.Thomason.DirectedComplex.Hom.comp
+@[ext]
+structure Table (K : OAI.Thomason.DirectedComplex.{u}) where
+  row : (p : ℕ) → Bool → K.Chain p
+  positive (p : ℕ) (b : Bool) : row p b ∈ K.positive p
+  boundary (p : ℕ) (b : Bool) :
+    K.d p (row (p+1) b) = row p true - row p false
+  augmentation (b : Bool) : K.augmentation (row 0 b) = 1
+  bounded : ∃ k, ∀ p, k < p → ∀ b, row p b = 0
+end OAI.Thomason.DirectedComplex
+end
+section
+namespace OAI.Thomason.DirectedComplex.Table
+variable {K : DirectedComplex.{u}}
+noncomputable def truncate (k : ℕ) (e : Bool) (x : OAI.Thomason.DirectedComplex.Table K) : OAI.Thomason.DirectedComplex.Table K where
+  row p b := if p < k then x.row p b else if p = k then x.row p e else 0
+  positive p b := by
+    split_ifs <;> first | exact x.positive _ _ | exact (K.positive _).zero_mem
+  boundary p b := by
+    by_cases hp : p < k
+    · by_cases hp' : p+1 < k
+      · simp only [hp, hp', ite_eq_left]
+        exact x.boundary p b
+      · have he : p+1 = k := by omega
+        simp only [ite_eq_left hp, ite_eq_right hp', ite_eq_left he]
+        exact x.boundary p e
+    · by_cases he : p = k
+      · have hp' : ¬p+1 < k := by omega
+        have he' : ¬p+1 = k := by omega
+      
 […]

@@ -85,7 +85,84 @@ def groundEmbeddable (D N : ZFSet.{u}) : Prop := ∃ f ∈ M.sets, InjectionCode
 end TransitiveGround
 def setTransitive (x : ZFSet.{u}) : Prop := ∀ y ∈ x, ∀ z ∈ y, z ∈ x
 def ordinalSetProperty (x : ZFSet.{u}) : Prop :=
-  setTransitive x ∧ ∀ y ∈ x, setTransit
+  setTransitive x ∧ ∀ y ∈ x, setTransitive y
+namespace TransitiveGround
+open SetFormula
+variable (M : TransitiveGround.{u})
+noncomputable def groundPower (B : ZFSet.{u}) : ZFSet.{u} :=
+  ZFSet.sep (fun p => p ∈ M.sets) (ZFSet.powerset B)
+end TransitiveGround
+def GroundBelow (M : TransitiveGround.{u}) (A K : ZFSet.{u}) : Prop :=
+  ∃ β ∈ K, M.groundEmbeddable A β
+def GroundCardinal (M : TransitiveGround.{u}) (κ : ZFSet.{u}) : Prop :=
+  ordinalSetProperty κ ∧ ∀ β ∈ κ, ¬ M.groundEmbeddable κ β
+def CofinalFunctionCode (α K f : ZFSet.{u}) : Prop :=
+  ZFSet.IsFunc α K f ∧ ∀ β ∈ K, ∃ x ∈ α, ∃ y ∈ K,
+    ZFSet.pair x y ∈ f ∧ (β = y ∨ β ∈ y)
+def GroundCofinalRegular (M : TransitiveGround.{u}) (K : ZFSet.{u}) : Prop :=
+  ∀ α ∈ K, ∀ f ∈ M.sets, ¬ CofinalFunctionCode α K f
+def GroundCardinalStrongLimit (M : TransitiveGround.{u}) (K : ZFSet.{u}) : Prop :=
+  ∀ κ ∈ K, GroundCardinal M κ → GroundBelow M (M.groundPower κ) K
+def GroundStandardInaccessible (M : TransitiveGround.{u}) (K : ZFSet.{u}) : Prop :=
+  GroundCardinal M K ∧ ¬ M.groundEmbeddable K ZFSet.omega ∧
+    GroundCofinalRegular M K ∧ GroundCardinalStrongLimit M K
+namespace SetFormula
+def extensionality : SetFormula 0 :=
+  .all (.all (imp
+    (.all (.conj (imp (.mem 0 2) (.mem 0 1)) (imp (.mem 0 1) (.mem 0 2))))
+    (.equal 1 0)))
+def foundation : SetFormula 0 :=
+  .all (imp (ex (.mem 0 1))
+    (ex (.conj (.mem 0 1) (.all (.neg (.conj (.mem 0 2) (.mem 0 1)))))))
+def emptySet : SetFormula 0 := ex (.all (.neg (.mem 0 1)))
+def pairing : SetFormula 0 :=
+  .all (.all (ex (.all (.conj
+    (imp (.mem 0 1) (disj (.equal 0 3) (.equal 0 2)))
+    (imp (disj (.equal 0 3) (.equal 0 2)) (.mem 0 1))))))
+def union : SetFormula 0 :=
+  .all (ex (.all (.conj
+    (imp (.mem 0 1) (ex (.conj (.mem 0 3) (.mem 1 0))))
+    (imp (ex (.conj (.mem 0 3) (.mem 1 0))) (.mem 0 1)))))
+def powerSet : SetFormula 0 :=
+  .all (ex (.all (.conj
+    (imp (.mem 0 1) (.all (imp (.mem 0 1) (.mem 0 3))))
+    (imp (.all (imp (.mem 0 1) (.mem 0 3))) (.mem 0 1)))))
+def SeparationSchema (U : Set ZFSet.{u}) : Prop :=
+  ∀ {n} (φ : SetFormula (n + 1)) (params : Fin n → ZFSet.{u}),
+    (∀ i, params i ∈ U) → ∀ x ∈ U, ∃ y ∈ U,
+      ∀ z ∈ U, z ∈ y ↔ z ∈ x ∧ Realize U φ (extend z params)
+def CollectionSchema (U : Set ZFSet.{u}) : Prop :=
+  ∀ {n} (φ : SetFormula (n + 2)) (params : Fin n → ZFSet.{u}),
+    (∀ i, params i ∈ U) → ∀ a ∈ U,
+      (∀ x ∈ U, x ∈ a → ∃ y ∈ U, Realize U φ (extend x (extend y params))) →
+      ∃ b ∈ U, ∀ x ∈ U, x ∈ a →
+        ∃ y ∈ U, y ∈ b ∧ Realize U φ (extend x (extend y params))
+def emptySetFormula {n : Nat} (x : Fin n) : SetFormula n := .all (.neg (.mem 0 x.succ))
+def successorFormula {n : Nat} (y x : Fin n) : SetFormula n :=
+  .all (.conj (imp (.mem 0 y.succ) (disj (.equal 0 x.succ) (.mem 0 x.succ)))
+    (imp (disj (.equal 0 x.succ) (.mem 0 x.succ)) (.mem 0 y.succ)))
+def infinity : SetFormula 0 :=
+  ex (.conj (ex (.conj (.mem 0 1) (emptySetFormula 0)))
+    (.all (imp (.mem 0 1) (ex (.conj (.mem 0 2) (successorFormula 0 1))))))
+def choice : SetFormula 0 :=
+  .all (imp (BoundedFormula.allMem 0 (BoundedFormula.nonemptyFormula 0)).toFormula
+    (ex (BoundedFormula.choiceFunctionFormula 1 0).toFormula))
+def ReplacementSchema (U : Set ZFSet.{u}) : Prop :=
+  ∀ {n} (φ : SetFormula (n + 2)) (params : Fin n → ZFSet.{u}),
+    (∀ i, params i ∈ U) → ∀ A ∈ U,
+      (∀ x ∈ U, x ∈ A → ∃ y ∈ U, Realize U φ (extend x (extend y params)) ∧
+        ∀ z ∈ U, Realize U φ (extend x (extend z params)) → z = y) →
+      ∃ B ∈ U, ∀ y ∈ U, y ∈ B ↔ ∃ x ∈ U, x ∈ A ∧ Realize U φ (extend x (extend y params))
+def finiteZFAxioms : SetFormula 0 :=
+  .conj extensionality (.conj foundation (.conj emptySet
+    (.conj pairing (.conj SetFormula.union (.conj powerSet infinity)))))
+def ZFRealization (U : Set ZFSet.{u}) : Prop :=
+  Realize U finiteZFAxioms Fin.elim0 ∧ SeparationSchema U ∧ ReplacementSchema U
+end SetFormula
+namespace BoundedFormula
+open SetFormula
+def injectionFormula {n} (d c f : Fin n) : BoundedFormula n :=
+  .conj (functionFormula d c f) (.allMem d (.allMem d.succ (.allMe
 […]
 
 === LEAN COMPARATOR PartitionConsistency (exact formal statement)
@@ -173,5 +250,78 @@ def subset {n} (a b : Fin n) : Formula n :=
 def empty {n} (a : Fin n) : Formula n :=
   rename ![a] (Formula.all (Formula.mem 1 0).neg : Formula 1)
 def nonempty {n} (a : Fin n) : Formula n :=
-  rename ![a] (Formula.ex (Formula.mem 1 
+  rename ![a] (Formula.ex (Formula.mem 1 0) : Formula 1)
+def unorderedPair {n} (p x y : Fin n) : Formula n :=
+  rename ![p, x, y]
+    (Formula.all ((Formula.mem 3 0).iff ((Formula.equal 3 1).disj (Formula.equal 3 2))) : Formula 3)
+def successor {n} (b a : Fin n) : Formula n :=
+  rename ![b, a]
+    (Formula.all ((Formula.mem 2 0).iff ((Formula.mem 2 1).disj (Formula.equal 2 1))) : Formula 2)
+def orderedPair {n} (p x y : Fin n) : Formula n :=
+  rename ![p, x, y]
+    (Formula.ex (Formula.ex ((unorderedPair 3 1 1).conj
+      ((unorderedPair 4 1 2).conj (unorderedPair 0 3 4)))) : Formula 3)
+def edge {n} (f x y : Fin n) : Formula n :=
+  rename ![f, x, y]
+    (Formula.ex ((Formula.mem 3 0).conj (orderedPair 3 1 2)) : Formula 3)
+def functionOn {n} (f d : Fin n) : Formula n :=
+  rename ![f, d]
+    ((Formula.all ((Formula.mem 2 0).imp
+        (Formula.ex (Formula.ex ((Formula.mem 3 1).conj (orderedPair 2 3 4)))))).conj
+      (Formula.all ((Formula.mem 2 1).imp
+        (Formula.ex ((edge 0 2 3).conj (Formula.all ((edge 0 2 4).imp (Formula.equal 4 3))))))) : Formula 2)
+def mapsTo {n} (f d r : Fin n) : Formula n :=
+  rename ![f, d, r]
+    ((functionOn 0 1).conj
+      (Formula.all (Formula.all ((Formula.mem 3 1).imp ((edge 0 3 4).imp (Formula.mem 4 2))))) : Formula 3)
+def surjection {n} (f d r : Fin n) : Formula n :=
+  rename ![f, d, r]
+    ((mapsTo 0 1 2).conj
+      (Formula.all ((Formula.mem 3 2).imp (Formula.ex ((Formula.mem 4 1).conj (edge 0 4 3))))) : Formula 3)
+def injection {n} (f d r : Fin n) : Formula n :=
+  rename ![f, d, r]
+    ((mapsTo 0 1 2).conj
+      (Formula.all (Formula.all (.all
+        ((Formula.mem 3 1).imp ((Formula.mem 4 1).imp
+          (((edge 0 3 5).conj (edge 0 4 5)).imp (Formula.equal 3 4))))))) : Formula 3)
+def transitiveSet {n} (a : Fin n) : Formula n :=
+  rename ![a]
+    (Formula.all (Formula.all ((Formula.mem 1 0).imp ((Formula.mem 2 1).imp (Formula.mem 2 0)))) : Formula 1)
+def membershipLinear {n} (a : Fin n) : Formula n :=
+  rename ![a]
+    ((Formula.all ((Formula.mem 1 0).imp (Formula.mem 1 1).neg)).conj
+      ((Formula.all (Formula.all (Formula.all ((Formula.mem 1 0).imp ((Formula.mem 2 0).imp ((Formula.mem 3 0).imp
+        (((Formula.mem 1 2).conj (Formula.mem 2 3)).imp (Formula.mem 1 3)))))))).conj
+        (Formula.all (Formula.all ((Formula.mem 1 0).imp ((Formula.mem 2 0).imp
+          ((Formula.equal 1 2).disj ((Formula.mem 1 2).disj (Formula.mem 2 1)))))))) : Formula 1)
+def membershipWellFounded {n} (a : Fin n) : Formula n :=
+  rename ![a]
+    (Formula.all (((subset 1 0).conj (nonempty 1)).imp
+      (Formula.ex ((Formula.mem 2 1).conj (Formula.all ((Formula.mem 3 1).imp (Formula.mem 3 2).neg))))) : Formula 1)
+def ordinal {n} (a : Fin n) : Formula n :=
+  (transitiveSet a).conj ((membershipLinear a).conj (membershipWellFounded a))
+def choiceOn {n} (c A : Fin n) : Formula n :=
+  rename ![c, A]
+    ((functionOn 0 1).conj
+      (Formula.all ((Formula.mem 2 1).imp (Formula.ex ((edge 0 2 3).conj (Formula.mem 3 2))))) : Formula 2)
+def nonemptyFamily {n} (F η : Fin n) : Formula n :=
+  rename ![F, η]
+    ((functionOn 0 1).conj
+      (Formula.all (Formula.all ((Formula.mem 2 1).imp ((edge 0 2 3).imp (nonempty 3))))) : Formula 2)
+def choiceForFamily {n} (c η F : Fin n) : Formula n :=
+  rename ![c, η, F]
+    ((functionOn 0 1).conj
+      (Formula.all (Formula.all ((Formula.mem 3 1).imp ((edge 2 3 4).imp
+        (Formula.ex ((edge 0 3 5).conj (Formula.mem 5 4))))))) : Formula 3)
+def PP : Sentence :=
+  Formula.all (Formula.all ((Formula.ex (surjection 2 0 1)).imp (Formula.ex (injection 2 1 0))))
+def AC : Sentence :=
+  Formula.all ((Formula.all ((Formula.mem 1 0).imp (nonempty 1))).imp (Formula.ex (choiceOn 1 0)))
+def ACwo : Sentence :=
+  Formula.all ((ordinal 0).imp
+    (Formula.all ((nonemptyFamily 1 0).imp (Formula.ex (choiceForFamily 2 0 1)))))
+def extensionality : Sentence :=
+  Formula.all (Formula.all ((Formula.all ((Formula.mem 2 0).iff (Formula.mem 2 1))).imp (Formula.equal 0 1)))
+def emptySet : Sentence := Formula.ex (empty 0)
+def pairing : Sentence
 […]

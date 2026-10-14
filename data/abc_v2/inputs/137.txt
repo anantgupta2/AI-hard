@@ -146,5 +146,79 @@ structure At where
   state : M.Q
   tape : Tape M.A
   ro : Fin M.heads → ℤ
-def move (q : M.Q) (s : M.A) (r : Fin M.he
-[…]
+def move (q : M.Q) (s : M.A) (r : Fin M.heads → M.A) :
+    SingleAct M.Q M.A M.heads :=
+  if M.halted q then
+    ⟨q,⟨s,.N⟩,fun _ => .N⟩
+  else M.program q s r
+def initial (x : List X) : M.At :=
+  ⟨M.beginState,⟨0,M.sensor x none⟩, fun _ => 0⟩
+def next (x : List X) (s : M.At) : M.At :=
+  let t := M.move s.state s.tape.see (fun i => M.sensor x (some i) (s.ro i))
+  ⟨t.out,s.tape.perform t.write,fun i => s.ro i + (t.others i).delta⟩
+def atTime (M : Single X) (x : List X) : ℕ → M.At :=
+  Nat.rec (M.initial x) (fun _ s => M.next x s)
+abbrev Outcome := M.Q × Bool
+def finish (q : M.Q) : M.Outcome :=
+  (q, M.halted q)
+def outcome (x : List X) (n : ℕ) : M.Outcome :=
+  M.finish (M.atTime x n).state
+def Inside (t : ℕ) (q : ℤ) : Prop := -(t:ℤ) ≤ q ∧ q ≤ (t:ℤ)
+end Single
+end Fifths
+namespace Fifths
+namespace Entry
+noncomputable def code {A : Type} [Fintype A] (a : A) : ℕ :=
+  (Fintype.equivFin A a).val
+end Entry
+def binaryIn {X J : Type} (pub : List X) (f : J → ℕ) : Inputs X J :=
+  ⟨pub, fun j => (f j).bits⟩
+def files {X : Type} (x : List X) : Inputs X Empty :=
+  ⟨x, Empty.elim⟩
+namespace Single
+open Entry
+variable {X : Type} (M : Single X)
+inductive Arg
+  | cap | tag | minus | magnitude
+  deriving DecidableEq
+instance : Fintype Arg :=
+  ⟨{.cap, .tag, .minus, .magnitude}, by intro a; cases a <;> simp⟩
+abbrev Sym := TM X Arg M.A
+noncomputable def arg (T : ℕ) (h : M.Tag) (p : ℤ) : Arg → ℕ
+  | .cap => T
+  | .tag => code h
+  | .minus => (decide (p < 0)).toNat
+  | .magnitude => p.natAbs
+end Single
+namespace Cost
+noncomputable def Log (T : ℕ) := Real.log (T+2 : ℝ) / Real.log 2
+noncomputable def exponent := (2:ℝ)/5
+end Cost
+namespace Single
+open Cost
+variable {X : Type} (M : Single X)
+def Access (A : M.Sym) (p q : ℝ) (x : List X) (T : ℕ) : Prop :=
+  ∀ (h : M.Tag) (l : ℤ), Inside T l →
+    ∃ s : ℕ, (s:ℝ) ≤ p * (Log T)^q ∧
+      A.Within (binaryIn x (M.arg T h l)) (M.sensor x h l) s
+end Single
+end Fifths
+namespace Fifths.Single
+open Entry Cost
+variable {X : Type} (M : Single X)
+theorem capped [Fintype X] (A : M.Sym) (p q : ℝ) (hp : 1 ≤ p) (_hq : 1 ≤ q) :
+    ∃ (N : TM X Unit M.Outcome) (e : ℕ) (c : ℝ), 0 < c ∧
+      ∀ (x : List X) (T : ℕ), 2 ≤ T → M.Access A p q x T →
+        ∃ b : ℕ, N.Within (binaryIn x (fun _ => T)) (M.outcome x T) b ∧
+          (b:ℝ) ≤ c*(T:ℝ)^exponent*(Log T)^e := by
+  sorry
+theorem unknown [Fintype X] (A : M.Sym) (p q : ℝ) (hp : 1 ≤ p) (_hq : 1 ≤ q) :
+    ∃ (N : TM X Empty M.Outcome) (e : ℕ) (c : ℝ), 0 < c ∧
+      ∀ (x : List X), (∀ T, 2 ≤ T → M.Access A p q x T) →
+        ∀ (t : ℕ), (M.outcome x t).2 = true →
+          ∃ b, N.Within (files x) (M.outcome x t) b ∧
+            (b:ℝ) ≤ c*((t:ℝ)+2)^exponent*(Log t)^e := by
+  sorry
+end Fifths.Single
+end OAI
+

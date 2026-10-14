@@ -101,5 +101,77 @@ structure OrthonormalFrame (g : SmoothMetric M) (c : M) where
 def OrthonormalFrame.map {g : SmoothMetric M} {c : M} (e : OrthonormalFrame g c) :
     FourSpace →ₗ[ℝ] FourSpace :=
   (WithLp.linearEquiv 2 ℝ (Fin 4 → ℝ)).symm.toLinearMap ∘ₗ
-    (Matrix.mulVecLin e.matrix) ∘ₗ (WithLp.linearE
-[…]
+    (Matrix.mulVecLin e.matrix) ∘ₗ (WithLp.linearEquiv 2 ℝ (Fin 4 → ℝ)).toLinearMap
+def OrthonormalFrame.vector {g : SmoothMetric M} {c : M}
+    (e : OrthonormalFrame g c) (i : Fin 4) : FourSpace :=
+  WithLp.toLp 2 (fun a => e.matrix a i)
+structure FrameBundle (g : SmoothMetric M) where
+  base : M
+  frame : OrthonormalFrame g base
+def frameRealization {g : SmoothMetric M} (e : FrameBundle g) :
+    M × (Fin 4 → TangentBundle I4 M) :=
+  (e.base, fun i => ⟨e.base, e.frame.vector i⟩)
+run_cmd Lean.modifyEnv fun env => Lean.Meta.auxLemmasExt.modifyState env fun _ => {}
+instance (g : SmoothMetric M) : TopologicalSpace (FrameBundle g) :=
+  TopologicalSpace.induced frameRealization inferInstance
+structure FrameOrientation (g : SmoothMetric M) where
+  positive : Set (FrameBundle g)
+  clopen : IsClopen positive
+  nonempty_fiber : ∀ c, ∃ e : OrthonormalFrame g c, (⟨c, e⟩ : FrameBundle g) ∈ positive
+  compatible : ∀ c (e f : OrthonormalFrame g c),
+    (⟨c, e⟩ : FrameBundle g) ∈ positive →
+      ((⟨c, f⟩ : FrameBundle g) ∈ positive ↔ 0 < e.matrix.det * f.matrix.det)
+end PositiveEinsteinFour.Geometry
+namespace PositiveEinsteinFour
+open EinsteinFour
+universe u
+structure ClosedOrientedMetricFour where
+  manifold : ModelWithCorners.MfldCat.{u} I4 ∞
+  [regular : T3Space manifold]
+  [secondCountable : SecondCountableTopology manifold]
+  [compact : CompactSpace manifold]
+  [connected : ConnectedSpace manifold]
+  metric : SmoothMetric manifold
+  orientation : Geometry.FrameOrientation metric
+attribute [instance] ClosedOrientedMetricFour.regular
+  ClosedOrientedMetricFour.secondCountable ClosedOrientedMetricFour.compact
+  ClosedOrientedMetricFour.connected
+section ClassificationDefinitions
+variable {M : Type*} [TopologicalSpace M] [ChartedSpace FourSpace M]
+  [IsManifold I4 ∞ M]
+def Classified (g : SmoothMetric M) : Prop :=
+  ∃ a : ℝ, 0 < a ∧
+    (ScaledIsometricTo g a roundDistance ∨
+      ScaledIsometricTo g a fubiniStudyDistance ∨
+      ScaledIsometricTo g a realProjectiveDistance)
+def ClassificationOn (M : Type*) [TopologicalSpace M] [ChartedSpace FourSpace M]
+    [IsManifold I4 ∞ M] [T2Space M] [SecondCountableTopology M]
+    [CompactSpace M] [ConnectedSpace M] : Prop :=
+  ∀ g : SmoothMetric M,
+    IsEinstein g → HasPositiveSectionalCurvature g → Classified g
+end ClassificationDefinitions
+theorem orientedClassification (X : ClosedOrientedMetricFour.{u})
+    (hEinstein : IsEinstein X.metric) (hpositive : HasPositiveSectionalCurvature X.metric) :
+    ∃ a : ℝ, 0 < a ∧ (ScaledIsometricTo X.metric a roundDistance ∨
+      ScaledIsometricTo X.metric a fubiniStudyDistance) := by
+  sorry
+section
+variable (M : Type u) [TopologicalSpace M] [ChartedSpace FourSpace M]
+  [IsManifold I4 ∞ M] [T2Space M] [SecondCountableTopology M]
+  [CompactSpace M] [ConnectedSpace M]
+theorem classificationOn : ClassificationOn M := by
+  sorry
+end
+theorem classification (M : Type*) [TopologicalSpace M] [ChartedSpace FourSpace M]
+    [IsManifold I4 ∞ M] [T2Space M] [SecondCountableTopology M]
+    [CompactSpace M] [ConnectedSpace M] (g : SmoothMetric M)
+    (hEinstein : IsEinstein g) (hpositive : HasPositiveSectionalCurvature g) :
+    ∃ a : ℝ, 0 < a ∧
+      (ScaledIsometricTo g a roundDistance ∨
+        ScaledIsometricTo g a fubiniStudyDistance ∨
+        ScaledIsometricTo g a realProjectiveDistance) := by
+  sorry
+end PositiveEinsteinFour
+end
+end OAI
+

@@ -137,7 +137,89 @@ def segmentSeminorm (V : Type) [PartialOrder V] : Seminorm ℝ (V →₀ ℝ) :=
       (hA : 0 ≤ A) (hB : 0 ≤ B) : TestBound (u + v) ((A + B) ^ 2) := by
     intro ι inst S hS hd
     have h₁ := hu ι inst S hS hd
- 
+    have h₂ := hv ι inst S hS hd
+    have hc := Real.sum_mul_le_sqrt_mul_sqrt (univ : Finset ι)
+      (fun i => segSum u (S i)) (fun i => segSum v (S i))
+    have hs₁ : Real.sqrt (∑ i, segSum u (S i) ^ 2) ≤ A :=
+      (Real.sqrt_le_iff).2 ⟨hA, h₁⟩
+    have hs₂ : Real.sqrt (∑ i, segSum v (S i) ^ 2) ≤ B :=
+      (Real.sqrt_le_iff).2 ⟨hB, h₂⟩
+    have hc' : ∑ i, segSum u (S i) * segSum v (S i) ≤ A * B :=
+      hc.trans (mul_le_mul hs₁ hs₂ (Real.sqrt_nonneg _) hA)
+    have he : (∑ i, segSum (u + v) (S i) ^ 2) =
+        (∑ i, segSum u (S i) ^ 2) + 2 * (∑ i, segSum u (S i) * segSum v (S i)) +
+        (∑ i, segSum v (S i) ^ 2) := by
+      simp only [segSum_add, add_sq, Finset.sum_add_distrib, Finset.mul_sum]
+      congr 1
+      congr 1
+      apply Finset.sum_congr rfl
+      intro i hi
+      ring
+    rw [he]
+    nlinarith
+  have zero_mem_testValues (u : V → ℝ) : 0 ∈ testValues u := by
+    refine ⟨PEmpty, inferInstance, PEmpty.elim, by simp, by simp [Pairwise], ?_⟩
+    simp [segSum]
+  have TestBound.bddAbove {u : V → ℝ} {C : ℝ} (h : TestBound u C) :
+      BddAbove (testValues u) := by
+    refine ⟨C, ?_⟩
+    rintro r ⟨ι, inst, S, hs, hd, rfl⟩
+    exact h ι inst S hs hd
+  have TestBound.squareSup_le {u : V → ℝ} {C : ℝ} (h : TestBound u C) :
+      squareSup u ≤ C := by
+    apply csSup_le ⟨0, zero_mem_testValues u⟩
+    rintro r ⟨ι, inst, S, hs, hd, rfl⟩
+    exact h ι inst S hs hd
+  have testBound_squareSup {u : V → ℝ} (hu : ∃ C, TestBound u C) :
+      TestBound u (squareSup u) := by
+    intro ι inst S hs hd
+    exact le_csSup (TestBound.bddAbove hu.choose_spec) ⟨ι, inst, S, hs, hd, rfl⟩
+  have squareSup_nonneg {u : V → ℝ} (hu : ∃ C, TestBound u C) : 0 ≤ squareSup u :=
+    TestBound.nonneg (testBound_squareSup hu)
+  have rho_nonneg (u : V → ℝ) : 0 ≤ rho u := Real.sqrt_nonneg _
+  have rho_sq {u : V → ℝ} (hu : ∃ C, TestBound u C) : rho u ^ 2 = squareSup u :=
+    Real.sq_sqrt (squareSup_nonneg hu)
+  have testBound_rho_sq {u : V → ℝ} (hu : ∃ C, TestBound u C) : TestBound u (rho u ^ 2) := by
+    rw [rho_sq hu]
+    exact testBound_squareSup hu
+  have rho_le_of_testBound {u : V → ℝ} {C : ℝ} (hC : 0 ≤ C)
+      (hu : TestBound u (C ^ 2)) : rho u ≤ C :=
+    Real.sqrt_le_iff.mpr ⟨hC, TestBound.squareSup_le hu⟩
+  have rho_add_le {u v : V → ℝ} (hu : ∃ C, TestBound u C) (hv : ∃ C, TestBound v C) :
+      rho (u + v) ≤ rho u + rho v :=
+    rho_le_of_testBound (add_nonneg (rho_nonneg u) (rho_nonneg v))
+      (TestBound.add (testBound_rho_sq hu) (testBound_rho_sq hv) (rho_nonneg u) (rho_nonneg v))
+  have rho_smul_le {u : V → ℝ} (hu : ∃ C, TestBound u C) (a : ℝ) :
+      rho (a • u) ≤ |a| * rho u := by
+    apply rho_le_of_testBound (mul_nonneg (abs_nonneg a) (rho_nonneg u))
+    have hh := TestBound.smul (testBound_rho_sq hu) a
+    simpa only [mul_pow, sq_abs] using hh
+  have rho_zero : rho (0 : V → ℝ) = 0 := by
+    apply le_antisymm _ (rho_nonneg _)
+    apply rho_le_of_testBound (C := 0) (by norm_num)
+    simpa using (TestBound.zero : TestBound (0 : V → ℝ) 0)
+  have l1size_nonneg [PartialOrder V] (u : V →₀ ℝ) : 0 ≤ l1size u :=
+    sum_nonneg (fun vertex _ => abs_nonneg (u vertex))
+  have finset_abs_sum_le_l1size [PartialOrder V] (u : V →₀ ℝ) (S : Finset V) :
+      ∑ v ∈ S, |u v| ≤ l1size u := by
+    have he : (∑ v ∈ S ∪ u.support, |u v|) = l1size u := by
+      symm
+      apply sum_subset subset_union_right
+      intro v hv hn
+      rw [Finsupp.notMem_support_iff.mp hn, abs_zero]
+    rw [← he]
+    exact sum_le_sum_of_subset_of_nonneg subset_union_left (fun v hv hn => abs_nonneg _)
+  have testBound_l1size (u : V →₀ ℝ) : TestBound u (l1size u ^ 2) := by
+    intro ι inst S hS hd
+    have habs : (∑ i, |segSum u (S i)|) ≤ l1size u := by
+      calc
+        (∑ i, |segSum u (S i)|) ≤ ∑ i, ∑ v ∈ S i, |u v| :=
+          sum_le_sum fun i hi => abs_sum_le_sum_abs _ _
+        _ = ∑ v ∈ univ.biUnion S, |u v| :=
+          (sum_biUnion (by intro i hi j hj hij; exact hd hij)).symm
+        _ ≤ l1size u := finset_abs_sum_le_l1size u _
+    have hsq := sum_sq_le_sq_sum_of_nonneg
+   
 […]
 
 === LEAN COMPARATOR MidpointLenses (exact formal statement)
@@ -238,7 +320,95 @@ instance : NormedAddCommGroup (Test V) := by
     classical
     rw [SegmentFamily.test, Finsupp.linearCombination_apply, Finsupp.sum]
     calc
-      ‖∑ v ∈ u.supp
+      ‖∑ v ∈ u.support, u v • F.column v‖ ≤
+          ∑ v ∈ u.support, ‖u v • F.column v‖ := norm_sum_le _ _
+      _ ≤ ∑ v ∈ u.support, |u v| := by
+        apply Finset.sum_le_sum
+        intro v hv
+        rw [norm_smul, Real.norm_eq_abs]
+        exact mul_le_of_le_one_right (abs_nonneg _) (norm_column_le F v)
+  have seminorm_sq {V : Type _} [SegmentSystem V] (F : SegmentFamily V) (u : V →₀ ℝ) :
+      F.seminorm u ^ 2 = ∑ S : F.sets, (∑ v ∈ S.val, u v) ^ 2 := by
+    change ‖F.test u‖ ^ 2 = _
+    rw [EuclideanSpace.real_norm_sq_eq]
+    apply Finset.sum_congr rfl
+    intro S _
+    rw [test_apply]
+  have singleton_seminorm {V : Type _} [SegmentSystem V] (v : V) (u : V →₀ ℝ) :
+      (SegmentFamily.singleton v).seminorm u = |u v| := by
+    have h := seminorm_sq (SegmentFamily.singleton v) u
+    have hh : (∑ S : (SegmentFamily.singleton v).sets, (∑ w ∈ S.val, u w) ^ 2) = u v ^ 2 := by
+      exact (Finset.sum_coe_sort (SegmentFamily.singleton v).sets
+        (fun S : Finset V => (∑ w ∈ S, u w) ^ 2)).trans (by simp [SegmentFamily.singleton])
+    rw [hh] at h
+    have hn := apply_nonneg (SegmentFamily.singleton v).seminorm u
+    nlinarith [sq_abs (u v), abs_nonneg (u v)]
+  have segmentTests_bdd (V : Type _) [SegmentSystem V] :
+      BddAbove (Set.range (SegmentFamily.seminorm (V := V))) := by
+    rw [Seminorm.bddAbove_iff]
+    refine ⟨fun u => ∑ v ∈ u.support, |u v|, ?_⟩
+    rintro _ ⟨p, ⟨F, rfl⟩, rfl⟩ u
+    exact norm_test_le F u
+  have le_segmentSeminorm {V : Type _} [SegmentSystem V]
+      (F : SegmentFamily V) (u : V →₀ ℝ) : F.seminorm u ≤ segmentSeminorm V u := by
+    have h := le_ciSup (f := fun G : SegmentFamily V => G.seminorm) (segmentTests_bdd V) F
+    exact Seminorm.le_def.mp h u
+  have abs_coord_le {V : Type _} [SegmentSystem V] (u : V →₀ ℝ) (v : V) :
+      |u v| ≤ segmentSeminorm V u := by
+    rw [← singleton_seminorm v u]
+    exact le_segmentSeminorm _ _
+  have segmentSeminorm_eq_zero {V : Type _} [SegmentSystem V] (u : V →₀ ℝ) :
+      segmentSeminorm V u = 0 ↔ u = 0 := by
+    constructor
+    · intro h
+      ext v
+      have hh := abs_coord_le u v
+      rw [h] at hh
+      simpa using hh
+    · rintro rfl
+      exact map_zero _
+  exact NormedAddCommGroup.ofCore (𝕜 := ℝ) {
+    norm_nonneg u := apply_nonneg (segmentSeminorm V) u.coeff
+    norm_smul c u := map_smul_eq_mul (segmentSeminorm V) c u.coeff
+    norm_triangle u v := map_add_le_add (segmentSeminorm V) u.coeff v.coeff
+    norm_eq_zero_iff u := segmentSeminorm_eq_zero u.coeff }
+instance : NormedSpace ℝ (Test V) where
+  norm_smul_le c u := le_of_eq (map_smul_eq_mul (segmentSeminorm V) c u.coeff)
+def evaluation (v : V) : Test V →L[ℝ] ℝ := by
+  have norm_column_le {V : Type _} [SegmentSystem V] (F : SegmentFamily V) (v : V) : ‖F.column v‖ ≤ 1 := by
+    classical
+    by_cases hv : ∃ S ∈ F.sets, v ∈ S
+    · obtain ⟨S, hS, hvS⟩ := hv
+      have he : F.column v = PiLp.single 2 (⟨S, hS⟩ : F.sets) (1 : ℝ) := by
+        ext T
+        change (if v ∈ T.val then (1 : ℝ) else 0) = _
+        by_cases hTS : T = ⟨S, hS⟩
+        · subst T
+          simp [hvS]
+        · have hn : v ∉ T.val := by
+            intro hvT
+            have hne : T.val ≠ S := fun h => hTS (Subtype.ext h)
+            exact Finset.disjoint_left.mp (F.disjoint T.property hS hne) hvT hvS
+          simp [hTS, hn]
+      rw [he, PiLp.norm_single]
+      norm_num
+    · have he : F.column v = 0 := by
+        ext S
+        have hn : v ∉ S.val := fun h => hv ⟨S.val, S.property, h⟩
+        simp [SegmentFamily.column, hn]
+      rw [he, norm_zero]
+      norm_num
+  have test_apply {V : Type _} [SegmentSystem V] (F : SegmentFamily V) (u : V →₀ ℝ) (S : F.sets) :
+      F.test u S = ∑ v ∈ S.val, u v := by
+    classical
+    simp only [SegmentFamily.test, Finsupp.linearCombination_apply, Finsupp.sum,
+      WithLp.ofLp_sum, Finset.sum_apply, PiLp.smul_apply, SegmentFamily.column,
+      smul_eq_mul]
+    simp only [mul_ite, mul_one, mul_zero]
+    rw [← Finset.sum_filter]
+    apply Finset.sum_subset
+    · intro v hv
+      exact (Finset.mem_filter.mp hv).2
 […]
 
 === LEAN COMPARATOR DiamondDistortion (exact formal statement)
@@ -342,6 +512,91 @@ instance : NormedAddCommGroup T.Primal := by
     · rintro rfl
       exact map_zero _
   exact AddGroupNorm.toNormedAddCommGroup
+    { T.primalSeminorm.toAddGroupSeminorm with
+      eq_zero_of_map_eq_zero' := fun u h => (primal_eq_zero_iff u).mp h }
+instance : NormedSpace ℝ T.Primal where
+  norm_smul_le c u := le_of_eq (T.primalSeminorm.smul' c u)
+abbrev JamesSpace := UniformSpace.Completion T.Primal
+abbrev Dual := StrongDual ℝ T.JamesSpace
+def coordinateFinite (v : ι) : T.Primal →L[ℝ] ℝ := by
+  have Family.test_apply (F : T.Family) (u : ι →₀ ℝ) (i : Fin F.n) :
+      F.test u i = ∑ v ∈ F.seg i, u v := rfl
+  have Family.seminorm_apply (F : T.Family) (u : ι →₀ ℝ) :
+      F.seminorm u = ‖F.test u‖ := rfl
+  have Family.test_single_le (F : T.Family) (v : ι) (r : ℝ) :
+      ‖F.test (Finsupp.single v r)‖ ≤ |r| := by
+    classical
+    rw [EuclideanSpace.norm_eq]
+    apply (Real.sqrt_le_left (abs_nonneg r)).2
+    by_cases h : ∃ i, v ∈ F.seg i
+    · obtain ⟨i, hi⟩ := h
+      have hne : ∀ j, j ≠ i → v ∉ F.seg j := by
+        intro j hji hj
+        exact Finset.disjoint_left.mp (F.disjoint hji) hj hi
+      rw [Finset.sum_eq_single i]
+      · simp [Family.test, Finsupp.single_apply, hi]
+      · intro j _ hji
+        simp [Family.test, Finsupp.single_apply, hne j hji]
+      · simp
+    · have hn : ∀ i, v ∉ F.seg i := by simpa using h
+      simp [Family.test, Finsupp.single_apply, hn, sq_nonneg]
+  have Family.test_le_l1 (F : T.Family) (u : ι →₀ ℝ) :
+      ‖F.test u‖ ≤ u.sum (fun _ r => |r|) := by
+    classical
+    calc
+      ‖F.test u‖ = ‖∑ v ∈ u.support, F.test (Finsupp.single v (u v))‖ := by
+        rw [← map_sum]
+        congr 2
+        exact (Finsupp.sum_single u).symm
+      _ ≤ ∑ v ∈ u.support, ‖F.test (Finsupp.single v (u v))‖ := norm_sum_le _ _
+      _ ≤ ∑ v ∈ u.support, |u v| := Finset.sum_le_sum fun v _ => Family.test_single_le F v (u v)
+      _ = u.sum (fun _ r => |r|) := rfl
+  have families_bddAbove : BddAbove (Set.range (Family.seminorm (T := T))) := by
+    rw [Seminorm.bddAbove_range_iff]
+    intro u
+    exact ⟨u.sum (fun _ r => |r|), by rintro _ ⟨F, rfl⟩; exact Family.test_le_l1 F u⟩
+  have test_le_primal (F : T.Family) (u : ι →₀ ℝ) :
+      ‖F.test u‖ ≤ T.primalSeminorm u := by
+    rw [primalSeminorm, Seminorm.iSup_apply families_bddAbove]
+    exact le_ciSup (⟨u.sum (fun _ r => |r|), by
+      rintro _ ⟨G, rfl⟩; exact Family.test_le_l1 G u⟩ :
+      BddAbove (Set.range (fun G : T.Family => G.seminorm u))) F
+  have coordinate_le_primal (u : ι →₀ ℝ) (v : ι) : |u v| ≤ T.primalSeminorm u := by
+    have h := test_le_primal (T.singletonFamily v) u
+    rw [EuclideanSpace.norm_eq] at h
+    change Real.sqrt (∑ _ : Fin 1, ‖∑ w ∈ ({v} : Finset ι), u w‖ ^ 2) ≤ _ at h
+    simpa [Real.sqrt_sq_eq_abs] using h
+  exact (show T.Primal →ₗ[ℝ] ℝ from Finsupp.lapply v).mkContinuous 1 (by
+      intro u
+      change ‖(show ι →₀ ℝ from u) v‖ ≤ 1 * T.primalSeminorm u
+      simpa only [one_mul, Real.norm_eq_abs] using coordinate_le_primal u v)
+def coordinate (v : ι) : T.Dual :=
+  (T.coordinateFinite v).extend UniformSpace.Completion.toComplL
+def unitFinite (v : ι) : T.Primal := Finsupp.single v 1
+def unitVector (v : ι) : T.JamesSpace := (T.unitFinite v : T.JamesSpace)
+def headDual (H : Finset ι) : T.Dual →L[ℝ] T.Dual :=
+  ∑ v ∈ H, (ContinuousLinearMap.apply ℝ ℝ (T.unitVector v)).smulRight (T.coordinate v)
+def CoordinatePredual : Submodule ℝ T.Dual :=
+  (Submodule.span ℝ (Set.range T.coordinate)).topologicalClosure
+end SegmentSystem
+def intervalSystem {ι : Type*} (r : ι → ι → Prop)
+    (hrefl : ∀ a, r a a) (hanti : ∀ a b, r a b → r b a → a = b) : SegmentSystem ι where
+  IsSegment s := ∃ a b, r a b ∧ ∀ v, v ∈ s ↔ r a v ∧ r v b
+  singleton v := by
+    refine ⟨v, v, hrefl v, ?_⟩
+    intro w
+    simp only [Finset.mem_singleton]
+    constructor
+    · rintro rfl
+      exact ⟨hrefl _, hrefl _⟩
+    · intro h
+      exact hanti w v h.2 h.1
+class Ancestry (ι : Type*) extends PartialOrder ι where
+  predecessors_total : ∀ {a b c : ι}, le a c → le b c → le a b ∨ le b a
+namespace Ancestry
+open scoped Classical
+variable {ι : Type*} [A : Ancestry ι]
+local instance : PartialOrder ι := A.toPartialOrder
 
 […]
 
@@ -505,7 +760,90 @@ instance (K : TestFamily I) : NormedAddCommGroup (TestVector K) := by
         rw [abs_mul]
         exact mul_le_of_le_one_right (abs_nonneg _) (K.coeff_bound _ f.property i)
   have testNorm_bddAbove (K : TestFamily I) (x : I →₀ ℝ) :
-      BddAbove (range fun f : K => |finitePairing 
+      BddAbove (range fun f : K => |finitePairing f.val x|) :=
+    ⟨∑ i ∈ x.support, |x i|, by rintro _ ⟨f, rfl⟩; exact finitePairing_abs_bound K f x⟩
+  have finitePairing_le_testNorm (K : TestFamily I) (f : K) (x : I →₀ ℝ) :
+      |finitePairing f.val x| ≤ testNorm K x := le_ciSup (testNorm_bddAbove K x) f
+  have finitePairing_single_test (x : I →₀ ℝ) (i : I) :
+      finitePairing (fun j => if j = i then (1 : ℝ) else 0) x = x i := by
+    classical
+    rw [finitePairing_apply]
+    simp only [mul_ite, mul_one, mul_zero]
+    by_cases hi : i ∈ x.support
+    · simp [hi]
+    · simp [hi, Finsupp.notMem_support_iff.mp hi]
+  have coordinate_le_testNorm (K : TestFamily I) (x : I →₀ ℝ) (i : I) :
+      |x i| ≤ testNorm K x := by
+    convert finitePairing_le_testNorm K ⟨_, K.singleton_mem i⟩ x using 1
+    rw [finitePairing_single_test]
+  exact NormedAddCommGroup.ofCore (𝕜 := ℝ) {
+    norm_nonneg := apply_nonneg (testSeminorm K)
+    norm_smul := map_smul_eq_mul (testSeminorm K)
+    norm_triangle := map_add_le_add (testSeminorm K)
+    norm_eq_zero_iff := fun x => ⟨by
+      intro h
+      apply Finsupp.ext
+      intro i
+      exact abs_nonpos_iff.mp (h ▸ coordinate_le_testNorm K x i), by
+      rintro rfl
+      exact map_zero (testSeminorm K)⟩ }
+instance (K : TestFamily I) : NormedSpace ℝ (TestVector K) where
+  norm_smul_le a x := le_of_eq (map_smul_eq_mul (testSeminorm K) a x)
+abbrev TestCompletion (K : TestFamily I) := UniformSpace.Completion (TestVector K)
+end TestNorms
+namespace TreeCalculus
+abbrev Node := List ℕ
+def potential (f : Node → ℝ) (s : Node) : ℝ := (s.inits.map f).sum
+inductive QuadraticKind where
+  | sibling | antichain | global
+  deriving DecidableEq
+def QuadraticGroup : QuadraticKind → Finset Node → Prop
+  | .sibling, B => ∃ r, ∀ s ∈ B, ∃ j, s = r ++ [j]
+  | .antichain, B => (B : Set Node).Pairwise (fun s t => ¬s <+: t ∧ ¬t <+: s)
+  | .global, _ => True
+def QuadraticBudget (k : QuadraticKind) (f : Node → ℝ) : Prop :=
+  ∀ B : Finset Node, QuadraticGroup k B → ∑ s ∈ B, f s ^ 2 ≤ 1
+def CoefficientSupport : QuadraticKind → (Node → ℝ) → Prop
+  | .sibling, _ => True
+  | .antichain, f => (Function.support f).Finite
+  | .global, f => Memℓp f 2
+structure IsTreeTest (includeRoot : Bool) (k : QuadraticKind) (f : Node → ℝ) : Prop where
+  root_zero : includeRoot = false → f [] = 0
+  potential_bound : ∀ s, |potential f s| ≤ 1
+  quadratic_budget : QuadraticBudget k f
+  coefficient_support : CoefficientSupport k f
+abbrev TreeCoordinate (includeRoot : Bool) := {s : Node // includeRoot = true ∨ s ≠ []}
+def liftCoefficients (r : Bool) (f : TreeCoordinate r → ℝ) (s : Node) : ℝ :=
+  if h : r = true ∨ s ≠ [] then f ⟨s, h⟩ else 0
+def treeTestFamily (r : Bool) (k : QuadraticKind) : TestFamily (TreeCoordinate r) := by
+  have potential_root (f : Node → ℝ) : potential f [] = f [] := by simp [potential]
+  have potential_child (f : Node → ℝ) (s : Node) (j : ℕ) :
+      potential f (s ++ [j]) = potential f s + f (s ++ [j]) := by
+    simp [potential, List.inits_append]
+  have potential_smul (a : ℝ) (f : Node → ℝ) (s : Node) :
+      potential (a • f) s = a * potential f s := by
+    induction s using List.reverseRecOn with
+    | nil => simp [potential_root]
+    | append_singleton s j ih => simp only [potential_child, ih, Pi.smul_apply, smul_eq_mul]; ring
+  have quadratic_singleton (k : QuadraticKind) {s : Node} (hs : s ≠ []) :
+      QuadraticGroup k {s} := by
+    cases k with
+    | sibling =>
+      cases s using List.reverseRecOn with
+      | nil => exact (hs rfl).elim
+      | append_singleton s j =>
+        refine ⟨s, ?_⟩
+        intro t ht
+        have ht' : t = s ++ [j] := by simpa using ht
+        exact ⟨j, ht'⟩
+    | antichain => simp [QuadraticGroup]
+    | global => trivial
+  have test_coefficient_bound {r : Bool} {k : QuadraticKind} {f : Node → ℝ}
+      (hf : IsTreeTest r k f) (s : Node) : |f s| ≤ 1 := by
+    by_cases hs : s = []
+    · subst s; simpa only [potential_root] using hf.potential_bound []
+    · have h := hf.quadratic_budget {s} (quadratic_singleton k hs)
+      rw [Finset.sum_singleton] at h
 […]
 
 === LEAN COMPARATOR IndependentProducts (exact formal statement)
@@ -691,5 +1029,96 @@ def joinedTree : FiniteRootedTree JoinedNode where
       · rw [ite_eq_right he]
         dsimp
         rw [List.length_dropLast]
-     
+        have hpos := List.length_pos_iff_ne_nil.mpr he
+        omega
+open Filter Topology
+def WeaklyNull {E : Type uSpace} [NormedAddCommGroup E] [NormedSpace ℝ E] (d : ℕ → E) : Prop :=
+  ∀ f : E →L[ℝ] ℝ, Tendsto (fun k => f (d k)) atTop (𝓝 0)
+structure EquivalentNorm (E : Type uSpace) [NormedAddCommGroup E] [NormedSpace ℝ E] where
+  N : Seminorm ℝ E
+  lower : ℝ
+  upper : ℝ
+  lower_pos : 0 < lower
+  lower_le_upper : lower ≤ upper
+  lower_bound : ∀ x, lower * ‖x‖ ≤ N x
+  upper_bound : ∀ x, N x ≤ upper * ‖x‖
+namespace EquivalentNorm
+variable {E : Type uSpace} [NormedAddCommGroup E] [NormedSpace ℝ E] (A : EquivalentNorm E)
+noncomputable def inner (x : E) (t : ℝ) (F : CofiniteSubspace E) : ℝ :=
+  sInf {r : ℝ | ∃ y ∈ F.space, A.N y = 1 ∧ r = A.N (x + t • y) - 1}
+noncomputable def modulus (t : ℝ) : ℝ :=
+  sInf {r : ℝ | ∃ x : E, A.N x = 1 ∧ r = sSup (Set.range (A.inner x t))}
+def AUC : Prop := ∀ t : ℝ, 0 < t → 0 < A.modulus t
+end EquivalentNorm
+open scoped ENNReal
+def IsReflexive (E : Type uSpace) [NormedAddCommGroup E] [NormedSpace ℝ E] : Prop :=
+  Function.Surjective (NormedSpace.inclusionInDoubleDual ℝ E)
+namespace SquareSum
+variable {ι : Type uIndex} [indexDecidable : DecidableEq ι] (E : ι → Type uFiber)
+    [∀ i, NormedAddCommGroup (E i)] [fiberNormedSpace : ∀ i, NormedSpace ℝ (E i)]
+abbrev Space : Type _ := ↥(lp E 2)
+end SquareSum
+open UniformSpace
+def completionEquivOfDense {E : Type uSpace} {F : Type uOther} [NormedAddCommGroup E]
+    [NormedSpace ℝ E] [NormedAddCommGroup F] [NormedSpace ℝ F] [CompleteSpace F] (f : E →L[ℝ] F)
+    (K : NNReal) (hK : ∀ x, ‖x‖ ≤ K * ‖f x‖) (hdense : DenseRange f) : Completion E ≃L[ℝ] F := by
+  let g := f.fromCompletion
+  have hbound : ∀ x : Completion E, ‖x‖ ≤ K * ‖g x‖ := by
+    intro x
+    induction x using Completion.induction_on with
+    | hp => exact isClosed_le continuous_norm (continuous_const.mul (g.continuous.norm))
+    | ih x => simpa only [g, ContinuousLinearMap.fromCompletion_apply_coe, Completion.norm_coe] using hK x
+  have hanti := g.antilipschitz_of_bound hbound
+  have hclosed := hanti.isClosed_range g.uniformContinuous
+  have hsurj : Function.Surjective g := by
+    intro y
+    have hh : y ∈ closure (Set.range f) := hdense y
+    have hsub : Set.range f ⊆ Set.range g := by
+      rintro _ ⟨x, rfl⟩
+      exact ⟨(x : Completion E), ContinuousLinearMap.fromCompletion_apply_coe f x⟩
+    have hm := closure_mono hsub hh
+    rw [hclosed.closure_eq] at hm
+    exact hm
+  exact ContinuousLinearEquiv.ofBijective g (LinearMap.ker_eq_bot.mpr hanti.injective)
+    (LinearMap.range_eq_top.mpr hsurj)
+def componentTree (h : ℕ+) : FiniteRootedTree (ComponentNode h) where
+  root := ⟨[], by simp⟩
+  parent s := ⟨s.1.dropLast, by rw [List.length_dropLast]; have := s.2; omega⟩
+  depth s := s.1.length
+  parent_root := Subtype.ext rfl
+  depth_root := rfl
+  parent_depth s hs := by
+    rw [List.length_dropLast]
+    have hne : s.1 ≠ [] := fun h => hs (Subtype.ext h)
+    have hp := List.length_pos_iff_ne_nil.mpr hne
+    omega
+def logarithmicGamma (M β : ℝ) : ℝ :=
+  let h := β ^ 2 / (2 * M ^ 2)
+  let c := β * Real.sqrt h / 8
+  let H := 1 + Real.log (M / c)
+  let K := 4 * (2 + Real.sqrt 6) * H / h
+  β * h / 8 * Real.exp (-K)
+open Filter
+open scoped Topology
+structure ChildExponent where
+  val : ℝ
+  one_le : 1 ≤ val
+namespace ChildExponent
+variable (p : ChildExponent)
+def agg {ι : Type uIndex} (s : Finset ι) (f : ι → ℝ) : ℝ :=
+  (∑ i ∈ s, |f i| ^ p.val) ^ (1 / p.val)
+end ChildExponent
+section
+variable {ι : Type uIndex} [indexFinite : Fintype ι] [indexDecidable : DecidableEq ι]
+    (T : FiniteRootedTree ι) (p : ChildExponent)
+def FiniteRootedTree.pfields (v : ι → ℝ) (s : ι) : ℝ × ℝ :=
+  leastPair (v s)
+    (p.agg Finset.univ (fun c : {c // c ∈ T.children s} => (pfields v c.1).1))
+    (p.agg Finset.univ (fun c : {c // c ∈ T.children s} => (pfields v c.1).2))
+termination_by T.maxDepth - T.depth s
+decreasing_by
+  all_goals
+    have hc := (Finset.mem_filter.mp c.2).2
+    have hd := T.parent_depth c.1 hc.1
+    rw [hc.2] at hd
 […]
