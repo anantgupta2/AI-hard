@@ -1,9 +1,9 @@
 # v2 adjudicator brief
 
 Two independent labellers labelled every family on the v2 buckets (`data/abc_v2/BUCKETS_PLAN.md`: read the
-"v2 buckets" and "Tie-break rules" sections, including rules 11 and 12). For the families in your batch they
+"v2 buckets" and "Tie-break rules" sections, rules 1–21, including the M12 limit-law code). For the families in your batch they
 disagree on at least one field. The disagreements, with both full records, are in `data/abc_v2/full/disputes.json`
-(key = fid; `fields` lists the disputed fields).
+(key = fid; `fields` lists the disputed fields; a field marked "(rule N check)" means both labellers agreed but rule N, added after labelling, may change it).
 
 For each fid in your batch:
 1. Read the family's input `data/abc_v2/inputs/<fid>.txt`. Open the main .tex under `data/raw/openai-math/`
