@@ -63,6 +63,12 @@
 .ax-deflink { margin-left: var(--cds-gap-xs); }
 #definitions .ax-kv { font-size: var(--cds-font-size-body); }
 #definitions .ax-kv dt { font-weight: var(--cds-font-weight-medium); color: var(--color-fg); }
+.ax-search { font: inherit; font-size: var(--cds-font-size-caption); color: var(--color-fg); background: var(--color-bg); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: 2px var(--cds-pad-sm); min-width: 0; flex: 1 1 14rem; max-width: 24rem; }
+.ax-search:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 1px; }
+.ax-heat th, .ax-heat td { white-space: nowrap; }
+.ax-heat tbody tr { cursor: default; }
+.ax-heat tbody th { position: static; font-weight: var(--cds-font-weight-regular, 400); color: var(--color-fg); border-bottom: 1px solid var(--color-border-line); padding: var(--cds-pad-xs) var(--cds-pad-sm); }
+#rel-assoc tbody tr, #rel-kappa tbody tr { cursor: default; }
 [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
 [data-dash-source-state=empty] { color: transparent; }
 #dash-root .ax { --ax-n3: var(--cds-chart-status-critical); --ax-n2: var(--cds-chart-reference); }
@@ -82,6 +88,7 @@
 
   <nav class="ax-tabs" role="tablist" aria-label="Views">
     <button class="ax-tab" role="tab" id="tab-families" data-tab="families" aria-selected="true">Families</button>
+    <button class="ax-tab" role="tab" id="tab-release" data-tab="release" aria-selected="false">Release labels</button>
     <button class="ax-tab" role="tab" id="tab-traces" data-tab="traces" aria-selected="false">Trace comparison</button>
     <button class="ax-tab" role="tab" id="tab-candidates" data-tab="candidates" aria-selected="false">Lemmas and definitions</button>
     <button class="ax-tab" role="tab" id="tab-shortlist" data-tab="shortlist" aria-selected="false">Eureka shortlist</button>
@@ -105,6 +112,76 @@
       </div>
     </div>
     <div id="family-detail" class="ax-page"></div>
+  </section>
+
+  <section class="ax-page" id="release" role="tabpanel" aria-labelledby="tab-release" hidden>
+    <div class="ax-card" id="rel-intro">
+      <h2>What the whole release claims</h2>
+      <p class="ax-note">All 372 families, labelled on the v2 buckets. Two independent passes wrote each headline as a quantified sentence and coded it; the 141 families with any disagreement went to an adjudicator. The Lean labels include the 6 corrections from the Lean scope check. <button type="button" class="ax-chip ax-deflink" data-def="def-v2">What the codes mean</button></p>
+      <div class="ax-figs" id="rel-figs"></div>
+    </div>
+    <div class="ax-grid">
+      <div class="ax-card"><h2>What the headline asserts</h2><p class="ax-note">A.matrix, families per code. Hover a bar for the share.</p><div class="ax-chart" id="rel-matrix"></div></div>
+      <div class="ax-card"><h2>Quantifier prefix</h2><p class="ax-note">Outermost quantifier, then the number of ∀/∃ alternations in the full prefix.</p><div class="ax-chart" id="rel-outer"></div><div class="ax-chart" id="rel-alt"></div></div>
+      <div class="ax-card"><h2>What was posed</h2><p class="ax-note">B.problem: the problem the family answers.</p><div class="ax-chart" id="rel-problem"></div></div>
+      <div class="ax-card"><h2>What happened to it</h2><p class="ax-note">B.outcome.</p><div class="ax-chart" id="rel-outcome"></div></div>
+      <div class="ax-card"><h2>Settings and side results</h2><p class="ax-note">Families carrying each flag (a family can carry several).</p><div class="ax-chart" id="rel-flags"></div></div>
+      <div class="ax-card"><h2>Does the Lean state the headline?</h2><p class="ax-note">lean_vs_headline over all 372 families.</p><div class="ax-chart" id="rel-lean"></div></div>
+    </div>
+    <div class="ax-card">
+      <h2>Assertion against outcome</h2>
+      <p class="ax-note">Families per cell; darker is more. Counterexamples almost always settle a problem negatively; limit laws and property claims carry most special cases.</p>
+      <div class="ax-scroll" id="rel-mxo"></div>
+    </div>
+    <div class="ax-card">
+      <h2>Assertion by subject</h2>
+      <p class="ax-note">Row percentages: what share of each subject's families asserts each kind of claim.</p>
+      <div class="ax-scroll" id="rel-sxm"></div>
+    </div>
+    <div class="ax-grid">
+      <div class="ax-card"><h2>How the labels relate</h2><p class="ax-note">Cramér's V with a permutation p-value (3,000 shuffles).</p><div class="ax-scroll" id="rel-assoc"></div></div>
+      <div class="ax-card"><h2>How reliable the labels are</h2><p class="ax-note">Agreement between the two independent passes (Cohen's κ), and agreement of the final labels with the in-depth v1 labels.</p><div class="ax-scroll" id="rel-kappa"></div></div>
+    </div>
+    <div class="ax-card" id="rel-length">
+      <h2>How long the proofs are</h2>
+      <p class="ax-note">PDF page counts of all 719 manuscripts at the pinned commit; a family's length is the sum over its manuscripts. Pages include introductions, background and references.</p>
+      <div class="ax-figs" id="rel-len-figs"></div>
+      <div class="ax-grid">
+        <div><h3>Families by total pages</h3><div class="ax-chart" id="rel-pages"></div></div>
+        <div><h3>Median pages by Lean status</h3><div class="ax-chart" id="rel-pages-lean"></div></div>
+        <div><h3>Median pages by subject</h3><div class="ax-chart" id="rel-pages-subject"></div></div>
+      </div>
+    </div>
+    <div class="ax-card" id="rel-scope">
+      <h2>Lean scope check</h2>
+      <p class="ax-note">The 67 families whose Lean statement is weaker than, or different from, the headline, checked against the formalized paper and OpenAI's scope note (lean/docs/&lt;fid&gt;.md).</p>
+      <div class="ax-grid">
+        <div><h3>Why the Lean differs</h3><div class="ax-chart" id="rel-scope-cat"></div></div>
+        <div><h3>Does OpenAI's note say so?</h3><div class="ax-chart" id="rel-scope-disc"></div></div>
+      </div>
+      <h3>Flagged families</h3>
+      <div class="ax-scroll">
+        <table class="ax-scopeflags" data-source="lean_scope" data-row-key="fid">
+          <thead><tr><th data-field="fid">Family</th><th data-field="category">Category</th><th data-field="disclosure">Note</th><th data-field="flag">Why flagged</th><th data-field="gap">What the Lean lacks</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="ax-card" id="rel-all">
+      <h2>All families</h2>
+      <div class="ax-filters">
+        <label class="ax-note" for="rel-search">Search</label>
+        <input id="rel-search" class="ax-search" type="search" placeholder="Title, subject, code or family number">
+        <span class="ax-note" id="rel-count"></span>
+      </div>
+      <div class="ax-scroll">
+        <table class="ax-rel" data-source="release_labels" data-row-key="fid">
+          <thead><tr><th data-field="fid">Family</th><th data-field="title">Title</th><th data-field="subject">Subject</th><th data-field="prefix">Prefix</th><th data-field="matrix">Asserts</th><th data-field="problem">Posed</th><th data-field="outcome">Outcome</th><th data-field="lean">Lean</th><th data-field="pages" class="num">Pages</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="rel-detail"></div>
+    </div>
   </section>
 
   <section class="ax-page" id="traces" role="tabpanel" aria-labelledby="tab-traces" hidden>
@@ -324,6 +401,63 @@
         </dl>
       </div>
     </div>
+    <div class="ax-card" id="def-v2">
+      <h2>Release-wide labels (v2 buckets)</h2>
+      <p class="ax-note">Used on the Release labels tab. The headline claim is first written as one semi-formal quantified sentence; the codes are read off that sentence. The full rules and tie-breaks are in data/abc_v2/BUCKETS_PLAN.md.</p>
+      <div class="ax-grid">
+        <div>
+          <h3>A.prefix · quantifiers</h3>
+          <dl class="ax-kv">
+            <dt>∀ ∃ ∃!</dt><dd>For all, there exists, there exists exactly one, over the main objects only, outermost first.</dd>
+            <dt>∀ᵍ</dt><dd>For generic or almost every object.</dd>
+            <dt>∀^∞ ∃^∞</dt><dd>For all sufficiently large, and for infinitely many.</dd>
+            <dt>ℙ</dt><dd>With high probability, almost surely, or a statement about a law.</dd>
+            <dt>none</dt><dd>A closed statement about one named object.</dd>
+          </dl>
+          <h3>A.matrix · what is asserted</h3>
+          <dl class="ax-kv">
+            <dt>M1</dt><dd>A property holds.</dd><dt>M2</dt><dd>Existence of an object.</dd><dt>M3</dt><dd>Counterexample to a universal claim.</dd>
+            <dt>M4</dt><dd>Non-existence.</dd><dt>M5</dt><dd>Equivalence or characterization.</dd><dt>M6</dt><dd>Classification.</dd>
+            <dt>M7</dt><dd>Identity or isomorphism.</dd><dt>M8</dt><dd>One-sided bound.</dd><dt>M9</dt><dd>Exact value or sharp bound.</dd>
+            <dt>M10</dt><dd>Computational status: an algorithm, hardness or decidability.</dd><dt>M11</dt><dd>Metamathematical: independence or consistency.</dd><dt>M12</dt><dd>Limit law: a scaling limit or limiting distribution.</dd>
+          </dl>
+        </div>
+        <div>
+          <h3>B.problem · what was posed</h3>
+          <dl class="ax-kv">
+            <dt>P1</dt><dd>A named conjecture.</dd><dt>P2</dt><dd>An explicitly posed open question.</dd><dt>P3</dt><dd>An entry in a numbered problem list.</dd>
+            <dt>P4</dt><dd>A record: a bound or algorithm to beat.</dd><dt>P5</dt><dd>Nothing posed.</dd>
+          </dl>
+          <h3>B.outcome · what happened</h3>
+          <dl class="ax-kv">
+            <dt>O1</dt><dd>Settled positively.</dd><dt>O2</dt><dd>Settled negatively.</dd><dt>O3</dt><dd>Refuted and replaced with a corrected statement.</dd>
+            <dt>O4</dt><dd>Shown independent.</dd><dt>O5</dt><dd>Special case only.</dd><dt>O6</dt><dd>Conditional on another conjecture.</dd>
+            <dt>O7</dt><dd>Record progress without settling.</dd><dt>O8</dt><dd>Extension of a known result.</dd><dt>O9</dt><dd>New proof of a known result.</dd>
+          </dl>
+        </div>
+        <div>
+          <h3>Flags</h3>
+          <dl class="ax-kv">
+            <dt>A flags</dt><dd>specific_instance, asymptotic_only, effective, ineffective, conditional_on, restricted_range, finite_checkable, probabilistic.</dd>
+            <dt>B flags</dt><dd>full_only_with_prior_results (cited theorems needed to reach the headline), adds_corollaries, builds_on_model_output (relies on another model-produced paper).</dd>
+          </dl>
+          <h3>Lean against the headline</h3>
+          <dl class="ax-kv">
+            <dt>same</dt><dd>The comparator states the headline, up to harmless formalization choices.</dd>
+            <dt>weaker</dt><dd>The headline implies the Lean statement, not conversely.</dd>
+            <dt>different</dt><dd>Neither implies the other: a lemma, a companion result or a different case.</dd>
+            <dt>no_lean</dt><dd>The family has no Lean.</dd>
+          </dl>
+          <h3>Lean scope categories</h3>
+          <dl class="ax-kv">
+            <dt>Companion paper</dt><dd>The Lean fully formalizes another manuscript of the family, not the headline one.</dd>
+            <dt>Partial, disclosed</dt><dd>A special case, weaker bound or one half, and OpenAI's scope note says so.</dd>
+            <dt>Lemma, disclosed</dt><dd>An intermediate result, and the note says so.</dd>
+            <dt>Partial, not flagged</dt><dd>Partial or a lemma, and the note does not say so or overstates it.</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
     <div class="ax-card" id="def-novelty">
       <h2>N · Novelty grade of each lemma or definition</h2>
       <dl class="ax-kv">
@@ -390,7 +524,7 @@ dash.calc('summary', {
   S.show = (id, push = true) => {
     S.tab = id;
     tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === id)));
-    ['families', 'traces', 'candidates', 'shortlist', 'f1', 'definitions'].forEach((p) => { document.getElementById(p).hidden = p !== id; });
+    ['families', 'release', 'traces', 'candidates', 'shortlist', 'f1', 'definitions'].forEach((p) => { document.getElementById(p).hidden = p !== id; });
     if (push) dash.setLink(id);
     S.redraw && S.redraw();
   };
@@ -401,7 +535,7 @@ dash.calc('summary', {
     if (el) el.scrollIntoView({ block: 'start' });
   }));
   const h = location.hash.slice(1);
-  if (['families', 'traces', 'candidates', 'shortlist', 'f1', 'definitions'].includes(h)) S.show(h, false);
+  if (['families', 'release', 'traces', 'candidates', 'shortlist', 'f1', 'definitions'].includes(h)) S.show(h, false);
 
   S.rows = (id) => { const d = dash.data(id); return d.status === 'ok' && Array.isArray(d.data) ? d.data : []; };
   S.el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
@@ -1044,6 +1178,232 @@ dash.calc('prover_counts', {
     detail.replaceChildren(box);
   }
   function renderAll() { renderFilters(); renderTable(); renderDetail(); }
+  dash.onData(renderAll);
+})();
+</script>
+
+<script>
+(() => {
+  const S = window.AX;
+  const fmt = d3.format(','), pct = d3.format('.0%');
+  const NAMES = {
+    M1: 'property holds', M2: 'existence', M3: 'counterexample', M4: 'non-existence', M5: 'equivalence', M6: 'classification',
+    M7: 'identity / isomorphism', M8: 'one-sided bound', M9: 'exact value / sharp', M10: 'computational status', M11: 'metamathematical', M12: 'limit law',
+    P1: 'named conjecture', P2: 'open question', P3: 'problem list', P4: 'record', P5: 'nothing posed',
+    O1: 'settled yes', O2: 'settled no', O3: 'refute and replace', O4: 'independent', O5: 'special case', O6: 'conditional', O7: 'record progress', O8: 'extension', O9: 'new proof',
+    same: 'states the headline', weaker: 'weaker than the headline', different: 'different result', no_lean: 'no Lean',
+    '∀': '∀ for all', '∃': '∃ there exists', 'ℙ': 'ℙ probabilistic', none: 'none (closed statement)',
+    companion_full: 'companion paper, fully formalized', headline_partial_disclosed: 'partial, disclosed', headline_lemma_disclosed: 'lemma, disclosed',
+    partial_undisclosed: 'partial, not flagged', label_error: 'our label was wrong',
+    explicit: 'says what is left out', implicit: 'accurate, gap not flagged', overstated: 'overstates the Lean',
+  };
+  const MATRIX = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10', 'M11', 'M12'];
+  const OUTCOME = ['O1', 'O2', 'O3', 'O4', 'O5', 'O6', 'O7', 'O8', 'O9'];
+  const name = (k) => (NAMES[k] ? (/^[MPO]\d/.test(k) ? `${k} ${NAMES[k]}` : NAMES[k]) : k);
+  S.rel = S.rel || { q: '', pick: null };
+
+  // Single-series horizontal bars: one hue, value labels at the bar end, tooltip per bar.
+  function hbars(id, data, opts = {}) {
+    const box = document.getElementById(id);
+    if (!box) return;
+    box.querySelector('svg')?.remove();
+    if (!data.length || box.closest('[hidden]')) return;
+    const W = box.clientWidth || 320, bar = 16, gap = 6, labelW = Math.min(190, W * 0.46), right = 64;
+    const H = data.length * (bar + gap);
+    const max = d3.max(data, (d) => d.v) || 1;
+    const x = d3.scaleLinear([0, max], [labelW, W - right]);
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H).attr('role', 'img')
+      .attr('aria-label', data.map((d) => `${d.label}: ${opts.fmt ? opts.fmt(d.v) : d.v}`).join('; '));
+    const tip = S.tip(box);
+    data.forEach((d, i) => {
+      const y = i * (bar + gap);
+      svg.append('text').attr('x', labelW - 8).attr('y', y + bar / 2).attr('dy', '0.35em').attr('text-anchor', 'end').text(d.label.length > 30 ? d.label.slice(0, 29) + '…' : d.label);
+      svg.append('rect').attr('x', labelW).attr('y', y).attr('width', Math.max(2, x(d.v) - labelW)).attr('height', bar).attr('rx', 3)
+        .style('fill', opts.color || dash.colors[0]);
+      svg.append('text').attr('x', x(d.v) + 6).attr('y', y + bar / 2).attr('dy', '0.35em').text(d.text ?? (opts.fmt ? opts.fmt(d.v) : fmt(d.v)));
+      svg.append('rect').attr('x', 0).attr('y', y - gap / 2).attr('width', W).attr('height', bar + gap).style('fill', 'transparent')
+        .on('mousemove', (ev) => { tip.replaceChildren(S.el('div', 'h', d.label), S.el('div', null, d.tip || d.text || String(d.v))); S.place(box, tip, ev); })
+        .on('mouseleave', () => { tip.hidden = true; });
+    });
+  }
+  const counts = (rows, f, order) => {
+    const c = d3.rollup(rows, (v) => v.length, f);
+    const keys = order ? order.filter((k) => c.has(k)) : [...c.keys()].sort((a, b) => c.get(b) - c.get(a));
+    return keys.map((k) => ({ k, n: c.get(k) }));
+  };
+  const asBars = (cs, total) => cs.map(({ k, n }) => ({ label: name(k), v: n, text: `${n} · ${pct(n / total)}`, tip: `${n} of ${total} families (${pct(n / total)})` }));
+
+  // Heat table: counts or row shares, one hue whose strength follows the value.
+  function heat(id, rows, rowKey, cols, colKey, mode) {
+    const box = document.getElementById(id);
+    if (!box) return;
+    const rk = [...new Set(rows.map((r) => r[rowKey]))].sort((a, b) => String(a).localeCompare(String(b), 'en', { numeric: true }));
+    const tab = d3.rollup(rows, (v) => v.length, (r) => r[rowKey], (r) => r[colKey]);
+    const max = d3.max(rk, (a) => d3.max(cols, (c) => { const n = tab.get(a)?.get(c) || 0; const t = d3.sum(tab.get(a)?.values() || []); return mode === 'row' ? n / t : n; })) || 1;
+    const t = S.el('table', 'ax-heat');
+    const hr = S.el('tr'); hr.append(S.el('th', null, ''), ...cols.map((c) => { const th = S.el('th', 'num', c); th.title = name(c); return th; }), S.el('th', 'num', 'n'));
+    const head = S.el('thead'); head.append(hr);
+    const body = S.el('tbody');
+    rk.forEach((a) => {
+      const tot = d3.sum(tab.get(a)?.values() || []);
+      const tr = S.el('tr'); tr.append(S.el('th', null, mode === 'row' ? a : name(a)));
+      cols.forEach((c) => {
+        const n = tab.get(a)?.get(c) || 0, v = mode === 'row' ? n / tot : n;
+        const td = S.el('td', 'num', n ? (mode === 'row' ? pct(v) : String(n)) : '·');
+        if (n) td.style.background = `color-mix(in oklab, ${dash.colors[0]} ${Math.round(8 + 52 * (v / max))}%, transparent)`;
+        td.title = `${mode === 'row' ? a : name(a)} · ${name(c)}: ${n} famil${n === 1 ? 'y' : 'ies'}${mode === 'row' ? ` (${pct(v)} of ${tot})` : ''}`;
+        tr.append(td);
+      });
+      tr.append(S.el('td', 'num', String(tot)));
+      body.append(tr);
+    });
+    t.append(head, body);
+    box.replaceChildren(t);
+  }
+
+  function figs(id, list) {
+    const box = document.getElementById(id);
+    if (!box) return;
+    box.replaceChildren(...list.map(([v, l]) => { const d = S.el('div', 'ax-fig'); d.append(S.el('span', 'v', v), S.el('span', 'l', l)); return d; }));
+  }
+
+  function statTables() {
+    const st = S.rows('label_stats');
+    const assoc = st.filter((r) => r.kind === 'assoc').sort((a, b) => b.value - a.value);
+    const label = { A_matrix: 'Asserts', A_outer: 'Outer quantifier', B_problem: 'Posed', B_outcome: 'Outcome', subject: 'Subject', lean: 'Has Lean', lean_vs_headline: 'Lean vs headline' };
+    const t = S.el('table');
+    const h = S.el('tr'); ['Pair', 'V', 'p'].forEach((x, i) => h.append(S.el('th', i ? 'num' : null, x)));
+    const th = S.el('thead'); th.append(h);
+    const tb = S.el('tbody');
+    assoc.forEach((r) => {
+      const tr = S.el('tr');
+      tr.append(S.el('td', null, `${label[r.a] || r.a} × ${label[r.b] || r.b}`), S.el('td', 'num', r.value.toFixed(2)), S.el('td', 'num', r.p < 0.001 ? '< 0.001' : r.p.toFixed(3)));
+      tb.append(tr);
+    });
+    t.append(th, tb);
+    document.getElementById('rel-assoc').replaceChildren(t);
+    const k = S.el('table');
+    const kh = S.el('tr'); ['Measure', 'Agreement', 'κ'].forEach((x, i) => kh.append(S.el('th', i ? 'num' : null, x)));
+    const kth = S.el('thead'); kth.append(kh);
+    const kb = S.el('tbody');
+    const kl = { A_matrix: 'Asserts (A.matrix)', A_prefix: 'Full prefix (A.prefix)', B_problem: 'Posed (B.problem)', B_outcome: 'Outcome (B.outcome)' };
+    st.filter((r) => r.kind === 'kappa').forEach((r) => { const tr = S.el('tr'); tr.append(S.el('td', null, 'Pass A vs pass B: ' + (kl[r.a] || r.a)), S.el('td', 'num', pct(r.agreement)), S.el('td', 'num', r.value.toFixed(2))); kb.append(tr); });
+    st.filter((r) => r.kind === 'vs_deep').forEach((r) => { const tr = S.el('tr'); tr.append(S.el('td', null, `Final vs in-depth v1 labels, axis ${r.a} (${r.b})`), S.el('td', 'num', pct(r.agreement)), S.el('td', 'num', '–')); kb.append(tr); });
+    k.append(kth, kb);
+    document.getElementById('rel-kappa').replaceChildren(k);
+  }
+
+  function scopeTable() {
+    const tb = document.querySelector('.ax-scopeflags tbody');
+    const rows = S.rows('lean_scope').map((r) => ({ ...r, flag: [
+      r.category === 'partial_undisclosed' ? 'gap not flagged by OpenAI' : '',
+      r.disclosure === 'overstated' ? 'note overstates the Lean' : '',
+      r.yaml_listed_but_partial ? 'formalization.yaml lists the paper as formalized' : '',
+      r.our_label_check !== 'confirmed' ? `our label corrected (${r.our_label_check.replace('should_be_same', 'same')})` : '',
+    ].filter(Boolean).join('; ') })).filter((r) => r.flag);
+    tb.replaceChildren(...S.sorted(rows, 'scope').map((r) => {
+      const tr = S.el('tr'); tr.tabIndex = 0; tr.dataset.key = r.fid;
+      tr.append(S.el('td', null, r.fid), S.el('td', null, name(r.category)), S.el('td', null, name(r.disclosure)), S.el('td', null, r.flag), S.el('td', null, r.gap));
+      tr.addEventListener('click', () => { S.rel.pick = r.fid; renderAll(); document.getElementById('rel-detail').scrollIntoView({ block: 'nearest' }); });
+      return tr;
+    }));
+  }
+
+  function filtered() {
+    const q = S.rel.q.trim().toLowerCase();
+    const rows = S.rows('release_labels');
+    if (!q) return rows;
+    return rows.filter((r) => [r.fid, r.title, r.subject, r.matrix, r.problem, r.outcome, r.lean, r.prefix, NAMES[r.matrix], NAMES[r.outcome]].join(' ').toLowerCase().includes(q));
+  }
+  function familyTable() {
+    const tb = document.querySelector('.ax-rel tbody');
+    const rows = S.sorted(filtered(), 'rel');
+    document.getElementById('rel-count').textContent = `${rows.length} of ${S.rows('release_labels').length} families`;
+    tb.replaceChildren(...rows.map((r) => {
+      const tr = S.el('tr'); tr.tabIndex = 0; tr.dataset.key = r.fid;
+      tr.setAttribute('aria-selected', String(S.rel.pick === r.fid));
+      tr.append(S.el('td', null, r.fid), S.el('td', null, r.title), S.el('td', null, r.subject), S.el('td', null, r.prefix),
+        S.el('td', null, name(r.matrix)), S.el('td', null, name(r.problem)), S.el('td', null, name(r.outcome)), S.el('td', null, r.lean), S.el('td', 'num', fmt(r.pages)));
+      const pick = () => { S.rel.pick = S.rel.pick === r.fid ? null : r.fid; familyTable(); detail(); };
+      tr.addEventListener('click', pick);
+      tr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+      return tr;
+    }));
+  }
+  function detail() {
+    const box = document.getElementById('rel-detail');
+    const r = S.rows('release_labels').find((x) => x.fid === S.rel.pick);
+    if (!r) { box.replaceChildren(S.el('p', 'ax-empty', 'Pick a family to see its quantified headline and every label.')); return; }
+    const sc = S.rows('lean_scope').find((x) => x.fid === r.fid);
+    const c = S.el('div', 'ax-card');
+    c.append(S.el('h3', null, `Family ${r.fid} · ${r.title}`));
+    const dl = S.el('dl', 'ax-kv');
+    [['Headline', r.claim], ['Subject', r.subject], ['Prefix', `${r.prefix} (${r.alternations} alternation${r.alternations === 1 ? '' : 's'})`], ['Asserts', name(r.matrix)],
+      ['Settings', r.A_flags || '–'], ['Posed', name(r.problem)], ['Outcome', name(r.outcome)], ['Side results', r.B_flags || '–'],
+      ['Lean vs headline', r.lean + (r.lean_fixed_from ? ` (corrected from ${r.lean_fixed_from} by the scope check)` : '')],
+      ['Lean scope', sc ? `${name(sc.category)}. ${sc.gap}` : null], ['OpenAI scope note', sc ? `“${sc.quote}”` : null],
+      ['Length', `${fmt(r.pages)} pages in ${r.manuscripts} manuscript${r.manuscripts === 1 ? '' : 's'}${r.lean_lines ? `; ${fmt(r.lean_lines)} non-blank Lean lines in its directories` : ''}`],
+      ['Labels', r.label_source === 'adjudicated' ? 'Adjudicated after the two passes disagreed' : 'Both independent passes agreed']]
+      .filter(([, v]) => v).forEach(([k, v]) => dl.append(S.el('dt', null, k), S.el('dd', null, v)));
+    c.append(dl);
+    if (S.rows('families').some((f) => f.fid === r.fid)) {
+      const b = S.el('button', 'ax-chip', 'Open the in-depth analysis'); b.type = 'button';
+      b.addEventListener('click', () => S.pickFamily(r.fid));
+      c.append(b);
+    }
+    box.replaceChildren(c);
+  }
+
+  function charts() {
+    const rows = S.rows('release_labels');
+    if (!rows.length) return;
+    const n = rows.length;
+    const med = (xs) => d3.median(xs.filter((x) => x != null));
+    const lean = rows.filter((r) => r.lean !== 'no_lean');
+    figs('rel-figs', [
+      [fmt(n), 'families labelled'],
+      [String(rows.filter((r) => r.label_source === 'adjudicated').length), 'adjudicated after disagreement'],
+      [pct(rows.filter((r) => r.outcome === 'O1' || r.outcome === 'O2').length / n), 'settle the posed problem outright'],
+      [pct(rows.filter((r) => r.lean === 'same').length / n), 'have Lean that states the headline'],
+    ]);
+    hbars('rel-matrix', asBars(counts(rows, (r) => r.matrix), n));
+    hbars('rel-outer', asBars(counts(rows, (r) => r.outer, ['∀', '∃', 'ℙ', 'none']), n));
+    hbars('rel-alt', asBars(counts(rows, (r) => r.alternations, [0, 1, 2, 3]).map(({ k, n: c }) => ({ k: `${k} alternation${k === 1 ? '' : 's'}`, n: c })), n));
+    hbars('rel-problem', asBars(counts(rows, (r) => r.problem, ['P1', 'P2', 'P3', 'P4', 'P5']), n));
+    hbars('rel-outcome', asBars(counts(rows, (r) => r.outcome, OUTCOME), n));
+    const flags = d3.rollups(rows.flatMap((r) => [...(r.A_flags ? r.A_flags.split(', ') : []), ...(r.B_flags ? r.B_flags.split(', ') : [])]), (v) => v.length, (f) => f)
+      .sort((a, b) => b[1] - a[1]).map(([k, c]) => ({ label: k.replace(/_/g, ' '), v: c, text: `${c} · ${pct(c / n)}`, tip: `${c} of ${n} families` }));
+    hbars('rel-flags', flags);
+    hbars('rel-lean', asBars(counts(rows, (r) => r.lean, ['same', 'weaker', 'different', 'no_lean']), n));
+    heat('rel-mxo', rows, 'matrix', OUTCOME, 'outcome', 'count');
+    heat('rel-sxm', rows, 'subject', MATRIX, 'matrix', 'row');
+    // Proof length.
+    const pg = rows.map((r) => r.pages);
+    figs('rel-len-figs', [
+      [String(med(pg)), 'median pages per family'],
+      [`${d3.quantile([...pg].sort(d3.ascending), 0.25)}–${d3.quantile([...pg].sort(d3.ascending), 0.75)}`, 'middle half of families, pages'],
+      [fmt(d3.max(pg)), 'longest family, pages'],
+      [fmt(d3.sum(pg)), 'pages in the whole release'],
+    ]);
+    const bins = [[0, 20], [20, 40], [40, 80], [80, 160], [160, 320], [320, Infinity]];
+    hbars('rel-pages', bins.map(([a, b]) => { const c = pg.filter((p) => p >= a && p < b).length; return { label: b === Infinity ? `${a}+ pages` : `${a}–${b - 1} pages`, v: c, text: `${c} · ${pct(c / n)}`, tip: `${c} of ${n} families` }; }));
+    hbars('rel-pages-lean', ['same', 'weaker', 'different', 'no_lean'].map((k) => { const xs = rows.filter((r) => r.lean === k).map((r) => r.pages); return { label: name(k), v: med(xs), text: `${med(xs)} pp`, tip: `median of ${xs.length} families` }; }));
+    hbars('rel-pages-subject', d3.rollups(rows, (v) => ({ m: med(v.map((r) => r.pages)), c: v.length }), (r) => r.subject).sort((a, b) => b[1].m - a[1].m)
+      .map(([k, o]) => ({ label: k, v: o.m, text: `${o.m} pp`, tip: `median of ${o.c} families` })));
+    // Lean scope.
+    const sc = S.rows('lean_scope');
+    hbars('rel-scope-cat', asBars(counts(sc, (r) => r.category, ['companion_full', 'headline_partial_disclosed', 'headline_lemma_disclosed', 'partial_undisclosed', 'label_error']), sc.length));
+    hbars('rel-scope-disc', asBars(counts(sc, (r) => r.disclosure, ['explicit', 'implicit', 'overstated']), sc.length));
+  }
+
+  function renderAll() { charts(); statTables(); scopeTable(); familyTable(); detail(); }
+  const search = document.getElementById('rel-search');
+  search.addEventListener('input', () => { S.rel.q = search.value; familyTable(); });
+  S.sortable(document.querySelector('.ax-rel'), 'rel', familyTable);
+  S.sortable(document.querySelector('.ax-scopeflags'), 'scope', scopeTable);
+  const prev = S.redraw;
+  S.redraw = () => { prev && prev(); if (S.tab === 'release') charts(); };
+  let raf; window.addEventListener('resize', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { if (S.tab === 'release') charts(); }); });
   dash.onData(renderAll);
 })();
 </script>
