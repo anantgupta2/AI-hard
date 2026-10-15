@@ -24,7 +24,7 @@ DESC = {
     "label_stats": ("Label statistics", "Cramér's V with permutation p-values between label axes, Cohen's kappa between the two labelling passes, and agreement with the in-depth v1 labels. From data/abc_v2/stats.json."),
     "lean_scope": ("Lean scope check", "For the 67 families whose Lean statement is weaker than or different from the headline: which paper the Lean formalizes, how much of it, whether OpenAI's scope note discloses the gap, and corrections to our labels. From data/lean_scope/scope_all.json."),
     "manuscript_lengths": ("Manuscript lengths", "Every manuscript in the release: PDF pages, technical pages (all but front matter, introduction / conclusion-type sections and references), pages inside proof blocks, and its longest single proof. From data/proof_lengths.json (scripts/proof_lengths.py, scripts/proof_text_lengths.py)."),
-    "frontier_lengths": ("Human frontier baseline", "21 well-known human frontier papers from arXiv measured the same way as the release: PDF pages, technical pages, proof-block pages and longest proof. From data/frontier_lengths.json (scripts/frontier_lengths.py)."),
+    "frontier_lengths": ("Human frontier baseline", "71 well-known human frontier papers from arXiv (all fields) measured the same way as the release: PDF pages, technical pages, proof-block pages and longest proof. From data/frontier_lengths.json (scripts/frontier_lengths.py)."),
     "items": ("Lemmas and definitions", "Every extracted lemma, definition and construction with its novelty grade (N0-N3) and eureka type (F), from the paper, family, trace and novelty analysts."),
 }
 assets = json.loads(Path(sys.argv[1]).read_text())
