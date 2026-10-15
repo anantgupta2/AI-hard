@@ -144,12 +144,39 @@
     </div>
     <div class="ax-card" id="rel-length">
       <h2>How long the proofs are</h2>
-      <p class="ax-note">Proof pages count only the text inside proof environments, converted to pages with each manuscript's own words per PDF page. Whole-paper pages (PDF page counts of all 719 manuscripts) include introductions, background and references. A family's length is the sum over its manuscripts.</p>
+      <p class="ax-note">Technical pages count everything except the front matter, the introduction, conclusion, discussion and acknowledgement-type sections, and the reference list. Definitions, preliminaries, claims, proofs and appendices are included. Words are converted to pages with each paper's own density. The human baseline is 21 well-known frontier papers from arXiv, measured the same way from their LaTeX sources.</p>
       <div class="ax-figs" id="rel-len-figs"></div>
+      <div>
+        <h3>Technical pages per paper, release against human frontier papers</h3>
+        <p class="ax-note">One dot per paper, log scale. The vertical mark is each group's median. Hover a dot for the paper.</p>
+        <div class="ax-chart" id="rel-strip"></div>
+      </div>
       <div class="ax-grid">
-        <div><h3>Families by proof pages</h3><div class="ax-chart" id="rel-pages"></div></div>
-        <div><h3>Median proof pages by Lean status</h3><div class="ax-chart" id="rel-pages-lean"></div></div>
-        <div><h3>Median proof pages by subject</h3><div class="ax-chart" id="rel-pages-subject"></div></div>
+        <div><h3>Families by technical pages</h3><div class="ax-chart" id="rel-pages"></div></div>
+        <div><h3>Median technical pages by Lean status</h3><div class="ax-chart" id="rel-pages-lean"></div></div>
+        <div><h3>Median technical pages by subject</h3><div class="ax-chart" id="rel-pages-subject"></div></div>
+      </div>
+      <div class="ax-grid">
+        <div>
+          <h3>Human frontier baseline</h3>
+          <p class="ax-note">Proof pages count only LaTeX proof blocks; papers that write “Proof.” as plain text score near zero there, so compare technical pages.</p>
+          <div class="ax-scroll">
+            <table class="ax-frontier" data-source="frontier_lengths" data-row-key="key">
+              <thead><tr><th data-field="name">Paper</th><th data-field="pages" class="num">Pages</th><th data-field="technical_pages" class="num">Technical</th><th data-field="longest_proof_pages" class="num">Longest proof</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <h3>Longest single proofs in the release</h3>
+          <p class="ax-note">The longest proof block in each manuscript, top 15. Click a row to open the family.</p>
+          <div class="ax-scroll">
+            <table class="ax-longest" data-source="manuscript_lengths" data-row-key="key">
+              <thead><tr><th data-field="fid">Family</th><th data-field="title">Manuscript</th><th data-field="longest_proof_pages" class="num">Longest proof</th><th data-field="technical_pages" class="num">Technical</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
     <div class="ax-card" id="rel-scope">
@@ -176,7 +203,7 @@
       </div>
       <div class="ax-scroll">
         <table class="ax-rel" data-source="release_labels" data-row-key="fid">
-          <thead><tr><th data-field="fid">Family</th><th data-field="title">Title</th><th data-field="subject">Subject</th><th data-field="prefix">Prefix</th><th data-field="matrix">Asserts</th><th data-field="problem">Posed</th><th data-field="outcome">Outcome</th><th data-field="lean">Lean</th><th data-field="proof_pages" class="num">Proof pages</th></tr></thead>
+          <thead><tr><th data-field="fid">Family</th><th data-field="title">Title</th><th data-field="subject">Subject</th><th data-field="prefix">Prefix</th><th data-field="matrix">Asserts</th><th data-field="problem">Posed</th><th data-field="outcome">Outcome</th><th data-field="lean">Lean</th><th data-field="technical_pages" class="num">Technical pages</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -1261,6 +1288,56 @@ dash.calc('prover_counts', {
     box.replaceChildren(t);
   }
 
+  // Dot strips on a shared log scale, one row per group, with a median mark.
+  function strips(id, groups) {
+    const box = document.getElementById(id);
+    if (!box) return;
+    box.querySelector('svg')?.remove();
+    if (box.closest('[hidden]') || !groups.every((g) => g.pts.length)) return;
+    const W = box.clientWidth || 320, left = Math.min(150, W * 0.34), right = 16, band = 46, axis = 22;
+    const H = groups.length * band + axis;
+    const all = groups.flatMap((g) => g.pts.map((p) => Math.max(1, p.v)));
+    const x = d3.scaleLog([1, d3.max(all)], [left, W - right]).nice();
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H).attr('role', 'img')
+      .attr('aria-label', groups.map((g) => `${g.label}: median ${d3.median(g.pts, (p) => p.v).toFixed(0)} technical pages`).join('; '));
+    svg.append('g').selectAll('line').data(x.ticks(5)).join('line').attr('x1', x).attr('x2', x).attr('y1', 0).attr('y2', H - axis).attr('stroke', 'var(--cds-chart-grid)');
+    svg.append('g').attr('transform', `translate(0,${H - axis})`).call(d3.axisBottom(x).ticks(5, ',').tickSize(0).tickPadding(6)).call((g) => g.select('.domain').remove()).attr('font-size', null).attr('font-family', null);
+    const tip = S.tip(box);
+    groups.forEach((g, gi) => {
+      const cy = gi * band + band / 2;
+      svg.append('text').attr('x', left - 10).attr('y', cy).attr('dy', '0.35em').attr('text-anchor', 'end').text(g.label);
+      const jit = (i) => (((i * 37) % 17) / 16 - 0.5) * (band * 0.55);
+      svg.append('g').selectAll('circle').data(g.pts).join('circle')
+        .attr('cx', (p) => x(Math.max(1, p.v))).attr('cy', (p, i) => cy + jit(i)).attr('r', 4)
+        .style('fill', g.color).style('fill-opacity', g.pts.length > 100 ? 0.45 : 0.85).attr('stroke', 'var(--color-panel)').attr('stroke-width', 1)
+        .on('mousemove', (ev, p) => { tip.replaceChildren(S.el('div', 'h', p.h), S.el('div', null, p.t), S.el('div', null, `${p.v.toFixed(0)} technical pages`)); S.place(box, tip, ev); })
+        .on('mouseleave', () => { tip.hidden = true; });
+      const m = d3.median(g.pts, (p) => p.v);
+      svg.append('line').attr('x1', x(m)).attr('x2', x(m)).attr('y1', cy - band * 0.42).attr('y2', cy + band * 0.42).attr('stroke', 'var(--color-fg)').attr('stroke-width', 2);
+      svg.append('text').attr('x', x(m) + 5).attr('y', cy - band * 0.32).text(`median ${m.toFixed(0)}`);
+    });
+  }
+
+  function lengthTables() {
+    const fb = document.querySelector('.ax-frontier tbody');
+    if (fb) fb.replaceChildren(...S.sorted(S.rows('frontier_lengths'), 'frontier').map((r) => {
+      const tr = S.el('tr'); tr.style.cursor = 'default';
+      const td = S.el('td'); const a = S.el('a', null, r.name); a.href = `https://arxiv.org/abs/${r.arxiv}`; a.target = '_blank'; a.rel = 'noopener'; td.append(a);
+      tr.append(td, S.el('td', 'num', String(r.pages)), S.el('td', 'num', r.technical_pages.toFixed(0)), S.el('td', 'num', r.uses_proof_blocks ? r.longest_proof_pages.toFixed(1) : '–'));
+      return tr;
+    }));
+    const lb = document.querySelector('.ax-longest tbody');
+    if (lb) {
+      const top = [...S.rows('manuscript_lengths')].sort((a, b) => b.longest_proof_pages - a.longest_proof_pages).slice(0, 15);
+      lb.replaceChildren(...S.sorted(top, 'longest').map((r) => {
+        const tr = S.el('tr'); tr.tabIndex = 0;
+        tr.append(S.el('td', null, r.fid), S.el('td', null, r.title), S.el('td', 'num', r.longest_proof_pages.toFixed(1)), S.el('td', 'num', r.technical_pages.toFixed(0)));
+        tr.addEventListener('click', () => { S.rel.pick = r.fid; familyTable(); detail(); document.getElementById('rel-detail').scrollIntoView({ block: 'nearest' }); });
+        return tr;
+      }));
+    }
+  }
+
   function figs(id, list) {
     const box = document.getElementById(id);
     if (!box) return;
@@ -1323,7 +1400,7 @@ dash.calc('prover_counts', {
       const tr = S.el('tr'); tr.tabIndex = 0; tr.dataset.key = r.fid;
       tr.setAttribute('aria-selected', String(S.rel.pick === r.fid));
       tr.append(S.el('td', null, r.fid), S.el('td', null, r.title), S.el('td', null, r.subject), S.el('td', null, r.prefix),
-        S.el('td', null, name(r.matrix)), S.el('td', null, name(r.problem)), S.el('td', null, name(r.outcome)), S.el('td', null, r.lean), S.el('td', 'num', String(Math.round(r.proof_pages))));
+        S.el('td', null, name(r.matrix)), S.el('td', null, name(r.problem)), S.el('td', null, name(r.outcome)), S.el('td', null, r.lean), S.el('td', 'num', String(Math.round(r.technical_pages))));
       const pick = () => { S.rel.pick = S.rel.pick === r.fid ? null : r.fid; familyTable(); detail(); };
       tr.addEventListener('click', pick);
       tr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
@@ -1342,7 +1419,7 @@ dash.calc('prover_counts', {
       ['Settings', r.A_flags || '–'], ['Posed', name(r.problem)], ['Outcome', name(r.outcome)], ['Side results', r.B_flags || '–'],
       ['Lean vs headline', r.lean + (r.lean_fixed_from ? ` (corrected from ${r.lean_fixed_from} by the scope check)` : '')],
       ['Lean scope', sc ? `${name(sc.category)}. ${sc.gap}` : null], ['OpenAI scope note', sc ? `“${sc.quote}”` : null],
-      ['Length', `about ${Math.round(r.proof_pages)} pages of proofs (${r.n_proofs} proofs, longest about ${r.longest_proof_pages} pages); ${fmt(r.pages)} pages in ${r.manuscripts} manuscript${r.manuscripts === 1 ? '' : 's'}${r.lean_lines ? `; ${fmt(r.lean_lines)} non-blank Lean lines in its directories` : ''}`],
+      ['Length', `about ${Math.round(r.technical_pages)} technical pages, of which about ${Math.round(r.proof_pages)} are proof blocks (${r.n_proofs} proofs, longest about ${r.longest_proof_pages} pages); ${fmt(r.pages)} pages in ${r.manuscripts} manuscript${r.manuscripts === 1 ? '' : 's'}${r.lean_lines ? `; ${fmt(r.lean_lines)} non-blank Lean lines in its directories` : ''}`],
       ['Labels', r.label_source === 'adjudicated' ? 'Adjudicated after the two passes disagreed' : 'Both independent passes agreed']]
       .filter(([, v]) => v).forEach(([k, v]) => dl.append(S.el('dt', null, k), S.el('dd', null, v)));
     c.append(dl);
@@ -1377,19 +1454,26 @@ dash.calc('prover_counts', {
     hbars('rel-lean', asBars(counts(rows, (r) => r.lean, ['same', 'weaker', 'different', 'no_lean']), n));
     heat('rel-mxo', rows, 'matrix', OUTCOME, 'outcome', 'count');
     heat('rel-sxm', rows, 'subject', MATRIX, 'matrix', 'row');
-    // Proof length.
-    const pg = rows.map((r) => r.proof_pages), sorted = [...pg].sort(d3.ascending), r0 = d3.format('.0f');
+    // Length: technical pages, against the human frontier baseline.
+    const r0 = d3.format('.0f'), r1 = d3.format('.1f');
+    const msl = S.rows('manuscript_lengths'), fr = S.rows('frontier_lengths');
+    const tp = rows.map((r) => r.technical_pages);
+    const sortedQ = (xs, q) => d3.quantile([...xs].sort(d3.ascending), q);
     figs('rel-len-figs', [
-      [r0(med(pg)), 'median proof pages per family'],
-      [`${r0(d3.quantile(sorted, 0.25))}–${r0(d3.quantile(sorted, 0.75))}`, 'middle half of families, proof pages'],
-      [r0(med(rows.map((r) => r.longest_proof_pages))), 'median longest single proof, pages'],
-      [pct(d3.sum(pg) / d3.sum(rows, (r) => r.pages)), 'of all pages are proofs'],
-      [r0(med(rows.map((r) => r.pages))), 'median whole-paper pages per family'],
+      [r0(med(msl.map((m) => m.technical_pages))), 'median technical pages, release manuscript'],
+      [r0(med(fr.map((m) => m.technical_pages))), 'median technical pages, human frontier paper'],
+      [r0(med(tp)), 'median technical pages per family'],
+      [`${r0(sortedQ(tp, 0.25))}–${r0(sortedQ(tp, 0.75))}`, 'middle half of families'],
+      [r1(d3.max(msl, (m) => m.longest_proof_pages)), 'longest single proof in the release, pages'],
     ]);
-    const bins = [[0, 10], [10, 20], [20, 40], [40, 80], [80, 160], [160, Infinity]];
-    hbars('rel-pages', bins.map(([a, b]) => { const c = pg.filter((p) => p >= a && p < b).length; return { label: b === Infinity ? `${a}+ pages` : `${a}–${b - 1} pages`, v: c, text: `${c} · ${pct(c / n)}`, tip: `${c} of ${n} families` }; }));
-    hbars('rel-pages-lean', ['same', 'weaker', 'different', 'no_lean'].map((k) => { const xs = rows.filter((r) => r.lean === k).map((r) => r.proof_pages); return { label: name(k), v: med(xs), text: `${r0(med(xs))} pp`, tip: `median of ${xs.length} families` }; }));
-    hbars('rel-pages-subject', d3.rollups(rows, (v) => ({ m: med(v.map((r) => r.proof_pages)), c: v.length }), (r) => r.subject).sort((a, b) => b[1].m - a[1].m)
+    strips('rel-strip', [
+      { label: `Release (${msl.length})`, color: dash.colors[0], pts: msl.map((m) => ({ v: m.technical_pages, h: `Family ${m.fid}`, t: m.title })) },
+      { label: `Human frontier (${fr.length})`, color: dash.colors[1], pts: fr.map((m) => ({ v: m.technical_pages, h: m.name, t: `arXiv ${m.arxiv}` })) },
+    ]);
+    const bins = [[0, 15], [15, 30], [30, 60], [60, 120], [120, 240], [240, Infinity]];
+    hbars('rel-pages', bins.map(([a, b]) => { const c = tp.filter((p) => p >= a && p < b).length; return { label: b === Infinity ? `${a}+ pages` : `${a}–${b} pages`, v: c, text: `${c} · ${pct(c / n)}`, tip: `${c} of ${n} families` }; }));
+    hbars('rel-pages-lean', ['same', 'weaker', 'different', 'no_lean'].map((k) => { const xs = rows.filter((r) => r.lean === k).map((r) => r.technical_pages); return { label: name(k), v: med(xs), text: `${r0(med(xs))} pp`, tip: `median of ${xs.length} families` }; }));
+    hbars('rel-pages-subject', d3.rollups(rows, (v) => ({ m: med(v.map((r) => r.technical_pages)), c: v.length }), (r) => r.subject).sort((a, b) => b[1].m - a[1].m)
       .map(([k, o]) => ({ label: k, v: o.m, text: `${r0(o.m)} pp`, tip: `median of ${o.c} families` })));
     // Lean scope.
     const sc = S.rows('lean_scope');
@@ -1397,11 +1481,13 @@ dash.calc('prover_counts', {
     hbars('rel-scope-disc', asBars(counts(sc, (r) => r.disclosure, ['explicit', 'implicit', 'overstated']), sc.length));
   }
 
-  function renderAll() { charts(); statTables(); scopeTable(); familyTable(); detail(); }
+  function renderAll() { charts(); statTables(); scopeTable(); lengthTables(); familyTable(); detail(); }
   const search = document.getElementById('rel-search');
   search.addEventListener('input', () => { S.rel.q = search.value; familyTable(); });
   S.sortable(document.querySelector('.ax-rel'), 'rel', familyTable);
   S.sortable(document.querySelector('.ax-scopeflags'), 'scope', scopeTable);
+  S.sortable(document.querySelector('.ax-frontier'), 'frontier', lengthTables);
+  S.sortable(document.querySelector('.ax-longest'), 'longest', lengthTables);
   const prev = S.redraw;
   S.redraw = () => { prev && prev(); if (S.tab === 'release') charts(); };
   let raf; window.addEventListener('resize', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { if (S.tab === 'release') charts(); }); });
