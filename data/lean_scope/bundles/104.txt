@@ -1,0 +1,303 @@
+FAMILY 104: Quasipolynomial algorithms for mean-payoff, stochastic and parity games
+OPENAI SUMMARY: Gives deterministic algorithms using $`2^{O((\log(L+2))^2)}`$ bit operations, for complete binary input length L, for ordinary mean-payoff games and two separate extensions. They compute exact values and optimal positional strategies in ordinary games, the nonnegative expectation-of-liminf value set in turn-based stochastic games, and the winning set for nonnegative liminf mean payoff conjoined with parity. Signed rewards, rational chance probabilities, and parity priorities are unrestricted and binary-encoded.
+OUR LABEL: lean_vs_headline = weaker
+OUR HEADLINE (semi-formal): ∃ deterministic algorithm, ∃ C, ∀ finite mean-payoff game G with binary signed weights (input length L): the algorithm outputs the zero-threshold winning set of G within 2^{C(log(L+2))^2} bit operations
+OUR NOTES: Headline: deterministic quasipolynomial time for mean-payoff games, extended to values and positional strategies, turn-based stochastic games, and mean-payoff parity games. Whether these games are in P stays open, hence P4/O7 (running-time record); P2/O1 if 'is there a quasipolynomial algorithm' is taken as the posed question. Lean covers only the randomized companion (weaker) and a Truffet counterexample (side result).
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Turn-Based Stochastic Mean-Payoff Games in Deterministic Quasipolynomial Time | in_formalization_yaml=False | withdrawn=False | main_tex=Turn-Based-Stochastic-Mean-Payoff-Games-in-Deterministic-Quasipolynomial-Time-October-5-2026/preprints/Turn-Based-Stochastic-Mean-Payoff-Games-in-Deterministic-Quasipolynomial-Time-October-5-2026/build/build/main.tex
+  ABSTRACT: We give a uniform deterministic quasipolynomial-time algorithm for finite turn-based stochastic mean-payoff games with signed integer rewards and rational chance-transition probabilities encoded in binary. It computes exactly the vertices of nonnegative value, including value zero, for the expectation of the pathwise liminf mean payoff. The algorithm uses exact rational arithmetic and $`2^{O((\log(L+2))^2)}`$ bit operations, where L is the complete binary input length.
+- Mean-payoff parity games in quasipolynomial time | in_formalization_yaml=False | withdrawn=False | main_tex=Mean-payoff-parity-games-in-quasipolynomial-time-October-5-2026/preprints/Mean-payoff-parity-games-in-quasipolynomial-time-October-5-2026/build/main.tex
+  ABSTRACT: We give a uniform deterministic quasipolynomial-time algorithm for mean-payoff parity games. It computes all vertices from which a player can enforce both nonnegative liminf mean payoff and the parity condition, with arbitrary signed binary rewards and unrestricted binary priorities. The running time is $`2^{O((\log(L+2))^2)}`$ bit operations, where L is the complete input length.
+- Deterministic quasipolynomial-time mean-payoff games | in_formalization_yaml=False | withdrawn=False | main_tex=Deterministic-quasipolynomial-time-mean-payoff-games-September-25-2026/preprints/Deterministic-quasipolynomial-time-mean-payoff-games-September-25-2026/build/source/main.tex
+  ABSTRACT: We give a deterministic algorithm that computes the complete zero-threshold winning set of a finite mean-payoff game with arbitrary signed integer edge weights encoded in binary. For total explicit input length L, it uses $`2^{O((\log(L+2))^2)}`$ bit operations. A reduction also computes the exact rational value at every vertex and globally optimal positional strategies for both players within the same quasipolynomial bound.
+- Randomized quasipolynomial-time mean-payoff games | in_formalization_yaml=True | withdrawn=False | main_tex=Randomized-quasipolynomial-time-mean-payoff-games-September-25-2026/preprints/Randomized-quasipolynomial-time-mean-payoff-games-September-25-2026/build/source/main.tex
+  ABSTRACT: We give a randomized algorithm that computes the complete zero-threshold winning set of a finite mean-payoff game with arbitrary signed integer edge weights encoded in binary. For total explicit input length L, it uses $`2^{O((\log(L+2))^2)}`$ bit operations on every random tape and is correct with probability at least 7/8. A polynomial-time check certifies the winning regions and positional strategies for both players or reports failure. Independent repetition therefore gives an always-correct algorithm with the same expected quasipolynomial bit bound.
+
+=== OPENAI SCOPE NOTE (lean/docs/104.md) ===
+# Quasipolynomial algorithms for mean-payoff, stochastic and parity games
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [Deterministic quasipolynomial-time mean-payoff games](../../preprints/Deterministic-quasipolynomial-time-mean-payoff-games-September-25-2026/paper.pdf)
+- [Randomized quasipolynomial-time mean-payoff games](../../preprints/Randomized-quasipolynomial-time-mean-payoff-games-September-25-2026/paper.pdf)
+
+## Scope
+
+The formalization checks that a specified two-step execution of Truffet's elimination procedure terminates with a feasible but nonoptimal output. It is a finite counterexample to that proposed optimization step.
+
+The formalized result gives one randomized algorithm for the complete zero-threshold winning set of every finite mean-payoff game with signed binary weights. It succeeds with probability at least $7/8$ and runs in quasipolynomial bit time on every random tape. Self-loops, parallel edges, and history-dependent strategies are allowed, and winning means a nonnegative liminf average payoff.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Finite counterexample to Truffet's optimization procedure | [TruffetCounterexample.lean](../ComparatorChallenges/TruffetCounterexample.lean) |
+| Randomized quasipolynomial mean-payoff algorithm | [RandomizedMeanPayoff.lean](../ComparatorChallenges/RandomizedMeanPayoff.lean) |
+
+
+=== COMPARATOR TruffetCounterexample ===
+import Mathlib
+
+namespace OAI
+
+noncomputable section
+namespace TruffetV4Counterexample
+
+abbrev Coeff := WithBot ℝ
+
+abbrev Form := Fin 3 → Coeff
+
+abbrev Var := Fin 2
+
+abbrev RowIndex := Fin 2
+
+def column (j : Var) : Fin 3 := ⟨j.val, Nat.lt_trans j.isLt (by decide)⟩
+
+def nullForm : Form := fun _ => ⊥
+
+structure Row where
+  lhs : Form
+  rhs : Form
+
+structure State where
+  rows : RowIndex → Row
+  cost : Form
+  remaining : Var → Prop
+
+def wellFormed (s : State) : Prop := ∀ j, ¬ s.remaining j →
+  s.cost (column j) = ⊥ ∧ ∀ i,
+    (s.rows i).lhs (column j) = ⊥ ∧ (s.rows i).rhs (column j) = ⊥
+
+def eval (f : Form) (w : Fin 3 → ℝ) : Coeff :=
+  max (f 0 + (w 0 : Coeff)) (max (f 1 + (w 1 : Coeff)) (f 2 + (w 2 : Coeff)))
+
+def feasible (s : State) (w : Fin 3 → ℝ) : Prop :=
+  ∀ i, eval (s.rows i).rhs w ≤ eval (s.rows i).lhs w
+
+def lower (s : State) (i : RowIndex) (j : Var) : Prop :=
+  (s.rows i).lhs (column j) ≠ ⊥ ∧
+    (s.rows i).rhs (column j) < (s.rows i).lhs (column j)
+
+def upper (s : State) (i : RowIndex) (j : Var) : Prop :=
+  (s.rows i).rhs (column j) ≠ ⊥ ∧
+    (s.rows i).lhs (column j) < (s.rows i).rhs (column j)
+
+def dominating (s : State) (j : Var) : Prop :=
+  s.remaining j ∧ (∃ i, lower s i j) ∧ ∃ i, upper s i j
+
+def eligible (s : State) (i : RowIndex) (j : Var) : Prop :=
+  s.remaining j ∧ lower s i j ∧ ((∃ k, dominating s k) → dominating s j)
+
+def bounded (s : State) : Prop :=
+  ∀ j, s.remaining j → (∃ i, lower s i j) ∨ ∃ i, upper s i j
+
+def stop (s : State) : Prop := ∀ i, (s.rows i).rhs 2 ≤ (s.rows i).lhs 2
+
+def switch (s : State) : Prop :=
+  (∀ j, s.remaining j → s.cost (column j) = ⊥) ∧ ¬ stop s ∧
+  (∃ j, s.remaining j) ∧
+  (¬ ∃ i j, s.remaining j ∧ lower s i j) ∧
+  ∃ i j, s.remaining j ∧ upper s i j
+
+def failure (s : State) : Prop := ¬ stop s ∧
+  ((¬ ∃ j, s.remaining j) ∨
+   ((¬ ∃ i j, s.remaining j ∧ lower s i j) ∧
+    (¬ ∃ i j, s.remaining j ∧ upper s i j)))
+
+def lowerForm (s : State) (i : RowIndex) (j : Var) : Form := fun k =>
+  if k = column j then ⊥ else
+    (s.rows i).rhs k + ((-WithBot.unbotD 0 ((s.rows i).lhs (column j)) : ℝ) : Coeff)
+
+def substitute (f : Form) (j : Var) (g : Form) : Form := fun k =>
+  if k = column j then ⊥ else max (f k) (f (column j) + g k)
+
+def cleanup (r : Row) : Row := by
+  classical
+  exact if ∀ k, r.rhs k ≤ r.lhs k then ⟨nullForm, nullForm⟩ else r
+
+def advance (s : State) (i : RowIndex) (j : Var) : State where
+  rows := fun r => cleanup ⟨substitute (s.rows r).lhs j (lowerForm s i j),
+    substitute (s.rows r).rhs j (lowerForm s i j)⟩
+  cost := substitute s.cost j (lowerForm s i j)
+  remaining := fun k => s.remaining k ∧ k ≠ j
+
+def ForcedSingletonStep (s s' : State) (i : RowIndex) (j : Var) : Prop :=
+  wellFormed s ∧ wellFormed s' ∧
+  bounded s ∧ ¬ stop s ∧ ¬ switch s ∧ ¬ failure s ∧
+  (∀ r k, eligible s r k ↔ r = i ∧ k = j) ∧
+  (∃ k, (substitute s.cost j (lowerForm s i j)) k ≠ ⊥) ∧
+  s' = advance s i j
+
+def initial : State where
+  rows := ![⟨![(0 : Coeff), 0, ⊥], ![⊥, ⊥, (0 : Coeff)]⟩,
+    ⟨![(0 : Coeff), ⊥, ⊥], ![⊥, (1 : Coeff), ((-2 : ℝ) : Coeff)]⟩]
+  cost := ![(0 : Coeff), ⊥, ⊥]
+  remaining := fun _ => True
+
+def middle : State where
+  rows := ![⟨nullForm, nullForm⟩,
+    ⟨![(0 : Coeff), ⊥, ⊥], ![⊥, ⊥, (1 : Coeff)]⟩]
+  cost := ![(0 : Coeff), ⊥, ⊥]
+  remaining := fun j => j = 0
+
+def finalState : State where
+  rows := fun _ => ⟨nullForm, nullForm⟩
+  cost := ![⊥, ⊥, (1 : Coeff)]
+  remaining := fun _ => False
+
+def crossRowRestriction (s : State) : Prop :=
+  ∀ i r : RowIndex, i ≠ r → ∀ α : ℝ, ∃ w : Fin 3 → ℝ,
+    eval (s.rows i).lhs w < (α : Coeff) + eval (s.rows r).rhs w
+
+def output : Fin 3 → ℝ := ![1, 0, 0]
+
+def better : Fin 3 → ℝ := ![0, -1, 0]
+
+theorem finite_execution_not_optimal :
+    crossRowRestriction initial ∧
+    ForcedSingletonStep initial middle 0 1 ∧
+    ForcedSingletonStep middle finalState 1 0 ∧
+    (¬ ∃ j, finalState.remaining j) ∧ stop finalState ∧
+    feasible initial output ∧ feasible initial better ∧
+    output 2 = 0 ∧ better 2 = 0 ∧
+    (output 1 : Coeff) = eval (lowerForm initial 0 1) output ∧
+    (output 0 : Coeff) = eval (lowerForm middle 1 0) output ∧
+    eval initial.cost output = eval finalState.cost output ∧
+    eval initial.cost better < eval finalState.cost output := by
+  sorry
+
+end TruffetV4Counterexample
+end
+
+end OAI
+
+
+=== COMPARATOR RandomizedMeanPayoff ===
+import Mathlib
+
+namespace OAI
+
+namespace MeanPayoff
+structure Game where
+  n : ℕ
+  positive : 0 < n
+  m : ℕ
+  tail : Fin m → Fin n
+  head : Fin m → Fin n
+  maxOwner : Fin n → Bool
+  weight : Fin m → ℤ
+  total : ∀ v : Fin n, ∃ e : Fin m, tail e = v
+
+def Strategy (G : Game) :=
+  List (Fin G.m) → (v : Fin G.n) → {e : Fin G.m // G.tail e = v}
+
+def move (G : Game) (σ τ : Strategy G) (v : Fin G.n)
+    (history : List (Fin G.m)) : Fin G.m :=
+  if G.maxOwner v then (σ history v).val else (τ history v).val
+
+def position (G : Game) (σ τ : Strategy G) (start : Fin G.n) :
+    ℕ → Fin G.n × List (Fin G.m)
+  | 0 => (start, [])
+  | t + 1 =>
+    let p := position G σ τ start t
+    let e := move G σ τ p.1 p.2
+    (G.head e, p.2 ++ [e])
+
+def play (G : Game) (σ τ : Strategy G) (start : Fin G.n) (t : ℕ) : Fin G.m :=
+  let p := position G σ τ start t
+  move G σ τ p.1 p.2
+
+noncomputable def meanPayoff (G : Game) (π : ℕ → Fin G.m) : ℝ :=
+  Filter.liminf (fun T : ℕ =>
+    (∑ j ∈ Finset.range T, (G.weight (π j) : ℝ)) / (T : ℝ)) Filter.atTop
+
+def Winning (G : Game) (v : Fin G.n) : Prop :=
+  ∃ σ : Strategy G, ∀ τ : Strategy G, 0 ≤ meanPayoff G (play G σ τ v)
+
+def encodeNat (n : ℕ) : List Bool :=
+  let bits := Nat.bits (n + 1)
+  List.replicate bits.length true ++ [false] ++ bits
+
+def encodeInt (z : ℤ) : List Bool :=
+  decide (z < 0) :: encodeNat z.natAbs
+
+def input (G : Game) : List Bool :=
+  encodeNat G.n ++ encodeNat G.m ++ List.ofFn G.maxOwner ++
+    (List.ofFn (fun e : Fin G.m =>
+      encodeNat ((G.tail e).val + 1) ++ encodeNat ((G.head e).val + 1) ++
+        encodeInt (G.weight e))).flatten
+
+abbrev Symbol := Option Bool
+
+inductive Direction where
+  | left | stay | right
+  deriving DecidableEq
+
+def Direction.offset : Direction → ℤ
+  | .left => -1
+  | .stay => 0
+  | .right => 1
+
+structure Action (q : ℕ) where
+  next : Fin q
+  write : Fin 3 → Symbol
+  shift : Fin 3 → Direction
+
+structure Machine where
+  states : ℕ
+  start : Fin states
+  transition : Fin states → (Fin 3 → Symbol) → Bool → Option (Action states)
+
+structure Configuration (M : Machine) where
+  control : Option (Fin M.states)
+  head : Fin 3 → ℤ
+  tape : Fin 3 → ℤ → Symbol
+
+def initial (M : Machine) (code : List Bool) : Configuration M where
+  control := some M.start
+  head := fun _ => 0
+  tape := fun k j => if k = 0 ∧ 0 ≤ j then code[j.toNat]? else none
+
+def step (M : Machine) (c : Configuration M) (bit : Bool) : Configuration M :=
+  match c.control with
+  | none => c
+  | some s =>
+    match M.transition s (fun k => c.tape k (c.head k)) bit with
+    | none => { c with control := none }
+    | some a =>
+      { control := some a.next
+        head := fun k => c.head k + (a.shift k).offset
+        tape := fun k => Function.update (c.tape k) (c.head k) (a.write k) }
+
+def run (M : Machine) (code : List Bool) (random : ℕ → Bool) : ℕ → Configuration M
+  | 0 => initial M code
+  | t + 1 => step M (run M code random t) (random t)
+
+def padBits {T : ℕ} (bits : Fin T → Bool) (j : ℕ) : Bool :=
+  if h : j < T then bits ⟨j, h⟩ else false
+
+def result (M : Machine) (G : Game) (T : ℕ) (bits : Fin T → Bool) : Configuration M :=
+  run M (input G) (padBits bits) T
+
+def CorrectOutput (G : Game) {M : Machine} (c : Configuration M) : Prop :=
+  c.control = none ∧
+  (∀ v : Fin G.n, c.tape 2 (v.val : ℤ) = some true ↔ Winning G v) ∧
+  (∀ v : Fin G.n, c.tape 2 (v.val : ℤ) = some false ↔ ¬ Winning G v) ∧
+  ∀ j : ℤ, (j < 0 ∨ (G.n : ℤ) ≤ j) → c.tape 2 j = none
+
+noncomputable def MainClaim : Prop := by
+  classical
+  exact ∃ M : Machine, ∃ C : ℝ, 0 < C ∧ ∀ G : Game, ∃ T : ℕ,
+    (T : ℝ) ≤ (2 : ℝ) ^ (C * (Real.logb 2 ((input G).length + 2)) ^ 2) ∧
+    (∀ bits : Fin T → Bool, (result M G T bits).control = none) ∧
+    7 * 2 ^ T ≤ 8 * (Finset.univ.filter
+      (fun bits : Fin T → Bool => CorrectOutput G (result M G T bits))).card
+
+end MeanPayoff
+
+theorem randomized_quasipolynomial_mean_payoff : MeanPayoff.MainClaim := by
+  sorry
+
+end OAI
+

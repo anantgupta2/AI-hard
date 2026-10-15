@@ -1,0 +1,88 @@
+FAMILY 247: An infinite finitely presented residually finite 2-group and a finitely presented nil algebra
+OPENAI SUMMARY: Constructs an infinite finitely presented residually finite group whose elements all have finite 2-power order, answering the finitely presented Burnside problem negatively even in this class. The construction also yields an infinite-dimensional finitely presented nil associative 𝔽2-algebra and a finitely presented infinite-dimensional algebraic unitization, giving negative answers to the corresponding nilpotence and Kurosh finiteness questions.
+OUR LABEL: lean_vs_headline = weaker
+OUR HEADLINE (semi-formal): ∃ infinite group G with an ordinary finite presentation, residually finite, every element of finite 2-power order
+OUR NOTES: Counterexample to the universal question 'is every f.p. periodic group finite?' (rule 5 → M3). Companion results: an infinite f.p. periodic Kazhdan group St_12(R), and f.p. nil/radical non-nilpotent 𝔽2-algebras answering the nilpotence and Kurosh-type questions negatively. Lean PeriodicGroup states only infinite f.p. periodic (no residual finiteness or 2-power order), hence weaker.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- An infinite finitely presented residually finite 2-group | in_formalization_yaml=False | withdrawn=False | main_tex=An-infinite-finitely-presented-residually-finite-2-group-October-5-2026/preprints/An-infinite-finitely-presented-residually-finite-2-group-October-5-2026/build/main.tex
+  ABSTRACT: We prove that the infinite, ordinarily finitely presented periodic Steinberg group $`\Gamma=\mathop{\mathrm{St}}\nolimits _{12}(R)`$ of a companion paper is residually finite. Its finite-index subgroup $`G=\ker(\Gamma\to\mathop{\mathrm{St}}\nolimits _{12}(\mathbb F_2))`$ is infinite, ordinarily finitely presented, and residually finite, and every element of G has finite 2-power order. The orders of its elements are unbounded. Phases of long words in the companion's graded algebra allow finite degree truncations to detect all elements of Γ, including the central kernel.
+- An infinite finitely presented periodic group | in_formalization_yaml=False | withdrawn=False | main_tex=An-infinite-finitely-presented-periodic-group-September-23-2026/preprints/An-infinite-finitely-presented-periodic-group-September-23-2026/build/paper.tex
+  ABSTRACT: We construct an infinite group with an ordinary finite presentation in which every element has finite order, answering the finitely presented Burnside question negatively. We also construct an infinite-dimensional finitely presented nonunital nil associative algebra over 𝔽2 that is Jacobson radical but not nilpotent. Its unitization is finitely presented, algebraic, and infinite-dimensional. These algebras answer the finitely presented nil- and radical-algebra nilpotence questions and the finite-presentation version of Kurosh's algebraic finiteness question negatively.
+
+=== OPENAI SCOPE NOTE (lean/docs/247.md) ===
+# An infinite finitely presented residually finite 2-group and a finitely presented nil algebra
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [An infinite finitely presented periodic group](../../preprints/An-infinite-finitely-presented-periodic-group-September-23-2026/paper.pdf)
+
+## Scope
+
+The finitely presented Burnside question asks whether a finitely presented group in which every element has finite order must be finite. The formalization gives a negative answer by constructing an infinite finitely presented periodic group, including a witness realized as a Steinberg group over an algebra of characteristic two. Periodicity means that each element has some finite order; no common exponent is asserted. The paper's separate nil-algebra and radical-algebra conclusions are outside these selected statements.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Infinite finitely presented periodic group | [PeriodicGroup.lean](../ComparatorChallenges/PeriodicGroup.lean) |
+
+
+=== COMPARATOR PeriodicGroup ===
+import Mathlib
+
+namespace OAI
+
+universe u
+
+namespace SourceBurnside
+
+structure Root (n : ℕ) where
+  row : Fin n
+  col : Fin n
+  ne : row ≠ col
+  deriving DecidableEq
+
+abbrev Generator (n : ℕ) (R : Type u) := Root n × R
+
+def bracket {G : Type u} [Group G] (x y : G) : G := x * y * x⁻¹ * y⁻¹
+
+def letter {n : ℕ} {R : Type u} (p : Root n) (a : R) :
+    FreeGroup (Generator n R) := FreeGroup.of (p, a)
+
+inductive SteinbergRel (n : ℕ) (R : Type u) [Ring R] :
+    FreeGroup (Generator n R) → Prop
+  | add (p : Root n) (a b : R) :
+      SteinbergRel n R (letter p (a + b) * (letter p a * letter p b)⁻¹)
+  | commute (p q : Root n) (h₁ : p.col ≠ q.row) (h₂ : p.row ≠ q.col) (a b : R) :
+      SteinbergRel n R (bracket (letter p a) (letter q b))
+  | mul (i j k : Fin n) (hij : i ≠ j) (hjk : j ≠ k) (hik : i ≠ k) (a b : R) :
+      SteinbergRel n R
+        (bracket (letter ⟨i, j, hij⟩ a) (letter ⟨j, k, hjk⟩ b) *
+          (letter ⟨i, k, hik⟩ (a * b))⁻¹)
+
+def Steinberg (n : ℕ) (R : Type u) [Ring R] :=
+  PresentedGroup {r | SteinbergRel n R r}
+  deriving Group
+
+def Periodic (G : Type u) [Group G] : Prop := ∀ g : G, ∃ m : ℕ, 0 < m ∧ g ^ m = 1
+
+def MainStatement : Prop :=
+  ∃ (R : Type) (_ : Ring R) (_ : Algebra (ZMod 2) R),
+    Infinite (Steinberg 12 R) ∧ Group.IsFinitelyPresented (Steinberg 12 R) ∧
+      Periodic (Steinberg 12 R)
+
+def BurnsideStatement : Prop :=
+  ∃ (G : Type) (_ : Group G), Infinite G ∧ Group.IsFinitelyPresented G ∧ Periodic G
+
+end SourceBurnside
+
+namespace SourceBurnside
+
+theorem thm_main : MainStatement ∧ BurnsideStatement := by
+  sorry
+
+end SourceBurnside
+
+end OAI
+

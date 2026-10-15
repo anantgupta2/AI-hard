@@ -1,0 +1,71 @@
+FAMILY 066: Bounded klt complements for Fano contractions
+OPENAI SUMMARY: Proves the finite-rational-coefficient form of Shokurov’s bounded-klt-complement conjecture for ϵ-lc complex Fano-type pairs with nef anti-log-canonical divisor. For ϵ-lc Fano contractions over any algebraically closed characteristic-zero field, it gives klt complements near every base point, with index bounded only by dimension and positive rational ϵ.
+OUR LABEL: lean_vs_headline = different
+OUR HEADLINE (semi-formal): ∀ d, ∀ ε∈ℚ_{>0}, ∀ ε-lc Fano contraction f:X→Z (dim d, char 0, alg. closed), ∀ closed z∈Z ∃ klt complement B near z with index ≤ N(d,ε) (N depends only on d,ε)
+OUR NOTES: Rule 19: N(d,ε) is a bound constant, not a prefix object (∀∃∀∃→∀∃); uniform index bound is the content (rule 11→M8). Proves exactly Chen's Conj. 1.1 form, using Chen's equivalence: O1+full_only.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Bounded klt complements for Fano contractions | in_formalization_yaml=False | withdrawn=False | main_tex=Bounded-klt-complements-for-Fano-contractions-September-25-2026/preprints/Bounded-klt-complements-for-Fano-contractions-September-25-2026/build/main.tex
+  ABSTRACT: For fixed dimension d and positive rational ϵ, we prove that every ϵ-log-canonical Fano contraction over an algebraically closed field of characteristic zero admits, near each closed base point, a klt complement of index bounded only by d and ϵ. Over ℂ, we also obtain monotone klt complements for Fano type pairs with nef anti-log-canonical divisor and coefficients in a fixed finite rational set. This proves the finite-rational-coefficient form of Shokurov's bounded-klt-complement conjecture.
+- Uniform Cartier sections for Fano type contractions | in_formalization_yaml=True | withdrawn=False | main_tex=Uniform-Cartier-sections-for-Fano-type-contractions-September-25-2026/preprints/Uniform-Cartier-sections-for-Fano-type-contractions-September-25-2026/build/main.tex
+  ABSTRACT: We prove the Cartier-divisor conjecture of Birkar and Shokurov for rational boundaries in characteristic zero and for real boundaries over ℂ. For an ϵ-lc Fano type contraction with positive-dimensional base and nef negative log canonical class, a Cartier divisor through any prescribed base point can be chosen with pullback log canonical threshold bounded below in terms of the dimension and ϵ alone.
+
+=== OPENAI SCOPE NOTE (lean/docs/066.md) ===
+# Bounded klt complements for Fano contractions
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [Uniform Cartier sections for Fano type contractions](../../preprints/Uniform-Cartier-sections-for-Fano-type-contractions-September-25-2026/Uniform-Cartier-sections-for-Fano-type-contractions-September-25-2026.pdf)
+
+## Scope
+
+The paper develops uniform Cartier sections for Fano-type contractions as a step toward bounded klt complements. The linked formalization proves a local compactness result: for positive numbers $a_i$, the chart-field retractions indexed by nonnegative weights satisfying $\sum_i a_iw_i=1$ form a compact set in the pointwise topology on the fraction field.
+
+The chart is built over an algebraically closed field from the localization of a polynomial ring at its origin. Its local domain is Noetherian, essentially of finite type and formally unramified over that localization, and formally étale over the polynomial ring. Uniform Cartier sections, bounded klt complements, and the paper's real-boundary and companion conclusions are outside this supporting statement.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Compactness of normalized chart-field retractions | [CartierChartCompactnessSupport.lean](../ComparatorChallenges/CartierChartCompactnessSupport.lean) |
+
+
+=== COMPARATOR CartierChartCompactnessSupport ===
+import OAI.AlgebraicGeometry.CartierSections.FieldTopology
+import OAI.AlgebraicGeometry.CartierSections.FieldRetraction
+
+namespace OAI
+
+noncomputable section
+open scoped BigOperators NNReal ENNReal
+namespace CartierSections
+section ClosedChartFieldTopology
+universe u
+local instance polynomialOrigin_isMaximal_topology {σ k : Type u} [Fintype σ] [Field k] :
+    (MvPolynomial.idealOfVars σ k).IsMaximal :=
+  polynomialOrigin_isMaximal
+
+variable {σ k R A K : Type u} [Fintype σ] [Field k] [IsAlgClosed k]
+  [CommRing R] [CommRing A] [IsLocalRing R] [IsLocalRing A] [IsNoetherianRing A]
+  [IsDomain A] [Field K] [Algebra A K] [IsFractionRing A K]
+  [Algebra (MvPolynomial σ k) R] [Algebra (MvPolynomial σ k) A]
+  [Algebra k A] [IsScalarTower k (MvPolynomial σ k) A]
+  [Algebra R A] [IsScalarTower (MvPolynomial σ k) R A]
+  [IsLocalization.AtPrime R (MvPolynomial.idealOfVars σ k)]
+  [IsLocalHom (algebraMap R A)] [Algebra.FormallyUnramified R A]
+  [Algebra.EssFiniteType R A] [Algebra.FormallyEtale (MvPolynomial σ k) A]
+
+lemma isCompact_closedChartFieldRetraction_cone
+    (a : σ → NNReal) (ha : ∀ i, 0 < a i) :
+    IsCompact ((fun w : σ → NNReal => fun x : K =>
+      closedChartFieldRetraction (σ := σ) (k := k) (R := R) (A := A) w x) ''
+      normalizedWeights a) := by
+  sorry
+
+end ClosedChartFieldTopology
+end CartierSections
+
+end
+
+end OAI
+

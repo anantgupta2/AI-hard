@@ -1,0 +1,252 @@
+FAMILY 212: Planar first-passage geometry and the absence of bigeodesics
+OPENAI SUMMARY: Proves that planar first-passage percolation has no doubly infinite geodesic for iid nonnegative nonatomic edge weights when the minimum of four weights has finite second moment. For exponential weights, the limit shape is strictly convex with C1 boundary. Differentiability also holds for every Gamma law with positive shape and rate.
+OUR LABEL: lean_vs_headline = different
+OUR HEADLINE (semi-formal): ∀ nonatomic law G on [0,∞) with E[min(X_1..X_4)^2] < ∞: ℙ-a.s. planar FPP on Z^2 has no bigeodesic
+OUR NOTES: Rule 13 check: absence of bigeodesics is a non-existence statement, not a limit law; M4 stays.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- No bigeodesics in planar first-passage percolation | in_formalization_yaml=False | withdrawn=False | main_tex=No-bigeodesics-in-planar-first-passage-percolation-September-24-2026/preprints/No-bigeodesics-in-planar-first-passage-percolation-September-24-2026/build/main.tex
+  ABSTRACT: We prove that planar first-passage percolation with independent identically distributed nonnegative nonatomic edge weights has almost surely no doubly infinite geodesic, provided the minimum of four independent weights has finite second moment. This resolves the planar no-bigeodesics conjecture under that moment assumption. The conclusion rules out all bigeodesics simultaneously, without any regularity assumption on the limit shape.
+- Strict convexity and differentiability of the planar exponential first-passage limit shape | in_formalization_yaml=True | withdrawn=False | main_tex=Strict-convexity-and-differentiability-of-the-planar-exponential-first-passage-limit-shape-September-24-2026/preprints/Strict-convexity-and-differentiability-of-the-planar-exponential-first-passage-limit-shape-September-24-2026/build/main.tex
+  ABSTRACT: We prove that the limit shape of undirected nearest-neighbor first-passage percolation on ℤ2 with independent exponential edge weights is strictly convex and has a C1 boundary. This resolves the strict convexity and differentiability conjectures for the planar exponential model. More generally, we prove differentiability of the time-constant norm for every Gamma edge-weight law with positive shape and rate.
+
+=== OPENAI SCOPE NOTE (lean/docs/212.md) ===
+# Planar first-passage geometry and the absence of bigeodesics
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [Strict convexity and differentiability of the planar exponential first-passage limit shape](../../preprints/Strict-convexity-and-differentiability-of-the-planar-exponential-first-passage-limit-shape-September-24-2026/main.pdf)
+
+## Scope
+
+The formalization proves differentiability of the planar first-passage time-constant norm for independent Gamma edge weights of every positive shape and rate. The norm is differentiable away from the origin, and its unit sphere has a $C^1$ boundary. This includes the exponential model, for which the linked statement also gives a unique supporting line at every boundary point.
+
+The paper also claims strict convexity for the exponential limit shape. Strict convexity is outside these selected differentiability statements.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Differentiability of the exponential first-passage limit shape | [PlanarFirstPassage.lean](../ComparatorChallenges/PlanarFirstPassage.lean) |
+| Differentiability for every positive Gamma edge-weight law | [GammaPassage.lean](../ComparatorChallenges/GammaPassage.lean) |
+
+
+=== COMPARATOR PlanarFirstPassage ===
+import Mathlib.Algebra.BigOperators.Group.List.Basic
+import Mathlib.Algebra.Group.Prod
+import Mathlib.Analysis.Calculus.ContDiff.Defs
+import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Analysis.Calculus.FDeriv.Basic
+import Mathlib.Analysis.InnerProductSpace.PiL2
+import Mathlib.Analysis.LocallyConvex.WithSeminorms
+import Mathlib.Probability.Distributions.Exponential
+import Mathlib.Probability.Independence.Basic
+
+namespace OAI
+
+namespace PlanarFPP
+
+open Set MeasureTheory ProbabilityTheory Filter
+open scoped Topology
+
+abbrev Vertex := ℤ × ℤ
+
+abbrev Edge := Vertex × Bool
+
+inductive Step where
+  | east | west | north | south
+  deriving DecidableEq
+
+def Step.delta : Step → Vertex
+  | .east => (1, 0)
+  | .west => (-1, 0)
+  | .north => (0, 1)
+  | .south => (0, -1)
+
+def Step.edge (p : Vertex) : Step → Edge
+  | .east => (p, false)
+  | .west => (p + (-1, 0), false)
+  | .north => (p, true)
+  | .south => (p + (0, -1), true)
+
+def displacement (ds : List Step) : Vertex := (ds.map Step.delta).sum
+
+def pathCost (τ : Edge → ℝ) (p : Vertex) : List Step → ℝ
+  | [] => 0
+  | d :: ds => τ (d.edge p) + pathCost τ (p + d.delta) ds
+
+abbrev Plane := EuclideanSpace ℝ (Fin 2)
+
+noncomputable def latticeFloor (v : Plane) : Vertex := (⌊v 0⌋, ⌊v 1⌋)
+
+noncomputable def passageTime (τ : Edge → ℝ) (p q : Vertex) : ℝ :=
+  sInf {t | ∃ ds : List Step, p + displacement ds = q ∧ pathCost τ p ds = t}
+
+structure TimeConstantNorm (μ : Plane → ℝ) : Prop where
+  nonneg : ∀ v, 0 ≤ μ v
+  zero_iff : ∀ v, μ v = 0 ↔ v = 0
+  triangle : ∀ v w, μ (v + w) ≤ μ v + μ w
+  homogeneous : ∀ (a : ℝ) v, μ (a • v) = |a| * μ v
+
+structure ExponentialEnvironment {Ω : Type*} [MeasurableSpace Ω]
+    (P : Measure Ω) (τ : Edge → Ω → ℝ) : Prop where
+  probability : IsProbabilityMeasure P
+  measurable : ∀ e, Measurable (τ e)
+  independent : iIndepFun τ P
+  marginal : ∀ e, Measure.map (τ e) P = expMeasure 1
+
+def IsTimeConstant {Ω : Type*} [MeasurableSpace Ω]
+    (P : Measure Ω) (τ : Edge → Ω → ℝ) (μ : Plane → ℝ) : Prop :=
+  ∀ v : Plane, ∀ᵐ ω ∂P,
+    Tendsto (fun t : ℝ => passageTime (fun e => τ e ω) (0, 0)
+      (latticeFloor (t • v)) / t) atTop (𝓝 (μ v))
+
+def DifferentiableAwayFromOrigin (μ : Plane → ℝ) : Prop :=
+  ∀ v : Plane, v ≠ 0 → ∃ ℓ : Plane →L[ℝ] ℝ, HasFDerivAt μ ℓ v
+
+def UniqueNormalizedSupports (μ : Plane → ℝ) : Prop :=
+  ∀ v : Plane, μ v = 1 → ∃! ℓ : Plane →L[ℝ] ℝ,
+    ℓ v = 1 ∧ ∀ w, ℓ w ≤ μ w
+
+def C1UnitSphere (μ : Plane → ℝ) : Prop :=
+  ∀ v : Plane, μ v = 1 → ∃ U : Set Plane, IsOpen U ∧ v ∈ U ∧
+    ∃ g : Plane → ℝ, ContDiffOn ℝ 1 g U ∧
+      (∀ w ∈ U, μ w = 1 ↔ g w = 0) ∧
+      ∀ w ∈ U, g w = 0 → ∃ ℓ : Plane →L[ℝ] ℝ,
+        HasFDerivAt g ℓ w ∧ ℓ ≠ 0
+
+def HasC1CurveChart (S : Set Plane) (v : Plane) : Prop :=
+  ∃ U : Set Plane, IsOpen U ∧ v ∈ U ∧ v ∈ S ∧ ∃ γ : ℝ → Plane, ∃ θ : Plane → ℝ,
+    ContDiff ℝ 1 γ ∧ ContinuousOn θ U ∧
+    (∀ t, γ t ∈ S ∩ U) ∧ (∀ t, θ (γ t)=t) ∧
+    (∀ z ∈ S ∩ U, γ (θ z)=z) ∧
+    (∀ t, ∃ d : Plane, HasDerivAt γ d t ∧ d ≠ 0)
+
+theorem manuscriptMain (Ω : Type) [MeasurableSpace Ω] (P : Measure Ω) (τ : Edge → Ω → ℝ)
+    (henv : ExponentialEnvironment P τ) :
+    ∃ μ : Plane → ℝ, TimeConstantNorm μ ∧ IsTimeConstant P τ μ ∧
+      DifferentiableAwayFromOrigin μ ∧ UniqueNormalizedSupports μ ∧ C1UnitSphere μ ∧
+      (∀ v ∈ frontier {z | μ z ≤ 1}, ∃! L : Set Plane,
+        ∃ g : Plane →L[ℝ] ℝ, g ≠ 0 ∧ (∀ z, μ z ≤ 1 → g z ≤ g v) ∧ L={z | g z=g v}) ∧
+      (∀ v ∈ frontier {z | μ z ≤ 1}, HasC1CurveChart (frontier {z | μ z ≤ 1}) v) := by
+  sorry
+
+end PlanarFPP
+
+end OAI
+
+
+=== COMPARATOR GammaPassage ===
+import Mathlib.Algebra.BigOperators.Group.List.Basic
+import Mathlib.Algebra.Group.Prod
+import Mathlib.Analysis.Calculus.ContDiff.Defs
+import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Analysis.Calculus.FDeriv.Basic
+import Mathlib.Analysis.InnerProductSpace.PiL2
+import Mathlib.Probability.Distributions.Gamma
+import Mathlib.Probability.Independence.Basic
+
+namespace OAI
+
+namespace PlanarFPP
+
+open Set MeasureTheory ProbabilityTheory Filter
+open scoped Topology
+
+abbrev Vertex := ℤ × ℤ
+
+abbrev Edge := Vertex × Bool
+
+inductive Step where
+  | east | west | north | south
+  deriving DecidableEq
+
+def Step.delta : Step → Vertex
+  | .east => (1, 0)
+  | .west => (-1, 0)
+  | .north => (0, 1)
+  | .south => (0, -1)
+
+def Step.edge (p : Vertex) : Step → Edge
+  | .east => (p, false)
+  | .west => (p + (-1, 0), false)
+  | .north => (p, true)
+  | .south => (p + (0, -1), true)
+
+def displacement (ds : List Step) : Vertex := (ds.map Step.delta).sum
+
+def pathCost (τ : Edge → ℝ) (p : Vertex) : List Step → ℝ
+  | [] => 0
+  | d :: ds => τ (d.edge p) + pathCost τ (p + d.delta) ds
+
+abbrev Plane := EuclideanSpace ℝ (Fin 2)
+
+noncomputable def latticeFloor (v : Plane) : Vertex := (⌊v 0⌋, ⌊v 1⌋)
+
+noncomputable def passageTime (τ : Edge → ℝ) (p q : Vertex) : ℝ :=
+  sInf {t | ∃ ds : List Step, p + displacement ds = q ∧ pathCost τ p ds = t}
+
+structure TimeConstantNorm (μ : Plane → ℝ) : Prop where
+  nonneg : ∀ v, 0 ≤ μ v
+  zero_iff : ∀ v, μ v = 0 ↔ v = 0
+  triangle : ∀ v w, μ (v + w) ≤ μ v + μ w
+  homogeneous : ∀ (a : ℝ) v, μ (a • v) = |a| * μ v
+
+def IsTimeConstant {Ω : Type*} [MeasurableSpace Ω]
+    (P : Measure Ω) (τ : Edge → Ω → ℝ) (μ : Plane → ℝ) : Prop :=
+  ∀ v : Plane, ∀ᵐ ω ∂P,
+    Tendsto (fun t : ℝ => passageTime (fun e => τ e ω) (0, 0)
+      (latticeFloor (t • v)) / t) atTop (𝓝 (μ v))
+
+def DifferentiableAwayFromOrigin (μ : Plane → ℝ) : Prop :=
+  ∀ v : Plane, v ≠ 0 → ∃ ℓ : Plane →L[ℝ] ℝ, HasFDerivAt μ ℓ v
+
+end PlanarFPP
+
+namespace GammaFPP
+
+open Set MeasureTheory ProbabilityTheory PlanarFPP
+
+structure IidEnvironment {Ω : Type*} [MeasurableSpace Ω]
+    (ν : Measure ℝ) (P : Measure Ω) (τ : PlanarFPP.Edge → Ω → ℝ) : Prop where
+  probability : IsProbabilityMeasure P
+  measurable : ∀ e, Measurable (τ e)
+  independent : iIndepFun τ P
+  marginal : ∀ e, Measure.map (τ e) P = ν
+
+
+abbrev GammaEnvironment {Ω : Type*} [MeasurableSpace Ω]
+    (shape rate : ℝ) (P : Measure Ω) (τ : PlanarFPP.Edge → Ω → ℝ) :=
+  IidEnvironment (gammaMeasure shape rate) P τ
+
+
+/-- A regular C¹ parametrization of the curve near a point, with a continuous inverse. -/
+def HasC1CurveChart (S : Set Plane) (v : Plane) : Prop :=
+  ∃ U : Set Plane, IsOpen U ∧ v ∈ U ∧ v ∈ S ∧ ∃ γ : ℝ → Plane, ∃ θ : Plane → ℝ,
+    ContDiff ℝ 1 γ ∧ ContinuousOn θ U ∧
+    (∀ t, γ t ∈ S ∩ U) ∧ (∀ t, θ (γ t)=t) ∧
+    (∀ z ∈ S ∩ U, γ (θ z)=z) ∧
+    (∀ t, ∃ d : Plane, HasDerivAt γ d t ∧ d ≠ 0)
+
+/-- The Gamma theorem: an actual deterministic passage-time limit norm exists
+for every positive shape and rate and every iid environment with that law.
+Its Frechet differentiability and literal unit-ball boundary charts are
+conclusions. No shape theorem, norm, or no-corner hypothesis is supplied. -/
+def GammaDifferentiabilityTarget : Prop :=
+  ∀ (shape rate : ℝ), 0 < shape → 0 < rate →
+    ∀ (Ω : Type) [MeasurableSpace Ω] (P : Measure Ω)
+      (τ : PlanarFPP.Edge → Ω → ℝ),
+      GammaEnvironment shape rate P τ →
+        ∃ μ : Plane → ℝ,
+          TimeConstantNorm μ ∧ IsTimeConstant P τ μ ∧
+          DifferentiableAwayFromOrigin μ ∧
+          ∀ v ∈ frontier {z : Plane | μ z ≤ 1},
+            HasC1CurveChart (frontier {z : Plane | μ z ≤ 1}) v
+
+theorem gamma_differentiability : GammaDifferentiabilityTarget := by
+  sorry
+
+end GammaFPP
+
+end OAI
+

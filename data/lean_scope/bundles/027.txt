@@ -1,0 +1,57 @@
+FAMILY 027: Potential integral density on curve character varieties
+OPENAI SUMMARY: Resolves the determinant-one curve case of Litt's integral-density question. For every smooth connected complex algebraic curve and every rank, integral points become Zariski dense in every component of its SLr character variety over the full ring of integers of one number field. Prescribed quasi-unipotent boundary conjugacy classes are allowed, including nonsemisimple classes.
+OUR LABEL: lean_vs_headline = different
+OUR HEADLINE (semi-formal): ∀ smooth connected complex curve X, ∀ r ≥1, ∀ quasi-unipotent classes C_1..C_s: ∃ number field L (finite over K) such that M_r(X)(O_L) ∩ Y(C) is Zariski dense in every component of Y
+OUR NOTES: Potential density read as existence of a field L over which density holds (M2; M1 alternative). Litt's question is posed for smooth projective varieties (with a boundary variant); here curves and SL_r only → O5. Lean comparator is an intermediate seam-equation lemma, not the headline.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Integral points on character varieties of curves | in_formalization_yaml=True | withdrawn=False | main_tex=Integral-points-on-character-varieties-of-curves-September-25-2026/preprints/Integral-points-on-character-varieties-of-curves-September-25-2026/build/main.tex
+  ABSTRACT: We prove potential Zariski density of integral points on SLr-character varieties of smooth complex curves in every rank. The result allows prescribed quasi-unipotent boundary monodromy, including exact nonsemisimple conjugacy classes, and holds on every component over the full ring of integers of one finite extension. Here integrality is measured in the ambient character variety, while the exact boundary conditions are imposed on the complex representation.
+
+=== OPENAI SCOPE NOTE (lean/docs/027.md) ===
+# Potential integral density on curve character varieties
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [Integral points on character varieties of curves](../../preprints/Integral-points-on-character-varieties-of-curves-September-25-2026/paper.pdf)
+
+## Scope
+
+The integral-density question asks whether integral points become Zariski dense in every component of a curve character variety after one finite extension of the number field. The linked formalization proves a supporting compatibility result for its marked-surface construction. Given a proper diagram with finitely many vertices, a chosen seam with maximal adjacent facet rank and a positive-genus parent, puncture data, an existing solution over a field, and a chosen boundary occurrence, the produced marked values satisfy every seam equation.
+
+This is conditional compatibility of the produced solution. Potential integral density, including the prescribed-boundary and all-component conclusions, remains outside the selected statement.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Compatibility of the produced marked solution with every seam equation | [CharacterVarietiesAllSeamsSupport.lean](../ComparatorChallenges/CharacterVarietiesAllSeamsSupport.lean) |
+
+
+=== COMPARATOR CharacterVarietiesAllSeamsSupport ===
+import OAI.AlgebraicGeometry.CharacterVarieties.Seams.ProducedEquations
+
+namespace OAI
+
+noncomputable section
+namespace IntegralCharacterVarieties.SurfacePresentation.Diagram
+open scoped Classical Matrix
+open OccurrenceIncidence VertexTable MatrixExpression NamedBandGrades HomTransport
+variable {F S V R K : Type} {arity : S → ℕ} [CommRing R] [Field K] [Algebra R K]
+    (D : Diagram F S V arity) (q : S) [Finite V]
+    (hproper : D.Proper) (hmax : ∀ f, D.rank f ≤ D.rank (D.ports.facet ⟨q,none⟩))
+    (hg : 0 < D.genus (D.bandCutParent q))
+    (P : D.Punctures R) (x : D.Solution P K)
+    (b0 : Fin (D.boundaryCount (D.bandCutParent q)))
+    (i0 : Fin (D.boundaryLength (D.bandCutParent q) b0))
+
+theorem producedMarkedValues_allSeams :
+    D.ProducedMarkedSeamEquations q hproper hmax hg P x b0 i0 := by
+  sorry
+
+end IntegralCharacterVarieties.SurfacePresentation.Diagram
+end
+
+
+end OAI
+

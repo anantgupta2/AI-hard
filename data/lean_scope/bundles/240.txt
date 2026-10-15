@@ -1,0 +1,141 @@
+FAMILY 240: Shelah's eventual categoricity and the prescribed-threshold obstruction
+OPENAI SUMMARY: Proves Shelah's eventual categoricity conjecture in ZFC: for each bound on the Löwenheim–Skolem number, a uniform threshold makes categoricity of an abstract elementary class in one cardinal above that threshold imply categoricity throughout the same tail. Categoricity means uniqueness up to isomorphism at a given cardinality. Under the continuum hypothesis, a proposed specific Hanf threshold need not suffice.
+OUR LABEL: lean_vs_headline = different
+OUR HEADLINE (semi-formal): ∀ infinite cardinal λ, ∃ μ(λ)≥λ, ∀ AEC K with LS(K)≤λ: (∃ κ≥μ(λ) with K categorical in κ) → (∀ κ'≥μ(λ), K categorical in κ')
+OUR NOTES: M2 is an alternative because the core is the existence of a threshold μ(λ). Secondary result: under CH, an AEC refuting the prescribed Hanf threshold ℶ_{(2^{ℵ0})^+}, so that form is not ZFC-provable. Lean covers only the CH obstruction, hence different.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- A CH obstruction to a prescribed categoricity threshold | in_formalization_yaml=True | withdrawn=False | main_tex=A-CH-Obstruction-to-a-Prescribed-Categoricity-Threshold-September-24-2026/preprints/A-CH-Obstruction-to-a-Prescribed-Categoricity-Threshold-September-24-2026/build/paper.tex
+  ABSTRACT: Assuming the continuum hypothesis, we construct an abstract elementary class with Löwenheim–Skolem number ℵ0 that is categorical in every sufficiently large cardinal but has at least two nonisomorphic models of cardinality $`\beth_{\omega_2}`$. Thus categoricity does not transfer down to the proposed bound $`\beth_{(2^{\aleph_0})^+}`$, which equals $`\beth_{\omega_2}`$ under CH. Consequently, if ZFC is consistent, the prescribed-threshold form of Shelah's categoricity conjecture is not provable in ZFC.
+- Eventual categoricity for abstract elementary classes | in_formalization_yaml=False | withdrawn=False | main_tex=Eventual-Categoricity-for-Abstract-Elementary-Classes-September-24-2026/preprints/Eventual-Categoricity-for-Abstract-Elementary-Classes-September-24-2026/build/main.tex
+  ABSTRACT: We prove Shelah's eventual categoricity conjecture for abstract elementary classes in ZFC. For each infinite bound on the Löwenheim–Skolem number there is a uniform threshold such that categoricity in any one cardinal at or above that threshold implies categoricity in every cardinal at or above the same threshold.
+
+=== OPENAI SCOPE NOTE (lean/docs/240.md) ===
+# Shelah's eventual categoricity and the prescribed-threshold obstruction
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [A CH obstruction to a prescribed categoricity threshold](../../preprints/A-CH-Obstruction-to-a-Prescribed-Categoricity-Threshold-September-24-2026/paper.pdf)
+
+## Scope
+
+Under the continuum hypothesis, the formalized result refutes the proposed transfer of categoricity down to the Hanf threshold. It gives an abstract elementary class in a countable relational language, with Löwenheim–Skolem number $\aleph_0$, that has two nonisomorphic models at $\beth_{\omega_2}=h(\aleph_0)$ but is categorical in every cardinal at least $\beth_{(2^{\aleph_1})^+}$.
+
+No amalgamation, joint embedding, tameness, or absence-of-maximal-models assumption is imposed. The later canonical-point obstruction and the separate eventual-categoricity theorem are not included.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| CH categoricity-threshold obstruction | [CHObstruction.lean](../ComparatorChallenges/CHObstruction.lean) |
+
+
+=== COMPARATOR CHObstruction ===
+import Mathlib
+
+namespace OAI
+
+universe u
+
+noncomputable section
+
+namespace CHObstruction
+
+open Cardinal Ordinal Order
+
+structure RelModel (L : ℕ → Type) where
+  carrier : ZFSet.{u}
+  rel : (n : ℕ) → L n → (Fin n → carrier) → Prop
+
+namespace RelModel
+
+variable {L : ℕ → Type}
+
+structure IsSubstructure (M N : RelModel.{u} L) : Prop where
+  subset : M.carrier ⊆ N.carrier
+  restrict : ∀ (n) (r : L n) (a : Fin n → M.carrier),
+    M.rel n r a ↔ N.rel n r (fun i => ⟨(a i).val, subset (a i).property⟩)
+
+structure Iso (M N : RelModel.{u} L) where
+  toEquiv : M.carrier ≃ N.carrier
+  map_rel : ∀ (n) (r : L n) (a : Fin n → M.carrier),
+    M.rel n r a ↔ N.rel n r (toEquiv ∘ a)
+
+def IsUnion {ι : Type u} (F : ι → RelModel.{u} L) (U : RelModel.{u} L) : Prop :=
+  (∀ i, IsSubstructure (F i) U) ∧
+  ∀ x : U.carrier, ∃ i, x.val ∈ (F i).carrier
+
+end RelModel
+
+structure ClassData (L : ℕ → Type) where
+  objects : RelModel.{u} L → Prop
+  strong : RelModel.{u} L → RelModel.{u} L → Prop
+
+namespace ClassData
+
+variable {L : ℕ → Type} (K : ClassData.{u} L)
+
+def LSBound (θ : Cardinal.{u}) : Prop :=
+  ℵ₀ ≤ θ ∧ Cardinal.lift.{u, 0} (# (Σ n, L n)) ≤ θ ∧
+  ∀ M, K.objects M → ∀ A : ZFSet.{u}, A ⊆ M.carrier →
+    ∃ N, K.objects N ∧ K.strong N M ∧ A ⊆ N.carrier ∧ N.carrier.card ≤ A.card + θ
+
+def HasLSNumber (θ : Cardinal.{u}) : Prop :=
+  K.LSBound θ ∧ ∀ θ', K.LSBound θ' → θ ≤ θ'
+
+structure IsAEC : Prop where
+  strong_objects : ∀ {M N}, K.strong M N → K.objects M ∧ K.objects N
+  refl : ∀ {M}, K.objects M → K.strong M M
+  antisymm : ∀ {M N}, K.strong M N → K.strong N M → M = N
+  trans : ∀ {M N P}, K.strong M N → K.strong N P → K.strong M P
+  substructure : ∀ {M N}, K.strong M N → M.IsSubstructure N
+  iso_objects : ∀ {M N}, K.objects M → Nonempty (M.Iso N) → K.objects N
+  iso_strong : ∀ {M N M' N'} (h : K.strong M N)
+    (e : M.Iso M') (f : N.Iso N'),
+    (∀ x : M.carrier,
+      (e.toEquiv x).val =
+        (f.toEquiv ⟨x.val, (substructure h).subset x.property⟩).val) →
+    K.strong M' N'
+  coherence : ∀ {M₀ M₁ M₂}, M₀.IsSubstructure M₁ →
+    K.strong M₀ M₂ → K.strong M₁ M₂ → K.strong M₀ M₁
+  chain_union : ∀ (γ : Ordinal.{u}), γ ≠ 0 →
+    ∀ (F : γ.ToType → RelModel.{u} L),
+    (∀ i, K.objects (F i)) →
+    (∀ i j, i ≤ j → K.strong (F i) (F j)) →
+    ∃ U, K.objects U ∧ RelModel.IsUnion F U ∧
+      (∀ i, K.strong (F i) U) ∧
+      (∀ N, K.objects N → (∀ i, K.strong (F i) N) → K.strong U N)
+  downward : ∃ θ, K.LSBound θ
+
+def Categorical (μ : Cardinal.{u}) : Prop :=
+  (∃ M, K.objects M ∧ M.carrier.card = μ) ∧
+  ∀ M N, K.objects M → K.objects N →
+    M.carrier.card = μ → N.carrier.card = μ → Nonempty (M.Iso N)
+
+def TwoModels (μ : Cardinal.{u}) : Prop :=
+  ∃ M N, K.objects M ∧ K.objects N ∧
+    M.carrier.card = μ ∧ N.carrier.card = μ ∧ ¬ Nonempty (M.Iso N)
+
+end ClassData
+
+def CH : Prop := (2 : Cardinal.{u}) ^ ℵ₀ = ℵ_ 1
+
+def hanf (κ : Cardinal.{u}) : Cardinal.{u} := beth (succ ((2 : Cardinal.{u}) ^ κ)).ord
+
+def endpoint : Cardinal.{u} := beth (ω_ 2)
+
+def tailThreshold : Cardinal.{u} := beth (succ ((2 : Cardinal.{u}) ^ (ℵ_ 1))).ord
+
+theorem main (hCH : CH.{u}) :
+    ∃ (L : ℕ → Type), Countable (Σ n, L n) ∧
+      ∃ K : ClassData.{u} L, K.IsAEC ∧ K.HasLSNumber ℵ₀ ∧
+        endpoint = hanf (ℵ₀ : Cardinal.{u}) ∧ K.TwoModels endpoint ∧
+        ∀ μ, tailThreshold ≤ μ → K.Categorical μ := by
+  sorry
+
+end CHObstruction
+
+end
+
+end OAI
+

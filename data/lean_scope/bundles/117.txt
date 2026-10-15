@@ -1,0 +1,87 @@
+FAMILY 117: Uniform sparsest cut: hardness and semidefinite gaps
+OPENAI SUMMARY: Proves that approximating Uniform Sparsest Cut within any fixed constant factor is NP-hard, even with nonnegative rational capacities and unit demands. The Goemans–Linial semidefinite relaxation also has integrality gaps of order at least $`\sqrt{\log n}/(\log\log n)^3`$, approaching the square-root-logarithmic upper bound.
+OUR LABEL: lean_vs_headline = different
+OUR HEADLINE (semi-formal): ∀ C > 1, ∃ poly-time reduction from 3CNF-SAT to (G, a) with nonnegative rational capacities and unit demands: satisfiable ⇒ Φ(G) ≤ a; unsatisfiable ⇒ Φ(G) > Ca
+OUR NOTES: No explicit open-question citation; earlier constant-factor hardness needed SSE/UGC. Lean covers the second result: Goemans–Linial integrality gap ≥ c√log n/(log log n)^3.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Constant-factor hardness of uniform sparsest cut | in_formalization_yaml=False | withdrawn=False | main_tex=Constant-factor-hardness-of-uniform-sparsest-cut-September-24-2026/preprints/Constant-factor-hardness-of-uniform-sparsest-cut-September-24-2026/build/source/main.tex
+  ABSTRACT: We prove that, for every fixed C &gt; 1, approximating Uniform Sparsest Cut within factor C is NP-hard. The output graphs have nonnegative rational capacities and unit demand between every pair of distinct vertices.
+- Near-square-root logarithmic integrality gaps for uniform sparsest cut | in_formalization_yaml=True | withdrawn=False | main_tex=Near-square-root-logarithmic-integrality-gaps-for-uniform-sparsest-cut-September-24-2026/preprints/Near-square-root-logarithmic-integrality-gaps-for-uniform-sparsest-cut-September-24-2026/build/source/main.tex
+  ABSTRACT: We construct uniform sparsest-cut instances whose Goemans–Linial semidefinite integrality gap is at least $`c\sqrt{\log n}/(\log\log n)^3`$ along a sequence $`n\to\infty`$. The demand is one between every pair of distinct vertices, and the capacities are nonnegative real numbers. This matches the Arora–Rao–Vazirani upper bound up to a power of $`\log\log n`$.
+
+=== OPENAI SCOPE NOTE (lean/docs/117.md) ===
+# Uniform sparsest cut: hardness and semidefinite gaps
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [Near-square-root logarithmic integrality gaps for uniform sparsest cut](../../preprints/Near-square-root-logarithmic-integrality-gaps-for-uniform-sparsest-cut-September-24-2026/Near-square-root-logarithmic-integrality-gaps-for-uniform-sparsest-cut-September-24-2026.pdf)
+
+## Scope
+
+The formalized result gives integrality gaps for the Goemans–Linial relaxation of uniform sparsest cut. Along a sequence of instance sizes $n\to\infty$, the ratio of the integral optimum to the positive relaxation optimum is at least $c\sqrt{\log n}/(\log\log n)^3$ for one absolute $c>0$. Every unordered pair has unit demand, and the relaxation uses squared Euclidean distances satisfying the triangle inequalities. The result is an existential sequence, not a bound for every size or a computational hardness theorem.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Uniform sparsest-cut integrality gaps | [UniformSparsestCut.lean](../ComparatorChallenges/UniformSparsestCut.lean) |
+
+
+=== COMPARATOR UniformSparsestCut ===
+import Mathlib
+
+namespace OAI
+
+noncomputable section
+
+open scoped BigOperators
+
+namespace UniformSparsestCut
+
+structure Capacity (n : ℕ) where
+  cap : Fin n → Fin n → ℝ
+  nonneg : ∀ i j, 0 ≤ cap i j
+  symm : ∀ i j, cap i j = cap j i
+  diagonal : ∀ i, cap i i = 0
+
+def pairSum {n : ℕ} (f : Fin n → Fin n → ℝ) : ℝ :=
+  ∑ i, ∑ j, if i < j then f i j else 0
+
+noncomputable def cutRatio {n : ℕ} (C : Capacity n) (B : Finset (Fin n)) : ℝ :=
+  (∑ i ∈ B, ∑ j ∈ Bᶜ, C.cap i j) /
+    ((B.card : ℝ) * ((n : ℝ) - (B.card : ℝ)))
+
+noncomputable def OPT {n : ℕ} (C : Capacity n) : ℝ :=
+  sInf {r | ∃ B : Finset (Fin n), B.Nonempty ∧ B ≠ Finset.univ ∧ r = cutRatio C B}
+
+def NegativeType {n : ℕ} (d : Fin n → Fin n → ℝ) : Prop :=
+  (∃ x : Fin n → EuclideanSpace ℝ (Fin n), ∀ i j, d i j = ‖x i - x j‖ ^ 2) ∧
+  ∀ i j k, d i k ≤ d i j + d j k
+
+def Feasible {n : ℕ} (d : Fin n → Fin n → ℝ) : Prop :=
+  NegativeType d ∧ pairSum d = 1
+
+noncomputable def glValue {n : ℕ} (C : Capacity n) : ℝ :=
+  sInf {r | ∃ d : Fin n → Fin n → ℝ, Feasible d ∧
+    r = pairSum (fun i j => C.cap i j * d i j)}
+
+open Filter
+
+theorem mainGap :
+    ∃ c : ℝ, 0 < c ∧
+      ∃ n : ℕ → ℕ, ∃ C : (j : ℕ) → Capacity (n j),
+        (∀ j, 2 ≤ n j) ∧
+        Tendsto n atTop atTop ∧
+        (∀ j, 0 < glValue (C j)) ∧
+        ∀ᶠ j in atTop,
+          c * Real.sqrt (Real.log (n j : ℝ)) / (Real.log (Real.log (n j : ℝ))) ^ 3 ≤
+            OPT (C j) / glValue (C j) := by
+  sorry
+
+end UniformSparsestCut
+
+end
+
+end OAI
+

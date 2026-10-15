@@ -1,0 +1,69 @@
+FAMILY 261: Localization and delocalization in the Anderson model
+OPENAI SUMMARY: Resolves the predicted spectral contrast for the lattice Anderson model with independent uniform site potentials. In dimension two, every positive disorder strength gives almost surely pure-point spectrum. In every fixed dimension d ≥ 3, sufficiently weak positive disorder gives purely absolutely continuous spectrum on a fixed open interval with nonzero spectral weight.
+OUR LABEL: lean_vs_headline = different
+OUR HEADLINE (semi-formal): ∀ h>0: ℙ-a.s. the 2D Anderson operator H_v (v_x iid uniform on [−h,h]) has pure-point spectrum with σ(H_v)=[−4−h,4+h]
+OUR NOTES: Family bundles two headlines: 2D pure point at every disorder (Simon Problem 2) and d≥3 purely a.c. spectrum on a fixed interval at weak disorder (Simon Problem 1, an existence-of-ac-spectrum claim, ∀∃ M2-like). Labelled the 2D result (first in summary, has Lean). O5 because only the uniform single-site law and pure-point part (not dynamical localization). Simon's list taken as an explicit numbered problem list (P3). Lean asserts only that the spectrum equals [−4−h,4+h], not pure-point type, hence 'different'.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Absolutely Continuous Spectrum for Weak-Disorder Anderson Models in Dimensions at Least Three | in_formalization_yaml=False | withdrawn=False | main_tex=Absolutely-Continuous-Spectrum-for-Weak-Disorder-Anderson-Models-in-Dimensions-at-Least-Three-September-23-2026/preprints/Absolutely-Continuous-Spectrum-for-Weak-Disorder-Anderson-Models-in-Dimensions-at-Least-Three-September-23-2026/build/paper.tex
+  ABSTRACT: For each fixed dimension d ≥ 3 and each fixed sufficiently small positive disorder strength, we prove that the Anderson operator on ℤd with independent uniform site potentials almost surely has purely absolutely continuous spectrum with nonzero weight on an open energy interval. The interval may depend on d but is independent of the disorder strength. This settles the purely absolutely continuous energy-range question in Simon's Problem 1 for this model.
+- Pure-Point Spectrum for the Two-Dimensional Anderson Model at Every Positive Disorder | in_formalization_yaml=False | withdrawn=False | main_tex=Pure-Point-Spectrum-for-the-Two-Dimensional-Anderson-Model-at-Every-Positive-Disorder-September-23-2026/preprints/Pure-Point-Spectrum-for-the-Two-Dimensional-Anderson-Model-at-Every-Positive-Disorder-September-23-2026/build/paper.tex
+  ABSTRACT: For each fixed positive disorder strength, we prove that the nearest-neighbor Anderson operator on the square lattice with independent uniform site potentials almost surely has pure-point spectral type throughout its spectrum. This resolves the pure-point assertion of the two-dimensional Anderson localization conjecture for the uniform single-site law.
+
+=== OPENAI SCOPE NOTE (lean/docs/261.md) ===
+# Localization and delocalization in the Anderson model
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [Pure-Point Spectrum for the Two-Dimensional Anderson Model at Every Positive Disorder](../../preprints/Pure-Point-Spectrum-for-the-Two-Dimensional-Anderson-Model-at-Every-Positive-Disorder-September-23-2026/paper.pdf)
+
+## Scope
+
+The linked formalization proves a supporting spectral statement for the nearest-neighbor Anderson operator on $\mathbb Z^2$. For every disorder strength $h>0$ with independent site potentials uniform on $[-h,h]$, it constructs the bounded self-adjoint operator almost surely and identifies its spectrum as the real interval $[-4-h,4+h]$.
+
+This selected statement identifies the spectral set. It does not assert the pure-point spectral type claimed in the accompanying paper.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Almost-sure spectrum of the planar Anderson operator | [PlanarAndersonSpectrum.lean](../ComparatorChallenges/PlanarAndersonSpectrum.lean) |
+
+
+=== COMPARATOR PlanarAndersonSpectrum ===
+import Mathlib
+
+namespace OAI
+
+noncomputable section
+open MeasureTheory
+open scoped ENNReal
+
+namespace PlanarAnderson
+
+abbrev Site := ℤ × ℤ
+abbrev Configuration := Site → ℝ
+abbrev Hilbert := lp (fun _ : Site => ℂ) 2
+
+def disorderLaw (h : ℝ) : Measure Configuration :=
+  Measure.infinitePi (fun _ : Site => ProbabilityTheory.cond volume (Set.Icc (-h) h))
+
+def IsAndersonOperator (v : Configuration) (H : Hilbert →L[ℂ] Hilbert) : Prop :=
+  ∀ (u : Hilbert) (x : Site),
+    (H u) x = u (x.1 + 1, x.2) + u (x.1 - 1, x.2) +
+      u (x.1, x.2 + 1) + u (x.1, x.2 - 1) + (v x : ℂ) * u x
+
+def spectralInterval (h : ℝ) : Set ℂ :=
+  {z | z.im = 0 ∧ -4 - h ≤ z.re ∧ z.re ≤ 4 + h}
+
+theorem anderson_spectrum_ae {h : ℝ} (hh : 0 < h) :
+    ∀ᵐ v ∂disorderLaw h, ∃ H : Hilbert →L[ℂ] Hilbert,
+      IsAndersonOperator v H ∧ IsSelfAdjoint H ∧ spectrum ℂ H = spectralInterval h := by
+  sorry
+
+end PlanarAnderson
+
+end
+
+end OAI
+

@@ -1,0 +1,255 @@
+FAMILY 307: Failure of rational injectivity for maximal coarse assembly
+OPENAI SUMMARY: Constructs a uniformly discrete bounded-geometry space whose maximal coarse assembly map is not rationally injective. The example is a coarse disjoint union of finite connected graphs of uniformly bounded degree, with an infinite-order kernel class. A companion gives the analogous failure for reduced coarse assembly, disproving the rational coarse Novikov conjecture.
+OUR LABEL: lean_vs_headline = weaker
+OUR HEADLINE (semi-formal): ∃ coarse disjoint union X = ⊔ X_j of finite connected graphs of uniformly bounded degree (uniformly discrete, bounded geometry) ∃ α ∈ KX_1(X) of infinite order with μ_X^max(α) = 0 (so μ_X^max ⊗ ℚ is not injective)
+OUR NOTES: μ_red factors through μ_max, so the maximal kernel class also refutes the rational coarse Novikov conjecture: rule 21 → P1. Lean reduced-assembly counterexample is implied by the headline → weaker.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Failure of rational injectivity for maximal coarse assembly | in_formalization_yaml=False | withdrawn=False | main_tex=Failure-of-rational-injectivity-for-maximal-coarse-assembly-October-5-2026/preprints/Failure-of-rational-injectivity-for-maximal-coarse-assembly-October-5-2026/build/main.tex
+  ABSTRACT: We construct a uniformly discrete bounded-geometry space whose maximal coarse assembly map has an infinite-order element in its kernel. The space is a coarse disjoint union of finite connected graphs of uniformly bounded degree, so maximal coarse assembly need not be rationally injective even for such graph unions.
+- A counterexample to the coarse Novikov conjecture | in_formalization_yaml=False | withdrawn=False | main_tex=A-counterexample-to-the-coarse-Novikov-conjecture-September-23-2026/preprints/A-counterexample-to-the-coarse-Novikov-conjecture-September-23-2026/build/main.tex
+  ABSTRACT: We disprove the coarse Novikov conjecture: ordinary coarse assembly need not be rationally injective for uniformly discrete spaces of bounded geometry. We construct a coarse disjoint union of finite graphs of uniformly bounded degree and an infinite-order class in its degree-one coarse K-homology whose image under ordinary coarse assembly in the K-theory of the reduced, locally compact Roe algebra vanishes.
+
+=== OPENAI SCOPE NOTE (lean/docs/307.md) ===
+# Failure of rational injectivity for maximal coarse assembly
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [A counterexample to the coarse Novikov conjecture](../../preprints/A-counterexample-to-the-coarse-Novikov-conjecture-September-23-2026/paper.pdf)
+
+## Scope
+
+The coarse Novikov conjecture predicts rational injectivity of the ordinary coarse assembly map for uniformly discrete spaces of bounded geometry. The formalization constructs a counterexample from a coarse disjoint union of finite connected graphs with uniformly bounded degree. Its degree-one coarse $K$-homology contains an infinite-order class whose image under ordinary coarse assembly into the reduced locally compact Roe algebra vanishes. The class remains nonzero after tensoring with $\mathbb Q$, so rational injectivity fails.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Failure of rational injectivity for ordinary coarse assembly | [CoarseAssembly.lean](../ComparatorChallenges/CoarseAssembly.lean) |
+
+
+=== COMPARATOR CoarseAssembly ===
+import Mathlib
+
+open scoped Topology
+
+namespace OAI
+
+/-! # A bounded-geometry counterexample to coarse Novikov
+
+The concrete graph union has an infinite-order class killed by its
+ordinary reduced coarse assembly map, including after rationalization.
+-/
+
+section
+
+noncomputable section
+
+namespace CoarseAssembly
+
+attribute [-instance] CStarAlgebra.toNormedRing CommCStarAlgebra.toNormedCommRing
+
+open Filter
+
+open scoped Topology
+
+variable {ι : Type*} {E F : ι → Type*}
+
+variable [∀ i, NormedAddCommGroup (E i)] [∀ i, NormedSpace ℂ (E i)]
+
+variable [∀ i, NormedAddCommGroup (F i)] [∀ i, NormedSpace ℂ (F i)]
+
+def blockLinear (A : ∀ i, E i →L[ℂ] F i) (C : ℝ) (_hC : 0 ≤ C)
+    (hA : ∀ i, ‖A i‖ ≤ C) : lp E 2 →ₗ[ℂ] lp F 2 where
+  toFun x := ⟨fun i => A i (x i), by
+    apply ((lp.memℓp x).norm.const_smul C).mono
+    intro i
+    exact (A i).le_opNorm (x i) |>.trans (mul_le_mul_of_nonneg_right (hA i) (norm_nonneg _))⟩
+  map_add' x y := by ext i; exact map_add (A i) _ _
+  map_smul' c x := by ext i; exact map_smul (A i) _ _
+
+def blockOperator (A : ∀ i, E i →L[ℂ] F i) (C : ℝ) (hC : 0 ≤ C)
+    (hA : ∀ i, ‖A i‖ ≤ C) : lp E 2 →L[ℂ] lp F 2 := by
+  classical
+
+  exact (OAI.CoarseAssembly.blockLinear A C hC hA).mkContinuous C ((
+    let local_proof {ι : Type _} {E : ι → Type _} {F : ι → Type _} [inst_local_3 : (i : ι) → NormedAddCommGroup (E i)] [inst_local_4 : (i : ι) → NormedSpace ℂ (E i)] [inst_local_5 : (i : ι) → NormedAddCommGroup (F i)] [inst_local_6 : (i : ι) → NormedSpace ℂ (F i)] (A : ∀ i, E i →L[ℂ] F i) (C : ℝ) (hC : 0 ≤ C)
+        (hA : ∀ i, ‖A i‖ ≤ C) (x : lp E 2) :
+        ‖OAI.CoarseAssembly.blockLinear A C hC hA x‖ ≤ C * ‖x‖ :=
+      open OAI OAI.CoarseAssembly in
+        open Filter in
+        open scoped Topology in
+        by
+          calc
+            _ ≤ ‖C • lp.toNorm x‖ := by
+              apply lp.norm_mono (by norm_num : (2 : ENNReal) ≠ 0)
+              intro i
+              change ‖A i (x i)‖ ≤ ‖C * ‖x i‖‖
+              rw [Real.norm_eq_abs, abs_of_nonneg (mul_nonneg hC (norm_nonneg _))]
+              exact (A i).le_opNorm (x i) |>.trans
+                (mul_le_mul_of_nonneg_right (hA i) (norm_nonneg _))
+            _ = C * ‖x‖ := by rw [norm_smul, Real.norm_eq_abs, abs_of_nonneg hC, lp.norm_toNorm]
+    local_proof) A C hC hA)
+
+def blockIsometry (V : ∀ i, E i →ₗᵢ[ℂ] F i) : lp E 2 →ₗᵢ[ℂ] lp F 2 where
+  toLinearMap := (blockOperator (fun i => (V i).toContinuousLinearMap) 1 zero_le_one
+    (fun i => (V i).norm_toContinuousLinearMap_le)).toLinearMap
+  norm_map' x := by
+    apply le_antisymm
+    · apply lp.norm_mono (by norm_num : (2 : ENNReal) ≠ 0)
+      intro i
+      exact le_of_eq ((V i).norm_map (x i))
+    · apply lp.norm_mono (by norm_num : (2 : ENNReal) ≠ 0)
+      intro i
+      exact le_of_eq ((V i).norm_map (x i)).symm
+
+end CoarseAssembly
+
+end
+end
+
+section
+
+noncomputable section
+
+namespace CoarseAssembly
+
+variable {ι : Type*} {Q : ι → Type*} {H : Type*}
+
+variable [NormedAddCommGroup H] [NormedSpace ℂ H]
+
+
+attribute [-instance] CStarAlgebra.toNormedRing CommCStarAlgebra.toNormedCommRing
+
+attribute [local instance 10000] T4Space.t3Space T5Space.toT4Space OrderTopology.t5Space
+  AddGroup.existsAddOfLE
+
+def flattenVector (x : lp (fun i => lp (fun _ : Q i => H) 2) 2) :
+    lp (fun _ : Sigma Q => H) 2 := by
+  classical
+
+  exact ⟨fun q => x q.1 q.2, by
+      apply memℓp_gen
+      simp only [ENNReal.toReal_ofNat, Real.rpow_two]
+      apply (summable_sigma_of_nonneg (fun q => sq_nonneg ‖x q.1 q.2‖)).2
+      refine ⟨fun i => (
+    let local_proof {J : Type _} {E : J → Type _} [∀ j, NormedAddCommGroup (E j)]
+        (x : lp E 2) : Summable (fun j => ‖x j‖ ^ 2) :=
+      open OAI OAI.CoarseAssembly in
+        by
+          simpa only [ENNReal.toReal_ofNat, Real.rpow_two] using
+            (lp.memℓp x).summable (by norm_num : 0 < (2 : ENNReal).toReal)
+    local_proof) (x i), ?_⟩
+      simpa only [← (
+    let local_proof {J : Type _} {E : J → Type _} [∀ j, NormedAddCommGroup (E j)]
+        (x : lp E 2) : ‖x‖ ^ 2 = ∑' j, ‖x j‖ ^ 2 :=
+      open OAI OAI.CoarseAssembly in
+        by
+          simpa only [ENNReal.toReal_ofNat, Real.rpow_two] using
+            lp.norm_rpow_eq_tsum (p := 2) (by norm_num) x
+    local_proof)] using (
+    let local_proof {J : Type _} {E : J → Type _} [∀ j, NormedAddCommGroup (E j)]
+        (x : lp E 2) : Summable (fun j => ‖x j‖ ^ 2) :=
+      open OAI OAI.CoarseAssembly in
+        by
+          simpa only [ENNReal.toReal_ofNat, Real.rpow_two] using
+            (lp.memℓp x).summable (by norm_num : 0 < (2 : ENNReal).toReal)
+    local_proof) x⟩
+
+def rowVector (x : lp (fun _ : Sigma Q => H) 2) (i : ι) : lp (fun _ : Q i => H) 2 := by
+  classical
+
+  exact ⟨fun q => x ⟨i, q⟩, by
+      apply memℓp_gen
+      simp only [ENNReal.toReal_ofNat, Real.rpow_two]
+      exact ((summable_sigma_of_nonneg (fun q => sq_nonneg ‖x q‖)).1
+        ((
+    let local_proof {J : Type _} {E : J → Type _} [∀ j, NormedAddCommGroup (E j)]
+        (x : lp E 2) : Summable (fun j => ‖x j‖ ^ 2) :=
+      open OAI OAI.CoarseAssembly in
+        by
+          simpa only [ENNReal.toReal_ofNat, Real.rpow_two] using
+            (lp.memℓp x).summable (by norm_num : 0 < (2 : ENNReal).toReal)
+    local_proof) x)).1 i⟩
+
+def unflattenVector (x : lp (fun _ : Sigma Q => H) 2) :
+    lp (fun i => lp (fun _ : Q i => H) 2) 2 := by
+  classical
+
+  exact ⟨OAI.CoarseAssembly.rowVector x, by
+      apply memℓp_gen
+      simp only [ENNReal.toReal_ofNat, Real.rpow_two, (
+    let local_proof {J : Type _} {E : J → Type _} [∀ j, NormedAddCommGroup (E j)]
+        (x : lp E 2) : ‖x‖ ^ 2 = ∑' j, ‖x j‖ ^ 2 :=
+      open OAI OAI.CoarseAssembly in
+        by
+          simpa only [ENNReal.toReal_ofNat, Real.rpow_two] using
+            lp.norm_rpow_eq_tsum (p := 2) (by norm_num) x
+    local_proof)]
+      exact ((summable_sigma_of_nonneg (fun q => sq_nonneg ‖x q‖)).1
+        ((
+    let local_proof {J : Type _} {E : J → Type _} [∀ j, NormedAddCommGroup (E j)]
+        (x : lp E 2) : Summable (fun j => ‖x j‖ ^ 2) :=
+      open OAI OAI.CoarseAssembly in
+        by
+          simpa only [ENNReal.toReal_ofNat, Real.rpow_two] using
+            (lp.memℓp x).summable (by norm_num : 0 < (2 : ENNReal).toReal)
+    local_proof) x)).2⟩
+
+def flattenEquiv :
+    lp (fun i => lp (fun _ : Q i => H) 2) 2 ≃ₗᵢ[ℂ] lp (fun _ : Sigma Q => H) 2 := by
+  classical
+  have OAI.CoarseAssembly.flattenVector_norm {ι : Type _} {Q : ι → Type _} {H : Type _} [inst_local_3 : NormedAddCommGroup H] (x : lp (fun i => lp (fun _ : Q i => H) 2) 2) :
+      ‖OAI.CoarseAssembly.flattenVector x‖ = ‖x‖  :=
+    open OAI OAI.CoarseAssembly in
+    by
+      have hsq : ‖OAI.CoarseAssembly.flattenVector x‖ ^ 2 = ‖x‖ ^ 2 := by
+        calc
+          _ = ∑' q, ‖OAI.CoarseAssembly.flattenVector x q‖ ^ 2 := (
+      let local_proof {J : Type _} {E : J → Type _} [∀ j, NormedAddCommGroup (E j)]
+          (x : lp E 2) : ‖x‖ ^ 2 = ∑' j, ‖x j‖ ^ 2 :=
+        open OAI OAI.CoarseAssembly in
+          by
+            simpa only [ENNReal.toReal_ofNat, Real.rpow_two] using
+              lp.norm_rpow_eq_tsum (p := 2) (by norm_num) x
+      local_proof) _
+          _ = ∑' i, ∑' q : Q i, ‖OAI.CoarseAssembly.flattenVector x ⟨i, q⟩‖ ^ 2 :=
+            Summable.tsum_sigma' (fun i => (
+      let local_proof {J : Type _} {E : J → Type _} [∀ j, NormedAddCommGroup (E j)]
+          (x : lp E 2) : Summable (fun j => ‖x j‖ ^ 2) :=
+        open OAI OAI.CoarseAssembly in
+          by
+            simpa only [ENNReal.toReal_ofNat, Real.rpow_two] using
+              (lp.memℓp x).summable (by norm_num : 0 < (2 : ENNReal).toReal)
+      local_proof) (x i))
+              ((
+      let local_proof {J : Type _} {E : J → Type _} [∀ j, NormedAddCommGroup (E j)]
+          (x : lp E 2) : Summable (fun j => ‖x j‖ ^ 2) :=
+        open OAI OAI.CoarseAssembly in
+          by
+            simpa only [ENNReal.toReal_ofNat, Real.rpow_two] using
+              (lp.memℓp x).summable (by norm_num : 0 < (2 : ENNReal).toReal)
+      local_proof) (OAI.CoarseAssembly.flattenVector x))
+          _ = ∑' i, ‖x i‖ ^ 2 := tsum_congr (fun i => ((
+      let local_proof {J : Type _} {E : J → Type _} [∀ j, NormedAddCommGroup (E j)]
+          (x : lp E 2) : ‖x‖ ^ 2 = ∑' j, ‖x j‖ ^ 2 :=
+        open OAI OAI.CoarseAssembly in
+          by
+            simpa only [ENNReal.toReal_ofNat, Real.rpow_two] using
+              lp.norm_rpow_eq_tsum (p := 2) (by norm_num) x
+      local_proof) (x i)).symm)
+          _ = ‖x‖ ^ 2 := ((
+      let local_proof {J : Type _} {E : J → Type _} [∀ j, NormedAddCommGroup (E j)]
+          (x : lp E 2) : ‖x‖ ^ 2 = ∑' j, ‖x j‖ ^ 2 :=
+        open OAI OAI.CoarseAssembly in
+          by
+            simpa only [ENNReal.toReal_ofNat, Real.rpow_two] using
+              lp.norm_rpow_eq_tsum (p := 2) (by norm_num) x
+      local_proof) x).symm
+      nlinarith [norm_nonneg (OAI.CoarseAssembly.flattenVector x), norm_nonneg x]
+  exact {
+    toFun := OAI.CoarseAssembly.flattenVector
+    invFun := OAI.CoarseAssembly.unflattenVector
+    left_inv := (
+    let local_proof {ι : Type _} {Q : ι → Type _} {H : Type _} 
+…(truncated)

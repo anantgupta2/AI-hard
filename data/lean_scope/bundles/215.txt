@@ -1,0 +1,98 @@
+FAMILY 215: Canonical $`O(3)`$ continuum limit and exact $`O(4)`$ mass asymptotics
+OPENAI SUMMARY: Constructs the canonical continuum limit of the two-dimensional nearest-neighbor $`O(3)`$ model: a non-Gaussian local relativistic theory with a unique vacuum and a positive mass gap. For the square-lattice $`O(4)`$ model, determines the exact leading asymptotic of the full transfer gap, $`m_{\mathrm{lat}}(\beta)\sim32e^{\pi/4-1/2}\sqrt\beta\,e^{-\pi\beta}`$. The family also proves exponential spin-correlation decay for two-dimensional nearest-neighbor $`O(n)`$ models with n ≥ 3 at every positive temperature.
+OUR LABEL: lean_vs_headline = different
+OUR HEADLINE (semi-formal): The 2D nearest-neighbour O(3) model has a canonical continuum limit as β→∞ (normalized by χ_β, ξ_β): it exists along all β, satisfies the OS axioms, is non-Gaussian, has a unique vacuum and a positive mass gap
+OUR NOTES: Rule 13: headline is the continuum (scaling) limit of the O(3) lattice fields as β→∞ — a scaling-limit claim, so M12.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- The canonical massive continuum limit of the two-dimensional O(3) model | in_formalization_yaml=False | withdrawn=False | main_tex=The-canonical-massive-continuum-limit-of-the-two-dimensional-O3-model-October-4-2026/preprints/The-canonical-massive-continuum-limit-of-the-two-dimensional-O3-model-October-4-2026/build/main.tex
+  ABSTRACT: We construct a canonical interacting massive continuum limit of the two-dimensional nearest-neighbor $`O(3)`$ model with unit-length spins, no external field, and no topological term. Normalized by susceptibility and second-moment correlation length, the limit exists as the bare coupling tends to infinity through all positive real values, without selecting subsequences. The limiting fields satisfy the Osterwalder–Schrader axioms and have a nonzero connected four-point correlation on separated time supports. Their reconstructed theory has a unique vacuum, a nonzero vacuum complement, and a positive Hamiltonian gap on that entire complement.
+- An Isolated Particle Pole for the Two-Dimensional O(3) Spin Field | in_formalization_yaml=False | withdrawn=False | main_tex=An-Isolated-Particle-Pole-for-the-Two-Dimensional-O3-Spin-Field-October-4-2026/preprints/An-Isolated-Particle-Pole-for-the-Two-Dimensional-O3-Spin-Field-October-4-2026/build/main.tex
+  ABSTRACT: We consider the continuum spin field constructed from the nearest-neighbor two-dimensional $`O(3)`$ model by the fixed prescription of the companion paper. We prove that its vector two-point spectral measure has a positive atom corresponding to the lowest mass, separated by a positive gap from all remaining mass support.
+- Exact mass asymptotics for the two-dimensional O(4) lattice model | in_formalization_yaml=False | withdrawn=False | main_tex=Exact-mass-asymptotics-for-the-two-dimensional-O4-lattice-model-October-5-2026/preprints/Exact-mass-asymptotics-for-the-two-dimensional-O4-lattice-model-October-5-2026/build/main.tex
+  ABSTRACT: For the nearest-neighbor $`O(4)`$ model on the square lattice at inverse temperature β, we prove the exact low-temperature asymptotic
+- Sharp mass bounds for the two-dimensional O(4) model | in_formalization_yaml=False | withdrawn=False | main_tex=Sharp-mass-bounds-for-the-two-dimensional-O4-model-September-23-2026/preprints/Sharp-mass-bounds-for-the-two-dimensional-O4-model-September-23-2026/build/main.tex
+  ABSTRACT: We prove sharp mass bounds for the two-dimensional nearest-neighbor $`O(4)`$ model. For all sufficiently large inverse couplings β, the full transfer gap, including rotation-invariant local-observable sectors, is bounded above and below by positive multiples of $`\sqrt\beta e^{-\pi\beta}`$. We also prove that the model has a unique periodic local limit and a positive full gap at every finite β &gt; 0, resolving the all-temperature lattice mass-generation conjecture for this periodic state. Under the stated cutoff scaling, the mass bounds are uniform in independently fixed physical units. A continuum spectral interpretation requires separate convergence hypotheses for the transfer semigroup and the block observables.
+- Exponential decay in two-dimensional classical O(n) models | in_formalization_yaml=True | withdrawn=False | main_tex=Exponential-decay-in-two-dimensional-classical-On-models-September-23-2026/preprints/Exponential-decay-in-two-dimensional-classical-On-models-September-23-2026/build/main.tex
+  ABSTRACT: We prove exponential decay of two-point correlations for the classical nearest-neighbor $`O(n)`$ model on the square lattice, for every n ≥ 3 and every finite positive inverse temperature. The estimate is uniform over finite free-boundary subgraphs and bounded nonnegative edge strengths. This resolves positively the all-temperature exponential spin-decay conjecture for these models.
+
+=== OPENAI SCOPE NOTE (lean/docs/215.md) ===
+# Canonical $`O(3)`$ continuum limit and exact $`O(4)`$ mass asymptotics
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [Exponential decay in two-dimensional classical $O(n)$ models](../../preprints/Exponential-decay-in-two-dimensional-classical-On-models-September-23-2026/paper.pdf)
+
+## Scope
+
+The formalized result proves exponential decay of spin correlations for the two-dimensional classical $O(n)$ model at every temperature when $n\ge3$. For each interaction bound $\beta>0$, constants $A$ and $m>0$ work for every finite square-lattice subgraph with free boundary and nonnegative edge strengths at most $\beta$: the correlation between sites $x,y$ is at most $Ae^{-m|x-y|}$. The infinite-volume limit and the separate $O(4)$ spectral-gap claim are not included.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Exponential correlation decay for classical $O(n)$ models | [ClassicalON.lean](../ComparatorChallenges/ClassicalON.lean) |
+
+
+=== COMPARATOR ClassicalON ===
+import Mathlib
+
+namespace OAI
+
+noncomputable section
+open MeasureTheory
+open scoped BigOperators InnerProductSpace
+
+namespace ClassicalON
+
+abbrev Site := ℤ × ℤ
+
+def PositiveNeighbor (x y : Site) : Prop :=
+  (y.1 = x.1 + 1 ∧ y.2 = x.2) ∨ (y.1 = x.1 ∧ y.2 = x.2 + 1)
+
+structure LatticeGraph where
+  vertices : Finset Site
+  edges : Finset (vertices × vertices)
+  nearest : ∀ e ∈ edges, PositiveNeighbor e.1.val e.2.val
+
+abbrev Spin (n : ℕ) := ↥(Metric.sphere (0 : EuclideanSpace ℝ (Fin n)) 1)
+abbrev Configuration (n : ℕ) (G : LatticeGraph) := G.vertices → Spin n
+
+def sphereProbability (n : ℕ) : Measure (Spin n) :=
+  let surface := (volume : Measure (EuclideanSpace ℝ (Fin n))).toSphere
+  (surface Set.univ)⁻¹ • surface
+
+def referenceLaw (n : ℕ) (G : LatticeGraph) : Measure (Configuration n G) :=
+  Measure.pi (fun _ => sphereProbability n)
+
+def interaction (n : ℕ) (G : LatticeGraph) (b : G.edges → ℝ)
+    (σ : Configuration n G) : ℝ :=
+  ∑ e : G.edges, b e * ⟪(σ e.val.1).val, (σ e.val.2).val⟫_ℝ
+
+def partition (n : ℕ) (G : LatticeGraph) (b : G.edges → ℝ) : ℝ :=
+  ∫ σ, Real.exp (interaction n G b σ) ∂referenceLaw n G
+
+def correlation (n : ℕ) (G : LatticeGraph) (b : G.edges → ℝ)
+    (x y : G.vertices) : ℝ :=
+  (∫ σ, ⟪(σ x).val, (σ y).val⟫_ℝ * Real.exp (interaction n G b σ)
+    ∂referenceLaw n G) / partition n G b
+
+def siteDistance (x y : Site) : ℝ :=
+  Real.sqrt (((x.1 : ℝ) - (y.1 : ℝ)) ^ 2 + ((x.2 : ℝ) - (y.2 : ℝ)) ^ 2)
+
+def ExponentialDecay : Prop :=
+  ∀ (n : ℕ), 3 ≤ n → ∀ (β : ℝ), 0 < β →
+    ∃ A m : ℝ, 0 < m ∧ ∀ (G : LatticeGraph) (b : G.edges → ℝ),
+      (∀ e, 0 ≤ b e ∧ b e ≤ β) → ∀ x y : G.vertices,
+        0 ≤ correlation n G b x y ∧
+          correlation n G b x y ≤ A * Real.exp (-m * siteDistance x.val y.val)
+
+theorem main : ExponentialDecay := by
+  sorry
+
+end ClassicalON
+
+end
+
+end OAI
+

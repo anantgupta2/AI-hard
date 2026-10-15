@@ -1,0 +1,53 @@
+FAMILY 184: Correspondence coloring with a fixed forbidden subgraph
+OPENAI SUMMARY: Proves the Alon–Krivelevich–Sudakov coloring conjecture in correspondence-coloring form: graphs avoiding any fixed subgraph F need $`O_F(\Delta/\log\Delta)`$ colors when their maximum degree Δ is sufficiently large. Also proves the Ajtai–Erdős–Komlós–Szemerédi independence conjecture: for fixed r ≥ 4, every n-vertex Kr-free graph of average degree d ≥ 2 has an independent set of size $`\Omega_r(n\log d/d)`$.
+OUR LABEL: lean_vs_headline = different
+OUR HEADLINE (semi-formal): ∀ finite graph F ∃C_F,Δ_F ∀ F-free graph G with Δ(G)≥Δ_F: χ_DP(G) ≤ ⌈C_F Δ/log Δ⌉
+OUR NOTES: Second manuscript: the AEKS independence conjecture α ≥ c_r n log d/d for K_r-free graphs (Erdős Problem 802, P3/O1). Only that result is in Lean (CliqueFreeLog), hence 'different' relative to the coloring headline. The headline is proved in a stronger (DP) form than conjectured, still coded O1.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Correspondence coloring graphs with a forbidden clique | in_formalization_yaml=False | withdrawn=False | main_tex=Correspondence-Coloring-Graphs-with-a-Forbidden-Clique-October-5-2026/preprints/Correspondence-Coloring-Graphs-with-a-Forbidden-Clique-October-5-2026/build/main.tex
+  ABSTRACT: For every fixed integer r ≥ 4, we prove that every Kr-free graph of sufficiently large maximum degree Δ has correspondence chromatic number $`O_r(\Delta/\log\Delta)`$. This resolves the Alon–Krivelevich–Sudakov coloring conjecture in the stronger correspondence-coloring form. The same bound, with a constant depending on F, holds when any fixed graph F is excluded as an ordinary subgraph. Ordinary and list coloring satisfy the same bounds.
+- A logarithmic independence bound for clique-free graphs | in_formalization_yaml=True | withdrawn=False | main_tex=A-Logarithmic-Independence-Bound-for-Clique-Free-Graphs-September-25-2026/preprints/A-Logarithmic-Independence-Bound-for-Clique-Free-Graphs-September-25-2026/build/main.tex
+  ABSTRACT: For every fixed integer r ≥ 4, every Kr-free graph on n vertices with average degree d ≥ 2 has an independent set of size at least $`c_r n\log d/d`$, where $`c_r\gt 0`$ depends only on r. This proves the fixed-clique-size independence conjecture of Ajtai, Erdős, Komlós and Szemerédi.
+
+=== OPENAI SCOPE NOTE (lean/docs/184.md) ===
+# Correspondence coloring with a fixed forbidden subgraph
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [A logarithmic independence bound for clique-free graphs](../../preprints/A-Logarithmic-Independence-Bound-for-Clique-Free-Graphs-September-25-2026/paper.pdf)
+
+## Scope
+
+The formalized result gives a logarithmic improvement in the independence number of clique-free graphs. For every fixed integer $r\ge4$, there is $c_r>0$ such that every finite $K_r$-free simple graph on $n$ vertices with average degree $d\ge2$ has an independent set of size at least $c_r n\log d/d$. The constant depends only on $r$.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Logarithmic independence bound for clique-free graphs | [CliqueFreeLog.lean](../ComparatorChallenges/CliqueFreeLog.lean) |
+
+
+=== COMPARATOR CliqueFreeLog ===
+import Mathlib
+
+namespace OAI
+
+namespace CliqueFreeLog
+
+noncomputable def averageDegree {V : Type*} [Fintype V] (G : SimpleGraph V) : ℝ := by
+  classical
+  exact 2 * (G.edgeFinset.card : ℝ) / (Fintype.card V : ℝ)
+
+theorem logarithmic_independence_bound (r : ℕ) (hr : 4 ≤ r) :
+    ∃ c : ℝ, 0 < c ∧
+      ∀ {V : Type} [Fintype V] (G : SimpleGraph V),
+        G.CliqueFree r → 2 ≤ averageDegree G →
+        c * (Fintype.card V : ℝ) * Real.log (averageDegree G) / averageDegree G ≤
+          (G.indepNum : ℝ) := by
+  sorry
+
+end CliqueFreeLog
+
+end OAI
+

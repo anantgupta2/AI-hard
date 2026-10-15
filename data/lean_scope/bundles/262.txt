@@ -1,0 +1,134 @@
+FAMILY 262: Sharp finite-matrix Lieb–Thirring inequalities and all equality cases
+OPENAI SUMMARY: Proves the sharp one-dimensional Lieb–Thirring inequality for $`1/2\lt \gamma\lt 3/2`$ and arbitrary finite-matrix potentials W ≥ 0 with $`\int\mathop{\mathrm{tr}}\nolimits (W^{\gamma+1/2})\lt \infty`$: the optimal constant is the scalar one-bound-state value, independent of matrix size. All equality cases are direct sums, in one constant unitary basis, of scalar sech2 solitons with independent scales and centers, and zero channels.
+OUR LABEL: lean_vs_headline = weaker
+OUR HEADLINE (semi-formal): ∀ γ∈(1/2,3/2), ∀ m≥1, ∀ measurable Hermitian PSD W:ℝ→ℂ^{m×m} with ∫tr W^{γ+1/2}<∞: Tr(H_W)_-^γ ≤ C_γ ∫ tr W^{γ+1/2}, C_γ the scalar one-bound-state constant, optimal for every m (attained by sech² potential); equality iff W is a constant-unitary direct sum of scalar sech² solitons and zero channels
+OUR NOTES: Headline per summary is the matrix version plus equality classification; posed problem is the scalar 1D Lieb–Thirring conjecture (γ=1 had been done by Read–Schulz 2026), which the family settles for all remaining γ; matrix version is an extension (O8 defensible). Lean sharp_lieb_thirring is the scalar (m=1) case only.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Equality cases in the sharp one-dimensional matrix Lieb–Thirring inequality | in_formalization_yaml=False | withdrawn=False | main_tex=Equality-cases-in-the-sharp-one-dimensional-matrix-Lieb-Thirring-inequality-October-5-2026/preprints/Equality-cases-in-the-sharp-one-dimensional-matrix-Lieb-Thirring-inequality-October-5-2026/build/main.tex
+  ABSTRACT: We classify all equality cases in the sharp one-dimensional Lieb–Thirring inequality for every finite matrix size and $`1/2\lt \gamma\lt 3/2`$. For measurable Hermitian positive semidefinite potentials W with $`\int_\mathbb R\mathop{\mathrm{tr}}\nolimits (W^{\gamma+1/2})\lt \infty`$, equality holds precisely for direct sums, in one constant unitary basis, of scalar one-bound-state solitons and zero channels. The nonzero solitons may have independent scales and centers.
+- Sharp one-dimensional Lieb–Thirring inequalities for matrix potentials | in_formalization_yaml=False | withdrawn=False | main_tex=Sharp-one-dimensional-Lieb-Thirring-inequalities-for-matrix-potentials-October-5-2026/preprints/Sharp-one-dimensional-Lieb-Thirring-inequalities-for-matrix-potentials-October-5-2026/build/main.tex
+  ABSTRACT: We prove the sharp one-dimensional Lieb–Thirring inequality for every finite matrix size and every exponent $`1/2\lt \gamma\lt 3/2`$. The optimal constant is the scalar one-bound-state constant, independently of the matrix size. The inequality bounds the full sum of negative eigenvalue moments for every measurable Hermitian positive semidefinite potential W satisfying $`\int_\mathbb R\mathop{\mathrm{tr}}\nolimits (W^{\gamma+1/2})\lt \infty`$. The matrices may have arbitrary rank and need not commute at different points.
+- Sharp one-dimensional Lieb–Thirring constants | in_formalization_yaml=True | withdrawn=False | main_tex=Sharp-One-Dimensional-Lieb-Thirring-Constants-September-23-2026/preprints/Sharp-One-Dimensional-Lieb-Thirring-Constants-September-23-2026/build/main.tex
+  ABSTRACT: We resolve affirmatively the remaining cases of the scalar one-dimensional Lieb–Thirring conjecture: for every $`\frac12\lt \gamma\lt \frac32`$, the optimal constant is the one-bound-state constant. The estimate holds for every nonnegative potential in $`L^{\gamma+1/2}(\mathbb R)`$, with all negative eigenvalues included.
+
+=== OPENAI SCOPE NOTE (lean/docs/262.md) ===
+# Sharp finite-matrix Lieb–Thirring inequalities and all equality cases
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [Sharp one-dimensional Lieb–Thirring constants](../../preprints/Sharp-One-Dimensional-Lieb-Thirring-Constants-September-23-2026/paper.pdf)
+
+## Scope
+
+The formalized result determines the sharp one-dimensional Lieb–Thirring constant for $1/2<\gamma<3/2$. For every nonnegative $W\in L^{\gamma+1/2}(\mathbb R)$, it bounds the full negative-eigenvalue moment of $-d^2/dx^2-W$ by the one-bound-state constant times the potential integral. This constant is optimal and is attained by $(r+1)\mathrm{sech}^2(rx)$, where $r=(\gamma-1/2)^{-1}$. No finite spectral cutoff is imposed.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Sharp one-dimensional Lieb–Thirring inequality | [LiebThirring.lean](../ComparatorChallenges/LiebThirring.lean) |
+
+
+=== COMPARATOR LiebThirring ===
+import Mathlib
+
+namespace OAI
+
+
+/-!
+The form domain is H¹(R;C), represented by an L² function together with its L²
+weak derivative. Null-set changes do not affect any definition below.
+`negativeMoment` is the extended nonnegative sum over negative eigenvalues,
+counting multiplicities: equivalently the supremum over all finite orthonormal
+families of weak eigenfunctions of the form. This does not assume in advance
+finiteness of the moment or a finite number of eigenvalues.
+-/
+
+
+noncomputable section
+open MeasureTheory
+open scoped ENNReal Matrix.Norms.L2Operator
+open Matrix
+
+namespace SharpLiebThirring
+
+structure H1 where
+  val : ℝ → ℂ
+  grad : ℝ → ℂ
+  val_memLp : MemLp val 2 volume
+  grad_memLp : MemLp grad 2 volume
+  weak_derivative : ∀ φ : ℝ → ℂ, ContDiff ℝ (↑(⊤ : ℕ∞) : WithTop ℕ∞) φ → HasCompactSupport φ →
+    (∫ x : ℝ, val x * deriv φ x) = -(∫ x : ℝ, grad x * φ x)
+
+def l2Pairing (u v : H1) : ℂ := ∫ x : ℝ, star (u.val x) * v.val x
+
+/-- The polarized form of -d²/dx² - W, on exactly H¹. -/
+def schrodingerForm (W : ℝ → ℝ) (u v : H1) : ℂ :=
+  (∫ x : ℝ, star (u.grad x) * v.grad x) -
+    ∫ x : ℝ, (W x : ℂ) * star (u.val x) * v.val x
+
+/-- Weak eigenfunction at the negative energy -k². -/
+def IsNegativeEigenfunction (W : ℝ → ℝ) (k : ℝ) (u : H1) : Prop :=
+  0 < k ∧ ∀ v : H1, schrodingerForm W v u = -(k ^ 2 : ℝ) * l2Pairing v u
+
+def IsOrthonormalFamily {N : ℕ} (u : Fin N → H1) : Prop :=
+  ∀ i j, l2Pairing (u i) (u j) = if i = j then 1 else 0
+
+/-- An unlimited finite-family-size supremum, in ℝ≥0∞, includes the entire sum. -/
+def negativeMoment (γ : ℝ) (W : ℝ → ℝ) : ℝ≥0∞ :=
+  ⨆ (N : ℕ) (u : Fin N → H1) (k : Fin N → ℝ)
+    (_ : IsOrthonormalFamily u) (_ : ∀ i, IsNegativeEigenfunction W (k i) (u i)),
+      ∑ i, (ENNReal.ofReal (k i)) ^ (2 * γ)
+
+/-- The moment retaining at most one negative eigenvalue. -/
+def oneStateMoment (γ : ℝ) (W : ℝ → ℝ) : ℝ≥0∞ :=
+  ⨆ (u : H1) (k : ℝ) (_ : l2Pairing u u = 1)
+    (_ : IsNegativeEigenfunction W k u), (ENNReal.ofReal k) ^ (2 * γ)
+
+def Admissible (γ : ℝ) (W : ℝ → ℝ) : Prop :=
+  (∀ᵐ x : ℝ, 0 ≤ W x) ∧ MemLp W (ENNReal.ofReal (γ + 1 / 2)) volume
+
+def potentialMass (γ : ℝ) (W : ℝ → ℝ) : ℝ≥0∞ :=
+  ∫⁻ x : ℝ, (ENNReal.ofReal (W x)) ^ (γ + 1 / 2)
+
+def semiclassicalConstant (γ : ℝ) : ℝ :=
+  Real.Gamma (γ + 1) / (2 * Real.sqrt Real.pi * Real.Gamma (γ + 3 / 2))
+
+def sharpConstant (γ : ℝ) : ℝ :=
+  2 * ((γ - 1 / 2) / (γ + 1 / 2)) ^ (γ - 1 / 2) * semiclassicalConstant γ
+
+def optimalConstant (γ : ℝ) : ℝ≥0∞ :=
+  ⨆ (W : ℝ → ℝ) (_ : Admissible γ W) (_ : 0 < potentialMass γ W),
+    negativeMoment γ W / potentialMass γ W
+
+def oneStateConstant (γ : ℝ) : ℝ≥0∞ :=
+  ⨆ (W : ℝ → ℝ) (_ : Admissible γ W) (_ : 0 < potentialMass γ W),
+    oneStateMoment γ W / potentialMass γ W
+
+def equalityPotential (γ : ℝ) (x : ℝ) : ℝ :=
+  let r := (γ - 1 / 2)⁻¹
+  (r + 1) * (Real.cosh (r * x))⁻¹ ^ 2
+
+/-- The full spectral bound, optimal constants, and attainment at the explicit potential. -/
+def MainClaim : Prop :=
+  ∀ γ : ℝ, 1 / 2 < γ → γ < 3 / 2 →
+    (∀ W : ℝ → ℝ, Admissible γ W →
+      negativeMoment γ W ≤ ENNReal.ofReal (sharpConstant γ) * potentialMass γ W) ∧
+    optimalConstant γ = ENNReal.ofReal (sharpConstant γ) ∧
+    oneStateConstant γ = ENNReal.ofReal (sharpConstant γ) ∧
+    Admissible γ (equalityPotential γ) ∧
+    0 < potentialMass γ (equalityPotential γ) ∧
+    negativeMoment γ (equalityPotential γ) =
+      ENNReal.ofReal (sharpConstant γ) * potentialMass γ (equalityPotential γ)
+
+/-- Full sharp Lieb–Thirring bound, both optimal constants, and equality at the
+explicit potential; no finite spectral cutoff is imposed. -/
+theorem sharp_lieb_thirring : MainClaim := by
+  sorry
+
+end SharpLiebThirring
+end
+
+end OAI
+

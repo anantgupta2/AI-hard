@@ -1,0 +1,56 @@
+FAMILY 084: The geometric case of the Erdős similarity conjecture
+OPENAI SUMMARY: For every fixed $`q\in(0,1)`$, constructs compact subsets of $`[0,1]`$ with measure arbitrarily close to one containing no translated and nontrivially dilated copy of $`\{q^n:n\ge1\}`$, with dilations of either sign. This resolves the geometric-progression case of the Erdős similarity conjecture for every ratio.
+OUR LABEL: lean_vs_headline = weaker
+OUR HEADLINE (semi-formal): ∀ q ∈ (0,1), ∀ η ∈ (0,1) ∃ compact E ⊆ [0,1] with m(E) > 1−η ∀ x ∈ ℝ, ∀ s ≠ 0: x + s·{q^n : n ≥ 1} ⊄ E
+OUR NOTES: Equivalently G_q is not measure universal (M4 reading). Erdős similarity conjecture also appears as Problem 4.33.7* in Erdős's problem list (P3 arguable). Only the class of geometric progressions is settled (O5). Lean covers only q=1/2 (dyadic case): weaker.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- The geometric case of the Erdős similarity conjecture | in_formalization_yaml=False | withdrawn=False | main_tex=The-geometric-case-of-the-Erdos-similarity-conjecture-October-5-2026/preprints/The-geometric-case-of-the-Erdos-similarity-conjecture-October-5-2026/build/main.tex
+  ABSTRACT: We prove the geometric-progression case of the Erdős similarity conjecture. For every fixed $`q\in(0,1)`$ and every $`\eta\in(0,1)`$, we construct a compact set $`E_{q,\eta}\subseteq[0,1]`$ of measure greater than $`1-\eta`$ containing no nontrivial affine copy of $`\{q^n:n\ge1\}`$, for any translation and either sign of nonzero dilation. The set may depend on q; the result makes no simultaneous assertion for different ratios.
+- The dyadic case of the Erdős similarity conjecture | in_formalization_yaml=False | withdrawn=False | main_tex=The-dyadic-case-of-the-Erdos-similarity-conjecture-September-25-2026/preprints/The-dyadic-case-of-the-Erdos-similarity-conjecture-September-25-2026/build/paper.tex
+  ABSTRACT: We construct a compact subset of the unit interval, of measure arbitrarily close to one, that contains no affine copy of the dyadic sequence $`\{2^{-n}:n\ge1\}`$. The conclusion holds for every translation and every nonzero real dilation, of either sign, proving the dyadic case of the Erdős similarity conjecture.
+
+=== OPENAI SCOPE NOTE (lean/docs/084.md) ===
+# The geometric case of the Erdős similarity conjecture
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [The dyadic case of the Erdős similarity conjecture](../../preprints/The-dyadic-case-of-the-Erdos-similarity-conjecture-September-25-2026/paper.pdf)
+
+## Scope
+
+The formalization proves the dyadic case of the Erdős similarity conjecture. For every $0<\eta<1$, it constructs a compact set $E\subset[0,1]$ of measure greater than $1-\eta$ that contains no affine copy of $\{2^{-n}:n\ge1\}$. Explicitly, for every translation $x$ and every nonzero real dilation $s$, some point $x+s2^{-n}$ lies outside $E$. Both signs of $s$ are included.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Positive-measure avoidance of every affine dyadic sequence | [DyadicAvoidance.lean](../ComparatorChallenges/DyadicAvoidance.lean) |
+
+
+=== COMPARATOR DyadicAvoidance ===
+import Mathlib
+
+namespace OAI
+
+noncomputable section
+
+namespace Problem310
+
+def dyadicPoint (n : ℕ) : ℝ :=
+  (2 : ℝ)⁻¹ ^ n
+
+theorem dyadic_affine_avoidance :
+    ∀ η : ℝ, 0 < η → η < 1 → ∃ E : Set ℝ,
+      E ⊆ Set.Icc (0 : ℝ) 1 ∧ IsCompact E ∧
+      MeasureTheory.volume E > ENNReal.ofReal (1 - η) ∧
+      ∀ x s : ℝ, s ≠ 0 → ∃ n : ℕ, 1 ≤ n ∧
+        x + s * dyadicPoint n ∉ E := by
+  sorry
+
+end Problem310
+
+end
+
+end OAI
+

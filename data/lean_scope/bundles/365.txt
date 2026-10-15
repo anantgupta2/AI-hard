@@ -1,0 +1,117 @@
+FAMILY 365: Joint metric and connection recovery from one boundary patch
+OPENAI SUMMARY: Zero-frequency measurements on any nonempty open boundary patch determine a smooth metric and smooth unitary connection on a trivial Hermitian rank-two bundle over a compact connected manifold of dimension at least three, up to diffeomorphism and gauge fixed on that patch. Inputs and observations use the same patch. In contrast, distinct uniformly positive bounded measurable scalar conductivities on a three-dimensional ball can have identical full-boundary data.
+OUR LABEL: lean_vs_headline = different
+OUR HEADLINE (semi-formal): ∀ compact connected M^n (n≥3) with boundary ∀ nonempty open Γ⊂∂M ∀ smooth (g_1,A_1),(g_2,A_2) (metric, u(2)-connection on M×C^2): Λ_{g_1,A_1,Γ}=Λ_{g_2,A_2,Γ} → ∃ diffeo Φ (Φ|_Γ=id) ∃ U:M→U(2) (U|_Γ=I): g_2=Φ*g_1 ∧ A_2=U^{-1}(Φ*A_1)U+U^{-1}dU
+OUR NOTES: Sources (both .tex) never say 'conjecture'; they call it the Calderón uniqueness problem, an explicitly posed question ('asks whether') → P2.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Determination of a metric and a unitary connection from one boundary patch | in_formalization_yaml=False | withdrawn=False | main_tex=Determination-of-a-metric-and-a-unitary-connection-from-one-boundary-patch-October-5-2026/preprints/Determination-of-a-metric-and-a-unitary-connection-from-one-boundary-patch-October-5-2026/build/paper.tex
+  ABSTRACT: We prove that zero-frequency boundary measurements on any nonempty open boundary patch determine both a smooth Riemannian metric and a smooth unitary connection on the trivial Hermitian rank-two bundle over a compact connected smooth manifold of dimension at least three with smooth boundary. Both inputs and observations are restricted to the same patch. The metric and connection are determined up to a diffeomorphism and a unitary gauge that restrict to the identity on the measured patch.
+- Smooth anisotropic uniqueness in the Calderón problem from one boundary patch | in_formalization_yaml=False | withdrawn=False | main_tex=Smooth-Anisotropic-Uniqueness-in-the-Calderon-Problem-from-One-Boundary-Patch-September-24-2026/preprints/Smooth-Anisotropic-Uniqueness-in-the-Calderon-Problem-from-One-Boundary-Patch-September-24-2026/build/paper.tex
+  ABSTRACT: We resolve the smooth anisotropic Calderón uniqueness problem with arbitrary same-patch measurements. A smooth Riemannian metric on a compact connected manifold of dimension at least three is determined, up to a diffeomorphism fixing the measured patch, by its zero-frequency Dirichlet-to-Neumann energy form with both input and observation on any nonempty open boundary patch.
+- Nonuniqueness for bounded measurable scalar conductivities in three dimensions | in_formalization_yaml=True | withdrawn=False | main_tex=Nonuniqueness-for-Bounded-Measurable-Scalar-Conductivities-in-Three-Dimensions-September-23-2026/preprints/Nonuniqueness-for-Bounded-Measurable-Scalar-Conductivities-in-Three-Dimensions-September-23-2026/build/paper.tex
+  ABSTRACT: We construct two distinct uniformly positive bounded measurable scalar conductivities on a ball in ℝ3 with the same full Dirichlet-to-Neumann operator. Both conductivities equal one near the boundary. This gives nonuniqueness in the scalar Calderón problem at bounded measurable regularity.
+
+=== OPENAI SCOPE NOTE (lean/docs/365.md) ===
+# Joint metric and connection recovery from one boundary patch
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [Nonuniqueness for Bounded Measurable Scalar Conductivities in Three Dimensions](../../preprints/Nonuniqueness-for-Bounded-Measurable-Scalar-Conductivities-in-Three-Dimensions-September-23-2026/paper.pdf)
+
+## Scope
+
+The Calderón inverse problem asks whether boundary measurements determine an interior conductivity. The formalized result gives nonuniqueness for bounded measurable scalar conductivities on the ball $B(0,3)\subset\mathbb R^3$: two uniformly positive conductivities differ on a set of positive volume, equal $1$ near the boundary, and have the same full weak Dirichlet-to-Neumann operator. Weak solutions exist uniquely for every boundary trace.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Scalar conductivity nonuniqueness | [Conductivity.lean](../ComparatorChallenges/Conductivity.lean) |
+
+
+=== COMPARATOR Conductivity ===
+import Mathlib
+
+namespace OAI
+
+noncomputable section
+open MeasureTheory
+open scoped ENNReal
+
+namespace ScalarConductivity
+
+abbrev R3 := EuclideanSpace ℝ (Fin 3)
+abbrev JetFiber := EuclideanSpace ℝ (Fin 4)
+def ball : Set R3 := Metric.ball 0 3
+def ballMeasure : Measure R3 := volume.restrict ball
+abbrev JetSpace := Lp JetFiber 2 ballMeasure
+
+def smoothJet (f : R3 → ℝ) (x : R3) : JetFiber :=
+  WithLp.toLp 2 (Fin.cases (f x) (fun i => gradient f x i))
+
+def smoothJets : Set JetSpace :=
+  { z | ∃ (f : R3 → ℝ) (_ : ContDiff ℝ (↑(⊤ : ℕ∞)) f)
+      (hf : MemLp (smoothJet f) 2 ballMeasure), z = hf.toLp (smoothJet f) }
+
+def compactSmoothJets : Set JetSpace :=
+  { z | ∃ (f : R3 → ℝ) (_ : ContDiff ℝ (↑(⊤ : ℕ∞)) f)
+      (_ : HasCompactSupport f) (_ : tsupport f ⊆ ball)
+      (hf : MemLp (smoothJet f) 2 ballMeasure), z = hf.toLp (smoothJet f) }
+
+def H1Space : Submodule ℝ JetSpace :=
+  (Submodule.span ℝ smoothJets).topologicalClosure
+abbrev H1 := H1Space
+
+def zeroTraceAmbient : Submodule ℝ JetSpace :=
+  (Submodule.span ℝ compactSmoothJets).topologicalClosure
+
+def H10 : Submodule ℝ H1 := zeroTraceAmbient.comap H1Space.subtype
+
+instance H10_isClosed : IsClosed (H10 : Set H1) := by
+  exact (Submodule.isClosed_topologicalClosure
+    (Submodule.span ℝ compactSmoothJets)).preimage continuous_subtype_val
+
+abbrev TraceSpace := H1 ⧸ H10
+abbrev TraceDual := TraceSpace →L[ℝ] ℝ
+abbrev DNOperator := TraceSpace →L[ℝ] TraceDual
+
+def trace (u : H1) : TraceSpace := H10.mkQ u
+
+def weakGradient (u : H1) (x : R3) : R3 :=
+  WithLp.toLp 2 (fun i => (u.val x) i.succ)
+
+def energy (γ : R3 → ℝ) (u v : H1) : ℝ :=
+  ∫ x, γ x * inner ℝ (weakGradient u x) (weakGradient v x) ∂ballMeasure
+
+def Harmonic (γ : R3 → ℝ) (u : H1) : Prop :=
+  ∀ h : H1, h ∈ H10 → energy γ u h = 0
+
+def IsDirichletToNeumann (γ : R3 → ℝ) (Λ : DNOperator) : Prop :=
+  ∀ f : TraceSpace, ∃ u : H1,
+    trace u = f ∧ Harmonic γ u ∧
+    (∀ u' : H1, trace u' = f → Harmonic γ u' → u' = u) ∧
+    ∀ v : H1, Λ f (trace v) = energy γ u v
+
+def EqualOneNearBoundary (γ : R3 → ℝ) : Prop :=
+  ∃ r : ℝ, 0 < r ∧ r < 3 ∧ ∀ᵐ x ∂ballMeasure, r < ‖x‖ → γ x = 1
+
+def MainStatement : Prop :=
+  ∃ (γ₀ γ₁ : R3 → ℝ) (c C : ℝ) (Λ : DNOperator),
+    0 < c ∧ c < C ∧
+    Measurable γ₀ ∧ Measurable γ₁ ∧
+    MemLp γ₀ ∞ ballMeasure ∧ MemLp γ₁ ∞ ballMeasure ∧
+    (∀ᵐ x ∂ballMeasure, c ≤ γ₀ x ∧ γ₀ x ≤ C) ∧
+    (∀ᵐ x ∂ballMeasure, c ≤ γ₁ x ∧ γ₁ x ≤ C) ∧
+    EqualOneNearBoundary γ₀ ∧ EqualOneNearBoundary γ₁ ∧
+    0 < ballMeasure {x | γ₀ x ≠ γ₁ x} ∧
+    IsDirichletToNeumann γ₀ Λ ∧ IsDirichletToNeumann γ₁ Λ
+
+theorem main_nonuniqueness : MainStatement := by
+  sorry
+
+end ScalarConductivity
+end
+
+end OAI
+

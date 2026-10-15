@@ -1,0 +1,295 @@
+FAMILY 291: Cuntz comparison, nuclear dimension, and equivariant Jiang–Su stability
+OPENAI SUMMARY: Proves equivariant Jiang–Su stability for every countable discrete amenable group action on a simple separable unital infinite-dimensional nuclear stably finite Jiang–Su-stable C∗-algebra, resolving this case of Szabó's conjecture without restrictions on trace dynamics. The family also proves the unital Toms–Winter conjecture, equating strict comparison, finite nuclear dimension and Jiang–Su stability in the simple separable unital infinite-dimensional nuclear setting.
+OUR LABEL: lean_vs_headline = different
+OUR HEADLINE (semi-formal): ∀ simple separable unital infinite-dim nuclear stably finite Z-stable A, ∀ countable discrete amenable G, ∀ action α: G↷A: α ≃_cc α⊗id_Z (cocycle conjugate)
+OUR NOTES: Cocycle conjugacy α ≃ α⊗id_Z is an equivalence of named objects (like Quillen equivalence) → M7; the ∃(Φ,u) is inside '≃', so prefix ∀.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Equivariant Jiang–Su Stability for Amenable Actions in the Unital Stably Finite Case | in_formalization_yaml=False | withdrawn=False | main_tex=Equivariant-Jiang-Su-Stability-for-Amenable-Actions-in-the-Unital-Stably-Finite-Case-October-5-2026/preprints/Equivariant-Jiang-Su-Stability-for-Amenable-Actions-in-the-Unital-Stably-Finite-Case-October-5-2026/build/paper.tex
+  ABSTRACT: Every action of a countable discrete amenable group on a simple, separable, unital, infinite-dimensional, nuclear, stably finite complex C∗-algebra that is already Jiang–Su stable absorbs the trivial action on the Jiang–Su algebra up to cocycle conjugacy. No restriction is imposed on the action on the tracial-state simplex. This proves the unital, stably finite case of Szabó's Conjecture A on automatic equivariant Jiang–Su stability.
+- Cuntz comparison and Jiang–Su absorption | in_formalization_yaml=False | withdrawn=False | main_tex=Cuntz-comparison-and-Jiang-Su-absorption-September-23-2026/preprints/Cuntz-comparison-and-Jiang-Su-absorption-September-23-2026/build/paper.tex
+  ABSTRACT: We prove that strict comparison in the extended-functional sense implies Jiang–Su absorption for separable simple nuclear non-elementary C∗-algebras. This resolves the corresponding implication of the Toms–Winter regularity problem, including nonunital algebras and allowing unbounded traces. More generally, every separable nuclear C∗-algebra whose Cuntz semigroup is almost unperforated and fully almost divisible absorbs the Jiang–Su algebra.
+- Nuclear dimension and Jiang–Su stability without elementary subquotients | in_formalization_yaml=False | withdrawn=False | main_tex=Nuclear-dimension-and-Jiang-Su-stability-without-elementary-subquotients-September-23-2026/preprints/Nuclear-dimension-and-Jiang-Su-stability-without-elementary-subquotients-September-23-2026/build/paper.tex
+  ABSTRACT: For separable nuclear C∗-algebras with no nonzero elementary ideal subquotients, finite nuclear dimension is equivalent to Jiang–Su stability. More generally, $`\dim_{\mathrm{nuc}}(A_0\otimes\mathcal Z)\le1`$ for every separable nuclear A0. This proves Robert and Tikuisis's Conjecture (C1) and the nuclear-dimension equivalence in the nonsimple Toms–Winter regularity question.
+- Tracial projection methods and uniform property Gamma | in_formalization_yaml=True | withdrawn=False | main_tex=Tracial-projection-methods-and-uniform-property-Gamma-September-23-2026/preprints/Tracial-projection-methods-and-uniform-property-Gamma-September-23-2026/build/main.tex
+  ABSTRACT: For a simple, separable, unital, infinite-dimensional, nuclear, stably finite C∗-algebra with traces, real rank zero of the uniform tracial ultrapower of its uniform tracial completion implies uniform property Γ. This answers Problem XXI of Schafhauser, Tikuisis and White affirmatively. Independently, strict comparison implies Jiang–Su absorption for simple, separable, unital, infinite-dimensional nuclear algebras, resolving the unital Toms–Winter conjecture. Under comparison tested on traces of finite target rank, we also obtain uniform property Γ and absorption for simple, separable, nuclear, stably projectionless algebras whose densely finite traces are all bounded and have a nonempty compact normalized base.
+
+=== OPENAI SCOPE NOTE (lean/docs/291.md) ===
+# Cuntz comparison, nuclear dimension, and equivariant Jiang–Su stability
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [Tracial projection methods and uniform property $\Gamma$](../../preprints/Tracial-projection-methods-and-uniform-property-Gamma-September-23-2026/paper.pdf)
+
+## Scope
+
+The formalization proves that real rank zero of the uniform tracial ultrapower of the uniform tracial completion implies uniform property $\Gamma$ for a simple separable unital infinite-dimensional nuclear stably finite $C^*$-algebra with traces. The conclusion holds at every specified free ultrafilter under the corresponding real-rank-zero hypothesis.
+
+The linked comparison results also prove Jiang–Su absorption and uniform property $\Gamma$ for simple separable unital infinite-dimensional nuclear algebras with strict comparison, and for the stated stably projectionless nuclear algebras with bounded densely finite traces, a nonempty compact normalized trace base, and the prescribed finite-target-rank comparison condition.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Uniform property $\Gamma$ from tracial real rank zero | [UniformGamma.lean](../ComparatorChallenges/UniformGamma.lean) |
+
+
+=== COMPARATOR UniformGamma ===
+import Mathlib
+
+namespace OAI
+
+noncomputable section
+
+/-!
+The final claim constructs the tracial quotients and states the original gamma assertion.
+`Analysis.TracialSplitting.Challenge.main_iff_original` verifies statement preservation.
+-/
+
+universe uA uD uE uI uR uX u v
+
+namespace Pureness
+
+open scoped ComplexOrder
+
+structure CStarAlgebraNorm (R : Type uR) [Ring R] [StarRing R] [Algebra ℂ R]
+    extends AlgebraNorm ℂ R where
+  cstar : ∀ x, toAlgebraNorm (star x * x) = toAlgebraNorm x * toAlgebraNorm x
+
+structure TracialState (A : Type uA) [CStarAlgebra A] [PartialOrder A] where
+  functional : A →ₚ[ℂ] ℂ
+  normalized : functional 1 = 1
+  tracial : ∀ a b : A, functional (a * b) = functional (b * a)
+
+structure ClosedStarIdeal (D : Type uD) [CStarAlgebra D] where
+  ideal : TwoSidedIdeal D
+  star_mem : ∀ {u : D}, u ∈ ideal → star u ∈ ideal
+  isClosed : IsClosed (ideal : Set D)
+
+end Pureness
+
+universe uNuclear
+
+namespace ComparatorModel
+
+namespace Pureness
+
+open scoped TensorProduct ComplexOrder
+
+abbrev CStarAlgebraNorm := @_root_.OAI.Pureness.CStarAlgebraNorm
+
+def IsNuclear (A : Type u) [CStarAlgebra A] : Prop :=
+  ∀ (B : Type v) [CStarAlgebra B], Subsingleton (CStarAlgebraNorm (A ⊗[ℂ] B))
+
+abbrev TracialState := @_root_.OAI.Pureness.TracialState
+
+end Pureness
+
+namespace CurrentMain
+
+open _root_.OAI.ComparatorModel.Pureness
+
+open scoped ComplexOrder
+
+def RealRankZero (D : Type) [CStarAlgebra D] : Prop :=
+  ∀ a : D, IsSelfAdjoint a → ∀ ε : ℝ, 0 < ε →
+    ∃ b : D, IsSelfAdjoint b ∧ (spectrum ℂ b).Finite ∧ ‖a - b‖ < ε
+
+def traceTwoNorm {D : Type} [CStarAlgebra D] [PartialOrder D]
+    (τ : TracialState D) (a : D) : ℝ :=
+  Real.sqrt (τ.functional (star a * a)).re
+
+end CurrentMain
+
+section
+
+open Filter
+
+open scoped Topology NNReal ENNReal
+
+abbrev Pureness.ClosedStarIdeal := @_root_.OAI.Pureness.ClosedStarIdeal
+
+namespace Pureness.ClosedStarIdeal
+
+section
+
+variable {D : Type} [CStarAlgebra D] (J : ClosedStarIdeal D)
+
+abbrev Quotient := J.ideal.ringCon.Quotient
+
+def quotientMap : D →ₐ[ℂ] J.Quotient := J.ideal.ringCon.mkₐ ℂ
+
+instance quotientStar : Star (J.Quotient) where
+  star := Quotient.map' star (by
+    intro u v h
+    change J.ideal.ringCon u v at h
+    change J.ideal.ringCon (star u) (star v)
+    rw [TwoSidedIdeal.rel_iff] at h ⊢
+    simpa only [star_sub] using J.star_mem h)
+
+instance quotientStarRing : StarRing (J.Quotient) where
+  star_involutive x := Quotient.inductionOn' x (fun u => congrArg J.quotientMap (star_star u))
+  star_mul x y := Quotient.inductionOn₂' x y (fun u v => congrArg J.quotientMap (star_mul u v))
+  star_add x y := Quotient.inductionOn₂' x y (fun u v => congrArg J.quotientMap (star_add u v))
+
+instance quotientStarModule : StarModule ℂ (J.Quotient) where
+  star_smul c x := Quotient.inductionOn' x (fun u => congrArg J.quotientMap (star_smul c u))
+
+abbrev idealSubmodule : Submodule ℂ (D) :=
+  (J.quotientMap).toLinearMap.ker
+
+instance idealSubmodule_closed : IsClosed (J.idealSubmodule : Set D) := by
+  have he : (J.idealSubmodule : Set D) = (J.ideal : Set D) := by
+    ext u
+    change J.ideal.ringCon.mk' u = J.ideal.ringCon.mk' 0 ↔ u ∈ J.ideal
+    exact Quotient.eq
+  rw [he]
+  exact J.isClosed
+
+def quotientLinearEquiv :
+    (D ⧸ J.idealSubmodule) ≃ₗ[ℂ] J.Quotient :=
+  (J.quotientMap).toLinearMap.quotKerEquivOfSurjective ((J.ideal.ringCon.mkₐ_surjective (α := ℂ)))
+
+instance quotientNormedAddCommGroup : NormedAddCommGroup (J.Quotient) :=
+  NormedAddCommGroup.induced _ _ (J.quotientLinearEquiv).symm
+    (J.quotientLinearEquiv).symm.injective
+
+instance quotientNormedSpace : NormedSpace ℂ (J.Quotient) :=
+  NormedSpace.induced ℂ _ _ (J.quotientLinearEquiv).symm
+
+def quotientNormEquiv : J.Quotient ≃ₗᵢ[ℂ]
+    (D ⧸ J.idealSubmodule) where
+  __ := (J.quotientLinearEquiv).symm
+  norm_map' _ := rfl
+
+instance quotientCompleteSpace : CompleteSpace (J.Quotient) :=
+  (J.quotientNormEquiv).toIsometryEquiv.completeSpace_iff.mpr inferInstance
+
+class NormConstruction : Prop where
+  mul_le : ∀ {D : Type} [CStarAlgebra D] (J : ClosedStarIdeal D) (x y : J.Quotient),
+    ‖x*y‖ ≤ ‖x‖*‖y‖
+  star_eq : ∀ {D : Type} [CStarAlgebra D] (J : ClosedStarIdeal D) (x : J.Quotient),
+    ‖star x‖ = ‖x‖
+  square_le : ∀ {D : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D]
+    (J : ClosedStarIdeal D) (x : J.Quotient), ‖x‖ * ‖x‖ ≤ ‖star x * x‖
+
+variable [ComparatorModel.Pureness.ClosedStarIdeal.NormConstruction]
+
+instance quotientNormedRing : NormedRing (J.Quotient) where
+  dist_eq := dist_eq_norm_neg_add
+  norm_mul_le := NormConstruction.mul_le J
+
+instance quotientNormedAlgebra : NormedAlgebra ℂ (J.Quotient) where
+  norm_smul_le := norm_smul_le
+
+instance quotientNormedStarGroup : NormedStarGroup (J.Quotient) where
+  norm_star_le x := (NormConstruction.star_eq J x).le
+
+end
+
+open Filter
+
+open scoped Topology NNReal ENNReal
+
+variable {D : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D]
+
+variable (J : ClosedStarIdeal D)
+
+variable [ComparatorModel.Pureness.ClosedStarIdeal.NormConstruction]
+
+instance quotientCStarAlgebra : CStarAlgebra (J.Quotient) where
+  norm_mul_self_le := NormConstruction.square_le J
+
+end Pureness.ClosedStarIdeal
+
+end
+
+section
+
+open _root_.OAI.ComparatorModel.Pureness
+
+section UniformTraceNorm
+
+variable {D : Type} {I : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D]
+
+variable (τ : I → TracialState D) [Nonempty I]
+
+variable [ComparatorModel.Pureness.ClosedStarIdeal.NormConstruction]
+
+def CurrentMain.familyTwoNorm (a : D) : ℝ := ⨆ i, traceTwoNorm (τ i) a
+
+end UniformTraceNorm
+
+open _root_.OAI.ComparatorModel.Pureness Filter
+
+open scoped Topology NNReal ENNReal
+
+variable [ComparatorModel.Pureness.ClosedStarIdeal.NormConstruction]
+
+instance CurrentMain.boundedFamilyProductCStar {X : Type} {D : Type} [CStarAlgebra D] [Nontrivial D] :
+    CStarAlgebra (lp (fun _ : X => D) ∞) where
+
+section UniformNull
+
+variable {D : Type} {I : Type} {X : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D]
+
+variable (τ : I → TracialState D) [Nonempty I]
+
+def CurrentMain.IsFamilyNull (F : Filter X) (u : X → D) : Prop :=
+  Tendsto (fun n => familyTwoNorm τ (u n)) F (𝓝 0)
+
+class CurrentMain.NullConstruction : Prop where
+  zero : ∀ {D I X : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D] (τ : I → Pureness.TracialState D) [Nonempty I]
+    (F : Filter X), IsFamilyNull τ F (fun _ => 0)
+  add : ∀ {D I X : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D] (τ : I → Pureness.TracialState D) [Nonempty I]
+    {F : Filter X} {u v : X → D}, IsFamilyNull τ F u → IsFamilyNull τ F v →
+    IsFamilyNull τ F (fun n => u n + v n)
+  neg : ∀ {D I X : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D] (τ : I → Pureness.TracialState D) [Nonempty I]
+    {F : Filter X} {u : X → D}, IsFamilyNull τ F u → IsFamilyNull τ F (fun n => -u n)
+  star : ∀ {D I X : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D] (τ : I → Pureness.TracialState D) [Nonempty I]
+    {F : Filter X} {u : X → D}, IsFamilyNull τ F u → IsFamilyNull τ F (fun n => star (u n))
+  mul_left : ∀ {D I X : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D] (τ : I → Pureness.TracialState D) [Nonempty I]
+    {F : Filter X} {u v : X → D}, IsFamilyNull τ F v → ∀ {M : ℝ},
+    (∀ n, ‖u n‖ ≤ M) → IsFamilyNull τ F (fun n => u n * v n)
+  mul_right : ∀ {D I X : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D] (τ : I → Pureness.TracialState D) [Nonempty I]
+    {F : Filter X} {u v : X → D}, IsFamilyNull τ F u → ∀ {M : ℝ},
+    (∀ n, ‖v n‖ ≤ M) → IsFamilyNull τ F (fun n => u n * v n)
+  closed : ∀ {D I X : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D] (τ : I → Pureness.TracialState D) [Nonempty I] (F : Filter X),
+    IsClosed {u : lp (fun _ : X => D) ∞ | IsFamilyNull τ F (fun n => u n)}
+
+variable [Nontrivial D]
+
+variable [ComparatorModel.CurrentMain.NullConstruction]
+
+def CurrentMain.familyNullTwoSided (F : Filter X) : TwoSidedIdeal (lp (fun _ : X => D) ∞) :=
+  TwoSidedIdeal.mk' {u | IsFamilyNull τ F (fun n => u n)}
+    (NullConstruction.zero τ F)
+    (fun hu hv => NullConstruction.add τ hu hv)
+    (fun hu => NullConstruction.neg τ hu)
+    (fun {u _} hv => NullConstruction.mul_left τ hv
+      (lp.norm_apply_le_norm ENNReal.top_ne_zero u))
+    (fun {_ v} hu => NullConstruction.mul_right τ hu
+      (lp.norm_apply_le_norm ENNReal.top_ne_zero v))
+
+def CurrentMain.familyNullIdeal (F : Filter X) : ClosedStarIdeal (lp (fun _ : X => D) ∞) where
+  ideal := familyNullTwoSided τ F
+  star_mem := by
+    intro u hu
+    apply (TwoSidedIdeal.mem_mk' _ _ _ _ _ _ (star u)).mpr
+    exact NullConstruction.star τ ((TwoSidedIdeal.mem_mk' _ _ _ _ _ _ u).mp hu)
+  isClosed := by
+    have he : (familyNullTwoSided τ F : Set (lp (fun _ : X => D) ∞)) =
+        {u | IsFamilyNull τ F (fun n => u n)} := by
+      ext u
+      exact TwoSidedIdeal.mem_mk' _ _ _ _ _ _ u
+    rw [he]
+    exact NullConstruction.closed τ F
+
+end UniformNull
+
+variable {D : Type} {I : Type} [CStarAlgebra D] [PartialOrder D] [StarOrderedRing D]
+
+variable (τ : I → TracialState D) [Nonempty I]
+
+variab
+…(truncated)

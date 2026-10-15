@@ -1,0 +1,134 @@
+FAMILY 290: Relative bicentralizers and modular spectral recovery
+OPENAI SUMMARY: Proves Connes' bicentralizer conjecture for every type III1 factor with separable predual and every faithful normal state. More generally, for every inclusion $`N\subset M`$ of von Neumann algebras with separable preduals admitting a faithful normal conditional expectation, constructs an amenable expected subalgebra $`P\subset N`$ with $`P'\cap c(M)=N'\cap c(M)`$, resolving the relative bicentralizer conjecture.
+OUR LABEL: lean_vs_headline = different
+OUR HEADLINE (semi-formal): ∀ unital inclusion N ⊂ M of von Neumann algebras with separable preduals and faithful normal conditional expectation: ∃ amenable P ⊂ N with faithful normal expectation F: N → P such that P' ∩ c(M) = N' ∩ c(M)
+OUR NOTES: Rule 16: summary's Connes claim was announced by Houdayer–Marrakchi (both papers call theirs an alternative proof), so headline is the new relative theorem: ∀ inclusion ∃ amenable expected P → ∀∃ M2; resolves Marrakchi's Conjecture C → P1/O1.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Expected amenable subalgebras preserving core commutants | in_formalization_yaml=False | withdrawn=False | main_tex=Expected-amenable-subalgebras-preserving-core-commutants-September-23-2026/preprints/Expected-amenable-subalgebras-preserving-core-commutants-September-23-2026/build/paper.tex
+  ABSTRACT: We prove that every inclusion $`N\subset M`$ of von Neumann algebras with separable preduals and a faithful normal conditional expectation contains an expected amenable subalgebra $`P\subset N`$ such that $`P'\cap c(M)=N'\cap c(M)`$, where $`c(M)`$ denotes the continuous core of M. This resolves the relative bicentralizer conjecture in this setting.
+- Bounded recovery for modular spectral averages | in_formalization_yaml=True | withdrawn=False | main_tex=Bounded-recovery-for-modular-spectral-averages-September-23-2026/preprints/Bounded-recovery-for-modular-spectral-averages-September-23-2026/build/paper.tex
+  ABSTRACT: We prove a bounded spectral recovery theorem for a von Neumann algebra with a faithful normal state whose centralizer consists only of scalars. A positive averaged squared norm for an arbitrary bounded Hilbert-space operator on shrinking modular spectral bands can be recovered on uniformly bounded algebra elements with shrinking spectral support. We apply this theorem to spectral intertwining rigidity and obtain an alternative proof of bicentralizer triviality for type III1 factors with separable predual.
+
+=== OPENAI SCOPE NOTE (lean/docs/290.md) ===
+# Relative bicentralizers and modular spectral recovery
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [Bounded recovery for modular spectral averages](../../preprints/Bounded-recovery-for-modular-spectral-averages-September-23-2026/Bounded-recovery-for-modular-spectral-averages-September-23-2026.pdf)
+
+## Scope
+
+For a faithful normal state with scalar centralizer in the stated standard-space representation, the formalized result converts positive modular spectral averages into uniformly bounded algebra elements. Given unit vectors in shrinking spectral bands around a real number $s$ and a positive limiting symmetric average for a bounded operator $T$, it finds a subsequence of bounded algebra elements whose images under $T$ stay uniformly nonzero and whose spectral bands have four times the original widths. The absolute bicentralizer conjecture is not included.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Bounded recovery from modular spectral averages | [BoundedRecovery.lean](../ComparatorChallenges/BoundedRecovery.lean) |
+
+
+=== COMPARATOR BoundedRecovery ===
+import Mathlib
+
+namespace OAI
+
+/-! Nondegenerate spectral calculus, the closed Tomita graph, and bounded recovery. -/
+
+universe u
+
+noncomputable section
+
+open Filter MeasureTheory Set
+open scoped Topology ComplexConjugate
+
+namespace BoundedRecovery
+
+variable {H : Type u} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+
+def spectralCharacter (t : ℝ) : BoundedContinuousFunction ℝ ℂ :=
+  BoundedContinuousFunction.ofNormedAddCommGroup
+    (fun u : ℝ => Complex.exp (((t * u : ℝ) : ℂ) * Complex.I))
+    (by fun_prop) 1 (by intro u; simp [Complex.norm_exp])
+
+def halfExponentialCutoff (n : ℕ) : BoundedContinuousFunction ℝ ℂ :=
+  BoundedContinuousFunction.ofNormedAddCommGroup
+    (fun u : ℝ => (Real.exp (min (n : ℝ) u / 2) : ℂ))
+    (by fun_prop) (Real.exp ((n : ℝ) / 2)) (by
+      intro u
+      simp only [Complex.norm_real, Real.norm_eq_abs, abs_of_pos (Real.exp_pos _)]
+      exact Real.exp_le_exp.mpr (div_le_div_of_nonneg_right (min_le_left _ _) (by norm_num)))
+
+structure RealSpectralCalculus (H : Type u) [NormedAddCommGroup H]
+    [InnerProductSpace ℂ H] [CompleteSpace H] where
+  calculus : (BoundedContinuousFunction ℝ ℂ) →⋆ₐ[ℂ] (H →L[ℂ] H)
+  nondegenerate : Dense {h : H | ∃ f : BoundedContinuousFunction ℝ ℂ,
+    HasCompactSupport (f : ℝ → ℂ) ∧ ∃ k : H, calculus f k = h}
+
+namespace RealSpectralCalculus
+
+def unitary (D : RealSpectralCalculus H) (t : ℝ) : H →L[ℂ] H :=
+  D.calculus (spectralCharacter t)
+
+def halfGraph (D : RealSpectralCalculus H) : Set (H × H) :=
+  {p | Tendsto (fun n : ℕ => D.calculus (halfExponentialCutoff n) p.1) atTop (𝓝 p.2)}
+
+def HasSpectralSupport (D : RealSpectralCalculus H) (I : Set ℝ) (h : H) : Prop :=
+  ∀ f : BoundedContinuousFunction ℝ ℂ, (∀ u ∈ I, f u = 0) → D.calculus f h = 0
+
+end RealSpectralCalculus
+
+structure StandardModularData (H : Type u) [NormedAddCommGroup H]
+    [InnerProductSpace ℂ H] [CompleteSpace H] where
+  M : VonNeumannAlgebra H
+  xi : H
+  norm_xi : ‖xi‖ = 1
+  cyclic : Dense {h : H | ∃ a : H →L[ℂ] H, a ∈ M ∧ a xi = h}
+  separating : ∀ a : H →L[ℂ] H, a ∈ M → a xi = 0 → a = 0
+  D : RealSpectralCalculus H
+  J : H ≃ₗᵢ⋆[ℂ] H
+  conjugation : Function.Involutive J
+  tomita_graph : closure {p : H × H | ∃ a : H →L[ℂ] H,
+      a ∈ M ∧ p = (a xi, (star a) xi)} =
+    {p | ∃ q : H, (p.1, q) ∈ D.halfGraph ∧ p.2 = J q}
+
+namespace StandardModularData
+
+def sigma (S : StandardModularData H) (t : ℝ) (a : H →L[ℂ] H) : H →L[ℂ] H :=
+  S.D.unitary t * a * S.D.unitary (-t)
+
+def ScalarCentralizer (S : StandardModularData H) : Prop :=
+  ∀ a : H →L[ℂ] H, a ∈ S.M → (∀ t : ℝ, S.sigma t a = a) →
+    ∃ c : ℂ, a = c • (1 : H →L[ℂ] H)
+
+end StandardModularData
+
+def symmetricAverage (f : ℝ → ℝ) (k : ℕ) : ℝ :=
+  (2 * (k : ℝ))⁻¹ * ∫ t in -(k : ℝ)..(k : ℝ), f t
+
+def fixedMean (omega : Ultrafilter ℕ) (f : ℝ → ℝ) : ℝ :=
+  Filter.limUnder (omega : Filter ℕ) (symmetricAverage f)
+
+def RecoveryConclusion (S : StandardModularData H) (T : H →L[ℂ] H)
+    (s : ℝ) (delta : ℕ → ℝ) : Prop :=
+  ∃ (nj : ℕ → ℕ) (_ : StrictMono nj) (v : ℕ → (H →L[ℂ] H)) (C eta : ℝ),
+    0 < eta ∧ ∀ j : ℕ, v j ∈ S.M ∧ ‖v j‖ ≤ C ∧ eta ≤ ‖T (v j S.xi)‖ ∧
+      S.D.HasSpectralSupport (Icc (s - 4 * delta (nj j)) (s + 4 * delta (nj j)))
+        (v j S.xi)
+
+theorem bounded_recovery (S : StandardModularData H) (hscalar : S.ScalarCentralizer)
+    (omega : Ultrafilter ℕ) (hfree : (omega : Filter ℕ) ≤ Filter.atTop)
+    (T : H →L[ℂ] H) (s : ℝ) (delta : ℕ → ℝ) (hdelta : ∀ n, 0 < delta n)
+    (hdelta0 : Tendsto delta atTop (𝓝 0)) (h : ℕ → H) (hunit : ∀ n, ‖h n‖ = 1)
+    (hband : ∀ n, S.D.HasSpectralSupport (Icc (s - delta n) (s + delta n)) (h n))
+    (hpositive : 0 < Filter.limsup
+      (fun n => fixedMean omega (fun t => ‖T (S.D.unitary t (h n))‖ ^ 2)) atTop) :
+    RecoveryConclusion S T s delta := by
+  sorry
+
+end BoundedRecovery
+
+end
+
+end OAI
+

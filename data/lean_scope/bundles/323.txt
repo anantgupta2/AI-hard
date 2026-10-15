@@ -1,0 +1,63 @@
+FAMILY 323: Independence of the separable quotient problem
+OPENAI SUMMARY: Establishes, relative to the consistency of a measurable cardinal, that the separable quotient problem is independent of ZFC. The assertion that every infinite-dimensional Banach space has a separable infinite-dimensional quotient can hold for all real and complex Banach spaces, whereas the continuum hypothesis yields counterexamples over both fields.
+OUR LABEL: lean_vs_headline = weaker
+OUR HEADLINE (semi-formal): ∀ F∈{ℝ,ℂ}: Con(ZFC+measurable) → (ZFC ⊬ SQ_F ∧ ZFC ⊬ ¬SQ_F); via ZFC ⊢ (c real-valued measurable → SQ_F) and ZFC ⊢ (CH → ¬SQ_F)
+OUR NOTES: Lean covers only the negative half (CH → ¬SQ_ℝ ∧ ¬SQ_ℂ): weaker. Corollary: SQ at density ℵ1 independent relative to Con(ZFC) alone. Prefix 'none' (closed statement about the specific sentence SQ_F; F ranges over two fields only).
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Relative independence of the separable quotient problem | in_formalization_yaml=False | withdrawn=False | main_tex=Relative-independence-of-the-separable-quotient-problem-September-23-2026/preprints/Relative-independence-of-the-separable-quotient-problem-September-23-2026/build/main.tex
+  ABSTRACT: The separable quotient problem asks whether every infinite-dimensional Banach space has a separable infinite-dimensional quotient. We prove that this statement is independent of ZFC, relative to the consistency of ZFC with a measurable cardinal. This holds over both the real and complex fields. For spaces of norm density ℵ1, we obtain independence relative to the consistency of ZFC alone.
+
+=== OPENAI SCOPE NOTE (lean/docs/323.md) ===
+# Independence of the separable quotient problem
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [Relative independence of the separable quotient problem](../../preprints/Relative-independence-of-the-separable-quotient-problem-September-23-2026/paper.pdf)
+
+## Scope
+
+The separable quotient problem asks whether every infinite-dimensional Banach space has an infinite-dimensional separable quotient. The linked formalization proves the negative direction under the continuum hypothesis: over both the real and complex fields, there is an infinite-dimensional Banach space admitting no bounded linear surjection onto an infinite-dimensional separable Banach space.
+
+This is the conditional counterexample direction. The positive consistency direction and the paper's full relative-independence conclusions are outside the selected statement.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Failure of the separable quotient assertion under the continuum hypothesis | [SeparableQuotientNegative.lean](../ComparatorChallenges/SeparableQuotientNegative.lean) |
+
+
+=== COMPARATOR SeparableQuotientNegative ===
+import Mathlib
+
+namespace OAI
+
+namespace SeparableQuotient
+
+open MeasureTheory Cardinal
+
+universe u
+
+/-- The continuum hypothesis. -/
+def CH : Prop := Cardinal.mk ℝ = Cardinal.aleph 1
+
+/-- A bounded linear surjection onto an infinite-dimensional separable Banach space. -/
+def HasSeparableQuotient (𝕜 : Type) [RCLike 𝕜]
+    (X : Type u) [NormedAddCommGroup X] [NormedSpace 𝕜 X] : Prop :=
+  ∃ (Y : Type u) (_ : NormedAddCommGroup Y) (_ : NormedSpace 𝕜 Y),
+    CompleteSpace Y ∧ TopologicalSpace.SeparableSpace Y ∧
+      (¬ FiniteDimensional 𝕜 Y) ∧ ∃ T : X →L[𝕜] Y, Function.Surjective T
+
+/-- The separable quotient assertion at an arbitrary ambient universe. -/
+def SQ (𝕜 : Type) [RCLike 𝕜] : Prop :=
+  ∀ (X : Type u) [NormedAddCommGroup X] [NormedSpace 𝕜 X] [CompleteSpace X],
+    (¬ FiniteDimensional 𝕜 X) → HasSeparableQuotient 𝕜 X
+
+theorem negative_main (hCH : CH) : ¬ SQ.{u} ℝ ∧ ¬ SQ.{u} ℂ := by
+  sorry
+
+end SeparableQuotient
+
+end OAI
+

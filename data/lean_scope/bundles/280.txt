@@ -1,0 +1,226 @@
+FAMILY 280: Unitary vertex operator algebras and conformal nets
+OPENAI SUMMARY: Proves the strongly rational case of the strong-locality conjecture: every simple unitary strongly rational complex vertex operator algebra generates a completely rational conformal net. Its simple modules are unitarizable, and its representation category agrees with the net’s finite-index sectors as a braided unitary tensor category.
+OUR LABEL: lean_vs_headline = weaker
+OUR HEADLINE (semi-formal): ∀ simple unitary strongly rational VOA V over ℂ: V is energy-bounded and CKLW-strongly local, A_V is a completely rational conformal net, V is completely unitary, and Rep(V) ≃ Rep^f(A_V) as braided unitary tensor categories
+OUR NOTES: Challenge file VertexAlgebraNet.main proves only energy bounds, CKLW strong locality and an irreducible net; no complete rationality or braided equivalence → weaker (rule 10).
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Strongly rational unitary vertex operator algebras and conformal nets | in_formalization_yaml=False | withdrawn=False | main_tex=Strongly-rational-unitary-vertex-operator-algebras-and-conformal-nets-September-25-2026/preprints/Strongly-rational-unitary-vertex-operator-algebras-and-conformal-nets-September-25-2026/build/main.tex
+  ABSTRACT: Every simple unitary strongly rational vertex operator algebra generates a completely rational conformal net. All its simple grading-restricted modules are unitarizable, its canonical fusion forms are positive, and the Carpi–Weiner–Xu functor gives a braided unitary tensor equivalence from its grading-restricted finite-length module category onto the finite-index sectors of the net. Gui's extension theorems then identify normalized irreducible finite-index local extensions of these nets with simple CFT-type conformal extensions of the vertex operator algebras.
+
+=== OPENAI SCOPE NOTE (lean/docs/280.md) ===
+# Unitary vertex operator algebras and conformal nets
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [Strongly rational unitary vertex operator algebras and conformal nets](../../preprints/Strongly-rational-unitary-vertex-operator-algebras-and-conformal-nets-September-25-2026/paper.pdf)
+
+## Scope
+
+The linked formalization proves the first construction step relating strongly rational unitary vertex operator algebras to conformal nets. For a simple unitary strongly rational vertex operator algebra, it establishes polynomial energy bounds and strong locality and constructs an irreducible conformal net with the stated covariance, vacuum, and positive-energy properties.
+
+The selected statement does not include complete rationality of the net, unitarizability of all simple modules, the braided tensor equivalence, or the classification of local extensions described in the paper.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Energy bounds, strong locality, and an irreducible conformal net | [VertexAlgebraNet.lean](../ComparatorChallenges/VertexAlgebraNet.lean) |
+
+
+=== COMPARATOR VertexAlgebraNet ===
+import Mathlib
+
+/-! The strongly rational unitary vertex operator algebra main result, clause (1). -/
+
+noncomputable section
+universe u v w
+
+namespace OAI.StronglyRationalVOA
+variable {V : Type u} [AddCommGroup V] [Module ℂ V]
+
+noncomputable abbrev StateField (V : Type u) (W : Type v)
+    [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W] :=
+  V →ₗ[ℂ] VertexOperator ℂ W
+
+noncomputable def mode {W : Type v} [AddCommGroup W] [Module ℂ W]
+    (Y : OAI.StronglyRationalVOA.StateField V W) (a : V) (n : ℤ) : Module.End ℂ W :=
+  VertexOperator.ncoeff (Y a) n
+
+noncomputable def JacobiIdentity (Y : OAI.StronglyRationalVOA.StateField V V) : Prop :=
+  ∀ (a b c : V) (m n k : ℤ),
+    (∑ᶠ j : ℕ, Ring.choose (m : ℂ) j •
+      OAI.StronglyRationalVOA.mode Y (OAI.StronglyRationalVOA.mode Y a (n + j) b) (m + k - j) c) =
+    ∑ᶠ j : ℕ, ((-1 : ℂ) ^ j * Ring.choose (n : ℂ) j) •
+      (OAI.StronglyRationalVOA.mode Y a (m + n - j) (OAI.StronglyRationalVOA.mode Y b (k + j) c) -
+        (-1 : ℂ) ^ n • OAI.StronglyRationalVOA.mode Y b (n + k - j) (OAI.StronglyRationalVOA.mode Y a (m + j) c))
+
+structure VertexAlgebra (V : Type u) [AddCommGroup V] [Module ℂ V] where
+  vacuum : V
+  fields : OAI.StronglyRationalVOA.StateField V V
+  vacuum_mode : ∀ (n : ℤ), OAI.StronglyRationalVOA.mode fields vacuum n = if n = -1 then 1 else 0
+  creation : ∀ a : V, OAI.StronglyRationalVOA.mode fields a (-1) vacuum = a
+  creation_truncation : ∀ (a : V) (n : ℤ), 0 ≤ n → OAI.StronglyRationalVOA.mode fields a n vacuum = 0
+  jacobi : OAI.StronglyRationalVOA.JacobiIdentity fields
+
+end OAI.StronglyRationalVOA
+
+namespace OAI.StronglyRationalVOA.VertexAlgebra
+variable {V : Type u} [AddCommGroup V] [Module ℂ V]
+variable (A : VertexAlgebra V)
+
+noncomputable def translation : Module.End ℂ V where
+  toFun a := OAI.StronglyRationalVOA.mode A.fields a (-2) A.vacuum
+  map_add' a b := by simp [OAI.StronglyRationalVOA.mode]
+  map_smul' z a := by simp [OAI.StronglyRationalVOA.mode]
+
+noncomputable def c2 : Submodule ℂ V :=
+  Submodule.span ℂ {x | ∃ a b : V, x = OAI.StronglyRationalVOA.mode A.fields a (-2) b}
+
+noncomputable def C2Cofinite : Prop := FiniteDimensional ℂ (V ⧸ A.c2)
+
+noncomputable def IsIdeal (I : Submodule ℂ V) : Prop :=
+  (∀ a : V, ∀ n : ℤ, ∀ x ∈ I, OAI.StronglyRationalVOA.mode A.fields a n x ∈ I) ∧
+  ∀ x ∈ I, A.translation x ∈ I
+
+noncomputable def IsSimple : Prop :=
+  A.vacuum ≠ 0 ∧ ∀ I : Submodule ℂ V, A.IsIdeal I → I = ⊥ ∨ I = ⊤
+
+end OAI.StronglyRationalVOA.VertexAlgebra
+
+namespace OAI.StronglyRationalVOA
+variable {V : Type u} [AddCommGroup V] [Module ℂ V]
+
+noncomputable def ModuleJacobiIdentity {W : Type v} [AddCommGroup W] [Module ℂ W]
+    (A : OAI.StronglyRationalVOA.VertexAlgebra V) (Y : OAI.StronglyRationalVOA.StateField V W) : Prop :=
+  ∀ (a b : V) (c : W) (m n k : ℤ),
+    (∑ᶠ j : ℕ, Ring.choose (m : ℂ) j •
+      OAI.StronglyRationalVOA.mode Y (OAI.StronglyRationalVOA.mode A.fields a (n + j) b) (m + k - j) c) =
+    ∑ᶠ j : ℕ, ((-1 : ℂ) ^ j * Ring.choose (n : ℂ) j) •
+      (OAI.StronglyRationalVOA.mode Y a (m + n - j) (OAI.StronglyRationalVOA.mode Y b (k + j) c) -
+        (-1 : ℂ) ^ n • OAI.StronglyRationalVOA.mode Y b (n + k - j) (OAI.StronglyRationalVOA.mode Y a (m + j) c))
+
+structure WeakModule (A : OAI.StronglyRationalVOA.VertexAlgebra V) (W : Type v)
+    [AddCommGroup W] [Module ℂ W] where
+  fields : OAI.StronglyRationalVOA.StateField V W
+  vacuum_mode : ∀ n : ℤ, OAI.StronglyRationalVOA.mode fields A.vacuum n = if n = -1 then 1 else 0
+  jacobi : OAI.StronglyRationalVOA.ModuleJacobiIdentity A fields
+
+end OAI.StronglyRationalVOA
+
+namespace OAI.StronglyRationalVOA.WeakModule
+variable {V : Type u} [AddCommGroup V] [Module ℂ V]
+variable {W : Type v} [AddCommGroup W] [Module ℂ W]
+    {A : VertexAlgebra V} (M : WeakModule A W)
+
+noncomputable def IsInvariant (I : Submodule ℂ W) : Prop :=
+  ∀ a : V, ∀ n : ℤ, ∀ x ∈ I, OAI.StronglyRationalVOA.mode M.fields a n x ∈ I
+
+noncomputable def CompletelyReducible : Prop :=
+  ∀ I : Submodule ℂ W, M.IsInvariant I →
+    ∃ J : Submodule ℂ W, M.IsInvariant J ∧ IsCompl I J
+
+end OAI.StronglyRationalVOA.WeakModule
+
+namespace OAI.StronglyRationalVOA
+variable {V : Type u} [AddCommGroup V] [Module ℂ V]
+
+structure CFTTypeVOA (V : Type u) [AddCommGroup V] [Module ℂ V]
+    extends OAI.StronglyRationalVOA.VertexAlgebra V where
+  conformalVector : V
+  centralCharge : ℂ
+  grade : ℕ → Submodule ℂ V
+  grading_internal : DirectSum.IsInternal grade
+  grade_finite : ∀ d, FiniteDimensional ℂ (grade d)
+  vacuum_ne_zero : vacuum ≠ 0
+  grade_zero : grade 0 = ℂ ∙ vacuum
+  conformal_mem : conformalVector ∈ grade 2
+  conformal_energy : ∀ d, ∀ a ∈ grade d,
+    OAI.StronglyRationalVOA.mode fields conformalVector 1 a = (d : ℂ) • a
+  conformal_translation : OAI.StronglyRationalVOA.mode fields conformalVector 0 = toVertexAlgebra.translation
+  translation_covariance : ∀ a : V, ∀ n : ℤ,
+    OAI.StronglyRationalVOA.mode fields (toVertexAlgebra.translation a) n =
+      (-(n : ℂ)) • OAI.StronglyRationalVOA.mode fields a (n - 1)
+  virasoro : ∀ m n : ℤ,
+    (OAI.StronglyRationalVOA.mode fields conformalVector (m + 1)).comp (OAI.StronglyRationalVOA.mode fields conformalVector (n + 1)) -
+      (OAI.StronglyRationalVOA.mode fields conformalVector (n + 1)).comp (OAI.StronglyRationalVOA.mode fields conformalVector (m + 1)) =
+    ((m - n : ℤ) : ℂ) • OAI.StronglyRationalVOA.mode fields conformalVector (m + n + 1) +
+      (if m + n = 0 then (centralCharge / 12) * ((m : ℂ)^3 - m) else 0) •
+        (1 : Module.End ℂ V)
+
+end OAI.StronglyRationalVOA
+
+namespace OAI.StronglyRationalVOA.CFTTypeVOA
+variable {V : Type u} [AddCommGroup V] [Module ℂ V]
+variable (A : CFTTypeVOA V)
+
+noncomputable def virasoroMode (m : ℤ) : Module.End ℂ V :=
+  OAI.StronglyRationalVOA.mode A.fields A.conformalVector (m + 1)
+
+noncomputable def physicalMode (a : V) (d : ℕ) (m : ℤ) : Module.End ℂ V :=
+  OAI.StronglyRationalVOA.mode A.fields a (m + d - 1)
+
+noncomputable def energyShift : Module.End ℂ V := 1 + A.virasoroMode 0
+
+noncomputable def gradingEquiv : V ≃ₗ[ℂ] DirectSum ℕ (fun d => A.grade d) :=
+  (LinearEquiv.ofBijective (DirectSum.coeLinearMap A.grade) A.grading_internal).symm
+
+noncomputable def IsAdmissible {W : Type v} [AddCommGroup W] [Module ℂ W]
+    (M : OAI.StronglyRationalVOA.WeakModule A.toVertexAlgebra W) : Prop :=
+  ∃ G : ℤ → Submodule ℂ W,
+    DirectSum.IsInternal G ∧ (∀ k : ℤ, k < 0 → G k = ⊥) ∧
+      ∀ d : ℕ, ∀ a ∈ A.grade d, ∀ n k : ℤ, ∀ x ∈ G k,
+        OAI.StronglyRationalVOA.mode M.fields a n x ∈ G (k + d - n - 1)
+
+noncomputable def IsRational : Prop :=
+  ∀ (W : Type v) [AddCommGroup W] [Module ℂ W]
+    (M : OAI.StronglyRationalVOA.WeakModule A.toVertexAlgebra W),
+    A.IsAdmissible M → M.CompletelyReducible
+
+end OAI.StronglyRationalVOA.CFTTypeVOA
+
+namespace OAI.StronglyRationalVOA.CFTTypeVOA
+variable {V : Type u} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    (A : CFTTypeVOA V)
+
+noncomputable def PolynomialEnergyBound (a : V) : Prop :=
+  ∃ C : ℝ, 0 < C ∧ ∃ p k : ℕ, ∀ (n : ℤ) (b : V),
+    ‖OAI.StronglyRationalVOA.mode A.fields a n b‖ ≤ C * (1 + |(n : ℝ)|) ^ p * ‖(A.energyShift ^ k) b‖
+
+noncomputable def PolynomialEnergyBounds : Prop := ∀ a : V, A.PolynomialEnergyBound a
+
+structure UnitaryStructure where
+  pct : V →ₛₗ[starRingEnd ℂ] V
+  pct_involutive : Function.Involutive pct
+  pct_vacuum : pct A.vacuum = A.vacuum
+  pct_conformal : pct A.conformalVector = A.conformalVector
+  pct_modes : ∀ (a b : V) (n : ℤ),
+    pct (OAI.StronglyRationalVOA.mode A.fields a n b) = OAI.StronglyRationalVOA.mode A.fields (pct a) n (pct b)
+  vacuum_norm : ‖A.vacuum‖ = 1
+  invariant : ∀ d : ℕ, ∀ a ∈ A.grade d, ∀ n : ℤ, ∀ b c : V,
+    inner ℂ (OAI.StronglyRationalVOA.mode A.fields a n b) c =
+      inner ℂ b (((-1 : ℂ) ^ d) •
+        ∑ j ∈ Finset.range (d + 1), ((j.factorial : ℂ)⁻¹) •
+          OAI.StronglyRationalVOA.mode A.fields ((A.virasoroMode 1 ^ j) (pct a))
+            (2 * (d : ℤ) - j - n - 2) c)
+
+end OAI.StronglyRationalVOA.CFTTypeVOA
+
+namespace OAI.StronglyRationalVOA.HilbertCore
+open Filter
+open UniformSpace
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+
+noncomputable def _root_.OAI.MinimalVertex.Code.StronglyRationalVOA.HilbertCore.space (V : Type*) [NormedAddCommGroup V] [InnerProductSpace ℂ V] :
+    Submodule ℂ (Completion V) :=
+  LinearMap.range (Completion.toComplₗᵢ : V →ₗᵢ[ℂ] Completion V).toLinearMap
+
+noncomputable def _root_.OAI.MinimalVertex.Code.StronglyRationalVOA.HilbertCore.equiv (V : Type*) [NormedAddCommGroup V] [InnerProductSpace ℂ V] :
+    V ≃ₗ[ℂ] (OAI.MinimalVertex.Code.StronglyRationalVOA.HilbertCore.space V) :=
+  LinearEquiv.ofInjective (Completion.toComplₗᵢ : V →ₗᵢ[ℂ] Completion V).toLinearMap
+    (Completion.toComplₗᵢ : V →ₗᵢ[ℂ] Completion V).injective
+
+noncomputable def _root_.OAI.MinimalVertex.Code.StronglyRationalVOA.HilbertCore.operator (T : V →ₗ[ℂ] Completion V) : Completion V →ₗ.[ℂ] Completion V where
+  domain := (OAI.MinimalVertex.Code.StronglyRationalVOA.HilbertCore.space V)
+  toFun := T.comp (OAI.MinimalVertex.Code.StronglyRationalVOA.HilbertCore.eq
+…(truncated)

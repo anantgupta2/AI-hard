@@ -1,0 +1,115 @@
+FAMILY 095: Hyperbolicity cones without semidefinite lifts
+OPENAI SUMMARY: Disproves the Projected Lax conjecture: some hyperbolicity cones are not spectrahedral shadows. The examples admit no exact finite affine semidefinite lift, regardless of the number of auxiliary variables or the real coefficients used. This also disproves the generalized Lax conjecture that every hyperbolicity cone is spectrahedral.
+OUR LABEL: lean_vs_headline = different
+OUR HEADLINE (semi-formal): ∃ real homogeneous hyperbolic polynomial p (w.r.t. e): K(p,e) is not a spectrahedral shadow (no finite affine semidefinite lift with any number of auxiliary variables)
+OUR NOTES: Projected Lax Conjecture (Netzer–Sanyal) refuted; existence argument in high dimension, no explicit witness. Lean (main_result) formalizes the explicit degree-20, 23-variable cone that is not spectrahedral, i.e. the secondary refutation of the generalized Lax conjecture; that explicit cone does admit a semidefinite lift (third manuscript), so the Lean covers a different, weaker result.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Hyperbolicity Cones Without Semidefinite Lifts | in_formalization_yaml=False | withdrawn=False | main_tex=Hyperbolicity-Cones-Without-Semidefinite-Lifts-October-5-2026/preprints/Hyperbolicity-Cones-Without-Semidefinite-Lifts-October-5-2026/build/source/main.tex
+  ABSTRACT: We prove that not every hyperbolicity cone is a spectrahedral shadow: some closed hyperbolicity cones admit no finite affine semidefinite lift, even with arbitrary real coefficients and any finite number of auxiliary variables. This disproves the Projected Lax Conjecture and hence the generalized Lax conjecture.
+- A nonspectrahedral hyperbolicity cone | in_formalization_yaml=True | withdrawn=False | main_tex=A-Nonspectrahedral-Hyperbolicity-Cone-September-24-2026/preprints/A-Nonspectrahedral-Hyperbolicity-Cone-September-24-2026/build/main.tex
+  ABSTRACT: We construct a homogeneous polynomial of degree 16 in 23 real variables whose hyperbolicity cone has no representation by a finite homogeneous real symmetric linear matrix inequality. This disproves the geometric Generalized Lax conjecture.
+- An Exact Semidefinite Lift of a Nonspectrahedral Hyperbolicity Cone | in_formalization_yaml=False | withdrawn=False | main_tex=An-Exact-Semidefinite-Lift-of-a-Nonspectrahedral-Hyperbolicity-Cone-October-5-2026/preprints/An-Exact-Semidefinite-Lift-of-a-Nonspectrahedral-Hyperbolicity-Cone-October-5-2026/build/main.tex
+  ABSTRACT: We construct an exact semidefinite lift of the explicit nonspectrahedral hyperbolicity cone in twenty-three variables defined in the companion paper. The lift is a homogeneous real symmetric pencil of size 100 with 307 auxiliary variables and represents the entire closed cone, including every point with singular X. Thus, although this cone has no semidefinite representation in its original coordinates, it admits one when auxiliary variables are allowed. The stated sizes are not claimed to be minimal.
+
+=== OPENAI SCOPE NOTE (lean/docs/095.md) ===
+# Hyperbolicity cones without semidefinite lifts
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [A nonspectrahedral hyperbolicity cone](../../preprints/A-Nonspectrahedral-Hyperbolicity-Cone-September-24-2026/nonspectrahedral-hyperbolicity-cone.pdf)
+
+## Scope
+
+The generalized Lax conjecture predicts that every hyperbolicity cone is spectrahedral. The formalized counterexample is an explicit homogeneous polynomial of degree $20$ in $23$ real variables. It is hyperbolic, but its closed hyperbolicity cone cannot be represented as the positive-semidefinite region of any finite real symmetric linear matrix pencil, in any positive matrix size.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Nonspectrahedral hyperbolicity cone | [HyperbolicCones.lean](../ComparatorChallenges/HyperbolicCones.lean) |
+
+
+=== COMPARATOR HyperbolicCones ===
+import Mathlib
+
+namespace OAI
+
+noncomputable section
+
+open scoped Matrix.Norms.L2Operator
+
+universe u
+
+namespace Paper256
+
+abbrev Mat (n : ℕ) (R : Type u) := Matrix (Fin n) (Fin n) R
+
+abbrev Sym (n : ℕ) := selfAdjoint (Mat n ℝ)
+
+instance instFiniteDimensionalSym (n : ℕ) : FiniteDimensional ℝ (Sym n) :=
+  FiniteDimensional.finiteDimensional_submodule (selfAdjoint.submodule ℝ (Mat n ℝ))
+
+abbrev Ambient := (Sym 4 × Sym 4) × (Fin 3 → ℝ)
+
+abbrev SymIndex := {ij : Fin 4 × Fin 4 // ij.1 ≤ ij.2}
+
+abbrev Coord := (SymIndex ⊕ SymIndex) ⊕ Fin 3
+
+def qMatrix {R : Type u} [CommRing R] (y : Fin 3 → R) : Mat 3 R :=
+  fun i j => if i = j then y i ^ 2 + y (i + 1) ^ 2 else -(y i * y j)
+
+def phi {R : Type u} [CommRing R] (y : Fin 3 → R) (X : Mat 4 R) : Mat 4 R :=
+  fun i j => Fin.cases
+    (Fin.cases
+      (Matrix.trace (qMatrix y * X.submatrix Fin.succ Fin.succ))
+      (fun j => -(∑ k, X 0 k.succ * qMatrix y k j)) j)
+    (fun i => Fin.cases
+      (-(∑ k, qMatrix y i k * X k.succ 0))
+      (fun j => X 0 0 * qMatrix y i j) j) i
+
+def matrixValue {R : Type u} [CommRing R]
+    (X Z : Mat 4 R) (y : Fin 3 → R) : R :=
+  Matrix.det ((Matrix.det X) • Z - phi y (Matrix.adjugate X))
+
+def symmetricCoordinates {R : Type u} (v : SymIndex → R) : Mat 4 R :=
+  fun i j => if h : i ≤ j then v ⟨(i, j), h⟩
+    else v ⟨(j, i), le_of_lt (lt_of_not_ge h)⟩
+
+def polynomial : MvPolynomial Coord ℝ :=
+  matrixValue
+    (symmetricCoordinates fun ij => MvPolynomial.X (Sum.inl (Sum.inl ij)))
+    (symmetricCoordinates fun ij => MvPolynomial.X (Sum.inl (Sum.inr ij)))
+    (fun i => MvPolynomial.X (Sum.inr i))
+
+def coordinates (x : Ambient) : Coord → ℝ :=
+  Sum.elim (Sum.elim
+    (fun ij => (x.1.1 : Mat 4 ℝ) ij.val.1 ij.val.2)
+    (fun ij => (x.1.2 : Mat 4 ℝ) ij.val.1 ij.val.2)) x.2
+
+def basePoint : Ambient := ((1, 1), 0)
+
+def linePolynomial (x : Ambient) : Polynomial ℝ :=
+  MvPolynomial.eval₂ Polynomial.C
+    (fun i => Polynomial.C (coordinates basePoint i) * Polynomial.X -
+      Polynomial.C (coordinates x i)) polynomial
+
+def cone : Set Ambient :=
+  {x | ∀ t : ℂ, (linePolynomial x).aeval t = 0 → t.im = 0 ∧ 0 ≤ t.re}
+
+theorem main_result :
+    Module.finrank ℝ Ambient = 23 ∧
+    polynomial.IsHomogeneous 20 ∧
+    polynomial.totalDegree = 20 ∧
+    MvPolynomial.eval (coordinates basePoint) polynomial = 1 ∧
+    (∀ (x : Ambient) (z : ℂ), (linePolynomial x).aeval z = 0 → z.im = 0) ∧
+    ∀ (N : ℕ) (_hN : 0 < N) (L : Ambient →ₗ[ℝ] Sym N),
+      cone ≠ {x | (L x : Mat N ℝ).PosSemidef} := by
+  sorry
+
+end Paper256
+
+end
+
+end OAI
+

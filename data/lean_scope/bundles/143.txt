@@ -1,0 +1,78 @@
+FAMILY 143: Hilbert's sixteenth problem: uniform bounds for limit cycles
+OPENAI SUMMARY: Resolves the uniform boundedness assertion in Hilbert's sixteenth problem: the number of isolated periodic orbits of a real planar polynomial vector field is bounded by a finite constant depending only on its degree. For classical quintic Liénard systems, the exact maximum is two limit cycles.
+OUR LABEL: lean_vs_headline = different
+OUR HEADLINE (semi-formal): ∀ d≥1 ∃ B(d)<∞ ∀ real planar polynomial vector field V of degree ≤ d: #limit cycles of V in ℝ² ≤ B(d)
+OUR NOTES: Hilbert's 16th (second part) asks for the maximum number and arrangement of limit cycles; only the finiteness of H(d) (uniform boundedness) is settled, with no effective B(d), so O5. O1 applies if the uniform-boundedness assertion counts as its own problem. Lean covers only the secondary result: quintic classical Liénard systems have at most 2 limit cycles, attained (degree-5 case of the Lins–de Melo–Pugh conjecture, M9). Hence 'different'.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Uniform bounds for planar polynomial limit cycles | in_formalization_yaml=False | withdrawn=False | main_tex=uniform-bounds-for-planar-polynomial-limit-cycles-September-24-2026/preprints/uniform-bounds-for-planar-polynomial-limit-cycles-September-24-2026/build/main.tex
+  ABSTRACT: For every degree, we prove that the number of isolated periodic orbits of a real planar polynomial vector field is bounded by a finite constant depending only on that degree. This establishes the uniform boundedness assertion in the second part of Hilbert's sixteenth problem. The proof uses separation of asymptotic expansions on nested complex domains and a finite-dimensional counting argument.
+- Two limit cycles for quintic Liénard systems | in_formalization_yaml=True | withdrawn=False | main_tex=two-limit-cycles-for-quintic-lienard-systems-September-24-2026/preprints/two-limit-cycles-for-quintic-lienard-systems-September-24-2026/build/paper.tex
+  ABSTRACT: Every classical Liénard system $`\dot x=y-F(x)`$, $`\dot y=-x`$, with F an arbitrary real polynomial of degree at most five, has at most two geometrically distinct isolated periodic orbits, and the bound is attained. This proves the degree-five case of the Lins Neto–de Melo–Pugh conjecture.
+
+=== OPENAI SCOPE NOTE (lean/docs/143.md) ===
+# Hilbert's sixteenth problem: uniform bounds for limit cycles
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [Two limit cycles for quintic Liénard systems](../../preprints/two-limit-cycles-for-quintic-lienard-systems-September-24-2026/two-limit-cycles-for-quintic-lienard-systems-September-24-2026.pdf)
+
+## Scope
+
+For the quintic Liénard system $x'=y-F(x)$, $y'=-x$, the formalized result proves that every real polynomial $F$ of degree at most five yields at most two limit cycles, and that some such $F$ yields exactly two. Limit cycles are isolated images of nonconstant periodic solutions. No sign, parity, hyperbolicity, or amplitude restriction is imposed.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Exact two-cycle bound for quintic Liénard systems | [QuinticLienard.lean](../ComparatorChallenges/QuinticLienard.lean) |
+
+
+=== COMPARATOR QuinticLienard ===
+import Mathlib
+
+namespace OAI
+
+namespace QuinticLienard
+
+abbrev Plane := ℝ × ℝ
+
+def vectorField (F : Polynomial ℝ) (z : Plane) : Plane :=
+  (z.2 - F.eval z.1, -z.1)
+
+def IsSolution (F : Polynomial ℝ) (z : ℝ → Plane) : Prop :=
+  ∀ t : ℝ, HasDerivAt z (vectorField F (z t)) t
+
+def IsPeriodicOrbit (F : Polynomial ℝ) (C : Set Plane) : Prop :=
+  ∃ (z : ℝ → Plane) (T : ℝ),
+    IsSolution F z ∧ 0 < T ∧ Function.Periodic z T ∧
+    (∃ s t : ℝ, z s ≠ z t) ∧ C = Set.range z
+
+def IsLimitCycle (F : Polynomial ℝ) (C : Set Plane) : Prop :=
+  IsPeriodicOrbit F C ∧
+    ∃ U : Set Plane, IsOpen U ∧ C ⊆ U ∧
+      ∀ C' : Set Plane, IsPeriodicOrbit F C' → C' ⊆ U → C' = C
+
+open scoped Topology NNReal ContDiff Manifold
+open Filter Set
+open Set Filter Metric MeasureTheory
+open scoped Topology NNReal ContDiff
+open scoped Topology ENNReal
+open Set Filter MeasureTheory
+open Set Filter Asymptotics
+open Set Filter Metric
+open scoped Topology NNReal
+open scoped Topology
+open scoped Topology ContDiff
+open Set Filter
+open scoped Topology ContDiff NNReal
+
+theorem main :
+    (∀ F : Polynomial ℝ, F.degree ≤ 5 → {C : Set Plane | IsLimitCycle F C}.encard ≤ 2) ∧
+    (∃ F : Polynomial ℝ, F.degree ≤ 5 ∧ {C : Set Plane | IsLimitCycle F C}.encard = 2) := by
+  sorry
+
+end QuinticLienard
+
+end OAI
+

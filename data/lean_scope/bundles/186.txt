@@ -1,0 +1,95 @@
+FAMILY 186: Uniform influence and sharp thresholds for graph and hypergraph properties
+OPENAI SUMMARY: Proves the Friedgut–Kalai threshold-width conjectures for graphs and fixed-uniformity hypergraphs. For fixed $`0\lt \varepsilon\lt 1/2`$, every nontrivial increasing relabeling-invariant property crosses from probability ε to $`1-\varepsilon`$ within width $`O((\log n)^{-2})`$ for graphs and $`O_r((\log n)^{-r/(r-1)})`$ for r-uniform hypergraphs, r ≥ 3. The hypergraph influence bound also applies to nonmonotone properties.
+OUR LABEL: lean_vs_headline = weaker
+OUR HEADLINE (semi-formal): ∀n≥2 ∀ nontrivial increasing vertex-invariant graph property P ∀ε∈(0,½): p_{1−ε}(P)−p_ε(P) ≤ 2¹⁹ log(1/(2ε))/(log n)²; analogously O_r((log n)^{−r/(r−1)}) for r-uniform hypergraphs
+OUR NOTES: The headline covers graphs and r-uniform hypergraphs. Lean formalizes only the graph threshold-width theorem, hence weaker. The (log n)^2 order is optimal by the FK clique example, so M9 is an alternative. The variance/influence bounds also hold for nonmonotone properties.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- A uniform influence bound for hypergraph properties | in_formalization_yaml=False | withdrawn=False | main_tex=A-uniform-influence-bound-for-hypergraph-properties-October-5-2026/preprints/A-uniform-influence-bound-for-hypergraph-properties-October-5-2026/build/main.tex
+  ABSTRACT: For every fixed integer r ≥ 3, we prove that every relabeling-invariant Boolean property of simple r-uniform hypergraphs on n vertices satisfies $`\mathop{\mathrm{Var}}\nolimits _p(f)\le C_r I_p(f)/(\log n)^{r/(r-1)}`$. The constant depends only on r, and the bound holds uniformly for all $`0\lt p\lt 1`$ without a monotonicity assumption. For increasing properties, it gives the corresponding threshold-width bound with exponent $`r/(r-1)`$, proving the hypergraph threshold-width conjecture of Friedgut and Kalai.
+- A Sharp Threshold Bound for Monotone Graph Properties | in_formalization_yaml=False | withdrawn=False | main_tex=A-Sharp-Threshold-Bound-for-Monotone-Graph-Properties-September-25-2026/preprints/A-Sharp-Threshold-Bound-for-Monotone-Graph-Properties-September-25-2026/build/main.tex
+  ABSTRACT: We prove the Friedgut–Kalai sharp-threshold conjecture. For every integer n ≥ 2, every nontrivial increasing family of graphs on n vertices invariant under all vertex permutations, and every $`0\lt \varepsilon\lt 1/2`$, the edge probabilities at which its probability equals ε and $`1-\varepsilon`$ differ by at most $`C\log(1/(2\varepsilon))/(\log n)^2`$, for a universal constant C.
+
+=== OPENAI SCOPE NOTE (lean/docs/186.md) ===
+# Uniform influence and sharp thresholds for graph and hypergraph properties
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [A Sharp Threshold Bound for Monotone Graph Properties](../../preprints/A-Sharp-Threshold-Bound-for-Monotone-Graph-Properties-September-25-2026/paper.pdf)
+
+## Scope
+
+The Friedgut–Kalai sharp-threshold conjecture concerns how quickly a nontrivial increasing graph property appears in the independent-edge random graph. For every $n\ge2$, every such property invariant under vertex relabeling, and $0<\varepsilon<1/2$, the formalization proves that the edge-probability interval between probabilities $\varepsilon$ and $1-\varepsilon$ has width at most $2^{19}\log(1/(2\varepsilon))/(\log n)^2$. The constant is uniform over the graph property, $n$, and $\varepsilon$.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Sharp threshold width for monotone graph properties | [SharpThreshold.lean](../ComparatorChallenges/SharpThreshold.lean) |
+
+
+=== COMPARATOR SharpThreshold ===
+import Mathlib
+
+namespace OAI
+
+noncomputable section
+
+namespace Problem313
+
+abbrev GraphEdge (n : ℕ) := {e : Finset (Fin n) // e.card = 2}
+
+abbrev GraphConfig (n : ℕ) := GraphEdge n → Bool
+
+def permEdge {n : ℕ} (π : Equiv.Perm (Fin n)) (e : GraphEdge n) : GraphEdge n :=
+  ⟨e.1.map π.toEmbedding, by simpa using e.2⟩
+
+def permuteConfig {n : ℕ} (π : Equiv.Perm (Fin n))
+    (x : GraphConfig n) : GraphConfig n :=
+  fun e => x (permEdge π.symm e)
+
+def VertexInvariant {n : ℕ} (f : GraphConfig n → Bool) : Prop :=
+  ∀ (π : Equiv.Perm (Fin n)) (x : GraphConfig n),
+    f (permuteConfig π x) = f x
+
+def ConfigLE {n : ℕ} (x y : GraphConfig n) : Prop :=
+  ∀ e, x e = true → y e = true
+
+def IncreasingGraphProperty {n : ℕ} (f : GraphConfig n → Bool) : Prop :=
+  ∀ x y, ConfigLE x y → f x = true → f y = true
+
+def NontrivialGraphProperty {n : ℕ} (f : GraphConfig n → Bool) : Prop :=
+  (∃ x, f x = true) ∧ (∃ x, f x = false)
+
+def boolReal (b : Bool) : ℝ :=
+  match b with
+  | false => 0
+  | true => 1
+
+def graphWeight {n : ℕ} (p : ℝ) (x : GraphConfig n) : ℝ := by
+  classical
+  exact Finset.univ.prod (fun e : GraphEdge n =>
+    if x e = true then p else 1 - p)
+
+def graphMean {n : ℕ} (p : ℝ) (f : GraphConfig n → Bool) : ℝ := by
+  classical
+  exact Finset.univ.sum (fun x : GraphConfig n =>
+    graphWeight p x * boolReal (f x))
+
+def graphQuantile {n : ℕ} (a : ℝ) (f : GraphConfig n → Bool) : ℝ :=
+  sInf {p : ℝ | p ∈ Set.Icc (0 : ℝ) 1 ∧ graphMean p f ≥ a}
+
+theorem sharp_threshold_width :
+    ∀ (n : ℕ) (f : GraphConfig n → Bool) (ε : ℝ),
+      2 ≤ n → VertexInvariant f → IncreasingGraphProperty f →
+      NontrivialGraphProperty f → 0 < ε → ε < (1 / 2 : ℝ) →
+      graphQuantile (1 - ε) f - graphQuantile ε f ≤
+        ((2 : ℝ) ^ 19 / (Real.log (n : ℝ)) ^ 2) * Real.log (1 / (2 * ε)) := by
+  sorry
+
+end Problem313
+
+end
+
+end OAI
+

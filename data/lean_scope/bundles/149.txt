@@ -1,0 +1,92 @@
+FAMILY 149: Classwise permanence for weakly reversible mass-action systems
+OPENAI SUMMARY: Proves the permanence conjecture for every finite weakly reversible mass-action system with fixed positive rate constants. Every positive stoichiometric compatibility class, even an unbounded one, has a common compact convex forward-invariant absorbing set. All positive trajectories in that class therefore eventually share positive lower and finite upper concentration bounds.
+OUR LABEL: lean_vs_headline = weaker
+OUR HEADLINE (semi-formal): ∀ finite weakly reversible network ∀ positive rate constants ∀ positive stoichiometric class P ∃ nonempty compact convex forward-invariant K_P⊂P ∀ x⁰∈P ∃ T(x⁰): x(t)∈K_P for all t≥T(x⁰)
+OUR NOTES: M1 (permanence holds as a property) is an equally good matrix. The paper proves 'the fixed-positive-rate, weakly reversible formulation' of the permanence conjecture; versions with variable or bounded time-dependent rates are not covered, so O5 is possible. The companion proves the boundedness and persistence conjectures (trajectory-dependent bounds). Lean MassAction states only that companion theorem, which the headline implies, hence 'weaker'.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Uniform Permanence in Weakly Reversible Mass-Action Systems | in_formalization_yaml=False | withdrawn=False | main_tex=Uniform-Permanence-in-Weakly-Reversible-Mass-Action-Systems-October-5-2026/preprints/Uniform-Permanence-in-Weakly-Reversible-Mass-Action-Systems-October-5-2026/build/main.tex
+  ABSTRACT: We prove the permanence conjecture for finite weakly reversible mass-action systems with fixed positive reaction rates. Every positive stoichiometric compatibility class admits one compact convex forward-invariant set that every positive trajectory in that class enters in finite time, even when the class is unbounded. The set depends only on the network, the rates, and the class; the entry time may depend on the initial state. Thus, after its entry time, every concentration satisfies the same positive lower and finite upper bounds throughout that class.
+- Boundedness and persistence of weakly reversible mass-action systems | in_formalization_yaml=False | withdrawn=False | main_tex=Boundedness-and-persistence-of-weakly-reversible-mass-action-systems-September-25-2026/preprints/Boundedness-and-persistence-of-weakly-reversible-mass-action-systems-September-25-2026/build/paper.tex
+  ABSTRACT: We prove the boundedness and persistence conjectures for finite weakly reversible mass-action systems with positive constant reaction rates. For every positive initial condition, the solution exists for all forward time, and every concentration remains bounded above and bounded away from zero. The bounds may depend on the initial condition, and no boundedness assumption is imposed on its stoichiometric compatibility class.
+
+=== OPENAI SCOPE NOTE (lean/docs/149.md) ===
+# Classwise permanence for weakly reversible mass-action systems
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [Boundedness and persistence of weakly reversible mass-action systems](../../preprints/Boundedness-and-persistence-of-weakly-reversible-mass-action-systems-September-25-2026/paper.pdf)
+
+## Scope
+
+The boundedness and persistence conjectures for mass-action systems ask whether positive concentrations remain finite and separated from zero. The formalization proves this for every finite weakly reversible reaction network with positive constant reaction rates and every strictly positive initial state. A global forward solution exists, and one $\varepsilon\in(0,1)$ bounds every concentration of every global forward solution between $\varepsilon$ and $\varepsilon^{-1}$ for all nonnegative times. The bound may depend on the network, rates, and initial state.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Global boundedness and persistence for weakly reversible mass-action systems | [MassAction.lean](../ComparatorChallenges/MassAction.lean) |
+
+
+=== COMPARATOR MassAction ===
+import Mathlib
+
+namespace OAI
+
+noncomputable section
+
+namespace Problem326
+
+structure ReactionNetwork (d : ℕ) where
+  complexes : Finset (Fin d → ℕ)
+  reactions : Finset ((Fin d → ℕ) × (Fin d → ℕ))
+  source_mem : ∀ e ∈ reactions, e.1 ∈ complexes
+  target_mem : ∀ e ∈ reactions, e.2 ∈ complexes
+  source_ne_target : ∀ e ∈ reactions, e.1 ≠ e.2
+
+abbrev Reaction {d : ℕ} (N : ReactionNetwork d) :=
+  {e : (Fin d → ℕ) × (Fin d → ℕ) // e ∈ N.reactions}
+
+def HasReaction {d : ℕ} (N : ReactionNetwork d)
+    (y z : Fin d → ℕ) : Prop :=
+  (y, z) ∈ N.reactions
+
+def WeaklyReversible {d : ℕ} (N : ReactionNetwork d) : Prop :=
+  ∀ e : Reaction N,
+    Relation.TransGen (HasReaction N) e.val.2 e.val.1
+
+def monomial {d : ℕ} (x : Fin d → ℝ) (y : Fin d → ℕ) : ℝ :=
+  Finset.univ.prod (fun i => x i ^ y i)
+
+def massAction {d : ℕ} (N : ReactionNetwork d)
+    (κ : Reaction N → ℝ) (x : Fin d → ℝ) : Fin d → ℝ :=
+  fun i => Finset.univ.sum (fun e : Reaction N =>
+    κ e * monomial x e.val.1 *
+      ((e.val.2 i : ℝ) - (e.val.1 i : ℝ)))
+
+def PositiveState {d : ℕ} (x : Fin d → ℝ) : Prop :=
+  ∀ i, 0 < x i
+
+def IsGlobalForwardSolution {d : ℕ} (N : ReactionNetwork d)
+    (κ : Reaction N → ℝ) (x0 : Fin d → ℝ)
+    (x : ℝ → (Fin d → ℝ)) : Prop :=
+  x 0 = x0 ∧
+    ∀ t : ℝ, 0 ≤ t →
+      HasDerivAt x (massAction N κ (x t)) t
+
+theorem global_bounded_persistent_solution :
+    ∀ (d : ℕ) (N : ReactionNetwork d) (κ : Reaction N → ℝ),
+      0 < d → WeaklyReversible N → (∀ e, 0 < κ e) →
+      ∀ x0 : Fin d → ℝ, PositiveState x0 →
+      ∃ ε : ℝ, 0 < ε ∧ ε < 1 ∧
+        (∃ x : ℝ → (Fin d → ℝ), IsGlobalForwardSolution N κ x0 x) ∧
+        ∀ x : ℝ → (Fin d → ℝ), IsGlobalForwardSolution N κ x0 x →
+        ∀ t : ℝ, 0 ≤ t → ∀ i : Fin d, ε ≤ x t i ∧ x t i ≤ ε⁻¹ := by
+  sorry
+
+end Problem326
+
+end
+
+end OAI
+

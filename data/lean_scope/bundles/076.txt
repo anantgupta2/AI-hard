@@ -1,0 +1,104 @@
+FAMILY 076: Real ultraflat Littlewood polynomials and unbounded binary merit factors
+OPENAI SUMMARY: Constructs polynomials with N consecutive coefficients in $`\{-1,1\}`$ whose modulus is $`(1+o(1))\sqrt N`$ uniformly on the entire unit circle, for every sufficiently large integer length N. Thus real Littlewood polynomials are ultraflat, including at the real endpoints. Their binary merit factors tend to infinity, disproving Turyn's bounded-merit-factor conjecture.
+OUR LABEL: lean_vs_headline = weaker
+OUR HEADLINE (semi-formal): ∀ ε∈(0,1) ∃ N₀ ∀ N ≥ N₀ ∃ signs ε_k ∈ {±1}: (1−ε)√N ≤ |Σ_{k<N} ε_k z^k| ≤ (1+ε)√N for all |z|=1
+OUR NOTES: The headline is an existence (M2) whose witnesses refute the real-sign Erdős fixed-gap conjecture (inf m_N ≥ 1+c) and Turyn's conjecture, so M3 by precedence. The problem source could also be read as P3 (Erdős 1957 Problems 22/26) or P2. The ultraflat paper builds on the two earlier model papers (minimal maxima; v2 lower envelope). The Lean covers only the upper half (m_N → 1) and finite-L^p flatness, not the two-sided ultraflat statement, hence weaker.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Ultraflat real Littlewood polynomials | in_formalization_yaml=False | withdrawn=False | main_tex=Ultraflat-real-Littlewood-polynomials-October-5-2026/preprints/Ultraflat-real-Littlewood-polynomials-October-5-2026/build/main.tex
+  ABSTRACT: For every $`\varepsilon\in(0,1)`$ and every sufficiently large integer N, there is a polynomial of length N with coefficients in $`\{-1,1\}`$ whose modulus lies between $`(1-\varepsilon)\sqrt N`$ and $`(1+\varepsilon)\sqrt N`$ everywhere on the unit circle. Thus real Littlewood polynomials can be ultraflat through every sufficiently large integer length. The signs may be chosen separately at each length.
+- Nearly minimal maxima and positive minima of Littlewood polynomials | in_formalization_yaml=False | withdrawn=False | main_tex=Nearly-minimal-maxima-and-positive-minima-of-Littlewood-polynomials-October-5-2026/preprints/Nearly-minimal-maxima-and-positive-minima-of-Littlewood-polynomials-October-5-2026/build/main.tex
+  ABSTRACT: For every η &gt; 0 and every sufficiently large integer N, there is a polynomial with N consecutive coefficients in $`\{-1,1\}`$ whose modulus lies between $`\sqrt N/16`$ and $`(1+\eta)\sqrt N`$ everywhere on the unit circle.
+- Asymptotically minimal maxima of real Littlewood polynomials | in_formalization_yaml=True | withdrawn=False | main_tex=Asymptotically-minimal-maxima-of-real-Littlewood-polynomials-September-23-2026/preprints/Asymptotically-minimal-maxima-of-real-Littlewood-polynomials-September-23-2026/build/main.tex
+  ABSTRACT: We prove that the minimum possible maximum modulus on the unit circle of a polynomial with N consecutive real coefficients in $`\{-1,1\}`$ is $`(1+o(1))\sqrt N`$, as N tends to infinity through all integers. This disproves the real-sign analogue of Erdős's fixed relative-gap conjecture. As a consequence, the largest binary merit factor at length N tends to infinity through all integer lengths, disproving Turyn's conjecture.
+
+=== OPENAI SCOPE NOTE (lean/docs/076.md) ===
+# Real ultraflat Littlewood polynomials and unbounded binary merit factors
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [Asymptotically minimal maxima of real Littlewood polynomials](../../preprints/Asymptotically-minimal-maxima-of-real-Littlewood-polynomials-September-23-2026/paper.pdf)
+
+## Scope
+
+The formalization gives real Littlewood polynomials of every sufficiently large length whose maximum modulus on the unit circle is at most $(1+\eta)\sqrt N$ for any fixed $\eta>0$. Thus the smallest possible maximum is asymptotically minimal through all integer lengths.
+
+A further statement chooses one family of real sign polynomials for all lengths such that, for every fixed finite $p>0$, the $L^p$ mean of $\bigl||P_N(z)|/\sqrt N-1\bigr|$ on the unit circle tends to zero. The results are existential and do not give an effective convergence rate or a signing algorithm.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Asymptotically minimal Littlewood maximum | [AsymptoticallyMinimalLittlewood.lean](../ComparatorChallenges/AsymptoticallyMinimalLittlewood.lean) |
+| Finite-exponent flatness of one all-length Littlewood family | [LittlewoodFiniteFlatness.lean](../ComparatorChallenges/LittlewoodFiniteFlatness.lean) |
+
+
+=== COMPARATOR AsymptoticallyMinimalLittlewood ===
+import Mathlib
+
+namespace OAI
+
+namespace AsymptoticallyMinimalLittlewood
+
+def littlewoodValue {N : ℕ} (ε : Fin N → ℝ) (z : ℂ) : ℂ :=
+  ∑ k : Fin N, (ε k : ℂ) * z ^ (k : ℕ)
+
+def IsRealSigning {N : ℕ} (ε : Fin N → ℝ) : Prop :=
+  ∀ k, ε k = -1 ∨ ε k = 1
+
+def MainStatement : Prop :=
+  ∀ η : ℝ, 0 < η → ∃ N₀ : ℕ, 1 ≤ N₀ ∧ ∀ N : ℕ, N₀ ≤ N →
+    ∃ ε : Fin N → ℝ, IsRealSigning ε ∧
+      ∀ z : ℂ, ‖z‖ = 1 → ‖littlewoodValue ε z‖ ≤ (1 + η) * Real.sqrt N
+
+theorem main : MainStatement := by
+  sorry
+
+end AsymptoticallyMinimalLittlewood
+
+end OAI
+
+
+=== COMPARATOR LittlewoodFiniteFlatness ===
+import Mathlib
+
+namespace OAI
+
+noncomputable section
+open MeasureTheory Filter Complex
+open scoped BigOperators Topology ComplexConjugate
+
+namespace AsymptoticallyMinimalLittlewoodFiniteFlatness
+
+/-- The consecutive-degree polynomial of a real coefficient family. -/
+def littlewoodValue {N : ℕ} (ε : Fin N → ℝ) (z : ℂ) : ℂ :=
+  ∑ k : Fin N, (ε k : ℂ) * z ^ (k : ℕ)
+
+/-- Every coefficient is a real sign. -/
+def IsRealSigning {N : ℕ} (ε : Fin N → ℝ) : Prop :=
+  ∀ k, ε k = -1 ∨ ε k = 1
+
+def MainStatement : Prop :=
+  ∃ ε : (N : ℕ) → Fin N → ℝ,
+    (∀ N : ℕ, IsRealSigning (ε N)) ∧
+    ∀ p : ℝ, 0 < p →
+      Filter.Tendsto
+        (fun N : ℕ =>
+          ∫ t : UnitAddCircle,
+            Real.rpow
+              |‖littlewoodValue (ε N) (fourier (1 : ℤ) t)‖ /
+                  Real.sqrt (N : ℝ) - 1|
+              p
+            ∂AddCircle.haarAddCircle)
+        Filter.atTop (𝓝 (0 : ℝ))
+
+/-- One all-length real-sign family for every finite positive real exponent. -/
+theorem main : MainStatement := by
+  sorry
+
+end AsymptoticallyMinimalLittlewoodFiniteFlatness
+
+end
+
+end OAI
+

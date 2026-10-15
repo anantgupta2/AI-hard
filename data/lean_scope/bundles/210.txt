@@ -1,0 +1,82 @@
+FAMILY 210: Foulkes' conjecture for sixth powers and quadratic stabilization
+OPENAI SUMMARY: Proves the sixth case of Foulkes’ conjecture: $`\mathop{\mathrm{Sym}}\nolimits ^6(\mathop{\mathrm{Sym}}\nolimits ^bV)`$ embeds equivariantly in $`\mathop{\mathrm{Sym}}\nolimits ^b(\mathop{\mathrm{Sym}}\nolimits ^6V)`$ for every b ≥ 6 and finite-dimensional complex V. More generally, the canonical multiplication map $`\mathop{\mathrm{Sym}}\nolimits ^b(\mathop{\mathrm{Sym}}\nolimits ^aV)\to\mathop{\mathrm{Sym}}\nolimits ^a(\mathop{\mathrm{Sym}}\nolimits ^bV)`$ is surjective for a ≥ 2 and $`b\ge a(a-1)`$, giving dimension-independent quadratic stabilization.
+OUR LABEL: lean_vs_headline = different
+OUR HEADLINE (semi-formal): ∀ b≥6 ∀ f.d. complex V ∃ GL(V)-equivariant injection Sym^6(Sym^b V) ↪ Sym^b(Sym^6 V)
+OUR NOTES: Equivalent to Schur-positivity of h_b[h_6]-h_6[h_b] (an M1 reading). O5: case a=6 of Foulkes' conjecture for all a. Uses the OpenAI companion (quadratic stabilization: canonical Foulkes–Howe map surjective for b ≥ a(a-1), which also answers Landsberg's Problem 7.19); the Lean comparator formalizes that companion result, so 'different'.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- Foulkes' conjecture for the sixth symmetric power | in_formalization_yaml=False | withdrawn=False | main_tex=Foulkes-Conjecture-for-the-Sixth-Symmetric-Power-September-25-2026/preprints/Foulkes-Conjecture-for-the-Sixth-Symmetric-Power-September-25-2026/build/main.tex
+  ABSTRACT: We prove the sixth-symmetric-power case of Foulkes' conjecture. For every integer b ≥ 6 and every finite-dimensional complex vector space V, there is a $`\mathop{\mathrm{GL}}\nolimits (V)`$-equivariant injection $`\mathop{\mathrm{Sym}}\nolimits ^6(\mathop{\mathrm{Sym}}\nolimits ^b V)\hookrightarrow\mathop{\mathrm{Sym}}\nolimits ^b(\mathop{\mathrm{Sym}}\nolimits ^6 V)`$.
+- Quadratic stabilization of the canonical Foulkes--Howe map | in_formalization_yaml=True | withdrawn=False | main_tex=Quadratic-Stabilization-of-the-Canonical-Foulkes-Howe-Map-September-25-2026/preprints/Quadratic-Stabilization-of-the-Canonical-Foulkes-Howe-Map-September-25-2026/build/paper.tex
+  ABSTRACT: For every finite-dimensional complex vector space V, we prove that the canonical Foulkes–Howe map $`\mathop{\mathrm{Sym}}\nolimits ^b(\mathop{\mathrm{Sym}}\nolimits ^a V)\longrightarrow\mathop{\mathrm{Sym}}\nolimits ^a(\mathop{\mathrm{Sym}}\nolimits ^b V)`$ is surjective whenever a ≥ 2 and $`b\ge a(a-1)`$. This gives a quadratic stabilization bound independent of $`\dim V`$.
+
+=== OPENAI SCOPE NOTE (lean/docs/210.md) ===
+# Foulkes' conjecture for sixth powers and quadratic stabilization
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [Quadratic stabilization of the canonical Foulkes–Howe map](../../preprints/Quadratic-Stabilization-of-the-Canonical-Foulkes-Howe-Map-September-25-2026/paper.pdf)
+
+## Scope
+
+The formalized result proves surjectivity of the canonical averaged Foulkes–Howe map $\mathrm{Sym}^b(\mathrm{Sym}^a\,V)\to\mathrm{Sym}^a(\mathrm{Sym}^b\,V)$ for every finite-dimensional complex vector space, $a\ge2$, and $b\ge a(a-1)$. It also covers the bijective $a=1$ case, the vanishing-on-products consequence, and the corresponding equivariant embedding in the reverse direction. The sixth-power specialization is covered for $b\ge30$; the companion's full range $b\ge6$ is not included.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Quadratic stabilization of the canonical Foulkes–Howe map | [FoulkesHowe.lean](../ComparatorChallenges/FoulkesHowe.lean) |
+
+
+=== COMPARATOR FoulkesHowe ===
+import Mathlib
+
+namespace OAI
+
+noncomputable section
+
+open scoped BigOperators
+universe u
+
+namespace Problem346
+
+def symMonomialRaw (n : ℕ) (V : Type u) [AddCommGroup V] [Module ℂ V]
+    (v : Fin n → V) : SymmetricAlgebra ℂ V :=
+  ∏ i : Fin n, SymmetricAlgebra.ι ℂ V (v i)
+
+def symPowSubmodule (n : ℕ) (V : Type u) [AddCommGroup V] [Module ℂ V] :
+    Submodule ℂ (SymmetricAlgebra ℂ V) :=
+  Submodule.span ℂ (Set.range (symMonomialRaw n V))
+
+abbrev SymPow (n : ℕ) (V : Type u) [AddCommGroup V] [Module ℂ V] :=
+  ↥(symPowSubmodule n V)
+
+def symMonomial (n : ℕ) (V : Type u) [AddCommGroup V] [Module ℂ V]
+    (v : Fin n → V) : SymPow n V :=
+  ⟨symMonomialRaw n V v, Submodule.subset_span (Set.mem_range_self v)⟩
+
+def foulkesFormula (a b : ℕ) (V : Type u) [AddCommGroup V] [Module ℂ V]
+    (v : Fin b → Fin a → V) : SymPow a (SymPow b V) := by
+  classical
+  exact
+    ((a.factorial : ℂ) ^ b)⁻¹ •
+      ∑ σ : Fin b → Equiv.Perm (Fin a),
+        symMonomial a (SymPow b V)
+          (fun i => symMonomial b V (fun j => v j ((σ j) i)))
+
+def IsFoulkesMap (a b : ℕ) (V : Type u) [AddCommGroup V] [Module ℂ V]
+    (μ : SymPow b (SymPow a V) →ₗ[ℂ] SymPow a (SymPow b V)) : Prop :=
+  ∀ v : Fin b → Fin a → V,
+    μ (symMonomial b (SymPow a V) (fun j => symMonomial a V (v j))) =
+      foulkesFormula a b V v
+
+theorem canonical_foulkes_howe_surjective :
+    ∀ (V : Type u) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] (a b : ℕ), 2 ≤ a → a * (a - 1) ≤ b → ∃ μ : SymPow b (SymPow a V) →ₗ[ℂ] SymPow a (SymPow b V), IsFoulkesMap a b V μ ∧ Function.Surjective μ ∧ ∀ ν : SymPow b (SymPow a V) →ₗ[ℂ] SymPow a (SymPow b V), IsFoulkesMap a b V ν → ν = μ := by
+  sorry
+
+end Problem346
+
+end
+
+end OAI
+

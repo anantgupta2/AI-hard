@@ -1,0 +1,134 @@
+FAMILY 157: Graph coloring, clique minors, and Colin de Verdière invariants
+OPENAI SUMMARY: Disproves Hadwiger's conjecture even for fractional coloring: arbitrarily large finite simple graphs with independence number at most two satisfy $`\chi_f(G)\gt h(G)`$, where $`h(G)`$ is the largest clique-minor order. Also disproves the fractional Colin de Verdière chromatic bound $`\chi_f(G)\le\mu(G)+1`$. In the positive direction, every finite nonempty graph satisfies $`\chi_{\mathrm{list}}(G)\le C h(G)`$ for a universal constant C.
+OUR LABEL: lean_vs_headline = weaker
+OUR HEADLINE (semi-formal): ∃ arbitrarily large m and m-vertex graphs G with α(G) ≤ 2 and h(G) < 26m/75 + 2/3 < m/2 ≤ χ_f(G) ≤ χ(G)
+OUR NOTES: Lean HadwigerCounterexample states χ ≥ m/2 > h but not the fractional χ_f claim, so 'weaker'. Same family: refutes the Colin de Verdière chromatic conjecture and proves the Linear List Hadwiger conjecture χ_list ≤ C·h. Taken together this could be read as O3 (refute and replace by a linear bound), but the linear bound is a separate pre-existing conjecture, so O2.
+
+MANUSCRIPTS (in_formalization_yaml = listed in lean/formalization.yaml as a paper with a formalized main result):
+- A counterexample to Hadwiger's conjecture | in_formalization_yaml=True | withdrawn=False | main_tex=A-counterexample-to-Hadwigers-conjecture-September-23-2026/preprints/A-counterexample-to-Hadwigers-conjecture-September-23-2026/build/main.tex
+  ABSTRACT: We disprove Hadwiger's conjecture by constructing arbitrarily large graphs whose chromatic number exceeds their Hadwiger number. The examples have independence number at most two, and even their ordinary fractional chromatic number exceeds their Hadwiger number. Thus they also disprove the fractional-coloring weakening discussed by Reed and Seymour.
+- A counterexample to the Colin de Verdière chromatic conjecture | in_formalization_yaml=False | withdrawn=False | main_tex=A-counterexample-to-the-Colin-de-Verdiere-chromatic-conjecture-September-23-2026/preprints/A-counterexample-to-the-Colin-de-Verdiere-chromatic-conjecture-September-23-2026/build/main.tex
+  ABSTRACT: We disprove the Colin de Verdière chromatic conjecture by constructing graphs whose chromatic number exceeds their Colin de Verdière invariant by more than one. The examples have independence number at most two. In fact, their ordinary fractional chromatic number also exceeds their Colin de Verdière invariant by more than one.
+- A linear list-coloring bound in terms of the Hadwiger number | in_formalization_yaml=False | withdrawn=False | main_tex=A-linear-list-coloring-bound-in-terms-of-the-Hadwiger-number-September-23-2026/preprints/A-linear-list-coloring-bound-in-terms-of-the-Hadwiger-number-September-23-2026/build/main.tex
+  ABSTRACT: We prove that every finite nonempty graph G satisfies $`\chi_{\mathrm{list}}(G)\le C h(G)`$ for an absolute integer C, where $`h(G)`$ is the largest order of a clique minor. This resolves the Linear List Hadwiger conjecture affirmatively.
+
+=== OPENAI SCOPE NOTE (lean/docs/157.md) ===
+# Graph coloring, clique minors, and Colin de Verdière invariants
+
+The following describes the scope of the Lean formalization related to the following accompanying paper(s):
+
+- [A linear list-coloring bound in terms of the Hadwiger number](../../preprints/A-linear-list-coloring-bound-in-terms-of-the-Hadwiger-number-September-23-2026/paper.pdf)
+- [A counterexample to Hadwiger's conjecture](../../preprints/A-counterexample-to-Hadwigers-conjecture-September-23-2026/paper.pdf)
+
+## Scope
+
+Hadwiger's conjecture predicts $\chi(G)\le h(G)$ for every finite graph, where $h(G)$ is the largest clique-minor order. The formalization constructs arbitrarily large finite simple counterexamples with independence number at most two. For a graph on $m$ vertices it proves
+$h(G)<26m/75+2/3<m/2\le\chi(G)$.
+This disproves the ordinary chromatic form. The paper's fractional-chromatic strengthening and the Colin de Verdière consequence are outside this selected statement.
+
+The Linear List Hadwiger conjecture asks for a universal linear bound on list chromatic number in terms of clique-minor size. The formalization proves that there is one integer $C\ge1$ such that every finite nonempty simple graph $G$ satisfies $\chi_{\mathrm{list}}(G)\le C h(G)$, where $h(G)$ is the largest order of a clique minor. The constant is independent of the graph.
+
+## Comparator links
+
+| Result | Comparator statement |
+| --- | --- |
+| Linear list-coloring bound in the Hadwiger number | [ListHadwiger.lean](../ComparatorChallenges/ListHadwiger.lean) |
+| Arbitrarily large counterexamples to Hadwiger's conjecture | [HadwigerCounterexample.lean](../ComparatorChallenges/HadwigerCounterexample.lean) |
+
+
+=== COMPARATOR ListHadwiger ===
+import Mathlib
+
+namespace OAI
+
+namespace LinearListHadwiger
+
+def ListColorable {V : Type} (G : SimpleGraph V) {Color : Type}
+    (L : V → Finset Color) : Prop :=
+  ∃ c : V → Color, (∀ v, c v ∈ L v) ∧ ∀ ⦃v w⦄, G.Adj v w → c v ≠ c w
+
+def Choosable {V : Type} (G : SimpleGraph V) (k : ℕ) : Prop :=
+  ∀ (Color : Type) (L : V → Finset Color), (∀ v, k ≤ (L v).card) → ListColorable G L
+
+noncomputable def listChromaticNumber {V : Type} (G : SimpleGraph V) : ℕ :=
+  sInf {k : ℕ | Choosable G k}
+
+def HasCliqueMinor {V : Type} (G : SimpleGraph V) (t : ℕ) : Prop :=
+  ∃ B : Fin t → Set V,
+    (∀ i, (G.induce (B i)).Connected) ∧
+    (∀ i j, i ≠ j → Disjoint (B i) (B j)) ∧
+    (∀ i j, i ≠ j → ∃ v ∈ B i, ∃ w ∈ B j, G.Adj v w)
+
+noncomputable def hadwigerNumber {V : Type} (G : SimpleGraph V) : ℕ :=
+  sSup {t : ℕ | HasCliqueMinor G t}
+
+def MainStatement : Prop :=
+  ∃ C : ℕ, 1 ≤ C ∧ ∀ (V : Type) [Fintype V] [Nonempty V] (G : SimpleGraph V),
+    listChromaticNumber G ≤ C * hadwigerNumber G
+
+theorem main_theorem : MainStatement := by
+  sorry
+
+end LinearListHadwiger
+
+end OAI
+
+
+=== COMPARATOR HadwigerCounterexample ===
+import Mathlib
+
+namespace OAI
+
+namespace HadwigerMatching
+
+universe u
+variable {V : Type u}
+
+def IsTouchingMatching (G : SimpleGraph V) (M : Finset (Finset V)) : Prop :=
+  (∀ e ∈ M, e.card = 2 ∧ G.IsClique (e : Set V)) ∧
+  (∀ e ∈ M, ∀ f ∈ M, e ≠ f → Disjoint e f) ∧
+  (∀ e ∈ M, ∀ f ∈ M, e ≠ f →
+    ∃ v ∈ e, ∃ w ∈ f, G.Adj v w)
+
+noncomputable def connectedMatchingNumber (G : SimpleGraph V) : ℕ :=
+  sSup {n : ℕ | ∃ M : Finset (Finset V), IsTouchingMatching G M ∧ M.card = n}
+
+end HadwigerMatching
+
+namespace LinearListHadwiger
+
+def HasCliqueMinor {V : Type} (G : SimpleGraph V) (t : ℕ) : Prop :=
+  ∃ B : Fin t → Set V,
+    (∀ i, (G.induce (B i)).Connected) ∧
+    (∀ i j, i ≠ j → Disjoint (B i) (B j)) ∧
+    (∀ i j, i ≠ j → ∃ v ∈ B i, ∃ w ∈ B j, G.Adj v w)
+
+noncomputable def hadwigerNumber {V : Type} (G : SimpleGraph V) : ℕ :=
+  sSup {t : ℕ | HasCliqueMinor G t}
+
+end LinearListHadwiger
+
+namespace HadwigerCounterexample
+
+open HadwigerMatching LinearListHadwiger
+
+theorem exists_counterexamples (M : ℕ) : ∃ m : ℕ, max M 5 ≤ m ∧
+    ∃ G : SimpleGraph (Fin m), G.indepNum ≤ 2 ∧
+      (connectedMatchingNumber G : ℚ) < (m : ℚ) / 100 ∧
+      (hadwigerNumber G : ℚ) < 26 * (m : ℚ) / 75 + 2 / 3 ∧
+      26 * (m : ℚ) / 75 + 2 / 3 < (m : ℚ) / 2 ∧
+      (m : ℚ) / 2 ≤ (G.chromaticNumber.toNat : ℚ) ∧
+      hadwigerNumber G < G.chromaticNumber.toNat ∧
+      G.chromaticNumber ≠ ⊤ ∧
+      G.chromaticNumber = ↑(G.chromaticNumber.toNat) := by
+  sorry
+
+theorem not_hadwiger_conjecture :
+    ¬ (∀ (m : ℕ) (G : SimpleGraph (Fin m)),
+      G.chromaticNumber ≤ ↑(hadwigerNumber G)) := by
+  sorry
+
+end HadwigerCounterexample
+
+end OAI
+
