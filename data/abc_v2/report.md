@@ -20,7 +20,7 @@
 
 **B.flags:** adds_corollaries 221 · full_only_with_prior_results 43 · builds_on_model_output 16
 
-**Lean vs headline:** same 175 (47%) · no_lean 130 (35%) · different 35 (9%) · weaker 32 (9%)
+**Lean vs headline:** same 176 (47%) · no_lean 130 (35%) · different 34 (9%) · weaker 32 (9%)
 
 ## Associations (Cramér's V, permutation p)
 
@@ -35,7 +35,7 @@
 | A_outer × subject | 0.29 | 0.001 |
 | A_matrix × lean | 0.30 | 0.000 |
 | B_outcome × lean | 0.22 | 0.010 |
-| lean_vs_headline × B_outcome | 0.17 | 0.416 |
+| lean_vs_headline × B_outcome | 0.16 | 0.517 |
 
 ## A.matrix × B.outcome (counts)
 
@@ -117,7 +117,7 @@
 
 ## Lean coverage of the headline (242 formalized families)
 
-same 175 (72%) · different 35 (14%) · weaker 32 (13%)
+same 176 (73%) · different 34 (14%) · weaker 32 (13%)
 
 ## Reliability
 

@@ -1,6 +1,6 @@
 # A/B buckets v2 and a high-confidence labelling plan
 
-Status: full run done (2026-10-14). 372 families × 2 independent passes (κ: matrix 0.89, prefix 0.80, problem 0.88, outcome 0.89), 141 adjudicated. Final labels `labels_v2.json`, report `report.md`. Pilot: `pilot/report.md`. Nothing here changes `docs/PLAN.md` or the argument doc yet.
+Status: full run done (2026-10-14). 372 families × 2 independent passes (κ: matrix 0.89, prefix 0.80, problem 0.88, outcome 0.89), 141 adjudicated. Final labels `labels_v2.json`, report `report.md`. Pilot: `pilot/report.md`. Lean scope check (2026-10-15, `data/lean_scope/report.md`): the 67 weaker/different families were checked against the formalized paper and OpenAI's scope notes; 6 `lean_vs_headline` labels were corrected (157→same; 184, 195, 261→weaker; 227, 266→different), applied in `scripts/abc_v2_final.py` and recorded per family as `lean_vs_headline_fixed_from`. Nothing here changes `docs/PLAN.md` or the argument doc yet.
 
 ## Why v1 is not enough
 

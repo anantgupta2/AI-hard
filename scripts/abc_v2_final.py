@@ -54,6 +54,11 @@ def flags(r, k):
     return sorted(set(out))
 
 
+# Corrections to lean_vs_headline from the Lean scope check (data/lean_scope/report.md).
+LEAN_FIX = {r["fid"]: {"should_be_same": "same"}.get(r["our_label_check"], r["our_label_check"])
+            for r in json.loads((ROOT / "data/lean_scope/scope_all.json").read_text(encoding="utf-8"))
+            if r["our_label_check"] != "confirmed"}
+
 final = []
 for fid in sorted(cat):
     r = ADJ.get(fid) or A[fid]
@@ -66,7 +71,9 @@ for fid in sorted(cat):
         "alternations": 0 if pre == "none" else sum(1 for i in range(1, len(pre)) if (pre[i] in "∀ℙ") != (pre[i - 1] in "∀ℙ") and pre[i] in "∀∃ℙ"),
         "A_matrix": r.get("A_matrix"), "A_flags": flags(r, "A_flags"),
         "B_problem": r.get("B_problem"), "B_outcome": r.get("B_outcome"), "B_flags": flags(r, "B_flags"),
-        "lean_vs_headline": r.get("lean_vs_headline"), "source": "adjudicated" if fid in ADJ else "agreed",
+        "lean_vs_headline": LEAN_FIX.get(fid, r.get("lean_vs_headline")),
+        "source": "adjudicated" if fid in ADJ else "agreed",
+        **({"lean_vs_headline_fixed_from": r.get("lean_vs_headline")} if fid in LEAN_FIX else {}),
     })
 (D / "labels_v2.json").write_text(json.dumps(final, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
 n = len(final)
