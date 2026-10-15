@@ -144,12 +144,12 @@
     </div>
     <div class="ax-card" id="rel-length">
       <h2>How long the proofs are</h2>
-      <p class="ax-note">PDF page counts of all 719 manuscripts at the pinned commit; a family's length is the sum over its manuscripts. Pages include introductions, background and references.</p>
+      <p class="ax-note">Proof pages count only the text inside proof environments, converted to pages with each manuscript's own words per PDF page. Whole-paper pages (PDF page counts of all 719 manuscripts) include introductions, background and references. A family's length is the sum over its manuscripts.</p>
       <div class="ax-figs" id="rel-len-figs"></div>
       <div class="ax-grid">
-        <div><h3>Families by total pages</h3><div class="ax-chart" id="rel-pages"></div></div>
-        <div><h3>Median pages by Lean status</h3><div class="ax-chart" id="rel-pages-lean"></div></div>
-        <div><h3>Median pages by subject</h3><div class="ax-chart" id="rel-pages-subject"></div></div>
+        <div><h3>Families by proof pages</h3><div class="ax-chart" id="rel-pages"></div></div>
+        <div><h3>Median proof pages by Lean status</h3><div class="ax-chart" id="rel-pages-lean"></div></div>
+        <div><h3>Median proof pages by subject</h3><div class="ax-chart" id="rel-pages-subject"></div></div>
       </div>
     </div>
     <div class="ax-card" id="rel-scope">
@@ -176,7 +176,7 @@
       </div>
       <div class="ax-scroll">
         <table class="ax-rel" data-source="release_labels" data-row-key="fid">
-          <thead><tr><th data-field="fid">Family</th><th data-field="title">Title</th><th data-field="subject">Subject</th><th data-field="prefix">Prefix</th><th data-field="matrix">Asserts</th><th data-field="problem">Posed</th><th data-field="outcome">Outcome</th><th data-field="lean">Lean</th><th data-field="pages" class="num">Pages</th></tr></thead>
+          <thead><tr><th data-field="fid">Family</th><th data-field="title">Title</th><th data-field="subject">Subject</th><th data-field="prefix">Prefix</th><th data-field="matrix">Asserts</th><th data-field="problem">Posed</th><th data-field="outcome">Outcome</th><th data-field="lean">Lean</th><th data-field="proof_pages" class="num">Proof pages</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -1323,7 +1323,7 @@ dash.calc('prover_counts', {
       const tr = S.el('tr'); tr.tabIndex = 0; tr.dataset.key = r.fid;
       tr.setAttribute('aria-selected', String(S.rel.pick === r.fid));
       tr.append(S.el('td', null, r.fid), S.el('td', null, r.title), S.el('td', null, r.subject), S.el('td', null, r.prefix),
-        S.el('td', null, name(r.matrix)), S.el('td', null, name(r.problem)), S.el('td', null, name(r.outcome)), S.el('td', null, r.lean), S.el('td', 'num', fmt(r.pages)));
+        S.el('td', null, name(r.matrix)), S.el('td', null, name(r.problem)), S.el('td', null, name(r.outcome)), S.el('td', null, r.lean), S.el('td', 'num', String(Math.round(r.proof_pages))));
       const pick = () => { S.rel.pick = S.rel.pick === r.fid ? null : r.fid; familyTable(); detail(); };
       tr.addEventListener('click', pick);
       tr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
@@ -1342,7 +1342,7 @@ dash.calc('prover_counts', {
       ['Settings', r.A_flags || '–'], ['Posed', name(r.problem)], ['Outcome', name(r.outcome)], ['Side results', r.B_flags || '–'],
       ['Lean vs headline', r.lean + (r.lean_fixed_from ? ` (corrected from ${r.lean_fixed_from} by the scope check)` : '')],
       ['Lean scope', sc ? `${name(sc.category)}. ${sc.gap}` : null], ['OpenAI scope note', sc ? `“${sc.quote}”` : null],
-      ['Length', `${fmt(r.pages)} pages in ${r.manuscripts} manuscript${r.manuscripts === 1 ? '' : 's'}${r.lean_lines ? `; ${fmt(r.lean_lines)} non-blank Lean lines in its directories` : ''}`],
+      ['Length', `about ${Math.round(r.proof_pages)} pages of proofs (${r.n_proofs} proofs, longest about ${r.longest_proof_pages} pages); ${fmt(r.pages)} pages in ${r.manuscripts} manuscript${r.manuscripts === 1 ? '' : 's'}${r.lean_lines ? `; ${fmt(r.lean_lines)} non-blank Lean lines in its directories` : ''}`],
       ['Labels', r.label_source === 'adjudicated' ? 'Adjudicated after the two passes disagreed' : 'Both independent passes agreed']]
       .filter(([, v]) => v).forEach(([k, v]) => dl.append(S.el('dt', null, k), S.el('dd', null, v)));
     c.append(dl);
@@ -1378,18 +1378,19 @@ dash.calc('prover_counts', {
     heat('rel-mxo', rows, 'matrix', OUTCOME, 'outcome', 'count');
     heat('rel-sxm', rows, 'subject', MATRIX, 'matrix', 'row');
     // Proof length.
-    const pg = rows.map((r) => r.pages);
+    const pg = rows.map((r) => r.proof_pages), sorted = [...pg].sort(d3.ascending), r0 = d3.format('.0f');
     figs('rel-len-figs', [
-      [String(med(pg)), 'median pages per family'],
-      [`${d3.quantile([...pg].sort(d3.ascending), 0.25)}–${d3.quantile([...pg].sort(d3.ascending), 0.75)}`, 'middle half of families, pages'],
-      [fmt(d3.max(pg)), 'longest family, pages'],
-      [fmt(d3.sum(pg)), 'pages in the whole release'],
+      [r0(med(pg)), 'median proof pages per family'],
+      [`${r0(d3.quantile(sorted, 0.25))}–${r0(d3.quantile(sorted, 0.75))}`, 'middle half of families, proof pages'],
+      [r0(med(rows.map((r) => r.longest_proof_pages))), 'median longest single proof, pages'],
+      [pct(d3.sum(pg) / d3.sum(rows, (r) => r.pages)), 'of all pages are proofs'],
+      [r0(med(rows.map((r) => r.pages))), 'median whole-paper pages per family'],
     ]);
-    const bins = [[0, 20], [20, 40], [40, 80], [80, 160], [160, 320], [320, Infinity]];
+    const bins = [[0, 10], [10, 20], [20, 40], [40, 80], [80, 160], [160, Infinity]];
     hbars('rel-pages', bins.map(([a, b]) => { const c = pg.filter((p) => p >= a && p < b).length; return { label: b === Infinity ? `${a}+ pages` : `${a}–${b - 1} pages`, v: c, text: `${c} · ${pct(c / n)}`, tip: `${c} of ${n} families` }; }));
-    hbars('rel-pages-lean', ['same', 'weaker', 'different', 'no_lean'].map((k) => { const xs = rows.filter((r) => r.lean === k).map((r) => r.pages); return { label: name(k), v: med(xs), text: `${med(xs)} pp`, tip: `median of ${xs.length} families` }; }));
-    hbars('rel-pages-subject', d3.rollups(rows, (v) => ({ m: med(v.map((r) => r.pages)), c: v.length }), (r) => r.subject).sort((a, b) => b[1].m - a[1].m)
-      .map(([k, o]) => ({ label: k, v: o.m, text: `${o.m} pp`, tip: `median of ${o.c} families` })));
+    hbars('rel-pages-lean', ['same', 'weaker', 'different', 'no_lean'].map((k) => { const xs = rows.filter((r) => r.lean === k).map((r) => r.proof_pages); return { label: name(k), v: med(xs), text: `${r0(med(xs))} pp`, tip: `median of ${xs.length} families` }; }));
+    hbars('rel-pages-subject', d3.rollups(rows, (v) => ({ m: med(v.map((r) => r.proof_pages)), c: v.length }), (r) => r.subject).sort((a, b) => b[1].m - a[1].m)
+      .map(([k, o]) => ({ label: k, v: o.m, text: `${r0(o.m)} pp`, tip: `median of ${o.c} families` })));
     // Lean scope.
     const sc = S.rows('lean_scope');
     hbars('rel-scope-cat', asBars(counts(sc, (r) => r.category, ['companion_full', 'headline_partial_disclosed', 'headline_lemma_disclosed', 'partial_undisclosed', 'label_error']), sc.length));

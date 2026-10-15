@@ -20,7 +20,7 @@ for r in labels:
         "A_flags": ", ".join(r["A_flags"]), "problem": r["B_problem"], "outcome": r["B_outcome"],
         "B_flags": ", ".join(r["B_flags"]), "lean": r["lean_vs_headline"], "lean_fixed_from": r.get("lean_vs_headline_fixed_from"),
         "scope_category": s.get("category"), "label_source": r["source"],
-        "pages": L["pages"], "manuscripts": L["n_ms"], "lean_lines": L["lean_lines"] or None,
+        "pages": L["pages"], "proof_pages": L["proof_pages"], "n_proofs": L["n_proofs"], "longest_proof_pages": L["longest_proof_pages"], "manuscripts": L["n_ms"], "lean_lines": L["lean_lines"] or None,
     })
 st = [{"key": f"kappa|{k}", "kind": "kappa", "a": k, "b": "", "value": v[1], "agreement": v[0], "p": None}
       for k, v in stats["interrater"].items()]
