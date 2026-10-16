@@ -1,5 +1,6 @@
 """Technical pages per paper by field: release manuscripts (subject of their family) against the human frontier
-baseline (data/frontier_lengths.json, tagged with the same subject names). Writes data/length_by_field.json and
+baseline (data/frontier_lengths.json, tagged with the same subject names) and every arXiv-tagged Annals paper of
+2016-2025 (data/annals_lengths.json). Writes data/length_by_field.json and
 prints a markdown table."""
 import csv
 import json
@@ -18,6 +19,10 @@ for m in json.loads((ROOT / "data/proof_lengths.json").read_text(encoding="utf-8
 for r in json.loads((ROOT / "data/frontier_lengths.json").read_text(encoding="utf-8")):
     if "error" not in r:
         hum[r["subject"]].append(r)
+ann = defaultdict(list)
+for r in json.loads((ROOT / "data/annals_lengths.json").read_text(encoding="utf-8")):
+    if "error" not in r and r.get("doc_words") and r.get("subject"):
+        ann[r["subject"]].append(r)
 rows = []
 for f in sorted(rel, key=lambda f: -median(m["technical_pages"] for m in rel[f])):
     rt, ht = [m["technical_pages"] for m in rel[f]], [r["technical_pages"] for r in hum.get(f, [])]
@@ -28,12 +33,14 @@ for f in sorted(rel, key=lambda f: -median(m["technical_pages"] for m in rel[f])
                  "ratio": round(median(rt) / median(ht), 2) if ht else None,
                  "release_longest_proof_median": round(median(rp), 1) if rp else None,
                  "human_longest_proof_median": round(median(hp), 1) if hp else None, "human_longest_proof_n": len(hp),
+                 "annals_n": len(ann.get(f, [])), "annals_median": round(median(r["technical_pages"] for r in ann[f]), 1) if ann.get(f) else None,
                  "human_papers": "; ".join(r["name"].split(":")[0] for r in hum.get(f, []))})
 (ROOT / "data/length_by_field.json").write_text(json.dumps(rows, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
 allr = [m["technical_pages"] for v in rel.values() for m in v]
 allh = [r["technical_pages"] for v in hum.values() for r in v]
-print(f"All fields: release {median(allr):.0f} (n={len(allr)}), human {median(allh):.0f} (n={len(allh)})\n")
-print("| Field | Release median (n) | Human median (n) | Release ÷ human | Longest proof: release / human |\n|---|---|---|---|---|")
+alla = [r["technical_pages"] for v in ann.values() for r in v]
+print(f"All fields: release {median(allr):.0f} (n={len(allr)}), famous {median(allh):.0f} (n={len(allh)}), Annals {median(alla):.0f} (n={len(alla)})\n")
+print("| Field | Release median (n) | Famous papers median (n) | Annals 2016–25 median (n) | Release ÷ famous |\n|---|---|---|---|---|")
 for r in rows:
     print(f"| {r['subject']} | {r['release_median']:.0f} ({r['release_n']}) | {r['human_median'] if r['human_median'] is not None else '–'} ({r['human_n']}) | "
-          f"{r['ratio'] if r['ratio'] else '–'} | {r['release_longest_proof_median']} / {r['human_longest_proof_median'] if r['human_longest_proof_median'] is not None else '–'} ({r['human_longest_proof_n']}) |")
+          f"{r['annals_median'] if r['annals_median'] is not None else '–'} ({r['annals_n']}) | {r['ratio'] if r['ratio'] else '–'} |")
