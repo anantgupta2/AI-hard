@@ -1,0 +1,49 @@
+FAMILY 189: Cycle–clique Ramsey numbers
+SUBJECT: Combinatorics
+OPENAI SUMMARY: Proves the Erdős–Faudree–Rousseau–Schelp conjecture: $`R(C_m,K_n)=(m-1)(n-1)+1`$ for every $`m\ge n\ge3`$, except $`R(C_3,K_3)=6`$. This is the exact threshold forcing a red m-cycle or a blue n-clique in every red–blue coloring of a complete graph.
+HEADLINE (v2, semi-formal): ∀m≥n≥3, (m,n)≠(3,3): R(C_m,K_n) = (m−1)(n−1)+1; and R(C₃,K₃)=6
+
+=== MANUSCRIPT: Cycle--clique Ramsey numbers [preprints/Cycle-clique-Ramsey-numbers-September-25-2026/build/main.tex]
+ABSTRACT: We prove that $`R(C_m,K_n)=(m-1)(n-1)+1`$ for every pair of integers $`m\ge n\ge3`$ other than $`(m,n)=(3,3)`$, for which $`R(C_3,K_3)=6`$. This establishes the cycle–clique conjecture of Erdős, Faudree, Rousseau and Schelp. The proof combines expansion in a minimal counterexample with a large-clique lemma and an optimization of paths joining clique vertices. These arguments reduce the remaining cases to $`3{,}099`$ finite parameter-pattern instances, which are excluded by two exact implementations of proved inference rules. Complete programs and deduction traces accompany the paper.
+[theorem] \label{thm:main} For all integers $m\ge n\ge3$ with $(m,n)\ne(3,3)$, \[ R(C_m,K_n)=(m-1)(n-1)+1. \] For the excluded pair, $R(C_3,K_3)=6$.
+[theorem] \label{clq:bound} Let \(k\ge3\) and \(2\le a\le k\) be integers, and let \(G\) be a finite simple graph such that \[ |V(G)|=ka+1,\qquad \alpha(G)\le a,\qquad C_{k+1}\not\subseteq G. \] Suppose also that \[ |N_G[I]|\ge k|I|+1 \quad\text{for every nonempty independent set }I\subseteq V(G). \] Then its maximum clique size \(t\) satisfies \begin{equation}\label{clq:bound-equation} \max\{3,\lfloor k/2\rfloor\}\le t\le k. \end{equation}
+[proposition] \label{clq:layer-interface} Let \(k\ge8\) be an integer, set \(s=\lfloor k/2\rfloor\), and let \(G\) be a nonempty finite simple graph with \(\alpha(G)\le k\) and \[ |N_G[I]|\ge k|I|+1 \quad\text{for every nonempty independent set }I\subseteq V(G). \] Suppose that \(G\) contains no \(K_s\). Fix a vertex \(r\) and a breadth-first spanning tree \(T\) of its component, rooted at \(r\). Then there exist \(i\in\{1,\ldots,s\}\) and an induced subgraph \(H\) of \(G\), all of whose vertices have depth \(i\) in \(T\), such that \(H\) is connected and nonbipartite, and \begin{equation}\label{clq:H-properties} \begin{gathered} |V(H)|\ge k,\qquad \delta(H)\ge s,\\ |N_H[I]|\ge s|I| \quad(I\ne\varnothing\text{ independent in }H). \end{gathered} \end{equation} The last inequality is strict whenever \(k\) […]
+PROOF STRATEGY (paper's own words):
+- \maketitle \begin{abstract} We prove that $R(C_m,K_n)=(m-1)(n-1)+1$ for every pair of integers $m\ge n\ge3$ other than $(m,n)=(3,3)$, for which $R(C_3,K_3)=6$. This establishes the cycle--clique conjecture of Erd\H{o}s, Faudree, Rousseau and Schelp. The proof combines expansion in a minimal counterexample with a large-clique lemma and an optimization of paths joining clique vertices. These arguments reduce the remaining cases to $3{,}099$ finite parameter-pattern instances, which are excluded by two exact implementations of proved inference rules. Complete programs and deduction traces accompany the paper. \end{abstract} \tableofcontents \section{Introduction} \label{sec:introduction}
+- The first structural step finds a clique of order \[ t\ge\max\{3,\lfloor k/2\rfloor\}. \] The proof uses distance layers in a rooted tree, followed by an explicit path-rotation argument. Independent-set expansion and rooted distance layers already appear in the cycle--clique argument of Erd\H{o}s, Faudree, Rousseau and Schelp~\cite[Section~3]{ErdosFaudreeRousseauSchelp1978}. We prove the particular quantitative statements needed here in Sections~\ref{sec:reduction} and~\ref{sec:clique}. The two smallest values $k=3,4$ are then settled directly.
+- Lemma~\ref{red:expansion} gives the expansion hypothesis for our graph. We first obtain a triangle. For larger \(k\), we then find an induced subgraph in a single distance layer with enough internal expansion to force a long path. Tree paths above that layer will close the path into a cycle on exactly \(k+1\) vertices. This layer-and-tree strategy has its antecedent in Erd\H{o}s, Faudree, Rousseau and Schelp \cite[Section~3]{ErdosFaudreeRousseauSchelp1978}; the quantitative layer and coloured-path statements used here are proved below.
+- We now show how the graph supplied by Proposition~\ref{clq:layer-interface} yields a forbidden cycle. The main step concerns paths whose ends lie in different parts of a partition. We first record the elementary longest-path bound needed when all vertices of the layer have a common tree parent.
+SECTION OUTLINE:
+Introduction
+  Previous results and the parameter range
+  The proof
+A minimal counterexample and neighborhood expansion
+A large clique
+  Paths of a prescribed length
+  Closing a path through the breadth-first tree
+The cases of four- and five-cycles
+From size to independence
+Optimal path systems
+  Paths joining clique vertices
+  Outside paths and separated balls
+Short paths between representatives
+Excluding large cliques
+  A restriction on small increases in amount
+  The three possible configurations
+  Independent sets in balls
+  The final packings
+The finite path-system argument
+  Patterns and their complete enumeration
+  Required edges and path labels
+  Deducing forbidden outside paths
+  Packing independent sets
+  Strengthening the forbidden parameters
+  Results and completion of the proof
+Exact implementations and accompanying data
+  The compact implementation
+  A separate implementation
+  Deduction traces and reproduction
+  The complete compact program
+LONGEST PROOF #1 (opening): Suppose such a graph exists. Applying the neighborhood bound to a singleton gives $\delta(G)\ge k$. Lemma~\ref{clq:triangle} supplies a triangle, and a clique of order $k+1$ would contain the forbidden cycle, so $3\le\omega(G)\le k$. For a clique $Q=\{q_1,\ldots,q_t\}$, let $F=G-Q$ and put \[ U_i=N_G(q_i)\cap V(F)\qquad(1\le i\le t). \] We will use this notation with different choices of $Q$, specifying the choice each time. A path between two distinct vertices of $Q$ whose internal vertices lie in $F$ can be completed using edges of $Q$. The exact numbers of internal vertices that are forbidden are checked below. \medskip \noindent\textbf{The case $k=3$.} Choose a triangle $Q=\{q_1,q_2,q_3\}$. Each $U_i$ is nonempty, since $q_i$ has two neighbors inside $Q$ and degree at least three. For distinct $i,j$, write $h$ for the remaining index. A common vertex $u\in U_i\cap U_j$ would give the […]
+LONGEST PROOF #2 (opening): Fix $\chi$ and $\ell$, and suppose that no such path exists. There are vertices $y,z$ with $\chi(y)\ne\chi(z)$ and a common neighbor $x$. Indeed, if no such pair existed, the color would be preserved along every walk of length two. In a connected nonbipartite graph there is an even walk between any two vertices: if a connecting path has odd length, first insert an odd closed walk obtained by going to an odd cycle, traversing it, and returning. Preservation of the color along successive pairs of steps would make $\chi$ constant. This proves the assertion, and $x,y,z$ are distinct because the graph is simple. Let $K$ be the component containing $x$ in $H-\{y,z\}$. Every vertex of $K$ loses at most two neighbors on deleting $y,z$, and all its other neighbors lie in the same component. Thus \begin{equation}\label{clq:component-degree} \delta(K)\ge s-2. \end{equation} There is no path of orde […]
+LONGEST PROOF #3 (opening): By Lemma~\ref{grow:short}, some pair of representatives admits an outside path with parameter between one and six. We may therefore apply Lemma~\ref{terminal:classification}. In each of its alternatives we will choose balls with distinct bases that are pairwise disjoint and anticomplete. Independent sets in these balls then combine into an independent set in \(G\). \paragraph{Alternative~\ref{terminal:two}: at least one missing vertex.} Put \(c=t-v\), so \(0\le c\le2\), and first suppose \(c\ge1\). Fix an orientation and choose the \(v=t-c\) representatives whose targets are incident to old paths. No pair of these targets covers the missing vertices. The endpoint restriction in Lemma~\ref{terminal:classification} therefore forbids every outside parameter \(1,\ldots,6\) between any two chosen representatives. Their radius-two balls are pairwise disjoint and anticomplete by Lemma~\ref{path […]

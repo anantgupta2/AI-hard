@@ -1,0 +1,38 @@
+FAMILY 094: Subpolynomial dimension reduction in Lp
+SUBJECT: Convex and metric geometry
+OPENAI SUMMARY: For every fixed $`1\lt p\lt \infty`$ and distortion D &gt; 1, every n-point subset of real Lp embeds into $`\ell_p^d`$ with distortion at most D and dimension $`d=n^{o(1)}`$, answering Naor's sublinear-dimension question for p ≠ 2. In contrast, exact embeddings require worst-case dimension $`\Theta(n^2)`$ when p ≠ 2.
+HEADLINE (v2, semi-formal): ∀ p ∈ (1,∞)∖{2}, ∀ D > 1 ∃ C_{p,D} ∀ n ≥ 2: d_p(n,D) ≤ exp(C_{p,D} (log n)^{γ(p)}) = n^{o(1)}
+
+=== MANUSCRIPT: Subpolynomial dimension reduction in Lp [preprints/Subpolynomial-dimension-reduction-in-Lp-September-23-2026/build/paper.tex]
+ABSTRACT: For every fixed $`1\lt p\lt \infty`$ and D &gt; 1, every n-point subset of a real Lp space embeds into $`\ell_p^d`$ with distortion at most D and subpolynomial dimension $`d=n^{o(1)}`$. The target has the same exponent p, and the embedding need not be linear.
+[theorem] \label{thm:main} Fix $1<p<\infty$, $p\ne2$, and put \[ \gamma(p)= \begin{cases} 2-p,&1<p<2,\\ 1-2/p,&2<p<\infty. \end{cases} \] For every $D>1$ there is a constant $C_{p,D}<\infty$ such that, for every integer $n\ge2$, \begin{equation}\label{eq:main-bounds} \frac{\log n}{\log(1+2D)} \le d_p(n,D) \le \exp\!\bigl(C_{p,D}(\log n)^{\gamma(p)}\bigr). \end{equation} For exact embeddings, \begin{equation}\label{eq:exact-bounds} \left\lfloor\frac{n-1}{4}\right\rfloor^2 \le d_p(n,1)\le\binom n2\qquad(n\ge9). \end{equation} Consequently, \[ \lim_{n\to\infty}\frac{\log d_p(n,D)}{\log n} =\begin{cases}0,&D>1,\\2,&D=1.\end{cases} \]
+PROOF STRATEGY (paper's own words):
+- The constants in the upper bound depend on the fixed parameters $p,D$; no uniformity as $p$ approaches an endpoint or $D$ approaches $1$ is asserted. For $p=2$, the classical Hilbert result gives the stronger bound $d_2(n,D)=O_D(\log n)$ for every fixed $D>1$. The theorem is existential and does not assert an efficient embedding algorithm.
+- The dependence on cardinality also distinguishes this problem from embedding one infinite space into a fixed finite-dimensional target. A metric space is \emph{doubling} if every ball can be covered by a fixed number of balls of half its radius. A separate construction gives an infinite doubling subset of real Hilbert space with no bi-Lipschitz embedding into any finite-dimensional Euclidean space at any finite distortion \cite{OpenAI2026DoublingHilbert}. This is compatible with finite-set dimension reduction and is not an input to our proof.
+- \subsection{Method and organization}
+- For completeness, we prove a Hoeffding-type bounded-sum estimate for the sampling step, with constants weaker than the classical bound in \cite[Theorem~2, p.~16, equation~(2.6)]{Hoeffding1963}. If $0\le X\le K^p$ and $X'$ is an independent copy, Jensen's inequality and symmetry give \[ \E e^{t(X-\E X)} \le\E e^{t(X-X')} =\E\cosh\bigl(t(X-X')\bigr) \le e^{t^2K^{2p}/2}, \] using $\cosh u\le e^{u^2/2}$. Take $d$ independent samples $F^{(1)},\ldots,F^{(d)}$ from the preceding distribution. Apply this bound to $X=|F_e|^p$, multiply moment generating functions, and use Markov's inequality with $t=\eta b/K^{2p}$. Applying the same argument to the lower tail gives \[ \Prob\left( \left|\frac1d\sum_{a=1}^d|F_e^{(a)}|^p-\E|F_e|^p\right|>\eta b \right) \le2\exp\left(-\frac{d\eta^2b^2}{2K^{2p}}\right). \] For the value in~\eqref{eq:sampling-dimension} with $C$ sufficiently large, a union bound over $|E|<n^2/2$ edges is less than one. Choose an outcome for which all empirical moments belong to $[(1-3\eta)b,(1+3\eta)b]$. Realize each $F^{(a)}$ by scalar labels $z_i^{(a)}$, and set \[ y_i=d^{-1/p}\bigl(z_i^{(1)},\ldots,z_i^{(d)}\bigr). \] Then \[ \frac{\|y_i-y_j\|_p^p}{\delta_{ij}^p} =\frac1d\sum_ […]
+SECTION OUTLINE:
+Introduction
+  Earlier results and the exact-distortion contrast
+  Method and organization
+Finite coordinates and normalized increments
+From weighted moments to an embedding
+A projection with controlled row sums
+Homogeneous increments and signed Poisson sampling
+The range \texorpdfstring{$1<p<2$}{1 < p < 2}
+  A common heavy-tailed marginal
+  Clipping and projection
+The range \texorpdfstring{$2<p<\infty$}{2 < p < infinity}
+  A ramp of truncations
+  The projection error
+  Poisson sampling
+  A bounded random gradient
+Dimension bounds and exact embeddings
+  Completion of the upper bound
+  The packing bound
+  A quadratic obstruction to exact embeddings
+Electrical-flow localization
+The Poisson moment inequality
+LONGEST PROOF #1 (opening): [Proof of Lemma~\ref{lem:localization}] Fix a strictly positive edge vector $w$, and define a vertex probability measure and its diagonal matrix by \[ \mu_i=\frac{\sum_{e\ni i}w_e^2}{2\|w\|_2^2}, \qquad M=\operatorname{diag}(\mu_i). \] Connectivity implies $\mu_i>0$. Put \[ L=B^TCB,\qquad S=M^{-1/2}LM^{-1/2},\qquad K_t=M^{-1/2}e^{-tS}M^{-1/2}. \] Writing $A=C^{1/2}BM^{-1/2}$, we have $S=A^TA$ and $\operatorname{im}A=\operatorname{im}(C^{1/2}B)$. Spectral decomposition therefore gives the convergent matrix integral \begin{equation}\label{eq:projection-heat-integral} Q=\int_0^\infty C^{1/2}BK_tB^TC^{1/2}\,dt. \end{equation} Indeed, the integrand is $Ae^{-tA^TA}A^T$, whose integral is the orthogonal projection onto $\operatorname{im}A$. For a vertex $v$, set $h_s=K_s\mathbf e_v$, where $\mathbf e_v$ is the $v$-th coordinate vector. The identity \[ K_s=e^{-sM^{-1}L}M^{-1} \] shows that $h_s$ […]
+LONGEST PROOF #2 (opening): [Proof of Lemma~\ref{lem:poisson-moments}] We prove the moment bounds first for a sum of independent symmetric real random variables $X_1,\ldots,X_N$ with finite $q$th moments. For real $a,b$, \begin{equation}\label{eq:scalar-lower} \frac{|a+b|^q+|a-b|^q}{2}\ge|a|^q+|b|^q. \end{equation} Indeed, convexity of $u\mapsto u^{q/2}$ first bounds the left side below by $(a^2+b^2)^{q/2}$, which is at least $|a|^q+|b|^q$. Iterating~\eqref{eq:scalar-lower} proves the lower moment bound. For every $\epsilon'>0$ there is $C_{q,\epsilon'}$ such that \begin{equation}\label{eq:scalar-upper} \frac{|a+b|^q+|a-b|^q}{2} \le |a|^q+(1+\epsilon')|b|^q +C_{q,\epsilon'}|a|^{q-2}|b|^2. \end{equation} To see this, the case $a=0$ is immediate. Otherwise divide by $|a|^q$ and put $u=b/a$. Near $u=0$, Taylor's theorem bounds the left side minus $1$ by $C_qu^2$. For sufficiently large $|u|$, the left side divided by  […]
+LONGEST PROOF #3 (opening): Let $\mathcal C$ be the convex hull of the compact set \[ \left\{\bigl(|f_e|^p\bigr)_{e\in E}: f\in V,\ \|f\|_\infty\le K\right\}. \] It is compact and consists exactly of the moment vectors of distributions of such gradients; finite mixtures suffice by Carath\'eodory's theorem. We claim that $\mathcal C$ meets the open box \[ \mathcal B=\{m\in\R^E: |m_e-b|<2\eta b\text{ for all }e\}. \] Otherwise, finite-dimensional separation \cite[Theorem~11.3]{Rockafellar1970} gives a vector $a\ne0$ such that, after normalizing $\sum_e|a_e|=1$, \[ \sum_e a_e(m_e-b)\ge2\eta b\qquad(m\in\mathcal C). \] Apply the hypothesis with $\lambda_e=\frac34|a_e|+\frac1{4|E|}$. Its moment vector $m\in\mathcal C$ satisfies \[ \sum_e a_e(m_e-b) \le\sum_e|a_e||m_e-b| \le\frac43\sum_e\lambda_e|m_e-b| \le\frac43\eta b, \] a contradiction. Thus there is one distribution of gradients, still bounded by $K$, for which ever […]

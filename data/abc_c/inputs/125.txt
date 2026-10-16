@@ -1,0 +1,100 @@
+FAMILY 125: The metric k-median approximation threshold and recovery
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Gives a deterministic polynomial-time $`(1+2/e+\varepsilon)`$-approximation for finite rational metric k-median with specified candidate facilities, for every fixed ε &gt; 0. Assuming $`P\ne NP`$, the optimal infimum approximation factor is $`1+2/e`$.
+HEADLINE (v2, semi-formal): ∀ ε > 0, ∃ deterministic poly-time algorithm, ∀ finite rational metric k-median instance: outputs S ⊆ F, |S| ≤ k, cost(S) ≤ (1 + 2/e + ε) opt_k; hence, if P ≠ NP, inf{achievable factor} = 1 + 2/e
+
+=== MANUSCRIPT: Single-exponential recovery and bounded-price strictness for metric k-median [preprints/Single-Exponential-Recovery-and-Bounded-Price-Strictness-for-Metric-k-Median-September-24-2026/build/paper.tex]
+ABSTRACT: We give an exact-budget recovery algorithm for metric k-median with single-exponential dependence on the number of comparison clusters without accurate, distinct proxies in a supplied anchor solution. On positive integral metrics of polynomially bounded diameter, a sufficiently small total proxy error and logarithmically many such clusters yield a $`(1+2/e+\varepsilon)`$ approximation in polynomial time with arbitrarily high success probability. We also prove bounded-price strictness for one compatible execution of the logarithmic-surplus construction. Together the recovery and payment arguments give a randomized $`(2-\sigma)`$ approximation, for an absolute σ &gt; 0, on arbitrary finite rational metrics, both with high probability and in expectation, while opening at most k facilities on every output.
+[theorem] [Refined recovery]\label{ref:recovery} Let $D$ and $F$ be disjoint indexed sets in a metric whose distances between distinct indices are positive integers bounded by a fixed polynomial in $N=|D|+|F|$. Fix $\varepsilon>0$ and $0<L_0<\infty$, and choose a fixed rational parameter \[ 0<\mu\le \min\{1/4,\varepsilon/12\}. \] Let $S\subseteq F$ have cardinality $h\ge1$. Suppose there exists a comparison solution $O\subseteq F$ of cardinality $h$ and cost $P>0$, with a partition into good and bad centers and distinct proxies $\phi_i\in S$ for the good centers, such that \begin{equation}\label{ref:proxy-hypothesis} \sum_{i\ \mathrm{good}}\sum_{p\in C_i}d(p,\phi_i) \le P_g+\mu P, \qquad m:=|\{i:i\ \mathrm{bad}\}|\le L_0\log N. \end{equation} Given $S$, $\mu$, $L_0$, and a failure parameter $\zeta\i […]
+[theorem] [Global application]\label{main:theorem} There is an absolute constant $\sigma>0$ with the following property. For every fixed $a>0$, a randomized polynomial-time algorithm for metric $k$-median always returns a set $S\subseteq F$ with $|S|\le k$ and satisfies \[ \Pr\!\left\{\operatorname{cost}(S) \le(2-\sigma)\operatorname{opt}_k\right\} \ge 1-(|D|+|F|+2)^{-a}. \] The same algorithm can be chosen to satisfy $\mathbb E\operatorname{cost}(S)\le(2-\sigma)\operatorname{opt}_k$. The running time is polynomial in the bit length of the finite rational metric input. Its degree may depend on the fixed constants.
+[theorem] [Anchoring] \label{loc:anchoring} Let $S$ be a width-$5$ local optimum, and let $O$ be a comparison set with $2\le h=|O|\le|S|$ and $P=\operatorname{cost}(O)>0$. Suppose $b>0$ satisfies \begin{equation} b\left(\ell+ \bigl|\{i\in O:n_i\operatorname{sep}_i<b\}\bigr|\right) \le10P. \label{loc:scale-condition} \end{equation} For every fixed $\mu\in(0,1]$, there is a partition $O=O_g\mathbin{\dot\cup}O_b$ and distinct proxies $\phi_i\in S$ for $i\in O_g$ such that, with $m=|O_b|$, \begin{equation} \sum_{i\in O_g}\sum_{p\in C_i}d(p,\phi_i) \le P_g+\mu P, \qquad m\le C_\mu\frac{P}{b}, \label{loc:anchoring-conclusion} \end{equation} where the finite constant \begin{equation} J_\mu=\left\lceil\frac{40}{\mu}\right\rceil, \qquad C_\mu=10+\frac{600}{\mu}\,2^{J_\mu-1} \label{loc:anchoring-constant} \en […]
+PROOF STRATEGY (paper's own words):
+- The recovery track is also a substantial adaptation of that work. Its Section~4.1.1 obtains almost exact proxies outside exceptional clusters, drawing on the structural local-search analysis of Cohen-Addad and Schwiegelshohn \cite{CohenAddadSchwiegelshohn2017}. Its Sections~4.2--4.4 sample leaders by distance, guess facility balls, attach leaf dummies and remove original centers; Section~4.6 completes these choices by partition-constrained submodular optimization. We prove the proxy statement under an explicit scale hypothesis, interleave the leader and removal steps, and amortize their radius guesses through disjoint sets of clients. An exact subset dynamic program handles removal destinations without a sampled ball, while a submodular surrogate handles destinations represented by proxies or balls. These changes yield the single-exponential exceptional-count bound used here.
+- \subsection{Proof overview}
+- We first prove the two local statements used by both branches of the algorithm. The geometric arguments apply to any finite metric. The bounded integral distance assumption is needed only for the polynomial running time of exact local descent. Exchanges of bounded size are standard in local-search analysis \cite[Sections~3.3--3.4]{Arya2004}. Our weighted comparison adapts the nearest-facility routing proof of Gupta and Tangwongsan \cite{GuptaTangwongsan2008} while protecting the specified proxies. The anchoring argument adapts the disjoint-region and incoming-client analysis of \cite{CohenAddadSchwiegelshohn2017} and \cite[Section~4.1.1]{CGLSS2026}. We prove the particular scale hypothesis and error bound needed here, for a comparison solution that need not be optimal.
+SECTION OUTLINE:
+Introduction
+  Recovery from an anchor
+  A compatible execution and its global application
+  Prior work and the relation to these methods
+  Proof overview
+Conventions and reduction to bounded integral distances
+Local search and anchored comparison clusters
+  Local optimality and weighted exchanges
+  Anchoring at any fixed accuracy
+Joint sampling of leaders and removals
+  Computable radii and reference metrics
+  A finite radius experiment
+  The experiment and adaptive guides
+  Near clients and the main stopping rule
+  Enumeration, precision, and running time
+Completing sampled prefixes and recovering the budget
+  A finite partition-constrained maximization procedure
+  The blue optimization and the red surrogate
+  A completion inequality with arbitrary slack
+  A quantitative recovery guarantee
+Sharper recovery when few clusters are unanchored
+  A guide with two stopping rules
+  The completion charges
+  Extraction, running time, and scope
+The surplus construction and its execution certificate
+  The sequence data and the external result
+  One execution supplies all the inequalities
+  Instantiating the construction
+Strictness at a bounded opening price
+The low sensitivity case
+The stability dichotomy and the final algorithm
+  Choosing the constants
+  Candidates on the bounded integral instance
+  General metrics and the expected guarantee
+LONGEST PROOF #1 (opening): Fix the supplied valid sequences, price and copy lengths. This proof uses their validity. No facility deletion, change of price, or movement of a free copy during the construction's search is used as a step of this history. Write $\beta_j$ for a transient budget, reserving $\alpha_j$ for its final value. Initialize $Q=\varnothing$, $z=1$, and $\beta_j=1$ for all clients. \paragraph{Witness sets and actual updates.} At a regular opening with witness $W\supseteq Q$, one has $A_W\subseteq A_Q$ and $I_Q\subseteq I_W$. Use the certified bid $\tau_j$ for $j\in A_W$ and the unchanged bid $z$ for $j\in A_Q\setminus A_W$. Budgets of already inactive clients stay fixed. Every actual active client whose budget increases lies within $vz$ of the newly opened regular facility. It therefore immediately becomes inactive, since \[ (1-\delta)d(j,Q\cup\{i\}) \le(1-\delta)vz<z\le\tau_j. \] Consequently ever […]
+LONGEST PROOF #2 (opening): We first turn the replay inequalities into a scalar suffix inequality. After normalizing the cluster cost, two lower bounds on its slack rule out a small total deficit: a tail index would force a large suffix maximum, while an early interval would then carry too much slack. The last step transfers the resulting gap to final budgets. \textit{Client-removal order and a suffix inequality.} Index the $q=|C|$ clients as $1,\ldots,q$ by their removal step in the fixed replay, breaking ties within an atomic step arbitrarily. This order is used only for the present suffix proof; the final-dual proof in Section~\ref{imp:section} sorts tied removals by final budget. For client $p$, let $Q_p^-$ denote the opened set immediately before its removal step, and let $z_p$ be the phase value at that pre-step state. Thus clients removed in one atomic step have the same $Q_p^-$ and $z_p$. Set \[ d_p=d(i,p), […]
+LONGEST PROOF #3 (opening): Since $L\ge1$ and $k>2L$, we have $h\ge2$ and $h-L=k-2L\ge1$. Apply Theorem~\ref{imp:cglss} at target $h$, then replay its output using Lemma~\ref{imp:surplus-history} to obtain the real set $U$ and its compatible budgets. In either output branch, $|U|\le h+L=k$. Pad $U$ to size $k$ using members of $F$, and run width-$5$ local search starting there; call its output $S$. Padding is possible because $k\le|F|$, and \begin{equation}\label{sur:local-start} |S|=k,\qquad \operatorname{cost}(S)\le\operatorname{cost}(U). \end{equation} This is polynomial time on the bounded integral metric, as in Lemma~\ref{loc:descent}. Fix an optimum $O$ of size $h$, padding if necessary, and write $P=\operatorname{opt}_h>0$, $C_i=\{p:p\text{ is assigned to }i\in O\}$, $n_i=|C_i|$, and $P_i=\sum_{p\in C_i}d(i,p)$. \textit{The unmerged small-price branch.} Suppose the output is the unmerged solution at $\lambda […]
+
+=== MANUSCRIPT: The approximation threshold for metric k-median [preprints/The-Approximation-Threshold-for-Metric-k-Median-September-24-2026/build/main.tex]
+ABSTRACT: For every fixed ε &gt; 0, we give a deterministic polynomial-time $`(1+2/e+\varepsilon)`$-approximation for finite rational metric k-median with specified candidate facilities, opening at most k facilities. Under $`P\ne NP`$, the infimum approximation factor in this model is therefore $`1+2/e`$.
+[theorem] \label{thm:main} For every fixed \(\varepsilon>0\), there is a deterministic algorithm which, given a finite rational metric \(k\)-median instance with \(1\le k\le |F|\), returns \(S\subseteq F\), \(|S|\le k\), such that \[ \sum_{j\in J}d(j,S)\le \left(1+\frac2e+\varepsilon\right)\OPT_k. \] Its running time is polynomial in the binary encoding length of the instance. The polynomial may depend on \(\varepsilon\).
+[corollary] \label{cor:threshold} If \(P\ne NP\), the infimum of deterministic polynomial-time approximation factors for metric \(k\)-median with specified candidate facilities is \(1+2/e\).
+[theorem] [Li--Svensson~\cite{LiSvensson2016}, Theorem~4 of the 2014 manuscript] \label{thm:li-svensson} Let \(\alpha>1\), and suppose \(\mathcal A\) is a \(c\)-additive \(\alpha\)-approximation algorithm for metric \(k\)-median. For every \(\eta>0\), there is an ordinary \((\alpha+\eta)\)-approximation algorithm with running time \(n^{O(c/\eta)}\) times the running time of \(\mathcal A\). For fixed \(\alpha,c,\eta\), this is polynomial overhead.
+PROOF STRATEGY (paper's own words):
+- The facility budget is a central difficulty: a solution with small connection cost can be much easier to obtain when extra facilities are allowed. Our approach first permits a constant additive surplus, makes that approximation deterministic, and then removes the surplus using an established reduction.
+- Metric \(k\)-median has been a testing ground for LP rounding, primal-dual algorithms, and local search. Charikar, Guha, Tardos and Shmoys gave the first constant-factor approximation through LP rounding~\cite{CharikarGuhaTardosShmoys2002}. Jain and Vazirani connected the cardinality constraint with metric facility location through Lagrangian relaxation and the primal-dual method~\cite{JainVazirani2001}. The combinatorial improvements of Charikar and Guha~\cite{CharikarGuha1999} and the greedy dual-fitting approach of Jain et al.~\cite{JainEtAl2003} developed this connection further. A different route, the bounded-swap local search of Arya et al.~\cite{Arya2004}, achieves factor \(3+\varepsilon\).
+- Li and Svensson~\cite{LiSvensson2016} made constant-additive pseudo-approximations a route past the factor-three barrier: a constant number of extra facilities can be removed at an arbitrarily small additional approximation loss. Subsequent bi-point rounding, including the corrected \(2.675+\varepsilon\) guarantee of Byrka et al.~\cite{ByrkaEtAl2017}, refined this approach. Gowda et al.~\cite{GowdaEtAl2023} obtained \(2.613\) in their SODA 2023 version. Cohen-Addad et al.~\cite{CGLSS2026} reached \(2+\varepsilon\), first announced in 2025. Byrka et al.~\cite{ByrkaEtAl2026} subsequently developed a graph-based iterative rounding framework that also gives \(2+\varepsilon\) for metric \(k\)-median and extends to other clustering objectives. Theorem~\ref{thm:main} reaches every fixed factor above the \(1+2/e\) hardness boundary in the general candidate-facility model.
+- Two other methodological antecedents are useful to distinguish. Splitting fractional facilities and organizing assignments around separated representatives and bundles are standard LP-rounding techniques; Charikar and Li~\cite{CharikarLi2012} provide a close predecessor. The pair updates used in our preparation belong to the dependent-rounding approach of Srinivasan~\cite{Srinivasan2001} and Gandhi et al.~\cite{GandhiEtAl2006}, with weighted variants studied by Byrka et al.~\cite{ByrkaEtAl2017}. We prove the particular moment bounds and coupled supplier construction needed here. Likewise, reducing the support of a distribution while matching moments is a standard Carath\'eodory argument; see Bayer and Teichmann~\cite{BayerTeichmann2005} for the finite-cubature perspective. Our implementation specifies which moments suffice throughout the physical process and proves the required rational encoding bounds.
+- \subsection{Proof overview}
+- \paragraph{Organization.} Section~\ref{sec:preliminaries} fixes the model and states the external additive-to-ordinary reduction. Section~\ref{sec:preparation} prepares the openings. Section~\ref{sec:inequality} proves the finite drift inequality, with its scalar certificates in Appendix~\ref{app:certificates}. Section~\ref{sec:rounding} gives and analyzes the iterative procedure. Section~\ref{sec:derandomization} supplies the deterministic implementation and completes the proof of Theorem~\ref{thm:main}.
+SECTION OUTLINE:
+Introduction
+  Historical context and method
+  Proof overview
+Preliminaries and the reduction
+  The fractional solution
+  Constant-additive pseudo-approximation
+  Probability and bookkeeping
+Preparing the openings
+A finite inequality for the drift
+Tapered iterative rounding
+  The graph and the physical process
+  The opening-count bound
+  A persistent backup and final completion
+  The potential and its single-action bounds
+  From the physical batch to the ideal bound
+  Averaging the graph and applying the finite inequality
+  Survival, accumulated error, and parameter choices
+Deterministic implementation and completion
+  Compression of finite distributions
+  A distribution list for the preparation stage
+  A distribution list for each physical round
+  Rational implementation and bit complexity
+  Loss allocation and the approximation theorem
+  Applying the reduction on rational inputs
+Exact certificates for the scalar bounds
+  Rational approximations and their errors
+  Reduction of the first, second, and final scalar bounds
+  The first coefficient table and its exact verification
+  The third scalar bound: perturbation estimate
+  Bernstein expansion and the second coefficient table
+LONGEST PROOF #1 (opening): [Proof of Theorem~\ref{thm:preparation}] We first form disjoint bundles containing most of each representative's assigned mass. We then round their deficits jointly with the openings that supply them, reserving a small amount of budget for clipping large deficits. After rounding inside bundles, every representative can again receive one unit. The final part of the proof compares connection costs at two representative-distance scales and conditions on the budget event. We will choose positive rational constants in the order \[ \delta,\quad M,\quad T_1,\quad\gamma,\quad g, \] with $\delta$ small, $M$ and then $T_1$ large, and $\gamma$ and then $g$ small. All choices depend only on $\eta$; the last choice means that every sufficiently fine even grid is permitted. During the proof we require \begin{equation}\label{eq:prep-parameter-basics} 0<\delta\le\tfrac14,\qquad 0<\gamma\le1,\qquad \thet […]
+LONGEST PROOF #2 (opening): [Proof of Theorem~\ref{thm:finite-inequality}] We may discard indices of probability zero. The proof treats the quantities with a fixed second index $i$ as a row, with $t$ indexing its columns. \paragraph{Reduction of the parameters.} For fixed $x,D,q,R,s$, the left side of Equation~\eqref{eq:finite-inequality} is nondecreasing in $y$. The coefficient of its linear $y$ term is nonnegative, and increasing $y$ decreases the positive part that is subtracted. Replace $y$ there by $\max(x,y)=x+w$, where $0\le w\le X=1-x$, and put $z=Pw^2$. If $y<x$, then $z=0\le\Theta$; otherwise $z=P(y-x)^2\le\Theta$, since $y\le1$. It is therefore sufficient to bound the modified left side by $2z$. This modified left side is affine separately in every $s_i$, and its hypotheses do not constrain $s_i$. Its maximum over $[0,1]^I$ is attained with every $s_i\in\{0,1\}$. Fix such a choice. For each row use the n […]
+LONGEST PROOF #3 (opening): The pre-round quantities $S,y,V,b,x$ are fixed throughout this proof. Define \begin{equation}\label{eq:rnd-graph-statistics} \begin{aligned} w_i&=\sum_{t\in S}gq_{ti}
+[…]

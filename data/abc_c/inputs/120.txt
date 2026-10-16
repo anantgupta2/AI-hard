@@ -1,0 +1,60 @@
+FAMILY 120: Almost-linear-time exact matching and prescribed-degree factors in general graphs
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Gives a randomized algorithm finding an exact maximum-cardinality matching in any simple undirected graph in $`(n+m)^{1+o(1)}`$ word time, with success probability at least 2/3. The time bound holds on every computation path. The same guarantees apply to finding a spanning subgraph with prescribed admissible vertex degrees, or deciding that none exists.
+HEADLINE (v2, semi-formal): ∃ uniform randomized word-RAM algorithm A ∀ simple graph G (n vertices, m edges): A halts within (n+m)^{1+o(1)} steps on every path and outputs a maximum matching with probability ≥ 2/3
+
+=== MANUSCRIPT: Almost-Linear-Time Maximum-Cardinality Matching in General Graphs [preprints/Almost-Linear-Time-Maximum-Cardinality-Matching-in-Sparse-General-Graphs-September-24-2026/build/main.tex]
+ABSTRACT: We prove that maximum-cardinality matching in a simple undirected graph with n vertices and m edges can be found by one uniform randomized algorithm in $`(n+m)^{1+o(1)}`$ time. The bound holds on every computation path in a logarithmic-word model, and the algorithm returns an explicit maximum matching with probability at least 2/3. An explicit reduction gives the same time and probability guarantees for deciding whether a simple host graph has a spanning subgraph with prescribed valid vertex degrees, and for finding one when it exists.
+[theorem] [Exact matching in almost-linear input-size time]\label{thm:main} There are a single uniform randomized word-RAM algorithm, fixed constants $c_0\ge2$ and $C\ge1$, and a nonincreasing function $\eta:\mathbb N_{\ge1}\to\mathbb R_{\ge0}$ with $\eta(q)\to0$ as $q\to\infty$ such that the following holds. For every input graph $G=([n],E)$ with $m=|E|$ and $p=n+m$, the algorithm halts on every computation path in at most \[ C p^{1+\eta(p)} \] instructions. With probability at least $2/3$ it outputs an explicit list of edges of a matching of size $\nu(G)$.
+[theorem] [Fixed-parameter subcubic perfect-matching search] \label{thm:subcubic} For the integers \(a\ge1000\) and fixed reliability parameters \(0\le\sigma\le a+1\), the construction defines a uniform randomized algorithm on loopless subcubic graphs with identified edge copies and \(N\le S\) vertices. Every computation halts with a checked perfect matching, a negative answer, or a suspension. It has no false positive. For each fixed input with a perfect matching, the probability of a negative answer is at most \begin{equation} \label{phase:pm-error} 2^{-\sigma}S^{-5}. \end{equation} This statement bounds erroneous answers, not suspensions, and holds conditionally for adaptive invocations with fresh randomness and valid prerequisites. For every sufficiently large fixed \(a\) and fixed admissible \( […]
+[corollary] [Quality through the recursion] \label{back:quality-induction} Assume the path assignments and public forest lifting of Section~\ref{sec:backend-updates}. The backend at level $i$ returns a certified score at least \begin{equation} \label{back:level-score} \frac12 b^{-2(d-i)}\OPT_i. \end{equation} At the outer level this is at least $M^{-10/a}\OPT$.
+PROOF STRATEGY (paper's own words):
+- \maketitle \begin{abstract} We prove that maximum-cardinality matching in a simple undirected graph with $n$ vertices and $m$ edges can be found by one uniform randomized algorithm in $(n+m)^{1+o(1)}$ time. The bound holds on every computation path in a logarithmic-word model, and the algorithm returns an explicit maximum matching with probability at least $2/3$. An explicit reduction gives the same time and probability guarantees for deciding whether a simple host graph has a spanning subgraph with prescribed valid vertex degrees, and for finding one when it exists. \end{abstract} \tableofcontents \clearpage \section{Introduction}\label{sec:introduction}
+- A matching in a graph is a set of edges with pairwise disjoint endpoints. The maximum-cardinality matching problem asks for such a set with the largest possible number of edges. We prove an almost-linear bound in the adjacency-list input size for general graphs, with explicit output and a single uniform algorithm. The running-time guarantee includes every unsuccessful random computation, all finite-precision work, and all input and output costs.
+- The structure of matchings has long connected combinatorial existence criteria with efficient construction. Hall's theorem characterizes when a family of sets has distinct representatives~\cite{Hall1935}, and Tutte's perfect-matching theorem identifies the obstruction caused by odd components~\cite{Tutte1947}. Berge's augmenting-path criterion turns maximum cardinality into a question about alternating paths~\cite{Berge1957}. Edmonds made this approach algorithmic in general graphs through blossom contraction and expansion~\cite{EdmondsPaths}. His matching-polytope theorem gives a complementary explanation of the odd-set constraints~\cite{EdmondsPolytope}: vertex-degree inequalities alone allow, for example, value $1/2$ on each edge of a triangle.
+- Tutte's short proof of the factor theorem reduces prescribed-degree $f$-factors to perfect matchings~\cite{Tutte1954Factor}. The reduction in Section~\ref{sec:f-factors} follows this incidence-port approach, replacing the local complete connections to auxiliary vertices by the rearrangeable networks used in Section~\ref{sec:uniformization}. This controls the size of the perfect-matching instance even when a host vertex has high degree. There are also direct algorithms: Gabow finds a maximum-cardinality edge set subject to $\deg_F(v)\le f(v)$ in $O(n^{2/3}m)$ time on simple graphs~\cite[Theorem~4.1]{Gabow2025FMatching}. After linear-time input processing, including removal of zero-demand vertices, this gives an $O(n+n^{2/3}m)$ factor test: an $f$-factor exists exactly when the returned set has $2|F|=\sum_v f(v)$.
+- Algebraic methods offer another important approach. Random evaluation of the Tutte matrix connects matching to linear algebra~\cite{Lovasz1979}. Mucha and Sankowski, and subsequently Harvey, obtained randomized algorithms that construct maximum matchings at the matrix-multiplication time scale, conventionally written $O(n^\omega)$ field operations~\cite{MuchaSankowski2004,Harvey2009}. These algorithms already recover explicit witnesses and can work over finite fields of polynomial size. Their matrix-multiplication bound is most competitive on dense graphs. Theorem~\ref{thm:main} instead gives an almost-linear bound in the explicit input size throughout the range of densities, including $n^{2+o(1)}$ at the dense extreme.
+SECTION OUTLINE:
+Introduction
+  Statement and computational model
+  Context and significance
+  Main ideas and organization
+Conventions and static primitives
+  Representations and fixed-parameter bounds
+  Exact integral flow
+  A clocked fallback
+Matching states and structural operations
+  The phase state and its ledgers
+  The top objective and the pricing primitive
+  The main actions and exact ledger edits
+  Maintaining the top barrier
+  Reset schedule and the exact exchange problem
+  Tight sets and factor-critical contraction
+  Bounded searches for a bin pair
+  Explicit matching materialization
+Local projection and the perfect-matching bound
+  A local exact projection
+  Debt, structural work, and progress
+  Implementation and total phase cost
+  Guarded prefixes and the PM guarantee
+Priced logarithmic steps
+  The interface
+  A backend with explicit forest paths
+  Degree reduction and integer pricing
+  Oriented forest operations
+  Preserving exact values under forest changes
+  Drift detection and refresh accounting
+  Precision, total cost, and completion of the engine proof
+A resource-preserving static routing sparsifier
+  Stages, pieces, and normalized sampling
+  Median cuts, integral matchings, and an expanding overlay
+  Recursive routing on the overlay
+  Filtering real embeddings and verifying a stage
+  Failure probability and finite computation
+Frozen decompositions and cycle quality
+  Parameters, scores, and the bottom level
+  Verified covers and a finite family of forests
+  Fixed marginals and the clipped decomposition
+LONGEST PROOF #1 (opening): First analyze ideal unlimited rejection, stopping the analysis when an inductive good event fails. The current degree ratio is allowed to be $D_c$, initially one, with the allowance multiplied by $20$ per level. Thus \[ D_c\le20^{2a^2}\le\Lambda^{1/20}. \] The inductive conductance lower bound is $1/(4r_m)$, so Lemma~\ref{route:cheeger} applies. A group $A$ occupies at least $1/(2b)$ of the labels; hence $\pi(A)\ge1/(2D_cb)$. An ordinary trial succeeds with probability at least $1/(4D_cb)$. The endpoint of a successful trial has distribution \begin{equation}\label{route:conditioned-endpoints} \frac{P^{2t}(x,y)}{P^{2t}(x,A)} \in\left[\frac14,4\right]\frac{\pi(y)}{\pi(A)} \subseteq\left[\frac{1}{4D_c|A|},\frac{4D_c}{|A|}\right] \quad(y\in A). \end{equation} Distinct final targets mean that at most $|A|$ packets seek group $A$. Packet arrivals at a specified child vertex therefore have expe […]
+LONGEST PROOF #2 (opening): Mark labels of the snapshot at $t_0$ as follows. Every split marks its ancestor at $t_0$, if one exists; every chord death marks the ancestors of both endpoint classes. Let $Y$ be the marked set. Then $|Y|\le2E_0$. The \emph{anchors} are all current descendants of $Y$ and all current classes born from activations after $t_0$, including their later descendants. There are $O(E_0)$ anchors: initially marked labels contribute at most $2E_0$, and every subsequent split or activation adds only constantly many class labels. Ancestors absent at $t_0$ belong to the latter activation families. Mark every old assigned path that visits $Y$, including at an endpoint. In particular the path of a deleted demand is marked, as is any path using a deleted support edge. Every unmarked path still uses the same live oriented chords on unchanged labels. Moreover its demand and all support edges on the path re […]
+LONGEST PROOF #3 (opening): [Proof of Lemma~\ref{lem:routing-helper}] At a fixed cut depth, condition on its input lists before making its fresh samples. Lemma~\ref{route:sampling} applies to these lists even though earlier cuts were random. Likewise the median potential and the recursive routing estimates are conditional on their respective inputs. The sum of all bad-event probabilities in one attempt is less than $1/2$ in the checked parameter range. Here are quantitative counts for this assertion. There are at most $M^2(D_p+1)$ pieces and at most $M^2$ resources having nonzero input data. The matrix and sample-count tails, resource tails, and product-mixing tails displayed above are each below $M^{-40}$, including their per-piece factors. For the router, the group-cut union is bounded by \eqref{route:cut-union}; the point-count and edge-step tails use $q_v=\Lambda^3$ and threshold $\Lambda^6$; the rejection tail […]

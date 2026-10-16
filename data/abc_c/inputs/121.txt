@@ -1,0 +1,60 @@
+FAMILY 121: Almost-linear approximation of edit distance
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: For every fixed rational $`\varepsilon\in(0,1)`$, gives a randomized $`(1+\varepsilon)`$ approximation to unit-cost edit distance in worst-case expected time $`N^{1+o(1)}`$, with success probability at least 2/3. The strings have total length N and polynomially bounded integer symbols. This is an asymptotic guarantee at fixed accuracy.
+HEADLINE (v2, semi-formal): ∃ randomized algorithm, ∀ rational ε ∈ (0,1), ∀ strings x, y (total length N): Pr[ED ≤ D̂ ≤ (1+ε)ED] ≥ 2/3, with worst-case expected time N^{1+o(1)} for each fixed ε
+
+=== MANUSCRIPT: An Almost-Linear Approximation Scheme for Edit Distance [preprints/An-Almost-Linear-Approximation-Scheme-for-Edit-Distance-September-24-2026/build/paper.tex]
+ABSTRACT: We give a uniform randomized approximation scheme for unit-cost edit distance. For every fixed rational $`\varepsilon\in(0,1)`$, it estimates the distance between arbitrary explicitly stored strings of total length N within a factor $`1+\varepsilon`$ with probability at least 2/3, in worst-case expected time $`N^{1+o(1)}`$ on a logarithmic-word RAM. The algorithm supports polynomially bounded integer alphabets and returns zero deterministically on equal strings.
+[theorem] \label{thm:main} There is one uniform randomized algorithm that, given $x,y$ and a rational $\varepsilon\in(0,1)$, returns a nonnegative integer $\widehat D$ such that \[ \Pr\bigl[\ED(x,y)\le \widehat D\le(1+\varepsilon)\ED(x,y)\bigr] \ge \frac23. \] For every fixed rational $\varepsilon$, its worst-case expected running time on strings of total length $N$ is $N^{1+o(1)}$ as $N\to\infty$ on the logarithmic-word RAM. The expectation is over internal randomness only, and the bound includes input processing, preprocessing, numerical work, random sampling and all data-structure operations. Equal strings return zero deterministically.
+[theorem] [Initial estimates]\label{thm:seed} With the parameters and labeled interval tree of Section~\ref{sec:geometry}, there is a lazily evaluated random table $U^{(0)}(I,q)$ of integers in $[0,N]$ such that, with probability at least $0.99$, simultaneously at every state, \begin{equation}\label{eq:seed-guarantee} c(I,q)\le U^{(0)}(I,q)\le A_{\mathrm{init}}c(I,q). \end{equation} Every zero-cost state has value zero on every execution. Conditional on any first request for an entry and the previously exposed randomness, its expected evaluation cost is at most $(1+|I|)2^{o(H)}$, uniformly in the state. This cost bound includes arithmetic and random sampling and does not require \eqref{eq:seed-guarantee} to hold.
+[theorem] [Refinement]\label{thm:refinement} Use the parameters and interval tree of Section~\ref{sec:geometry} in the large-input branch. Let $A$ be a power of two with $1\le A\le A_{\rm init}$, and let $U$ be an integer table on every labeled tree node and every valid target state, with \[ 0\le U(I,q)\le N,\qquad c(I,q)\le U(I,q)\le A c(I,q). \] Set $a=\max\{1,A/F\}$. There is a randomized, finitely executable refinement table $d_S$ such that, for every state $(I,q)$, \begin{equation}\label{eq:refinement-guarantee} d_S(I,q)\ge c(I,q)/a,\qquad \E\bigl[\pos{d_S(I,q)-c(I,q)}\bigr]\le c(I,q)/\ell. \end{equation} The first inequality holds for every outcome of the refinement randomness; the expectation in the second is conditional on the fixed table $U$. At zero-cost states the returned value is zero f […]
+PROOF STRATEGY (paper's own words):
+- An approximation scheme receives a rational $\varepsilon\in(0,1)$ and estimates the distance multiplicatively. Its guarantee must therefore include returning zero when the two strings are equal. We prove the following result.
+- \subsection{Context and approach} Edit distance originates in the study of errors in transmitted strings, including Levenshtein's binary codes for insertions, deletions and bit flips~\cite{Levenshtein1966}. The dynamic program of Wagner and Fischer~\cite{WagnerFischer1974} computes the minimum cost of insertions, deletions and substitutions in quadratic time. Masek and Paterson~\cite{MasekPaterson1980} applied block tabulation to obtain a logarithmic speedup for fixed alphabets and suitable fixed costs. Distance-sensitive exact algorithms offer another route when few edits are needed: Ukkonen~\cite{Ukkonen1985} developed bounded-distance methods, and Landau and Vishkin~\cite{LandauVishkin1988,LandauVishkin1989} combined furthest-reaching states with fast matching queries. Myers's related difference algorithm~\cite{Myers1986} treats insertion--deletion scripts. For unrestricted exact computation, Backurs and Indyk~\cite{BackursIndyk2018} showed that a strongly subquadratic deterministic algorithm would refute the Strong Exponential Time Hypothesis. That lower bound does not rule out fixed-factor approximation.
+- \subsection{Proof overview} Recursively partition the first string into a tree of intervals, ending at intervals of length at most one. An interval state consists of a source interval $I$ and a target interval in the second string; its true cost is the edit distance between the two substrings. An action at a nonleaf assigns one target interval to each source child. We charge the sum of the child estimates together with penalties for gaps or overlaps between successive target endpoints and at the two outer endpoints. These penalties let us compare nearby actions without requiring their target intervals to join exactly.
+- The refinement will need an integer estimate at every interval state, including states chosen adaptively by later computations. We construct these estimates as a random table, while evaluating only the entries that are requested. The construction builds on tree and precision-sampling ideas of Andoni, Krauthgamer, and Onak~\cite{AndoniKrauthgamerOnak2010}; the complete bounds needed here are proved below.
+- The hierarchical representation below is an adaptation of the E-distance of Andoni, Krauthgamer and Onak~\cite[Definition~3.2 and Theorem~3.3]{AndoniKrauthgamerOnak2010}. We prove its precise bounds here, including the treatment of unequal lengths, empty intervals and bounded integer shifts.
+SECTION OUTLINE:
+Introduction
+  Context and approach
+  Proof overview
+Alignment geometry and computational parameters
+  Paths, states and connection costs
+  Uniform access to the accuracy input
+  Parameters and the fixed interval tree
+Simultaneous coarse estimates
+  A deterministic shift tree
+  Pruning and precision sampling
+  Converting the estimate to an integer seed
+  The conditional cost of an adaptive request
+A seed-to-refinement construction
+  Cost cones and their local evaluation
+  Wide actions and Bellman propagation
+  Local evaluation of later cones
+Predicted bands and the refined tables
+  A band predicted from prefix costs
+  The finite-mixture interface for online choices
+  Shared group samples and the update
+  Deterministic invariants
+  Accuracy of one group selection
+A comparison tree and cost-weighted curvature
+  Exact paths and rounded child states
+  Mass and energy telescopes
+  Coverage by the computed bands
+Conditional regret and the first crossing
+  A telescoping bound at every comparison node
+  An entropy inequality with fixed block masses
+  Clipping before and after the first crossing
+Accuracy and the sequence of seed passes
+  Summing the comparison regrets
+  Improving simultaneous seeds
+  The final answer
+Finite optimization and exact sampling
+Lazy evaluation and the expected work bound
+  Evaluation order and stored randomness
+  Finite local calculations on inaccurate seeds
+  The current-index child budget
+  Earlier inputs and local arithmetic
+LONGEST PROOF #1 (opening): There is a feasible vector positive in every coordinate, obtained by averaging the list. The maximizer is positive as well: at a zero coordinate, moving a small distance towards that average produces a positive entropy contribution of order $s\ln(1/s)$, which dominates the terms of order $s$ from the other coordinates and the linear objective. Strict concavity gives uniqueness. Set $\sigma=G_0^{-50}$ and smooth the objective by replacing $-x\ln x$ with $-(x+\sigma)\ln(x+\sigma)$ in each coordinate. Denote the result by $\mathcal F_\sigma$. Integrating the derivative of $x\ln x$, including at zero, gives \begin{equation} \sup_{\rho\in\mathcal Q} \abs{\mathcal F_\sigma(\rho)-\mathcal F(\rho)} \le 4d\sqrt\sigma. \label{eq:entropy-smoothing} \end{equation} The gradient of $\mathcal F_\sigma$ has Euclidean Lipschitz constant at most $1/\sigma$. The diameter of $\mathcal Q$ is at most $2$. Sta […]
+LONGEST PROOF #2 (opening): The monotone cost vectors satisfy, coordinatewise, \begin{equation}\label{eq:increment-properties} \Delta_t\ge0, \qquad \sum_{t=1}^S\Delta_t =f_0-f_S\le1. \end{equation} Define the potential \[ \Psi(v)=\max_{\rho\in\mathcal Q} \{\mathcal H(\rho)+\eta\langle v,\rho\rangle\}. \] Compactness gives a maximizer, and strict concavity of entropy makes it unique. It is positive: moving a small distance $u$ from a vector with a zero coordinate toward the positive feasible vector increases entropy by a positive multiple of $u\ln(1/u)+O(u)$, whereas the linear term changes by only $O(u)$. At a positive maximizer $p$, first-order optimality along feasible segments gives \[ \langle\nabla\mathcal H(p)+\eta v,\rho-p\rangle\le0 \qquad(\rho\in\mathcal Q). \] Since $\mathcal H(\rho)-\mathcal H(p) =\langle\nabla\mathcal H(p),\rho-p\rangle-\KL(\rho\Vert p)$, we obtain the precise penalty \begin{equation}\la […]
+LONGEST PROOF #3 (opening): [Proof of Theorem~\ref{thm:refinement}, accuracy part] Fix a starting state with true cost $D>0$ and its comparison tree from Section~\ref{sec:comparison}. For brevity write $\overline d_t=\max(c,d_t)$ at every state, as in Section~\ref{sec:regret}. Terminal values are exact, so summing \eqref{eq:node-regret-definition} over the tree at a fixed index gives the identity \[ \overline d_t(\mathrm{root}) =C_{\mathrm{term}}+L\sum_{\mathrm{nonterminal}}e +\sum_{\mathrm{nonterminal}}\mathcal R_t. \] Average this identity over $t=1,\ldots,S$. Since the root estimates decrease with $t$, the final positive error satisfies the deterministic bound \begin{equation}\label{eq:root-regret-telescope} (d_S(\mathrm{root})-D)_+ \le C_{\mathrm{term}}-D+L\sum_{\mathrm{nonterminal}}e +\frac1S\sum_{\mathrm{nonterminal}}\sum_{t=1}^S\mathcal R_t. \end{equation} Lemma~\ref{lem:comparison-tree} bounds the first two […]

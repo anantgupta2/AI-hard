@@ -1,0 +1,57 @@
+FAMILY 109: Integer multiplication below $`n\log n`$
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Multiplies two n-bit integers exactly at every input length in deterministic worst-case time $`O(n(\log n)^{1-\kappa})`$, with $`\kappa=2^{-182}`$, on one fixed finite-alphabet Turing machine with finitely many one-dimensional tapes. This disproves the Schönhage–Strassen $`n\log n`$ optimality conjecture in the ordinary multitape bit model.
+HEADLINE (v2, semi-formal): ∃ deterministic multitape TM A (fixed finite alphabet, finitely many tapes) computing the product of two n-bit integers for all n with T_A(n) = O(n (lg n)^{1−κ}), κ = 2^{−182}
+
+=== MANUSCRIPT: Integer multiplication below n log n [preprints/Integer-multiplication-below-n-log-n-September-23-2026/build/main.tex]
+ABSTRACT: We give a deterministic algorithm that multiplies two n-bit integers in $`O(n(\lg n)^{1-\kappa})`$ worst-case time, with $`\kappa=2^{-182}`$, on one fixed finite-alphabet Turing machine with a fixed finite number of one-dimensional tapes. The algorithm is exact for every input length and disproves the $`n\log n`$ optimality conjecture of Schönhage and Strassen in this model.
+[theorem] \label{thm:main} There is one deterministic Turing machine $A$, with a fixed finite alphabet and a fixed finite number of one-dimensional tapes, that computes this exact product for every $n\ge1$ and every pair of $n$-bit inputs. Its worst-case running time satisfies \[ T_A(n)=O\!\left(n(\lg n)^{1-\kappa}\right), \qquad \kappa=2^{-182}. \]
+[corollary] [Exact division and integer square root] \label{cor:exact-arithmetic} There are deterministic machines with fixed finite alphabets and fixed finite numbers of one-dimensional tapes performing the following tasks in $O(n(\lg n)^{1-\kappa})$ worst-case time, for every $n\ge1$. For $x,y\in\{0,1\}^n$, put $a=\operatorname{val}(x)$ and $b=\operatorname{val}(y)$. If $b>0$, the division machine takes $x\#y$ and returns $\operatorname{bin}_n(q)\#\operatorname{bin}_n(r)$, where $q=\lfloor a/b\rfloor$ and $r=a-bq$. The square-root machine takes $x$ and returns $\operatorname{bin}_n(\lfloor\sqrt a\rfloor)$. Leading zeroes are allowed, and $\kappa$ is as in Theorem~\ref{thm:main}.
+[proposition] \label{prop:bit-motif-interface} The bit network has $W_{\rm b}$ wires, uses only pointwise XOR gates, and sends its input vector to the permutation $\rho$ of that vector. Its rational matrices are common to all incidences of a gate and obey \[ M_{\mathrm{sink}(\rho(w))}-M_{\mathrm{source}(w)}=I_m \quad\text{for every input role }w. \] The sum of the rational ranks of all edge differences is \begin{align} s_{\rm b} &=\sum_{e}\operatorname{rank}_{\mathbb Q} (M_{\mathrm{head}(e)}-M_{\mathrm{tail}(e)})\\ &=W_{\rm b}m-N+2L_{\rm b} =177176569088785861287000000<W_{\rm b}m. \end{align}
+PROOF STRATEGY (paper's own words):
+- The subset-intersection construction in Section~\ref{sec:finite-networks} has an earlier source outside multiplication. Alon's presentation of the Frankl--Wilson construction~\cite{FranklWilson1981} gives low-degree representations of complementary intersection graphs over different fields \cite[Section~3, remark after the proof of Theorem~1.1]{Alon1998}. At the prime $p=2$, its subsets have size three and the two polynomial evaluations are the intersection count modulo two and the intersection count minus one. These are the two pairing formulas used here. We change the ground-set size and express the second pairing through a rational bilinear form.
+- We construct two fixed linear networks that exchange two banks of values while restoring every auxiliary value. When the values are replaced by arrays, a common representation on all wires at a gate lets that gate act pointwise without disturbing the representation. We explain this invariant before constructing the subspace labels that make changes of representation cheap. The first network uses bit values and rational subspaces; the second uses Gaussian dyadic values and binary subspaces. The scalar domain specifies the values combined at a gate, while the subspace labels are used to construct operators on each wire's address-indexed array.
+SECTION OUTLINE:
+Introduction
+  The two tape operations
+  Linear networks and the recursive saving
+  From transforms to the exact product
+  Other arithmetic operations
+  Historical context and inherited methods
+  The finite-network ingredients
+  Lower-bound scope and matrix transposition
+  Companion application to exact Fourier transforms
+The machine model and elementary streams
+  Array order and elementary scans
+Two finite networks with a rank saving
+  Scalar operations and restored auxiliary values
+  From scalar values to arrays
+  Subspaces attached to the gates
+  The rational matrix interface
+  The binary phase interface
+  Explicit rational bounds for the two recurrences
+Faster interchange of address chunks
+  A matrix decomposition adapted to tape order
+  Transferring a finite circuit to address permutations
+  Removing width and row restrictions
+Fast simultaneous synthetic butterfly layers
+  Phase frames for a simultaneous butterfly layer
+  Packed changes of selected address bits
+  Batching a common layer on a fixed number of tapes
+  An explicit guard-width bound
+Synthetic transforms and their tape layout
+  Roots, butterflies, and stored frequency order
+  A layout on which the parallel layers apply
+Exact normalized polynomial products
+  The normalized convolution interface
+Resampling with the permutations left in the transform
+  The one-dimensional interface
+  Growing dimension and the padded array
+  The middle transform and the final permutation
+Exact integer multiplication and its cost
+  A fixed rational choice
+  Input and transform sizes
+  An explicit cyclic-convolution layout
+LONGEST PROOF #1 (opening): Put $D=d-1$ and write $a_i=\log_2t_i$. The supplied encoding has $2w=\Theta(p)$ bits per coefficient, so the logical bit volume is $\Theta(Tp)$. Call an axis long if $a_i=\ell$ and short if $a_i=\ell-1$. Name the original bit slots of axis $i$ by $(i,h)$, $a_i-1\geq h\geq0$. Initially these slots are in axis order and, within each axis, in decreasing $h$. The coefficients of each polynomial form a contiguous suffix. Put \[ b=(\ell-1)\bmod K, \qquad q=\lfloor(\ell-1)/K\rfloor. \] Form a list of the slots to move to a prefix. First list $(i,\ell-1)$ for the length-$2^\ell$ axes in increasing $i$. Then list $(i,h)$ for $h=b-1,\ldots,0$, and within each $h$ in increasing $i$; this second list is empty if $b=0$. Move each listed slot immediately after the prefix already formed, leaving all other slots in their relative order. There are at most $D(b+1)=O(dK)$ listed slots, so the moves cost $O […]
+LONGEST PROOF #2 (opening): The Gaussian resampling argument uses two maps $\mathsf S,\mathsf T:\mathbb C^s\to\mathbb C^t$. For $0\leq k<t$, they are \[ (\mathsf S u)_k=\frac1\alpha\sum_{j\in\mathbb Z} e^{-\pi\alpha^{-2}(j-sk/t)^2}u_j, \qquad (\mathsf T u)_k=\sum_{j\in\mathbb Z} e^{-\pi\alpha^2(tj/s-k)^2}u_j. \] Both sums converge absolutely. For $0\leq j<s$, define \[ q_j=\left\lfloor\frac{tj}{s}+\frac12\right\rfloor, \qquad \beta_j=\frac{tj}{s}-q_j. \] Thus $q_j$ is an integer nearest to $tj/s$, with ties rounded upward. Let $C:\mathbb C^t\to\mathbb C^s$ select these coordinates, and let $\mathsf D:\mathbb C^s\to\mathbb C^s$ be the diagonal map \[ (Cv)_j=v_{q_j},\qquad (\mathsf D u)_j=e^{\pi\alpha^2\beta_j^2}u_j. \] Set $N=C\mathsf T\mathsf D$. In $(Nu)_j$, the summand with index $j$ is exactly $u_j$: the factor in $\mathsf D$ cancels the Gaussian factor at the selected coordinate $q_j$. The other summands form $ […]
+LONGEST PROOF #3 (opening): We first construct eight rotations that have the required effect away from a small set of addresses. We then correct exactly that set. For a Boolean control $c$ and arbitrary integers $u,w$, perform the following eight operations in the displayed chronological order. Every predicate uses the current values of the integers. \begin{equation} \label{eq:eight-packed-additions} \begin{array}{rcl@{\qquad}l} u&\leftarrow&u-c[\,w\equiv0\pmod2\,],&(1)\\ w&\leftarrow&w-c[\,u\equiv0\pmod2\,],&(2)\\ u&\leftarrow&u+c[\,w\equiv0\pmod2\,],&(3)\\ w&\leftarrow&w+c[\,u\equiv0\pmod2\,],&(4)\\ w&\leftarrow&w+c[\,u\equiv1\pmod2\,],&(5)\\ u&\leftarrow&u+c[\,w\equiv1\pmod2\,],&(6)\\ w&\leftarrow&w-c[\,u\equiv1\pmod2\,],&(7)\\ u&\leftarrow&u-c[\,w\equiv1\pmod2\,].&(8) \end{array} \end{equation} If $c=0$, these operations do nothing. If $c=1$, the first four operations induce the cycle $(00\ 01\ 10)$ in every sq […]

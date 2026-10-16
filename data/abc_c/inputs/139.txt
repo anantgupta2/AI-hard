@@ -1,0 +1,60 @@
+FAMILY 139: Subpolynomial query complexity for log-concave sampling
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: For C2 potentials with a supplied minimizer and $`I\preceq\nabla^2V\preceq2I`$, proves that sampling within total variation 1/10 requires only $`C_\varepsilon d^\varepsilon`$ exact value-and-gradient queries for every fixed ε &gt; 0. The bound holds on every run, with unrestricted computation between queries. A logarithmic lower bound also holds, so the optimal power-law exponent in this oracle model is zero.
+HEADLINE (v2, semi-formal): γ* = 0: ∀ ε > 0 ∃ C_ε ∀ d ≥ 2: Q(d) ≤ C_ε d^ε, and ∃ c, d_0 ∀ d ≥ d_0: Q(d) ≥ c log d (Q = first-order query complexity of sampling well-conditioned log-concave laws to TV 1/10)
+
+=== MANUSCRIPT: Subpolynomial query complexity for well-conditioned log-concave sampling [preprints/Subpolynomial-query-complexity-for-well-conditioned-log-concave-sampling-September-26-2026/build/main.tex]
+ABSTRACT: For every fixed ε &gt; 0, we give a sampling algorithm using at most $`C_\varepsilon d^\varepsilon`$ exact first-order queries on every execution for C2 potentials on ℝd with a known minimizer and Hessian between Id and $`2I_d`$. The output has total-variation distance at most 1/10 from the target Gibbs law. Computation between queries is unrestricted. We also prove an $`\Omega(\log d)`$ query lower bound for arbitrary randomized adaptive algorithms, determining the optimal dimension exponent to be zero.
+[theorem] \label{thm:main} In the oracle model above, for every \(\varepsilon>0\) there is \(C_\varepsilon<\infty\) such that \[ Q(d)\le C_\varepsilon d^\varepsilon \qquad(d\ge2). \] There are also absolute constants \(c>0\) and \(d_0\) such that \[ Q(d)\ge c\log d\qquad(d\ge d_0). \] The lower bound applies to arbitrary randomized adaptive first-order algorithms. In particular, \(\gamma_*=0\).
+[theorem] [Noisy near-quadratic sampling]\label{thm:primitive} Fix \(0<e<1\), an integer \(K_0\ge2\), and \(t>0\) satisfying \begin{equation}\label{eq:t-choice} 40(K_0+2)t<\frac14. \end{equation} There are constants and a dimension threshold depending only on \(e,K_0,t\) with the following property. For every integer \(d\) above that threshold, put \(\delta=d^{-e}\). One measurable randomized oracle procedure works for every \(F\in C^2(\R^d)\) with \(\Lip(\nabla F)\le\delta\), every \(x\in\R^d\), and every \(0<r\le1\). Given evaluation access to \(g=\nabla F\), it uses at most \(\polylog(d)\delta^{-t}\) evaluations of \(g\) on every execution and returns \[ X=X_{\mathrm{pre}}+\tfrac12G, \] where \(G\sim N(0,I_d)\) is independent of \(X_{\mathrm{pre}}\) and of all queries, and \begin{equation}\label{ […]
+[proposition] [Gaussian jet bounds] \label{prop:gaussian-jets} Under the assumptions above, in particular $l\le1/2$, define for each integer $q\ge1$ \[ U_q(\rho,y)=\rho^{-q}\nabla^q M_\rho(y)\qquad(\rho>0). \] These tensors extend smoothly to $\rho=0$. There is an absolute constant $C$ such that, for every $0\le\rho<1$, $y\in\R^d$ and every split, \begin{equation} |U_q(\rho,y)|_{\mathrm{split}} \le C^q q^{Cq}L(\sqrt a)^{-(q-1)}. \label{eq:jets} \end{equation} Here and below the vector-output slot is included among the tensor slots. The constant is uniform in the dimension, the primitive, its center and scale, and the derivative order $q$. Moreover, $DM_\rho$ and $U_1$ are symmetric, and \begin{equation} \nabla H_\rho(y)=y+r\rho M_\rho(y),\qquad \|\nabla^2H_\rho\|_{\op}\le C. \label{eq:interpolation-scor […]
+PROOF STRATEGY (paper's own words):
+- The smoothed Picard work is also a close methodological precedent: it develops Gaussian smoothing of \(C^2\) potentials, conditional cumulant estimates for derivatives of the smoothed potential, and high-order Picard approximation, including arbitrary Picard depth when exact smoothed gradients are available. Here we prove the all-split tensor estimates needed by our construction and implement recursively nested noisy conditional means with finitely many queries to the original gradient. This finite implementation, together with the subsequent removal of the auxiliary noise, gives every fixed positive query exponent in Theorem~\ref{thm:main}.
+- For lower bounds, \citet{chewi2023lower} developed a systematic first-order query-complexity treatment of log-concave sampling. Their Gaussian lower bounds use rotational invariance to reduce arbitrary adaptive algorithms to block-Krylov information. Their results already give logarithmic dimension dependence for well-conditioned Gaussian sampling at a suitable fixed total-variation accuracy. Our lower-bound proof follows that strategy, with an explicit spectrum in \([1,2]\) and a separating statistic. We give the full argument for total-variation threshold \(1/10\), including unrestricted randomized outputs.
+- \subsection{Proof strategy and principal ingredients}
+- To make the conditional operation reusable, we work with a $C^2$ perturbation $F:\R^d\to\R$, a center $x\in\R^d$, a scale $0<r\le1$, and the near-quadratic law \[ \nu(dz)\propto e^{-|z|^2/2-F(x+rz)}\,dz, \] where the gradient of $F$ has small Lipschitz constant. We construct two procedures: a sample from \(\nu\) with an added Gaussian, and the mean \(\E_\nu\nabla F(x+rZ)\) with an added Gaussian. The noise is not merely an error allowance. It is used to make recursive evaluation possible.
+- \paragraph{Dimension-controlled high derivatives.} High-order approximation is useful only if each further derivative does not introduce another power of the dimension. Derivatives of a Gaussian conditional mean form tensors with many coordinate slots. We bound each tensor as a matrix under every division of those slots into two nonempty groups. These bounds let us estimate the contractions arising along the flow by matrix composition. Repeated integration by parts then incurs only polylogarithmic dimension losses, followed by one $\sqrt d$ cost at the final vector output. The first step builds on classical Appell polynomials and higher-order Poincar\'e estimates \citep{anshelevich2004appell,adamczak2015concentration,kothari2017agnostic}; we prove the all-split cumulant and subsequent divergence estimates needed here. All high derivatives come from Gaussian conditioning; the original potential still needs only the $C^2$ regularity in \eqref{eq:original-class}.
+SECTION OUTLINE:
+Introduction
+  Model and result
+  Historical context
+  Proof strategy and principal ingredients
+The near-quadratic sampling problem
+  Notation and the auxiliary theorem
+  Convexity, moments, and comparisons
+  Coupling and smoothing conventions
+Gaussian transport and tensor derivatives
+  Cumulants from the Poincar\'e inequality
+  The transport equation
+Dimension bounds for material derivatives
+  Material derivatives of the conditional jets
+  Contractions and the expressions they generate
+  One final vector dimension factor
+A stationary flow for noisy means
+  Transport Jacobians and the zero endpoint
+  A kernel for the centered observable
+  Stationarity and the path integral
+  Derivatives on a stationary trajectory
+Finite formulas for the two flows
+  Probability transport by global Picard iteration
+  The kernel action through harmonic trajectories
+  The zero endpoint of the kernel integral
+  A globally Lipschitz approximate centering velocity
+  The mean formula and the order of parameter choices
+  The exact circuit interface and its derivation
+Finite evaluation of nested conditional means
+  Why Gaussian center noise helps
+  The numerical input and the implementation task
+  Two routines and two different kinds of depth
+  Evaluating an expression at a noisy center
+  Query-preserving shifts and the deterministic cap
+  Terminal errors and propagation of scales
+  Stability for arbitrary fixed seeds
+  Standalone accuracy and the primitive theorem
+From noisy conditional samples to the target law
+  A contracting noised chain
+  Conditional descent and its ideal histories
+  The Gaussian base rule
+LONGEST PROOF #1 (opening): We induct on the finite construction of $E$, proving all derivative and moment orders simultaneously. Permutations and single contractions follow directly from the preceding lemma. For a divergence, we first integrate by parts in a high trace moment. The resulting coordinate sums can be arranged as a composition of matrix unfoldings with only one closing trace. We then choose the moment large enough to absorb that trace's dimension factor. For a normalized jet, $\nabla^jU_q=\rho^jU_{q+j}$, so Proposition~\ref{prop:gaussian-jets} proves the assertion after enlarging a constant depending on $q$. Permutations cause no change. For a contraction, distribute the derivatives by Leibniz, use Lemma~\ref{lem:split-contraction} on each summand, and use the inductive estimates at exponent $2p$ on both factors. The number of Leibniz summands is at most $2^j$. Their weights and derivative orders add,  […]
+LONGEST PROOF #2 (opening): The terminal assertion is Lemma~\ref{lem:compiler-terminal}. All random variables below have finite second moments: the actual algorithms are finite compositions of affine maps and globally Lipschitz oracle evaluations, while ideal tilted variables have the primitive moment bounds. Thus all $W_2$ comparisons are defined. For a nonterminal $\mathsf M$, first couple its approximate $\mathsf S$ position anchor to an ideal anchor, independently of all remaining seed blocks. The child labels are $(b-10t,p-1/4)$. By induction and Lemma~\ref{lem:compiler-lipschitz}, replacing this anchor costs at most \[ \polylog(d)L\delta^{p-1/4}D(x). \] After division by the mean error unit $\sigma\delta^pD(x)$, the cost is at most $\polylog(d)\delta^{b-1/4}$, hence is bounded for large $d$. We may now assume that the position anchor has law $b_*Z+RN$, where $Z\sim\nu_{x,r}$ and $N$ is standard Gaussian, and  […]
+LONGEST PROOF #3 (opening): We expand only the additive state formulas, stopping whenever an earlier mean value is reached. This convention is what makes the coefficient bounds local: the center expression inside that earlier mean is kept as its own node. \emph{The three transport formulas.} A probability Picard state has its input position as direct term and mean coefficients with absolute sum at most $C_mr$. A harmonic state has direct term $\cos z$ times its input position plus $\sin z$ times its input momentum, with mean coefficients of absolute sum at most $C_mr$. The sine-weighted row sums are bounded because their integration intervals have bounded length. These assertions hold at every iteration: its additive direct term is the original input, not the preceding Picard iterate. For a kernel evaluation, the scalar expansion \eqref{eq:kernel-scalar-expansion} has absolute coefficient sum at most $B_d\sigma^{-1 […]

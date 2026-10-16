@@ -1,0 +1,109 @@
+FAMILY 140: Memory–sample lower bounds for noiseless Gaussian regression
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: For fixed A &gt; 0, a one-pass learner with $`Ad^2`$ persistent bits needs $`\Omega_A(d\log(1/\epsilon))`$ noiseless Gaussian samples to recover a unit vector to angular error $`0\lt \epsilon\le1/10`$ with probability 2/3, uniformly in accuracy for large d. Computation and randomized updates are unrestricted, but output uses only the terminal state, stopping index and fresh randomness.
+HEADLINE (v2, semi-formal): ∀ A>0, ∀^∞ d, ∀ M≤Ad², ∀ ε∈(0,1/10], ∀ one-pass M-bit learner on exact Gaussian measurements y_t=⟨x_t,s⟩, s uniform on S^{d−1}, with success prob ≥ 2/3: horizon T ≥ c_A·d·log(1/ε)
+
+=== MANUSCRIPT: Memory and precision in noiseless Gaussian regression [preprints/Memory-and-precision-in-noiseless-Gaussian-regression-September-27-2026/build/main.tex]
+ABSTRACT: For every fixed A &gt; 0, a learner that retains at most $`Ad^2`$ bits between fresh exact Gaussian linear measurements needs $`\Omega_A(d\log(1/\epsilon))`$ measurements to estimate a uniformly random unit vector to angular error at most ϵ, for any $`0\lt \epsilon\le 1/10`$, with probability at least 2/3. The constant is absolute for $`o(d^2)`$ memory.
+[theorem] [Memory and precision]\label{h:main} For every fixed finite \(A>0\), there are constants \(c_A>0\) and \(d_A\) such that the following holds. Let \(d\ge d_A\), let \(0\le M\le Ad^2\) be an integer, and let \(0<\epsilon\le1/10\). For any learner in Definition~\ref{h:model}, draw \(S\sim\sigma_d\) independently of the rows and the learner's data-independent randomness. If \[ \Prob\{\arccos\ip{\widehat s}{S}\le\epsilon\}\ge\frac23, \] then its prescribed horizon satisfies \[ T\ge c_A\,d\log(1/\epsilon). \]
+[corollary] [Subquadratic memory]\label{h:subquadratic} Let \(M(d)\ge0\) be integer-valued with \(M(d)=o(d^2)\), and let \(0<\epsilon(d)\le1/10\) be any accuracy sequence. A family of learners in Definition~\ref{h:model} with uniform-sphere average success at least \(2/3\) satisfies \[ T(d)\ge c\,d\log(1/\epsilon(d)) \] for all sufficiently large \(d\), where \(c>0\) is absolute. The dimension threshold may depend on the memory sequence.
+[corollary] [A guarantee for every signal]\label{h:worst-signal} The conclusions of Theorem~\ref{h:main} and Corollary~\ref{h:subquadratic} also hold when their average-success assumption is replaced by \[ \Prob\{\arccos\ip{\widehat s}{s}\le\epsilon\}\ge\frac23 \qquad\text{for every }s\in S^{d-1}, \] where this probability is over the rows and the learner's randomness.
+PROOF STRATEGY (paper's own words):
+- The every-signal consequence follows by averaging the same learner over \(\sigma_d\); it does not say that every individual signal is hard for every learner. We prove Theorem~\ref{h:main} and both corollaries after completing the backward argument in Section~\ref{h:end:section}.
+- A block of exact equations acts on a localized part of each continuation's successful mass. We prove its projection bound for an arbitrary finite measure with controlled mass in every ambient ball. Keeping the coefficient and support radius visible will expose the cancellation in the block estimate. The same theorem will later apply to a prior supported on a lower-dimensional part of the sphere.
+- Projection loses \(m(1-1/p)\) powers of the support radius. The volume of the projected ball will restore exactly this power. We prove the theorem by controlling inverse affine distances, expanding a smoothed density moment, and then removing the smoothing on matrix--label space. The independent-copy moment and successive orthogonalization have a close predecessor in the noisy regression analysis of \cite[Section~7, Lemma~12]{SSV2019}. That result treats a one-row noisy interval under a global \(L^2\) density condition; here the input is local growth, and the output concerns several rows and exact labels.
+SECTION OUTLINE:
+Exact observations and finite memory
+  The precision problem and its predecessors
+  Why the precision scale is natural
+  A backward proof under the original prior
+Local mass of terminal success
+Exact Gaussian projection
+  Affine distances and the Gram determinant
+  Smoothing and exact labels
+  The common projected support
+One block of arbitrary computation
+From one block to a finite stream
+  Fresh continuations and local destinations
+  Borel versions and the original randomized experiment
+  The quantitative success bound
+Constant accuracy and the main lower bound
+Selection on a common data domain
+A paired-coordinate cube application
+  The prior and its terminal mass
+  Transferring local mass to the embedded measure
+  The block bound and the streaming consequence
+  An affine-distance interpretation
+Other exact-label interfaces
+  A direct bound for measurable tests
+  Spherical absolute continuity and compatible fibers
+  Convergence and an everywhere-full-rank version
+Coefficient recurrences and support alternatives
+  Spherical restrictions and a second moment calculation
+  Enclosing balls as an alternative support
+  Terminal coefficients
+  One coefficient recurrence
+Normalizations and quantitative consequences
+  The density interfaces in the same recurrence
+  One logarithmic extraction
+  Explicit constants and thresholds
+A sharper full-data residual bound
+LONGEST PROOF #1 (opening): Let $U$ be the row span of $X$, write $r=\dim U\le T$, and put $k=d-r$. The labels determine $u=P_US$: the restriction of $X$ to $U=(\ker X)^\perp$ is injective. More explicitly, when $T>0$, diagonalizing $XX^{\mathsf T}$ shows that the consistent label $Y$ determines \[ u=\lim_{\eta\downarrow0} X^{\mathsf T}(XX^{\mathsf T}+\eta I_T)^{-1}Y. \] This also shows that $u$ is a measurable function of the data. The analogous limit \[ P_U=\lim_{\eta\downarrow0}X^{\mathsf T} (XX^{\mathsf T}+\eta I_T)^{-1}X \] shows that the projection is measurable in $X$. For the empty horizon $T=0$, $X$ has no rows and $U=\{0\}$, $u=0$. The same values hold whenever the row span is zero, including an all-zero matrix. In all these cases the residual radius $\rho=\sqrt{1-\|u\|^2}$ equals one. Standard Borel disintegration supplies a conditional probability kernel for the actual joint law and the Borel data map $ […]
+LONGEST PROOF #2 (opening): We first construct versions for a fixed set of rules. If $f:\mathbb R^d\times\mathbb R\to[0,1]$ is measurable in the $\lambda$-completion, each dyadic superlevel set $\{f\ge k2^{-n}\}$, $1\le k\le2^n$, agrees with a Borel set outside a Borel $\lambda$-null set, by the description of completion in Tao~\cite[Exercise~1.4.26]{TaoMeasure2011}. Replace these superlevel sets by their Borel representatives in \[ f_n=2^{-n}\sum_{k=1}^{2^n}\mathbf 1_{\{f\ge k2^{-n}\}}. \] The resulting Borel functions have a Borel $\limsup$ equal to $f$ outside the union of the countably many null sets, since $f_n\to f$. Thus each coordinate of each finite kernel has a Borel version. For one state and index, choose all of its coordinate versions simultaneously. The Borel set on which the resulting vector is not nonnegative with sum one is null; on this set replace the vector by a fixed point mass. The result is a […]
+LONGEST PROOF #3 (opening): Use the seedwise convention just established, and first start from any prescribed initial state. For \(T>0\), partition the stream into \(m=\lceil T/p\rceil\) consecutive blocks, each of length at most \(p=k_0\). Lemma~\ref{h:stream:categories}, with angular terminal score and signal \(\iota(u)\), represents the preceding success function by the exact block formula in Corollary~\ref{h:cube:block}. For a block of length \(k\), its Borel routes have at most \begin{equation}\label{h:cube:destinations} N\le(k+2)2^M \end{equation} destinations. The stopping offsets are local to this block, including an immediate stop; its continuing functions use fresh future samples. These are the same phase and terminal-state conventions as in that lemma. For \(n\ge8\), \(p\ge n/8\), \(d\le2n+1\), and \(M\le d^2\), \[ \frac{\log N}{p} \le\frac{d^2\log2+\log(p+2)}p\le C_4n \] with a universal \(C_4\). Choose […]
+
+=== MANUSCRIPT: Posterior replicas and conditional information in Gaussian regression [preprints/Posterior-replicas-and-conditional-information-in-Gaussian-regression-September-27-2026/build/main.tex]
+ABSTRACT: For a signal with density bounded by L relative to uniform probability on $`S^{d-1}`$, we bound the information in a finite message W formed from exact Gaussian measurements, conditional on an independent projection revealed only to the analyst. For explicit row counts proportional to d, the bound is $`O(H(W)/d+d+\log(2+\log L))`$. Consequently, a finite-state learner with $`o(d^2)`$ persistent bits and a deterministic sample horizon needs $`\Omega(d\log(1/\epsilon))`$ fresh noiseless Gaussian measurements for constant-probability angular accuracy $`0\lt \epsilon\le1/10`$ under the uniform spherical prior.
+[theorem] [Gaussian replica block bound]\label{thm:gaussian-block} For all sufficiently large $d$, set \[ k=2\lfloor d/16\rfloor,\qquad m=k,\qquad t=m+1,\qquad \ell=4k. \] Suppose $p=f\sigma_d$ is a probability with $0\le f\le L<\infty$. In the block experiment above, let $A$ have $k$ rows and let $B$ have $\ell$ rows. There is an absolute constant $C$ such that \begin{equation}\label{eq:gaussian-block} I(S;W\mid B,BS) \le \frac{H(W)}{t}+Cd+C\log(2+\log L). \end{equation} The bound is uniform over the prior, the density bound $L$, and the message kernel. The labels used to produce $W$ are the exact values $AS$.
+[theorem] [Uniform-prior sample lower bound]\label{thm:streaming} Let $M(d)=o(d^2)$ be nonnegative integer-valued, and let $0<\epsilon(d)\le1/10$. Suppose a family of learners in Definition~\ref{def:streaming-model} satisfies \[ \Prob\{\arccos\langle\widehat S,S\rangle\le\epsilon(d)\}\ge\frac23 \qquad\text{when }S\sim\sigma_d, \] where the probability includes the signal, samples, and learner randomness. Then there is an absolute $c>0$ such that \[ T(d)\ge c\,d\log\frac1{\epsilon(d)} \] for all sufficiently large $d$. The eventual threshold may depend on the memory sequence.
+[corollary] [Three endpoint substitutions]\label{cor:replica-endpoints} Assume $0<\epsilon\le1/10$ in Lemma~\ref{lem:residual-information}. For sufficiently large $d$ the following bounds hold. \begin{enumerate}[label=(\roman*)] \item If $G$ is Gaussian, $p\ge3/5$, and $0\le b\le d/2$, the beta-variance bound (with the separate deterministic case at $b=0$) and the angular cap just described give \begin{equation}\label{eq:endpoint-gaussian} I(S;V\mid G,GS)\ge \tfrac12(d-b-1)\log\frac1{5\epsilon}-\log2. \end{equation} \item If $G$ is a Haar frame, $p\ge2/3$, and $b=\lfloor d/4\rfloor$, Markov's bound $\Prob\{R<1/2\}\le4b/(3d)\le1/3$ gives \begin{equation}\label{eq:endpoint-haar} I(S;V\mid G,GS)\ge \tfrac13(d-b-1)\log\frac1{4\epsilon}-\log2. \end{equation} \item If $G$ is Gaussian, $p\ge3/5$, and $b=\lfl […]
+PROOF STRATEGY (paper's own words):
+- The total-correlation argument uses Watanabe's measure of multivariate dependence~\cite{Watanabe1960} and its general probability-space chain rules~\cite[Sections~3.3 and~6]{Austin2020}. Posterior resampling preserves the joint law with the observed data, as in the general Nishimori identity recorded by Lelarge and Miolane~\cite[Proposition~16]{LelargeMiolane2019}. Here its role is to preserve the signal--message pair law while introducing dependence among replicas. The projected tests use the relative-entropy variational principle; a convenient statement is \cite[Equations~(1.1)--(1.2)]{DupuisMao2022}. The equal-label measure is related to coarea~\cite[Theorem~3.1]{Federer1959} and to affine simplex-volume changes of variables~\cite[Lemma~1]{Drury1984}. We prove the Gaussian probability normalization and the required evaluations at constrained labels directly. Thus these classical tools provide the background for the exact-fiber calculation, rather than an unproved formula for its particular probability law.
+- Fix $A$ first and disintegrate each point by its projected label. Given the first label $y$, the other labels approach $y$ under either probability approximate identity. The base density is continuous in the interior of its support, and the conditional fiber law varies weakly continuously there. The spherical boundary has zero projected probability. Thus the integral converges to \[ \int\gamma_{k,d}(dA)\int (p_A^0(y))^t \int G(\mathbf u,A)(P^0_{A,y})^{\otimes t}(d\mathbf u)\,dy. \] To justify the passage, condition first also on $u_1$. The absolute value of the remaining integral is at most $\norm G_\infty(\sup p_A^0)^m$. The density suprema are uniformly bounded on the compact matrix support: this follows from \eqref{eq:spherical-projection-density}, whose exponent is nonnegative, and from the Gaussian density formula. The bound is global in all the other labels, including labels near or outside the spherical support, because each $\varphi_\eta$ is a probabilit
+SECTION OUTLINE:
+Introduction
+  Related memory--sample bounds
+  Conditional information from one block
+  A streaming consequence
+  Information and geometric comparisons
+Finite states and the information required at the endpoint
+  Finite-state learners
+  Spherical caps and residual fibers
+  Borel rules, randomness, and bounded stopping
+Posterior replicas and exact equal-label measures
+  Information in a message and loss of correlation
+  Projection fibers and inverse affine volumes
+  The exact finite measure on equal labels
+  Finite correlation for bounded spherical priors
+A Gaussian test that cancels the affine volume
+  The observable projected test
+  Comparing the remaining projection densities
+Shared data and distance-bin comparisons
+  The shared-data law and its affine heights
+  Projected height bins
+  A fixed mixture before averaging the side matrix
+Current-state recurrences and the streaming bound
+  The Gaussian replica clock
+  The distance-bin clock
+Haar projections and posterior replica information
+  An exact identity for the replica measure
+  The correlation retained by the auxiliary projection
+  Cancellation and the block information bound
+  The terminal fiber and the streaming conclusion
+Synthetic Gaussian projections
+  The actual and projected replica laws
+  The synthetic density and its critical kernel
+  Integrability and cancellation of the correlation costs
+  Iteration along the full state history
+Stiefel incidence and conditional block information
+  Two probability laws on compatible signals
+  The common measure and its density versions
+  An inverse kernel at two scales
+  Finite histories and the precision endpoint
+LONGEST PROOF #1 (opening): We first take $\nu=P^0$. Let $\varphi_\eta$ be either the uniform density on the radius-$\eta$ $k$-ball or the density of $N(0,\eta^2 I_k)$. For a continuous compactly supported test $G(\mathbf u,A)$ whose matrix support lies in the open full-row-rank set, integrate \begin{equation}\label{eq:equal-label-approximation} G(\mathbf u,A)\prod_{i=2}^t\varphi_\eta(A(u_i-u_1)) \end{equation} against $(P^0)^{\otimes t}(d\mathbf u)\gamma_{k,d}(dA)$. Fix $A$ first and disintegrate each point by its projected label. Given the first label $y$, the other labels approach $y$ under either probability approximate identity. The base density is continuous in the interior of its support, and the conditional fiber law varies weakly continuously there. The spherical boundary has zero projected probability. Thus the integral converges to \[ \int\gamma_{k,d}(dA)\int (p_A^0(y))^t \int G(\mathbf u,A)(P^0_{A,y})^{ […]
+LONGEST PROOF #2 (opening): We first establish the identities without dividing by any projection density. In \(\mathsf M_A\), integrating the tuple variables gives the exact \((s_1,A)\)-marginal \begin{equation}\label{inc:MA-marginal} \mu(ds_1)\gamma_{n,d}(dA)\,p_A(As_1)^\ell. \end{equation} For fixed full-rank \(A\), this weight is finite by \eqref{inc:ellipsoid-bound}. Where it is positive, \(\lambda_{A,As_1}^{\otimes\ell} =p_A(As_1)^\ell\mu_{A,As_1}^{\otimes\ell}\). The rank argument for the \(Q\) experiment therefore shows that \(\operatorname{rank}U=\ell\) outside an \(\mathsf M_A\)-null set. At zero weight the fiber product has zero mass. The same reasoning in \(\mathsf M_C\) gives the exact \((s_1,B,C)\)-marginal \begin{equation}\label{inc:MC-marginal} \mu(ds_1)\gamma_{p,d}(dB)\upsilon_{n,p}(dC)\,p_D(Ds_1)^\ell, \end{equation} and the rank argument for \(R\) removes the loci where \(U\) or \(BU\) has rank le […]
+LONGEST PROOF #3 (opening): At the fixed tuple, the restriction of \(B\) to \(L\) has rank \(u\) almost surely. Choose an orthonormal \(m\times q\) matrix \(N\) whose columns span \((BL)^\perp\), using only \(BD_{\mathbf x}\). Gram--Schmidt with a fixed ordering gives a measurable choice on the full-rank set. With an independent standard Gaussian \(k\times q\) matrix \(H\), the required conditional law of \(F\) is realized by \begin{equation}\label{syn:synthetic-realization} F=HN^{\mathsf T}. \end{equation} The choice of \(N\) uses only \(B|_L\). The Gaussian restriction \(B|_{L^\perp}\) is independent of \(B|_L\). Write \(s-x=v+w\) with \(v\in L\) and \(w\in L^\perp\). Then \(N^{\mathsf T}Bv=0\), while, conditionally on \(B|_L\), the vector \(N^{\mathsf T}Bw\) has law \(N(0,\norm w^2I_q)\). Therefore, conditionally on \(H\) and \(B|_L\), \begin{equation}\label{syn:covariance} FB(s-x)\sim N(0,\delta(s)^2HH^{\mathsf […]
+
+=== MANUSCRIPT: Localization costs and information growth for exact Gaussian observations [preprints/Localization-costs-and-information-growth-for-exact-Gaussian-observations-September-27-2026/build/main.tex]
+ABSTRACT: For the image of a uniform cube under a spherical coordinate map, we prove that finite messages from t blocks of $`\Theta(d)`$ exact Gaussian measurements reveal only $`O_A(dt)`$ information when each message has at most $`\exp(Ad^2)`$ values, for fixed A. The same bound holds when each message is supplemented with a 
+[…]

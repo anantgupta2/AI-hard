@@ -1,0 +1,60 @@
+FAMILY 136: A quasilinear PCP theorem for PPAD
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Resolves the quasilinear PCP-for-PPAD conjecture. An End-of-Line instance of length N reduces to numerical circuit constraints of total length $`N(\log N)^{O(1)}`$ such that any polynomially encoded rational assignment satisfying all but a fixed fraction to fixed accuracy yields an endpoint solution. Such assignments always exist, giving robust local verification with only quasilinear size overhead.
+HEADLINE (v2, semi-formal): ∃ rational ε,δ>0 ∃ deterministic poly-time R, D ∀ End-of-Line instance I of length N: |R(I)| ≤ A·N⌈log N⌉^b, acceptable assignments of R(I) exist, and ∀ assignment x ε-satisfying all but a δ fraction of gates: D(I,x) is a solution of I
+
+=== MANUSCRIPT: The PCP-for-PPAD conjecture: a quasilinear reduction [preprints/The-PCP-for-PPAD-conjecture-a-quasilinear-reduction-September-25-2026/build/main.tex]
+ABSTRACT: We prove the quasilinear-size PCP-for-PPAD conjecture of Babichenko, Papadimitriou, and Rubinstein. There are fixed positive rational constants ε and δ and a deterministic polynomial-time reduction that transforms an End-of-Line instance of binary length N into a generalized circuit of total binary length $`N(\log N)^{O(1)}`$. From any rational assignment of polynomial encoding length that ε-satisfies all but a δ fraction of the gates, a solution to the original End-of-Line instance can be recovered in polynomial time, regardless of which gates fail. Such assignments always exist, with one fixed polynomial bound on their encoding length.
+[theorem] [Quasilinear PCP for PPAD]\label{thm:main} There are fixed rational constants \[ 0<\eps<\tfrac1{10},\qquad 0<\delta<1, \] a fixed positive integer $A$, a fixed nonnegative integer $b$, a fixed polynomial $p$ with nonnegative integer coefficients, and deterministic algorithms $R,D$ with the following properties. \begin{enumerate}[label=\textup{(\roman*)}] \item Every generalized circuit in Definition~\ref{def:gcircuit} has an acceptable rational assignment of encoding length at most $p(M)$. \item For every End-of-Line instance $I$ of length $N$, the output $R(I)$ is a generalized circuit whose complete encoding length satisfies \[ M\leq A N\bigl\lceil\log_2(N+2)\bigr\rceil^b. \] \item The construction $R$ runs in time polynomial in $N$, with one fixed polynomial bound. \item For every accep […]
+[theorem] [Outer-code interface]\label{thm:outer-codes} There exist fixed constants $d$, $\delta_1>0$, $C_0<\infty$, $\lambda>0$, $\theta_{\mathrm{out}}>0$, and $K_{\mathrm{out}}<\infty$, with $\lambda\le\min\{(8C_0)^{-1},\delta_1/16\}$, having the following uniform properties for every input length $N$ and its padded tape length $h=O(N)$, after the fixed padding in \eqref{oc:outer-size}. \begin{enumerate}[label=(\roman*)] \item The group $\Gamma=\F_2^r\rtimes H$ has $|\Gamma|\le M_or^9=O(N\operatorname{polylog} N)$, where $M_o=2^r=O(N)$. Its A and B label lists are symmetric, of degree $d$, and have mean-zero norm at most $\lambda$. There is a field $J=\F_{p^4}$ with $p>M_o>|H|$, $p\equiv1\pmod{M_o}$, and a primitive $M_o$-th root $\zeta\in\F_p$. All public group and field data and the common scala […]
+[theorem] [Outer representation interface]\label{thm:outer-representation} There are fixed positive constants $\delta_{\rm raw},\rho_{\rm raw}$, fixed integers $C_L,c_{\rm raw}$, and uniform deterministic algorithms with the following properties for every End-of-Line input of length $N$. They construct a directed graph of valid extended labels, represented by canonical words \[ R_v\in(\{0,1\}^L)^\Gamma, \qquad |\Gamma|=N\operatorname{poly}(\ell_N), \qquad L=(\ell_N+C_{\rm base})^{C_L}, \qquad \ell_N=\lceil\log_2(N+2)\rceil, \] where $C_{\rm base}$ may be any sufficiently large fixed integer. \begin{enumerate}[label=\textup{(\roman*)}] \item \textbf{Graph and endpoint data.} The graph has indegree and outdegree at most one, no self-edges, and no isolated vertices. It has the public distinguished sour […]
+PROOF STRATEGY (paper's own words):
+- \maketitle \begin{abstract} We prove the quasilinear-size PCP-for-PPAD conjecture of Babichenko, Papadimitriou, and Rubinstein. There are fixed positive rational constants $\eps$ and $\delta$ and a deterministic polynomial-time reduction that transforms an End-of-Line instance of binary length $N$ into a generalized circuit of total binary length $N(\log N)^{O(1)}$. From any rational assignment of polynomial encoding length that $\eps$-satisfies all but a $\delta$ fraction of the gates, a solution to the original End-of-Line instance can be recovered in polynomial time, regardless of which gates fail. Such assignments always exist, with one fixed polynomial bound on their encoding length. \end{abstract} \tableofcontents \section{Introduction and the exact search relation}\label{sec:introduction}
+- \subsection{Proof strategy: encoded paths and robust local computation}
+- \paragraph{Organization and imported inputs.} Section~\ref{sec:outer-composition} assembles the main theorem from the outer representation, the port interface stated there, and the independent geometric interface. It proves universal decoding, the complete binary size bound, and rational-witness totality. Sections~\ref{sec:inner-algebra}--\ref{sec:inner-gadget} prove the port interface, and Section~\ref{sec:geometry} proves both the displacement bound and finite numerical access. Section~\ref{sec:weak-nash} gives the consequences described below. Appendix~\ref{sec:extensions} collects the separate full-macrograph and unrestricted-product variants; these are not prerequisites for the fixed-port composition.
+- The outer code has two roles. Its systematic coordinates carry the data on which the representation computes, and its redundant coordinates make local consistency imply proximity in the metric that counts an entire stored symbol as one position. We construct the code, including its matrix twists and simultaneous systematic encoders. All vector-valued statements below use joint support: a coordinate is erroneous when any component is erroneous. Their constants do not depend on the number of components or stored slots. The notation in this section is local to the outer construction; in particular, the group constructed here is not the affine group used later for the inner construction.
+- The proof uses the decreasing-disagreement method of \cite[Section~4.2, Algorithm~1 and Propositions~4.7--4.8]{DEL+2022}. We prove the version for joint tuples with commuting twists needed here.
+SECTION OUTLINE:
+Introduction and the exact search relation
+  The source and target problems
+  Main theorem
+  Proof strategy: encoded paths and robust local computation
+  Consequences for games and markets
+A sparse macrograph for End-of-Line
+  Sparse transcripts and their two orders
+  The cyclic schedule and reciprocal proposals
+  Endpoints, sparse edits, and uniform size
+Outer index groups and systematic square codes
+  A group of quasilinear order
+  Common scalar local codes
+  Twists and simultaneous systematic extension
+  Proximity and one-axis gaps
+  Correction with value-independent uncertainty supports
+Certified programs and persistent tape equations
+  Full operations and a fixed query list
+  Scalar transforms with certified stages
+  Triangular A-only certificates
+  Mode-serial filling of a full slot
+  From sparse tape wiring to row systems
+A locally evolving outer representation
+  Finite differences of the complete certificate tuple
+  Public addresses, logical reads, and a reversible preparation
+  The extended graph and its endpoint payload
+  A packed tester for valid represented vertices
+  Full representation cost and a fixed local Boolean exponent
+  Correction and the complete outer interface
+Binary composition and the robust outer circuit
+  A fixed port and a robust Boolean decision
+  Port substitution, validation, and average correction
+  Small-support ideal tapes and complete branch counts
+  Cohorts, individual read routing, and gate realization
+  All failure and spoilage charges
+  Parameter order and synchronization before decisions
+  The clipped mean contradiction and universal decoding
+  Complete output length, uniformity, and totality
+The inner path and its algebraic representation
+  Parameters and the extended path
+  Chart conventions and lifted cyclic interpolation
+LONGEST PROOF #1 (opening): \paragraph{Sparse row equations.} Use the normalization in Lemma~\ref{lem:macrograph}. The Boolean tests for the four arrays are $z(z-1)=0$ at each row, and content must vanish where occupation is zero, by $a(1-e)=0$. For occupation in a prescribed order $\pi$, impose \[ e_{\pi(i+1)}(1-e_{\pi(i)})=0\quad(0\le i<h-1). \] Together with Booleanity, these equations say that occupied positions form a prefix. Its desired length is imposed separately by its integer count. Full occupation may instead be imposed row by row. Fixed gate truth tables have multilinear representing polynomials over $J$: for a Boolean input $a\in\{0,1\}^m$ its indicator is $\prod_{i:a_i=1}z_i\prod_{i:a_i=0}(1-z_i)$, so summing the indicators weighted by the truth-table values gives the desired polynomial. The arity is fixed. Gate, input-copy, designated-comparison, dummy, and tape-to-tape-copy equations are conditioned […]
+LONGEST PROOF #2 (opening): \paragraph{Cyclic schedule and Boolean validity.} Use the normalized transcript positions and the two orders of Section~\ref{macro:transcripts}, renaming their length \(T=O(N)\). For this variant keep two content tapes \(A,B\); their occupied prefix lengths are specified by the public stage, so no occupation coordinates are needed. With the notation \(Q_x,U_y,V_y\) from that section, use the following four stage conditions: \[ \begin{array}{c|l} 0\le s\le T & A=Q_x,\quad B\text{ a forward prefix of length }s \text{ from }S(x),\\ T\le s\le2T & B=Q_y,\quad A\text{ a reconstruction prefix of length }2T-s \text{ from }y,\\ 2T\le s\le3T & B\text{ a valid full transcript},\quad A=\operatorname{pref}_{\pi_{\mathrm f},s-2T}(B),\\ 3T\le s\le4T & A\text{ a valid full transcript},\quad B=\operatorname{pref}_{\pi_{\mathrm f},4T-s}(A). \end{array} \] The boundary descriptions agree. At \(s=T\), the f […]
+LONGEST PROOF #3 (opening): Take a positive fixed mixture of the test families described below, including each present block type. Their query counts are bounded, and all requested nonuniform masks are implemented by the splitting operation above. We prove the gap by a sequential replacement argument. Consider any sequence of increasing sizes and words whose rejection tends to zero, allowing the public circuits to vary in the fixed template. We show distance tending to zero from a canonical valid word. A bounded smooth test retains vanishing rejection after a vanishing-distance change, by the union bound over its potential reads; for a branching test use its entire bounded answer tree. \paragraph{Copies, symbols, and slot tensors.} Compare two independent random copies of a uniform original bit. If the fraction of ones among its copies is \(p\), the test rejects with probability \(2p(1-p)\), which is at least \(\mi […]

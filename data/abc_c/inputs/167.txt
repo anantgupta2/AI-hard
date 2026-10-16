@@ -1,0 +1,96 @@
+FAMILY 167: Planar distinct distances and unit-distance bounds
+SUBJECT: Combinatorics
+OPENAI SUMMARY: Proves the weak pinned Erdős distance conjecture: for every fixed ε &gt; 0, all but $`o(n)`$ points of any n-point planar set determine at least $`n^{1-\varepsilon}`$ distinct nonzero distances. A complementary theorem bounds the number of unit-distance pairs by $`O(n^{4/3-\delta})`$ for an absolute δ &gt; 0.
+HEADLINE (v2, semi-formal): ∀ ε>0: sup_{P⊂ℝ², |P|=n} #{x∈P: |D_x(P)| < n^{1−ε}}/n → 0 as n→∞ (all but o(n) pins of any n-point planar set see ≥ n^{1−ε} distinct distances); Lean/main form: ∀ s>0, F_n(s) → 0
+
+=== MANUSCRIPT: The weak pinned planar distance theorem [preprints/The-weak-pinned-planar-distance-theorem-September-23-2026/build/main.tex]
+ABSTRACT: We prove the weak pinned Erdős distinct-distance conjecture. For every fixed ε &gt; 0, all but $`o(n)`$ points of any n-point planar set determine at least $`n^{1-\varepsilon}`$ distinct nonzero distances.
+[theorem] \label{thm:main} For every fixed $s>0$, one has $F_n(s)\longrightarrow0$ as $n\longrightarrow\infty$.
+[corollary] \label{cor:pins} For every fixed $\varepsilon>0$, \[ \sup_{\substack{P\subset\R^2\\|P|=n}} \frac{\bigl|\{x\in P:|D_x(P)|<n^{1-\varepsilon}\}\bigr|}{n} \longrightarrow0. \] In particular, every sufficiently large $n$-point planar set has a pin determining at least $n^{1-\varepsilon}$ distinct nonzero distances.
+[proposition] \label{prop:graph} Under the supposition above, there is a sequence of finite sets $P\subset\R^2$ of real algebraic points, with $n=|P|\to\infty$, and nonempty directed graphs $E$ on $P$, with the following properties. Their densities $d_n=|E|/[n(n-1)]$ tend to $\theta$, and every fiber has $k_e\ge n^{s-o(1)}$, uniformly in $e$. For a fixed constant $B_0$, \begin{equation}\label{eq:ext-domination} q\le B_0\pi,\qquad q_X,q_Y\le B_0\alpha,\qquad \frac{q_X+q_Y}{2}\ge(1-o(1))\alpha \end{equation} pointwise, and \begin{equation}\label{eq:ext-small-degree} q_Y\{y:d^-(y)<n^\gamma\}=O(n^{\gamma-1})=o(1). \end{equation} Finally, put $\lambda_n=1/\log n$. For every subset $C\subset P$, with $m=|C|$ and $p_e=\mu_e(C)$, \begin{equation}\label{eq:subset} \E_e\,\1_C(x_e)p_e\1_{\{p_e\ge\lambda_n\}} \le \ […]
+PROOF STRATEGY (paper's own words):
+- \maketitle \begin{abstract} We prove the weak pinned Erd\H{o}s distinct-distance conjecture. For every fixed $\varepsilon>0$, all but $o(n)$ points of any $n$-point planar set determine at least $n^{1-\varepsilon}$ distinct nonzero distances. \end{abstract} \tableofcontents \section{Introduction}\label{sec:introduction}
+- \subsection{The proof in outline} Assuming that Theorem~\ref{thm:main} fails, we first choose a sequence with nearly maximal density of pairs in large distance fibers. Section~\ref{sec:extremal} extracts a directed graph of these pairs while controlling how much of a fiber can lie in a small subset. Transfer for real closed fields preserves every distance equality and disequality and puts each finite configuration in a number field \cite[Theorems~3.1 and~4.1]{RCFTransfer}. Neither the field nor its degree is fixed.
+- If the overlap scale stays bounded, one complex embedding can be normalized so that the two coordinate distributions have non-atomic limits. The fiber and incoming-neighbor estimates yield a family of M\"obius maps carrying one limiting coordinate law to the other. The first source coordinate is independent of the entire target pair; the second source coordinate need not be. To remove the latter dependence, fix a target pair and sample a point from the first limiting coordinate law. Its image under the fiber map has the second limiting law. The fiber equation writes the negative logarithm of the distance from that image to the second target coordinate as a difference of logarithmic distances from the sampled point to the first source and target coordinates, up to an additive constant. Independence lets the first source coordinate approach the first target coordinate. This difference then collapses in probability under the fixed sampling law, whereas the image's logarithmic target-distance law has positive spread even after additive constants are discarded. Section~\ref{sec:bounded} makes this contradiction precise.
+- The tree-transport formula is a standard sum of the imbalances across tree edges \cite[Section~2, Equation~(5)]{TreeTransport}; we prove its finite form and the conditional comparisons needed here. Weak compactness and Portmanteau provide subsequential probability laws \cite[Proposition~5.3 and Theorems~4.2,~3.2]{WeakCompactness}. The local arguments must additionally establish non-atomicity, independence of the source parameter, and preservation of the fiber map. These properties connect the standard tools to the additive overlap identity and its exact variance consequence.
+- Section~\ref{sec:extremal} prepares the extremal graph and its sampling laws. Section~\ref{sec:hierarchies} constructs the partitions and proves the additive identity. Sections~\ref{sec:smallcells} and \ref{sec:variance} establish the overlap and variance estimates. Sections~\ref{sec:unbounded} and \ref{sec:bounded} exclude the two scale regimes and complete the proof of Theorem~\ref{thm:main}.
+- \begin{proof} We construct the graph, prove that deleting low-degree vertices cannot remove half the configuration, and then prove the subset estimate.
+SECTION OUTLINE:
+Introduction
+  Background and significance
+  The proof in outline
+A graph of large distance classes
+Arithmetic and nested partitions
+  Two coordinates at every place
+  Nested grids and their error
+  Removing the giant cell
+  The exact overlap identity
+Small cells and fiber mass
+Variance from off-diagonal sampling
+The case of unbounded overlap scale
+  Extracting cells of positive mass
+  Distances obtained from the hierarchy
+  Transport to independent uniform vertices
+  A lower bound for tree distance fluctuations
+Bounded scale and a limiting fiber map
+  A selected embedding and normalized limits
+  The variance estimate determines the limiting laws
+  The joint limit and its fiber equation
+  A nonatomic obstruction to the fiber maps
+LONGEST PROOF #1 (opening): We construct the graph, prove that deleting low-degree vertices cannot remove half the configuration, and then prove the subset estimate. \paragraph{Preserving the exact distance pattern.} For fixed $N$, the numerator defining $F_N(s)$ takes values in the finite set $\{0,1,\ldots,N(N-1)\}$. Its maximum is therefore attained, without any compactness assertion about configurations. Choose a sequence $N\to\infty$ on which $F_N(s)\to\theta$ and an attaining configuration for each $N$. Each such configuration can be replaced by one with real algebraic coordinates without changing any distance class. To see this, label its points by $1,\ldots,N$ and use coordinate variables $(u_i,b_i)$. Write $D_{ij}=(u_i-u_j)^2+(b_i-b_j)^2$. Require $D_{ij}>0$ for $i<j$, and prescribe, for every two unordered pairs, the equality $D_{ij}=D_{kl}$ or the disequality $D_{ij}\ne D_{kl}$ that holds in the original  […]
+LONGEST PROOF #2 (opening): We separate large cells, complements of giants, and actual small cells. For a set of size $m\ge2$, \begin{equation}\label{eq:sc-pair-comparison} \frac{\alpha(C)^2}{2} \le \pi(C^2)=\frac{m(m-1)}{n(n-1)} \le\alpha(C)^2. \end{equation} If $a\ge\tau$, then $m\ge2$ and the integrand of $T(\lambda)$ is at most $\lambda\le2\lambda\pi(C^2)/\tau^2$. These occurrences contribute at most $2\lambda W_2/\tau^2$. If $C$ is the complement occurrence of a giant and $a<\tau$, its contribution is at most \[ q(C^2)\le B_0\pi(C^2)\le B_0\tau a. \] The integral of $a$ over the giant-complement occurrences is $A$, so their contribution is at most $B_0\tau A$. These two classes retain the multiplicities of the transformed family. It remains to treat actual nongiant cells of mass less than $\tau$. Fix a place, a coordinate $j$, and the two entire realized hierarchies. Let $j'$ be the other coordinate and set $H […]
+LONGEST PROOF #3 (opening): The proof uses an exact signed identity for pair probabilities, followed by separate estimates on large cells, small cells, and singletons. The integer $k\ge n^\gamma>1$ is at least two. Let $P_B$ be the uniform law on distinct ordered pairs from $B$. Define another law $R_B$ on distinct pairs as follows. First take $X$ uniformly from $B$. If $k<n$, then, conditionally on $X$, take $Y$ uniformly from $B\setminus\{X\}$ with probability $k/n$, and uniformly from $P\setminus B$ otherwise. If $B=P$, define $R_B=P_B=\pi$ directly; the outside branch has zero probability and need not be defined. The first marginal of $R_B$ is $\nu$, and its second marginal is exactly $\alpha$. Indeed, a point $y\in B$ receives mass \[ (k-1)\frac1k\frac{k}{n}\frac1{k-1}=\frac1n, \] and a point $y\notin B$ receives mass $k(1/k)((n-k)/n)/(n-k)=1/n$. Thus the signed measure $P_B-2R_B+\pi$ has total mass zero. Its  […]
+
+=== MANUSCRIPT: A power saving for planar unit distances [preprints/A-power-saving-for-planar-unit-distances-September-23-2026/build/main.tex]
+ABSTRACT: We prove a power saving for the planar unit-distance problem: for some absolute $`\beta\lt 4/3`$, every set of n points in the Euclidean plane determines $`O(n^\beta)`$ unordered pairs at unit distance.
+[theorem] \label{thm:main} There are absolute constants \(0<C<\infty\) and \(1\le\beta<4/3\) such that \(u(n)\le Cn^\beta\) for every nonnegative integer \(n\).
+[proposition] \label{inc:incidence} For \(m\) distinct points and \(l\) distinct unit circles in the plane, \begin{equation}\label{inc:incidence-bound} I\le C\log^2(2+m+l) \bigl(m^{2/3}l^{2/3}+m+l\bigr), \end{equation} where \(C\) is an absolute constant. In particular, when \(m,l\) are bounded by a fixed power of \(t\), the logarithmic factor is \((\log t)^{O(1)}\).
+[proposition] \label{inc:piece} From a sequence of \(n=t^3\) real planar points with at least \(t^{4-o(1)}\) ordered unit pairs, one can obtain real algebraic point and center sets \(P,Q\), and a nonempty graph \(E\subseteq P\times Q\) consisting of unit incidences, with the following properties. There is a parameter \(a=a(t)>0\) such that \(a\to0\), \(a\log t\to\infty\), and \begin{equation}\label{inc:scales} |P|=t^{1+2a+o(a)},\qquad |Q|=t^{2+a+o(a)},\qquad |E|=t^{2+2a+o(a)}. \end{equation} Writing \(d(p),d(q)\) for graph degrees, uniformly over all vertices, \begin{equation}\label{inc:degrees} d(p)=t^{1+o(a)},\qquad d(q)=t^{a+o(a)}. \end{equation} The uniform law on \(E\) has marginals \(\mu(p)=d(p)/|E|\) and \(\kappa(q)=d(q)/|E|\) satisfying \begin{equation}\label{inc:marginal-atoms} \mu(p)\ge\frac{\ […]
+PROOF STRATEGY (paper's own words):
+- \maketitle \begin{abstract} We prove a power saving for the planar unit-distance problem: for some absolute \(\beta<4/3\), every set of \(n\) points in the Euclidean plane determines \(O(n^\beta)\) unordered pairs at unit distance. \end{abstract} \section{Introduction}\label{sec:introduction}
+- For a finite set \(X\subset\R^2\), write \[ u(X)=\#\bigl\{\{x,y\}\subset X:\ \norm{x-y}_2=1\bigr\}, \qquad u(n)=\max_{\substack{X\subset\R^2\\ |X|=n}}u(X). \] Thus pairs are unordered and their endpoints are distinct. We prove a fixed power saving over the exponent \(4/3\).
+- Our proof begins with the same point--circle incidence interpretation. Random cuttings isolate a piece of the incidence graph with controlled degrees; their sampled-cell construction belongs to the framework of Clarkson and Clarkson--Shor \cite{Clarkson1987,ClarksonShor1989}. The next ingredient is information: two points sampled as neighbors of one center share little information. Entropy methods already played a role in the distinct-distance estimates of Tardos and Katz--Tardos \cite{Tardos2003,KatzTardos}. In particular, the conditional-copy argument of Katz--Tardos retains the marginal law when resampling within a class. Here that principle enters a short-history prediction lemma whose tests may depend on a neighboring center. Its exact conditional laws and the independence of the fresh test are proved in \Cref{sec:prediction}.
+- \subsection{The proof in outline}
+- After adjoining one side's positions and derivative data, a point on the other side still has the independence required by its locus. For each radicand we construct, over this enlarged coefficient field, a valuation that is odd on that radicand and zero on the others. These valuations permit independent sign changes of the square roots. An unused sign change contradicts the differentiated equations. The popular-unit-circle exclusion removes the case in which the required square-class independence fails.
+- The proof excludes every sequence whose unit-distance counts approach the exponent \(4/3\), establishing the existence of a fixed positive gap without estimating its size.
+- The input to this section is a sequence of planar configurations with \(t=n^{1/3}\to\infty\) and at least \(t^{4-o(1)}\) ordered unit pairs. We construct an unbalanced incidence graph whose degrees are controlled on both sides. Its edge law has a uniform expansion estimate, including for arbitrarily small sets. We then prove two consequences of that estimate and show that the endpoints of a random two-edge path have mutual information \(o(\log t)\).
+SECTION OUTLINE:
+Introduction
+  The unit-distance problem and earlier methods
+  The proof in outline
+An incidence piece and its probability laws
+  Preserving incidences under algebraic specialization
+  Cuttings and the incidence bound
+  Degree control and a maximizing rectangle
+  Matching labels and uniformly rare sets
+  The information carried by a wedge
+Prediction from short histories
+  The probability laws and the entropy comparison
+  Acceptance tests and the prediction coupling
+  Equality of one coordinate
+  Choosing the history length
+Heights and coordinate tests
+  A weighted product formula
+  Thresholds and their total variation
+  Excluding bounded total variation
+  Coordinate states on the original levels
+Level decomposition and difference budgets
+  Parameters, rare levels, and histories
+  Three fixed pair experiments
+Common levels and positive rare mass
+  From sampled histories to the actual point
+  Classification and suppression of common variation
+  A second score forces positive rare mass
+Extracting multiplicatively organized pairs
+  A pointwise estimate and its tail consequence
+  Point profiles and a common height band
+  Removing common unit circles and choosing witnesses
+The algebraic obstruction
+  Negligible height as a field of constants
+  A complete grid with generic positions
+  Differentiation and the surviving generic point
+  A separate odd valuation for each radicand
+  An unused sign change
+LONGEST PROOF #1 (opening): An odd valuation detects a nonsquare because the valuation of a square is even. We construct the stated valuations over \(K_0\) in each possible locus case. All noncoincidences used in the constructions will first be proved from the original joint genericity over \(B_0\). \emph{The left locus is the plane.} The polynomial \[ Q_\ell=(z-z_{r_\ell})(w-w_{r_\ell})-4 \] is irreducible in \(K_0[z,w]\). It is primitive as a polynomial in \(w\), because its leading coefficient \(z-z_{r_\ell}\) is coprime to its constant coefficient, and is linear over \(K_0(z)\). The polynomials \(Q_\ell\) are distinct, as comparison of the coefficients of \(z\) and \(w\) recovers their centers. None divides any \(L_m=(z-z_{r_m})(w-w_{r_m})\). The exponent of \(Q_\ell\) in a rational function is therefore the required valuation. \emph{The left locus is a curve, and either the loci differ or its \(z\)-projection  […]
+LONGEST PROOF #2 (opening): Suppose $S\le S_0$ on a subsequence. All constants in this proof may depend on the fixed $S_0$. By \eqref{ht:independent-profiles}, there is an edge value $d_0$ such that \[ \E_Eh(d_e/d_0)\le S_0. \] Temporarily replace the two coordinates by $z/d_0$ and $d_0w$. Their edge jumps are $D_e=d_e/d_0$ and $D_e^{-1}$, whose mean heights are at most $S_0$. \Cref{inc:matching} supplies the label hypothesis of \Cref{ht:transfer}. Applying it to both coordinates bounds the sum of the two mean point-pair difference heights. Averaging over the second point then chooses $p_0\in P$ such that the translated coordinates \[ Z_x=(z_x-z_{p_0})/d_0,\qquad W_x=d_0(w_x-w_{p_0}) \] satisfy a fixed bound on $\E_\mu(h(Z_p)+h(W_p))$. Since $Z_q=Z_p-D_{pq}$ and $W_q=W_p-D_{pq}^{-1}$ on an edge, \Cref{ht:height} also bounds the center means. Thus there is a fixed $C_h<\infty$ with \begin{equation}\label{ht:normaliz […]
+LONGEST PROOF #3 (opening): First use \Cref{inc:specialization}. Choose \(a\to0\) sufficiently slowly that the initial incidence count is at least \(t^{4-o(a)}\) and every fixed power of \(\log t\) is \(t^{o(a)}\). In particular \(a\log t\to\infty\). Apply \Cref{inc:cutting} with \(R=t^{1-a}\) and \(s=O(t^{1-a}\log t)\). There are \(t^3\) points and circles. Incidences on the sampled circles number at most \(s t^3\), and incidences at deleted points with other circles number at most \(2s t^3\). Thus the deletion costs \(O(t^{4-a}\log t)=o(t^{4-o(a)})\). Each remaining region meets at most \(t^{2+a}\) circles. Further split its assigned point set into sets of size at most \(2t^{1+2a}\). The total number of resulting pieces is at most the original region count plus \(O(t^3/t^{1+2a})\), hence at most \(t^{2-2a+o(a)}\). Some piece has at least \(t^{2+2a-o(a)}\) incidences. Denote its two vertex sets temporarily by \(P_ […]

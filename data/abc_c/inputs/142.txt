@@ -1,0 +1,59 @@
+FAMILY 142: Deterministic polynomial factorization over prime fields
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Gives a uniform deterministic algorithm that completely factors every nonzero dense degree-n polynomial over a prime field 𝔽p, including multiplicities, in bit complexity polynomial in $`(n+1)\log p`$. The prime is supplied in binary. No randomness, integer-factorization or primitive-root oracle, or GRH assumption is required.
+HEADLINE (v2, semi-formal): ∃ uniform deterministic algorithm A ∀ prime p (binary) ∀ nonzero dense f∈F_p[x] of degree n: A outputs the complete factorization (irreducible factors with multiplicities) in O(((n+1)⌈log₂ p⌉)^{10^{12}}) bit operations, without GRH or oracles
+
+=== MANUSCRIPT: Deterministic Polynomial Factorization over Prime Fields [preprints/Deterministic-Polynomial-Factorization-over-Prime-Fields-October-4-2026/build/main.tex]
+ABSTRACT: We give a uniform deterministic polynomial-time algorithm for complete factorization over prime fields. For a prime p in binary and a nonzero polynomial $`f\in\mathbf F_p[x]`$ given by its dense coefficient list, the algorithm computes the irreducible factors and their multiplicities using a number of bit operations polynomial in $`(\deg f+1)\log p`$. The proof uses the uniform Hecke zero-free theorem from the companion paper *Primitive roots for every admissible integer base*.
+[theorem] \label{thm:factorization} There is a uniform deterministic algorithm that, given a prime $p$ in binary and a nonzero dense polynomial $f\in\Fp[x]$ of degree $n$, outputs its leading coefficient and its distinct monic irreducible factors with their multiplicities in \[ O\bigl(((n+1)\lceil\log_2p\rceil)^{10^{12}}\bigr) \] bit operations, with absolute implied constant. A constant polynomial returns an empty factor list. The algorithm uses no randomness, integer-factorization oracle, primitive-root oracle, or GRH assumption.
+[theorem] \label{thm:reduction} There is a uniform deterministic algorithm with the following guarantee. Its input is a prime $p$ and a nonzero dense polynomial $f\in\Fp[x]$. If $p>B^{200000}$ and $n\ge2$, its input also includes one auxiliary prime $\ell_q$ satisfying \eqref{eq:auxiliary} for each prime $q\le n$. It outputs the complete factorization of $f$, including multiplicities. Let $E=\max(2,\max_q\ell_q)$, with $E=2$ when no auxiliary primes are required. For an absolute constant $C$, the algorithm uses $O((B+E)^C)$ bit operations. It uses neither randomness nor an integer factorization or primitive-root oracle.
+[proposition] [Even-degree splitting] \label{ff:even-split} Let $p$ be odd, and let $F\in\mathbf F_p[T]$ be monic, square-free, and totally split of even degree $N\ge2$, with $p>N$. Given a generator $u$ of the full $2$-primary subgroup of $\mathbf F_p^*$, one can deterministically find a nontrivial proper monic divisor of $F$ in a number of bit operations polynomial in $N$ and $\log p$.
+PROOF STRATEGY (paper's own words):
+- The dependence on $E$ is on the numerical value of the auxiliary primes, not merely their bit lengths. Consequently Theorem~\ref{thm:reduction} becomes a polynomial-time factorization theorem when these primes are bounded by a fixed power of $B$. Upward search, trial division, and modular exponentiation then construct them within the same kind of bound. We prove this consequence from the cited zero-free theorem in Section~\ref{sec:analytic}. The reduction in Theorem~\ref{thm:reduction} does not use that theorem.
+- Our effective treatment of divisors also builds on established computational geometry. Ideal representations on superelliptic curves, Riemann--Roch algorithms, and finite-dimensional linear algebra for Jacobian arithmetic appear in \cite{GPS02,Hess02,KhuriMakdisi04}. For norm equations, we use the relation between cyclic algebras and norms, and the approach through maximal orders and minimal left ideals developed in explicit matrix-algebra computations~\cite{GilleSzamuely06,IRS12,IKR18}. The general function-field algorithm of Ivanyos, Kutas, and R\'onyai uses a finite-field polynomial-factorization oracle. Here the cyclic presentation gives explicit local orders, and evaluation of their global sections at a rational point gives a rank-one idempotent by linear algebra. The structural explanation uses the splitting of vector bundles on the projective line~\cite{Grothendieck57,HazewinkelMartin82}.
+- The substantive step of the present reduction is the odd-degree separator, together with a uniform implementation of the divisor-class divisions it requires. A filtration of lifted ramification classes keeps the necessary field extensions of polynomial degree. A lattice of divisors at infinity then forces two ramification points to receive different labels. We prove this mechanism and its algorithms directly; the earlier results just discussed provide their mathematical context. The separate step of finding sufficiently small auxiliary primes is isolated in Section~\ref{sec:analytic}, which is the only place the companion's analytic theorem enters.
+- \subsection{Proof strategy}
+SECTION OUTLINE:
+Introduction
+  The auxiliary-prime reduction
+  History and the role of the construction
+  Proof strategy
+Finite-field computations without known roots
+  Simultaneous execution and zero tests
+  Logarithms in primary subgroups
+  Root extraction in a finite reduced algebra
+  Splitting an even number of roots
+Auxiliary primes and primary generators
+  A degree-\texorpdfstring{$q$}{q} field without factoring a cyclotomic polynomial
+  Extracting the primary generators
+  The increasing-degree construction
+Divisions on a cyclic cover
+  The curve and its infinity lattice
+  Recording a class together with an infinity divisor
+  Frobenius and rational divisions
+  Why the labels must separate ramification points
+Divisor arithmetic without factoring supports
+  Fractional ideals and finite linear algebra
+  Local expansions and Riemann--Roch reduction
+  Summing divisors given over a product algebra
+  Binary coefficients at infinity and function circuits
+Solving the promised norm equations
+  The cyclic algebra and its local matrix models
+  Why one fiber contains a rank-one matrix
+  From the fiber idempotent to a norm solution
+  Computing all sections by finite linear systems
+  Algorithm and polynomial bounds
+Effective division by \texorpdfstring{$1-\sigma$}{1-sigma}
+Splitting an odd number of roots
+  The working field and the computational operations
+  The procedure
+  Correctness and cost
+From a splitting procedure to complete factorization
+  Separating the factors through the Berlekamp algebra
+  The recursive driver
+  Preprocessing and the original input
+Uniform bit complexity
+Small auxiliary primes from a uniform zero-free strip
+LONGEST PROOF #1 (opening): We first analyze the branch $p>B^{200000}$. Let $N\le n$ be the degree of a polynomial passed to the splitting procedure. In an odd-degree split, the prime $q\mid N$, the integer $r=v_q(N)$, the extension field $k$, and the genus $g$ satisfy \begin{equation} \begin{gathered} q,N,L\le B,\qquad [k:\mathbf F_p]\le N(q-1)<B^2,\\ 2g<B^2,\qquad m=(q-1)r+1<B^2. \end{gathered} \label{complexity:basic} \end{equation} The intermediate fields used in making one table entry also have degree at most $B^2$ after the invariant algebra has been extracted. \smallskip \noindent\emph{Scalar arithmetic and rational functions.} A scalar of $k$ has fewer than $B^3$ bits in a basis over $\mathbf F_p$. A multiplication table, or the equivalent tower representation, gives addition, multiplication, and inversion by schoolbook arithmetic and linear algebra. The algebra $A=k[T]/F$ has dimension $N$ over $k$; its ze […]
+LONGEST PROOF #2 (opening): The construction has three steps: separate extension degrees, obtain a primary generator on each resulting part, and take the two coprime parts of the root. \smallskip \noindent\emph{Separate extension degrees.} For $d=1,\ldots,h$, use gcds with $X^{Q^d}-X$, removing factors already found, to form the product $H_d$ of the irreducible factors of $H$ of degree $d$. All powers are computed modulo the current modulus by binary powering. Discard $H_d=1$. Every field component of $k[X]/H_d$ has cardinality $Q^d$. Write \[ Q^d-1=q^s t,\qquad q\nmid t. \] Only division by the specified prime $q$ is needed to find $s$ and $t$. \smallskip \noindent\emph{Obtain a primary generator.} Since $q$ is odd and $q\mid Q-1$, the elementary lifting-the-exponent identity is \begin{equation} v_q(Q^d-1)=v_q(Q-1)+v_q(d). \label{ff:lte} \end{equation} To see this, raising a number congruent to $1$ modulo $q$ to a […]
+LONGEST PROOF #3 (opening): Lemma~\ref{div:compression} gives $j=h^+/h^-\in k(X)^*$ with \begin{equation}\label{div:dividej} \operatorname{div}_C(j)=\sum_{a=0}^{q-1}\sigma^aD. \end{equation} Put $b=v_{X=x}(j)$. Since $F$ has a simple root at $x$, the rational function $j/F^b$ is a unit there, even when $b$ is negative. Compute its nonzero residue and set \begin{equation}\label{div:normalization} c=\left(\left.\frac{j}{F^b}\right|_{X=x}\right)^{-1}, \qquad G=cj. \end{equation} Thus $G/F^b$ has residue $1$ at $x$. We first justify that $G$ is a norm from $\mathcal L=k(C)$ to $k(X)$, which is the promise needed by the norm algorithm. Choose a rational divisor $D_0$ representing a class with $(1-\sigma)[D_0]=[D]$. Lemma~\ref{geom:descent} supplies rational representatives and rational functions for rational principal divisors. There is therefore an $a_0\in\mathcal L^*$ with \[ \operatorname{div}(a_0)=D-(1-\sigma)D_0. \ […]

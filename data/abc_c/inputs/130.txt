@@ -1,0 +1,95 @@
+FAMILY 130: Exact Fourier transforms below $`n\log n`$
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Gives a deterministic length-n discrete Fourier transform algorithm using $`O(n(\log n)^{1-\delta})`$ operations for every n, with explicit $`\delta=10^{-13}`$. The model uses exact complex arithmetic, unrestricted coefficients and a supplied root of unity, and counts scalar preparation and logarithmic-word indexing.
+HEADLINE (v2, semi-formal): ∃ one deterministic algorithm A ∀ n≥1 ∀ x∈ℂ^n: A computes F_n x exactly (exact complex arithmetic, supplied root, prep and indexing counted) in O(n(log n)^{1−10^{−13}}) operations
+
+=== MANUSCRIPT: An explicit power saving for the exact discrete Fourier transform [preprints/An-explicit-power-saving-for-the-exact-discrete-Fourier-transform-September-25-2026/build/main.tex]
+ABSTRACT: We give a deterministic algorithm that computes the discrete Fourier transform at every length n in $`O(n(\log n)^{1-10^{-13}})`$ operations. The model uses exact complex arithmetic, unrestricted coefficients, specified Fourier roots, and unit-cost logarithmic-size indexing; scalar preparation and array organization are included.
+[theorem] \label{thm:main} There is a single deterministic algorithm which, for every positive integer $n$ and every $x\in\C^n$, computes $F_nx$ exactly. In the model above, including scalar preparation, schedule construction, and index work, its running time is \begin{equation}\label{eq:main-bound} O\!\left(n(\log n)^\theta(\log\log n)^{4-\theta}\right) \end{equation} as $n\to\infty$. It suffices to supply the specified root $\zeta_{D_*}$ for an explicitly computable integer $D_*<1024n^3$.
+[corollary] \label{cor:decimal} In the same model, the transform is computable at every length in \[ O\!\left(n(\log n)^{1-10^{-13}}\right)=o(n\log n) \] time.
+[corollary] [Exact convolution and polynomial multiplication] \label{cor:polynomial-multiplication} There is a single deterministic algorithm which, for every positive integer $n$ and every $a,b\in\C^n$, computes the linear convolution \[ c_k=\sum_{\substack{0\le r,s<n\\r+s=k}}a_rb_s, \qquad 0\le k\le 2n-2. \] Equivalently, it multiplies two complex polynomials of degree less than $n$. In the exact complex field-operation, specified-root, and address cost model above, with general field multiplication permitted for the pointwise products, the total running time, including scalar preparation, schedule construction, padding, and index work, is \[ O\!\left(n(\log n)^\theta(\log\log n)^{4-\theta}\right) \qquad(n\to\infty), \] and hence is eventually $O(n(\log n)^{1-10^{-13}})$. This is a bilinear arithmet […]
+PROOF STRATEGY (paper's own words):
+- \maketitle \begin{abstract} We give a deterministic algorithm that computes the discrete Fourier transform at every length $n$ in $O(n(\log n)^{1-10^{-13}})$ operations. The model uses exact complex arithmetic, unrestricted coefficients, specified Fourier roots, and unit-cost logarithmic-size indexing; scalar preparation and array organization are included. \end{abstract} \section{Introduction}
+- Improvements within that scale and improvements of the scale itself are different questions. Alman and Rao use matrix non-rigidity to improve the Walsh--Hadamard transform and then the leading constant for power-of-two discrete Fourier transforms~\cite[Theorem~1.2 and Section~7]{almanrao}. Their Fourier bound has leading term $(15/4)n\log_2 n$ in a count of real arithmetic operations, with circuit structure and constants precomputed. Here we obtain a power saving in the logarithm at every length, in an exact complex-arithmetic model that also counts scalar preparation and array organization.
+- The finite network is credited at its use to~\cite{motif}, and the exact-width Fourier mechanism is shared with~\cite[Section~3]{exactfourier}. We prove the interfaces used here, including their preparation and indexing bounds. In particular, we do not import the later tape or precision bounds of~\cite{motif}, nor infer uniformity from the circuit-existence conclusion of~\cite{exactfourier}.
+SECTION OUTLINE:
+Introduction
+  Arithmetic model and main result
+  The construction and its reusable parts
+An explicit saving for a fixed two-coordinate transform
+  A scalar network with arbitrary auxiliary values
+  Frames turn binary dimensions into directional operations
+  Binary labels and the dimension budget
+  Transforming every physical role
+  Linear-time address changes
+  Exact batching and the critical exponent
+Compiling a Fourier transform on its own coordinates
+  Reducing Fourier matrices to triangular Toeplitz matrices
+  Convolution and arbitrary borrowed coordinates
+  Toeplitz layers and a measured workspace rule
+  Fourier layers and a fixed word in the kernel
+Synchronizing tensor factors in linear array work
+  A linear-time traversal rule
+  Packing sectors
+  The synchronized transform
+Working lengths and the transform at every length
+  Enough small, pairwise coprime factors
+  CRT permutations and the working transform
+  Chirp convolution and preparation
+  The final estimates
+  Two-input convolution and polynomial multiplication
+Effective synthesis and uniform compilation
+  Obtaining finite rational algebra data
+  A printer for increasingly efficient radices
+  From a slow printer to a fast uniform algorithm
+LONGEST PROOF #1 (opening): We split the transform into two smaller diagonal blocks and a cross update. For each rectangular part of that update, we will construct a convolution DAG and fit all its gate coordinates inside the parent block. We then count the resulting layers and the preparation work. Write $T_v=(h_{i-j})_{0\le j\le i<v}$, with zero entries above the diagonal and $h_0\ne0$. The same initial sequence $h$ specifies all smaller blocks used below. Its reciprocal-series coefficients are computed by \begin{equation}\label{loc:reciprocal} g_0=h_0^{-1},\qquad g_k=-h_0^{-1}\sum_{j=1}^k h_jg_{k-j}\quad(1\le k<r). \end{equation} They give the inverse of every lower triangular Toeplitz block. For $v>1$, put $p=\lfloor v/2\rfloor$ and write \[ T_v=\begin{pmatrix}T_p&0\\B&T_{v-p}\end{pmatrix}. \] The factorization \[ T_v=\begin{pmatrix}I&0\\E&I\end{pmatrix} \diag(T_p,T_{v-p}),\qquad E=BT_p^{-1}, \] first performs  […]
+LONGEST PROOF #2 (opening): The printing budget will control both the circuit description and all literal scalar data, without requiring a bound on when a record appears. Normalize the printer to output at most one bit per machine step. For $n\ge2$, run it from the beginning for $B=\lfloor\log_2 n\rfloor$ bit steps. Select the last completed record with $2\le m_t\le\sqrt B$; if there is none, use the ordinary radix $m=2$ circuit. Every fixed record eventually finishes and satisfies the width bound, so the selected stream index tends to infinity. In particular $m\to\infty$ and $s/(m\log m)\to0$. The total visible description has at most $B$ bits. Decode the selected explicit lists to addressable arrays and evaluate its preparation program once. Construct rational literals by their binary expansions and perform each listed operation in the stated arithmetic model. This costs $B^{O(1)}$, including parsing and bit simu […]
+LONGEST PROOF #3 (opening): Here is the full list of nonzero or potentially nonzero residuals. All rows except the last are tensored with $Q$. The vectors $t_X,t_Y$ on a side wire are its two physical triple indicators. The omitted edges have zero residual. \[ \begin{array}{l|l} \text{wire and edge}&\text{orthogonal residual}\\\hline X:\ \mathrm{in}\to2&B\otimes t_X^\perp\\ X:\ 2\to3&P\otimes t_X^\perp\\ Y:\ 0\to1&B\otimes t_Y^\perp\\ Y:\ 4\to5&P\otimes t_Y^\perp\\ \text{center}:\ \mathrm{source}\to1&B\otimes D\\ \text{center}:\ 1\to3,\ 3\to4,\ 4\to6&P\otimes D\quad\text{(each)}\\ \text{side}:\ \mathrm{source}\to0&B\otimes\langle t_Y\rangle\\ \text{side}:\ 0\to2&(B\otimes t_Y^\perp)\mathbin\perp (P\otimes\langle t_X\rangle)\\ \text{side}:\ 2\to5&P\otimes\langle t_X,t_Y\rangle^\perp\\ \text{side}:\ 5\to7&P\otimes\langle t_Y\rangle\\ \text{auxiliary}:\ \mathrm{last}\to\mathrm{sink} &E\otimes D\otimes Q^\perp. \end{ar […]
+
+=== MANUSCRIPT: Finite tensor savings and exact Fourier circuits [preprints/Finite-tensor-savings-and-exact-Fourier-circuits-September-25-2026/build/main.tex]
+ABSTRACT: We construct exact nonuniform Fourier circuits of size $`o(n\log n)`$ along an unbounded sequence of lengths, counting every addition, subtraction, and scalar multiplication. This refutes the $`\Omega(n\log n)`$ lower bound in the unrestricted complex linear-circuit model. The construction uses a finite tensor saving: a tensor power of some invertible nonmonomial complex matrix can be computed with fewer matrix calls than the standard tensor-axis algorithm on the same coordinates, when invertible monomial maps are allowed freely between calls.
+[theorem] \label{thm:main} In this model, \[ \liminf_{n\to\infty}\frac{L(n)}{n\log_2 n}=0. \] Equivalently, for every $c>0$ and every integer $N_0\ge2$, there is an integer $n\ge N_0$ and an exact circuit for $F_n$ with fewer than $c n\log_2 n$ gates.
+[proposition] [Transfer of a finite win]\label{prop:win-to-fourier} If a finite win exists, there are integers $n_m\to\infty$ and exact linear circuits for $F_{n_m}$ whose scalar gate counts satisfy \[ L(n_m)=o(n_m\log_2n_m). \] In particular the conclusion is in the model charging additions, subtractions, and multiplication by every prechosen complex scalar.
+[theorem] [Global prices under the no-win assumption] \label{thm:prices} There is a function \[ p:\bigcup_{n\geq1}\GL_n(\C)\longrightarrow[0,\infty) \] which vanishes exactly on the monomial matrices and has the following properties. For invertible matrices of the indicated sizes, \begin{align} p(LAR)&=p(A) &&\text{if $L,R$ are monomial of width $|A|$}, \label{price:monomial-law}\\ p(AB)&\leq p(A)+p(B) &&\text{if $|A|=|B|$}, \label{price:product-law}\\ p(A\otimes B)&=|B|p(A)+|A|p(B), \label{price:tensor-law}\\ p(A\oplus B)&=p(A)+p(B), \label{price:sum-law}\\ p(A^{-1})&=p(A^{\mathsf T})=p(A). \label{price:symmetry-law} \end{align} Moreover, \begin{equation} p(U)=1,\qquad U=\begin{pmatrix}1&0\\1&1\end{pmatrix}. \label{price:normalization} \end{equation}
+PROOF STRATEGY (paper's own words):
+- \maketitle \begin{abstract} We construct exact nonuniform Fourier circuits of size $o(n\log n)$ along an unbounded sequence of lengths, counting every addition, subtraction, and scalar multiplication. This refutes the $\Omega(n\log n)$ lower bound in the unrestricted complex linear-circuit model. The construction uses a finite tensor saving: a tensor power of some invertible nonmonomial complex matrix can be computed with fewer matrix calls than the standard tensor-axis algorithm on the same coordinates, when invertible monomial maps are allowed freely between calls. \end{abstract} \tableofcontents \section{Introduction}\label{intro:sec:introduction}
+- The argument centers on a finite question about tensor products. For integers $q,b\ge2$, applying a fixed $q\times q$ matrix on each axis computes its $b$th tensor power with $bq^{b-1}$ matrix calls. A \emph{monomial matrix} is a permutation matrix times an invertible diagonal matrix. We prove that, for at least one invertible nonmonomial matrix, an exact computation improves this count. A single such finite saving is enough: tensor amplification turns it into an exponent improvement, and a factorization that preserves the number of coordinates transfers the improvement to Fourier matrices. The existence proof develops a second set of tools, based on prices of matrix calls and their behavior under feedback and changes of boundary conditions.
+- The local Fourier construction uses established ideas from structured linear algebra and reversible computation. Kuznetsov gives an $LDL^{\mathsf T}$ factorization of geometric Vandermonde matrices, including Fourier matrices, whose triangular factors are diagonal scalings of triangular Toeplitz matrices \citep[Theorem~1]{kuznetsov2018}. We give a Newton-polynomial derivation of this identity and implement its factors on the original coordinates. Low displacement rank supplies the convolution representation used in that implementation \citep[Lemmas~1--2]{kailathKungMorf1979}. Computing, reading the output, and reversing a computation is the uncomputation pattern of Bennett \citep[pp.~526--529]{bennett1973}. Restoration from arbitrary workspace contents is achieved by the cleanup construction for transparent programs \citep[Section~3]{buhrmanEtAl2014}. We prove the particular linear replay identity, its pair-layer bound, and its fit inside the existing coordinate set.
+- \Cref{gen:sec:generation,fft:transfer} prove the transfer from one finite win, through positive generation, amplification, and exact-width Fourier layers. \Cref{price:section} constructs the price function from the opposite assumption. \Cref{corner:sec:corners,feedback:sec} establish corner contraction, feedback, and algebraic specialization. \Cref{pivot:sec:pivots} gives scalar-pivot invariance and the dense-pair bound. Finally, \cref{reflect:section} uses those laws to force the reflection contradiction and prove \cref{thm:finite-win}, which closes the proof of \cref{thm:main}.
+SECTION OUTLINE:
+Introduction
+  The model and the result
+  Historical context
+  The mechanism of the proof
+  Conventions and order of the argument
+Positive words and tensor amplification
+  One fixed positive pattern generates every target
+  Amplifying a finite saving
+From a finite win to exact Fourier circuits
+  Convolutions and borrowed coordinates
+  An exact-width factorization
+  Prime factors and synchronized generation
+Packing finite comparisons into global prices
+  The comparison inequalities
+  Separation, normalization, and compactness
+  Algebraic laws and symmetry
+Triangular matrices and invertible corners
+  Rectangular shears and scalar convolution
+  Triangular monotonicity by whole-block compression
+  A time cascade and its initial-state correction
+  Proof of the corner law and its circuit consequence
+Changing the coefficient boundary and specializing prices
+  A uniform comparison for scalar moduli
+  Closing a state connection
+  Specialization at any regular invertible value
+Pivoting and the price of a dense pair
+  A general pivot inequality
+  One shared coordinate and exact scalar pivots
+  Four forms and the dense-pair bound
+Signed matrices and the reflection contradiction
+  Signed bit operators with an exact price
+  Pricing a reflection by two algebraic specializations
+  The graph of the positive eigenspace
+LONGEST PROOF #1 (opening): Suppose such a combination exists. We will choose a block-diagonal matrix $J$ containing many copies of every $A_i$ and many identity blocks, and compute $J^{\otimes b}$ in fewer than the usual $b|J|^{b-1}$ calls to $J$. Its tensor sectors give disjoint places to run copies of the comparison programs. The strict savings in every type leave room to spread these programs over fewer time slots while preserving each program's order. For a slot to be one call to $J$, however, it must contain exactly the prescribed number of calls to each $A_i$. Random start times will first keep all slot loads below these capacities. We then fill every vacancy with a call belonging to an identity word on separate coordinates. The construction must therefore provide both slack in each slot and enough unused coordinates for these identity words. We first choose block proportions that reserve enough identity spa […]
+LONGEST PROOF #2 (opening): Choose once and for all polynomial $J(z)$ and scalar polynomial $u(z)$ such that \[ G(z)^{-1}=J(z)/u(z),\qquad u(0)\ne0; \] for example, take $J=\operatorname{adj}G$ and $u=\det G$. Write \[ G_k(z)=G(z)^{\otimes k}=\sum_{j=0}^{d}G_jz^j, \qquad J_k(z)=J(z)^{\otimes k}=\sum_{i=0}^{e}J_iz^i, \qquad e=k\deg J. \] These are degree bounds with zero coefficient matrices permitted. The subscript on $G_j$ or $J_i$ in this proof denotes a coefficient of the tensor power, rather than of the original fixed matrix. Both $d$ and $e$ are bounded by a fixed multiple of $k$. If $d=0$, multiplication is coefficientwise, so $W=A_G$ and the result holds. Assume $d>0$ and set $T=t-d$. Let $L=W-A_G$. An input supported at times less than $T$ has product with $G_k$ of degree less than $t$, so $L$ has zero columns at those times. Scalar polynomial division also shows that, for every input $x(z)$ of degree less  […]
+LONGEST PROOF #3 (opening): We build a fixed word whose adjustable diagonal factors give a full-rank differential, then show that its actual values contain a nonempty Zariski open subset of $\GL_q(\C)$. Every invertible target is a product of two values from this subset, so doubling the word gives the common pattern. Let $E_{ij}$ denote the matrix units. Let $\mathfrak d\subset\Mat_q(\C)$ be the diagonal subspace and let $\mathcal S$ be the semigroup of words in $A$ and monomials, including identity. Inverses are not among the specified calls. First we prove \begin{equation}\label{gen:eq:tangent-span} \Span_{s\in\mathcal S}s\mathfrak d s^{-1}=\Mat_q(\C). \end{equation} If $A\mathfrak d A^{-1}\subset\mathfrak d$, each rank-one idempotent $A E_{ii}A^{-1}$ would be a diagonal rank-one idempotent, hence some $E_{\pi(i)\pi(i)}$. Orthogonality of these idempotents forces $\pi$ to be a permutation. The identity $A E_{ii}= […]

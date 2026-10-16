@@ -1,0 +1,39 @@
+FAMILY 128: A factor-two approximation for shortest common superstring
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Gives a deterministic polynomial-time algorithm constructing a common superstring of length at most twice the optimum for every finite family of explicitly represented strings. The running time is polynomial in the full encoded input length, including symbol labels.
+HEADLINE (v2, semi-formal): ∃ deterministic poly-time algorithm, ∀ finite family S of explicitly represented strings: outputs a common superstring T with |T| ≤ 2·OPT(S)
+
+=== MANUSCRIPT: A Polynomial-Time 2-Approximation for Shortest Common Superstring [preprints/A-Polynomial-Time-2-Approximation-for-Shortest-Common-Superstring-September-24-2026/build/paper.tex]
+ABSTRACT: We give a deterministic algorithm that, for every finite family of explicitly represented ordinary strings, outputs a common superstring of length at most twice the optimum in time polynomial in the total encoded input size, including symbol labels. The guarantee applies to the algorithm constructed here, not the classical maximum-overlap Greedy procedure.
+[theorem] \label{thm:main} There is a deterministic algorithm, polynomial in the total encoded input size, that on every finite collection $\mathcal S$ of explicitly represented ordinary strings outputs a common superstring $T$ satisfying \[ \len{T}\le 2\OPT(\mathcal S). \]
+[proposition] \label{prop:partition} After all groups have been processed, every layer is either marked rooted or belongs to exactly one outgoing block. These two classes are disjoint. Each block consists of layers from one primitive-text group and targets a single actual layer. Its total budget remains reserved for its planned link. A collective block of $k$ layers and period $p$ also satisfies \eqref{eq:sharp-band} at its distinguished position; an individual block consists of one layer.
+[theorem] [Connecting the base graph]\label{thm:connection} The base graph can be connected to $\eps$ by adding closed walks of total up cost at most $W$.
+PROOF STRATEGY (paper's own words):
+- \paragraph{Proof overview.} The vertices of our hierarchical graph are all substrings of the inputs, including the empty word. An up edge appends a letter and costs one; a down edge deletes the first letter and costs zero. A balanced multiset of edges has equal incoming and outgoing degree at each vertex. If its support is connected and visits the empty word and every required string, an Euler tour spells a common superstring whose length is its up-edge cost.
+- \paragraph{Organization.} \Cref{sec:counts} constructs the counts and their balanced graph. \Cref{sec:layers} develops the layer representation and the periodicity facts. \Cref{sec:connections} gives the connection operations, \Cref{sec:processing} processes groups of equal primitive text, and \Cref{sec:cycles} resolves the remaining cycles. \Cref{sec:algorithm} proves polynomial time and extracts the output string.
+- In the other case, \eqref{eq:block-count} implies \[ B_A(v;N)=N(v)\ge m(v)>B_A(v;m). \] Every difference $N(r)-m(r)$ in this blocking sum is nonnegative by induction. Some contributing word $r$ therefore has $N(r)-m(r)\ge1$. Choose one of its counted placements of $v$. The $k+1$ period-spaced prefixes $w$ within that placement give distinct counted placements of $w$ in the same $r$. Hence $b_{A,w}(r)\ge k+1$. All other terms in the difference of blocking sums are nonnegative, and therefore \[ N(w)\ge B_A(w;N)\ge B_A(w;m)+k+1. \] Every lower bound used to define $m(w)$ is thus at most $N(w)$, completing the induction.
+SECTION OUTLINE:
+Introduction
+Forced occurrence counts
+  Blocking an occurrence
+  The rules
+  The balanced base graph
+Periodic layers
+  Lifting closed walks to windows
+  Sorting primitive passages
+  Unblocked occurrences on layers
+  Two periodicity facts
+Connection operations
+  Following ordered windows
+  A collective outgoing link
+  Several requests at one host
+Processing the period groups
+  Incoming requests and a baseline
+  Easy connections for the upper layers
+  Forcing a record on another aligned text
+  Distributing the remaining budgets
+Opening cycles of planned links
+Polynomial time and the output string
+LONGEST PROOF #1 (opening): [Proof of \Cref{thm:main}] Parse and preprocess the explicit input in time polynomial in its encoded size $N$. This handles the empty instance and preserves the optimum otherwise. In the nonempty case, construct the counts and base graph of \Cref{sec:counts}. By \Cref{lem:counts,lem:base}, its cost is $W\le\OPT(\mathcal S)$ and it contains every required vertex. Apply \Cref{thm:connection}. The resulting graph is balanced, its used support is connected, it includes $\eps$, and its total up cost is at most $2W$. A finite balanced directed multigraph with connected used support has a closed Euler tour from any used vertex. One may obtain it by following unused edges until a closed walk is formed, and splicing further closed walks at visited vertices until all edges have been used. Balance prevents an unfinished walk from stopping away from its starting point, and connectivity ensures that  […]
+LONGEST PROOF #2 (opening): We will spend the host budget on one closed excursion through contact words for the requesting layers. Requesters from all but one child group attach to those contacts using their own budgets. The requesters from the remaining group are touched directly by the host excursion, leaving one of their budgets to connect a contact shorter than their period to $\eps$. By \Cref{lem:agreement}, \begin{equation}\label{eq:host-length} b_i-a_i<p_i+q. \end{equation} If record $i$ is before record $l$ along a lift of the host path, their starts and ends are ordered. When $b_i>a_l$, their overlap is an agreement interval between two distinct child texts, so \begin{equation}\label{eq:child-overlap} b_i-a_l<p_i+p_l. \end{equation} If there is no overlap, the same strict inequality is immediate. Choose an index $j$ of minimum $p_j$. Start at its record and order all other records before the next copy of i […]
+LONGEST PROOF #3 (opening): If the plan is an individual link, \eqref{eq:single-short} already gives the contact. For a collective plan with $k$ source layers of period $p$, put $K=kp$. Recall that $t$ is distinguished, $H=f_H(t)$, and the target record $R=[a,b)$ agrees with the source text and satisfies \[ a\le t<H-K\le b,\qquad b-a<p+q. \] If any constituent layer already contains a vertex of length at most $q$, the ordinary collective link connects that vertex to the target and to all other constituents, so it suffices. Otherwise every vertex on every constituent layer has length greater than $q$. Every forward rotation of the target's text is at most its own distinguished rotation, and hence at most the selected block's distinguished rotation. The target alignment is different from the source alignment by construction. If $b-t\ge q$, agreement on $R$ would include all $q$ positions starting at $t$, contrary to  […]

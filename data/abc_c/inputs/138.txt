@@ -1,0 +1,94 @@
+FAMILY 138: Subset Sum in $`O(2^{0.49n})`$ time
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Gives a uniform randomized classical algorithm for worst-case Subset Sum in ordinary $`O(2^{0.49n})`$ word-RAM time on polynomial-bit inputs, where n counts the integers. The time bound holds on every execution and success probability is at least 2/3 on every input. Inputs may repeat positive integers; words have $`O(n+b)`$ bits for maximum input bit length b.
+HEADLINE (v2, semi-formal): ∃ uniform randomized word-RAM algorithm A for Subset Sum ∀ c ∃ C_c,N_c ∀ inputs with n≥N_c and b≤n^c: A is correct w.p. ≥2/3 and halts within C_c·2^{0.49n} operations on every execution
+
+=== MANUSCRIPT: Subset Sum in Time $`O(2^{0.49n})`$ [preprints/Subset-Sum-in-Time-2-power-0-49n-October-4-2026/build/main.tex]
+ABSTRACT: We give a uniform randomized classical algorithm for Subset Sum with bounded error and worst-case running time $`O(2^{0.49n})`$ on polynomial-bit inputs in a word-RAM model, where n is the number of input integers. The time bound holds on every random execution.
+[theorem] \label{thm:main} There is a uniform randomized classical algorithm $\mathcal A$ for Subset Sum with the following properties in the word-RAM model \eqref{eq:word-length}. For every input with $n\ge2$, the algorithm halts on every execution and outputs the correct answer with probability at least $2/3$. For every fixed positive integer $c$, there are constants $C_c>0$ and $N_c\ge2$ such that every input with $n\ge N_c$ and $b\le n^c$ is processed, on every outcome of the random choices, in at most \[ C_c\,2^{0.49n} \] word operations. The program is not given $c$ and does not depend on $c$.
+[proposition] [Capped preliminary search] \label{prop:preliminary} Given fixed transformed weights and targets from \eqref{eq:transformed}, there is a randomized procedure that either returns the correct decision for the original instance or returns \textup{CONTINUE}. On every execution its running time is at most \[ 2^{0.489985n}\operatorname{poly}(n+b+2). \] If $V$ is uniform among the $\lfloor n/2\rfloor$-element subsets and $\mathbb E d(V)>0.01004n$, then the probability of \textup{CONTINUE} is $O(1/n)$, uniformly in the fixed weights.
+[proposition] [Filtering moments]\label{prop:filtering-moments} The functions in \eqref{eq:filter-scores} satisfy \begin{equation}\label{eq:continuous-filtering-moments} \begin{split} \int_{\mathbb T}M(x)^2 2^{8.5(\Delta-u(x))}\,dx&<2^{0.5168},\\ \int_{\mathbb T}M(x)^2 2^{8.3(a v(x)-u(x))}\,dx&<2^{0.5168}. \end{split} \end{equation}
+PROOF STRATEGY (paper's own words):
+- \subsection{Related approaches}
+- Two other directions explain both the progress on Subset Sum and the difficulty of a worst-case improvement in $n$. Pseudopolynomial algorithms measure their complexity in the numerical target $t$. Bellman's dynamic-programming approach~\cite{Bellman1957} yields $O(nt)$ time. Koiliaris and Xu~\cite{KoiliarisXu2017} improved this bound deterministically, and Bringmann~\cite{Bringmann2017} obtained a randomized $\widetilde O(n+t)$ algorithm. Chan~\cite{Chan2026} subsequently obtained a deterministic near-linear pseudopolynomial algorithm. These bounds are particularly effective for small targets; polynomial \emph{bit length}, however, permits much larger targets. Here and in historical comparisons, $\widetilde O$ suppresses polylogarithmic factors.
+- \subsection{Proof overview}
+- For a prime $P$, write $e_P(x)=\exp(2\pi\mathrm i x/P)$. With independent uniform residues $\phi_1,\ldots,\phi_n$ modulo $P$, assign a subset $I$ the phase \[ \chi(I)=e_P\left(\sum_{i\in I}\phi_i\right). \] For each transformed target $t'$, a subset is an \emph{alias} if its sum is $t'$ modulo $P$ but not over the integers. The identity \begin{equation}\label{eq:overview-subtraction} \sum_{\sum_{i\in I}c_i=t'}\chi(I) =\sum_{\sum_{i\in I}c_i\equiv t'\pmod P}\chi(I) -\sum_{\substack{I\text{ an alias}\\\text{for }t'}}\chi(I) \end{equation} is the organizing principle. On a negative instance the left side is zero for every transformed target; an isolated positive target leaves a single phase of modulus one. The two sums on the right can be much larger, so their difference must be recovered to small \emph{absolute} error. A relative approximation to the modular sum would not suffice. We choose a random prime modulus larger than the desired running time, so neither scanning all residues nor evaluating every Fourier frequency is affordable. We estimate the modular sum and subtract the phases of a complete list of aliases.
+- \paragraph{A checksum without a full Fourier transform.} Writing $V_{t'}$ for the modular sum in \eqref{eq:overview-subtraction}, Fourier inversion gives \[ V_{t'}=\frac1P\sum_{k=0}^{P-1}J_{t'}(k), \qquad J_{t'}(k)=e_P(-kt')\prod_{i=1}^n \bigl(1+e_P(\phi_i+kc_i)\bigr). \] For each fixed $k$, independent uniform phases give $\mathbb E_\phi|J_{t'}(k)|^2=2^n$. Thus the elementary second-moment bound for uniform frequency sampling does not give the required running time. For a chosen digit base $L$, writing $k=hL+l$ expresses the phase vector $(\phi_i+kc_i)_i$ as the difference between $(\phi_i+hLc_i)_i$ and $(-lc_i)_i$, all modulo $P$. These high- and low-digit vectors form two lists. The filters must keep the stored lists short, cover every frequency, and control the second moment of the resulting estimate. A table specifies random coordinate shifts, with some coordinates ignored; a sum of logarithmic density scores tests each vector against the table. A \emph{match} consists of a table and a digit pair whose two vectors both pass. This two-sided organization is related to asymmetric locality-sensitive filtering~\cite{Christiani2017}.
+SECTION OUTLINE:
+Introduction
+  Model and main result
+  Related approaches
+  Proof overview
+Isolation, distinct sums, and prime collisions
+  Isolating one exact target
+  Deficiency and the preliminary search
+  A collision bound for random primes
+A fixed filtering construction
+Estimating a modular checksum
+  Frequency patterns and block tables
+  Coverage and list sizes
+  Constructing and sampling the matches
+  Direct summation and importance sampling
+  Resource and precision bounds
+Extracting the modular aliases
+  Representations and filtered lists
+  Why the visited lists and pairs are small
+  Why every alias is recovered
+The algorithm and its finite implementation
+  Subtracting aliases
+  Finite arithmetic and bounded sampling
+  Correctness and the uniform running-time bound
+An elementary certificate for the filtering moments
+  Reducing the scores to two convolutions
+  Finite arithmetic certificate
+  Controlling the inner quadratures
+  An analytic strip for the outer integrands
+LONGEST PROOF #1 (opening): [Proof of Theorem~\ref{thm:main}] First consider an input above the fixed cutoff that satisfies \eqref{eq:bit-guard}. Fix any outcome of the tie weights, and hence all the integers $c_i,t_s$. The proof divides according to the expectation of the deficiency on a uniform half; the algorithm never evaluates this expectation. If $\E d(V)>0.01004n$, Proposition~\ref{prop:preliminary} returns an exact decision except with probability $o(1)$. If instead \eqref{eq:low-deficiency} holds, Theorem~\ref{thm:aliases} gives complete alias extraction with probability $1-o(1)$. Conditional on each fixed $P$ and transformed instance, Theorem~\ref{thm:checksum} supplies all checksum estimates with probability $1-o(1)$, uniformly in those data. The additional sampling loss is $o(1)$ by \eqref{eq:sampling-coupling}. These statements do not condition on the preliminary outcome \textsc{Continue}. Equivalently […]
+LONGEST PROOF #2 (opening): First fix the phases, $k<P$, its pattern, and one block. We lower-bound the chance that one block table accepts both digits representing $k$. Change the label law as follows: retain the probability of $*$, but conditional on a non-$*$ label give $w=z_i-\theta$ density $K_{x_i(k)}$ relative to the uniform finite-circle law. Under this new law the expected high score, low score, and base-two log likelihood ratio against the original law are, respectively, \[ \alpha A(x_i(k)),\qquad \alpha E(x_i(k)),\qquad \alpha D(x_i(k)). \] Indeed, a non-$*$ label has likelihood ratio $K_{x_i(k)}(w)$ and $y_i-\theta=x_i(k)+w$. The coordinate variables remain independent. Their absolute values are bounded by a fixed constant, uniformly in $P,k,\alpha$. Chebyshev's inequality and a union bound therefore show that, for sufficiently large block size, all three block averages are within $\eps$ of their means  […]
+LONGEST PROOF #3 (opening): The relative-entropy argument is unchanged for normalized finite averages. For uniform bounds, note that \[ |r|\le2.433,\qquad |s|\le4.010. \] Consequently $F,G$, all their normalizers, and all the densities above are bounded above and bounded away from zero by absolute constants, on either circle. The same holds for $Q$ and $K_x$, so their logarithms and the averages defining the scores are uniformly bounded. If $H(x,w)$ is a continuously differentiable periodic function, the error in replacing its $w$ integral by a $P$-point average is at most $2\pi\|\partial_w H\|_\infty/P$, uniformly in $x$. Apply this fact first to the normalizers and then to the numerators in \eqref{eq:filter-kernel} and \eqref{eq:filter-scores}. The lower bounds on denominators allow division and taking logarithms without losing uniform convergence. Thus the finite versions of $D,A,E,u,v$ converge uniformly, at th […]
+
+=== MANUSCRIPT: A Low-Space Algorithm for Worst-Case Subset Sum [preprints/A-Low-Space-Algorithm-for-Worst-Case-Subset-Sum-September-26-2026/build/main.tex]
+ABSTRACT: We give a uniform classical randomized decision algorithm for worst-case Subset Sum. Under every fixed polynomial bound on input-integer bit length, it uses $`\mathop{\mathrm{poly}}\nolimits (n)2^{n/2}`$ time and ordinary $`O(2^{n/5})`$ writable words of $`O(n+b)`$ bits, where b is the largest input bit length. Both resource bounds hold on every execution. The error is one-sided: the algorithm always rejects unsolvable instances and accepts each solvable instance with probability at least 2/3.
+[theorem] \label{thm:main} There is a single uniform classical randomized algorithm in this model that never answers YES incorrectly and answers each YES instance correctly with probability at least $2/3$. For every fixed positive integer $c$, there are a constant $A_c>0$ and positive integers $k_c,N_c$ such that, whenever $n\ge N_c$ and $b\le n^c$, every outcome of the algorithm's randomness uses at most \[ A_c n^{k_c}2^{n/2}\quad\text{operations} \qquad\text{and}\qquad A_c(n+b+2)^{15}2^{0.199n}\quad\text{writable words}. \] The algorithm does not depend on $c$.
+[corollary] \label{cor:target} For every fixed $\rho>0.199$, the same algorithm has ordinary $O_{c,\rho}(2^{\rho n})$ word space under each fixed polynomial-bit convention, with the time and correctness guarantees of Theorem~\ref{thm:main}. In particular, it has $O_c(2^{n/5})$ word space.
+[corollary] [Reusing the families]\label{cor:separator-reuse} Fix a finite list of checks satisfying the input conditions of Lemma~\ref{lem:separator}, with common block parameters, and let \[ N_{\mathrm{check}}=\sum_{\text{checks}}(|\mathcal L|+|\mathcal R|). \] The list may itself be random, provided that, conditional on the list and its parameters, the four families have the independent distributions \eqref{sep:families}. In the ideal experiment, the expected total check work conditional on the list and its parameters is at most \[ W_0=N_{\mathrm{check}} u^{22}2^{(1-h_*)m}. \] Preprocessing is paid once. Processing checks one at a time uses the check workspace of Lemma~\ref{lem:separator}, in addition to any storage retained by the caller. For any $0<\delta<1$, total check work exceeds $W_0/\delta$ […]
+PROOF STRATEGY (paper's own words):
+- \subsection{Two trials and the proof strategy}
+- Both trials use the same three facts about an arbitrary fixed input. The number of distinct sums changes little when one index is replaced; prescribed-cardinality choices have accurate entropy estimates; and a random prime rarely identifies two fixed unequal integer weights. We prove these facts first. We then give the small-state streams that turn stored lists into much larger generated lists.
+- This trial uses the classical stored-list and generated-stream viewpoint of Schroeppel and Shamir~\cite{SS81}. Its modular regeneration and overflow rule also belong to the dissection approach: Dinur, Dunkelman, Keller, and Shamir~\cite{DDKS12} developed the earlier framework under randomness assumptions, and Austrin, Kaski, Koivisto, and M\"a\"att\"a~\cite{AKKM13} adapted dissection to worst-case Subset Sum. The trial and its bounds here are proved directly, including the dependence on the input bit length.
+SECTION OUTLINE:
+Introduction
+  Model and main result
+  Representations and their predecessors
+  Two trials and the proof strategy
+Counting and enumeration tools
+  How many distinct sums does a block have?
+  Exact entropy estimates
+  Random primes and the sampling interface
+  Sorted modular pair streams
+  Bounded dictionaries
+Compressing repeated sums
+  Seven compacted blocks and four groups
+  Work, space, and success
+Representations and bounded parent dictionaries
+  Shared mixers and leaf lists
+  Nested modular filters
+  Parent dictionaries and prefix recomputation
+  Three bounds for prefix recomputation
+Weighted disjointness in bounded space
+  Inputs and sampled families
+  Reusing the same families
+Survival within the resource budgets
+  Fixing a witness before the last random choices
+  Unconditional resource bounds
+  The extra prime and the solution bucket
+  Applying the three prefix bounds
+  Independent families and bounded-trial success
+A single uniform bounded algorithm
+  Bounded sampling and its exact law
+  Exact word operations
+  Space on every random outcome
+  A finite program, amplification and the theorem
+LONGEST PROOF #1 (opening): We first check coverage of one fixed pair. We then describe a traversal whose workspace is bounded for every family outcome. Its time will be charged to individual occurrences of input records, and an entropy estimate will bound their expectation. \paragraph{Coverage of one pair.} Fix a pair satisfying \eqref{sep:target}. On block $T_i$, a sampled set must contain its left mask and avoid its right mask. Their union has size $g/2$, so the separation probability is exactly \[ \theta_i=\binom{g/2}{e-c_i}\big/\binom{g}{e}. \] Equation~\eqref{sep:families} gives $\nu_i\theta_i\ge10$. The probability that no family member separates the pair on this block is at most $(1-\theta_i)^{\nu_i}\le e^{-10}$. A union bound over the four blocks shows that some tuple of family indices separates the whole pair with probability at least $1-4e^{-10}$. This is coverage of a fixed pair; no simultaneous coverag […]
+LONGEST PROOF #2 (opening): \emph{Balance the solution and its deficiencies.} Fix an original solution \(S\) for analysis. Under the random sign flip \(F\), its signed counterpart \(S'=S\mathbin{\triangle}F\) is a uniform subset of the input indices, independent of the mixers. Put \(A_i=S'\cap M_i\). By Lemma~\ref{lem:entropy}, the balance event \[ |A_0|=|A_L|=|A_R|=s \] has probability at least \((m+1)^{-3}\). This event has the same probability for every choice of the three mixers before ordering them. Conditional on it, their distribution is unchanged, and their selected halves are independent uniform halves given the mixers. Each selected half and its complement in a pre-order mixer is therefore marginally a uniform size-\(s\) set of input indices. By Lemma~\ref{lem:deficiency}, with conditional probability \(1-O(1/n)\), all six halves have deficiency at most \(\tau=.0078n\): a deviation of \(.0001n\) above the […]
+LONGEST PROOF #3 (opening): First bound the stored and generated lists deterministically, assuming the seven size tests pass. To retain the effects of floors, put \[ \delta=.12n-s\in[0,4),\qquad \epsilon=.05n-r_R\in[0,1). \] Then $r_L=.11n+7\delta+\epsilon$ and $a\le.1125n-\delta$. Each stored product list on the right has at most \[ 2^{a+\lceil r_R/2\rceil}\le 2^{.1375n+1/2} \] occurrences. The left raw list has at most $2^{.11n+29}$ occurrences, and each $D_i$ has at most $2^{.1125n}$ entries. Hence every stored sublist in Table~\ref{tab:compression} has size at most $2^{.14n}$ for sufficiently large $n$. Let $N_{L1},N_{L2},N_{R1},N_{R2}$ denote the lengths of the four group streams, counting occurrences. Their direct product bounds are \[ \begin{aligned} N_{L1}&\le2^{2a}\le2^{.225n},& N_{L2}&\le2^{a+r_L}\le2^{.2225n+25},\\ N_{Ri}&\le2^{2a+r_{Ri}}\le2^{.25n+1/2} &&(i=1,2). \end{aligned} \] More importantly, the p […]

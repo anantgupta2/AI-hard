@@ -1,0 +1,110 @@
+FAMILY 113: Approximate counting and entropy of perfect matchings
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Gives a fully polynomial randomized approximation scheme for counting perfect matchings in arbitrary finite simple graphs, with exact detection of zero counts. Also proves the perfect-matching entropy conjecture of Anari, Oveis Gharan, and Vinzant, bounding the maximum entropy of a matching law at every feasible edge-marginal vector in a loopless labelled multigraph, including boundary points.
+HEADLINE (v2, semi-formal): ∃ randomized algorithm, ∀ finite simple graph G, ∀ rational ε ∈ (0,1), δ ∈ (0,1/2): Pr[(1−ε)Z(G) ≤ Ẑ ≤ (1+ε)Z(G)] ≥ 1−δ, Ẑ = 0 surely if Z(G) = 0, worst-case time poly(|G|, 1/ε, log 1/δ)
+
+=== MANUSCRIPT: A Fully Polynomial Randomized Approximation Scheme for Perfect Matchings in General Graphs [preprints/A-Fully-Polynomial-Randomized-Approximation-Scheme-for-Perfect-Matchings-in-General-Graphs-September-23-2026/build/main.tex]
+ABSTRACT: We give a fully polynomial randomized approximation scheme (FPRAS) for counting perfect matchings in arbitrary finite simple undirected graphs, resolving the general-graph perfect-matching approximation problem. The algorithm returns zero with certainty when no perfect matching exists. Otherwise, it achieves relative error ε with failure probability at most δ in worst-case bit time polynomial in the input length, $`\varepsilon ^{-1}`$, and $`\log\delta^{-1}`$.
+[theorem] \label{thm:main} There is a uniform classical randomized algorithm which, given $G$ and rational parameters $0<\eps<1$ and $0<\delta<1/2$, returns a nonnegative rational number $\widehat Z$ such that \[ \Prb\bigl[(1-\eps)Z(G)\le \widehat Z\le(1+\eps)Z(G)\bigr] \ge 1-\delta. \] If $Z(G)=0$, the output is zero with certainty. The worst-case bit running time is polynomial in the input encoding length, $\eps^{-1}$, and $\log\delta^{-1}$.
+[theorem] [Logical hole bound] \label{thm:logical-hole-bound} Let $\lambda$ be balanced, let $B$ be its bottleneck similarity, and set \[ D_0=10^8(n+1)^4. \] For every even set $U\subseteq V$, \begin{equation} \label{eq:logical-hole-bound} g_\lambda(U)\Phi_B(U)\le 2D_0^{|U|/2}. \end{equation}
+[proposition] [Marked matching laws]\label{prop:marked-laws} For arbitrary positive logical activities, sample from the bag matching law and reveal the edge portions as above. The all-real event has probability $1/I$; conditional on this event, the decoded logical matching has law $\pi_\lambda$. For each logical edge $uv$, \begin{equation}\label{eq:probe} \Prb(\text{probe for }uv\text{ is used and all other edges are real}) =\frac{g_\lambda(uv)}{DI}. \end{equation} Conditional on this event, the residual logical matching has the $\lambda$-weighted perfect-matching law on the vertices other than $u,v$.
+PROOF STRATEGY (paper's own words):
+- Let $G=(V,E)$ be a finite simple undirected graph. A perfect matching is a set of edges incident to each vertex exactly once. Write \[ Z(G)=\#\{M\subseteq E:M\text{ is a perfect matching of }G\}. \] A fully polynomial randomized approximation scheme approximates $Z(G)$ within a prescribed relative error, with a prescribed success probability, in time polynomial in the input length and the reciprocal error. The confidence parameter enters through its logarithm. We prove the following theorem, including a bound on the time of every execution.
+- For approximation, three problems must be distinguished: counting all matchings, counting bipartite perfect matchings, and counting perfect matchings in general graphs. Jerrum and Sinclair gave an FPRAS for the total number of matchings in an arbitrary graph, summed over all cardinalities~\cite[Corollary~4.5]{JerrumSinclair1989}. Their perfect-matching algorithm applied when the ratio of near-perfect matchings, which leave exactly two vertices unmatched, to perfect matchings was bounded by a fixed polynomial~\cite[Theorem~5.3]{JerrumSinclair1989}. Without such a bound, perfect matchings can carry too little stationary mass for this sampling approach. Approximating the total number of matchings therefore does not isolate its perfect-matching contribution with relative accuracy.
+- The proof below also builds on the methodological framework of weighted matching chains. Alternating overlays and weight-preserving switches underlie the encodings of Jerrum and Sinclair and of Jerrum, Sinclair, and Vigoda~\cite{JerrumSinclair1989,JerrumSinclairVigoda2004}. Their sampling-to-counting strategy learns local partition ratios while gradually changing activities. Here these ratios are exposed by marked edges in an enlarged graph, and vertex scaling maintains a row-wise balance condition. The capacity bound, subdivision and marked-edge identities needed for this construction are proved explicitly.
+SECTION OUTLINE:
+Introduction
+  History and significance
+  Proof architecture
+Preliminaries
+  Weighted matchings and holes
+  Bottleneck similarities
+  Tree bags
+  Dirichlet energy and approximation
+Controlling the cost of unmatched vertices
+A subdivision with controlled holes
+  The path profile
+  The enlarged matching law
+  Exact accounting for deleted vertices
+  Charging the pairing capacity
+A quadrangulation adapted to the labels
+A two-coordinate energy inequality
+  The pair kernel
+  An exact identity on a cycle
+  Encoding the demands
+  Controlling context errors by cycle swaps
+  Completion of the energy proof
+A sampler from replicated adjacent tiers
+  An exact refresh at unit activities
+  The product chain
+  A quantitative sampling guarantee
+From samples to the number of perfect matchings
+  The schedule and vertex scales
+  Observables from one marked sample
+  Estimating and restoring balance
+  Success probability and output
+A bounded-bit implementation
+  Sizes of the parameters and state spaces
+  Rational bit lengths
+  Random choices with a fixed number of bits
+  Total bit cost
+Prescribed-degree subgraphs and fixed-cardinality matchings
+  Constant-fibre reductions
+  A deletion sampler for perfect matchings
+LONGEST PROOF #1 (opening): We give a recursive splitting rule. A subproblem is an admissible odd arc $J=(v_0,\ldots,v_s)$; its \emph{exterior} is its complementary arc in the full cycle. Choose a label $P\in S_{v_0}\cap S_{v_s}$, and write $a_i$ for the label of $v_iv_{i+1}$, $0\le i<s$. Adjacent terms of this sequence are equal or adjacent in the tree. If $s=1$, no cell is needed. For $s\ge3$, we find indices \begin{equation} \label{eq:cell-split-indices} 0<p_1<p_2<s,\qquad p_1\text{ odd},\quad p_2\text{ even}, \end{equation} such that the three subarcs with successive endpoint pairs \[ (v_0,v_{p_1}),\qquad (v_{p_1},v_{p_2}),\qquad (v_{p_2},v_s) \] are admissible. They and the exterior arc form the four sides of the new cell. We call these the first, middle, third, and exterior sides, respectively. We repeatedly use the following elementary fact about a tree. If a contiguous part of the label walk avoids $P$ and  […]
+LONGEST PROOF #2 (opening): We first describe a repair operation. Start with the union of the four through patterns $T_J$ in a cell. Each corner is covered twice, once by each incident side. Select a good opposite pair of sides. For each selected short side delete its sole edge. For each selected long side delete its first and last edges, and insert its chosen leaf repair. Each corner loses exactly one incident edge. On a long selected side the only newly uncovered internal vertices are its two leaves, which the repair matches. Thus the resulting edges form a perfect matching of all cycle vertices. This verifies legality also for a side of length three: its two leaves are distinct and its repair is an ordinary colored edge between them. \paragraph{Switch demands.} Use $A_P$ as the first output. In the second output retain the edges of $I_2$ outside $C$, start with all four through patterns, and apply the preceding  […]
+LONGEST PROOF #3 (opening): Throughout this proof, omit the subscript $\mu$ from $g$ and $r$. Write $B=B_{ij}$. For $B\le8$, the assertion follows from \eqref{eq:small-hole-bounds}. Suppose therefore that $B>8$, and choose a simple path from $i$ to $j$ whose $\lambda$-activities, and hence its $\mu$-activities, are all at least $B$. We first give one step of the relocation. Let $a$ be the hole currently on this path, let $S$ be the current hole set, and let $z$ be the next vertex. Thus $a\in S$ and $\mu_{az}\ge B$. If $z\in S$, inserting $az$ in a matching missing $S$ is injective and increases its weight by $\mu_{az}$. Hence \begin{equation} \label{eq:adjacent-hole-fill} \frac{g(S)}{r_a}\le \frac{g(S\setminus\{a,z\})}{B r_a}\le\frac{32}{B}. \end{equation} The last inequality uses $|S|\le4$, \eqref{eq:small-hole-bounds}, and $r_a\ge1/8$. Now suppose $z\notin S$. Choose $p\ne z$ with $g(zp)=r_z$. Inserting $az$ give […]
+
+=== MANUSCRIPT: Entropy and Face Dimension of the Perfect-Matching Polytope [preprints/Entropy-and-Face-Dimension-of-the-Perfect-Matching-Polytope-September-23-2026/build/main.tex]
+ABSTRACT: We prove the perfect-matching entropy conjecture of Anari, Oveis Gharan, and Vinzant. For every feasible vector x of perfect-matching edge marginals in a loopless labelled multigraph on $`2m\ge2`$ vertices, the maximum entropy $`H(x)`$ of a matching law with marginals x satisfies
+[theorem] [Pointwise entropy bounds]\label{ent:main} Let $G$ be a loopless multigraph on $2m\ge2$ vertices with at least one perfect matching. For every $x\in P(G)$, \begin{equation}\label{intro:main-bound} F(x)-\left(2-\frac2m\right)B(x) \le H(x)\le F(x). \end{equation}
+[theorem] [Deterministic approximate counting] \label{thm:main}\label{thm:algorithm-guarantee} There is one uniform deterministic algorithm which, on a graph on $n$ vertices with nonnegative binary integer pair multiplicities, returns an integer $A\ge0$ satisfying \[ N(G)/512^n\le A\le N(G). \] Its running time and output length are polynomial in the input bit length. In particular, $A=0$ exactly when $N(G)=0$. The guarantee includes a compact input consisting of binary $n$ and a list of positive pair records.
+[theorem] [Perfect matching polytope] \label{geom:thm-polytope} For every graph \(G\) as above, \begin{equation} \label{geom:eq-polytope} P(G)=\left\{x\in\mathbb R^E: \begin{aligned} x_e&\ge0 &&(e\in E),\\ x(\delta(v))&=1 &&(v\in V),\\ x(\delta(S))&\ge1 &&(S\subseteq V,\ |S|\text{ odd}) \end{aligned}\right\}. \end{equation}
+PROOF STRATEGY (paper's own words):
+- \maketitle \begin{abstract} We prove the perfect-matching entropy conjecture of Anari, Oveis Gharan, and Vinzant. For every feasible vector $x$ of perfect-matching edge marginals in a loopless labelled multigraph on $2m\ge2$ vertices, the maximum entropy $H(x)$ of a matching law with marginals $x$ satisfies \[ F(x)-(2-2/m)B(x)\le H(x)\le F(x), \] where $F(x)=-\sum_e x_e\log x_e$ and $B(x)=-\sum_e(1-x_e)\log(1-x_e)$. This bound holds throughout the polytope, including its boundary. We also prove the sharp bound $|\supp x|-\dim F_x\le3m-2$, where $F_x$ is the minimal face of the perfect-matching polytope containing $x$. \end{abstract} \section{Introduction}
+- The construction follows the entropy-optimization approach of Anari, Oveis Gharan and Vinzant~\citep[FOCS version, Section~I.D]{AnariOveisGharanVinzant2018}, with a rational optimizer and all bit bounds given explicitly here. Section~\ref{cons:weighted-section} establishes the binary-log weighted interface. Sections~\ref{d:sec-objective} and~\ref{d:sec-optimization} first complete the input to $K_n$, assigning tiny positive dyadic weights to absent pairs. This keeps the optimization polytope nonempty and separates zero from positive original counts. They then replace the weighted entropy objective by an integer-slope dyadic interpolant and an exact penalty on a box. On $K_n$, correcting degrees and then mixing with the uniform feasible point repairs constraint violations. The resulting fixed-grid iteration needs only an active violated row. Section~\ref{d:sec-odd-cuts} finds that row by a parity-preserving cut recursion, and Section~\ref{d:sec-algorithm} proves the count, zero-detection and bit-complexity guarantees. Minimum odd cuts as matching-constraint separators go back to Padberg and Rao~\citep{PadbergRao1982}. The exponential matching laws used in the entropy proof remain an […]
+- The geometric input to the entropy argument is a bound on the number of independent equations defining a face on its positive coordinates. We prove the odd-cut description by gluing matching laws across a tight cut. The same gluing operation then combines directions in the two contracted polytopes. Both directions preserve the total mass on the cut, which saves one compatibility equation and yields the sharp bound $3m-2$. The laminar proof of the same estimate is given in Appendix~\ref{a:section}.
+- Both contracted graphs have smaller even order. The degree equations at retained vertices are unchanged, and the degree sum at the new vertex is \(x(C)=1\). To check an odd-cut inequality in a contracted graph, complement its side if necessary so that it excludes the new vertex. The complement remains odd because that graph has even order. Its cut then has exactly the same edge labels and sum as the cut of the corresponding odd set of original vertices. Thus each \(x_i\) satisfies the smaller system in Equation~\eqref{geom:eq-polytope}. By induction, it is the mean of a law on perfect matchings of \(G_i\).
+SECTION OUTLINE:
+Introduction
+  Entropy and structural consequences
+  Face dimension and the entropy argument
+  Deterministic counting with binary multiplicities
+Faces and tight cuts of the perfect matching polytope
+  Contraction and the odd-cut description
+  Directions in the minimal face
+  Sharp codimension from compatible directions
+  Removing fixed coordinates
+Entropy and the covariance trace
+  Continuity and maximum entropy on a face
+  The trace obstruction
+  The upper bound and componentwise refinement
+Entropy and counting consequences
+  Entropy defects and separable counting estimates
+  Uniform marginals and structural lower counts
+Triangle expansions and sharp face codimension
+  Expansion and contraction
+  A triangular minimal face for every order
+  An eight-vertex obstruction to coefficient one
+Weighted partition functions
+A rational objective for counting matchings
+  Completing the graph with small weights
+  Interpolating entropy on a dyadic grid
+Optimization by an exact penalty
+Computing an active odd-cut constraint
+The algorithm and its guarantee
+Alternative geometric and entropy arguments
+  Uncrossing and a laminar rank bound
+  The quotient-space contraction argument
+  The exact fractional residual cases
+  The coefficient-three and coefficient-four covariance proofs
+  Two other entropy comparisons
+  Structural estimates from the other entropy bounds
+A normalized-covariance proof of the nonlinear entropy bound
+  The face at a hypothetical positive maximum
+  A finite exponential family on the normalized tangent space
+  The second variation and its trace
+A convention allowing singleton loops
+LONGEST PROOF #1 (opening): [Proof of Theorem~\ref{b:thm-nonlinear}] Define \[ f(t)=8(1-e^{-t}), \qquad \Psi(y)=F(y)-H(y)-mf\bigl(F(y)/m\bigr). \] Suppose that \(\Psi\) is positive somewhere. By Lemma~\ref{ent:continuity}, it has a positive maximum at some \(x\in P\). Let \(F_x\) be the minimal face containing \(x\), and put \[ A=\{e\in E:x_e>0\},\qquad s=|A|,\qquad d=\dim F_x,\qquad t=F(x)/m. \] Here \(s\) counts supported \emph{edges}. Each matching has exactly \(m\) edges, so \(\sum_ex_e=m\) and \(0\le x_e\le1\). Concavity of \(-u\ln u\) gives \[ 0\le t\le\ln(s/m). \] On \([0,\ln8]\), we have \(f(0)=0\) and \(f'(t)\ge1\), so \(f(t)\ge t\). Since \(H(x)\ge0\), positivity of \(\Psi(x)\) therefore forces \(t>\ln8\), and hence \(s>8m\). The supported-face estimate of Proposition~\ref{a:prop-supported-codimension} now yields \begin{equation} d\ge s-4m>\frac{s}{2}>0. \label{b:eq-large-dimension} \end{equation} Thus al […]
+LONGEST PROOF #2 (opening): The empty graph gives the stated trivial case. Assume \(n\ge2\). For the upper bound, regard a matching law with mean \(x\) as a law on \(\{0,1\}^E\), giving zero probability to nonmatching vectors. Compare it with independent Bernoulli coordinates of respective means \(x_e\). This product law is positive wherever the matching law is positive: a coordinate with mean zero or one is necessarily fixed at that value under both laws. Equation~\eqref{ent:comparison} now gives the upper bound. For the lower bound, fix either \(c=3\) or \(c=4\). Lemma~\ref{ent:continuity} and continuity of \(J_c\) imply that \( H-J_c\) attains its minimum on the compact set \(P\). At an integral mean the only possible law is the point mass at that matching vector, so \( H=J_c=0\). It suffices to rule out a fractional minimizer. Suppose, then, that \(x\) is such a minimizer. Take its positive maximizing law \(p\) […]
+LONGEST PROOF #3 (opening): Call a cut \emph{terminal-separating} if both sides meet \(U\). Compute a minimum cut for every pair of distinct terminals using Lemma~\ref{d:lem-unit-mincut}, and take the least-capacity result, with sides \(A\) and \(\overline A=W\setminus A\). This is a minimum terminal-separating cut: every such cut separates some terminal pair, and every recorded pair cut is terminal-separating. If \(|A\cap U|\) is odd, return \(A\). Every admissible odd-terminal cut is terminal-separating, so this answer is optimal. Otherwise both \(A\cap U\) and \(\overline A\cap U\) have positive even cardinality. Form two children: \begin{enumerate}[label=(\roman*),nosep] \item keep \(A\), contract \(\overline A\) to a new nonterminal, and use terminal set \(A\cap U\); \item keep \(\overline A\), contract \(A\) to a new nonterminal, and use terminal set \(\overline A\cap U\). \end{enumerate} For example, in the  […]

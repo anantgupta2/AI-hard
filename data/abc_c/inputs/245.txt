@@ -1,0 +1,60 @@
+FAMILY 245: Weak normalization implies strong normalization in pure type systems
+SUBJECT: Mathematical logic
+OPENAI SUMMARY: Proves that weak normalization implies strong normalization for every pure type system: if every legal expression in every valid context has a β-normal form, every β-reduction sequence terminates. This resolves the β-Barendregt–Geuvers–Klop conjecture, including nonfunctional rules and open contexts.
+HEADLINE (v2, semi-formal): ∀ pure type system P: (∀ legal expression in every valid context, weakly β-normalizing) → (all such strongly β-normalizing)
+
+=== MANUSCRIPT: Weak and strong normalization in pure type systems [preprints/Weak-and-strong-normalization-in-pure-type-systems-September-25-2026/build/paper.tex]
+ABSTRACT: We prove that every weakly β-normalizing pure type system is strongly β-normalizing. Both properties quantify over all legal expressions in all valid contexts, and reduction acts inside type annotations. No functionality hypothesis is required. This resolves the β-Barendregt–Geuvers–Klop conjecture.
+[theorem] [The $\beta$-Barendregt--Geuvers--Klop conjecture] \label{thm:main} Let $\mathcal P=(\mathcal S,\mathcal A,\mathcal R)$ be any pure type system. If every legal expression of $\mathcal P$, in every valid context, is weakly $\beta$-normalizing, then every such expression is strongly $\beta$-normalizing. No functionality assumption is imposed on $\mathcal A$ or $\mathcal R$.
+[proposition] [Advancing one component] \label{prop:advance-component} Under the hypotheses of Lemma~\ref{lem:sn-fundamental}, \eqref{eq:processed-invariant} also holds for every actual type with profile in $S$.
+[proposition] [Completion of the interface argument] \label{prop:interfaces-imply-sn} If the interface can be implemented at every strongly connected component, then every legal expression of the PTS is strongly normalizing.
+PROOF STRATEGY (paper's own words):
+- \maketitle \begin{abstract} We prove that every weakly $\beta$-normalizing pure type system is strongly $\beta$-normalizing. Both properties quantify over all legal expressions in all valid contexts, and reduction acts inside type annotations. No functionality hypothesis is required. This resolves the $\beta$-Barendregt--Geuvers--Klop conjecture. \end{abstract} \setcounter{tocdepth}{1} \tableofcontents \clearpage \section{Introduction}\label{sec:introduction}
+- One line of earlier work reduces strong normalization to weak normalization of translated terms. The translation must preserve typing, so the products available in the source specification are decisive. S{\o}rensen's continuation-passing construction proves the implication for generalized nondependent, clean, negatable systems \cite[Theorem~3.5.20]{Sorensen1997}; the uniform nondependent result of Barthe, Hatcliff and S{\o}rensen develops this approach \cite{BartheHatcliffSorensen2001}. Mull's thesis weakens the cleanliness and negatability restrictions within the nondependent tiered setting \cite[Theorem~2]{MullThesis2023}. Here the sorts form a finite axiom chain and each product inherits its codomain's sort. In particular, the theorem allows a weakly clean alternative at each non-top tier that does not require negatability, alongside an alternative retaining negatability and a further cleanliness condition. These results explain both the force of type-preserving translations and the importance of the product rules they require.
+- \paragraph{Proof strategy.} A finite derivation of a counterexample uses only a finite part of the specification, so the proof first reduces to finite sort and rule sets. Under weak normalization and confluence, every legal expression then has a unique normal form. The \emph{sort profile} of a normal type records all sorts at which it can be typed. Retaining this set accommodates nonfunctional specifications; tracking its growth under substitution replaces an appeal to uniqueness of types.
+- \paragraph{Organization.} Section~\ref{pts:metatheory} establishes the required PTS metatheory. Sections~\ref{sec:profiles} and~\ref{sec:simple-components} develop the candidate interface and its two simpler realizations. Section~\ref{obs:section} constructs the remaining interpretation, conditional on the graph exclusion. Sections~\ref{sec:enc-wrappers}, \ref{chan-section} and~\ref{rel-section} build the logical and relational realization. Section~\ref{rel-diagonal} gives the guarded diagonal argument. Section~\ref{sec:conclusion} proves the exclusion and completes the theorem.
+- For the simultaneous assertion, induct on the source derivation. Thin axioms to $\Delta$. At a variable use its assigned judgment, and at weakening discard the assignment for the last declaration. Under a binder $x:D$, choose $y$ fresh for $\Delta$ and the images of $\sigma$. Transport the domain sorting by induction, extend the target context to $\Delta,y:D\sigma$, and extend the substitution by $x\mapsto y$. The earlier assignments thin to this context; the new assignment is the variable rule. Apply induction to the binder premise and reapply product formation or abstraction with the original axiom or rule choices. Application uses substitution composition. Conversion uses the transported sorting of its target and preservation of raw conversion.
+SECTION OUTLINE:
+Introduction
+  Pure type systems and normalization
+Structural properties
+  Conversion and preservation of typing
+  Neutral expressions and normal forms
+  Finite specifications and a common context
+Sort profiles and normalization candidates
+  Profiles and the dependency graph
+  Application tests and candidates
+  The interface for one component
+Two component constructions
+  Components without an odd closed walk
+  Components with at most one internal product child
+Observation spaces and substitution-stable candidates
+  Which values require observations?
+  Actual frames and plain observation spaces
+  Free observation spaces
+  Finite typing trees and environments
+  Evaluation and reading candidates
+  Uniform finite bounds for typed evaluation
+  Good evaluations and substitution
+  Reduction and normal-tree independence
+  The candidate interface
+A typed calculus for the forbidden configuration
+  Modes and the ambient context
+  Reduction after forgetting the modes
+  Witnesses and terminal transformations
+  Proof transport and derived logic
+  Data wrappers and exact cancellation
+Typed data channels
+  The required paths and the first channel
+  Bits stored by pairs of odd wrappers
+  Marked queries and point values
+  A bundle carrying an exact parameter
+  The common type of probes
+  The second channel and permitted quantifiers
+Relational coding of the diagonal argument
+  Generic relations and probes
+  The laws needed for the diagonal argument
+  Three tagged copies and one admissible parameter
+LONGEST PROOF #1 (opening): We prove the statement together with totality by induction on syntax size, proving $\operatorname{Val}$ before $\operatorname{Read}$ at a given size. All calls to $\operatorname{Read}$ from a product $\operatorname{Val}$ concern proper children; the only same-size call is from the remaining $\operatorname{Read}$ clause to $\operatorname{Val}$. Thus this is a well-founded order. A bound for a node is the maximum of the finitely many bounds described below for its possible clauses. Conditional variation of the actual profiles does not introduce infinitely many cases: the estimates distinguish only inactive, plain, plus, and minus layers and the finitely many syntactic evaluation clauses. \paragraph{Lookup and defaults.} \label{obs:bound-leaves} A minus lookup already lies in $C_k$, and a plus lookup agrees under $\equiv_k$ whenever the environments agree to any level at least $k$. Plain lo […]
+LONGEST PROOF #2 (opening): Induct lexicographically on $(\ell(M),|M|)$, where $|M|$ is syntax size including annotations. The induction is simultaneous over all typings, contexts, and admissible environments. A proper subexpression has no larger reduction height and smaller size; a beta reduct has strictly smaller height. Typed substitution gives all required actual typings throughout. We shall repeatedly use a fresh-variable extension. If a binder has raw generic annotation $B$, then $B\xi$ is sorted over a finite prefix of $\Omega$. Saturation supplies a fresh variable $z$ declared at that raw type, beyond a common prefix for the finite expressions in question. Choose $z$ outside the free names of all other images. It belongs to $G_{(B\xi)^\#}$ by Lemma~\ref{lem:test-properties}, and hence satisfies whichever of the three admissibility conditions applies. Any allowed parameter extension can be used. Invariance r […]
+LONGEST PROOF #3 (opening): Process the finitely many plain secondary components in source order. Suppose first that a component $C$ has no internal negative edge. Every active domain used by a legal frame at a type of layer in $C$ then lies in an earlier component: otherwise the frame's triple, whose open codomain is active, would contribute an internal negative edge. Thus all frame alphabets can be specified without using a space whose layer belongs to $C$. For $\pi(T)\in C$, consider finite paths of legal frames beginning at $T$. A continuing path has all its target layers in $C$, and includes the empty path. An exiting path has all but its final target layer in $C$ and its final target in an earlier component. Define $\mathcal K_T$ to be the set of tables assigning a member of $\mathcal B$ to each continuing path and a member of the final target space to each exiting path. Split a table according to the empty p […]

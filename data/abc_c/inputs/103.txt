@@ -1,0 +1,61 @@
+FAMILY 103: Exact derandomization of logarithmic space: $`\mathsf L=\mathsf{RL}=\mathsf{BPL}`$
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Proves $`\mathsf L=\mathsf{RL}=\mathsf{BPL}`$, resolving derandomization for bounded-error logarithmic-space computation. An effective compiler converts each randomized polynomial-time logarithmic-space machine deciding a language with one-sided or two-sided error into a deterministic logarithmic-space decider with explicit polynomial running-time bounds.
+HEADLINE (v2, semi-formal): L = RL = BPL
+
+=== MANUSCRIPT: Exact derandomization of logarithmic space: L = RL = BPL [preprints/Exact-Derandomization-of-Logarithmic-Space-L-equals-RL-equals-BPL-September-23-2026/build/main.tex]
+ABSTRACT: We prove $`\mathsf L=\mathsf{RL}=\mathsf{BPL}`$, resolving the derandomization problem for polynomial-time randomized logarithmic space.
+[theorem] [Exact logarithmic-space derandomization]\label{thm:main} \[ \Lclass=\RL=\BPL. \]
+[theorem] [Acceptance-probability approximation]\label{thm:probability} Fix a randomized machine $\mathcal M$ with polynomial worst-case running time and $O(\log(n+2))$ work space. Let $p_{\mathcal M}(x)$ be its acceptance probability on an input $x$ of length $n$. There is a uniform deterministic algorithm which, on input $(x,1^q)$ with $q\ge1$, outputs an integer $0\le a\le2^{q+2}$ satisfying \[ \left|a2^{-(q+2)}-p_{\mathcal M}(x)\right|\le2^{-q}. \] It uses $O(\log(n+2)+q)$ work space and $(n+2)^{O(1)}2^{O(q)}$ time. The constants depend only on $\mathcal M$.
+[proposition] [One-stage density and active-count reduction] \label{prop:hier-copy-step} Choose the detector rank $J$ large enough that \begin{equation} J\geq\frac{2C_\pi(D_0-1)k_*(k_*+1)}{\delta_0}, \label{eq:hier-active-J} \end{equation} and then choose $R_*$ as in Equation~\eqref{eq:hier-column-constants}. The matrix $C^+$ is strictly forward and substochastic, and \[ C^+(x_i,y_j)\leq f/q, \qquad |\mathcal A(C^+)|\leq2|\mathcal A(C)|. \] If $P^r$ is the matrix from $V^+$ to $V$ defined by \begin{equation} P^r(x_i,x)=r_i(x),\qquad P^r(x_i,z)=0\quad(z\ne x), \label{eq:hier-projection} \end{equation} then \begin{equation} C^+P^r=P^rD. \label{eq:hier-one-step-intertwining} \end{equation}
+PROOF STRATEGY (paper's own words):
+- \maketitle \begin{abstract} We prove $\Lclass=\RL=\BPL$, resolving the derandomization problem for polynomial-time randomized logarithmic space. \end{abstract}
+- Recent results refine both general and structured models. Chen, Cohen, Doron, Khaskelberg and Ta-Shma improve error reduction for weighted generators; in the polynomial-width regime their construction has seed length $\log|\Sigma|+O(\log^2 T+\log(1/\delta))$, where $T$ is branching-program length, $\Sigma$ its alphabet and $\delta$ the error~\cite{ChenCohenDoronKhaskelbergTaShma2026}. Cheng and Wu obtain simultaneous polynomial-time and polylogarithmic-space simulations for regular branching programs, with extensions to polynomial-time randomized logarithmic-space machines whose two-way read-only random tape visits each cell at most constantly often, and to such machines with read-once randomness and an auxiliary stack whose push, pop and idle schedule is independent of the random bits. Consecutive stays on a random-tape cell count as one visit~\cite[Theorems~5--6]{ChengWu2026SC}. Hardness-versus-randomness approaches additionally give conditional, certified and per-instance alternatives; Pyne and Tell survey this line of work~\cite{PyneTell2026}.
+- \subsection{Proof strategy}
+- Sections~\ref{sec:arith} and~\ref{sec:ctrl} establish its total space bound. Numerical operations request one bounded digit at a time. The controller keeps one vertex cursor, uses bounded inverse ports for correction moves, and recovers incoming accesses by traversing finite program trees, using the contour idea of Cook and McKenzie~\cite{CookMcKenzie1987} and the space-preserving traversal perspective of Lange, McKenzie and Tapp~\cite{LMT2000}. A shared catalytic bit vector permits fingerprint comparisons without keeping a key index at every recursive level. The controller assigns each call a decreasing recursion allowance $w$, with top allowance $O(B)$, and uses the requested digit place $t$ as its numerical clock. If the child has allowance $w'$ and digit place $j$, all local data retained during that call occupy at most \[ A(w-w')+D(t-j) \] bits, including the controller copies used by a traversal. The child clock may increase only in proportion to the decrease of allowance. These differences telescope along the active call chain; the environment, cursor, catalyst and scratch are shared once. The bound and termination do not depend on statistical accuracy.
+- \begin{proof} Equation~\eqref{eq:hier-Q} gives $Q(0)=0$ and $0\leq Q(t)\leq t$ for $t\ge0$. Consequently $\widehat E_i\leq G_i$. If $\widehat E_{i-1}\mathbf 1\leq(i-1)\mathbf 1$, then \[ G_i\mathbf 1=C\mathbf 1+\widehat E_{i-1}C\mathbf 1 \leq\mathbf 1+\widehat E_{i-1}\mathbf 1 \leq i\mathbf 1. \] For an individual entry, \[ G_i(x,y)\leq f+f\sum_z\widehat E_{i-1}(x,z)\leq if. \] This proves the pilot bounds by induction.
+- A product of strictly forward matrices is strictly forward. A zero row of $C$ remains a zero row in all these formulas, by induction from the zero correction. A zero column of $C$ is a zero column of every product of the form $FC$ and hence of every input and correction. This proves the remaining assertions. \end{proof}
+SECTION OUTLINE:
+Introduction
+  Historical context
+  Proof strategy
+The transition model and resource parameters
+Rank channels for retained vertex sets
+The exact correction and copy hierarchy
+  Correction with a fixed column multiplier
+  A finite pilot chooses the column multiplier
+  The finite residual
+  Copies reduce density while controlling active vertices
+  Reward transport and the final deterministic target
+Stochastic atoms and their interfaces
+  Table domains and the normalization principle
+  Dense bins and preparatory normalization
+  Corrections with an incoming gate
+  Detector scores
+  Actual ports and estimated assembly
+  Integrated losses and assembly bounds
+Conditional averaging in the shared environment
+  Generating paths without retaining their endpoints
+Additive estimation and conditional prefix bounds
+  Tasks and dependency order
+  Raw sample terms
+  Mean comparisons and the cost of releasing a source
+  Choosing precision to pay for scale and domain changes
+  The additive schedule
+  Absolute difference bounds and averaging noise
+Compression of additive row estimates
+  The row interface
+  The update map
+  Deterministic comparison arguments
+  Charging overflow events
+  Bounding numerical ranges
+  The error reserve with exact endpoint grouping
+Adaptive fingerprints within budget blocks
+  Uniform salts and their access rule
+  The update rule and the clean calculation
+  Witness envelopes and escaped paths
+  Bucket algebra and the collision charge
+  Closing the coupled induction
+LONGEST PROOF #1 (opening): Table~\ref{tab:ctrl-records} summarizes the records to be charged. We verify the recipes and their dependencies in the order in which they are constructed. All constants depend only on the fixed construction constants and the base machine. \begin{table}[tbp] \centering \small \renewcommand{\arraystretch}{1.15} \begin{tabular}{@{}p{0.22\textwidth}p{0.40\textwidth}p{0.31\textwidth}@{}} \toprule Operation & Data retained across a lower call & Local space bound \\ \midrule Structural tests and list selection & Immediate descriptors, loop indices, counts and flags & $O(d)$ \\ Numerical recipes & Gate paths, pending bits and permitted early operand words & $c_{\rm str}d+c_{\rm num}(t-j)$ \\ Ordered terminal paths & One frame's choices, phase and bounded inverse tokens & $O(d)$ per immediate frame \\ Incoming score ranks & A partial score suffix; the full word only over structural calls & $O(1+ […]
+LONGEST PROOF #2 (opening): [Proof of Theorem~\ref{thm:ctrl-realization}] Let $S$ exceed the finite number of operation strata in Lemma~\ref{lem:ctrl-recipes}, including the subdivision of path validation and all final wrappers. Choose fixed integers $K_0>S+1$ and $K_1>2(K_0+S+1)$, increasing them as needed for the local constants. Assign to an operation at budget $M$, prefix slack $d$ and stratum $s_0\in\{0,\ldots,S\}$ the allowance \begin{equation}\label{eq:ctrl-allowance-formula} w=K_1(1+M)-(K_0+s_0)d. \end{equation} Final wrappers use $d=1$, with increasing $s_0$ down their dependencies. For a nontrivial prefix, $1\le d\le M$; trivial tasks use fixed top strata and terminate locally. A same-slack descent lowers $w$ by at least $d$. A preceding-prefix descent to $2d$, even with a reset to an earlier stratum, lowers it by at least $(K_0-S)d>d$. A statistical descent to $m\le M-d$ lowers it by at least $(K_1-K_0-S […]
+LONGEST PROOF #3 (opening): Fix $q$ and write $A=6$. Partition ordered pairs $(i,j)$ of nonnegative places into a zero band, where $\min(i,j)=0$, and positive bands \[ \mathcal P_D=\{(i,j):D\leq\min(i,j)<2D\}, \qquad D=1,2,4,\ldots. \] Set $h_0=h_\circ$ for the zero band and $h_D=h_\circ+\lfloor D/4\rfloor$ for positive bands. The fixed integer $h_\circ$ will be chosen below. Retain in band $D$ only pairs with $i+j\leq t+h_D$, and let \begin{equation} S_D=\sum_{\substack{(i,j)\in\mathcal P_D\\i+j\leq t+h_D}} x_i y_j2^{t+h_D-i-j}. \label{eq:arith-band-integer} \end{equation} For the zero band the same formula uses its defining pair set. These are mathematical integers; no bound on their full binary length is assumed in the residue computation. At any fixed diagonal $i+j=s$, a positive band contains at most $2D$ ordered pairs. Indeed the smaller place has $D$ possibilities, and an off-diagonal pair has two orientatio […]

@@ -1,0 +1,94 @@
+FAMILY 119: The Courtade–Kumar and Hellinger conjectures
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Proves the Courtade–Kumar conjecture: among Boolean functions of independent uniform bits, a single coordinate retains the most mutual information after independent bit-flip noise. A stronger theorem treats randomized binary summaries at fixed initial information. The Hellinger conjecture is also proved for every Boolean output bias and noise correlation.
+HEADLINE (v2, semi-formal): ∀ n, ∀ ρ ∈ [−1,1], ∀ Boolean f: {−1,1}^n → {−1,1}: I(f(X);Y) ≤ ψ(|ρ|) (= 1 − h_2((1−ρ)/2) bits), with equality for signed coordinate functions
+
+=== MANUSCRIPT: Sharp binary-information contraction on the discrete cube [preprints/Sharp-binary-information-contraction-on-the-discrete-cube-September-24-2026/build/main.tex]
+ABSTRACT: We prove sharp contraction of the information carried by a binary channel under independent symmetric noise on a uniform discrete cube. At fixed initial information, a noisy coordinate retains the most information. The Boolean specialization resolves the Courtade–Kumar conjecture and gives an output-entropy refinement. We also establish a stronger mean-dependent entropy-production bound. The proof combines an explicit three-point optimizer for the local joining problem, two entropy capacities, and a common-output thinning inequality, followed by dimension induction and integration along the noise semigroup.
+[theorem] [Sharp soft-channel contraction] \label{main:soft} For every finite $n\ge0$, every $u:\Omega_n\to[-1,1]$, and $-1\le\rho\le1$, \begin{equation} I(T_\rho u) \le\psi\!\left(|\rho|\,\psi^{-1}(I(u))\right). \label{main:interpolation} \end{equation} The inverse is the nonnegative increasing branch on $[0,L]$. For $n\ge1$, every soft coordinate $u(x)=a x_i$, $|a|\le1$, attains equality.
+[corollary] [The Boolean bound with output bias] \label{main:ck} For every finite $n\ge0$, $\rho\in[-1,1]$, and $f:\Omega_n\to\{-1,1\}$, put $m=\E f$ and $r_m=\psi^{-1}(H(m))$. Then \begin{equation} I(f(X);Y)\le\psi(|\rho|r_m)\le\psi(|\rho|). \label{main:bound} \end{equation} For $n\ge1$, signed coordinate functions attain the bound at $m=0$. If $0<|m|<1$ and $0<|\rho|\le1$, the refined upper curve is strictly below the universal curve $\psi(|\rho|)$.
+[theorem] [Sharp soft production] \label{upgrade:production} For every finite $n\ge0$ and every $g:\{-1,1\}^n\to(-1,1)$, with $m=\E g$, \begin{equation} D(g)\ge\widehat{\mathcal B}_m(I(g)) =\max\{\mathcal B_m(I(g)),F(I(g))\} \ge F(I(g)). \label{upgrade:production-bound} \end{equation}
+PROOF STRATEGY (paper's own words):
+- \maketitle \begin{abstract} We prove sharp contraction of the information carried by a binary channel under independent symmetric noise on a uniform discrete cube. At fixed initial information, a noisy coordinate retains the most information. The Boolean specialization resolves the Courtade--Kumar conjecture and gives an output-entropy refinement. We also establish a stronger mean-dependent entropy-production bound. The proof combines an explicit three-point optimizer for the local joining problem, two entropy capacities, and a common-output thinning inequality, followed by dimension induction and integration along the noise semigroup. \end{abstract}
+- A one-bit summary of independent fair bits can be chosen before those bits pass through independent binary symmetric channels. Which summary retains the most information about the noisy observation? Kumar and Courtade formulated the conjecture that a single input coordinate is optimal at every noise level and in every dimension \cite{KumarCourtade2013,CourtadeKumar2014}. We prove a sharp comparison for arbitrary randomized binary summaries, together with a mean-dependent bound on their instantaneous information loss.
+- Chen, Gohari, and Nair \cite{ChenGohariNair2025} developed the differential approach that we use: prove a local entropy-production inequality, lift it by induction on the cube dimension, and integrate along the noise semigroup. Their approach builds on the auxiliary receiver method of Gohari and Nair \cite{GohariNair2022}. The August 2026 revision of Chen--Gohari--Nair disproves one proposed auxiliary inequality \cite[Appendix~B]{ChenGohariNair2025}; the local comparisons below are proved directly. Their symmetric optimizer is a predecessor of our arbitrary-mean joining problem, as explained in Section~\ref{canonical:section}.
+- Recent preprints announce proofs of the Courtade--Kumar conjecture by several routes. Chen, Gohari, Javanmard, Lin, Mirrokni, Nair, and Woodruff~\cite{ChenEtAl2026CK} use a computer-assisted Bellman inequality; Ky and Tran~\cite{KyTran2026CK} develop entropy-production and spectral estimates with computer-assisted verification; Mahdavifar and Beirami~\cite{MahdavifarBeirami2026CK} use entropy flow, Fourier analysis, and bounds for pivotal sets; and Kramer and Saglam~\cite{KramerSaglam2026} prove a finite-noise bound that retains the Boolean output bias. The overlap with the first work extends beyond the Boolean conjecture: its Lemma~9.2 applies to arbitrary binary channels, and retaining the initial information when integrating its production bound gives Theorem~\ref{main:soft} and Corollary~\ref{main:ck}. Our proof solves the joining problem with a common entropy budget and uses two capacities and common-output thinning. It also proves the additional mean-dependent production estimate in Theorem~\ref{upgrade:production}; we compare the two production profiles in Section~\ref{flow:comparison}.
+SECTION OUTLINE:
+The contraction theorem and its mechanism
+  Prior work and related results
+  From information loss to a local joining inequality
+  Two profiles and the geometry of the joining cost
+The scalar rate and its curvature
+A joining cost with one entropy budget
+  Constructing and certifying the priced core
+  The two canonical geometries
+The deterministic capacity comparison
+A reserve that survives adding either common output
+  A logarithmic bound for the corner geometry
+  The common-output contraction
+  From one core to the local inequality
+Paying the information increment by thinning
+  The common-output path
+  The normalized derivative
+  An estimate for entropy intervals
+  The entropy interval of the channel
+  The canonical high-entropy value
+From the linear reserve to the sharp rate
+  The reserve above half information
+  A direct comparison with the one-corner wall
+  The local inequality and dimension induction
+Sharp entropy interpolation under noise
+  Comparison of mean-dependent production bounds
+LONGEST PROOF #1 (opening): We first bound the cutoff by a rational function: \begin{equation} \label{thinning:cutoff-bound} \beta\ge b_*:=\frac{4x}{3+x},\qquad 1-\beta\le\frac{3\sigma}{3+x}\le\frac32\gamma. \end{equation} For $0<x\le1$, let $R(x)=(3+x)\log(1+x)/x$. Direct differentiation gives \[ x^2R'(x)=N(x):=\frac{x(3+x)}{1+x}-3\log(1+x), \qquad N'(x)=-\frac{x(1-x)}{(1+x)^2}\le0. \] Since $N(0)=0$, $R$ decreases and $R(x)\ge R(1)=4L$. This proves the first inequality, including $x=0$ by continuity. The other two follow from $1-b_*=3\sigma/(3+x)$ and $x\le1$. Consider an admissible interval $[u,u+z]$ with $z<\gamma$. The constraints imply \[ a:=\frac{2-u}{1+z}\in[1,p]. \] Keep this $a$ and the cutoff $\beta$ fixed, and consider the affine family of intervals \begin{equation} \label{thinning:affine-intervals} u_a(s)=2-a(1+s),\qquad v_a(s)=u_a(s)+s, \qquad 0\le s\le z. \end{equation} Because $1\le a\le p$, these i […]
+LONGEST PROOF #2 (opening): An infinite joining cost makes the assertion immediate. Otherwise positive child entropies give $|a|,|b|<1$, and entropy concavity makes all the profile arguments physical. If the parent maximum is attained by $\mathcal B_m(I)$, apply the local reserve inequality of Theorem~\ref{reserve:joining} and enlarge the two child terms to their $\widehat{\mathcal B}$ values. This includes every tie at the parent. It remains to suppose $F(I)>\mathcal B_m(I)$. Put $d=|a-b|/2$ and \[ \bar h(m,d)=\frac{H(m+d)+H(m-d)}2, \qquad j=\bar h(m,d)-e=\frac{I_a+I_b}{2}. \] Since $\widehat{\mathcal B}\ge F$, convexity at the original child states gives \begin{equation} \frac{\widehat{\mathcal B}_a(I_a) +\widehat{\mathcal B}_b(I_b)}2 \ge\frac{F(I_a)+F(I_b)}2\ge F(j). \label{upgrade:original-child-pooling} \end{equation} For $d=0$, one has $I=j$ and nonnegativity of cost proves the claim. Otherwise reflect to $m> […]
+LONGEST PROOF #3 (opening): The nonnegative center of the core supplies the essential lower entropy bound. Write $h_{\mathrm{bin}}(t)=H(1-2t)$, let $\sigma_c=1-x_c\le1$, and put \[ t=\frac{1-d_c/\sigma_c}{2}\in(0,1/2). \] The two negative-output probabilities at the core are $\sigma_c t$ and $\sigma_c(1-t)$. Concavity and $h_{\mathrm{bin}}(0)=0$ imply \[ h_{\mathrm{bin}}(\sigma_c t)\ge\sigma_c h_{\mathrm{bin}}(t),\qquad h_{\mathrm{bin}}(\sigma_c(1-t)) \ge\sigma_c h_{\mathrm{bin}}(1-t)=\sigma_c h_{\mathrm{bin}}(t). \] Averaging and multiplying by $\lambda$, with $\sigma=\lambda\sigma_c$ and $d/\sigma=d_c/\sigma_c$, gives \begin{equation} \label{thinning:entropy-floor} e\ge\sigma H(d/\sigma). \end{equation} This is a consequence of the oriented common-output path; it is not an assertion about every pair law with the same means. The bound $H(r)\ge L(1-r^2)$ in Lemma~\ref{scalar:entropy-bounds} now yields \begin{equati […]
+
+=== MANUSCRIPT: Hellinger contraction with arbitrary Boolean output bias [preprints/Hellinger-contraction-with-arbitrary-Boolean-output-bias-September-24-2026/build/main.tex]
+ABSTRACT: We prove the Hellinger conjecture for Boolean functions on the uniform discrete cube, with arbitrary output bias. For a Boolean function of mean m and every $`\rho\in[-1,1]`$, the loss $`\sqrt{1-m^2}-\mathbb E\sqrt{1-(T_\rho f)^2}`$ is at most $`1-\sqrt{1-\rho^2}`$, with equality for signed coordinates. The proof combines asymmetric dimension induction, a calibrated noise-semigroup energy estimate, and finite exact arithmetic certificates. The Hellinger inequality also yields the Courtade–Kumar information bound.
+[theorem] [Hellinger conjecture]\label{thm:main} For every \(n\ge1\), every Boolean function \(f:\{-1,1\}^n\to\{-1,1\}\), and every \(\rho\in[-1,1]\), writing \(m=\E f\), one has \begin{equation}\label{eq:main} H(m)-\E H(T_\rho f)\le1-H(\rho). \end{equation} Both expectations are with respect to the uniform probability measure.
+[theorem] \label{thm:induction} Let $f:\{-1,1\}^n\to\{-1,1\}$, let $m=\E f$, and let $0<\rho<1$. If $s=\sqrt{1-\rho^2}\le .84$, then \[ \E H(T_\rho f)\ge H(m)-1+s. \]
+[proposition] \label{ind:prop:asymmetric} For the fixed $s$, parameters, and profile above, every increasing Boolean function satisfies \begin{equation}\label{ind:eq:all-dimensions} \E G\bigl((1+T_\rho f)/2\bigr)\ge sB(\E f). \end{equation}
+PROOF STRATEGY (paper's own words):
+- \maketitle \begin{abstract} We prove the Hellinger conjecture for Boolean functions on the uniform discrete cube, with arbitrary output bias. For a Boolean function of mean $m$ and every $\rho\in[-1,1]$, the loss $\sqrt{1-m^2}-\E\sqrt{1-(T_\rho f)^2}$ is at most $1-\sqrt{1-\rho^2}$, with equality for signed coordinates. The proof combines asymmetric dimension induction, a calibrated noise-semigroup energy estimate, and finite exact arithmetic certificates. The Hellinger inequality also yields the Courtade--Kumar information bound. \end{abstract}
+- Chen and Nair~\cite[Theorem~2, Equation~(6), and Remark~5]{ChenNair24} proved a mean-dependent lower bound using the Gaussian isoperimetric profile. Let $\phi_{\rm G}$ and $\Phi_{\rm G}$ be the standard Gaussian density and distribution function, and put $I_{\rm G}(p)=\phi_{\rm G}(\Phi_{\rm G}^{-1}(p))$ for $0<p<1$, with $I_{\rm G}(0)=I_{\rm G}(1)=0$. Writing $s=\sqrt{1-\rho^2}$, their estimate is \[ \E H(T_\rho f)\ge 2s\,I_{\rm G}\!\left(\frac{1+m}{2}\right). \] This bound holds for every Boolean mean. It implies the Hellinger inequality wherever its right side reaches $H(m)-1+s$, but at $m=0$ it gives only $\sqrt{2/\pi}\,s$, below the sharp value $s$ for $s>0$. Their proof in Section~III.B splits the cube into two sections and closes a recursion for a profile of their means. It connects this induction to Bobkov's local two-point inequality and its tensorization on the discrete cube~\cite[Proposition~1 and Lemma~1]{Bobkov97}. The induction below uses this local-to-product strategy with an asymmetric profile and a sheared two-point comparison; its scalar inequalities are proved here.
+- \paragraph{Proof strategy.} A differential approach to the Hellinger conjecture was developed by Chen, Gohari, and Nair in 2025~\cite[Section~III, Lemma~6 and Theorem~7]{HellingerDifferential}. They express the noise-semigroup derivative of $\E H(T_\rho f)$ as a sum of edge costs and bound that derivative through scalar profiles. We use the same derivative identity, in the normalization specified in Section~\ref{sec:continuation}. The calibrated edge comparison and the spectral estimates needed for our continuation argument are proved below.
+- The proof is computer-assisted only through fixed scalar inequalities, independent of \(n\). Every decimal appearing as an inequality constant denotes its exact rational value. We give the transformations, domains, arithmetic recursions, and positive bounds that certify these inequalities; the supplementary sources reproduce the finite calculations.
+- \paragraph{Organization.} Section~\ref{sec:preliminaries} fixes the cube conventions. Section~\ref{sec:induction} proves the dimension-induction range. Section~\ref{sec:continuation} reduces the rest to excluding an energy crossing. Sections~\ref{sec:central}, \ref{sec:intermediate}, and \ref{sec:large-bias} treat the three bias regimes and complete the proof. Appendix~\ref{app:arithmetic} records the exact-arithmetic conventions; Appendix~\ref{app:scalar} proves the scalar estimates needed for the induction.
+SECTION OUTLINE:
+Introduction
+Cube conventions and elementary reductions
+Dimension induction
+  Compression and a small coordinate
+  The scalar interface
+  Averaging and dimension induction
+A continuation criterion
+The central band
+  The calibrated edge cost
+  Reduction to variance and first-level estimates
+  A variance gain around the calibration
+  Concentration of the first Fourier level
+Intermediate biases
+  Parity and an energy reduction
+  Pointwise bounds and the bias margins
+  Proof of the pointwise comparison
+  The six exact polynomial certificates
+Large biases
+  The cube norm inequalities
+  Reduction to a series of powers
+  Uniform bounds on the four noise intervals
+  Exact rational evaluation
+Completion of the proof
+  The information-theoretic consequence
+Exact arithmetic conventions
+  Bernstein coefficients
+  Intervals and derivative enclosures
+  Supplementary sources
+The scalar certificates
+  Reduction of the pair inequality
+  Interval arithmetic for the three pair regions
+  The seventeen polynomial profiles
+  Profile data and exact sign verification
+  The three-coordinate base case
+LONGEST PROOF #1 (opening): [Proof of Proposition~\ref{prop:large-bias}] We first use the norm inequalities to bound a positive series of moments. We then bound its terms and tail uniformly on four intervals of $r$. Finally, exact rational estimates make the resulting bound smaller than $1-s$ on each interval. The case $s=1$ has $\rho=0$ and $d=m$, hence $h-b=0$. We may therefore assume $0.84\le s<1$, so $0<r\le0.2944$. Write \[ p=\Pr(f=-1)=\frac{1-m}{2}\in(0,0.13],\qquad U=T_\rho\mathbf1_{\{f=-1\}}=\frac{1-d}{2}. \] The preceding approximation argument applies to this indicator input. After taking its limit, $0\le U\le1$ and $H(d)=2\sqrt U\sqrt{1-U}$. For $0\le z\le1$, the binomial expansion has positive coefficients: \begin{equation}\label{lb:binomial} 1-\sqrt{1-z}=\sum_{k\ge1}c_kz^k,\qquad c_k=\frac{\binom{2k}{k}}{(2k-1)4^k},\qquad c_1=\frac12,\quad c_{k+1}=c_k\frac{k-1/2}{k+1}. \end{equation} The usual Taylor e […]
+LONGEST PROOF #2 (opening): [Proof of Lemma~\ref{mid:pointwise}] Introduce the midpoint and signed half-difference of the two angles: \[ \beta=\arcsin m,\qquad t=\frac{\arcsin d-\beta}{2},\qquad c=t+\beta. \] Then \(|c|+|t|=\max\{|\arcsin d|,|\beta|\}<\pi/2\). The case \(t=0\) gives \(d=m\) and \(V=\Psi=0\); hence assume \(t\ne0\). Elementary angle identities give \[ d-m=2\cos c\sin t,\qquad md+hH(d)=\cos(2t). \] Changing variables \(z=\sin\theta\) in the integral defining \(F\) gives, with the orientation of the integral retained if \(t<0\), \[ g-F(m)=\int_{c-t}^{c+t}\frac{d\theta}{\sqrt{\cos\theta}}. \] Normalize this integral by setting \[ T=\frac mh,\qquad q=\frac{\cos c}{h}=\cos t-T\sin t>0, \qquad G=\tan c. \] It follows that \begin{equation}\label{mid:angular-identities} V=\frac{2\sin^2t}{h},\qquad \frac{\Psi}{V}=4\sqrt q\,A-q^2-3, \qquad A=\frac{t}{\sin t}\frac12\int_{-1}^1 (\cos(tu)-G\sin(tu))^{-1/2}\,du.  […]
+LONGEST PROOF #3 (opening): [Proof of Proposition~\ref{prop:central}] Recall that $q$ is the total degree-one Fourier weight of $g$, $l$ is its largest coordinate weight, and $H_0=\Var g-q$ is its weight above degree one. The resources available to control $q-l$ follow without losing the $\Delta$ term. Namely, \eqref{cen:crossing}, \eqref{cen:spectral-energy}, and \eqref{cen:variance-gain} imply \begin{equation}\label{cen:resources} H_0+C_0V_0\le\Phi(M)-\frac{p_*\Delta}{1+p_*}\le\Phi(M), \qquad q\ge M-\Phi(M)-\Delta>.985M>0. \end{equation} Indeed, substituting the variance gain into the first energy bound gives \[ H_0+C_0V_0\le K-M+\frac{\Delta}{1+p_*}-\Phi(l) =\Phi(M)-\frac{p_*\Delta}{1+p_*}-\Phi(l). \] Since $\Phi(l)\ge0$, this proves the first resource bound. Combining it with the variance gain once more yields \[ q\ge M-\Phi(M)+2C_0V_0+\frac{p_*-1}{1+p_*}\Delta \ge M-\Phi(M)-\Delta. \] Thus the second inequalit […]

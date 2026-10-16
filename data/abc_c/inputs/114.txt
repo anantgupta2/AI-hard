@@ -1,0 +1,91 @@
+FAMILY 114: Approximate counting of common integer polymatroid bases
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Gives a fully polynomial randomized approximation scheme for counting common integer bases of two integral polymatroids of equal total rank, supplied by exact rank-value oracles. Capacities are binary-encoded, each integer vector counts once, and oracle calls and bit operations outside the oracles are polynomial on every execution. For matroids presented by independence oracles, the results also cover common independent sets of prescribed, unrestricted, or maximum cardinality, even when the ranks differ.
+HEADLINE (v2, semi-formal): ∃ randomized oracle algorithm, ∀ n, ∀ integral polymatroid rank oracles r_1, r_2 with r_1(E) = r_2(E) = R (binary), ∀ ε, δ: Pr[(1−ε)Z ≤ Ẑ ≤ (1+ε)Z] ≥ 1−δ using poly(n, ℓ, 1/ε, log 1/δ) oracle calls and bit operations on every execution
+
+=== MANUSCRIPT: An FPRAS for Common Integer Polymatroid Bases with Binary Capacities [preprints/An-FPRAS-for-Common-Integer-Polymatroid-Bases-with-Binary-Capacities-October-5-2026/build/main.tex]
+ABSTRACT: We give a fully polynomial randomized approximation scheme for counting common integer bases of two polymatroids with the same total rank, supplied by exact rank-value oracles. The total rank and capacities are encoded in binary, and each integer vector is counted once. On every execution, the number of oracle calls and the bit work outside the oracles are bounded by a fixed polynomial in the ground-set size, the binary input length, the inverse relative-error tolerance, and the logarithm of the inverse failure probability. The algorithm handles binary capacities directly, without expanding them into labelled copies.
+[theorem] \label{thm:main} There is a single uniform randomized algorithm which, for every input described above, outputs a nonnegative rational $\widehat Z$ satisfying \[ \PP\bigl((1-\eps)Z\le\widehat Z\le(1+\eps)Z\bigr) \ge1-\delta. \] If $Z=0$, the algorithm outputs zero on every execution. On every execution, both its number of oracle calls and its number of other bit operations are bounded by one fixed polynomial in \[ n,\qquad \ell,\qquad \eps^{-1},\qquad \log(\delta^{-1}). \] The bit-operation bound includes rational arithmetic, generation of independent unbiased random bits, and the encoding of the output.
+[proposition] [Oracle algorithms]\label{prop:oracle-tools} The following operations have deterministic oracle and bit complexity bounded by fixed polynomials in the indicated input sizes. \begin{enumerate} \item An integer-valued submodular function on a finite ground set can be minimized, with a minimizing set returned, from an exact value oracle and a bound on the binary lengths of its values. The size parameters are the ground-set cardinality and that value-length bound. \item Let $Q\subseteq\mathbb R^d$ be a bounded rational polytope, supplied by strong separation, a coordinate bound, and a bound on the binary encoding length of each individual defining inequality. The separator returns inequalities of length polynomial in the query length and the supplied description bounds. Exact rational linear o […]
+[proposition] [Root-direction log-concavity] \label{prop:shift-logconcavity} Let $f_1,f_2$ be integral normalized submodular functions on $E$, not necessarily nondecreasing, and define \[ Y(d)=\#\{(x_1,x_2)\in(B(f_1)\cap\Z^E)\times (B(f_2)\cap\Z^E):x_1-x_2=d\}. \] For $d_0\in\Z^E$ and distinct $j,k\in E$, put $y(t)=Y(d_0+t(e_j-e_k))$, $t\in\Z$. The positive support of $y$ is an integer interval, possibly empty or a singleton. For integers $a<t<b$ with $y(a),y(b)>0$, \begin{equation} y(t)\ge y(a)^{(b-t)/(b-a)}y(b)^{(t-a)/(b-a)}. \label{eq:shift-interpolation} \end{equation}
+PROOF STRATEGY (paper's own words):
+- Another line of work develops the concavity behind matroid counting. Adiprasito, Huh, and Katz proved the Hodge--Riemann relations for matroid Chow rings and deduced log concavity of characteristic-polynomial coefficients~\cite{AHK2018}. Anari, Liu, Oveis Gharan, and Vinzant used log-concave polynomials and high-dimensional walks to obtain an independence-oracle FPRAS for the bases of a single arbitrary matroid~\cite{ALOV2024}. Br{\"a}nd{\'e}n and Huh's theory of Lorentzian polynomials includes matroid basis polynomials and factorial-normalized generating polynomials of integer polymatroid bases~\cite{BH2020}. These statements concern an individual matroid or polymatroid; taking common bases need not preserve the exchange property of its support. Moreover, the factorial normalization weights integer bases nonuniformly. They therefore do not directly yield the uniform common-base count considered here. Our proof verifies the needed quadratic inequalities for its particular auxiliary weights.
+- \subsection{Proof strategy}
+- The geometric comparison will require log-concavity of lattice-pair counts along the directions $e_j-e_k$. The eventual counting algorithm will require two quadratic inequalities for positive weights on integer boxes. We develop a common argument for both purposes: rank penalties satisfy the inequalities, and summing paired coordinates preserves them. The quadratic viewpoint comes from the rank-deficiency construction in~\cite[Section~3, ``Quadratic signature inequalities'']{Parent}. That paper derives its forms from the Lorentzian property of homogenized matroid Tutte polynomials and closure under nonnegative linear substitutions~\cite[Theorems~4.10 and~2.10]{BH2020}. Here we prove the integer statements directly.
+SECTION OUTLINE:
+Introduction
+  The problem and the result
+  Context and prior work
+  Proof strategy
+Polyhedral tools and a feasible center
+  Exact oracle operations
+  Base-polytope calculus
+  Integrality and quantitative stability
+  Constructing a feasible center
+Integer signatures and difference counts
+  The two tests and balanced summation
+  Rank penalties, grouped coordinates, and reflection
+  Log-concavity of difference counts
+Partitions, shift averages, and controlled expansion
+  Partitions determined by small slack
+  Two averages over small shifts
+  Subdivision into slices with slack
+  From expanded cells to original cells
+Polynomial port ranges and positive weights
+  Part totals and an integral coordinate map
+  Convex penalties and comparison with the count
+  Smoothing and the paired count model
+  The quantitative signature estimate
+Evaluating the weights with bounded rational computation
+  Magnitude bounds before numerical approximation
+  A rational volume problem
+  Positive rational outputs and deterministic caps
+Counting the balanced port profiles
+  Two factorial weights and their signatures
+  The transport input and the chain it controls
+  Power annealing and exact initialization
+  Capped restarts and ratio estimates
+  Implementation with bounded fair-bit computation
+  Completion of the approximation
+LONGEST PROOF #1 (opening): The lower bound follows from inclusion. For the upper bound, define the full-star weighted pair sums \[ \mathcal W=\sum_l\omega(l)Y(d(l)),\qquad \mathcal W^+=\sum_l\omega(l)Y^+(d(l)). \] Fix common integer superblock totals \(w\), and perform the two independent subdivisions of Lemma~\ref{lem:refinement-witnesses}. We compare one pair of terminal slices \(Q_1,Q_2\) and its expanded pair \(Q_1+\Delta_1,Q_2+\Delta_2\). Their partitions \(\mathcal P_1,\mathcal P_2\) may differ. Let their witnesses be \(a_1^*,a_2^*\), and put \(a^*=(a_1^*,a_2^*)\). For each system use the affine coordinates obtained by retaining all but one physical coordinate in each terminal part. The omitted coordinate is the prescribed integer total minus the retained coordinates. The integral points in this affine space therefore form precisely a unit grid. Lebesgue measure below is the product measure in these free coo […]
+LONGEST PROOF #2 (opening): First evaluate a single smoothed block integral. Round $\mathcal Q$ by the rational affine construction above, apply the volume theorem with relative error $\rho/10$, and restore the exact determinant factor. Use the same parameter $\rho$ in~\eqref{eq:volume-lift-scales}. By Lemma~\ref{lem:volume-lift}, its successful output is a relative $\rho/2$ approximation to $\widetilde I_G$. For completeness, all resource bounds here are bounds on actual finite-bit executions. Let $B$ be a furnished polynomial upper bound on the expected combined number of bit operations and oracle calls of one volume run, including the cost of its separation queries. If the chosen version already has a deterministic bound, use that bound instead. Interrupt the run after $16B$ operations; Markov's inequality increases the failure probability by at most $1/16$. The resulting success probability is at least $11/16$. […]
+LONGEST PROOF #3 (opening): We first establish the structure of the tight constraint normals. For a fixed rank system at $y\in B(f)$, the tight sets are closed under union and intersection by the calculation in the preceding proof. Choose a maximal strictly increasing chain of tight sets from $\varnothing$ to $E$. No tight set can cut a difference between successive members of this chain: otherwise intersecting that set with the upper member and adjoining the lower member inserts another tight set. Every tight-set indicator is therefore a sum of these difference indicators. In particular, the chain indicators span all tight rank normals. A second version preserves nonnegative coefficients. Any nonnegative combination of tight-set indicators can be expressed as a nonnegative combination of indicators from a chain. To see this, keep the resulting vector and the total coefficient fixed, allowing a coefficient on the e […]
+
+=== MANUSCRIPT: Approximate counting of common bases of two matroids [preprints/Approximate-counting-of-common-bases-of-two-matroids-September-23-2026/build/main.tex]
+ABSTRACT: We give a fully polynomial randomized approximation scheme for counting the common bases of two arbitrary matroids of the same rank, supplied by independence oracles. The algorithm requires no explicit representation of either matroid and has polynomial bounds on both oracle calls and bit operations on every execution.
+[theorem] \label{thm:main} There is a single randomized oracle algorithm with the following guarantee. Given independence oracles for arbitrary rank-$r$ matroids $M_1,M_2$ on $[n]$, and rational $\epsilon,\delta\in(0,1)$, it outputs a nonnegative rational $\widehat Z$ such that \[ \Prob\bigl[(1-\epsilon)Z(M_1,M_2)\le\widehat Z \le(1+\epsilon)Z(M_1,M_2)\bigr]\ge1-\delta. \] If $Z(M_1,M_2)=0$, its output is always zero. On every execution, the number of oracle calls and the number of other bit operations are bounded by a fixed polynomial in \[ n,\qquad \ell,\qquad \epsilon^{-1},\qquad \log\delta^{-1}, \] where $\ell$ is the binary encoding length of $n,r,\epsilon,\delta$. The algorithm uses only independent unbiased random bits and does not require a representation of either matroid.
+[theorem] [Br\"and\'en--Huh]\label{thm:BH} For a matroid $N$ on a ground set $E$ and $0<q\le1$, the polynomial \[ T_{q,N}(z_0,z)=\sum_{A\subseteq E} q^{-\rank_N(A)}z_0^{|E|-|A|}\prod_{a\in A}z_a \] is Lorentzian. Lorentzian polynomials are closed under partial derivatives and nonnegative linear substitutions, and a quadratic Lorentzian polynomial has a Hessian with at most one positive eigenvalue. In particular, $T_{q,N}$ has the quadratic signature property.
+[proposition] [Observable Poincar\'e inequality]\label{prop:observable} For good multipliers and every $H:\Om\to\R$, \begin{equation}\label{eq:observable} \Var_\pi(\Qproj H)\le K_{\rm obs}\calE(H), \qquad K_{\rm obs}=2000n^6. \end{equation}
+PROOF STRATEGY (paper's own words):
+- Our input consists of two matroids $M_1,M_2$ of the same rank $r$ on the explicitly enumerated ground set $[n]=\{1,\ldots,n\}$, supplied by fixed exact independence oracles. Each query is an $n$-bit subset indicator. We count an oracle call separately from the bit operations needed to construct the query and process the answer. Writing $\mathcal B(M)$ for the set of bases of $M$, the quantity to be estimated is \[ Z(M_1,M_2)=|\mathcal B(M_1)\cap\mathcal B(M_2)|. \] The required approximation has relative error at most $\epsilon$ with failure probability at most $\delta$. A fully polynomial randomized approximation scheme, or FPRAS, achieves this guarantee with polynomial dependence on the input size, $\epsilon^{-1}$, and $\log\delta^{-1}$. We prove such a result in the oracle model, with a work bound on every execution rather than only in expectation.
+- For intersections, earlier approaches gave coarser approximations or required additional algebraic information. Barvinok and Samorodnitsky used random linear optimization to obtain coarse estimates of logarithms of set-system cardinalities; their optimization-oracle framework applies to common bases through matroid intersection \cite[arXiv version~2, Sections~2.1--2.2 and Theorem~3.1]{BS2007}. Anari and Oveis Gharan obtained exponential-factor approximations from real-stable polynomials supplied by evaluation oracles \cite{AO2017}; Straszak and Vishnoi developed capacity bounds with stability and representation-dependent qualifications \cite{SV2016}. Such polynomial evaluations are not furnished by an independence oracle. Anari, Oveis Gharan, and Vinzant then gave a deterministic polynomial-time $2^{O(r)}$-factor approximation for common bases of arbitrary rank-$r$ independence-oracle matroids \cite{AOV2021}. Their relative-approximation scheme has $2^{O(r)}$ dependence in its running time, so it becomes fully polynomial when $r=O(\log n)$ but does not give an unrestricted-rank FPRAS \cite[arXiv version~2, Theorem~1.3 and Corollary~1.4]{AOV2021}.
+- \paragraph{Proof strategy.} We encode a common basis as a basis of a rank-$n$ matroid on $2n$ elements that chooses one element from each of $n$ prescribed pairs. To maintain strictly positive weights, an $n$-set $S$ of rank deficiency $d=n-\rank(S)$ receives weight $q^d$, with $q$ decreasing from $1$ to an exponentially small rational. An $n$-set choosing one element from every pair is called a \emph{transversal}. The total weight of transversals is initially known and approaches the desired count as $q$ decreases.
+- These tools bound variation visible on individual transversals and on the means of defect types. They need not bound arbitrary variation within a defect type. This distinction dictates the simulation argument: we prove rapid mixing for the \emph{trace}, which records successive visits to transversals, and a separate variance bound for the type indicators and ratio observables actually averaged by the algorithm. Chen, Vigoda, and Yang used partition-restricted Poincar\'e inequalities to control hole-pattern frequency estimates in the permanent algorithm \cite{CVY2026}. Here the variance bound also retains individual transversal values, and we combine it with trace mixing. A \emph{warm start} is a starting law bounded pointwise by a controlled multiple of the stationary law. Fresh independent restarts along the annealing schedule supply these starts even though the multipliers are learned adaptively from earlier observations.
+SECTION OUTLINE:
+Introduction
+The paired-ground-set reduction
+Quadratic signature inequalities
+  Relations between defect totals
+A transport inequality
+A chain and its observable Poincar\'e bound
+  Variation on transversals
+  Means of defect classes
+Two consequences for simulation
+  Time averages from a warm start
+  The trace on transversals
+Annealing and learning the multipliers
+  Parameters and the schedule
+  One run
+  Warm restarts and estimation error
+  Induction on learned weights
+  Accuracy of the product
+Oracle implementation, bit bounds, and amplification
+  States and oracle weights
+  Sizes of the rational numbers
+  Exact rational choices with bounded trials
+  Amplification and completion of the proof
+Counting and sampling common independent sets
+LONGEST PROOF #1 (opening): Orient the edges arbitrarily. We seek a signed edge flow $J$ whose divergence (net outgoing current) at $S$ is $f(S)/s_p$ on $\mathcal X_p$, $-f(S)/s_d$ on $\mathcal X_d$, and zero elsewhere. Summation by parts and Cauchy--Schwarz would then give \begin{equation}\label{eq:flowcriterion} \begin{split} (\overline H_p-\overline H_d)^2 &=\left(\sum_{e=(S,S')}J(e)(H(S)-H(S'))\right)^2\\ &\le\left(\sum_e\frac{J(e)^2}{\kappa(e)}\right)D_{\mathcal X}(H), \end{split} \end{equation} where each undirected edge occurs once with its chosen orientation. It suffices to bound this flow energy by the coefficient in \eqref{eq:transport}. This passage from a signed flow to an energy bound is the standard electrical-network duality \cite[Section~1.3.5, 2006 web edition]{DoyleSnell2006}. We first assign balanced demands recursively and then route them within cliques at the leaves. Process the ordinary slots  […]
+LONGEST PROOF #2 (opening): [Proof of Corollary~\ref{cor:intersection}] \textbf{Counting by truncation.} Use the deterministic matroid-intersection algorithm \cite[Section~41.2, Theorem~41.4]{Schrijver2003}, already invoked in \Cref{sec:reduction}, to find the maximum common independent-set size $h$. Its input permits different ranks and requires only the promised matroid axioms, a common explicit ground set, and exact independence oracles. If $k<0$ or $k>h$, then $\mathcal C_k$ is empty, so return $0$ for its count. If $k=0$, return $1$. For $0<k\le h$, define the truncation $T_k(M_i)$ by declaring $J$ independent exactly when it is independent in $M_i$ and $|J|\le k$. Both truncations have rank exactly $k$: a common independent set of size $h$ contains an independent $k$-set in each matroid. Their common bases are therefore precisely $\mathcal C_k$. A truncation query uses at most one original independence query  […]
+LONGEST PROOF #3 (opening): We construct a binary tree that successively conditions the transversal law. We choose each branching pair to control the trans
+[…]

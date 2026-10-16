@@ -1,0 +1,47 @@
+FAMILY 124: Polynomial-time scheduling on three identical machines
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Resolves the three-processor unit-job scheduling problem of Garey and Johnson: a deterministic polynomial-time algorithm minimizes makespan for nonpreemptive unit-length jobs with arbitrary precedence constraints on three identical parallel machines. For an explicitly given precedence graph, it decides deadline feasibility exactly and constructs a feasible schedule.
+HEADLINE (v2, semi-formal): ∃ deterministic multitape TM, ∃ C, ∀ DAG of n unit jobs, ∀ deadline T: constructs a minimum-makespan schedule on 3 identical machines and decides deadline feasibility within C(L+2)^{150020} steps
+
+=== MANUSCRIPT: A Polynomial-Time Algorithm for Three-Machine Unit-Job Scheduling [preprints/A-polynomial-time-algorithm-for-three-machine-unit-job-scheduling-September-24-2026/build/paper.tex]
+ABSTRACT: We give a uniform deterministic polynomial-time algorithm for scheduling unit-length jobs with arbitrary precedence constraints on three identical parallel machines. The algorithm constructs a schedule of minimum makespan and decides exactly whether all jobs can finish by a specified deadline. The proof reorganizes feasible schedules into intervals whose job sets have descriptions of bounded size. A dynamic program searches a family containing polynomially many such descriptions. Global boundary conditions and simplification of inherited information keep the descriptions bounded throughout the decomposition.
+[theorem] \label{thm:main} Let an explicitly listed finite directed acyclic graph specify the precedence constraints on \(n\ge1\) nonpreemptive unit-length jobs on three identical machines. There is a uniform deterministic algorithm that constructs a feasible schedule of minimum makespan. Given also an integer deadline \(1\le T\le n\), it decides feasibility exactly and returns a schedule whenever the answer is affirmative. Both tasks can be performed in \(O((L+2)^{150020})\) steps on a deterministic multitape Turing machine, where \(L\) is the total binary input length.
+[proposition] \label{prop:algorithm} This is a uniform deterministic polynomial-time algorithm. Every set it accepts has a full schedule, which the algorithm can explicitly return. With \(K=10000\), its deadline decision and schedule construction take \(O((L+2)^{150020})\) deterministic multitape steps.
+[theorem] \label{thm:structure} Every feasible full three-machine schedule has a bounded-description hierarchy. In fact, the global node predicates and relative split predicates needed in the hierarchy have fewer than \(500\) leaves.
+PROOF STRATEGY (paper's own words):
+- Nederlof, Swennenhuis, and Węgrzycki developed this structural approach into an exact algorithm with running time \((1+n/m)^{O(\sqrt{nm})}\) for \(n\) jobs on \(m\) machines, hence \(2^{O(\sqrt n\log n)}\) for three machines \citep[Theorem~1.1]{NSW2025}. Their decomposition at selected slots and memoization of subproblems described by source and sink sets already control the number of subproblems despite potentially linear recursion depth \citep[Sections~5--6]{NSW2025}. Their proper-decomposition theorem assumes at most \(m\) sources \citep[Definition~1 and Theorem~3.1]{NSW2025}; their full algorithm handles arbitrary precedence graphs. The marked intervals below build on this decomposition viewpoint. We prove the required separator statements and bound the size of each global interval description directly; the polynomial bound does not follow by specializing their subexponential bound.
+- We prove that every feasible instance has a recursive decomposition in which each gap is described \emph{globally}, as a subset of all jobs, by a Boolean formula of bounded size. The permitted tests are precedence to or from a triple of jobs, membership in that triple, and rank thresholds in a fixed linear extension or its reverse. The bound is independent of the depth of the decomposition. There are therefore only polynomially many sets that the algorithm must consider. Compatible selected triples connect smaller accepted gap sets, and their concatenation gives the schedule.
+- \paragraph{Organization.} \Cref{sec:preliminaries,sec:algorithm} specify a finite description family and the uniform algorithm. \Cref{sec:separators} supplies common cutoffs, and \Cref{sec:construction} uses them to form smaller child intervals. \Cref{sec:lists} bounds inherited predicate information; \Cref{sec:boundary} proves the global boundary invariants. \Cref{sec:descriptions} describes whole intervals and marked splits by bounded formulas, completing the hierarchy proof. \Cref{sec:complexity} gives the explicit running-time bound.
+- \begin{lemma}\label{lem:hierarchy-dp} If a feasible \(J\) has a bounded-description hierarchy, the algorithm accepts \(J\). \end{lemma} \begin{proof} Induct on node size. Its marks give compatible states in chronological order by property (ii). Their end gaps and transition gaps are empty or are its children, belong to \(\F\), and are strictly smaller because there is an actual mark. They have already been accepted by induction. The states consequently give an initial-to-final path. The root belongs to \(\F\) because its predicate is true. \end{proof}
+- We prove the following structural assertion in \Cref{sec:separators,sec:construction,sec:lists,sec:boundary,sec:descriptions}. The considerably larger allowance \(K=10000\) avoids dependence on tight constant bookkeeping.
+SECTION OUTLINE:
+Introduction
+Full schedules, frames, and descriptions
+  Padding and interval reorderings
+  The two frames
+  A fixed finite family
+The algorithm and its structural certificate
+Separators with a shared cutoff
+  Lexicographic normalization
+The interval construction and its invariants
+  Global lists and boundary conditions
+  A center and two open sides
+Short global lists and changes of direction
+  Carry and pruning
+  The two updates
+  Why only five entries survive
+  Flattening the history of a run
+  Constructing the new switch upset
+  Predicate bounds and the induction order
+Preserving the global boundary invariants
+  Excluding distant qualifiers
+  Exchanges after future child reorderings
+Global interval predicates and completion
+  Global tests for local cutoffs
+  A child as a global set
+  Relative predicates for the marked splits
+Running time in the explicit input model
+Conclusion
+LONGEST PROOF #1 (opening): It suffices to prove the assertion before pruning, since pruning only removes qualifiers. Let \(z\) qualify for the pre-pruning child list and be scheduled at or before \(a'\). If \(a<\operatorname{time}(z)\le a'\), the job belongs to the normalized open side \(E\) of the parent. By \Cref{lem:update-labels}, it is high at the edge cutoff \(S\). The local separator at \(a'\) puts it in \(P_{a'}\) when strictly earlier, and membership in the triple puts it in \(\wP{a'}\) when its time equals \(a'\). Now suppose \(z\) is at or before \(a\). The new injection \(D_a\setminus P_b\) cannot contain such a job. Nor can either switch entry, by \Cref{lem:G} and the strictness of \(D_a\). Thus the only remaining case is a same-direction carry qualifier. The parent's Invariant~\ref{inv:past} supplies a job \(y\in a\) with \(z=y\) or \(z\prec y\). The carry is a global upset, so \(y\) also qualifies b […]
+LONGEST PROOF #2 (opening): \textbf{One advance at a fixed cutoff.} Keep the normalized schedule and its priority order fixed. Let \(L\) be a prefix of that priority order, and suppose the current position \(s\) satisfies the earlier-high condition for \(L\). If a later low job does not descend from \(s\), choose the earliest slot \(t>s\) containing such a job, and choose one of them, \(x\). Every domain predecessor of \(x\) lies strictly before \(s\). Indeed, that predecessor is low because \(L\) is an ideal. A predecessor at \(s\) would force \(x\in D_s\). A predecessor strictly between \(s\) and \(t\) would descend from \(s\), by the earliest choice of \(t\), and again force \(x\in D_s\). Let \(y\) be a high domain job at a slot \(r\) with \(s\le r<t\). If \(y\) had no domain successor at or before \(t\), exchanging \(x\) and \(y\) would be feasible: all predecessors of \(x\) are before \(s\), and delaying \(y\) […]
+LONGEST PROOF #3 (opening): [Running-time bound in \Cref{prop:algorithm}] First specify a conservative implementation using sequential scans. Write \(B=C_KN^{3K}\) for an upper bound on the number of enumerated formulas, where \(C_K\) depends only on the fixed \(K\). There are at most \(B\) distinct sets and at most \(S=BN^3\) candidate states for each \(W\). Store their bit vectors, reachability marks, and predecessor record numbers on work tapes. Each state record uses \(O_K(N)\) bits: its indices require only \(O_K(\log N)\) bits. Store an explicit full schedule with each previously accepted set. This table uses \(O_K(BN^2)\) bits, since a schedule lists at most \(N\) job identifiers and their slots. A complete scan to fetch or update a state record costs \(O_K(SN)=O_K(BN^4)\) steps. A lookup in the acceptance table by comparing all bit vectors costs \(O_K(BN^2)\) steps. Even checking all required precedence rel […]

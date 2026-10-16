@@ -1,0 +1,88 @@
+FAMILY 117: Uniform sparsest cut: hardness and semidefinite gaps
+SUBJECT: Theoretical computer science
+OPENAI SUMMARY: Proves that approximating Uniform Sparsest Cut within any fixed constant factor is NP-hard, even with nonnegative rational capacities and unit demands. The Goemans–Linial semidefinite relaxation also has integrality gaps of order at least $`\sqrt{\log n}/(\log\log n)^3`$, approaching the square-root-logarithmic upper bound.
+HEADLINE (v2, semi-formal): ∀ C > 1, ∃ poly-time reduction from 3CNF-SAT to (G, a) with nonnegative rational capacities and unit demands: satisfiable ⇒ Φ(G) ≤ a; unsatisfiable ⇒ Φ(G) > Ca
+
+=== MANUSCRIPT: Constant-factor hardness of uniform sparsest cut [preprints/Constant-factor-hardness-of-uniform-sparsest-cut-September-24-2026/build/source/main.tex]
+ABSTRACT: We prove that, for every fixed C &gt; 1, approximating Uniform Sparsest Cut within factor C is NP-hard. The output graphs have nonnegative rational capacities and unit demand between every pair of distinct vertices.
+[theorem] \label{thm:main} For every fixed real constant $C>1$, there is a polynomial-time reduction from $3$CNF satisfiability to finite undirected graphs with nonnegative rational capacities and exactly unit demands, together with a positive rational threshold $a$, such that \[ \begin{array}{ll} \text{the formula is satisfiable}&\Longrightarrow\ \Phi(G)\le a,\\[2pt] \text{the formula is unsatisfiable}&\Longrightarrow\ \Phi(G)>Ca. \end{array} \] The graph size and the bit lengths of all output numbers are polynomial in the formula size, with constants and exponents allowed to depend on $C$. In particular, approximating Uniform Sparsest Cut within any fixed factor $C>1$ is NP-hard.
+[theorem] \label{thm:bit-test-system} For every fixed $\lambda>0$ there are constants $\eta>0$, $B<\infty$, and a fixed finite list of bounded-arity test laws with the following properties. From a Boolean $3$CNF formula one can construct, in polynomial time, a finite uniform space $\cS$ of bit positions and these test laws on $\cS$. \begin{enumerate}[label=\textup{(\roman*)}] \item Every individual question marginal is at most $B$ times uniform measure on $\cS$. All samplers are polynomially enumerable finite weighted lists with rational probabilities; every positive seed probability is at least inverse-polynomial in the input size. \item If the formula is satisfiable, there is an assignment $y:\cS\to\F_2$ accepted by every test in every support. \item If the formula is unsatisfiable, every assignme […]
+[theorem] [Analytic score gap]\label{thm:score-gap} For each fixed $T_0\ge1$, the primitive system of Section~\ref{sec:events} admits a demand law $\mu$ of scores and a finite sum $\cD$ of raw comparison forms with the following properties. All arities, score bounds, numerical dimensions, and total comparison weight are bounded by constants independent of the input size. The laws and weights do not depend on a lookup. At a perfect witness $x$, \[ \int|B(x)-B'(x)|\dd\mathfrak m(B,B')\le4, \qquad \mu\{B:B(x)\ge1/4\},\ \mu\{B:B(x)\le-1/4\}\ge10^{-4}. \] In a NO instance, every binary measurable lookup with $\nu=\Var_\mu(h)>0$ satisfies $\cD(h)>T_0\nu$. Conditional on the discrete sampling data, the numerical laws and score entries belong to fixed finite families of polynomials with rational coefficient […]
+PROOF STRATEGY (paper's own words):
+- \maketitle \begin{abstract} We prove that, for every fixed $C>1$, approximating Uniform Sparsest Cut within factor $C$ is NP-hard. The output graphs have nonnegative rational capacities and unit demand between every pair of distinct vertices. \end{abstract} \tableofcontents \section{Introduction}\label{sec:introduction}
+- Uniform Sparsest Cut asks for a partition that separates little capacity relative to the number of vertex pairs it separates. This normalization makes the problem sensitive to bottlenecks at every scale, including cuts with a small side. Its connection with multicommodity flow gives both a way to certify that a graph has no sparse cut and a route to approximation algorithms. Leighton and Rao developed this flow--cut approach and its logarithmic approximation guarantees \cite{LeightonRao1999}. Arora, Rao, and Vazirani improved the approximation factor to $O(\sqrt{\log N})$ using semidefinite programming; their treatment of the unweighted uniform objective appears in \cite[Section~6, Theorem~16]{ARV2009}.
+- The reduction has four interfaces. A satisfying assignment supplies a low-cost cut; conversely, a cut with small cost relative to its separated demand will determine a satisfying assignment. The main difficulty in this converse is that the separated demand can be arbitrarily small. Errors must therefore be controlled relative to that demand, rather than by one fixed additive tolerance.
+- The first ingredient is a short list of vectors on which every quadratic evaluation that is nonzero somewhere on the list has large support. Its length must be linear in the ambient dimension. We construct the list by evaluating functions in an additive tower, and give the local calculations and finite algorithm needed for its uniformity.
+- Iterating Equation~\ref{eq:pencil-precision-recurrence} for at most $l-1$ steps shows that every retained series length is at most \[ (2N)^{O_r(l+1)}. \] Elementary truncated addition, multiplication, inversion and composition, and coefficientwise reversion, use a number of field operations polynomial in the retained lengths. All branch counts, field representation sizes and matrix dimensions are polynomial in $N$; allowing every level and every basis input multiplies these bounds by polynomial factors. For $N\geq2$, $\log((2N)^{O_r(l+1)})=O_r((\log N)^2)=O_r(N)$; the case $N=1$ is a fixed computation. Total bit complexity is consequently $2^{O_r(N)}$. Enumerating the rational evaluation tuples, evaluating the functions, and selecting the independent columns require only additional polynomial time in $N$ and the matrix sizes. Finally $N<rd$, so the entire construction takes $2^{O_r(d)}$ time. Together with the evaluation argument, this completes the proof of Lemma~\ref{lem:pencil}.
+- The internal-edge estimate below is the usual centered-indicator spectral calculation; see Alon and Chung \cite[Lemma~2.3]{AlonChung1988}. We prove the eigen
+SECTION OUTLINE:
+Introduction
+  Historical context and significance
+  Proof structure and main constructions
+  Conventions and parameter dependence
+An explicit pencil of directions
+  The two local extensions
+  All branches of the tower
+  Integral lattices and their determinants
+  A large space of global functions
+  Evaluation and the quadratic zero bound
+  A finite algorithm and its precision bounds
+A bit-test system with mixing parity queries
+  The matrix walk and the masked parity law
+  Boolean tables and polynomial slack
+  One oracle, a fixed list of tests, and completeness
+  Deterministic correction of almost quadratic lines
+  Support gaps and exact bank affinity
+Primitive events and a valuation obstruction
+  The primitive types
+  A quantitative tag--dictator dichotomy
+  The tag regime is impossible
+  Decoding the ordinary tests
+From rare conjunctions to a common valuation
+Scores, comparison measures, and an amplitude signal
+  Demand and random half-freezing
+  The order of the constants
+  Paths, replacements, and formal cells
+  Smoothing and the comparison measures
+  A sequential rational funding schedule
+  Orientation and clipping
+Conditional kernels and ordered paths
+  The deleted-slot background
+  Forcing a slot and rebuilding the fine state
+  Endpoint conversion and path inequalities
+  Selecting an exterior and threshold
+  The interface for finite compilation
+Finite graphs with exactly uniform demands
+  Canonical keys and rational integration
+  Replication and auxiliary vertices
+  Completeness
+LONGEST PROOF #1 (opening): We first bound the normalization of the successful event, then expose a common conditional density. We control entropy loss in two clipping steps, then deduce concentration near the endpoints of a fixed interval. Finally, one prefix and one threshold will satisfy every calibration and order requirement simultaneously. All logarithms are natural, and $0\log0$ is interpreted as zero. We give quantitative estimates which also establish the asserted uniformity. Throughout the proof, an expectation over a prefix is taken under the success-conditioned law defined below, unless another law is indicated. \paragraph{Entropy and a lower bound on the normalization.} Let $Y_i$ be the full marked primitive sample in coordinate $i$, and let $R(Y_i)$ denote its predicate. Set \[ Z=\Prob_{P_*^t}\left(W\left(\bigwedge_{i=1}^tR(Y_i)\right)=1\right), \qquad Q=P_*^t\left(\,\cdot\;\middle|\; W\left(\bigwedge […]
+LONGEST PROOF #2 (opening): Let $H$ consist of directions whose fraction of failing bases is at most $\delta$. Mark initially those points whose fraction of failing directions is greater than $\delta$, obtaining $D_0$ with $\mu(D_0)\leq\delta$. Markov's inequality also gives $\mathsf D(H)\geq1-\delta$. Both notions of line failure are unchanged by multiplying a direction by a nonzero scalar. Enlarge $D_0$ by adding an outside point $x$ whenever $\Prob_h[x+h\in D]\geq\gamma$. If $D_0$ has $k\geq1$ points, the first set of size $2k$, if reached, has internal directed edge mass at least $k\gamma/|G|$: every added source point contributed that amount at its addition and those edges remain internal. Dividing by its density gives at least $\gamma/2$, contrary to Equation~\ref{eq:internal-edge-bound} and $2\delta+\lambda_1<\gamma/2$. If $k=0$, no point can be added. Thus the final $D$ has density at most $2\delta$, and ev […]
+LONGEST PROOF #3 (opening): Enumerate the discrete seeds in the demand and comparison experiments. There are polynomially many seeds: the number of samples per experiment is fixed, and every bit-test sampling space has polynomial size. Their probabilities are rational with polynomial encoding length, and every positive discrete sampling probability is at least an inverse polynomial. Conditional on a seed, the remaining numerical variables range over rectangular boxes of fixed dimension. Atoms and signs are separate discrete choices. The smoothing densities and comparison weights are polynomial with rational coefficients on finitely many rectangular pieces; absolute derivative weights are split at their changes of sign. Each score-table entry is a polynomial with fixed rational coefficients in these variables. These assertions also hold for forced-slot comparisons, common-noise comparisons, path interpolation, cell  […]
+
+=== MANUSCRIPT: Near-square-root logarithmic integrality gaps for uniform sparsest cut [preprints/Near-square-root-logarithmic-integrality-gaps-for-uniform-sparsest-cut-September-24-2026/build/source/main.tex]
+ABSTRACT: We construct uniform sparsest-cut instances whose Goemans–Linial semidefinite integrality gap is at least $`c\sqrt{\log n}/(\log\log n)^3`$ along a sequence $`n\to\infty`$. The demand is one between every pair of distinct vertices, and the capacities are nonnegative real numbers. This matches the Arora–Rao–Vazirani upper bound up to a power of $`\log\log n`$.
+[theorem] \label{thm:main} There are an absolute constant $c>0$ and capacity instances $C^{(j)}$ on $n_j\to\infty$ vertices, with $\GL(C^{(j)})>0$, such that \[ \frac{\OPT(C^{(j)})}{\GL(C^{(j)})} \ge c\,\frac{\sqrt{\log n_j}}{(\log\log n_j)^3} \] for all sufficiently large $j$. The demand is one between every pair of distinct vertices.
+[proposition] \label{prop:metric} For every sufficiently large integer $m$, the vertex set $V$ in \eqref{ker:vertices} admits a negative-type semimetric $d$ with the following properties. Its chart maps $v_s(\theta)$, defined almost everywhere on $U=(-2,2)^m$, satisfy \begin{equation}\label{met:eq:macro} \left|d(v_s(\theta),v_t(\eta)) -c_*\sqrt m\,|\theta-\eta|\right|\le Cr \qquad(\theta,\eta\in U) \end{equation} whenever the labels are defined, where $r=m^{-8}$. For labels in the same chart, \begin{equation}\label{met:eq:adjacent} \|x-x'\|_1=\tau \quad\Longrightarrow\quad d((s,x),(s,x'))\le C\tau\frac mN(\log m)^2. \end{equation} Moreover, \begin{equation}\label{met:eq:size-diameter} |V|\le\exp(Cm\log m),\qquad \operatorname{diam}(V,d)\le Cm, \end{equation} and, for independent uniform $\theta,\eta\in  […]
+[proposition] [Contraction bound] \label{prop:contraction} Let $(V,d)$ and the chart maps $v_s:U\to V$ be those of \Cref{prop:metric}, where $U=(-2,2)^m$, $1\le s\le S=m^3$, and $N=m^6$. There is an absolute constant $C$ such that every map $F:V\to\ell_1^D$, for every finite $D$, satisfying \[ \|F(v)-F(w)\|_1\le d(v,w)\qquad(v,w\in V) \] obeys \begin{equation} \E_{\theta,\eta\in T} \|F(v_1(\theta))-F(v_1(\eta))\|_1 \le C\sqrt m\,(\log m)^{5/2}, \label{con:eq:contraction} \end{equation} where $T=(-1,1)^m$ and the two parameters are independent and uniform.
+PROOF STRATEGY (paper's own words):
+- \maketitle \begin{abstract} We construct uniform sparsest-cut instances whose Goemans--Linial semidefinite integrality gap is at least $c\sqrt{\log n}/(\log\log n)^3$ along a sequence $n\to\infty$. The demand is one between every pair of distinct vertices, and the capacities are nonnegative real numbers. This matches the Arora--Rao--Vazirani upper bound up to a power of $\log\log n$. \end{abstract}
+- \subsection{Proof strategy}
+SECTION OUTLINE:
+Introduction
+  History and the uniform-demand obstacle
+  Proof strategy
+Families of directions
+A Hilbert kernel with chart extensions
+  The common kernel
+  Extensions with small coordinate profiles
+  Rounded charts and their angles
+The finite negative-type semimetric
+Contractions into \texorpdfstring{$\ell_1$}{ell1}
+Exactly uniform demands
+  Replacing the parameter distribution by multiplicities
+  The number of vertices
+Gaussian directions: the probabilistic proof
+LONGEST PROOF #1 (opening): [Proof of \Cref{prop:contraction}] We use $r=m^{-8}$ and $\tau=m^{-2000}$ as in \Cref{prop:metric}. For each chart, define \[ f_s(\theta)=F(v_s(\theta))\quad\text{for almost every }\theta\in U, \] and extend $f_s$ by zero outside $U$. Set $f_s=0$ also on the threshold hyperplanes and on $\partial U$. These are bounded, compactly supported functions because $V$ is finite. The macroscopic estimate in \Cref{prop:metric} implies \begin{align} \|f_s(\theta)-f_1(\theta)\|_1&\le Cr, &&\text{for almost every }\theta\in U,\label{con:eq:chart-close}\\ \|f_s(\theta)-f_s(\eta)\|_1 &\le c_*\sqrt m\,|\theta-\eta|+Cr, &&\text{off the threshold hyperplanes in }U. \label{con:eq:macro-variation} \end{align} \paragraph{Smoothing.} Fix an even, nonnegative function $\rho\in C_c^\infty((-1,1))$ with $\int_\R\rho=1$. Set $\lambda=m^{-2}$ and \[ \kappa_\lambda(z)=\prod_{j=1}^m\lambda^{-1}\rho(z_j/\lambda), \qq […]
+LONGEST PROOF #2 (opening): [Proof of \Cref{lem:directions}] Choose all the $g_{s,i}$ independently with the standard Gaussian distribution on $\R^m$. We show that the required events hold simultaneously with probability tending to one as $m\to\infty$. We first record the elementary estimates used below. For a standard Gaussian $G$ in $\R^m$, \begin{equation}\label{dir:gaussian-identities} \E\cos\langle G,w\rangle=e^{-|w|^2/2}, \qquad \E\bigl[G\sin\langle G,w\rangle\bigr]=w e^{-|w|^2/2}. \end{equation} Indeed, rotation reduces the first identity to the one-dimensional cosine transform. Gaussian integration by parts gives the differential equation $\phi'(t)=-t\phi(t)$ for that transform, with $\phi(0)=1$. Differentiating the first identity with respect to $w$ gives the second; the finite first Gaussian moment justifies this differentiation. Also, exponential Markov inequalities applied to $\E e^{t|G|^2}=(1-2t)^{-m/2 […]
+LONGEST PROOF #3 (opening): We first identify the profile that the preliminary extension should reproduce. For $|\theta|,|\eta|\le3\sqrt m$, put $w=(\eta-\theta)/\sigma$. Differentiation in $\theta$ of the Gaussian term in \eqref{eq:kernel} gives the vector \[ \sqrt m\int_a^b w e^{-|w|^2/2}\,\frac{d\sigma}{\sigma}. \] The empirical approximation in \Cref{lem:directions} suggests replacing $w e^{-|w|^2/2}$ by $N^{-1}\sum_i g_{s,i}\sin\langle g_{s,i},w\rangle$. We realize this profile using the auxiliary Fourier components. Define $A_s^0(\theta)e_i$ to be supported in summand $(s,i)$ of $\Hh$, where it is the function \[ \frac{m}{N}\varepsilon^{-1/2} E'\!\left(\frac{\langle g_{s,i},\theta\rangle}{\sigma}\right). \] Its profile is \begin{equation} \label{ker:initial-profile} \langle A_s^0(\theta)e_i,p(\eta)\rangle =\frac{m}{N}\int_a^b\sin\langle g_{s,i},w\rangle\, \frac{d\sigma}{\sigma}. \end{equation} Since $u_{s,i}= […]
