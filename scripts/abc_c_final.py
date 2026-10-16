@@ -105,16 +105,12 @@ def final():
     pairs = [("outer", ["∀", "∃", "none", "ℙ"], "outer quantifier"),
              ("matrix", ["M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9", "M10", "M11", "M12"], "asserts"),
              ("problem", ["P1", "P2", "P3", "P4", "P5"], "posed"),
-             ("outcome", ["O1", "O2", "O3", "O4", "O5", "O6", "O7", "O8", "O9"], "outcome"),
-             ("lean", ["same", "weaker", "different", "no_lean"], "Lean")]
+             ("outcome", ["O1", "O2", "O3", "O4", "O5", "O6", "O7", "O8", "O9"], "outcome")]
     for axis, names in (("form", FORM), ("engine", ENGINE)):
         for ck, cols, label in pairs:
             v = cramers_v([r[axis] for r in rows], [r[ck] for r in rows])
             stats["assoc"][f"{axis}x{ck}"] = round(v, 3)
             print(f"### {axis} × {label} (row %, Cramér's V = {v:.2f})\n\n" + table(axis, names, ck, cols, axis) + "\n")
-        v = cramers_v([r[axis] for r in rows], [r["subject"] for r in rows])
-        stats["assoc"][f"{axis}xsubject"] = round(v, 3)
-        print(f"{axis} × subject: Cramér's V = {v:.2f}\n")
     v = cramers_v([r["form"] for r in rows], [r["engine"] for r in rows])
     stats["assoc"]["formxengine"] = round(v, 3)
     print(f"### form × engine (counts, Cramér's V = {v:.2f})\n\n" + table("form", FORM, "engine", list(ENGINE), "form", pct=False) + "\n")
