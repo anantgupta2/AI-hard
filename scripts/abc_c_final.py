@@ -55,6 +55,17 @@ def prep():
         print(f"{k}: agreement {100 * po:.0f}%, kappa {kk:.2f}")
     disputes = {f: {"fields": [k for k in ("form", "engine") if A[f][k] != B[f][k]], "a": A[f], "b": B[f]}
                 for f in common if A[f]["form"] != B[f]["form"] or A[f]["engine"] != B[f]["engine"]}
+    # Sweeps of agreed families for the conventions in adjudicator_brief.md, and 248 (the brief's worked example).
+    import re
+    SCALING = re.compile(r"tightness|subsequential|scaling limit|continuum limit|converge[sd]? (?:in law|weakly)", re.I)
+    for f in common:
+        if f in disputes:
+            continue
+        text = " ".join([A[f].get("backbone") or "", B[f].get("backbone") or ""])
+        if SCALING.search(text) and A[f]["form"] != "F5":
+            disputes[f] = {"fields": ["form (scaling-limit convention check)"], "a": A[f], "b": B[f]}
+        elif f == "248":
+            disputes[f] = {"fields": ["form (worked example in the brief: decide from the paper)"], "a": A[f], "b": B[f]}
     (D / "full/disputes.json").write_text(json.dumps(disputes, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     fids = sorted(disputes)
     k = max(1, round(len(fids) / 30))
