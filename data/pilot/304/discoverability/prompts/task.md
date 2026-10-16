@@ -1,0 +1,1 @@
+Task. Propose the single most useful new invariant, lemma or construction for proving the statement, stated precisely, with a proof sketch showing how it yields a contradiction with faithfulness. Be concrete; at most 700 words.
