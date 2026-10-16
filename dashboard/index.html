@@ -69,6 +69,11 @@
 .ax-heat tbody tr { cursor: default; }
 .ax-heat tbody th { position: static; font-weight: var(--cds-font-weight-regular, 400); color: var(--color-fg); border-bottom: 1px solid var(--color-border-line); padding: var(--cds-pad-xs) var(--cds-pad-sm); }
 #rel-assoc tbody tr, #rel-kappa tbody tr { cursor: default; }
+.ax-meter { display: flex; align-items: center; gap: var(--cds-gap-xs); min-width: 9rem; }
+.ax-meter .bar { flex: 1; height: .6rem; border-radius: 3px; background: var(--cds-chart-grid); overflow: hidden; }
+.ax-meter .bar > span { display: block; height: 100%; border-radius: 3px; }
+.ax-meter .v { font-variant-numeric: tabular-nums; white-space: nowrap; min-width: 3.2rem; text-align: right; }
+#disc-body tbody tr { cursor: default; }
 [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
 [data-dash-source-state=empty] { color: transparent; }
 #dash-root .ax { --ax-n3: var(--cds-chart-status-critical); --ax-n2: var(--cds-chart-reference); }
@@ -346,6 +351,11 @@
       <h2>F1 extension definitions and where they might reach</h2>
       <p class="ax-note">Every item graded as an F1 extension definition, a new defined object like Cook's pigeonhole variables. For each: the definition, its abstract mechanism, the precedent check, newer open problems it might help with, known theorems to use as speedup-test targets, and the exact Lean source.</p>
       <div class="ax-filters" id="f1-filter" role="group" aria-label="F1 item"></div>
+    </div>
+    <div class="ax-card" id="f1-disc">
+      <h2>Can a model find it without the paper?</h2>
+      <p class="ax-note">Discoverability tests: independent samples from a model trained before the paper existed, each given the problem plus one level of help, with no tools. Two blind judges decide whether each answer contains the paper's key mechanism.</p>
+      <div id="disc-body"></div>
     </div>
     <div id="f1-detail" class="ax-page"></div>
   </section>
@@ -1492,5 +1502,45 @@ dash.calc('prover_counts', {
   S.redraw = () => { prev && prev(); if (S.tab === 'release') charts(); };
   let raf; window.addEventListener('resize', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { if (S.tab === 'release') charts(); }); });
   dash.onData(renderAll);
+})();
+</script>
+
+<script>
+(() => {
+  const S = window.AX;
+  function meter(k, n, color) {
+    const d = S.el('div', 'ax-meter'), bar = S.el('div', 'bar'), fill = S.el('span');
+    fill.style.width = `${n ? (100 * k / n) : 0}%`; fill.style.background = color;
+    bar.append(fill); d.append(bar, S.el('span', 'v', `${k} / ${n}`));
+    d.setAttribute('aria-label', `${k} of ${n}`);
+    return d;
+  }
+  function render() {
+    const box = document.getElementById('disc-body');
+    const rows = S.rows('discoverability');
+    if (!rows.length) { box.replaceChildren(S.el('p', 'ax-empty', 'No discoverability test has been run yet.')); return; }
+    const out = [];
+    [...new Set(rows.map((r) => r.fid))].forEach((fid) => {
+      const rs = rows.filter((r) => r.fid === fid).sort((a, b) => a.order - b.order);
+      out.push(S.el('h3', null, `Family ${fid} · ${rs[0].protocol} · ${rs[0].date}`));
+      const t = S.el('table'), head = S.el('tr');
+      ['Help given', 'Samples', 'Found the key mechanism (both judges)', 'Used signatures or Witt groups'].forEach((x, i) => head.append(S.el('th', i === 1 ? 'num' : null, x)));
+      const th = S.el('thead'); th.append(head);
+      const tb = S.el('tbody');
+      rs.forEach((r) => {
+        const tr = S.el('tr');
+        const hit = S.el('td'); hit.append(meter(r.hit, r.n, dash.colors[0]));
+        if (r.hit_one_judge) hit.append(S.el('span', 'ax-note', ` +${r.hit_one_judge} if either judge`));
+        const sw = S.el('td'); sw.append(meter(r.uses_witt, r.n, dash.colors[1]));
+        tr.append(S.el('td', null, r.arm_text), S.el('td', 'num', String(r.n)), hit, sw);
+        tb.append(tr);
+      });
+      t.append(th, tb);
+      const wrap = S.el('div', 'ax-scroll'); wrap.append(t);
+      out.push(wrap, S.el('p', 'ax-def-p', rs[0].verdict), S.el('p', 'ax-note', `Caveats: ${rs[0].caveats} Full write-up: ${rs[0].report}.`));
+    });
+    box.replaceChildren(...out);
+  }
+  dash.onData(render);
 })();
 </script>

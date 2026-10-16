@@ -37,6 +37,17 @@ ms = [{"key": f"{m['fid']}|{i}", "fid": m["fid"], "title": m["title"], "pages": 
 fr = [{"key": r["arxiv"], "arxiv": r["arxiv"], "name": r["name"], "title": r["title"], "pages": r["pages"], "technical_pages": r["technical_pages"],
        "proof_pages": r["proof_pages"], "longest_proof_pages": r["longest_proof_pages"], "uses_proof_blocks": (r["proof_share"] or 0) > 0.25}
       for r in json.loads((ROOT / "data/frontier_lengths.json").read_text(encoding="utf-8")) if "error" not in r]
-for name, data in (("release_labels", rows), ("label_stats", st), ("lean_scope", sc), ("manuscript_lengths", ms), ("frontier_lengths", fr)):
+ARM_TEXT = {"bare": "Problem only: the reduction, Newman, Yang", "open": "Plus the paper's bibliography, as titles",
+            "template": "Plus the classical finite-group signature-divisibility fact", "pivot": "Plus the paper's own machinery, key step hidden"}
+disc = []
+for nv in sorted(ROOT.glob("data/pilot/*/novelty.json")):
+    d = json.loads(nv.read_text(encoding="utf-8")).get("discoverability_results")
+    if not d:
+        continue
+    for i, (arm, a) in enumerate(d["arms"].items()):
+        disc.append({"key": f"{nv.parent.name}|{arm}", "fid": nv.parent.name, "order": i, "arm": arm, "arm_text": ARM_TEXT.get(arm, arm),
+                     "n": a["n"], "hit": a["hit"], "hit_one_judge": a["hit_one_judge"], "uses_witt": a["uses_witt"],
+                     "protocol": d["protocol"], "date": d["date"], "verdict": d["verdict"], "caveats": d["caveats"], "report": d["report"]})
+for name, data in (("discoverability", disc), ("release_labels", rows), ("label_stats", st), ("lean_scope", sc), ("manuscript_lengths", ms), ("frontier_lengths", fr)):
     (OUT / f"{name}.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
     print(name, len(data), (OUT / f"{name}.json").stat().st_size // 1024, "KB")
