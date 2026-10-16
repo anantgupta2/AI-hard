@@ -39,3 +39,14 @@ describes, not every lemma).
 
 ## Output record
 `fid, form, form_secondary[], engine, engine_secondary[], computer_assisted, backbone (≤ 30 words: the top-level argument), quote (≤ 40 words verbatim from the input supporting the form), conf {form, engine}`
+
+## Status and conventions (2026-10-16)
+Full run done: 372 families × 2 independent passes (form κ 0.87, engine κ 0.81), 85 adjudicated (81 disputes plus
+4 scaling-limit convention checks). Final labels `labels_c.json`, report `report.md` (from `scripts/abc_c_final.py`).
+Conventions the adjudicators applied: scaling limits (tightness, then identify every subsequential limit) are F5;
+an explicit algorithm or gadget that is the theorem's content is F4; "assume X, derive impossibility" is F2, but a
+direct uniform bound that only contradicts a criterion at the end is F1 (family 248, decided from the paper).
+Known soft spot: the E4/E5 boundary in algebraic geometry was drawn differently by two adjudicators (birational
+geometry under E4 in one batch; varieties, curves and covers under E5 in another), so engine shares for algebraic
+geometry carry about ±5 points of noise. No family received E6 as primary: labellers always named the engine of the
+new part (rule 7).

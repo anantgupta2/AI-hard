@@ -1,3 +1,5 @@
+> Superseded by data/abc_c/report.md (two-axis proof type, two passes plus adjudication). This file uses the single bulk-pass C label (κ 0.44 against the in-depth labels).
+
 Proof type: C1 Construction 141 (38%) · C2 Induction / iteration 28 (8%) · C3 Indirect 46 (12%) · C4 Estimation chain 103 (28%) · C5 Reduction / transfer 54 (15%)
 
 ### Proof type × outer quantifier (row %, Cramér's V = 0.33)
