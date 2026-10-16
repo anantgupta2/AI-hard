@@ -15,3 +15,11 @@ For each fid in your batch:
 Write the file named in your task; validate it (every fid once, codes valid, JSON parses). Use only your own scratch
 folder (named in your task). Do not commit and do not write other repository files. Final message: lines written, how
 many disputes went to pass A's value, pass B's, or a third value, and any rule you found ambiguous.
+
+## Conventions for recurring cases (apply consistently)
+- Scaling-limit theorems (prove tightness, then identify every subsequential limit): F5 primary (a compactness
+  argument gives the limit), F1 secondary.
+- An explicit algorithm, reduction gadget or hardness construction that is the content of the theorem: F4 (rule 2
+  takes precedence over rule 6). A pure "A implies B" transfer between known statements stays F1.
+- "Assume a counterexample / a faithful action / amenability and derive an impossibility" stays F2 even when the
+  impossibility is a quantitative estimate.
