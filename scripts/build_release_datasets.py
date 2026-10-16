@@ -10,6 +10,8 @@ OUT = ROOT / "data/dashboard"
 labels = json.loads((ROOT / "data/abc_v2/labels_v2.json").read_text(encoding="utf-8"))
 stats = json.loads((ROOT / "data/abc_v2/stats.json").read_text(encoding="utf-8"))
 lengths = {f["fid"]: f for f in json.loads((ROOT / "data/proof_lengths.json").read_text(encoding="utf-8"))["families"]}
+cl = {r["fid"]: r for r in json.loads((ROOT / "data/abc_c/labels_c.json").read_text(encoding="utf-8"))}
+cstats = json.loads((ROOT / "data/abc_c/stats.json").read_text(encoding="utf-8"))
 scope = {r["fid"]: r for r in json.loads((ROOT / "data/lean_scope/scope_all.json").read_text(encoding="utf-8"))}
 
 rows = []
@@ -20,6 +22,9 @@ for r in labels:
         "prefix": r["A_prefix"], "outer": r["A_outer"], "alternations": r["alternations"], "matrix": r["A_matrix"],
         "A_flags": ", ".join(r["A_flags"]), "problem": r["B_problem"], "outcome": r["B_outcome"],
         "B_flags": ", ".join(r["B_flags"]), "lean": r["lean_vs_headline"], "lean_fixed_from": r.get("lean_vs_headline_fixed_from"),
+        "form": cl[r["fid"]]["form"], "form_secondary": ", ".join(cl[r["fid"]]["form_secondary"]),
+        "engine": cl[r["fid"]]["engine"], "engine_secondary": ", ".join(cl[r["fid"]]["engine_secondary"]),
+        "computer_assisted": cl[r["fid"]]["computer_assisted"], "backbone": cl[r["fid"]]["backbone"],
         "scope_category": s.get("category"), "label_source": r["source"],
         "pages": L["pages"], "technical_pages": L["technical_pages"], "proof_pages": L["proof_pages"], "n_proofs": L["n_proofs"], "longest_proof_pages": L["longest_proof_pages"], "manuscripts": L["n_ms"], "lean_lines": L["lean_lines"] or None,
     })
@@ -27,6 +32,10 @@ st = [{"key": f"kappa|{k}", "kind": "kappa", "a": k, "b": "", "value": v[1], "ag
       for k, v in stats["interrater"].items()]
 st += [{"key": f"assoc|{k}", "kind": "assoc", "a": k.split("x")[0], "b": k.split("x", 1)[1], "value": v[0], "agreement": None, "p": v[1]}
        for k, v in stats["assoc"].items()]
+st += [{"key": f"kappa|C_{k}", "kind": "kappa", "a": f"C_{k}", "b": "", "value": v[1], "agreement": v[0], "p": None}
+       for k, v in cstats["interrater"].items()]
+st += [{"key": f"assoc|C_{k}", "kind": "assoc", "a": "C_" + k.split("x")[0], "b": k.split("x", 1)[1], "value": v, "agreement": None, "p": None}
+       for k, v in cstats["assoc"].items() if k.startswith(("formx", "enginex")) and not k.endswith("engine")]
 a, b, n = stats["vs_deep_v1"]
 st += [{"key": "deep|A", "kind": "vs_deep", "a": "A", "b": f"{n} families", "value": None, "agreement": a, "p": None},
        {"key": "deep|B", "kind": "vs_deep", "a": "B", "b": f"{n} families", "value": None, "agreement": b, "p": None}]
